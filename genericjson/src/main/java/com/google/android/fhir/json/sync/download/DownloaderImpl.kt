@@ -16,15 +16,12 @@
 
 package com.google.android.fhir.json.sync.download
 
-import com.google.android.fhir.json.SyncDownloadContext
 import com.google.android.fhir.json.sync.DataSource
 import com.google.android.fhir.json.sync.DownloadState
 import com.google.android.fhir.json.sync.DownloadWorkManager
 import com.google.android.fhir.json.sync.Downloader
-import com.google.android.fhir.json.sync.ResourceSyncException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Implementation of the [Downloader]. It orchestrates the pre & post processing of resources via
@@ -36,27 +33,8 @@ internal class DownloaderImpl(
   private val dataSource: DataSource,
   private val downloadWorkManager: DownloadWorkManager
 ) : Downloader {
-  private val resourceTypeList = ResourceType.values().map { it.name }
 
-  override suspend fun download(context: SyncDownloadContext): Flow<DownloadState> = flow {
-    var resourceTypeToDownload: ResourceType = ResourceType.Bundle
-    emit(DownloadState.Started(resourceTypeToDownload))
-    var url = downloadWorkManager.getNextRequestUrl(context)
-    while (url != null) {
-      try {
-        resourceTypeToDownload =
-          ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
-
-        emit(
-          DownloadState.Success(
-            downloadWorkManager.processResponse(dataSource.download(url!!)).toList()
-          )
-        )
-      } catch (exception: Exception) {
-        emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
-      }
-
-      url = downloadWorkManager.getNextRequestUrl(context)
-    }
+  override suspend fun download(): Flow<DownloadState> = flow {
+    downloadWorkManager.getNextRequestUrl()
   }
 }

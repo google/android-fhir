@@ -14,27 +14,21 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.json.sync
+package com.google.android.fhir.json.sync.upload
 
-import com.google.android.fhir.json.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.json.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.json.sync.ResourceSyncException
+import com.google.android.fhir.json.sync.UploadResult
+import com.google.android.fhir.json.sync.Uploader
 import kotlinx.coroutines.flow.Flow
-import org.json.JSONObject
+import kotlinx.coroutines.flow.flow
 
-/** Module for uploading local changes to a [DataSource]. */
-internal interface Uploader {
+/** [Uploader] implementation to work with Fhir [Bundle]. */
+internal class NoOpUploader() : Uploader {
 
-  /**
-   * Uploads the local changes to the [DataSource]. Particular implementations should take care of
-   * transforming the [SquashedLocalChange]s to particular network operations.
-   */
-  suspend fun upload(
+  override suspend fun upload(
     localChanges: List<SquashedLocalChange>,
-  ): Flow<UploadResult>
-}
-
-internal sealed class UploadResult {
-  data class Success(val localChangeToken: LocalChangeToken, val resource: JSONObject) :
-    UploadResult()
-  data class Failure(val syncError: ResourceSyncException) : UploadResult()
+  ): Flow<UploadResult> = flow {
+    emit(UploadResult.Failure(ResourceSyncException(Exception("Not Implemented"))))
+  }
 }

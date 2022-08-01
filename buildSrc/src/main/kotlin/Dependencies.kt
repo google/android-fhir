@@ -64,6 +64,8 @@ object Dependencies {
     const val kotlinTestJunit = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.Kotlin.stdlib}"
     const val kotlinCoroutinesTest =
       "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.kotlinCoroutinesCore}"
+    const val serialization =
+      "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.Kotlin.kotlinSerialization}"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.Kotlin.stdlib}"
   }
 
@@ -169,6 +171,7 @@ object Dependencies {
     }
 
     object Kotlin {
+      const val kotlinSerialization = "1.3.3"
       const val kotlinCoroutinesCore = "1.6.2"
       const val stdlib = "1.6.10"
     }

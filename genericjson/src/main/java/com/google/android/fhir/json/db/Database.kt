@@ -18,13 +18,9 @@ package com.google.android.fhir.json.db
 
 import com.google.android.fhir.json.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.json.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.json.db.impl.entities.LocalChangeEntity
-import com.google.android.fhir.json.db.impl.entities.ResourceEntity
-import com.google.android.fhir.json.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.json.search.SearchQuery
+import com.google.android.fhir.json.db.impl.entities.JsonObjectEntity
 import java.time.Instant
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
+import org.json.JSONObject
 
 /** The interface for the FHIR resource database. */
 internal interface Database {
@@ -35,7 +31,7 @@ internal interface Database {
    * @param <R> The resource type
    * @return the logical IDs of the newly created resources.
    */
-  suspend fun <R : Resource> insert(vararg resource: R): List<String>
+  suspend fun insert(vararg resource: JSONObject): List<String>
 
   /**
    * Inserts a list of remote `resources` into the FHIR resource database. If any of the resources
@@ -43,7 +39,7 @@ internal interface Database {
    *
    * @param <R> The resource type
    */
-  suspend fun <R : Resource> insertRemote(vararg resource: R)
+  suspend fun insertRemote(vararg resource: JSONObject)
 
   /**
    * Updates the `resource` in the FHIR resource database. If the resource does not already exist,
@@ -51,15 +47,10 @@ internal interface Database {
    *
    * @param <R> The resource type
    */
-  suspend fun update(vararg resources: Resource)
+  suspend fun update(vararg resources: JSONObject)
 
   /** Updates the `resource` meta in the FHIR resource database. */
-  suspend fun updateVersionIdAndLastUpdated(
-    resourceId: String,
-    resourceType: ResourceType,
-    versionId: String,
-    lastUpdated: Instant
-  )
+  suspend fun updateVersionIdAndLastUpdated(resourceId: String, lastUpdated: Instant)
 
   /**
    * Selects the FHIR resource of type `clazz` with `id`.
@@ -67,45 +58,29 @@ internal interface Database {
    * @param <R> The resource type
    * @throws ResourceNotFoundException if the resource is not found in the database
    */
-  @Throws(ResourceNotFoundException::class)
-  suspend fun select(type: ResourceType, id: String): Resource
+  @Throws(ResourceNotFoundException::class) suspend fun select(id: String): JSONObject
 
   /**
-   * Selects the saved `ResourceEntity` of type `clazz` with `id`.
+   * Selects the saved `JsonObjectEntity` of type `clazz` with `id`.
    *
    * @param <R> The resource type
    * @throws ResourceNotFoundException if the resource is not found in the database
    */
-  @Throws(ResourceNotFoundException::class)
-  suspend fun selectEntity(type: ResourceType, id: String): ResourceEntity
-
-  /**
-   * Return the last update data of a resource based on the resource type. If no resource of
-   * [resourceType] is inserted, return `null`.
-   * @param resourceType The resource type
-   */
-  suspend fun lastUpdate(resourceType: ResourceType): String?
+  @Throws(ResourceNotFoundException::class) suspend fun selectEntity(id: String): JsonObjectEntity
 
   /**
    * Insert resources that were synchronised.
    *
    * @param syncedResources The synced resource
    */
-  suspend fun insertSyncedResources(
-    syncedResources: List<SyncedResourceEntity>,
-    resources: List<Resource>
-  )
+  suspend fun insertSyncedResources(resources: List<JSONObject>)
 
   /**
    * Deletes the FHIR resource of type `clazz` with `id`.
    *
    * @param <R> The resource type
    */
-  suspend fun delete(type: ResourceType, id: String)
-
-  suspend fun <R : Resource> search(query: SearchQuery): List<R>
-
-  suspend fun count(query: SearchQuery): Long
+  suspend fun delete(id: String)
 
   /**
    * Retrieves all [LocalChangeEntity] s for all [Resource] s, which can be used to update the
@@ -118,7 +93,7 @@ internal interface Database {
   suspend fun deleteUpdates(token: LocalChangeToken)
 
   /** Remove the [LocalChangeEntity] s with matching resource ids. */
-  suspend fun deleteUpdates(resources: List<Resource>)
+  suspend fun deleteUpdates(resources: List<JSONObject>)
 
   /** Runs the block as a database transaction. */
   suspend fun withTransaction(block: suspend () -> Unit)

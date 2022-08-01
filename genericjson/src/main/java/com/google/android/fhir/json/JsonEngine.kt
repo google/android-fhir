@@ -16,15 +16,12 @@
 
 package com.google.android.fhir.json
 
-import com.google.android.fhir.json.db.ResourceNotFoundException
 import com.google.android.fhir.json.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.json.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.json.search.Search
 import com.google.android.fhir.json.sync.ConflictResolver
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
+import org.json.JSONObject
 
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface JsonEngine {
@@ -33,21 +30,16 @@ interface JsonEngine {
    *
    * @return the logical IDs of the newly created resources.
    */
-  suspend fun create(vararg resource: Resource): List<String>
+  suspend fun create(vararg resource: JSONObject): List<String>
 
   /** Loads a FHIR resource given the class and the logical ID. */
-  suspend fun get(type: ResourceType, id: String): Resource
+  suspend fun get(id: String): JSONObject
 
   /** Updates a FHIR [resource] in the local storage. */
-  suspend fun update(vararg resource: Resource)
+  suspend fun update(vararg resource: JSONObject)
 
   /** Removes a FHIR resource given the class and the logical ID. */
-  suspend fun delete(type: ResourceType, id: String)
-
-  /**
-   * Searches the database and returns a list resources according to the [search] specifications.
-   */
-  suspend fun <R : Resource> search(search: Search): List<R>
+  suspend fun delete(id: String)
 
   /**
    * Synchronizes the [upload] result in the database. [upload] operation may result in multiple
@@ -55,7 +47,7 @@ interface JsonEngine {
    * api caller should [Flow.collect] it.
    */
   suspend fun syncUpload(
-    upload: (suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>)
+    upload: (suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, JSONObject>>)
   )
 
   /**
@@ -64,40 +56,9 @@ interface JsonEngine {
    */
   suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+    download: suspend () -> Flow<List<JSONObject>>
   )
-
-  /**
-   * Returns the total count of entities available for given search.
-   *
-   * @param search
-   */
-  suspend fun count(search: Search): Long
 
   /** Returns the timestamp when data was last synchronized. */
   suspend fun getLastSyncTimeStamp(): OffsetDateTime?
-}
-
-/**
- * Returns a FHIR resource of type [R] with [id] from the local storage.
- *
- * @param <R> The resource type which should be a subtype of [Resource].
- * @throws ResourceNotFoundException if the resource is not found
- */
-@Throws(ResourceNotFoundException::class)
-suspend inline fun <reified R : Resource> JsonEngine.get(id: String): R {
-  return get(getResourceType(R::class.java), id) as R
-}
-
-/**
- * Deletes a FHIR resource of type [R] with [id] from the local storage.
- *
- * @param <R> The resource type which should be a subtype of [Resource].
- */
-suspend inline fun <reified R : Resource> JsonEngine.delete(id: String) {
-  delete(getResourceType(R::class.java), id)
-}
-
-interface SyncDownloadContext {
-  suspend fun getLatestTimestampFor(type: ResourceType): String?
 }

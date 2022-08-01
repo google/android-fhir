@@ -17,9 +17,6 @@
 package com.google.android.fhir.json
 
 import android.content.Context
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
-import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.json.db.Database
 import com.google.android.fhir.json.db.impl.DatabaseConfig
 import com.google.android.fhir.json.db.impl.DatabaseEncryptionKeyProvider.isDatabaseEncryptionSupported
@@ -31,7 +28,6 @@ import timber.log.Timber
 
 internal data class JsonServices(
   val jsonEngine: JsonEngine,
-  val parser: IParser,
   val database: Database,
   val remoteDataSource: DataSource? = null
 ) {
@@ -60,11 +56,9 @@ internal data class JsonServices(
     }
 
     fun build(): JsonServices {
-      val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
       val db =
         DatabaseImpl(
           context = context,
-          iParser = parser,
           DatabaseConfig(inMemory, enableEncryption, databaseErrorStrategy)
         )
       val engine = JsonEngineImpl(database = db, context = context)
@@ -74,12 +68,7 @@ internal data class JsonServices(
             .apply { setAuthenticator(it.authenticator) }
             .build()
         }
-      return JsonServices(
-        jsonEngine = engine,
-        parser = parser,
-        database = db,
-        remoteDataSource = remoteDataSource
-      )
+      return JsonServices(jsonEngine = engine, database = db, remoteDataSource = remoteDataSource)
     }
   }
 

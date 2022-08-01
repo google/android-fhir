@@ -24,7 +24,6 @@ import android.util.ArrayMap
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
 import com.google.android.fhir.json.db.DatabaseEncryptionException
-import com.google.android.fhir.json.db.DatabaseEncryptionException.DatabaseEncryptionErrorCode.UNSUPPORTED
 import com.google.android.fhir.json.db.databaseEncryptionException
 import java.nio.charset.StandardCharsets
 import java.security.KeyStore
@@ -60,7 +59,10 @@ internal object DatabaseEncryptionKeyProvider {
       try {
         Mac.getInstance(KEY_ALGORITHM_HMAC_SHA256)
       } catch (exception: NoSuchAlgorithmException) {
-        throw DatabaseEncryptionException(exception, UNSUPPORTED)
+        throw DatabaseEncryptionException(
+          exception,
+          DatabaseEncryptionException.DatabaseEncryptionErrorCode.UNSUPPORTED
+        )
       }
 
     try {

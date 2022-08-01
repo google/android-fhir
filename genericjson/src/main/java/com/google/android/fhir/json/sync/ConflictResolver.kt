@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.json.sync
 
-import org.hl7.fhir.r4.model.Resource
+import org.json.JSONObject
 
 /** Resolves conflicts between the client and remote changes in a Resource. */
 fun interface ConflictResolver {
@@ -24,7 +24,7 @@ fun interface ConflictResolver {
    * @param local The modified resource on the client.
    * @param remote The latest version of the resource downloaded from the remote server.
    */
-  fun resolve(local: Resource, remote: Resource): ConflictResolutionResult
+  fun resolve(local: JSONObject, remote: JSONObject): ConflictResolutionResult
 }
 
 /**
@@ -35,7 +35,7 @@ fun interface ConflictResolver {
  */
 sealed class ConflictResolutionResult
 
-data class Resolved(val resolved: Resource) : ConflictResolutionResult()
+data class Resolved(val resolved: JSONObject) : ConflictResolutionResult()
 
 /** Accepts the local change and rejects the remote change. */
 val AcceptLocalConflictResolver = ConflictResolver { local, _ -> Resolved(local) }

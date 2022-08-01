@@ -19,51 +19,34 @@ package com.google.android.fhir.json.impl
 import android.content.Context
 import com.google.android.fhir.json.DatastoreUtil
 import com.google.android.fhir.json.JsonEngine
-import com.google.android.fhir.json.SyncDownloadContext
 import com.google.android.fhir.json.db.Database
 import com.google.android.fhir.json.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.json.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.json.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.json.logicalId
-import com.google.android.fhir.json.search.Search
-import com.google.android.fhir.json.search.count
-import com.google.android.fhir.json.search.execute
 import com.google.android.fhir.json.sync.ConflictResolver
 import com.google.android.fhir.json.sync.Resolved
-import com.google.android.fhir.json.toTimeZoneString
+import java.time.Instant
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
-import timber.log.Timber
+import org.json.JSONObject
 
 /** Implementation of [JsonEngine]. */
 internal class JsonEngineImpl(private val database: Database, private val context: Context) :
   JsonEngine {
-  override suspend fun create(vararg resource: Resource): List<String> {
+  override suspend fun create(vararg resource: JSONObject): List<String> {
     return database.insert(*resource)
   }
 
-  override suspend fun get(type: ResourceType, id: String): Resource {
-    return database.select(type, id)
+  override suspend fun get(id: String): JSONObject {
+    return database.select(id)
   }
 
-  override suspend fun update(vararg resource: Resource) {
+  override suspend fun update(vararg resource: JSONObject) {
     database.update(*resource)
   }
 
-  override suspend fun delete(type: ResourceType, id: String) {
-    database.delete(type, id)
-  }
-
-  override suspend fun <R : Resource> search(search: Search): List<R> {
-    return search.execute(database)
-  }
-
-  override suspend fun count(search: Search): Long {
-    return search.count(database)
+  override suspend fun delete(id: String) {
+    database.delete(id)
   }
 
   override suspend fun getLastSyncTimeStamp(): OffsetDateTime? {
@@ -72,129 +55,67 @@ internal class JsonEngineImpl(private val database: Database, private val contex
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+    download: suspend () -> Flow<List<JSONObject>>
   ) {
-    download(
-      object : SyncDownloadContext {
-        override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
+    download().collect { resources ->
+      database.withTransaction {
+        val resolved =
+          resolveConflictingResources(
+            resources,
+            getConflictingResourceIds(resources),
+            conflictResolver
+          )
+        saveRemoteResourcesToDatabase(resources)
+        saveResolvedResourcesToDatabase(resolved)
       }
-    )
-      .collect { resources ->
-        database.withTransaction {
-          val resolved =
-            resolveConflictingResources(
-              resources,
-              getConflictingResourceIds(resources),
-              conflictResolver
-            )
-          saveRemoteResourcesToDatabase(resources)
-          saveResolvedResourcesToDatabase(resolved)
-        }
-      }
+    }
   }
 
-  private suspend fun saveResolvedResourcesToDatabase(resolved: List<Resource>?) {
+  private suspend fun saveResolvedResourcesToDatabase(resolved: List<JSONObject>?) {
     resolved?.let {
       database.deleteUpdates(it)
       database.update(*it.toTypedArray())
     }
   }
 
-  private suspend fun saveRemoteResourcesToDatabase(resources: List<Resource>) {
-    val timeStamps =
-      resources.groupBy { it.resourceType }.entries.map {
-        SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
-      }
-    database.insertSyncedResources(timeStamps, resources)
+  private suspend fun saveRemoteResourcesToDatabase(resources: List<JSONObject>) {
+    database.insertSyncedResources(resources)
   }
 
   private suspend fun resolveConflictingResources(
-    resources: List<Resource>,
+    resources: List<JSONObject>,
     conflictingResourceIds: Set<String>,
     conflictResolver: ConflictResolver
   ) =
     resources
-      .filter { conflictingResourceIds.contains(it.logicalId) }
-      .map { conflictResolver.resolve(database.select(it.resourceType, it.logicalId), it) }
+      .filter { conflictingResourceIds.contains(it["id"].toString()) }
+      .map { conflictResolver.resolve(database.select(it["id"].toString()), it) }
       .filterIsInstance<Resolved>()
       .map { it.resolved }
       .takeIf { it.isNotEmpty() }
 
-  private suspend fun getConflictingResourceIds(resources: List<Resource>) =
+  private suspend fun getConflictingResourceIds(resources: List<JSONObject>) =
     resources
-      .map { it.logicalId }
+      .map { it["id"].toString() }
       .toSet()
       .intersect(database.getAllLocalChanges().map { it.localChange.resourceId }.toSet())
 
   override suspend fun syncUpload(
-    upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+    upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, JSONObject>>
   ) {
     val localChanges = database.getAllLocalChanges()
     if (localChanges.isNotEmpty()) {
       upload(localChanges).collect {
         database.deleteUpdates(it.first)
-        when (it.second) {
-          is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
-          else -> updateVersionIdAndLastUpdated(it.second)
-        }
+        updateVersionIdAndLastUpdated(it.second)
       }
     }
   }
 
-  private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {
-    when (bundle.type) {
-      Bundle.BundleType.TRANSACTIONRESPONSE -> {
-        bundle.entry.forEach {
-          when {
-            it.hasResource() -> updateVersionIdAndLastUpdated(it.resource)
-            it.hasResponse() -> updateVersionIdAndLastUpdated(it.response)
-          }
-        }
-      }
-      else -> {
-        // Leave it for now.
-        Timber.i("Received request to update meta values for ${bundle.type}")
-      }
-    }
+  private suspend fun updateVersionIdAndLastUpdated(resource: JSONObject) {
+    database.updateVersionIdAndLastUpdated(
+      resource["id"].toString(),
+      Instant.parse(resource["lastUpdated"].toString())
+    )
   }
-
-  private suspend fun updateVersionIdAndLastUpdated(response: Bundle.BundleEntryResponseComponent) {
-    if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
-      response.resourceIdAndType?.let { (id, type) ->
-        database.updateVersionIdAndLastUpdated(
-          id,
-          type,
-          response.etag,
-          response.lastModified.toInstant()
-        )
-      }
-    }
-  }
-
-  private suspend fun updateVersionIdAndLastUpdated(resource: Resource) {
-    if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
-      database.updateVersionIdAndLastUpdated(
-        resource.id,
-        resource.resourceType,
-        resource.meta.versionId,
-        resource.meta.lastUpdated.toInstant()
-      )
-    }
-  }
-
-  /**
-   * May return a Pair of versionId and resource type extracted from the
-   * [Bundle.BundleEntryResponseComponent.location].
-   *
-   * [Bundle.BundleEntryResponseComponent.location] may be:
-   *
-   * 1. absolute path: `<server-path>/<resource-type>/<resource-id>/_history/<version>`
-   *
-   * 2. relative path: `<resource-type>/<resource-id>/_history/<version>`
-   */
-  private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
-    get() =
-      location?.split("/")?.takeIf { it.size > 3 }?.let {
-        it[it.size - 3] to ResourceType.fromCode(it[it.size - 4])
-      }
 }

@@ -17,7 +17,6 @@
 package com.google.android.fhir.json
 
 import android.content.Context
-import com.google.android.fhir.json.DatabaseErrorStrategy.UNSPECIFIED
 import com.google.android.fhir.json.sync.Authenticator
 import com.google.android.fhir.json.sync.DataSource
 
@@ -47,17 +46,17 @@ object JsonEngineProvider {
    */
   @Synchronized
   fun getInstance(context: Context): JsonEngine {
-    return getOrCreateFhirService(context).jsonEngine
+    return getOrCreateJsonService(context).jsonEngine
   }
 
   @Synchronized
   @JvmStatic // needed for mockito
   internal fun getDataSource(context: Context): DataSource? {
-    return getOrCreateFhirService(context).remoteDataSource
+    return getOrCreateJsonService(context).remoteDataSource
   }
 
   @Synchronized
-  private fun getOrCreateFhirService(context: Context): JsonServices {
+  private fun getOrCreateJsonService(context: Context): JsonServices {
     if (jsonServices == null) {
       jsonEngineConfiguration = jsonEngineConfiguration ?: JsonEngineConfiguration()
       val configuration = checkNotNull(jsonEngineConfiguration)
@@ -102,7 +101,7 @@ object JsonEngineProvider {
  */
 data class JsonEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
-  val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
+  val databaseErrorStrategy: DatabaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED,
   val serverConfiguration: ServerConfiguration? = null,
   val testMode: Boolean = false
 )

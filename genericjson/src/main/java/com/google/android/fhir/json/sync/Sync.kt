@@ -25,7 +25,6 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.google.android.fhir.json.JsonEngine
 import com.google.android.fhir.json.JsonEngineProvider
-import org.hl7.fhir.r4.model.ResourceType
 
 object Sync {
   fun basicSyncJob(context: Context): SyncJob {
@@ -51,7 +50,6 @@ object Sync {
       ?: Result.Error(
         listOf(
           ResourceSyncException(
-            ResourceType.Bundle,
             IllegalStateException(
               "JsonEngineConfiguration.ServerConfiguration is not set. Call JsonEngineProvider.init to initialize with appropriate configuration."
             )

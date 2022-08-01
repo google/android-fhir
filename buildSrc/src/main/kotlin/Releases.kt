@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,12 @@ object Releases {
     override val artifactId = "engine"
     override val version = "0.1.0-beta01"
     override val name = "Android FHIR Engine Library"
+  }
+
+  object Json : LibraryArtifact {
+    override val artifactId = "generic-json"
+    override val version = "0.1.0-alpha01"
+    override val name = "Android JSON Engine Library"
   }
 
   object DataCapture : LibraryArtifact {

@@ -16,9 +16,7 @@
 
 package com.google.android.fhir.json.sync
 
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.OperationOutcome
-import org.hl7.fhir.r4.model.Resource
+import org.json.JSONObject
 
 /**
  * Interface for an abstraction of retrieving FHIR data from a network source. The network
@@ -29,12 +27,12 @@ internal interface DataSource {
    * @return [Bundle] of type [BundleType.SEARCHSET] for a successful operation, [OperationOutcome]
    * otherwise. Call this api with the relative path of the resource search url to be downloaded.
    */
-  suspend fun download(path: String): Resource
+  suspend fun download(path: String): JSONObject
 
   /**
    * @return [Bundle] of type [BundleType.TRANSACTIONRESPONSE] for a successful operation,
    * [OperationOutcome] otherwise. Call this api with the [Bundle] that needs to be uploaded to the
    * server.
    */
-  suspend fun upload(bundle: Bundle): Resource
+  suspend fun upload(jsonObject: JSONObject): JSONObject
 }

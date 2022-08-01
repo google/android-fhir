@@ -20,34 +20,22 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.room.Room
 import androidx.room.withTransaction
-import androidx.sqlite.db.SimpleSQLiteQuery
-import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.json.DatabaseErrorStrategy
 import com.google.android.fhir.json.db.Database
 import com.google.android.fhir.json.db.ResourceNotFoundException
-import com.google.android.fhir.json.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.json.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.json.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.json.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.json.db.impl.entities.LocalChangeEntity
-import com.google.android.fhir.json.db.impl.entities.ResourceEntity
-import com.google.android.fhir.json.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.json.logicalId
-import com.google.android.fhir.json.search.SearchQuery
+import com.google.android.fhir.json.db.impl.entities.JsonObjectEntity
 import java.time.Instant
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
+import org.json.JSONObject
 
 /**
  * The implementation for the persistence layer using Room. See docs for
- * [com.google.android.fhir.json.db.Database] for the API docs.
+ * [com.google.android.fhir.db.Database] for the API docs.
  */
 @Suppress("UNCHECKED_CAST")
-internal class DatabaseImpl(
-  private val context: Context,
-  private val iParser: IParser,
-  databaseConfig: DatabaseConfig
-) : Database {
+internal class DatabaseImpl(context: Context, databaseConfig: DatabaseConfig) : Database {
 
   val db: ResourceDatabase
 
@@ -96,11 +84,10 @@ internal class DatabaseImpl(
         .build()
   }
 
-  private val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
-  private val syncedResourceDao = db.syncedResourceDao()
-  private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
+  private val resourceDao by lazy { db.resourceDao() }
+  private val localChangeDao = db.localChangeDao()
 
-  override suspend fun <R : Resource> insert(vararg resource: R): List<String> {
+  override suspend fun insert(vararg resource: JSONObject): List<String> {
     val logicalIds = mutableListOf<String>()
     db.withTransaction {
       logicalIds.addAll(resourceDao.insertAll(resource.toList()))
@@ -109,90 +96,41 @@ internal class DatabaseImpl(
     return logicalIds
   }
 
-  override suspend fun <R : Resource> insertRemote(vararg resource: R) {
+  override suspend fun insertRemote(vararg resource: JSONObject) {
     db.withTransaction { resourceDao.insertAll(resource.toList()) }
   }
 
-  override suspend fun update(vararg resources: Resource) {
+  override suspend fun update(vararg resources: JSONObject) {
     db.withTransaction {
       resources.forEach {
-        val oldResourceEntity = selectEntity(it.resourceType, it.logicalId)
+        val oldResourceEntity = selectEntity(it["id"].toString())
         resourceDao.update(it)
         localChangeDao.addUpdate(oldResourceEntity, it)
       }
     }
   }
 
-  override suspend fun updateVersionIdAndLastUpdated(
-    resourceId: String,
-    resourceType: ResourceType,
-    versionId: String,
-    lastUpdated: Instant
-  ) {
-    db.withTransaction {
-      resourceDao.updateRemoteVersionIdAndLastUpdate(
-        resourceId,
-        resourceType,
-        versionId,
-        lastUpdated
-      )
-    }
+  override suspend fun updateVersionIdAndLastUpdated(resourceId: String, lastUpdated: Instant) {
+    db.withTransaction { resourceDao.updateRemoteVersionIdAndLastUpdate(resourceId, lastUpdated) }
   }
 
-  override suspend fun select(type: ResourceType, id: String): Resource {
+  override suspend fun select(id: String): JSONObject {
     return db.withTransaction {
-      resourceDao.getResource(resourceId = id, resourceType = type)?.let {
-        iParser.parseResource(it)
-      }
-        ?: throw ResourceNotFoundException(type.name, id)
-    } as
-      Resource
-  }
-
-  override suspend fun lastUpdate(resourceType: ResourceType): String? {
-    return db.withTransaction { syncedResourceDao.getLastUpdate(resourceType) }
-  }
-
-  override suspend fun insertSyncedResources(
-    syncedResources: List<SyncedResourceEntity>,
-    resources: List<Resource>
-  ) {
-    db.withTransaction {
-      syncedResourceDao.insertAll(syncedResources)
-      insertRemote(*resources.toTypedArray())
+      resourceDao.getResource(id)?.let { JSONObject(it) } ?: throw ResourceNotFoundException(id)
     }
   }
 
-  override suspend fun delete(type: ResourceType, id: String) {
+  override suspend fun insertSyncedResources(resources: List<JSONObject>) {
+    db.withTransaction { insertRemote(*resources.toTypedArray()) }
+  }
+
+  override suspend fun delete(id: String) {
     db.withTransaction {
-      val remoteVersionId: String? =
-        try {
-          selectEntity(type, id).versionId
-        } catch (e: ResourceNotFoundException) {
-          null
-        }
-      val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
+      val rowsDeleted = resourceDao.deleteResource(resourceId = id)
       if (rowsDeleted > 0)
         localChangeDao.addDelete(
           resourceId = id,
-          resourceType = type,
-          remoteVersionId = remoteVersionId
         )
-    }
-  }
-
-  override suspend fun <R : Resource> search(query: SearchQuery): List<R> {
-    return db.withTransaction {
-      resourceDao
-        .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .map { iParser.parseResource(it) as R }
-        .distinctBy { it.id }
-    }
-  }
-
-  override suspend fun count(query: SearchQuery): Long {
-    return db.withTransaction {
-      resourceDao.countResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
     }
   }
 
@@ -202,7 +140,7 @@ internal class DatabaseImpl(
    */
   override suspend fun getAllLocalChanges(): List<SquashedLocalChange> {
     return db.withTransaction {
-      localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
+      localChangeDao.getAllLocalChanges().groupBy { it.resourceId }.values.map {
         SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
       }
     }
@@ -212,10 +150,9 @@ internal class DatabaseImpl(
     db.withTransaction { localChangeDao.discardLocalChanges(token) }
   }
 
-  override suspend fun selectEntity(type: ResourceType, id: String): ResourceEntity {
+  override suspend fun selectEntity(id: String): JsonObjectEntity {
     return db.withTransaction {
-      resourceDao.getResourceEntity(resourceId = id, resourceType = type)
-        ?: throw ResourceNotFoundException(type.name, id)
+      resourceDao.getResourceEntity(resourceId = id) ?: throw ResourceNotFoundException(id)
     }
   }
 
@@ -223,7 +160,7 @@ internal class DatabaseImpl(
     db.withTransaction(block)
   }
 
-  override suspend fun deleteUpdates(resources: List<Resource>) {
+  override suspend fun deleteUpdates(resources: List<JSONObject>) {
     localChangeDao.discardLocalChanges(resources)
   }
 
@@ -239,16 +176,16 @@ internal class DatabaseImpl(
      * unintentional switching of database encryption across releases. When this happens, we throw
      * [IllegalStateException] so that app developers have a chance to fix the issue.
      */
-    const val UNENCRYPTED_DATABASE_NAME = "resources.db"
+    const val UNENCRYPTED_DATABASE_NAME = "json_resources.db"
 
     /**
      * The name for encrypted database.
      *
      * See [UNENCRYPTED_DATABASE_NAME] for the reason we use a separate name.
      */
-    const val ENCRYPTED_DATABASE_NAME = "resources_encrypted.db"
+    const val ENCRYPTED_DATABASE_NAME = "json_resources_encrypted.db"
 
-    @VisibleForTesting const val DATABASE_PASSPHRASE_NAME = "fhirEngineDbPassphrase"
+    @VisibleForTesting const val DATABASE_PASSPHRASE_NAME = "jsonEngineDbPassphrase"
   }
 }
 

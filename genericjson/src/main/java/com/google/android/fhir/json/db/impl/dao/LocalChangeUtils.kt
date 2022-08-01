@@ -16,13 +16,11 @@
 
 package com.google.android.fhir.json.db.impl.dao
 
-import ca.uhn.fhir.parser.IParser
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.JsonPatch
 import com.github.fge.jsonpatch.diff.JsonDiff
 import com.google.android.fhir.json.db.impl.entities.LocalChangeEntity
-import org.hl7.fhir.r4.model.Resource
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -65,10 +63,8 @@ internal object LocalChangeUtils {
     return LocalChangeEntity(
       id = 0,
       resourceId = second.resourceId,
-      resourceType = second.resourceType,
       type = type,
       payload = payload,
-      versionId = second.versionId
     )
   }
 
@@ -90,12 +86,12 @@ internal object LocalChangeUtils {
   }
 
   /** Calculates the JSON patch between two [Resource] s. */
-  internal fun diff(parser: IParser, source: Resource, target: Resource): JSONArray {
+  internal fun diff(source: JSONObject, target: JSONObject): JSONArray {
     val objectMapper = ObjectMapper()
     return getFilteredJSONArray(
       JsonDiff.asJson(
-        objectMapper.readValue(parser.encodeResourceToString(source), JsonNode::class.java),
-        objectMapper.readValue(parser.encodeResourceToString(target), JsonNode::class.java)
+        objectMapper.readValue(source.toString(), JsonNode::class.java),
+        objectMapper.readValue(target.toString(), JsonNode::class.java)
       )
     )
   }

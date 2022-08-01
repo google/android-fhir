@@ -20,13 +20,11 @@ import android.content.Context
 import com.google.android.fhir.json.DatastoreUtil
 import com.google.android.fhir.json.JsonEngine
 import com.google.android.fhir.json.sync.download.DownloaderImpl
-import com.google.android.fhir.json.sync.upload.BundleUploader
-import com.google.android.fhir.json.sync.upload.TransactionBundleGenerator
+import com.google.android.fhir.json.sync.upload.NoOpUploader
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
   val timestamp: OffsetDateTime = OffsetDateTime.now()
@@ -38,14 +36,14 @@ sealed class Result {
 sealed class State {
   object Started : State()
 
-  data class InProgress(val resourceType: ResourceType?) : State()
+  data class InProgress(val resourceType: String = "JSON") : State()
   data class Glitch(val exceptions: List<ResourceSyncException>) : State()
 
   data class Finished(val result: Result.Success) : State()
   data class Failed(val result: Result.Error) : State()
 }
 
-data class ResourceSyncException(val resourceType: ResourceType, val exception: Exception)
+data class ResourceSyncException(val exception: Exception)
 
 /** Class that helps synchronize the data source and save it in the local database */
 internal class JsonSynchronizer(
@@ -53,8 +51,7 @@ internal class JsonSynchronizer(
   private val jsonEngine: JsonEngine,
   private val dataSource: DataSource,
   private val downloadManager: DownloadWorkManager,
-  private val uploader: Uploader =
-    BundleUploader(dataSource, TransactionBundleGenerator.getDefault()),
+  private val uploader: Uploader = NoOpUploader(),
   private val downloader: Downloader = DownloaderImpl(dataSource, downloadManager),
   private val conflictResolver: ConflictResolver
 ) {
@@ -107,10 +104,10 @@ internal class JsonSynchronizer(
     val exceptions = mutableListOf<ResourceSyncException>()
     jsonEngine.syncDownload(conflictResolver) {
       flow {
-        downloader.download(it).collect {
+        downloader.download().collect {
           when (it) {
             is DownloadState.Started -> {
-              setSyncState(State.InProgress(it.type))
+              setSyncState(State.InProgress())
             }
             is DownloadState.Success -> {
               emit(it.resources)

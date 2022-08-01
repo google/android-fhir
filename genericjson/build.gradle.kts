@@ -1,5 +1,3 @@
-import codegen.GenerateSourcesTask
-
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -8,24 +6,9 @@ plugins {
   jacoco
 }
 
-publishArtifact(Releases.Engine)
+publishArtifact(Releases.Json)
 
 createJacocoTestReportTask()
-
-val generateSourcesTask =
-  project.tasks.register("generateSearchParamsTask", GenerateSourcesTask::class) {
-    srcOutputDir.set(project.layout.buildDirectory.dir("gen/main"))
-    testOutputDir.set(project.layout.buildDirectory.dir("gen/test"))
-  }
-
-kotlin {
-  sourceSets {
-    val main by getting
-    val test by getting
-    main.kotlin.srcDirs(generateSourcesTask.map { it.srcOutputDir })
-    test.kotlin.srcDirs(generateSourcesTask.map { it.testOutputDir })
-  }
-}
 
 android {
   compileSdk = Sdk.compileSdk
@@ -34,7 +17,7 @@ android {
     targetSdk = Sdk.targetSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // need to specify this to prevent junit runner from going deep into our dependencies
-    testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
+    testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.json"
     // Required when setting minSdkVersion to 20 or lower
     // See https://developer.android.com/studio/write/java8-support
     multiDexEnabled = true
@@ -115,7 +98,6 @@ dependencies {
   implementation(Dependencies.Retrofit.coreRetrofit)
   implementation(Dependencies.Retrofit.gsonConverter)
   implementation(Dependencies.Room.ktx)
-  implementation(Dependencies.Room.runtime)
   implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.guava)
   implementation(Dependencies.httpInterceptor)
@@ -125,6 +107,7 @@ dependencies {
 
   kapt(Dependencies.Room.compiler)
 
+  testImplementation(Dependencies.Kotlin.serialization)
   testImplementation(Dependencies.AndroidxTest.archCore)
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
@@ -135,5 +118,3 @@ dependencies {
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
 }
-
-configureDokka(Releases.Engine.artifactId, Releases.Engine.version)

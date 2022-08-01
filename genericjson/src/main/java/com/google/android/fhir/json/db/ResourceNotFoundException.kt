@@ -18,20 +18,13 @@ package com.google.android.fhir.json.db
 
 /** Thrown to indicate that the requested resource is not found. */
 class ResourceNotFoundException : Exception {
-  val type: String
   val id: String
 
-  constructor(
-    type: String,
-    id: String,
-    cause: Throwable
-  ) : super("Resource not found with type $type and id $id!", cause) {
-    this.type = type
+  constructor(id: String, cause: Throwable) : super("Resource not found with id $id!", cause) {
     this.id = id
   }
 
-  constructor(type: String, id: String) : super("Resource not found with type $type and id $id!") {
-    this.type = type
+  constructor(id: String) : super("Resource not found with id $id!") {
     this.id = id
   }
 }

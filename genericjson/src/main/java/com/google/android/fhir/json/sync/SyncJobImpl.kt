@@ -34,7 +34,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.mapNotNull
-import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
 class SyncJobImpl(private val context: Context) : SyncJob {
@@ -111,7 +110,6 @@ class SyncJobImpl(private val context: Context) : SyncJob {
       ?: Result.Error(
         listOf(
           ResourceSyncException(
-            ResourceType.Bundle,
             IllegalStateException(
               "JsonEngineConfiguration.ServerConfiguration is not set. Call JsonEngineProvider.init to initialize with appropriate configuration."
             )

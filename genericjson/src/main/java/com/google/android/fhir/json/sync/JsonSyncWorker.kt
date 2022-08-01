@@ -24,8 +24,6 @@ import androidx.work.workDataOf
 import com.google.android.fhir.json.JsonEngine
 import com.google.android.fhir.json.JsonEngineProvider
 import com.google.android.fhir.json.OffsetDateTimeTypeAdapter
-import com.google.android.fhir.json.sync.Result.Error
-import com.google.android.fhir.json.sync.Result.Success
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
@@ -41,7 +39,7 @@ import timber.log.Timber
 /** A WorkManager Worker that handles periodic sync. */
 abstract class JsonSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
-  abstract fun getFhirEngine(): JsonEngine
+  abstract fun getJsonEngine(): JsonEngine
   abstract fun getDownloadWorkManager(): DownloadWorkManager
   abstract fun getConflictResolver(): ConflictResolver
 
@@ -68,7 +66,7 @@ abstract class JsonSyncWorker(appContext: Context, workerParams: WorkerParameter
     val jsonSynchronizer =
       JsonSynchronizer(
         applicationContext,
-        getFhirEngine(),
+        getJsonEngine(),
         dataSource,
         getDownloadWorkManager(),
         conflictResolver = getConflictResolver()
@@ -107,7 +105,7 @@ abstract class JsonSyncWorker(appContext: Context, workerParams: WorkerParameter
      */
     val retries = inputData.getInt(MAX_RETRIES_ALLOWED, 0)
     return when {
-      result is Success -> {
+      result is com.google.android.fhir.json.sync.Result.Success -> {
         Result.success(output)
       }
       retries > runAttemptCount -> {
@@ -121,8 +119,8 @@ abstract class JsonSyncWorker(appContext: Context, workerParams: WorkerParameter
 
   private fun buildOutput(result: com.google.android.fhir.json.sync.Result): Data {
     return when (result) {
-      is Success -> buildWorkData(State.Finished(result))
-      is Error -> buildWorkData(State.Failed(result))
+      is com.google.android.fhir.json.sync.Result.Success -> buildWorkData(State.Finished(result))
+      is com.google.android.fhir.json.sync.Result.Error -> buildWorkData(State.Failed(result))
     }
   }
 

@@ -34,6 +34,8 @@ object Plugins {
   const val androidGradlePlugin = "com.android.tools.build:gradle:${Versions.androidGradlePlugin}"
   const val kotlinGradlePlugin =
     "org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.Versions.Kotlin.stdlib}"
+  const val kotlinSerializationPlugin =
+    "org.jetbrains.kotlin:kotlin-serialization:${Dependencies.Versions.Kotlin.stdlib}"
   const val navSafeArgsGradlePlugin =
     "androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.Versions.Androidx.navigation}"
   const val rulerGradlePlugin = "com.spotify.ruler:ruler-gradle-plugin:1.2.1"

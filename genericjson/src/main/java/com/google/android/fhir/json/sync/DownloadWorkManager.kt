@@ -16,8 +16,7 @@
 
 package com.google.android.fhir.json.sync
 
-import com.google.android.fhir.json.SyncDownloadContext
-import org.hl7.fhir.r4.model.Resource
+import org.json.JSONObject
 
 /**
  * Manager that generates the FHIR requests and handles the FHIR responses of a download job.
@@ -30,10 +29,10 @@ interface DownloadWorkManager {
    * Returns the URL for the next download request, or `null` if there is no more download request
    * to be issued.
    */
-  suspend fun getNextRequestUrl(context: SyncDownloadContext): String?
+  suspend fun getNextRequestUrl(): String?
 
   /**
    * Processes the download response and returns the resources to be saved to the local database.
    */
-  suspend fun processResponse(response: Resource): Collection<Resource>
+  suspend fun processResponse(response: JSONObject): Collection<JSONObject>
 }

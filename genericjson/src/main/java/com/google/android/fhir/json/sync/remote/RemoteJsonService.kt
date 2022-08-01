@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.json.sync.remote
 
-import com.google.android.fhir.BuildConfig
+import com.google.android.fhir.common.BuildConfig
 import com.google.android.fhir.json.NetworkConfiguration
 import com.google.android.fhir.json.sync.Authenticator
 import com.google.android.fhir.json.sync.DataSource
@@ -24,11 +24,9 @@ import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Resource
+import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Url
@@ -36,9 +34,9 @@ import retrofit2.http.Url
 /** Interface to make http requests to the FHIR server. */
 internal interface RemoteJsonService : DataSource {
 
-  @GET override suspend fun download(@Url path: String): Resource
+  @GET override suspend fun download(@Url path: String): JSONObject
 
-  @POST(".") override suspend fun upload(@Body bundle: Bundle): Resource
+  @POST(".") override suspend fun upload(jsonObject: JSONObject): JSONObject
 
   class Builder(
     private val baseUrl: String,

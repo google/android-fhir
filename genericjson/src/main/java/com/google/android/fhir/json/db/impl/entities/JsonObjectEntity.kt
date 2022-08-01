@@ -16,35 +16,20 @@
 
 package com.google.android.fhir.json.db.impl.entities
 
-import androidx.room.Embedded
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.google.android.fhir.json.index.entities.UriIndex
+import java.time.Instant
 import java.util.UUID
-import org.hl7.fhir.r4.model.ResourceType
 
 @Entity(
   indices =
-    [
-      Index(value = ["resourceType", "index_name", "index_value"]),
-      // keep this index for faster foreign lookup
-      Index(value = ["resourceUuid"])],
-  foreignKeys =
-    [
-      ForeignKey(
-        entity = ResourceEntity::class,
-        parentColumns = ["resourceUuid"],
-        childColumns = ["resourceUuid"],
-        onDelete = ForeignKey.CASCADE,
-        onUpdate = ForeignKey.NO_ACTION,
-        deferred = true
-      )]
+    [Index(value = ["resourceUuid"], unique = true), Index(value = ["resourceId"], unique = true)]
 )
-internal data class UriIndexEntity(
+internal data class JsonObjectEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceUuid: UUID,
-  val resourceType: ResourceType,
-  @Embedded(prefix = "index_") val index: UriIndex
+  val resourceId: String,
+  val serializedResource: String,
+  val lastUpdatedRemote: Instant?
 )

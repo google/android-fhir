@@ -20,8 +20,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.google.android.fhir.json.DatabaseErrorStrategy
 import com.google.android.fhir.json.db.DatabaseEncryptionException
-import com.google.android.fhir.json.db.DatabaseEncryptionException.DatabaseEncryptionErrorCode.TIMEOUT
-import com.google.android.fhir.json.db.DatabaseEncryptionException.DatabaseEncryptionErrorCode.UNKNOWN
 import com.google.android.fhir.json.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import java.lang.Exception
 import java.time.Duration
@@ -107,7 +105,8 @@ class SQLCipherSupportHelper(
         return passphraseFetcher()
       } catch (exception: DatabaseEncryptionException) {
         lastException = exception
-        if (exception.errorCode == TIMEOUT) {
+        if (exception.errorCode == DatabaseEncryptionException.DatabaseEncryptionErrorCode.TIMEOUT
+        ) {
           Timber.i("Fail to get the encryption key on attempt: $retryAttempt")
           delay(retryDelay.toMillis() * retryAttempt)
         } else {
@@ -116,7 +115,11 @@ class SQLCipherSupportHelper(
       }
     }
     Timber.w("Can't access the database encryption key after $MAX_RETRY_ATTEMPTS attempts.")
-    throw lastException ?: DatabaseEncryptionException(Exception(), UNKNOWN)
+    throw lastException
+      ?: DatabaseEncryptionException(
+        Exception(),
+        DatabaseEncryptionException.DatabaseEncryptionErrorCode.UNKNOWN
+      )
   }
 
   override fun getReadableDatabase() = writableDatabase

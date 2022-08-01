@@ -22,26 +22,12 @@ import com.google.android.fhir.json.db.impl.entities.LocalChangeEntity
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.Calendar
-import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Type converters for Room to persist ResourceType as a string. see:
  * https://developer.android.com/training/data-storage/room/referencing-data
  */
 internal object DbTypeConverters {
-  private val resourceTypeLookup = ResourceType.values().associateBy { it.name }
-
-  /**
-   * Converts a [ResourceType] into a String to be persisted in the database. This allows us to save
-   * [ResourceType] into the database while keeping it as the real type in entities.
-   */
-  @JvmStatic @TypeConverter fun typeToString(resourceType: ResourceType) = resourceType.name
-
-  /** Converts a String into a [ResourceType]. Called when a query returns a [ResourceType]. */
-  @JvmStatic
-  @TypeConverter
-  fun stringToResourceType(data: String) =
-    resourceTypeLookup[data] ?: throw IllegalArgumentException("invalid resource type: $data")
 
   // Since we're narrowing BigDecimal to double, search/sort precision is limited.
   // Search/sort for values that are close enough to resolve to the same double will be undefined.
