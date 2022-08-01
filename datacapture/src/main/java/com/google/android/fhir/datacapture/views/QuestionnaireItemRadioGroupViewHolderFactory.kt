@@ -99,7 +99,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
             .inflate(R.layout.questionnaire_item_radio_button, null)
         val radioButton =
           radioButtonItem.findViewById<RadioButton>(R.id.radio_button) as RadioButton
-        var isCurrentlySelected = false
+        var isCurrentlySelected: Boolean
         radioButton.apply {
           id = viewId
           text = answerOption.displayString
@@ -112,22 +112,12 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
               ViewGroup.LayoutParams.WRAP_CONTENT
             )
           isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
-          isCurrentlySelected = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
+          isCurrentlySelected = isChecked
           setOnClickListener { radioButton ->
             isCurrentlySelected = !isCurrentlySelected
             when (isCurrentlySelected) {
               true -> {
-                // if-else block to prevent over-writing of "items" nested within "answer"
-                if (questionnaireItemViewItem.answers.isNotEmpty()) {
-                  questionnaireItemViewItem.answers.apply { this[0].value = answerOption.value }
-                } else {
-                  questionnaireItemViewItem.setAnswer(
-                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                      value = answerOption.value
-                    }
-                  )
-                }
-
+                updateAnswer(answerOption)
                 val buttons = radioGroup.children.asIterable().filterIsInstance<RadioButton>()
                 buttons.forEach { button -> uncheckIfNotButtonId(radioButton.id, button) }
               }
@@ -144,6 +134,19 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
 
       private fun uncheckIfNotButtonId(checkedId: Int, button: RadioButton) {
         if (button.id != checkedId) button.isChecked = false
+      }
+
+      private fun updateAnswer(answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent) {
+        // if-else block to prevent over-writing of "items" nested within "answer"
+        if (questionnaireItemViewItem.answers.isNotEmpty()) {
+          questionnaireItemViewItem.answers.apply { this[0].value = answerOption.value }
+        } else {
+          questionnaireItemViewItem.setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = answerOption.value
+            }
+          )
+        }
       }
     }
 }
