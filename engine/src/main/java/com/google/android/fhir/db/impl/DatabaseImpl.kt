@@ -220,6 +220,14 @@ internal class DatabaseImpl(
     }
   }
 
+  override suspend fun withTransaction(block: suspend () -> Unit) {
+    db.withTransaction(block)
+  }
+
+  override suspend fun deleteUpdates(resources: List<Resource>) {
+    localChangeDao.discardLocalChanges(resources)
+  }
+
   override fun close() {
     db.close()
   }

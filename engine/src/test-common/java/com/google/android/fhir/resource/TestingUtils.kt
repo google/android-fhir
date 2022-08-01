@@ -25,6 +25,7 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.search.Search
+import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.common.truth.Truth.assertThat
@@ -139,6 +140,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
 
     override suspend fun syncDownload(
+      conflictResolver: ConflictResolver,
       download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
     ) {
       download(

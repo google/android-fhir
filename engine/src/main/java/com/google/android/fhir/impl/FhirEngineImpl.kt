@@ -25,9 +25,12 @@ import com.google.android.fhir.db.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
+import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
+import com.google.android.fhir.sync.ConflictResolver
+import com.google.android.fhir.sync.Resolved
 import com.google.android.fhir.toTimeZoneString
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
@@ -81,6 +84,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun syncDownload(
+    conflictResolver: ConflictResolver,
     download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
   ) {
     download(
@@ -89,13 +93,51 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       }
     )
       .collect { resources ->
-        val timeStamps =
-          resources.groupBy { it.resourceType }.entries.map {
-            SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
-          }
-        database.insertSyncedResources(timeStamps, resources)
+        database.withTransaction {
+          val resolved =
+            resolveConflictingResources(
+              resources,
+              getConflictingResourceIds(resources),
+              conflictResolver
+            )
+          saveRemoteResourcesToDatabase(resources)
+          saveResolvedResourcesToDatabase(resolved)
+        }
       }
   }
+
+  private suspend fun saveResolvedResourcesToDatabase(resolved: List<Resource>?) {
+    resolved?.let {
+      database.deleteUpdates(it)
+      database.update(*it.toTypedArray())
+    }
+  }
+
+  private suspend fun saveRemoteResourcesToDatabase(resources: List<Resource>) {
+    val timeStamps =
+      resources.groupBy { it.resourceType }.entries.map {
+        SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+      }
+    database.insertSyncedResources(timeStamps, resources)
+  }
+
+  private suspend fun resolveConflictingResources(
+    resources: List<Resource>,
+    conflictingResourceIds: Set<String>,
+    conflictResolver: ConflictResolver
+  ) =
+    resources
+      .filter { conflictingResourceIds.contains(it.logicalId) }
+      .map { conflictResolver.resolve(database.select(it.resourceType, it.logicalId), it) }
+      .filterIsInstance<Resolved>()
+      .map { it.resolved }
+      .takeIf { it.isNotEmpty() }
+
+  private suspend fun getConflictingResourceIds(resources: List<Resource>) =
+    resources
+      .map { it.logicalId }
+      .toSet()
+      .intersect(database.getAllLocalChanges().map { it.localChange.resourceId }.toSet())
 
   override suspend fun syncUpload(
     upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
