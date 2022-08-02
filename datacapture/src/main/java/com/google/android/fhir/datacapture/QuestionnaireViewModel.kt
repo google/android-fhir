@@ -586,8 +586,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * Finds a variable, first checks at origin if not found, then checks in parent hierarchy, if not
-   * found, then checks at root level and return the Pair
+   * Finds a variable, first checks at origin if not found then checks in parent hierarchy, if not
+   * found then checks at root level and return the Pair
    *
    * @param variableName the [String] to match the variable
    * @param origin the [Questionnaire.QuestionnaireItemComponent] from where we have to track
