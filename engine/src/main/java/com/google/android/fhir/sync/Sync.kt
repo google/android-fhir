@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,10 +41,12 @@ object Sync {
   suspend fun oneTimeSync(
     context: Context,
     fhirEngine: FhirEngine,
-    downloadManager: DownloadWorkManager
+    downloadManager: DownloadWorkManager,
+    resolver: ConflictResolver
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
-      FhirSynchronizer(context, fhirEngine, it, downloadManager).synchronize()
+      FhirSynchronizer(context, fhirEngine, it, downloadManager, conflictResolver = resolver)
+        .synchronize()
     }
       ?: Result.Error(
         listOf(
