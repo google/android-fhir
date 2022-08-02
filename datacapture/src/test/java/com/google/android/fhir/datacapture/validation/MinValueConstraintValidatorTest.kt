@@ -121,19 +121,18 @@ class MinValueConstraintValidatorTest {
           }
         )
       }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponseItemAnswerComponent().apply {
-            value = DateType(SimpleDateFormat("yyyy-MM-dd").parse("2021-06-01"))
-          }
-        )
-      }
+
+    val answers =
+      listOf(
+        QuestionnaireResponseItemAnswerComponent().apply {
+          value = DateType(SimpleDateFormat("yyyy-MM-dd").parse("2021-06-01"))
+        }
+      )
 
     val validationResult =
       MinValueConstraintValidator.validate(
         questionnaireItem,
-        questionnaireResponseItem,
+        answers,
         InstrumentationRegistry.getInstrumentation().context
       )
 
@@ -165,15 +164,14 @@ class MinValueConstraintValidatorTest {
           }
         )
       }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = DateType(Date()) })
-      }
+
+    val answers =
+      listOf(QuestionnaireResponseItemAnswerComponent().apply { value = DateType(Date()) })
 
     val validationResult =
       MinValueConstraintValidator.validate(
         questionnaireItem,
-        questionnaireResponseItem,
+        answers,
         InstrumentationRegistry.getInstrumentation().context
       )
 
