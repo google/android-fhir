@@ -39,6 +39,8 @@ include(":demo")
 
 include(":engine")
 
+include(":genericjson")
+
 include(":workflow")
 
 include(":testing")
