@@ -174,7 +174,7 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun search_byXFhirQueryString_shouldReturn_MalePatients() = runBlocking {
+  fun search_byXFhirQueryString_shouldReturn_FemalePatients() = runBlocking {
     val patients =
       listOf(
         buildPatient("3", "C", Enumerations.AdministrativeGender.FEMALE),
