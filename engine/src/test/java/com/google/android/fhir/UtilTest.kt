@@ -87,17 +87,17 @@ class UtilTest : TestCase() {
   }
 
   @Test
-  fun isValidDateOnly_withValidDateOnlyString_shouldReturnTrue() {
+  fun `isValidDateOnly() should return true for valid date only string`() {
     assertThat(isValidDateOnly("2022-01-02")).isTrue()
   }
 
   @Test
-  fun isValidDateOnly_withValidDatetimeString_shouldReturnFalse() {
+  fun `isValidDateOnly() should return false for valid datetime string`() {
     assertThat(isValidDateOnly("2022-01-02 00:00:01")).isFalse()
   }
 
   @Test
-  fun isValidDateOnly_withInvalidDate_shouldReturnFalse() {
+  fun `isValidDateOnly() should return false for invalid date string`() {
     assertThat(isValidDateOnly("33-33-33")).isFalse()
   }
 

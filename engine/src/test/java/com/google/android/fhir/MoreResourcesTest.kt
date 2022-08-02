@@ -35,12 +35,12 @@ class MoreResourcesTest {
   }
 
   @Test
-  fun getResourceClassByName() {
+  fun `getResourceClass() by name should return resource class`() {
     assertThat(getResourceClass<Resource>("Patient")).isEqualTo(Patient::class.java)
   }
 
   @Test
-  fun getResourceClassByResourceType() {
+  fun `getResourceClass() by resource type should return resource class`() {
     assertThat(getResourceClass<Resource>(ResourceType.Patient)).isEqualTo(Patient::class.java)
   }
 }
