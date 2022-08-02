@@ -18,16 +18,11 @@ package com.google.android.fhir.datacapture
 
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
-import com.google.android.fhir.datacapture.mapping.ResourceMapper
-import com.google.android.fhir.datacapture.validation.MAX_VALUE_EXTENSION_URL
-import com.google.android.fhir.datacapture.validation.MIN_VALUE_EXTENSION_URL
 import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
-import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Expression
-import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
