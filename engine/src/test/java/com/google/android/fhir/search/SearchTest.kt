@@ -2120,7 +2120,7 @@ class SearchTest {
   }
 
   @Test
-  fun search_condition_search_params_clinical_status_token_filter_code_only() {
+  fun `search filter should append index name only for token filter with code only`() {
     val query =
       Search(ResourceType.Condition)
         .apply {
@@ -2146,7 +2146,7 @@ class SearchTest {
   }
 
   @Test
-  fun search_condition_search_params_clinical_status_token_filter_code_and_system() {
+  fun `search filter should append index name and index system for token filter with code and system`() {
     val query =
       Search(ResourceType.Condition)
         .apply {

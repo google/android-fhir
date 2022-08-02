@@ -174,7 +174,7 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun search_byXFhirQueryString_shouldReturn_FemalePatients() = runBlocking {
+  fun `search() by x-fhir-query should return female patients for gender param`() = runBlocking {
     val patients =
       listOf(
         buildPatient("3", "C", Enumerations.AdministrativeGender.FEMALE),
@@ -192,7 +192,7 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun search_byXFhirQueryString_shouldReturn_SortedPatients() = runBlocking {
+  fun `search() by x-fhir-query should return sorted patients for sort param`() = runBlocking {
     val patients =
       listOf(
         buildPatient("3", "C", Enumerations.AdministrativeGender.FEMALE),
@@ -209,7 +209,7 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun search_byXFhirQueryString_shouldReturn_LimitedPatients() = runBlocking {
+  fun `search() by x-fhir-query should return limited patients for count param`() = runBlocking {
     val patients =
       listOf(
         buildPatient("3", "C", Enumerations.AdministrativeGender.FEMALE),
@@ -225,14 +225,14 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun search_byXFhirQueryStringWithEmptyParams_shouldReturnAllResourceList() = runBlocking {
+  fun `search() by x-fhir-query should return all patients for empty params`() = runBlocking {
     val result = fhirEngine.search("Patient")
 
     assertThat(result.size).isEqualTo(1)
   }
 
   @Test
-  fun search_byXFhirQueryString_shouldThrowFHIRException_ForUnrecognizedResourceType() {
+  fun `search() by x-fhir-query should throw FHIRException for unrecognized resource type`() {
     val exception =
       assertThrows(FHIRException::class.java) {
         runBlocking {
@@ -243,7 +243,7 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun search_byXFhirQueryString_shouldThrowIllegalArgumentException_ForUnrecognizedParamName() {
+  fun `search() by x-fhir-query should throw IllegalArgumentException for unrecognized param name`() {
     val exception =
       assertThrows(IllegalArgumentException::class.java) {
         runBlocking { fhirEngine.search("Patient?customParam=true&gender=male&_sort=name") }
