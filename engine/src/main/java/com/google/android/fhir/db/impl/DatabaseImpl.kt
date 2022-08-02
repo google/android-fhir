@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -216,6 +216,14 @@ internal class DatabaseImpl(
       resourceDao.getResourceEntity(resourceId = id, resourceType = type)
         ?: throw ResourceNotFoundException(type.name, id)
     }
+  }
+
+  override suspend fun withTransaction(block: suspend () -> Unit) {
+    db.withTransaction(block)
+  }
+
+  override suspend fun deleteUpdates(resources: List<Resource>) {
+    localChangeDao.discardLocalChanges(resources)
   }
 
   override fun close() {

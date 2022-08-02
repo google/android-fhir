@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.demo.data
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.google.android.fhir.demo.FhirApplication
+import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
 
@@ -28,6 +29,8 @@ class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters
   override fun getDownloadWorkManager(): DownloadWorkManager {
     return DownloadWorkManagerImpl()
   }
+
+  override fun getConflictResolver() = AcceptLocalConflictResolver
 
   override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)
 }
