@@ -30,9 +30,9 @@ import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.json.DatastoreUtil
-import com.google.android.fhir.json.FhirEngineProvider
+import com.google.android.fhir.json.JsonEngineProvider
 import com.google.android.fhir.json.db.Database
-import com.google.android.fhir.json.impl.FhirEngineImpl
+import com.google.android.fhir.json.impl.JsonEngineImpl
 import com.google.android.fhir.json.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.time.OffsetDateTime
@@ -78,11 +78,11 @@ class SyncJobTest {
   @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
 
   private lateinit var syncJob: SyncJob
-  private lateinit var mock: MockedStatic<FhirEngineProvider>
+  private lateinit var mock: MockedStatic<JsonEngineProvider>
 
   @Before
   fun setup() {
-    fhirEngine = FhirEngineImpl(database, context)
+    fhirEngine = JsonEngineImpl(database, context)
     syncJob = Sync.basicSyncJob(context)
 
     val config =
@@ -94,8 +94,8 @@ class SyncJobTest {
     // Initialize WorkManager for instrumentation tests.
     WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
     workManager = WorkManager.getInstance(context)
-    mock = Mockito.mockStatic(FhirEngineProvider::class.java)
-    whenever(FhirEngineProvider.getDataSource(anyOrNull())).thenReturn(dataSource)
+    mock = Mockito.mockStatic(JsonEngineProvider::class.java)
+    whenever(JsonEngineProvider.getDataSource(anyOrNull())).thenReturn(dataSource)
   }
 
   @After
@@ -348,7 +348,7 @@ class SyncJobTest {
 
   @Test
   fun `should fail when there data source is null`() = runBlockingTest {
-    whenever(FhirEngineProvider.getDataSource(anyOrNull())).thenReturn(null)
+    whenever(JsonEngineProvider.getDataSource(anyOrNull())).thenReturn(null)
     whenever(database.getAllLocalChanges()).thenReturn(listOf())
     whenever(dataSource.download(any()))
       .thenReturn(Bundle().apply { type = Bundle.BundleType.SEARCHSET })

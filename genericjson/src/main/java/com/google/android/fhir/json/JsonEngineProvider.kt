@@ -21,33 +21,33 @@ import com.google.android.fhir.json.DatabaseErrorStrategy.UNSPECIFIED
 import com.google.android.fhir.json.sync.Authenticator
 import com.google.android.fhir.json.sync.DataSource
 
-/** The provider for [FhirEngine] instance. */
-object FhirEngineProvider {
-  private var fhirEngineConfiguration: FhirEngineConfiguration? = null
-  private var fhirServices: FhirServices? = null
+/** The provider for [JsonEngine] instance. */
+object JsonEngineProvider {
+  private var jsonEngineConfiguration: JsonEngineConfiguration? = null
+  private var jsonServices: JsonServices? = null
 
   /**
-   * Initializes the [FhirEngine] singleton with a custom Configuration.
+   * Initializes the [JsonEngine] singleton with a custom Configuration.
    *
    * This method throws [IllegalStateException] if it is called multiple times
    */
   @Synchronized
-  fun init(fhirEngineConfiguration: FhirEngineConfiguration) {
-    check(FhirEngineProvider.fhirEngineConfiguration == null) {
-      "FhirEngineProvider: FhirEngineConfiguration has already been initialized."
+  fun init(jsonEngineConfiguration: JsonEngineConfiguration) {
+    check(JsonEngineProvider.jsonEngineConfiguration == null) {
+      "JsonEngineProvider: JsonEngineConfiguration has already been initialized."
     }
-    FhirEngineProvider.fhirEngineConfiguration = fhirEngineConfiguration
+    JsonEngineProvider.jsonEngineConfiguration = jsonEngineConfiguration
   }
 
   /**
-   * Returns the cached [FhirEngine] instance. Creates a new instance from the supplied [Context] if
+   * Returns the cached [JsonEngine] instance. Creates a new instance from the supplied [Context] if
    * it doesn't exist.
    *
-   * If this method is called without calling [init], the default [FhirEngineConfiguration] is used.
+   * If this method is called without calling [init], the default [JsonEngineConfiguration] is used.
    */
   @Synchronized
-  fun getInstance(context: Context): FhirEngine {
-    return getOrCreateFhirService(context).fhirEngine
+  fun getInstance(context: Context): JsonEngine {
+    return getOrCreateFhirService(context).jsonEngine
   }
 
   @Synchronized
@@ -57,12 +57,12 @@ object FhirEngineProvider {
   }
 
   @Synchronized
-  private fun getOrCreateFhirService(context: Context): FhirServices {
-    if (fhirServices == null) {
-      fhirEngineConfiguration = fhirEngineConfiguration ?: FhirEngineConfiguration()
-      val configuration = checkNotNull(fhirEngineConfiguration)
-      fhirServices =
-        FhirServices.builder(context.applicationContext)
+  private fun getOrCreateFhirService(context: Context): JsonServices {
+    if (jsonServices == null) {
+      jsonEngineConfiguration = jsonEngineConfiguration ?: JsonEngineConfiguration()
+      val configuration = checkNotNull(jsonEngineConfiguration)
+      jsonServices =
+        JsonServices.builder(context.applicationContext)
           .apply {
             if (configuration.enableEncryptionIfSupported) enableEncryptionIfSupported()
             setDatabaseErrorStrategy(configuration.databaseErrorStrategy)
@@ -73,21 +73,21 @@ object FhirEngineProvider {
           }
           .build()
     }
-    return checkNotNull(fhirServices)
+    return checkNotNull(jsonServices)
   }
 
   @Synchronized
   fun cleanup() {
-    check(fhirEngineConfiguration?.testMode == true) {
-      "FhirEngineProvider: FhirEngineProvider needs to be in the test mode to perform cleanup."
+    check(jsonEngineConfiguration?.testMode == true) {
+      "JsonEngineProvider: JsonEngineProvider needs to be in the test mode to perform cleanup."
     }
     forceCleanup()
   }
 
   internal fun forceCleanup() {
-    fhirServices?.database?.close()
-    fhirServices = null
-    fhirEngineConfiguration = null
+    jsonServices?.database?.close()
+    jsonServices = null
+    jsonEngineConfiguration = null
   }
 }
 
@@ -100,7 +100,7 @@ object FhirEngineProvider {
  * WARNING: Your app may try to decrypt an unencrypted database from a device which was previously
  * on API 22 but later upgraded to API 23. When this happens, an [IllegalStateException] is thrown.
  */
-data class FhirEngineConfiguration(
+data class JsonEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
   val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
   val serverConfiguration: ServerConfiguration? = null,

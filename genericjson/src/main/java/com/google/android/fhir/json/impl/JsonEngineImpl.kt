@@ -18,7 +18,7 @@ package com.google.android.fhir.json.impl
 
 import android.content.Context
 import com.google.android.fhir.json.DatastoreUtil
-import com.google.android.fhir.json.FhirEngine
+import com.google.android.fhir.json.JsonEngine
 import com.google.android.fhir.json.SyncDownloadContext
 import com.google.android.fhir.json.db.Database
 import com.google.android.fhir.json.db.impl.dao.LocalChangeToken
@@ -39,9 +39,9 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
-/** Implementation of [FhirEngine]. */
-internal class FhirEngineImpl(private val database: Database, private val context: Context) :
-  FhirEngine {
+/** Implementation of [JsonEngine]. */
+internal class JsonEngineImpl(private val database: Database, private val context: Context) :
+  JsonEngine {
   override suspend fun create(vararg resource: Resource): List<String> {
     return database.insert(*resource)
   }

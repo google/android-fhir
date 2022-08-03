@@ -32,7 +32,7 @@ internal data class NestedContext(val parentType: ResourceType, val param: IPara
  * [https://www.hl7.org/fhir/search.html#has]. For example: search all Patient that have Condition -
  * Diabetes. This search uses the subject field in the Condition resource. Code snippet:
  * ```
- *     FhirEngine.search<Patient> {
+ *     JsonEngine.search<Patient> {
  *        has<Condition>(Condition.SUBJECT) {
  *          filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
  *        }

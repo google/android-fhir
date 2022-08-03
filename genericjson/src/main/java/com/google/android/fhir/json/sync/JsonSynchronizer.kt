@@ -18,7 +18,7 @@ package com.google.android.fhir.json.sync
 
 import android.content.Context
 import com.google.android.fhir.json.DatastoreUtil
-import com.google.android.fhir.json.FhirEngine
+import com.google.android.fhir.json.JsonEngine
 import com.google.android.fhir.json.sync.download.DownloaderImpl
 import com.google.android.fhir.json.sync.upload.BundleUploader
 import com.google.android.fhir.json.sync.upload.TransactionBundleGenerator
@@ -48,9 +48,9 @@ sealed class State {
 data class ResourceSyncException(val resourceType: ResourceType, val exception: Exception)
 
 /** Class that helps synchronize the data source and save it in the local database */
-internal class FhirSynchronizer(
+internal class JsonSynchronizer(
   context: Context,
-  private val fhirEngine: FhirEngine,
+  private val jsonEngine: JsonEngine,
   private val dataSource: DataSource,
   private val downloadManager: DownloadWorkManager,
   private val uploader: Uploader =
@@ -105,7 +105,7 @@ internal class FhirSynchronizer(
 
   private suspend fun download(): Result {
     val exceptions = mutableListOf<ResourceSyncException>()
-    fhirEngine.syncDownload(conflictResolver) {
+    jsonEngine.syncDownload(conflictResolver) {
       flow {
         downloader.download(it).collect {
           when (it) {
@@ -132,7 +132,7 @@ internal class FhirSynchronizer(
 
   private suspend fun upload(): Result {
     val exceptions = mutableListOf<ResourceSyncException>()
-    fhirEngine.syncUpload { list ->
+    jsonEngine.syncUpload { list ->
       flow {
         uploader.upload(list).collect {
           when (it) {

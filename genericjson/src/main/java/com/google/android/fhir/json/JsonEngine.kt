@@ -27,7 +27,7 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
-interface FhirEngine {
+interface JsonEngine {
   /**
    * Creates one or more FHIR [resource]s in the local storage.
    *
@@ -85,7 +85,7 @@ interface FhirEngine {
  * @throws ResourceNotFoundException if the resource is not found
  */
 @Throws(ResourceNotFoundException::class)
-suspend inline fun <reified R : Resource> FhirEngine.get(id: String): R {
+suspend inline fun <reified R : Resource> JsonEngine.get(id: String): R {
   return get(getResourceType(R::class.java), id) as R
 }
 
@@ -94,7 +94,7 @@ suspend inline fun <reified R : Resource> FhirEngine.get(id: String): R {
  *
  * @param <R> The resource type which should be a subtype of [Resource].
  */
-suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
+suspend inline fun <reified R : Resource> JsonEngine.delete(id: String) {
   delete(getResourceType(R::class.java), id)
 }
 

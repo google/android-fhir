@@ -23,8 +23,8 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
 import com.google.android.fhir.json.DatastoreUtil
-import com.google.android.fhir.json.FhirEngine
-import com.google.android.fhir.json.FhirEngineProvider
+import com.google.android.fhir.json.JsonEngine
+import com.google.android.fhir.json.JsonEngineProvider
 import com.google.android.fhir.json.OffsetDateTimeTypeAdapter
 import com.google.gson.GsonBuilder
 import java.time.OffsetDateTime
@@ -46,7 +46,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
 
   /** Periodically sync the data with given configuration for given worker class */
   @ExperimentalCoroutinesApi
-  override fun <W : FhirSyncWorker> poll(
+  override fun <W : JsonSyncWorker> poll(
     periodicSyncConfiguration: PeriodicSyncConfiguration,
     clazz: Class<W>
   ): Flow<State> {
@@ -98,13 +98,13 @@ class SyncJobImpl(private val context: Context) : SyncJob {
    * subscribe to given flow
    */
   override suspend fun run(
-    fhirEngine: FhirEngine,
+    jsonEngine: JsonEngine,
     downloadManager: DownloadWorkManager,
     resolver: ConflictResolver,
     subscribeTo: MutableSharedFlow<State>?
   ): Result {
-    return FhirEngineProvider.getDataSource(context)?.let {
-      FhirSynchronizer(context, fhirEngine, it, downloadManager, conflictResolver = resolver)
+    return JsonEngineProvider.getDataSource(context)?.let {
+      JsonSynchronizer(context, jsonEngine, it, downloadManager, conflictResolver = resolver)
         .apply { if (subscribeTo != null) subscribe(subscribeTo) }
         .synchronize()
     }
@@ -113,7 +113,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
           ResourceSyncException(
             ResourceType.Bundle,
             IllegalStateException(
-              "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration."
+              "JsonEngineConfiguration.ServerConfiguration is not set. Call JsonEngineProvider.init to initialize with appropriate configuration."
             )
           )
         )

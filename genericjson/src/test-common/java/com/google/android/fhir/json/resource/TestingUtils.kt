@@ -18,7 +18,7 @@ package com.google.android.fhir.json.resource
 
 import androidx.work.Data
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.json.FhirEngine
+import com.google.android.fhir.json.JsonEngine
 import com.google.android.fhir.json.SyncDownloadContext
 import com.google.android.fhir.json.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.json.db.impl.dao.SquashedLocalChange
@@ -115,7 +115,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     queries: List<String> = listOf("Patient/bob", "Encounter/doc")
   ) : TestDownloadManagerImpl(queries)
 
-  object TestFhirEngineImpl : FhirEngine {
+  object TestJsonEngineImpl : JsonEngine {
     override suspend fun create(vararg resource: Resource) = emptyList<String>()
 
     override suspend fun update(vararg resource: Resource) {}

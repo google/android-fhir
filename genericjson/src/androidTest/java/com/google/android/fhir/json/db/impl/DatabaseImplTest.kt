@@ -22,7 +22,7 @@ import androidx.test.filters.MediumTest
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.json.DateProvider
-import com.google.android.fhir.json.FhirServices
+import com.google.android.fhir.json.JsonServices
 import com.google.android.fhir.json.db.ResourceNotFoundException
 import com.google.android.fhir.json.logicalId
 import com.google.android.fhir.json.search.getQuery
@@ -83,7 +83,7 @@ class DatabaseImplTest {
 
   private val context: Context = ApplicationProvider.getApplicationContext()
   private val services =
-    FhirServices.builder(context)
+    JsonServices.builder(context)
       .inMemory()
       .apply { if (encrypted) enableEncryptionIfSupported() }
       .build()
@@ -371,7 +371,7 @@ class DatabaseImplTest {
         lastUpdated = Date()
       }
     database.insert(patient)
-    services.fhirEngine.syncUpload { it ->
+    services.jsonEngine.syncUpload { it ->
       it.first { it.localChange.resourceId == "remote-patient-3" }.let {
         flowOf(
           it.token to

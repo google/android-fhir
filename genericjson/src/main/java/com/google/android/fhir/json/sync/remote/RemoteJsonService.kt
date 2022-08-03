@@ -34,7 +34,7 @@ import retrofit2.http.POST
 import retrofit2.http.Url
 
 /** Interface to make http requests to the FHIR server. */
-internal interface RemoteFhirService : DataSource {
+internal interface RemoteJsonService : DataSource {
 
   @GET override suspend fun download(@Url path: String): Resource
 
@@ -50,7 +50,7 @@ internal interface RemoteFhirService : DataSource {
       this.authenticator = authenticator
     }
 
-    fun build(): RemoteFhirService {
+    fun build(): RemoteJsonService {
       val logger = HttpLoggingInterceptor()
       logger.level =
         if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
@@ -84,7 +84,7 @@ internal interface RemoteFhirService : DataSource {
         .addConverterFactory(FhirConverterFactory.create())
         .addConverterFactory(GsonConverterFactory.create())
         .build()
-        .create(RemoteFhirService::class.java)
+        .create(RemoteJsonService::class.java)
     }
   }
 

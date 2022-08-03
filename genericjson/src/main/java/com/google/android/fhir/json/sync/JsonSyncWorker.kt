@@ -21,8 +21,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.google.android.fhir.json.FhirEngine
-import com.google.android.fhir.json.FhirEngineProvider
+import com.google.android.fhir.json.JsonEngine
+import com.google.android.fhir.json.JsonEngineProvider
 import com.google.android.fhir.json.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.json.sync.Result.Error
 import com.google.android.fhir.json.sync.Result.Success
@@ -39,9 +39,9 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /** A WorkManager Worker that handles periodic sync. */
-abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
+abstract class JsonSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
-  abstract fun getFhirEngine(): FhirEngine
+  abstract fun getFhirEngine(): JsonEngine
   abstract fun getDownloadWorkManager(): DownloadWorkManager
   abstract fun getConflictResolver(): ConflictResolver
 
@@ -51,8 +51,8 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       .setExclusionStrategies(StateExclusionStrategy())
       .create()
 
-  /** The purpose of this api makes it easy to stub [FhirSyncWorker] for testing. */
-  internal open fun getDataSource() = FhirEngineProvider.getDataSource(applicationContext)
+  /** The purpose of this api makes it easy to stub [JsonSyncWorker] for testing. */
+  internal open fun getDataSource() = JsonEngineProvider.getDataSource(applicationContext)
 
   override suspend fun doWork(): Result {
     val dataSource =
@@ -60,13 +60,13 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         ?: return Result.failure(
           buildWorkData(
             IllegalStateException(
-              "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration."
+              "JsonEngineConfiguration.ServerConfiguration is not set. Call JsonEngineProvider.init to initialize with appropriate configuration."
             )
           )
         )
 
-    val fhirSynchronizer =
-      FhirSynchronizer(
+    val jsonSynchronizer =
+      JsonSynchronizer(
         applicationContext,
         getFhirEngine(),
         dataSource,
@@ -87,11 +87,11 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         }
       }
 
-    fhirSynchronizer.subscribe(flow)
+    jsonSynchronizer.subscribe(flow)
 
     Timber.v("Subscribed to flow for progress")
 
-    val result = fhirSynchronizer.synchronize()
+    val result = jsonSynchronizer.synchronize()
     val output = buildOutput(result)
 
     // await/join is needed to collect states completely
@@ -140,7 +140,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
 
   /**
    * Exclusion strategy for [Gson] that handles field exclusions for [State] returned by
-   * FhirSynchronizer. It should skip serializing the exceptions to avoid exceeding WorkManager
+   * JsonSynchronizer. It should skip serializing the exceptions to avoid exceeding WorkManager
    * WorkData limit
    * @see <a
    * href="https://github.com/google/android-fhir/issues/707">https://github.com/google/android-fhir/issues/707</a>

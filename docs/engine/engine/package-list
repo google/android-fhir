@@ -253,7 +253,7 @@ $dokka.location:com.google.android.fhir.sync/FhirSyncWorker///PointingToDeclarat
 $dokka.location:com.google.android.fhir.sync/FhirSyncWorker/FhirSyncWorker/#Context#WorkerParameters/PointingToDeclaration/engine/com.google.android.fhir.sync/-fhir-sync-worker/-fhir-sync-worker.html
 $dokka.location:com.google.android.fhir.sync/FhirSyncWorker/doWork/#/PointingToDeclaration/engine/com.google.android.fhir.sync/-fhir-sync-worker/do-work.html
 $dokka.location:com.google.android.fhir.sync/FhirSyncWorker/getDownloadWorkManager/#/PointingToDeclaration/engine/com.google.android.fhir.sync/-fhir-sync-worker/get-download-work-manager.html
-$dokka.location:com.google.android.fhir.sync/FhirSyncWorker/getFhirEngine/#/PointingToDeclaration/engine/com.google.android.fhir.sync/-fhir-sync-worker/get-fhir-engine.html
+$dokka.location:com.google.android.fhir.sync/FhirSyncWorker/getJsonEngine/#/PointingToDeclaration/engine/com.google.android.fhir.sync/-fhir-sync-worker/get-fhir-engine.html
 $dokka.location:com.google.android.fhir.sync/PeriodicSyncConfiguration///PointingToDeclaration/engine/com.google.android.fhir.sync/-periodic-sync-configuration/index.html
 $dokka.location:com.google.android.fhir.sync/PeriodicSyncConfiguration/PeriodicSyncConfiguration/#Constraints#com.google.android.fhir.sync.RepeatInterval#com.google.android.fhir.sync.RetryConfiguration?/PointingToDeclaration/engine/com.google.android.fhir.sync/-periodic-sync-configuration/-periodic-sync-configuration.html
 $dokka.location:com.google.android.fhir.sync/PeriodicSyncConfiguration/repeat/#/PointingToDeclaration/engine/com.google.android.fhir.sync/-periodic-sync-configuration/repeat.html

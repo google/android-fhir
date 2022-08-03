@@ -21,11 +21,11 @@ import androidx.work.WorkerParameters
 import com.google.android.fhir.json.resource.TestingUtils
 
 class TestSyncWorker(appContext: Context, workerParams: WorkerParameters) :
-  FhirSyncWorker(appContext, workerParams) {
+  JsonSyncWorker(appContext, workerParams) {
 
   override fun getDataSource() = TestingUtils.TestDataSourceImpl
 
-  override fun getFhirEngine() = TestingUtils.TestFhirEngineImpl
+  override fun getFhirEngine() = TestingUtils.TestJsonEngineImpl
 
   override fun getDownloadWorkManager() = TestingUtils.TestDownloadManagerImpl()
 

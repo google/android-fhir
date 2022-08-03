@@ -17,7 +17,7 @@
 package com.google.android.fhir.json.sync
 
 import androidx.work.WorkInfo
-import com.google.android.fhir.json.FhirEngine
+import com.google.android.fhir.json.JsonEngine
 import java.time.OffsetDateTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -25,13 +25,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 
 interface SyncJob {
   @ExperimentalCoroutinesApi
-  fun <W : FhirSyncWorker> poll(
+  fun <W : JsonSyncWorker> poll(
     periodicSyncConfiguration: PeriodicSyncConfiguration,
     clazz: Class<W>
   ): Flow<State>
 
   suspend fun run(
-    fhirEngine: FhirEngine,
+    jsonEngine: JsonEngine,
     downloadManager: DownloadWorkManager,
     resolver: ConflictResolver,
     subscribeTo: MutableSharedFlow<State>?

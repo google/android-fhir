@@ -82,12 +82,12 @@ data class RetryConfiguration(
    */
   val backoffCriteria: BackoffCriteria,
 
-  /** Maximum retries for a failing [FhirSyncWorker] */
+  /** Maximum retries for a failing [JsonSyncWorker] */
   val maxRetries: Int
 )
 
 /**
- * The criteria for [FhirSyncWorker] failure retry based on
+ * The criteria for [JsonSyncWorker] failure retry based on
  * [androidx.work.WorkRequest.Builder.setBackoffCriteria]
  */
 data class BackoffCriteria(

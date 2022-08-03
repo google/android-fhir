@@ -16,16 +16,16 @@
 
 package com.google.android.fhir.json.search
 
-import com.google.android.fhir.json.FhirEngine
+import com.google.android.fhir.json.JsonEngine
 import org.hl7.fhir.r4.model.Resource
 
-suspend inline fun <reified R : Resource> FhirEngine.search(init: Search.() -> Unit): List<R> {
+suspend inline fun <reified R : Resource> JsonEngine.search(init: Search.() -> Unit): List<R> {
   val search = Search(type = R::class.java.newInstance().resourceType)
   search.init()
   return this.search(search)
 }
 
-suspend inline fun <reified R : Resource> FhirEngine.count(init: Search.() -> Unit): Long {
+suspend inline fun <reified R : Resource> JsonEngine.count(init: Search.() -> Unit): Long {
   val search = Search(type = R::class.java.newInstance().resourceType)
   search.init()
   return this.count(search)

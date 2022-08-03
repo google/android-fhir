@@ -20,7 +20,7 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 
-/** The DateProvider Instance [FhirEngine] uses for date/time related operations. */
+/** The DateProvider Instance [JsonEngine] uses for date/time related operations. */
 object DateProvider {
   lateinit var clock: Clock
   private var fixed = false

@@ -25,10 +25,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
-/** Unit tests for [FhirEngineProvider]. */
+/** Unit tests for [JsonEngineProvider]. */
 @RunWith(RobolectricTestRunner::class)
-class FhirEngineProviderTest {
-  private val provider: FhirEngineProvider = FhirEngineProvider
+class JsonEngineProviderTest {
+  private val provider: JsonEngineProvider = JsonEngineProvider
 
   @After
   fun tearDown() {
@@ -52,7 +52,7 @@ class FhirEngineProviderTest {
 
   @Test
   fun build_twiceWithAppContext_afterCleanup_shouldReturnDifferentInstances() {
-    provider.init(FhirEngineConfiguration(testMode = true))
+    provider.init(JsonEngineConfiguration(testMode = true))
     val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
     provider.cleanup()
     val engineTwo = provider.getInstance(ApplicationProvider.getApplicationContext())
@@ -61,7 +61,7 @@ class FhirEngineProviderTest {
 
   @Test
   fun cleanup_not_in_test_mode_fails() {
-    provider.init(FhirEngineConfiguration(testMode = false))
+    provider.init(JsonEngineConfiguration(testMode = false))
 
     provider.getInstance(ApplicationProvider.getApplicationContext())
 
@@ -71,7 +71,7 @@ class FhirEngineProviderTest {
 
   @Test
   fun createFhirEngineConfiguration_withDefaultNetworkConfig_shouldHaveDefaultTimeout() {
-    val config = FhirEngineConfiguration(serverConfiguration = ServerConfiguration(""))
+    val config = JsonEngineConfiguration(serverConfiguration = ServerConfiguration(""))
     with(config.serverConfiguration!!.networkConfiguration) {
       assertThat(this.connectionTimeOut).isEqualTo(10L)
       assertThat(this.readTimeOut).isEqualTo(10L)
@@ -82,7 +82,7 @@ class FhirEngineProviderTest {
   @Test
   fun createFhirEngineConfiguration_configureNetworkTimeouts_shouldHaveconfiguredTimeout() {
     val config =
-      FhirEngineConfiguration(
+      JsonEngineConfiguration(
         serverConfiguration =
           ServerConfiguration(
             "",

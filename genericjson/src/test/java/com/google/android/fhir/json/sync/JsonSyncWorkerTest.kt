@@ -22,7 +22,7 @@ import androidx.work.Data
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
-import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.json.JsonEngine
 import com.google.android.fhir.json.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -34,12 +34,12 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)
-class FhirSyncWorkerTest {
+class JsonSyncWorkerTest {
   private lateinit var context: Context
   class PassingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
-    FhirSyncWorker(appContext, workerParams) {
+    JsonSyncWorker(appContext, workerParams) {
 
-    override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
+    override fun getFhirEngine(): JsonEngine = TestingUtils.TestJsonEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
     override fun getDownloadWorkManager(): DownloadWorkManager =
       TestingUtils.TestDownloadManagerImpl()
@@ -47,9 +47,9 @@ class FhirSyncWorkerTest {
   }
 
   class FailingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
-    FhirSyncWorker(appContext, workerParams) {
+    JsonSyncWorker(appContext, workerParams) {
 
-    override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
+    override fun getFhirEngine(): JsonEngine = TestingUtils.TestJsonEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestFailingDatasource
     override fun getDownloadWorkManager(): DownloadWorkManager =
       TestingUtils.TestDownloadManagerImpl()
@@ -59,9 +59,9 @@ class FhirSyncWorkerTest {
   class FailingPeriodicSyncWorkerWithoutDataSource(
     appContext: Context,
     workerParams: WorkerParameters
-  ) : FhirSyncWorker(appContext, workerParams) {
+  ) : JsonSyncWorker(appContext, workerParams) {
 
-    override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
+    override fun getFhirEngine(): JsonEngine = TestingUtils.TestJsonEngineImpl
     override fun getDownloadWorkManager() = TestingUtils.TestDownloadManagerImpl()
     override fun getDataSource(): DataSource? = null
     override fun getConflictResolver() = AcceptRemoteConflictResolver

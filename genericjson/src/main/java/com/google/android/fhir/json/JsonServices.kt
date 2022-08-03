@@ -24,13 +24,13 @@ import com.google.android.fhir.json.db.Database
 import com.google.android.fhir.json.db.impl.DatabaseConfig
 import com.google.android.fhir.json.db.impl.DatabaseEncryptionKeyProvider.isDatabaseEncryptionSupported
 import com.google.android.fhir.json.db.impl.DatabaseImpl
-import com.google.android.fhir.json.impl.FhirEngineImpl
+import com.google.android.fhir.json.impl.JsonEngineImpl
 import com.google.android.fhir.json.sync.DataSource
-import com.google.android.fhir.json.sync.remote.RemoteFhirService
+import com.google.android.fhir.json.sync.remote.RemoteJsonService
 import timber.log.Timber
 
-internal data class FhirServices(
-  val fhirEngine: FhirEngine,
+internal data class JsonServices(
+  val jsonEngine: JsonEngine,
   val parser: IParser,
   val database: Database,
   val remoteDataSource: DataSource? = null
@@ -59,7 +59,7 @@ internal data class FhirServices(
       this.serverConfiguration = serverConfiguration
     }
 
-    fun build(): FhirServices {
+    fun build(): JsonServices {
       val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
       val db =
         DatabaseImpl(
@@ -67,15 +67,15 @@ internal data class FhirServices(
           iParser = parser,
           DatabaseConfig(inMemory, enableEncryption, databaseErrorStrategy)
         )
-      val engine = FhirEngineImpl(database = db, context = context)
+      val engine = JsonEngineImpl(database = db, context = context)
       val remoteDataSource =
         serverConfiguration?.let {
-          RemoteFhirService.builder(it.baseUrl, it.networkConfiguration)
+          RemoteJsonService.builder(it.baseUrl, it.networkConfiguration)
             .apply { setAuthenticator(it.authenticator) }
             .build()
         }
-      return FhirServices(
-        fhirEngine = engine,
+      return JsonServices(
+        jsonEngine = engine,
         parser = parser,
         database = db,
         remoteDataSource = remoteDataSource

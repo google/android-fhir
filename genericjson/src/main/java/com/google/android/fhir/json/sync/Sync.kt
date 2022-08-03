@@ -23,8 +23,8 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import com.google.android.fhir.json.FhirEngine
-import com.google.android.fhir.json.FhirEngineProvider
+import com.google.android.fhir.json.JsonEngine
+import com.google.android.fhir.json.JsonEngineProvider
 import org.hl7.fhir.r4.model.ResourceType
 
 object Sync {
@@ -40,12 +40,12 @@ object Sync {
   // TODO: Check if this api is required anymore since we have SyncJob.run to do the same work.
   suspend fun oneTimeSync(
     context: Context,
-    fhirEngine: FhirEngine,
+    jsonEngine: JsonEngine,
     downloadManager: DownloadWorkManager,
     resolver: ConflictResolver
   ): Result {
-    return FhirEngineProvider.getDataSource(context)?.let {
-      FhirSynchronizer(context, fhirEngine, it, downloadManager, conflictResolver = resolver)
+    return JsonEngineProvider.getDataSource(context)?.let {
+      JsonSynchronizer(context, jsonEngine, it, downloadManager, conflictResolver = resolver)
         .synchronize()
     }
       ?: Result.Error(
@@ -53,7 +53,7 @@ object Sync {
           ResourceSyncException(
             ResourceType.Bundle,
             IllegalStateException(
-              "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration."
+              "JsonEngineConfiguration.ServerConfiguration is not set. Call JsonEngineProvider.init to initialize with appropriate configuration."
             )
           )
         )
@@ -61,10 +61,10 @@ object Sync {
   }
 
   /**
-   * Starts a one time sync based on [FhirSyncWorker]. In case of a failure, [RetryConfiguration]
+   * Starts a one time sync based on [JsonSyncWorker]. In case of a failure, [RetryConfiguration]
    * will guide the retry mechanism. Caller can set [retryConfiguration] to [null] to stop retry.
    */
-  inline fun <reified W : FhirSyncWorker> oneTimeSync(
+  inline fun <reified W : JsonSyncWorker> oneTimeSync(
     context: Context,
     retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
   ) {
@@ -76,11 +76,11 @@ object Sync {
       )
   }
   /**
-   * Starts a periodic sync based on [FhirSyncWorker]. It takes [PeriodicSyncConfiguration] to
+   * Starts a periodic sync based on [JsonSyncWorker]. It takes [PeriodicSyncConfiguration] to
    * determine the sync frequency and [RetryConfiguration] to guide the retry mechanism. Caller can
    * set [retryConfiguration] to [null] to stop retry.
    */
-  inline fun <reified W : FhirSyncWorker> periodicSync(
+  inline fun <reified W : JsonSyncWorker> periodicSync(
     context: Context,
     periodicSyncConfiguration: PeriodicSyncConfiguration
   ) {
@@ -94,7 +94,7 @@ object Sync {
   }
 
   @PublishedApi
-  internal inline fun <W : FhirSyncWorker> createOneTimeWorkRequest(
+  internal inline fun <W : JsonSyncWorker> createOneTimeWorkRequest(
     retryConfiguration: RetryConfiguration?,
     clazz: Class<W>
   ): OneTimeWorkRequest {
@@ -113,7 +113,7 @@ object Sync {
   }
 
   @PublishedApi
-  internal inline fun <W : FhirSyncWorker> createPeriodicWorkRequest(
+  internal inline fun <W : JsonSyncWorker> createPeriodicWorkRequest(
     periodicSyncConfiguration: PeriodicSyncConfiguration,
     clazz: Class<W>
   ): PeriodicWorkRequest {

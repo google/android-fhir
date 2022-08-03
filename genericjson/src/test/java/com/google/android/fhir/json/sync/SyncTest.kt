@@ -19,7 +19,7 @@ package com.google.android.fhir.json.sync
 import android.content.Context
 import androidx.work.BackoffPolicy
 import androidx.work.WorkerParameters
-import com.google.android.fhir.json.FhirEngine
+import com.google.android.fhir.json.JsonEngine
 import com.google.android.fhir.json.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.TimeUnit
@@ -32,9 +32,9 @@ import org.robolectric.annotation.Config
 @Config(manifest = Config.NONE)
 class SyncTest {
   class PassingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
-    FhirSyncWorker(appContext, workerParams) {
+    JsonSyncWorker(appContext, workerParams) {
 
-    override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
+    override fun getFhirEngine(): JsonEngine = TestingUtils.TestJsonEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
     override fun getDownloadWorkManager(): DownloadWorkManager =
       TestingUtils.TestDownloadManagerImpl()

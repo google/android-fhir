@@ -17,10 +17,10 @@
 package com.google.android.fhir.json.impl
 
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
-import com.google.android.fhir.json.FhirServices.Companion.builder
+import com.google.android.fhir.json.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.json.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.json.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.json.JsonServices.Companion.builder
 import com.google.android.fhir.json.db.ResourceNotFoundException
 import com.google.android.fhir.json.get
 import com.google.android.fhir.json.resource.TestingUtils
@@ -43,11 +43,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
-/** Unit tests for [FhirEngineImpl]. */
+/** Unit tests for [JsonEngineImpl]. */
 @RunWith(RobolectricTestRunner::class)
-class FhirEngineImplTest {
+class JsonEngineImplTest {
   private val services = builder(ApplicationProvider.getApplicationContext()).inMemory().build()
-  private val fhirEngine = services.fhirEngine
+  private val fhirEngine = services.jsonEngine
   private val testingUtils = TestingUtils(services.parser)
 
   @Before fun setUp(): Unit = runBlocking { fhirEngine.create(TEST_PATIENT_1) }
