@@ -181,8 +181,8 @@ internal abstract class LocalChangeDao {
   suspend fun discardLocalChanges(resources: List<Resource>) {
     resources.forEach { discardLocalChanges(it.logicalId, it.resourceType) }
   }
-  
-   @Query(
+
+  @Query(
     """
         SELECT *
         FROM LocalChangeEntity

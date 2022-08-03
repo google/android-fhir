@@ -76,13 +76,13 @@ internal class DatabaseImpl(
     db =
       // Initializes builder with the database file name
       when {
-        databaseConfig.inMemory ->
-          Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
-        enableEncryption ->
-          Room.databaseBuilder(context, ResourceDatabase::class.java, ENCRYPTED_DATABASE_NAME)
-        else ->
-          Room.databaseBuilder(context, ResourceDatabase::class.java, UNENCRYPTED_DATABASE_NAME)
-      }
+          databaseConfig.inMemory ->
+            Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
+          enableEncryption ->
+            Room.databaseBuilder(context, ResourceDatabase::class.java, ENCRYPTED_DATABASE_NAME)
+          else ->
+            Room.databaseBuilder(context, ResourceDatabase::class.java, UNENCRYPTED_DATABASE_NAME)
+        }
         .apply {
           // Provide the SupportSQLiteOpenHelper which enables the encryption.
           if (enableEncryption) {
@@ -244,7 +244,14 @@ internal class DatabaseImpl(
         return@withTransaction null
       }
       val localChangeEntity = LocalChangeUtils.squash(localChangeEntityList)
-      LocalChange(localChangeEntity.resourceType,localChangeEntity.resourceId,localChangeEntity.timestamp, localChangeEntity.type,localChangeEntity.payload,localChangeEntity.versionId)
+      LocalChange(
+        localChangeEntity.resourceType,
+        localChangeEntity.resourceId,
+        localChangeEntity.timestamp,
+        localChangeEntity.type,
+        localChangeEntity.payload,
+        localChangeEntity.versionId
+      )
     }
   }
 
@@ -291,8 +298,7 @@ internal class DatabaseImpl(
      */
     const val ENCRYPTED_DATABASE_NAME = "resources_encrypted.db"
 
-    @VisibleForTesting
-    const val DATABASE_PASSPHRASE_NAME = "fhirEngineDbPassphrase"
+    @VisibleForTesting const val DATABASE_PASSPHRASE_NAME = "fhirEngineDbPassphrase"
   }
 }
 

@@ -315,7 +315,7 @@ class FhirEngineImplTest {
         "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id nonexistent_patient!"
       )
   }
-fun syncDownload_conflictResolution_acceptRemote_shouldHaveNoLocalChangeAnymore() = runBlocking {
+  fun syncDownload_conflictResolution_acceptRemote_shouldHaveNoLocalChangeAnymore() = runBlocking {
     val originalPatient =
       Patient().apply {
         id = "original-001"
