@@ -61,8 +61,10 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
+        responseOptions(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -86,8 +88,10 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
+        responseOptions(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -95,7 +99,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnTextInDialog("Save")
 
     assertDisplayedText().isEmpty()
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
+    assertThat(questionnaireItemViewItem.answers).isEmpty()
   }
 
   @Test
@@ -103,8 +107,10 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
+        responseOptions(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -114,7 +120,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnText("Cancel")
 
     assertDisplayedText().isEmpty()
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
+    assertThat(questionnaireItemViewItem.answers).isEmpty()
   }
 
   @Test
@@ -122,8 +128,10 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3"),
-        responseOptions()
-      ) {}
+        responseOptions(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -141,8 +149,10 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
+        responseOptions(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -159,8 +169,10 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
+        responseOptions(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -168,7 +180,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnTextInDialog("Save")
 
     assertDisplayedText().isEmpty()
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
+    assertThat(questionnaireItemViewItem.answers).isEmpty()
   }
 
   @Test
@@ -176,8 +188,10 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
+        responseOptions(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
     endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
@@ -185,7 +199,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnText("Cancel")
 
     assertDisplayedText().isEmpty()
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
+    assertThat(questionnaireItemViewItem.answers).isEmpty()
   }
 
   /** Method to run code snippet on UI/main thread */

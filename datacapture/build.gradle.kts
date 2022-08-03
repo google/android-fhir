@@ -11,7 +11,6 @@ createJacocoTestReportTask()
 
 android {
   compileSdk = Sdk.compileSdk
-  buildToolsVersion = Plugins.Versions.buildTools
 
   defaultConfig {
     minSdk = Sdk.minSdk
@@ -71,6 +70,7 @@ dependencies {
     exclude(module = "httpclient")
     exclude(group = "net.sf.saxon", module = "Saxon-HE")
   }
+  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
@@ -87,3 +87,5 @@ dependencies {
   testImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.Espresso.espressoCore)
 }
+
+configureDokka(Releases.DataCapture.artifactId, Releases.DataCapture.version)

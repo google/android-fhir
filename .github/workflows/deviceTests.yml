@@ -1,0 +1,124 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: DeviceTests
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events for the `master` branch
+on:
+  push:
+    branches: [ master ]
+    tags:
+      run_ci*
+  pull_request:
+    branches: [ master ]
+env:
+  # Allow precise monitoring of the save/restore of Gradle User Home by `gradle-build-action`
+  # See https://github.com/marketplace/actions/gradle-build-action?version=v2.1.1#cache-debugging-and-analysis
+  GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: true
+  GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: "fhir" # change this to invalidate cache
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # Build will compile APK, test APK and run tests, lint, etc.
+  build:
+
+    runs-on: macos-latest # use mac build for emulator hardware accelerator
+
+    strategy:
+      matrix:
+        api-level: [ 24, 27, 30 ]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Cancel previous
+        uses: styfle/cancel-workflow-action@0.7.0
+        with:
+          access_token: ${{ github.token }}
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          # Fetch origin/master for spotless ratchet to work
+          # https://github.com/diffplug/spotless/issues/1242
+          fetch-depth: 0
+      - name: Setup machine
+        uses: ./.github/actions/commonSetup
+
+      - name: Load AVD cache
+        uses: actions/cache@v2
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.api-level }}
+
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: default
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+      - name: Run instrumentation tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: default
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: |
+            ./gradlew :datacapture:connectedCheck --stacktrace --scan
+            ./gradlew :catalog:connectedCheck  --stacktrace --scan
+            ./gradlew :engine:connectedCheck  --stacktrace --scan
+            ./gradlew :workflow:connectedCheck --stacktrace --scan
+
+      - name: Generate Jacoco test coverage reports
+        if: matrix.api-level == 30 # Only generate coverage report on API level 30
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          script: ./gradlew jacocoTestReport --info --scan
+
+      - name: Zip artifact for debugging
+        if: ${{ failure() }}
+        run: zip build.zip ./*/build -r
+
+      # Upload the build dir for all the modules for diagnosis
+      - name: Upload build dir
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: build.zip
+
+      - name: Copy test results
+        if: always()
+        run: |
+          mkdir -p test-results
+          find . -type f -regex ".*[t|androidT]est-results/.*xml" -exec cp {} test-results/ \;
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: test-results

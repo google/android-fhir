@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
+import com.google.android.fhir.sync.ConflictResolver
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
@@ -61,7 +62,10 @@ interface FhirEngine {
    * Synchronizes the [download] result in the database. The database will be updated to reflect the
    * result of the [download] operation.
    */
-  suspend fun syncDownload(download: suspend (SyncDownloadContext) -> Flow<List<Resource>>)
+  suspend fun syncDownload(
+    conflictResolver: ConflictResolver,
+    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+  )
 
   /**
    * Returns the total count of entities available for given search.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,18 @@
 package com.google.android.fhir.datacapture.views
 
 import android.text.InputType
+import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemEditTextDecimalViewHolderFactory :
-  QuestionnaireItemEditTextViewHolderFactory() {
+  QuestionnaireItemEditTextViewHolderFactory(
+    R.layout.questionnaire_item_edit_text_single_line_view
+  ) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object :
       QuestionnaireItemEditTextViewHolderDelegate(
         InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL,
-        isSingleLine = true
       ) {
       override fun getValue(
         text: String

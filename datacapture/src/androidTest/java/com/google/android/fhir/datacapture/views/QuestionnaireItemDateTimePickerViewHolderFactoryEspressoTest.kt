@@ -67,8 +67,10 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
     val questionnaireItemView =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
@@ -107,8 +109,10 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
     val questionnaireItemView =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
