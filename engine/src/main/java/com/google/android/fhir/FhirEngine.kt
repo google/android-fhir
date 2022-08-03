@@ -93,8 +93,8 @@ interface FhirEngine {
    * [resourceType] and [Resource.id], return `null`.
    * @param type The [ResourceType]
    * @param id The resource id [Resource.id]
-   * @return [LocalChange] A squashed local changes for given [resourceType] and [Resource.id]
-   * . If there is no local change for given [resourceType] and [Resource.id], return `null`.
+   * @return [LocalChange] A squashed local changes for given [resourceType] and [Resource.id] . If
+   * there is no local change for given [resourceType] and [Resource.id], return `null`.
    */
   suspend fun getLocalChange(type: ResourceType, id: String): LocalChange?
 

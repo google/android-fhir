@@ -132,7 +132,10 @@ internal abstract class LocalChangeDao {
         LIMIT 1
     """
   )
-  abstract suspend fun lastChangeType(resourceId: String, resourceType: ResourceType): LocalChangeType?
+  abstract suspend fun lastChangeType(
+    resourceId: String,
+    resourceType: ResourceType
+  ): LocalChangeType?
 
   @Query(
     """
@@ -181,8 +184,8 @@ internal abstract class LocalChangeDao {
   suspend fun discardLocalChanges(resources: List<Resource>) {
     resources.forEach { discardLocalChanges(it.logicalId, it.resourceType) }
   }
-  
-   @Query(
+
+  @Query(
     """
         SELECT *
         FROM LocalChangeEntity

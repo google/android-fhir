@@ -143,11 +143,17 @@ internal object LocalChangeUtils {
     }
 }
 
-/**
- * Method to convert LocalChangeEntity to LocalChange instance.
- */
-internal fun LocalChangeEntity.toLocalChange(): LocalChange{
-  return LocalChange(this.resourceType,this.resourceId,this.timestamp,this.type, this.payload,this.versionId, LocalChangeToken(listOf(this.id)))
+/** Method to convert LocalChangeEntity to LocalChange instance. */
+internal fun LocalChangeEntity.toLocalChange(): LocalChange {
+  return LocalChange(
+    this.resourceType,
+    this.resourceId,
+    this.timestamp,
+    this.type,
+    this.payload,
+    this.versionId,
+    LocalChangeToken(listOf(this.id))
+  )
 }
 
 data class LocalChangeToken(val ids: List<Long>)

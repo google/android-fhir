@@ -96,7 +96,7 @@ class BundleUploaderTest {
   companion object {
     val localChanges =
       listOf(
-          LocalChangeEntity(
+        LocalChangeEntity(
             id = 1,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
@@ -115,8 +115,9 @@ class BundleUploaderTest {
                     )
                   }
                 )
-          ).toLocalChange().apply {  LocalChangeToken(listOf(1)) }
-
+          )
+          .toLocalChange()
+          .apply { LocalChangeToken(listOf(1)) }
       )
   }
 }

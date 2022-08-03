@@ -48,7 +48,7 @@ class TransactionBundleGeneratorTest {
     val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
     val changes =
       listOf(
-          LocalChangeEntity(
+        LocalChangeEntity(
             id = 1,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
@@ -65,9 +65,10 @@ class TransactionBundleGeneratorTest {
                   )
                 }
               )
-          ).toLocalChange().apply { token= LocalChangeToken(listOf(1)) },
-
-          LocalChangeEntity(
+          )
+          .toLocalChange()
+          .apply { token = LocalChangeToken(listOf(1)) },
+        LocalChangeEntity(
             id = 2,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-002",
@@ -95,9 +96,10 @@ class TransactionBundleGeneratorTest {
                   }
                 )
                 .toString()
-          ).toLocalChange().apply {  LocalChangeToken(listOf(2)) }
-        ,
-          LocalChangeEntity(
+          )
+          .toLocalChange()
+          .apply { LocalChangeToken(listOf(2)) },
+        LocalChangeEntity(
             id = 3,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-003",
@@ -114,8 +116,9 @@ class TransactionBundleGeneratorTest {
                   )
                 }
               )
-          ).toLocalChange().apply { LocalChangeToken(listOf(3)) }
-
+          )
+          .toLocalChange()
+          .apply { LocalChangeToken(listOf(3)) }
       )
     val generator = TransactionBundleGenerator.Factory.getDefault()
     val result = generator.generate(listOf(changes))

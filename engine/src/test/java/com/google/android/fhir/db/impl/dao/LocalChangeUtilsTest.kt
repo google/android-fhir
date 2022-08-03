@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,24 +36,25 @@ class LocalChangeUtilsTest : TestCase() {
   @Test
   fun `toLocalChange() should return LocalChange`() = runBlocking {
     val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-    val localChangeEntity = LocalChangeEntity(
-      id = 1,
-      resourceType = ResourceType.Patient.name,
-      resourceId = "Patient-001",
-      type = LocalChangeType.INSERT,
-      payload =
-      jsonParser.encodeResourceToString(
-        Patient().apply {
-          id = "Patient-001"
-          addName(
-            HumanName().apply {
-              addGiven("John")
-              family = "Doe"
+    val localChangeEntity =
+      LocalChangeEntity(
+        id = 1,
+        resourceType = ResourceType.Patient.name,
+        resourceId = "Patient-001",
+        type = LocalChangeType.INSERT,
+        payload =
+          jsonParser.encodeResourceToString(
+            Patient().apply {
+              id = "Patient-001"
+              addName(
+                HumanName().apply {
+                  addGiven("John")
+                  family = "Doe"
+                }
+              )
             }
           )
-        }
       )
-    )
 
     val localChange = localChangeEntity.toLocalChange()
     assertThat(localChangeEntity.id).isEqualTo(localChange.token.ids.first())
@@ -64,5 +65,4 @@ class LocalChangeUtilsTest : TestCase() {
     assertThat(localChangeEntity.payload).isEqualTo(localChange.payload)
     assertThat(localChangeEntity.versionId).isEqualTo(localChange.versionId)
   }
-
 }

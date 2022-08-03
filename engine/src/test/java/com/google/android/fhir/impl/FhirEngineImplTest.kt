@@ -184,15 +184,13 @@ class FhirEngineImplTest {
     }
 
     assertThat(localChanges).hasSize(1)
-    //val localChange = localChanges[0].localChange
-    with(localChanges[0]){
+    // val localChange = localChanges[0].localChange
+    with(localChanges[0]) {
       assertThat(this.resourceType).isEqualTo(ResourceType.Patient.toString())
       assertThat(this.resourceId).isEqualTo(TEST_PATIENT_1.id)
       assertThat(this.type).isEqualTo(LocalChangeType.INSERT)
-      assertThat(this.payload)
-        .isEqualTo(services.parser.encodeResourceToString(TEST_PATIENT_1))
+      assertThat(this.payload).isEqualTo(services.parser.encodeResourceToString(TEST_PATIENT_1))
     }
-
   }
 
   @Test
@@ -318,7 +316,7 @@ class FhirEngineImplTest {
         "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id nonexistent_patient!"
       )
   }
-fun syncDownload_conflictResolution_acceptRemote_shouldHaveNoLocalChangeAnymore() = runBlocking {
+  fun syncDownload_conflictResolution_acceptRemote_shouldHaveNoLocalChangeAnymore() = runBlocking {
     val originalPatient =
       Patient().apply {
         id = "original-001"
@@ -353,9 +351,7 @@ fun syncDownload_conflictResolution_acceptRemote_shouldHaveNoLocalChangeAnymore(
     fhirEngine.syncDownload(AcceptRemoteConflictResolver) { flowOf((listOf(remoteChange))) }
 
     assertThat(
-        services.database.getAllLocalChanges().filter {
-          it.resourceId == "Patient/original-001"
-        }
+        services.database.getAllLocalChanges().filter { it.resourceId == "Patient/original-001" }
       )
       .isEmpty()
     testingUtils.assertResourceEquals(fhirEngine.get<Patient>("original-001"), remoteChange)
@@ -409,14 +405,10 @@ fun syncDownload_conflictResolution_acceptRemote_shouldHaveNoLocalChangeAnymore(
 
     val localChangeDiff =
       """[{"op":"remove","path":"\/address\/0\/country"},{"op":"add","path":"\/address\/0\/city","value":"Malibu"},{"op":"add","path":"\/address\/-","value":{"city":"Malibu","state":"California"}}]"""
-        assertThat(
-          services
-            .database
-            .getAllLocalChanges()
-            .first { it.resourceId == "original-002" }
-            .payload
-        )
-          .isEqualTo(localChangeDiff)
+    assertThat(
+        services.database.getAllLocalChanges().first { it.resourceId == "original-002" }.payload
+      )
+      .isEqualTo(localChangeDiff)
     testingUtils.assertResourceEquals(fhirEngine.get<Patient>("original-002"), localChange)
   }
 

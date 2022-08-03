@@ -76,13 +76,13 @@ internal class DatabaseImpl(
     db =
       // Initializes builder with the database file name
       when {
-        databaseConfig.inMemory ->
-          Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
-        enableEncryption ->
-          Room.databaseBuilder(context, ResourceDatabase::class.java, ENCRYPTED_DATABASE_NAME)
-        else ->
-          Room.databaseBuilder(context, ResourceDatabase::class.java, UNENCRYPTED_DATABASE_NAME)
-      }
+          databaseConfig.inMemory ->
+            Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
+          enableEncryption ->
+            Room.databaseBuilder(context, ResourceDatabase::class.java, ENCRYPTED_DATABASE_NAME)
+          else ->
+            Room.databaseBuilder(context, ResourceDatabase::class.java, UNENCRYPTED_DATABASE_NAME)
+        }
         .apply {
           // Provide the SupportSQLiteOpenHelper which enables the encryption.
           if (enableEncryption) {
@@ -204,7 +204,9 @@ internal class DatabaseImpl(
   override suspend fun getAllLocalChanges(): List<LocalChange> {
     return db.withTransaction {
       localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
-         LocalChangeUtils.squash(it).toLocalChange().apply { token = LocalChangeToken(it.map { it.id }) }
+        LocalChangeUtils.squash(it).toLocalChange().apply {
+          token = LocalChangeToken(it.map { it.id })
+        }
       }
     }
   }
@@ -243,8 +245,9 @@ internal class DatabaseImpl(
       if (localChangeEntityList.isEmpty()) {
         return@withTransaction null
       }
-       LocalChangeUtils.squash(localChangeEntityList).toLocalChange()
-        .apply { token = LocalChangeToken(localChangeEntityList.map { it.id }) }
+      LocalChangeUtils.squash(localChangeEntityList).toLocalChange().apply {
+        token = LocalChangeToken(localChangeEntityList.map { it.id })
+      }
     }
   }
 
@@ -291,8 +294,7 @@ internal class DatabaseImpl(
      */
     const val ENCRYPTED_DATABASE_NAME = "resources_encrypted.db"
 
-    @VisibleForTesting
-    const val DATABASE_PASSPHRASE_NAME = "fhirEngineDbPassphrase"
+    @VisibleForTesting const val DATABASE_PASSPHRASE_NAME = "fhirEngineDbPassphrase"
   }
 }
 
