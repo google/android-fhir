@@ -134,6 +134,9 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+
+  implementation("org.apache.lucene:lucene-core:9.3.0")
+  implementation("org.apache.lucene:lucene-queryparser:9.3.0")
 }
 
 configureDokka(Releases.Engine.artifactId, Releases.Engine.version)
