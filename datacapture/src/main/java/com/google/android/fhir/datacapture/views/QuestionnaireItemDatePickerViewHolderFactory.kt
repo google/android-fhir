@@ -18,25 +18,33 @@ package com.google.android.fhir.datacapture.views
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.icu.text.DateFormat
+import android.text.TextWatcher
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.core.widget.doOnTextChanged
+import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.utilities.isAndroidIcuSupported
+import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import java.text.ParseException
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.chrono.IsoChronology
-import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
-import java.time.format.DateTimeParseException
 import java.time.format.FormatStyle
 import java.util.Locale
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -48,8 +56,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-      private val localeDateFormatter = getDateFormatter()
-      private val localeDateParser = getLocalDateParser()
+      private var textWatcher: TextWatcher? = null
       private val localePattern =
         DateTimeFormatterBuilder.getLocalizedDateTimePattern(
           FormatStyle.SHORT,
@@ -62,25 +69,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         header = itemView.findViewById(R.id.header)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
-        textInputEditText.doOnTextChanged { text, start, count, after ->
-          // this check is required to avoid infinite loop, as bind() also set date input text.
-          if (count == after) {
-            return@doOnTextChanged
-          }
-          var localDate: LocalDate? = null
-          try {
-            localDate = LocalDate.parse(text, localeDateParser)
-          } catch (e: DateTimeParseException) {
-            questionnaireItemViewItem.clearAnswer()
-          }
-          localDate?.run {
-            questionnaireItemViewItem.setAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = DateType(localDate.year, localDate.monthValue - 1, localDate.dayOfMonth)
-              }
-            )
-          }
-        }
         textInputLayout.setEndIconOnClickListener {
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
@@ -91,10 +79,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             .apply {
               addOnPositiveButtonClickListener { epochMilli ->
                 textInputEditText.setText(
-                  Instant.ofEpochMilli(epochMilli)
-                    .atZone(ZONE_ID_UTC)
-                    .toLocalDate()
-                    .format(localeDateFormatter)
+                  Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate().localizedString
                 )
                 questionnaireItemViewItem.setAnswer(
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -115,14 +100,24 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = localePattern
+        textInputEditText.removeTextChangedListener(textWatcher)
         textInputEditText.setText(
-          questionnaireItemViewItem
-            .answers
-            .singleOrNull()
+          questionnaireItemViewItem.answers.singleOrNull()
             ?.valueDateType
             ?.localDate
-            ?.format(localeDateFormatter)
+            ?.localizedString
         )
+        var parseJob: Job? = null
+        textWatcher =
+          textInputEditText.doAfterTextChanged { text ->
+            // allow user to enter the input, e.g year may be y, yy, yyyy
+            parseJob?.cancel()
+            parseJob =
+              CoroutineScope(Dispatchers.Main).launch {
+                delay(1000)
+                updateAnswer(text.toString())
+              }
+          }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
@@ -151,6 +146,24 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           .setTitleText(R.string.select_date)
           .setSelection(selectedDate)
           .build()
+      }
+
+      private fun updateAnswer(text: CharSequence?) {
+        var localDate: LocalDate? = null
+        try {
+          val date = parseDate(text, textInputEditText.context.applicationContext)
+          localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        } catch (e: ParseException) {
+          questionnaireItemViewItem.clearAnswer()
+        }
+
+        localDate?.run {
+          questionnaireItemViewItem.setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = DateType(localDate!!.year, localDate!!.monthValue - 1, localDate!!.dayOfMonth)
+            }
+          )
+        }
       }
     }
 }
@@ -187,27 +200,9 @@ internal val DateType.localDate
       day,
     )
 
-/**
- * Returns default [DateTimeFormatter] with year-of-era 'yyyy'. e.g 'yyyy' accepts 2004 year-of-era
- */
-internal fun getDateFormatter(): DateTimeFormatter {
-  val localDatePattern =
-    DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-      FormatStyle.SHORT,
-      null,
-      IsoChronology.INSTANCE,
-      Locale.getDefault()
-    )
-  val start = localDatePattern.indexOf('y')
-  val end = start + localDatePattern.filter { it == 'y' }.count()
-  return DateTimeFormatter.ofPattern(localDatePattern.replaceRange(start until end, "yyyy"))
-    .withLocale(Locale.getDefault())
-}
-
-/** Returns [DateTimeFormatter] to parse [LocalDate]. */
-internal fun getLocalDateParser(): DateTimeFormatter {
-  return DateTimeFormatterBuilder()
-    .appendOptional(getDateFormatter())
-    .appendOptional(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))
-    .toFormatter()
-}
+internal fun parseDate(text: CharSequence?, context: Context) =
+  if (isAndroidIcuSupported()) {
+    DateFormat.getDateInstance(DateFormat.SHORT).parse(text.toString())
+  } else {
+    android.text.format.DateFormat.getDateFormat(context).parse(text.toString())
+  }
