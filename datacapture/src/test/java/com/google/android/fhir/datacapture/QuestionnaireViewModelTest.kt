@@ -23,11 +23,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.QUESTIONNAIRE_HAS_REVIEW_PAGE
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
@@ -1595,7 +1595,7 @@ class QuestionnaireViewModelTest(
           .registerInputStream(questionnaireResponseUri, questionnaireResponseFile.inputStream())
       }
     }
-    reviewMode.let { state.set(QUESTIONNAIRE_HAS_REVIEW_PAGE, it) }
+    reviewMode.let { state.set(EXTRA_ENABLE_REVIEW_PAGE, it) }
     return QuestionnaireViewModel(context, state)
   }
 

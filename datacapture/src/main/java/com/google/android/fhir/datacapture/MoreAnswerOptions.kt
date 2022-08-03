@@ -22,7 +22,6 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 
@@ -60,18 +59,4 @@ internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.optionExclusiv
       return value.booleanValue()
     }
     return false
-  }
-
-val QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.displayString: String?
-  get() {
-    return if (hasValueCoding()) {
-      val display = valueCoding.display
-      if (display.isNullOrEmpty()) {
-        valueCoding.code
-      } else {
-        display
-      }
-    } else {
-      null
-    }
   }

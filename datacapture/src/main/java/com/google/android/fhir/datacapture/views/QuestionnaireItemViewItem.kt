@@ -18,23 +18,11 @@ package com.google.android.fhir.datacapture.views
 
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.displayString
-import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.Attachment
-import org.hl7.fhir.r4.model.BooleanType
-import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.DateTimeType
-import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.DecimalType
-import org.hl7.fhir.r4.model.IntegerType
-import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
-import org.hl7.fhir.r4.model.TimeType
-import org.hl7.fhir.r4.model.UriType
 
 /**
  * Data item for [QuestionnaireItemViewHolder] in [RecyclerView].
@@ -107,26 +95,7 @@ data class QuestionnaireItemViewItem(
   internal val answerString: String
     get() {
       if (!questionnaireResponseItem.hasAnswer()) return NOT_ANSWERED
-      val answerList = mutableListOf<String>()
-      questionnaireResponseItem.answer.forEach {
-        answerList.add(
-          when (it.value) {
-            is BooleanType -> it.valueBooleanType.valueAsString ?: NOT_ANSWERED
-            is StringType -> it.valueStringType.valueAsString ?: NOT_ANSWERED
-            is IntegerType -> it.valueIntegerType.valueAsString ?: NOT_ANSWERED
-            is DecimalType -> it.valueDecimalType.valueAsString ?: NOT_ANSWERED
-            is DateType -> it.valueDateType.localDate.localizedString
-            is DateTimeType -> it.valueDateTimeType.valueAsString ?: NOT_ANSWERED
-            is TimeType -> it.valueTimeType.valueAsString ?: NOT_ANSWERED
-            is Quantity -> it.valueQuantity.value.toString()
-            is UriType -> it.valueUriType?.valueAsString ?: NOT_ANSWERED
-            is Attachment -> it.valueAttachment.url ?: NOT_ANSWERED
-            is Coding -> it.displayString ?: NOT_ANSWERED
-            else -> NOT_ANSWERED
-          }
-        )
-      }
-      return answerList.joinToString()
+      return questionnaireResponseItem.answer.map { it.displayString }.joinToString()
     }
 
   internal fun addAnswer(

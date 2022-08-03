@@ -201,11 +201,17 @@ open class QuestionnaireFragment : Fragment() {
      */
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI = "questionnaire-response-uri"
 
-    /** A boolean flag to have a review page at the end of the questionnaire. */
-    const val QUESTIONNAIRE_HAS_REVIEW_PAGE = "questionnaire-has-review-page"
+    /**
+     * A [Boolean] extra to control if a review page is shown. By default it will be shown at the
+     * end of the questionnaire.
+     */
+    const val EXTRA_ENABLE_REVIEW_PAGE = "enable-review-page"
 
-    /** A boolean flag to open review page as the entry point of the questionnaire. */
-    const val QUESTIONNAIRE_ENTRY_BY_REVIEW_PAGE = "questionnaire-entry-review-page"
+    /**
+     * An [Boolean] extra to control if the review page is to be opened first. This has no effect if
+     * review page is not enabled.
+     */
+    const val EXTRA_SHOW_REVIEW_PAGE_FIRST = "show-review-page-first"
 
     const val SUBMIT_REQUEST_KEY = "submit-request-key"
   }

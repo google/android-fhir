@@ -168,25 +168,25 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /** Flag to support fragment for review-feature */
-  private val hasReviewPage: Boolean
+  private val enableReviewPage: Boolean
 
   init {
-    hasReviewPage = state[QuestionnaireFragment.QUESTIONNAIRE_HAS_REVIEW_PAGE] ?: false
+    enableReviewPage = state[QuestionnaireFragment.EXTRA_ENABLE_REVIEW_PAGE] ?: false
   }
 
-  /** Flag to open fragment in data-collection or review-mode */
-  private val entryByReviewPage: Boolean
+  /** Flag to open fragment first in data-collection or review-mode */
+  private val showReviewPageFirst: Boolean
 
   init {
-    entryByReviewPage =
-      hasReviewPage && state[QuestionnaireFragment.QUESTIONNAIRE_ENTRY_BY_REVIEW_PAGE] ?: false
+    showReviewPageFirst =
+      enableReviewPage && state[QuestionnaireFragment.EXTRA_SHOW_REVIEW_PAGE_FIRST] ?: false
   }
 
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
 
   /** Toggles review mode. */
-  private val reviewFlow = MutableStateFlow(entryByReviewPage)
+  private val reviewFlow = MutableStateFlow(showReviewPageFirst)
 
   /** Flag to show/hide submit button. */
   private var showSubmitButtonFlag = false
@@ -271,9 +271,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** StateFlow whether to show review button or not */
   internal val showReviewButtonStateFlow: StateFlow<Boolean> =
     combine(reviewFlow, pageFlow) { reviewFlow, pagination ->
-        hasReviewPage && !reviewFlow && (pagination == null || !pagination.hasNextPage)
+        enableReviewPage && !reviewFlow && (pagination == null || !pagination.hasNextPage)
       }
-      .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = entryByReviewPage)
+      .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = showReviewPageFirst)
 
   /** StateFlow whether to show submit button or not */
   internal val showSubmitButtonStateFlow: StateFlow<Boolean> =
@@ -317,7 +317,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             questionnaireResponseItemList = questionnaireResponse.item,
             pagination = questionnaire.getInitialPagination(),
             modificationCount = 0,
-            reviewMode = hasReviewPage
+            reviewMode = enableReviewPage
           )
       )
 
