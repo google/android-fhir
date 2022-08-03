@@ -231,16 +231,19 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   internal fun goToPreviousPage() {
-    // check(hasPreviousPage) { "Can't call goToPreviousPage() if hasPreviousPage is false ($this)"
-    // }
     val currentPageIndex = currentPageIndexFlow.value!!
+    check(pages!!.take(currentPageIndex).any { it.enabled }) {
+      "Can't call goToPreviousPage() if no preceding page is enabled"
+    }
     currentPageIndexFlow.value =
       pages!!.map { it.index < currentPageIndex && it.enabled }.indexOfLast { it }
   }
 
   internal fun goToNextPage() {
-    // check(hasNextPage) { "Can't call goToNextPage() if hasNextPage is false ($this)" }
     val currentPageIndex = currentPageIndexFlow.value!!
+    check(pages!!.drop(currentPageIndex + 1).any { it.enabled }) {
+      "Can't call goToNextPage() if no following page is enabled"
+    }
     currentPageIndexFlow.value =
       pages!!.map { it.index > currentPageIndex && it.enabled }.indexOfFirst { it }
   }
