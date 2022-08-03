@@ -16,9 +16,9 @@
 
 package com.google.android.fhir.sync.upload
 
+import com.google.android.fhir.db.LocalChange
+import com.google.android.fhir.db.LocalChangeType
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import org.hl7.fhir.r4.model.Bundle
 
 typealias ResourceBundleAndAssociatedLocalChangeTokens = Pair<Bundle, List<LocalChangeToken>>
@@ -29,23 +29,23 @@ typealias ResourceBundleAndAssociatedLocalChangeTokens = Pair<Bundle, List<Local
  */
 internal open class TransactionBundleGenerator(
   val getBundleEntryComponentGeneratorForLocalChangeType:
-    (type: LocalChangeEntity.Type) -> HttpVerbBasedBundleEntryComponentGenerator
+    (type: LocalChangeType) -> HttpVerbBasedBundleEntryComponentGenerator
 ) {
 
   fun generate(
-    localChanges: List<List<SquashedLocalChange>>
+    localChanges: List<List<LocalChange>>
   ): List<ResourceBundleAndAssociatedLocalChangeTokens> {
     return localChanges.filter { it.isNotEmpty() }.map { generateBundle(it) }
   }
 
   private fun generateBundle(
-    localChanges: List<SquashedLocalChange>
+    localChanges: List<LocalChange>
   ): ResourceBundleAndAssociatedLocalChangeTokens {
     return Bundle().apply {
       type = Bundle.BundleType.TRANSACTION
       localChanges.forEach {
         this.addEntry(
-          getBundleEntryComponentGeneratorForLocalChangeType(it.localChange.type).getEntry(it)
+          getBundleEntryComponentGeneratorForLocalChangeType(it.type).getEntry(it)
         )
       }
     } to localChanges.map { it.token }
@@ -81,8 +81,8 @@ internal open class TransactionBundleGenerator(
 internal object PutForCreateAndPatchForUpdateBasedTransactionGenerator :
   TransactionBundleGenerator({ type ->
     when (type) {
-      LocalChangeEntity.Type.INSERT -> HttpPutForCreateEntryComponentGenerator
-      LocalChangeEntity.Type.UPDATE -> HttpPatchForUpdateEntryComponentGenerator
-      LocalChangeEntity.Type.DELETE -> HttpDeleteEntryComponentGenerator
+      LocalChangeType.INSERT -> HttpPutForCreateEntryComponentGenerator
+      LocalChangeType.UPDATE -> HttpPatchForUpdateEntryComponentGenerator
+      LocalChangeType.DELETE -> HttpDeleteEntryComponentGenerator
     }
   })

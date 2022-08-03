@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.sync.upload
 
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.db.LocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
@@ -40,21 +40,21 @@ internal abstract class HttpVerbBasedBundleEntryComponentGenerator(
    * [Resource] may not be required in the request like in the case of a [Bundle.HTTPVerb.DELETE]
    * request.
    */
-  protected abstract fun getEntryResource(localChange: LocalChangeEntity): IBaseResource?
+  protected abstract fun getEntryResource(localChange: LocalChange): IBaseResource?
 
   /**
    * Returns a [Bundle.BundleEntryComponent] for a [SquashedLocalChange] to be added to the [Bundle]
    * .
    */
-  fun getEntry(squashedLocalChange: SquashedLocalChange): Bundle.BundleEntryComponent {
+  fun getEntry(squashedLocalChange: LocalChange): Bundle.BundleEntryComponent {
     return Bundle.BundleEntryComponent().apply {
-      resource = getEntryResource(squashedLocalChange.localChange) as Resource?
-      request = getEntryRequest(squashedLocalChange.localChange)
+      resource = getEntryResource(squashedLocalChange) as Resource?
+      request = getEntryRequest(squashedLocalChange)
       fullUrl = request?.url
     }
   }
 
-  private fun getEntryRequest(localChange: LocalChangeEntity) =
+  private fun getEntryRequest(localChange: LocalChange) =
     Bundle.BundleEntryRequestComponent(
       Enumeration(Bundle.HTTPVerbEnumFactory()).apply { value = httpVerb },
       UriType("${localChange.resourceType}/${localChange.resourceId}")

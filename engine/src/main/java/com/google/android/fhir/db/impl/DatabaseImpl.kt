@@ -28,7 +28,7 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
@@ -201,10 +201,10 @@ internal class DatabaseImpl(
    * @returns a list of pairs. Each pair is a token + squashed local change. Each token is a list of
    * [LocalChangeEntity.id] s of rows of the [LocalChangeEntity].
    */
-  override suspend fun getAllLocalChanges(): List<SquashedLocalChange> {
+  override suspend fun getAllLocalChanges(): List<LocalChange> {
     return db.withTransaction {
       localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
-        SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
+         LocalChangeUtils.squash(it).toLocalChange().apply { token = LocalChangeToken(it.map { it.id }) }
       }
     }
   }
@@ -243,8 +243,8 @@ internal class DatabaseImpl(
       if (localChangeEntityList.isEmpty()) {
         return@withTransaction null
       }
-      val localChangeEntity = LocalChangeUtils.squash(localChangeEntityList)
-      LocalChange(localChangeEntity.resourceType,localChangeEntity.resourceId,localChangeEntity.timestamp, localChangeEntity.type,localChangeEntity.payload,localChangeEntity.versionId)
+       LocalChangeUtils.squash(localChangeEntityList).toLocalChange()
+        .apply { token = LocalChangeToken(localChangeEntityList.map { it.id }) }
     }
   }
 

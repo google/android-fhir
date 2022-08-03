@@ -18,8 +18,9 @@ package com.google.android.fhir.sync.upload
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.db.LocalChangeType
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.sync.UploadResult
@@ -95,13 +96,11 @@ class BundleUploaderTest {
   companion object {
     val localChanges =
       listOf(
-        SquashedLocalChange(
-          LocalChangeToken(listOf(1)),
           LocalChangeEntity(
             id = 1,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
-            type = LocalChangeEntity.Type.INSERT,
+            type = LocalChangeType.INSERT,
             payload =
               FhirContext.forCached(FhirVersionEnum.R4)
                 .newJsonParser()
@@ -116,8 +115,8 @@ class BundleUploaderTest {
                     )
                   }
                 )
-          )
-        )
+          ).toLocalChange().apply {  LocalChangeToken(listOf(1)) }
+
       )
   }
 }

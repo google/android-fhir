@@ -16,8 +16,8 @@
 
 package com.google.android.fhir.sync.upload
 
+import com.google.android.fhir.db.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.UploadResult
@@ -37,7 +37,7 @@ internal class BundleUploader(
 ) : Uploader {
 
   override suspend fun upload(
-    localChanges: List<SquashedLocalChange>,
+    localChanges: List<LocalChange>,
   ): Flow<UploadResult> = flow {
     bundleGenerator.generate(listOf(localChanges)).forEach { (bundle, localChangeTokens) ->
       try {

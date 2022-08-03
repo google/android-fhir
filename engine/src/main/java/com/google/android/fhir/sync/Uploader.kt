@@ -16,8 +16,8 @@
 
 package com.google.android.fhir.sync
 
+import com.google.android.fhir.db.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Bundle
 
@@ -29,7 +29,7 @@ internal interface Uploader {
    * transforming the [SquashedLocalChange]s to particular network operations.
    */
   suspend fun upload(
-    localChanges: List<SquashedLocalChange>,
+    localChanges: List<LocalChange>,
   ): Flow<UploadResult>
 }
 

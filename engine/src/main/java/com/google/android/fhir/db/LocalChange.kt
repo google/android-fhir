@@ -1,6 +1,6 @@
 package com.google.android.fhir.db
 
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import org.hl7.fhir.r4.model.Resource
 
 /**
@@ -18,8 +18,7 @@ data class LocalChange(
   /**
    * Type of local change like insert, delete, etc
    */
-  //TODO extract Type enum from LocalChangeEntity and make LocalChangeEntity as internal class
-  val type: LocalChangeEntity.Type,
+  val type: LocalChangeType,
   /**
    * json string with local changes
    */
@@ -27,5 +26,8 @@ data class LocalChange(
   /**
    * last udated vesrion for resource
    */
-  val versionId: String? = null)
-
+  val versionId: String? = null,
+  /**
+   *This token value must be explicitly applied when list of local changes are squashed and [LocalChange] class instance is created.
+   */
+  var token: LocalChangeToken)

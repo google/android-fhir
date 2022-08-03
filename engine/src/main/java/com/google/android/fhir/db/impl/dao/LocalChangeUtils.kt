@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.JsonPatch
 import com.github.fge.jsonpatch.diff.JsonDiff
+import com.google.android.fhir.db.LocalChange
+import com.google.android.fhir.db.LocalChangeType
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import org.hl7.fhir.r4.model.Resource
 import org.json.JSONArray
@@ -34,17 +36,17 @@ internal object LocalChangeUtils {
 
   fun mergeLocalChanges(first: LocalChangeEntity, second: LocalChangeEntity): LocalChangeEntity {
     // TODO (maybe this should throw exception when two entities don't have the same versionID)
-    val type: LocalChangeEntity.Type
+    val type: LocalChangeType
     val payload: String
     when (second.type) {
-      LocalChangeEntity.Type.UPDATE ->
+      LocalChangeType.UPDATE ->
         when (first.type) {
-          LocalChangeEntity.Type.UPDATE -> {
-            type = LocalChangeEntity.Type.UPDATE
+          LocalChangeType.UPDATE -> {
+            type = LocalChangeType.UPDATE
             payload = mergePatches(first.payload, second.payload)
           }
-          LocalChangeEntity.Type.INSERT -> {
-            type = LocalChangeEntity.Type.INSERT
+          LocalChangeType.INSERT -> {
+            type = LocalChangeType.INSERT
             payload = applyPatch(first.payload, second.payload)
           }
           else -> {
@@ -53,12 +55,12 @@ internal object LocalChangeUtils {
             )
           }
         }
-      LocalChangeEntity.Type.DELETE -> {
-        type = LocalChangeEntity.Type.DELETE
+      LocalChangeType.DELETE -> {
+        type = LocalChangeType.DELETE
         payload = ""
       }
-      LocalChangeEntity.Type.INSERT -> {
-        type = LocalChangeEntity.Type.INSERT
+      LocalChangeType.INSERT -> {
+        type = LocalChangeType.INSERT
         payload = second.payload
       }
     }
@@ -141,6 +143,11 @@ internal object LocalChangeUtils {
     }
 }
 
-data class LocalChangeToken(val ids: List<Long>)
+/**
+ * Method to convert LocalChangeEntity to LocalChange instance.
+ */
+internal fun LocalChangeEntity.toLocalChange(): LocalChange{
+  return LocalChange(this.resourceType,this.resourceId,this.timestamp,this.type, this.payload,this.versionId, LocalChangeToken(listOf(this.id)))
+}
 
-data class SquashedLocalChange(val token: LocalChangeToken, val localChange: LocalChangeEntity)
+data class LocalChangeToken(val ids: List<Long>)
