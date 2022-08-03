@@ -97,37 +97,35 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         val radioButtonItem =
           LayoutInflater.from(radioGroup.context)
             .inflate(R.layout.questionnaire_item_radio_button, null)
+        var isCurrentlySelected = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
         val radioButton =
-          radioButtonItem.findViewById<RadioButton>(R.id.radio_button) as RadioButton
-        var isCurrentlySelected: Boolean
-        radioButton.apply {
-          id = viewId
-          text = answerOption.displayString
-          layoutParams =
-            ViewGroup.LayoutParams(
-              when (choiceOrientation) {
-                ChoiceOrientationTypes.HORIZONTAL -> ViewGroup.LayoutParams.WRAP_CONTENT
-                ChoiceOrientationTypes.VERTICAL -> ViewGroup.LayoutParams.MATCH_PARENT
-              },
-              ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-          isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
-          isCurrentlySelected = isChecked
-          setOnClickListener { radioButton ->
-            isCurrentlySelected = !isCurrentlySelected
-            when (isCurrentlySelected) {
-              true -> {
-                updateAnswer(answerOption)
-                val buttons = radioGroup.children.asIterable().filterIsInstance<RadioButton>()
-                buttons.forEach { button -> uncheckIfNotButtonId(radioButton.id, button) }
-              }
-              false -> {
-                questionnaireItemViewItem.clearAnswer()
-                (radioButton as RadioButton).isChecked = false
+          radioButtonItem.findViewById<RadioButton>(R.id.radio_button).apply {
+            id = viewId
+            text = answerOption.displayString
+            layoutParams =
+              ViewGroup.LayoutParams(
+                when (choiceOrientation) {
+                  ChoiceOrientationTypes.HORIZONTAL -> ViewGroup.LayoutParams.WRAP_CONTENT
+                  ChoiceOrientationTypes.VERTICAL -> ViewGroup.LayoutParams.MATCH_PARENT
+                },
+                ViewGroup.LayoutParams.WRAP_CONTENT
+              )
+            isChecked = isCurrentlySelected
+            setOnClickListener { radioButton ->
+              isCurrentlySelected = !isCurrentlySelected
+              when (isCurrentlySelected) {
+                true -> {
+                  updateAnswer(answerOption)
+                  val buttons = radioGroup.children.asIterable().filterIsInstance<RadioButton>()
+                  buttons.forEach { button -> uncheckIfNotButtonId(radioButton.id, button) }
+                }
+                false -> {
+                  questionnaireItemViewItem.clearAnswer()
+                  (radioButton as RadioButton).isChecked = false
+                }
               }
             }
           }
-        }
         radioGroup.addView(radioButton)
         flow.addView(radioButton)
       }
