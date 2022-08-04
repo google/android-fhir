@@ -32,6 +32,7 @@ import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import timber.log.Timber
 
 abstract class SyncStrategy {
   abstract val syncStrategyTypes: SyncStrategyTypes
@@ -78,9 +79,9 @@ class SequentialSyncStrategy() : SyncStrategy() {
     if (mapOfResourceIdLocalChange.isNotEmpty()) {
       walkAndReturnLocalChange(mapOfResourceIdLocalChange, ::collectAndEmitLocalChangesList)
     }
-    println("number of local changes ${localChanges.size}")
+    Timber.i("number of local changes ${localChanges.size}")
     if (listOfLocalChange.isNotEmpty()) {
-      println("not empty function exit ${listOfLocalChange.size}")
+      Timber.i("not empty function exit ${listOfLocalChange.size}")
       collectAndEmitLocalChange(listOfLocalChange, upload)
       idsDone.drop(listOfLocalChange.size)
       listOfLocalChange = mutableListOf()
@@ -88,10 +89,10 @@ class SequentialSyncStrategy() : SyncStrategy() {
   }
 
   private suspend fun collectAndEmitLocalChangesList(resourceId: String) {
-    println("collected $resourceId")
+    Timber.i("collected $resourceId")
     if (listOfLocalChange.size >= 10) {
       mapOfResourceIdLocalChange[resourceId]?.let { it -> listOfLocalChange.add(it) }
-      println("emitting ${listOfLocalChange.size}")
+      Timber.i("emitting ${listOfLocalChange.size}")
       collectAndEmitLocalChange(listOfLocalChange, upload)
       idsDone.drop(listOfLocalChange.size)
       listOfLocalChange = mutableListOf()
@@ -139,7 +140,7 @@ class SequentialSyncStrategy() : SyncStrategy() {
       if (references.isEmpty()) {
         idsDone.add(idSquashedLocalChange.key)
         runBlocking { collectAndEmit(idSquashedLocalChange.key) }
-        println("Added ${idSquashedLocalChange.key} size ${idsDone.size}")
+        Timber.i("Added ${idSquashedLocalChange.key} size ${idsDone.size}")
       } else {
         if (localChange.localChange.resourceType == "Encounter") {
           val encounter =
@@ -173,7 +174,7 @@ class SequentialSyncStrategy() : SyncStrategy() {
         }
         idsDone.add(idSquashedLocalChange.key)
         runBlocking { collectAndEmit(idSquashedLocalChange.key) }
-        println("Added ${idSquashedLocalChange.key} size ${idsDone.size}")
+        Timber.i("Added ${idSquashedLocalChange.key} size ${idsDone.size}")
       }
     }
   }

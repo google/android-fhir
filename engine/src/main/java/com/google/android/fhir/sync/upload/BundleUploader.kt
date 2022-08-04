@@ -23,12 +23,14 @@ import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.UploadResult
 import com.google.android.fhir.sync.Uploader
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import timber.log.Timber
 
 /** [Uploader] implementation to work with Fhir [Bundle]. */
 internal class BundleUploader(
@@ -38,21 +40,21 @@ internal class BundleUploader(
 
   override suspend fun upload(
     listOfLocalChanges: List<SquashedLocalChange>,
-  ): Flow<UploadResult> = flow {
-    println("uploading ${listOfLocalChanges.size}")
-    bundleGenerator.generate(listOf(listOfLocalChanges)).forEach { (bundle, localChangeTokens) ->
-      try {
-        println("uploading ${bundle.entry.size}")
+  ): Flow<UploadResult> =
+    flow {
+      Timber.i("uploading ${listOfLocalChanges.size}")
+      bundleGenerator.generate(listOf(listOfLocalChanges)).forEach { (bundle, localChangeTokens) ->
+        Timber.i("uploading ${bundle.entry.size}")
         val response = dataSource.upload(bundle)
         emit(getUploadResult(response, localChangeTokens))
-      } catch (e: Exception) {
-        println("exception ${bundle.entry.size}")
-        println("exception stacktrace ${e.stackTraceToString()}")
-        emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
-        return@flow
       }
     }
-  }
+      .catch { exception ->
+        Timber.i("exception stacktrace ${exception.stackTraceToString()}")
+        emit(
+          UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, exception as Exception))
+        )
+      }
 
   private fun getUploadResult(response: Resource, localChangeTokens: List<LocalChangeToken>) =
     when {

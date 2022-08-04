@@ -38,6 +38,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Url
+import timber.log.Timber
 
 /** Interface to make http requests to the FHIR server. */
 internal interface RemoteFhirService : DataSource {
@@ -70,7 +71,7 @@ internal interface RemoteFhirService : DataSource {
           try {
             writeToFile(fullFileName, it)
           } catch (exception: FileNotFoundException) {
-            println("File not found")
+            Timber.i("File not found")
           }
         }
       val logger = HttpLoggingInterceptor(customLogger)

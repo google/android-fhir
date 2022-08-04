@@ -17,6 +17,8 @@
 package com.google.android.fhir.impl
 
 import android.content.Context
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.SyncDownloadContext
@@ -28,6 +30,7 @@ import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
+import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.toTimeZoneString
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
@@ -38,8 +41,11 @@ import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
 /** Implementation of [FhirEngine]. */
-internal class FhirEngineImpl(private val database: Database, private val context: Context) :
-  FhirEngine {
+internal class FhirEngineImpl(
+  private val database: Database,
+  private val context: Context,
+  private val dataSource: DataSource?
+) : FhirEngine {
   private var syncUploadStrategyContext = SyncUploadContext()
 
   override suspend fun create(vararg resource: Resource): List<String> {
@@ -91,12 +97,37 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     squashedChanges: List<SquashedLocalChange>,
     upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
-    println("COLLECTED FROM REARRANGE ${squashedChanges.size}")
+    var resourceSuccessfullyUploaded = true
+    Timber.i("COLLECTED FROM REARRANGE ${squashedChanges.size}")
     upload(squashedChanges).collect {
-      database.deleteUpdates(it.first)
-      when (it.second) {
-        is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
-        else -> updateVersionIdAndLastUpdated(it.second)
+      val idsToDeleteFromUpdate = it.first.ids as MutableList
+
+      // Check server for resource before delete.
+      try {
+        Timber.i(
+          "Bundle From server" +
+            FhirContext.forCached(FhirVersionEnum.R4)
+              .newJsonParser()
+              .encodeResourceToString(it.second)
+        )
+        (it.second as Bundle).entry.forEachIndexed { index, bundleEntry ->
+          val response = bundleEntry.response
+          val url = response.location.toString() + "?_elements=identifier"
+          val downloadBundle = dataSource?.download(url)
+          if (downloadBundle == null) {
+            Timber.i("Resource failed in upload" + downloadBundle?.id.toString())
+            idsToDeleteFromUpdate.remove(it.first.ids[index])
+          } else {
+            Timber.i("Resource Found after upload" + downloadBundle.id.toString())
+          }
+        }
+        database.deleteUpdates(LocalChangeToken(idsToDeleteFromUpdate))
+        when (it.second) {
+          is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
+          else -> updateVersionIdAndLastUpdated(it.second)
+        }
+      } catch (exception: Exception) {
+        Timber.i(exception)
       }
     }
   }
