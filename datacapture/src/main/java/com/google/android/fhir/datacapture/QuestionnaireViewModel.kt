@@ -78,7 +78,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
   }
 
-  private val entryMode: EntryMode by lazy { questionnaire.entryMode ?: EntryMode.RANDOM }
+  @VisibleForTesting
+  val entryMode: EntryMode by lazy { questionnaire.entryMode ?: EntryMode.RANDOM }
 
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse

@@ -1293,6 +1293,63 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
+  fun `should Allow user to move forward And Back When No EntryMode is defined`() = runBlocking {
+    val paginationExtension =
+      Extension().apply {
+        url = EXTENSION_ITEM_CONTROL_URL
+        setValue(CodeableConcept(Coding().apply { code = "page" }))
+      }
+
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 1"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 2"
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val state = viewModel.questionnaireStateFlow.first()
+    assertThat(state.pagination)
+      .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
+    assertThat(state.items).hasSize(2)
+    viewModel.goToNextPage()
+
+    assertThat(viewModel.entryMode).isEqualTo(EntryMode.RANDOM)
+    assertTrue(
+      viewModel.getPageFlow().value!!.currentPageIndex ==
+        viewModel.getPageFlow().value!!.lastPageIndex
+    )
+
+    viewModel.goToPreviousPage()
+    assertTrue(viewModel.getPageFlow().value!!.currentPageIndex == 0)
+  }
+
+  @Test
   fun `should Allow user to move forward Only Using Sequential Entry Mode`() = runBlocking {
     val paginationExtension =
       Extension().apply {
