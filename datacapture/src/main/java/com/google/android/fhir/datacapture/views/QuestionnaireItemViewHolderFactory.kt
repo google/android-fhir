@@ -28,7 +28,7 @@ import com.google.android.fhir.datacapture.validation.ValidationResult
  *
  * @param resId the layout resource for the view
  */
-abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId: Int) {
+abstract class QuestionnaireItemViewHolderFactory(@LayoutRes open val resId: Int) {
   fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
     return QuestionnaireItemViewHolder(
       LayoutInflater.from(parent.context).inflate(resId, parent, false),

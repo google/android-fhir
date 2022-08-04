@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,14 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.get
 import com.google.android.fhir.resource.TestingUtils
+import com.google.android.fhir.sync.AcceptLocalConflictResolver
+import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
@@ -189,9 +192,113 @@ class FhirEngineImplTest {
 
   @Test
   fun syncDownload_downloadResources() = runBlocking {
-    fhirEngine.syncDownload { flowOf((listOf(TEST_PATIENT_2))) }
+    fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf((TEST_PATIENT_2)))) }
 
     testingUtils.assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
+  }
+
+  @Test
+  fun syncDownload_conflictResolution_acceptRemote_shouldHaveNoLocalChangeAnymore() = runBlocking {
+    val originalPatient =
+      Patient().apply {
+        id = "original-001"
+        meta =
+          Meta().apply {
+            versionId = "1"
+            lastUpdated = Date()
+          }
+        addName(
+          HumanName().apply {
+            family = "Stark"
+            addGiven("Tony")
+          }
+        )
+      }
+    fhirEngine.syncDownload(AcceptRemoteConflictResolver) { flowOf((listOf((originalPatient)))) }
+
+    val localChange =
+      originalPatient.copy().apply { addAddress(Address().apply { city = "Malibu" }) }
+    fhirEngine.update(localChange)
+
+    val remoteChange =
+      originalPatient.copy().apply {
+        meta =
+          Meta().apply {
+            versionId = "2"
+            lastUpdated = Date()
+          }
+        addAddress(Address().apply { country = "USA" })
+      }
+
+    fhirEngine.syncDownload(AcceptRemoteConflictResolver) { flowOf((listOf(remoteChange))) }
+
+    assertThat(
+        services.database.getAllLocalChanges().filter {
+          it.localChange.resourceId == "Patient/original-001"
+        }
+      )
+      .isEmpty()
+    testingUtils.assertResourceEquals(fhirEngine.get<Patient>("original-001"), remoteChange)
+  }
+
+  @Test
+  fun syncDownload_conflictResolution_acceptLocal_shouldHaveLocalChangeCreatedAgainstRemoteVersion() =
+      runBlocking {
+    val originalPatient =
+      Patient().apply {
+        id = "original-002"
+        meta =
+          Meta().apply {
+            versionId = "1"
+            lastUpdated = Date()
+          }
+        addName(
+          HumanName().apply {
+            family = "Stark"
+            addGiven("Tony")
+          }
+        )
+      }
+    fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf((originalPatient)))) }
+    var localChange =
+      originalPatient.copy().apply { addAddress(Address().apply { city = "Malibu" }) }
+    fhirEngine.update(localChange)
+
+    localChange =
+      localChange.copy().apply {
+        addAddress(
+          Address().apply {
+            city = "Malibu"
+            state = "California"
+          }
+        )
+      }
+    fhirEngine.update(localChange)
+
+    val remoteChange =
+      originalPatient.copy().apply {
+        meta =
+          Meta().apply {
+            versionId = "2"
+            lastUpdated = Date()
+          }
+        addAddress(Address().apply { country = "USA" })
+      }
+
+    fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf(remoteChange))) }
+
+    val localChangeDiff =
+      """[{"op":"remove","path":"\/address\/0\/country"},{"op":"add","path":"\/address\/0\/city","value":"Malibu"},{"op":"add","path":"\/address\/-","value":{"city":"Malibu","state":"California"}}]"""
+    assertThat(
+        services
+          .database
+          .getAllLocalChanges()
+          .first { it.localChange.resourceId == "original-002" }
+          .localChange
+          .payload
+      )
+      .isEqualTo(localChangeDiff)
+    testingUtils.assertResourceEquals(fhirEngine.get<Patient>("original-002"), localChange)
   }
 
   companion object {

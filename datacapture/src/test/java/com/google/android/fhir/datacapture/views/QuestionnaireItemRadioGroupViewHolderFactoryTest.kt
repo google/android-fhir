@@ -317,6 +317,59 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
   }
 
   @Test
+  fun `unselect radio button if selected radio button is clicked`() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    viewHolder.bind(questionnaireItemViewItem)
+    val singleChoiceOption =
+      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
+        RadioButton
+    singleChoiceOption.performClick()
+    assertThat(singleChoiceOption.isChecked).isTrue()
+    singleChoiceOption.performClick()
+
+    assertThat(singleChoiceOption.isChecked).isFalse()
+  }
+
+  @Test
+  fun `clear the answer if selected radio button is clicked`() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    viewHolder.bind(questionnaireItemViewItem)
+    val singleChoiceOption =
+      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
+        RadioButton
+    singleChoiceOption.performClick()
+    singleChoiceOption.performClick()
+
+    assertThat(questionnaireItemViewItem.answers.isEmpty()).isTrue()
+  }
+
+  @Test
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(

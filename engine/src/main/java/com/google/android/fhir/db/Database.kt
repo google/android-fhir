@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,6 +116,12 @@ internal interface Database {
 
   /** Remove the [LocalChangeEntity] s with given ids. Call this after a successful sync. */
   suspend fun deleteUpdates(token: LocalChangeToken)
+
+  /** Remove the [LocalChangeEntity] s with matching resource ids. */
+  suspend fun deleteUpdates(resources: List<Resource>)
+
+  /** Runs the block as a database transaction. */
+  suspend fun withTransaction(block: suspend () -> Unit)
 
   /** Closes the database connection. */
   fun close()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -160,7 +160,12 @@ class SyncJobTest {
     val flow = MutableSharedFlow<State>()
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(fhirEngine, TestingUtils.TestDownloadManagerImpl(), flow)
+    syncJob.run(
+      fhirEngine,
+      TestingUtils.TestDownloadManagerImpl(),
+      AcceptRemoteConflictResolver,
+      flow
+    )
 
     // State transition for successful job as below
     // Started, InProgress, Finished (Success)
@@ -190,7 +195,12 @@ class SyncJobTest {
 
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(fhirEngine, TestingUtils.TestDownloadManagerImpl(), flow)
+    syncJob.run(
+      fhirEngine,
+      TestingUtils.TestDownloadManagerImpl(),
+      AcceptRemoteConflictResolver,
+      flow
+    )
     // State transition for failed job as below
     // Started, InProgress, Glitch, Failed (Error)
     assertThat(res.map { it::class.java })
@@ -280,6 +290,7 @@ class SyncJobTest {
       TestingUtils.TestDownloadManagerImplWithQueue(
         listOf("Patient/bob", "Encounter/doc", "Observation/obs")
       ),
+      AcceptRemoteConflictResolver,
       flow
     )
 
@@ -320,6 +331,7 @@ class SyncJobTest {
       TestingUtils.TestDownloadManagerImplWithQueue(
         listOf("Patient/bob", "Encounter/doc", "Observation/obs")
       ),
+      AcceptRemoteConflictResolver,
       flow
     )
 
@@ -346,7 +358,13 @@ class SyncJobTest {
     val flow = MutableSharedFlow<State>()
     val job = launch { flow.collect { res.add(it) } }
 
-    val result = syncJob.run(fhirEngine, TestingUtils.TestDownloadManagerImplWithQueue(), flow)
+    val result =
+      syncJob.run(
+        fhirEngine,
+        TestingUtils.TestDownloadManagerImplWithQueue(),
+        AcceptRemoteConflictResolver,
+        flow
+      )
 
     assertThat(res).isEmpty()
     assertThat(result).isInstanceOf(Result.Error::class.java)
