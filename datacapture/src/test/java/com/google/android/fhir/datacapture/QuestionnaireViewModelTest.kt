@@ -1169,7 +1169,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun `should Allow user to move forward And Back Using Prior Entry Mode`() = runBlocking {
+  fun `should allow user to move forward and back using prior entry-mode`() = runBlocking {
     val paginationExtension =
       Extension().apply {
         url = EXTENSION_ITEM_CONTROL_URL
@@ -1231,7 +1231,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun `should Allow user to move forward And Back Using Random Entry Mode`() = runBlocking {
+  fun `should allow user to move forward and back using random entry-mode`() = runBlocking {
     val paginationExtension =
       Extension().apply {
         url = EXTENSION_ITEM_CONTROL_URL
@@ -1293,7 +1293,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun `should Allow user to move forward And Back When No EntryMode is defined`() = runBlocking {
+  fun `should allow user to move forward and back when no entry-mode is defined`() = runBlocking {
     val paginationExtension =
       Extension().apply {
         url = EXTENSION_ITEM_CONTROL_URL
@@ -1350,7 +1350,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun `should Allow user to move forward Only Using Sequential Entry Mode`() = runBlocking {
+  fun `should allow user to move forward only using sequential entry-mode`() = runBlocking {
     val paginationExtension =
       Extension().apply {
         url = EXTENSION_ITEM_CONTROL_URL
