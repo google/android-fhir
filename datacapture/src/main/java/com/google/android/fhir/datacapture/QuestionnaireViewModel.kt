@@ -541,11 +541,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * If an expression is simple and evaluates on first evaluation, the function returns the
    * evaluated value otherwise we parse the expression using regex [Regex] for variable (For
    * example: A variable name could be %weight) and build a list of variables that the expression
-   * contains and for every variable, we try to first find it at origin, then up in the parent
-   * hierarchy and then at root/questionnaire level, if found we get their expressions and pass them
-   * into the same function to evaluate it value recursively, we put the variable name and its
-   * evaluated value into the map [Map] to use this map to pass into fhirPathEngine's evaluate
-   * method to apply the evaluated values to the expression being evaluated.
+   * contains and for every variable, we first find it at origin, then up in the parent hierarchy
+   * and then at root/questionnaire level, if found we get their expressions and pass them into the
+   * same function to evaluate it value recursively, we put the variable name and its evaluated
+   * value into the map [Map] to use this map to pass into fhirPathEngine's evaluate method to apply
+   * the evaluated values to the expression being evaluated.
    *
    * @param expression the [Expression] Variable expression
    * @param origin the [Questionnaire.QuestionnaireItemComponent] where this expression is defined,
