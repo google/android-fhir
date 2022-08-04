@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,9 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
 object QuestionnaireItemPhoneNumberViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_edit_text_view) {
+  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_edit_text_single_line_view) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
-    object : QuestionnaireItemEditTextViewHolderDelegate(InputType.TYPE_CLASS_PHONE, true) {
+    object : QuestionnaireItemEditTextViewHolderDelegate(InputType.TYPE_CLASS_PHONE) {
 
       override fun getValue(
         text: String
