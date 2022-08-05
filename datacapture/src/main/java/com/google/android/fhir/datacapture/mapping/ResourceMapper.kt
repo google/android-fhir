@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,10 +63,12 @@ import org.hl7.fhir.r4.utils.StructureMapUtilities
  * [population](http://build.fhir.org/ig/HL7/sdc/populate.html).
  *
  * This class supports
- * [Definition-based extraction](http://build.fhir.org/ig/HL7/sdc/extraction.html#definition-based-extraction),
- * [StructureMap-based extraction](http://hl7.org/fhir/uv/sdc/extraction.html#structuremap-based-extraction),
- * and
- * [expression-based population](http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population).
+ * [Definition-based extraction](http://build.fhir.org/ig/HL7/sdc/extraction.html#definition-based-extraction)
+ * ,
+ * [StructureMap-based extraction](http://hl7.org/fhir/uv/sdc/extraction.html#structuremap-based-extraction)
+ * , and
+ * [expression-based population](http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population)
+ * .
  *
  * See the [developer guide](https://github.com/google/android-fhir/wiki/SDCL%3A-Use-ResourceMapper)
  * for more information.
@@ -88,7 +90,8 @@ object ResourceMapper {
    * [Bundle] is returned if [structureMapExtractionContext] is not provided.
    *
    * Otherwise, this method will perform
-   * [Definition-based extraction](http://hl7.org/fhir/uv/sdc/extraction.html#definition-based-extraction).
+   * [Definition-based extraction](http://hl7.org/fhir/uv/sdc/extraction.html#definition-based-extraction)
+   * .
    *
    * @param questionnaire A [Questionnaire] with data extraction extensions.
    * @param questionnaireResponse A [QuestionnaireResponse] with answers for [questionnaire].
