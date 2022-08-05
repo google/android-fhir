@@ -15,5 +15,5 @@
 -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.google.android.fhir"
+    package="com.google.android.fhir.json"
 />

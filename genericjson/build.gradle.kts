@@ -29,10 +29,10 @@ android {
       resources.setSrcDirs(listOf("sampledata"))
     }
 
-    getByName("test").apply {
-      java.srcDirs("src/test-common/java")
-      resources.setSrcDirs(listOf("sampledata"))
-    }
+    //    getByName("test").apply {
+    //      java.srcDirs("src/test-common/java")
+    //      resources.setSrcDirs(listOf("sampledata"))
+    //    }
   }
 
   buildTypes {

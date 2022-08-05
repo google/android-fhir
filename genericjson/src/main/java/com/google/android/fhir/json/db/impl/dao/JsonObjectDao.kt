@@ -91,22 +91,26 @@ internal abstract class JsonObjectDao {
 
   private suspend fun insertResource(resource: JSONObject): String {
     val resourceUuid = UUID.randomUUID()
-    var logicalId = resourceUuid.toString()
 
-    // Use the local UUID as the logical ID of the resource
-    resource["id"].let { logicalId = it.toString() }
+    val resourceId =
+      if (!resource.has("id")) {
+        resourceUuid.toString()
+      } else {
+        resource.get("id").toString()
+      }
 
-    val lastUpdatedRemote = resource.get("lastUpdated").let { Instant.parse(it.toString()) }
+    //    val lastUpdatedRemote =
+    //      resource.get("lastUpdated").let { Instant.parse(it.toString()) }
 
     val entity =
       JsonObjectEntity(
         id = 0,
         resourceUuid = resourceUuid,
-        resourceId = logicalId,
+        resourceId = resourceId,
         serializedResource = resource.toString(),
-        lastUpdatedRemote = lastUpdatedRemote
+        lastUpdatedRemote = Instant.now()
       )
     insertResource(entity)
-    return logicalId
+    return resourceId
   }
 }

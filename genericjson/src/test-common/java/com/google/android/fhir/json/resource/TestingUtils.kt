@@ -21,7 +21,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /** Utilities for testing. */
-class TestingUtils {
+object TestingUtils {
 
   /** Asserts that the `expected` and the `actual` FHIR resources are equal. */
   fun assertResourceEquals(expected: JSONObject?, actual: JSONObject?) {
@@ -46,33 +46,27 @@ class TestingUtils {
     assertThat(actuals).containsExactlyElementsIn(expecteds)
   }
 
-  // /** Reads a [Resource] from given file in the `sampledata` dir */
-  // fun <R : Resource> readFromFile(clazz: Class<R>, filename: String): R {
-  //   val resourceJson = readJsonFromFile(filename)
-  //   return jsonParser.parseResource(clazz, resourceJson.toString()) as R
-  // }
-  //
-  // /** Reads a [JSONObject] from given file in the `sampledata` dir */
-  // private fun readJsonFromFile(filename: String): JSONObject {
-  //   val inputStream = javaClass.getResourceAsStream(filename)
-  //   val content = inputStream!!.bufferedReader(Charsets.UTF_8).readText()
-  //   return JSONObject(content)
-  // }
-  //
-  // /** Reads a [JSONArray] from given file in the `sampledata` dir */
-  // fun readJsonArrayFromFile(filename: String): JSONArray {
-  //   val inputStream = javaClass.getResourceAsStream(filename)
-  //   val content = inputStream!!.bufferedReader(Charsets.UTF_8).readText()
-  //   return JSONArray(content)
-  // }
-  //
+  /** Reads a [JSONObject] from given file in the `sampledata` dir */
+  fun readJsonFromFile(filename: String): JSONObject {
+    val inputStream = javaClass.getResourceAsStream(filename)
+    val content = inputStream!!.bufferedReader(Charsets.UTF_8).readText()
+    return JSONObject(content)
+  }
+
+  /** Reads a [JSONArray] from given file in the `sampledata` dir */
+  fun readJsonArrayFromFile(filename: String): JSONArray {
+    val inputStream = javaClass.getResourceAsStream(filename)
+    val content = inputStream!!.bufferedReader(Charsets.UTF_8).readText()
+    return JSONArray(content)
+  }
+
   // object TestDataSourceImpl : DataSource {
   //
-  //   override suspend fun download(path: String): Resource {
+  //   override suspend fun download(path: String): JSONObject {
   //     return Bundle().apply { type = Bundle.BundleType.SEARCHSET }
   //   }
   //
-  //   override suspend fun upload(bundle: Bundle): Resource {
+  //   override suspend fun upload(bundle: Bundle): JSONObject {
   //     return Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
   //   }
   // }
@@ -82,9 +76,9 @@ class TestingUtils {
   // ) : DownloadWorkManager {
   //   private val urls = LinkedList(queries)
   //
-  //   override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? = urls.poll()
+  //   override suspend fun getNextRequestUrl(): String? = urls.poll()
   //
-  //   override suspend fun processResponse(response: Resource): Collection<Resource> {
+  //   override suspend fun processResponse(response: JSONObject): Collection<JSONObject> {
   //     val patient = Patient().setMeta(Meta().setLastUpdated(Date()))
   //     return listOf(patient)
   //   }
@@ -94,52 +88,36 @@ class TestingUtils {
   //   queries: List<String> = listOf("Patient/bob", "Encounter/doc")
   // ) : TestDownloadManagerImpl(queries)
   //
-  // object TestFhirEngineImpl : FhirEngine {
-  //   override suspend fun create(vararg resource: Resource) = emptyList<String>()
+  // object TestFhirEngineImpl : JsonEngine {
+  //   override suspend fun create(vararg resource: JSONObject) = emptyList<String>()
   //
-  //   override suspend fun update(vararg resource: Resource) {}
+  //   override suspend fun update(vararg resource: JSONObject) {}
   //
-  //   override suspend fun get(type: ResourceType, id: String): Resource {
-  //     return Patient()
+  //   override suspend fun get(id: String): JSONObject {
+  //     return JSONObject()
   //   }
   //
-  //   override suspend fun delete(type: ResourceType, id: String) {}
-  //
-  //   override suspend fun <R : Resource> search(search: Search): List<R> {
-  //     return emptyList()
-  //   }
+  //   override suspend fun delete(id: String) {}
   //
   //   override suspend fun syncUpload(
-  //     upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+  //     upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, JSONObject>>
   //   ) {
   //     upload(listOf())
   //   }
   //
   //   override suspend fun syncDownload(
   //     conflictResolver: ConflictResolver,
-  //     download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+  //     download: suspend () -> Flow<List<JSONObject>>
   //   ) {
-  //     download(
-  //       object : SyncDownloadContext {
-  //         override suspend fun getLatestTimestampFor(type: ResourceType): String {
-  //           return "123456788"
-  //         }
-  //       }
-  //     )
+  //     download()
   //       .collect {}
   //   }
-  //   override suspend fun count(search: Search): Long {
-  //     return 0
-  //   }
   //
-  //   override suspend fun getLastSyncTimeStamp(): OffsetDateTime? {
-  //     return OffsetDateTime.now()
-  //   }
   // }
   //
   // object TestFailingDatasource : DataSource {
   //
-  //   override suspend fun download(path: String): Resource {
+  //   override suspend fun download(path: String): JSONObject {
   //     val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
   //     // data size exceeding the bytes acceptable by WorkManager serializer
   //     val dataSize = Data.MAX_DATA_BYTES + 1
@@ -147,17 +125,17 @@ class TestingUtils {
   //     throw Exception(hugeStackTraceMessage)
   //   }
   //
-  //   override suspend fun upload(bundle: Bundle): Resource {
+  //   override suspend fun upload(bundle: JSONObject): JSONObject {
   //     throw Exception("Posting Bundle failed...")
   //   }
   // }
   //
-  // class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSource {
+  // class BundleDataSource(val onPostBundle: suspend (JSONObject) -> JSONObject) : DataSource {
   //
-  //   override suspend fun download(path: String): Resource {
+  //   override suspend fun download(path: String): JSONObject {
   //     TODO("Not yet implemented")
   //   }
   //
-  //   override suspend fun upload(bundle: Bundle) = onPostBundle(bundle)
+  //   override suspend fun upload(bundle: JSONObject) = onPostBundle(bundle)
   // }
 }
