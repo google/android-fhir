@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDownloadWorkManager(): DownloadWorkManager
+  abstract fun getConflictResolver(): ConflictResolver
 
   private val gson =
     GsonBuilder()
@@ -65,7 +66,13 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         )
 
     val fhirSynchronizer =
-      FhirSynchronizer(applicationContext, getFhirEngine(), dataSource, getDownloadWorkManager())
+      FhirSynchronizer(
+        applicationContext,
+        getFhirEngine(),
+        dataSource,
+        getDownloadWorkManager(),
+        conflictResolver = getConflictResolver()
+      )
     val flow = MutableSharedFlow<State>()
 
     val job =
