@@ -24,6 +24,7 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.get
 import com.google.android.fhir.resource.TestingUtils
+import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.common.truth.Truth.assertThat
@@ -31,6 +32,7 @@ import java.util.Date
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
@@ -172,6 +174,84 @@ class FhirEngineImplTest {
   }
 
   @Test
+  fun `search() by x-fhir-query should return female patients for gender param`() = runBlocking {
+    val patients =
+      listOf(
+        buildPatient("3", "C", Enumerations.AdministrativeGender.FEMALE),
+        buildPatient("2", "B", Enumerations.AdministrativeGender.FEMALE),
+        buildPatient("1", "A", Enumerations.AdministrativeGender.MALE)
+      )
+
+    fhirEngine.create(*patients.toTypedArray())
+
+    val result = fhirEngine.search("Patient?gender=female")
+
+    assertThat(result.size).isEqualTo(2)
+    assertThat(result.all { (it as Patient).gender == Enumerations.AdministrativeGender.FEMALE })
+      .isTrue()
+  }
+
+  @Test
+  fun `search() by x-fhir-query should return sorted patients for sort param`() = runBlocking {
+    val patients =
+      listOf(
+        buildPatient("3", "C", Enumerations.AdministrativeGender.FEMALE),
+        buildPatient("2", "B", Enumerations.AdministrativeGender.FEMALE),
+        buildPatient("1", "A", Enumerations.AdministrativeGender.MALE)
+      )
+
+    fhirEngine.create(*patients.toTypedArray())
+
+    val result = fhirEngine.search("Patient?_sort=-name").map { it as Patient }
+
+    assertThat(result.mapNotNull { it.nameFirstRep.given.firstOrNull()?.value })
+      .isEqualTo(listOf("C", "B", "A"))
+  }
+
+  @Test
+  fun `search() by x-fhir-query should return limited patients for count param`() = runBlocking {
+    val patients =
+      listOf(
+        buildPatient("3", "C", Enumerations.AdministrativeGender.FEMALE),
+        buildPatient("2", "B", Enumerations.AdministrativeGender.FEMALE),
+        buildPatient("1", "A", Enumerations.AdministrativeGender.MALE)
+      )
+
+    fhirEngine.create(*patients.toTypedArray())
+
+    val result = fhirEngine.search("Patient?_count=1").map { it as Patient }
+
+    assertThat(result.size).isEqualTo(1)
+  }
+
+  @Test
+  fun `search() by x-fhir-query should return all patients for empty params`() = runBlocking {
+    val result = fhirEngine.search("Patient")
+
+    assertThat(result.size).isEqualTo(1)
+  }
+
+  @Test
+  fun `search() by x-fhir-query should throw FHIRException for unrecognized resource type`() {
+    val exception =
+      assertThrows(FHIRException::class.java) {
+        runBlocking {
+          fhirEngine.search("CustomResource?active=true&gender=male&_sort=name&_count=2")
+        }
+      }
+    assertThat(exception.message).isEqualTo("Unknown resource typeCustomResource")
+  }
+
+  @Test
+  fun `search() by x-fhir-query should throw IllegalArgumentException for unrecognized param name`() {
+    val exception =
+      assertThrows(IllegalArgumentException::class.java) {
+        runBlocking { fhirEngine.search("Patient?customParam=true&gender=male&_sort=name") }
+      }
+    assertThat(exception.message).isEqualTo("customParam not found in Patient")
+  }
+
+  @Test
   fun syncUpload_uploadLocalChange() = runBlocking {
     val localChanges = mutableListOf<SquashedLocalChange>()
     fhirEngine.syncUpload {
@@ -196,6 +276,18 @@ class FhirEngineImplTest {
 
     testingUtils.assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
   }
+
+  private fun buildPatient(
+    patientId: String,
+    name: String,
+    patientGender: Enumerations.AdministrativeGender
+  ) =
+    Patient().apply {
+      id = patientId
+      nameFirstRep.addGiven(name)
+      gender = patientGender
+      active = true
+    }
 
   @Test
   fun syncDownload_conflictResolution_acceptRemote_shouldHaveNoLocalChangeAnymore() = runBlocking {

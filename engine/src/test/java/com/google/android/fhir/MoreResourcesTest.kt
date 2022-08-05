@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,12 @@ class MoreResourcesTest {
   }
 
   @Test
-  fun getResourceClass() {
+  fun `getResourceClass() by name should return resource class`() {
     assertThat(getResourceClass<Resource>("Patient")).isEqualTo(Patient::class.java)
+  }
+
+  @Test
+  fun `getResourceClass() by resource type should return resource class`() {
+    assertThat(getResourceClass<Resource>(ResourceType.Patient)).isEqualTo(Patient::class.java)
   }
 }
