@@ -312,11 +312,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
   }
 
-  fun List<Questionnaire.QuestionnaireItemComponent>.flattened():
-    List<Questionnaire.QuestionnaireItemComponent> {
-    return this + this.flatMap { if (it.hasItem()) it.item.flattened() else it.item }
-  }
-
   fun detectCalculatedExpressionCyclicDependency(
     items: List<Questionnaire.QuestionnaireItemComponent>
   ) {

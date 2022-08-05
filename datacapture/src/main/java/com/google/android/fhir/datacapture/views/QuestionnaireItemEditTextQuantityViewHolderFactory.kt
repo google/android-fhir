@@ -17,8 +17,8 @@
 package com.google.android.fhir.datacapture.views
 
 import android.text.InputType
-import java.math.BigDecimal
 import com.google.android.fhir.datacapture.R
+import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 

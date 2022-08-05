@@ -302,6 +302,15 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
 }
 
 /**
+ * Flatten a nested list of [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]
+ * recursively and returns a flat list of all items into list embedded at any level
+ */
+fun List<Questionnaire.QuestionnaireItemComponent>.flattened():
+  List<Questionnaire.QuestionnaireItemComponent> {
+  return this + this.flatMap { if (it.hasItem()) it.item.flattened() else it.item }
+}
+
+/**
  * Creates a list of [QuestionnaireResponse.QuestionnaireResponseItemComponent]s from the nested
  * items in the [Questionnaire.QuestionnaireItemComponent].
  *
