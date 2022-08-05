@@ -231,21 +231,19 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   internal fun goToPreviousPage() {
-    val currentPageIndex = currentPageIndexFlow.value!!
-    check(pages!!.take(currentPageIndex).any { it.enabled }) {
+    val previousPageIndex =
+      pages!!.indexOfLast { it.index < currentPageIndexFlow.value!! && it.enabled }
+    check(previousPageIndex != -1) {
       "Can't call goToPreviousPage() if no preceding page is enabled"
     }
-    currentPageIndexFlow.value =
-      pages!!.map { it.index < currentPageIndex && it.enabled }.indexOfLast { it }
+    currentPageIndexFlow.value = previousPageIndex
   }
 
   internal fun goToNextPage() {
-    val currentPageIndex = currentPageIndexFlow.value!!
-    check(pages!!.drop(currentPageIndex + 1).any { it.enabled }) {
-      "Can't call goToNextPage() if no following page is enabled"
-    }
-    currentPageIndexFlow.value =
-      pages!!.map { it.index > currentPageIndex && it.enabled }.indexOfFirst { it }
+    val nextPageIndex =
+      pages!!.indexOfFirst { it.index > currentPageIndexFlow.value!! && it.enabled }
+    check(nextPageIndex != -1) { "Can't call goToNextPage() if no following page is enabled" }
+    currentPageIndexFlow.value = nextPageIndex
   }
 
   /** [QuestionnaireState] to be displayed in the UI. */
@@ -320,36 +318,37 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     currentPageIndex: Int?,
   ): QuestionnaireState {
-    // Paginated questionnaire
-    currentPageIndex?.let { currentPageIndexNonNull ->
-      pages =
-        (0 until pages!!.size).map {
-          QuestionnairePage(
-            it,
-            EnablementEvaluator.evaluate(
-              questionnaireItemList[it],
-              questionnaireResponseItemList[it],
-              questionnaireResponse
-            ) { questionnaireResponseItem, linkId ->
-              findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, linkId)
-            }
-          )
-        }
-
+    if (currentPageIndex == null) {
+      // Single-page questionnaire
       return QuestionnaireState(
-        items =
-          getQuestionnaireItemViewItems(
-            questionnaireItemList[currentPageIndexNonNull],
-            questionnaireResponseItemList[currentPageIndexNonNull]
-          ),
-        pagination = QuestionnairePagination(pages!!, currentPageIndexNonNull)
+        items = getQuestionnaireItemViewItems(questionnaireItemList, questionnaireResponseItemList),
+        pagination = null
       )
     }
 
-    // Single-page questionnaire
+    // Paginated questionnaire
+    pages =
+      questionnaireItemList.zip(questionnaireResponseItemList).mapIndexed {
+        index,
+        (questionnaireItem, questionnaireResponseItem) ->
+        QuestionnairePage(
+          index,
+          EnablementEvaluator.evaluate(
+            questionnaireItem,
+            questionnaireResponseItem,
+            questionnaireResponse
+          ) { questionnaireResponseItem, linkId ->
+            findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, linkId)
+          }
+        )
+      }
     return QuestionnaireState(
-      items = getQuestionnaireItemViewItems(questionnaireItemList, questionnaireResponseItemList),
-      pagination = null
+      items =
+        getQuestionnaireItemViewItems(
+          questionnaireItemList[currentPageIndex],
+          questionnaireResponseItemList[currentPageIndex]
+        ),
+      pagination = QuestionnairePagination(pages!!, currentPageIndex)
     )
   }
 
@@ -492,7 +491,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private fun Questionnaire.getInitialPages() =
     if (questionnaire.isPaginated) {
       // Assume all pages are enabled to begin with
-      (0 until item.size).map { QuestionnairePage(it, true) }.toList()
+      item.indices.map { QuestionnairePage(it, true) }
     } else {
       null
     }
@@ -567,7 +566,7 @@ internal data class QuestionnairePage(
 )
 
 internal val QuestionnairePagination.hasPreviousPage: Boolean
-  get() = pages.take(currentPageIndex).any { it.enabled }
+  get() = pages.any { it.index < currentPageIndex && it.enabled }
 
 internal val QuestionnairePagination.hasNextPage: Boolean
-  get() = pages.drop(currentPageIndex + 1).any { it.enabled }
+  get() = pages.any { it.index > currentPageIndex && it.enabled }
