@@ -18,6 +18,7 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import com.google.android.fhir.search.ConditionParam
+import com.google.android.fhir.search.Modifier
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 
@@ -38,4 +39,5 @@ internal data class ReferenceParamFilterCriteria(
   val parameter: ReferenceClientParam,
   override val filters: List<ReferenceParamFilterCriterion>,
   override val operation: Operation,
-) : FilterCriteria(filters, operation, parameter, "ReferenceIndexEntity")
+  override val modifier: Modifier? = null
+) : FilterCriteria(filters, operation, modifier, parameter, "ReferenceIndexEntity")

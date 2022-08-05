@@ -19,6 +19,7 @@ package com.google.android.fhir.search.filter
 import ca.uhn.fhir.rest.gclient.IParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import com.google.android.fhir.search.ConditionParam
+import com.google.android.fhir.search.Modifier
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchQuery
 import org.hl7.fhir.r4.model.Patient
@@ -29,6 +30,9 @@ internal interface FilterCriterion {
 
   /** Returns [ConditionalParam]s for the particular [FilterCriterion]. */
   fun getConditionalParams(): List<ConditionParam<out Any>>
+
+  fun getModifierParams(): List<ConditionParam<out Any>>
+
 }
 
 /**
@@ -44,6 +48,7 @@ internal interface FilterCriterion {
 internal sealed class FilterCriteria(
   open val filters: List<FilterCriterion>,
   open val operation: Operation,
+  open val modifier: Modifier?,
   val param: IParam,
   private val entityTableName: String
 ) {
@@ -54,7 +59,9 @@ internal sealed class FilterCriteria(
    * [query] and provide its own implementation. See [DateClientParamFilterCriteria] for reference.
    */
   open fun query(type: ResourceType): SearchQuery {
-    val conditionParams = filters.flatMap { it.getConditionalParams() }
+    val conditionParams = filters.flatMap {
+      it.getConditionalParams()
+    }
     return SearchQuery(
       """
       SELECT resourceUuid FROM $entityTableName

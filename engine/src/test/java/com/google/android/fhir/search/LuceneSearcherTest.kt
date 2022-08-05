@@ -36,6 +36,9 @@ class LuceneSearcherTest {
 
   @Test
   fun index_id() {
-    LuceneSearcher.search("abc").scoreDocs.forEach { LuceneSearcher.getDocument(it).fields }
+    LuceneSearcher.search("address:ceetee1").forEach { println(it.fields)}
+    LuceneSearcher.search("address-city:ceetee1").forEach { println(it.fields)}
+    LuceneSearcher.search("address-city:ceetee1").forEach { println(it.fields)}
+    LuceneSearcher.search("address-city:ceetee1").forEach { println(it.fields)}
   }
 }

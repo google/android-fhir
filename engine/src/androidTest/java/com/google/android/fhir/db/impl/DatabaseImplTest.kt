@@ -26,6 +26,7 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
+import com.google.android.fhir.search.Modifier
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
@@ -2666,6 +2667,22 @@ class DatabaseImplTest {
     assertThat(result.map { it.nameFirstRep.nameAsSingleString })
       .containsExactly("John Doe", "Jane Doe", "John Roe", "Jane Roe")
       .inOrder()
+  }
+
+  @Test
+  fun test_lucene() = runBlocking {
+    database.insertRemote(TEST_PATIENT_1)
+    val result =
+            database.search<Patient>(
+                    Search(ResourceType.Patient)
+                            .apply {
+                              filter(Patient.GENDER, {value = of("male")}, modifier = Modifier.TEXT)
+                              count = 100
+                              from = 0
+                            }
+                            .getQuery()
+            )
+    assertThat(result).hasSize(1)
   }
 
   private companion object {

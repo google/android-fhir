@@ -18,6 +18,7 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import com.google.android.fhir.search.ConditionParam
+import com.google.android.fhir.search.Modifier
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 import org.hl7.fhir.r4.model.CodeType
@@ -109,7 +110,8 @@ class TokenFilterValue internal constructor() {
 internal data class TokenParamFilterValueInstance(var uri: String? = null, var code: String)
 
 internal data class TokenParamFilterCriteria(
-  var parameter: TokenClientParam,
-  override val filters: List<TokenParamFilterCriterion>,
-  override val operation: Operation,
-) : FilterCriteria(filters, operation, parameter, "TokenIndexEntity")
+        var parameter: TokenClientParam,
+        override val filters: List<TokenParamFilterCriterion>,
+        override val operation: Operation,
+        override val modifier: Modifier?
+) : FilterCriteria(filters, operation, modifier, parameter, "TokenIndexEntity")

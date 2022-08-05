@@ -18,6 +18,7 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import com.google.android.fhir.search.ConditionParam
+import com.google.android.fhir.search.Modifier
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.StringFilterModifier
@@ -51,4 +52,5 @@ internal data class StringParamFilterCriteria(
   val parameter: StringClientParam,
   override val filters: List<StringParamFilterCriterion>,
   override val operation: Operation,
-) : FilterCriteria(filters, operation, parameter, "StringIndexEntity")
+  override val modifier: Modifier? = null
+) : FilterCriteria(filters, operation, modifier, parameter, "StringIndexEntity")

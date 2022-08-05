@@ -19,6 +19,7 @@ package com.google.android.fhir.search.filter
 import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.search.ConditionParam
+import com.google.android.fhir.search.Modifier
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.SearchQuery
@@ -71,8 +72,9 @@ class DateFilterValues internal constructor() {
 internal data class DateClientParamFilterCriteria(
   val parameter: DateClientParam,
   override val filters: List<DateParamFilterCriterion>,
-  override val operation: Operation
-) : FilterCriteria(filters, operation, parameter, "") {
+  override val operation: Operation,
+  override val modifier: Modifier? = null
+) : FilterCriteria(filters, operation, modifier, parameter, "") {
 
   override fun query(type: ResourceType): SearchQuery {
 
@@ -99,13 +101,15 @@ internal data class DateClientParamFilterCriteria(
   private data class DateFilterCriteria(
     val parameter: DateClientParam,
     override val filters: List<DateParamFilterCriterion>,
-    override val operation: Operation
-  ) : FilterCriteria(filters, operation, parameter, "DateIndexEntity")
+    override val operation: Operation,
+    override val modifier: Modifier? = null
+  ) : FilterCriteria(filters, operation, modifier, parameter, "DateIndexEntity")
 
   /** Internal class used to generate query for DateTime type Criterion */
   private data class DateTimeFilterCriteria(
     val parameter: DateClientParam,
     override val filters: List<DateParamFilterCriterion>,
-    override val operation: Operation
-  ) : FilterCriteria(filters, operation, parameter, "DateTimeIndexEntity")
+    override val operation: Operation,
+    override val modifier: Modifier? = null
+  ) : FilterCriteria(filters, operation, modifier, parameter, "DateTimeIndexEntity")
 }

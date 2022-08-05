@@ -65,8 +65,8 @@ android {
     isCoreLibraryDesugaringEnabled = true
     // Sets Java compatibility to Java 8
     // See https = //developer.android.com/studio/write/java8-support
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
   }
 
   packagingOptions {
@@ -74,7 +74,7 @@ android {
   }
 
   // See https = //developer.android.com/studio/write/java8-support
-  kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
+  kotlinOptions { jvmTarget = JavaVersion.VERSION_11.toString() }
 
   configureJacocoTestOptions()
 }
@@ -135,8 +135,9 @@ dependencies {
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
 
-  implementation("org.apache.lucene:lucene-core:9.3.0")
-  implementation("org.apache.lucene:lucene-queryparser:9.3.0")
+  implementation("org.apache.lucene:lucene-core:4.8.1")
+  implementation("org.apache.lucene:lucene-queryparser:4.8.1")
+  implementation("org.apache.lucene:lucene-analyzers-common:4.8.1")
 }
 
 configureDokka(Releases.Engine.artifactId, Releases.Engine.version)

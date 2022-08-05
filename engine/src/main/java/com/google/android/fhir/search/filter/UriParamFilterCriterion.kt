@@ -18,6 +18,7 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.UriClientParam
 import com.google.android.fhir.search.ConditionParam
+import com.google.android.fhir.search.Modifier
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 
@@ -35,5 +36,6 @@ data class UriParamFilterCriterion(val parameter: UriClientParam, var value: Str
 internal data class UriFilterCriteria(
   val parameter: UriClientParam,
   override val filters: List<UriParamFilterCriterion>,
-  override val operation: Operation
-) : FilterCriteria(filters, operation, parameter, "UriIndexEntity")
+  override val operation: Operation,
+  override val modifier: Modifier? = null
+) : FilterCriteria(filters, operation, modifier, parameter, "UriIndexEntity")

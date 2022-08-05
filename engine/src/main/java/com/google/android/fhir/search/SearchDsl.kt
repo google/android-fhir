@@ -101,11 +101,12 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   fun filter(
     tokenParameter: TokenClientParam,
     vararg init: TokenParamFilterCriterion.() -> Unit,
-    operation: Operation = Operation.OR
+    operation: Operation = Operation.OR,
+    modifier: Modifier? = null
   ) {
     val filters = mutableListOf<TokenParamFilterCriterion>()
     init.forEach { TokenParamFilterCriterion(tokenParameter).apply(it).also(filters::add) }
-    tokenFilterCriteria.add(TokenParamFilterCriteria(tokenParameter, filters, operation))
+    tokenFilterCriteria.add(TokenParamFilterCriteria(tokenParameter, filters, operation, modifier))
   }
 
   fun filter(

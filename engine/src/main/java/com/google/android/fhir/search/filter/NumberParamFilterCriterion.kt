@@ -18,6 +18,7 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.search.Modifier
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.getConditionParamPair
@@ -41,4 +42,5 @@ internal data class NumberParamFilterCriteria(
   val parameter: NumberClientParam,
   override val filters: List<NumberParamFilterCriterion>,
   override val operation: Operation,
-) : FilterCriteria(filters, operation, parameter, "NumberIndexEntity")
+  override val modifier: Modifier? = null
+) : FilterCriteria(filters, operation, modifier, parameter, "NumberIndexEntity")

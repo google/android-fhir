@@ -33,6 +33,7 @@ import org.apache.lucene.index.IndexWriterConfig
 import org.apache.lucene.index.Term
 import org.apache.lucene.store.Directory
 import org.apache.lucene.store.FSDirectory
+import org.apache.lucene.util.Version
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -56,12 +57,13 @@ object LuceneIndexer {
   fun resourceIndexer(indexDirPath: String) {
     val indexDir: Directory =
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        FSDirectory.open(File(indexDirPath).toPath())
+        FSDirectory.open(File(indexDirPath))
       } else {
         TODO("VERSION.SDK_INT < O")
+        throw UnsupportedOperationException("SDK LOWER")
       }
-    analyzer = StandardAnalyzer() // TODO ???
-    iwc = IndexWriterConfig(analyzer)
+    analyzer = StandardAnalyzer(Version.LUCENE_48) // TODO ???
+    iwc = IndexWriterConfig(Version.LUCENE_48, analyzer)
 
     // default configuration for index. This cannot be changed after index is created using this
     // object. For any changes we will need to getConfig from the index writer.
@@ -162,7 +164,7 @@ object LuceneIndexer {
 
   fun Quantity.asStringValue() = "${this.value}|${this.system ?: ""}|${this.unit ?: ""}"
 
-  fun Identifier.asStringValue() = "${this.system ?: ""}|${this.value}"
+  fun Identifier.asStringValue() = "${this.system ?: ""}|${this.value}|${this.type.text}"
 
   fun Coding.asStringValue() = "${this.system ?: ""}|${this.code}|${this.display ?: ""}"
 
