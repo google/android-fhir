@@ -17,11 +17,8 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
-import android.text.Spanned
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
@@ -30,44 +27,20 @@ import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
 import org.hl7.fhir.r4.model.Questionnaire
 
-/** View for the prefix, question, and hint of a questionnaire item. */
-internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet?) :
+internal class QuestionnaireGroupTypeHeaderView(context: Context, attrs: AttributeSet?) :
   LinearLayout(context, attrs) {
 
   init {
-    LayoutInflater.from(context).inflate(R.layout.questionnaire_item_header, this, true)
+    LayoutInflater.from(context).inflate(R.layout.questionnaire_group_type_header, this, true)
   }
 
-  private var prefix: TextView = findViewById(R.id.prefix)
-  private var question: TextView = findViewById(R.id.question)
-  private var hint: TextView = findViewById(R.id.hint)
-
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
+    val prefix = findViewById<TextView>(R.id.prefix)
+    val question = findViewById<TextView>(R.id.question)
+    val hint = findViewById<TextView>(R.id.hint)
     prefix.updateText(questionnaireItem.localizedPrefixSpanned)
     question.updateText(questionnaireItem.localizedTextSpanned)
     hint.updateText(questionnaireItem.localizedHintSpanned)
-    //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
-    // questionnaire.
     visibility = isViewVisible(prefix, question, hint)
   }
-}
-
-internal fun TextView.updateText(localizedText: Spanned?) {
-  text = localizedText
-  visibility =
-    if (localizedText.isNullOrEmpty()) {
-      GONE
-    } else {
-      VISIBLE
-    }
-}
-
-/** Returns [VISIBLE] if any of the [view] is visible, else returns [GONE]. */
-internal fun isViewVisible(vararg view: TextView): Int {
-  view.forEach {
-    if (it.visibility == VISIBLE) {
-      return VISIBLE
-    }
-  }
-  return GONE
 }

@@ -20,7 +20,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
 >
-    <com.google.android.fhir.datacapture.views.QuestionnaireItemHeaderView
+    <com.google.android.fhir.datacapture.views.QuestionnaireGroupTypeHeaderView
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
