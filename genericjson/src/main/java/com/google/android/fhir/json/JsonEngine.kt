@@ -41,6 +41,10 @@ interface JsonEngine {
   /** Removes a FHIR resource given the class and the logical ID. */
   suspend fun delete(id: String)
 
+  suspend fun search(): List<JSONObject>
+
+  suspend fun count(): Long
+
   /**
    * Synchronizes the [upload] result in the database. [upload] operation may result in multiple
    * calls to the server to upload the data. Result of each call will be emitted by [upload] and the

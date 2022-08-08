@@ -18,23 +18,35 @@ package com.google.android.fhir.json.sync.download
 
 import com.google.android.fhir.json.sync.DataSource
 import com.google.android.fhir.json.sync.DownloadState
-import com.google.android.fhir.json.sync.DownloadWorkManager
 import com.google.android.fhir.json.sync.Downloader
+import com.google.android.fhir.json.sync.JsonDownloadWorkManager
+import com.google.android.fhir.json.sync.ResourceSyncException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 /**
  * Implementation of the [Downloader]. It orchestrates the pre & post processing of resources via
- * [DownloadWorkManager] and downloading of resources via [DataSource]. [Downloader] clients should
- * call download and listen to the various states emitted by [DownloadWorkManager] as
+ * [JsonDownloadWorkManager] and downloading of resources via [DataSource]. [Downloader] clients
+ * should call download and listen to the various states emitted by [JsonDownloadWorkManager] as
  * [DownloadState].
  */
 internal class DownloaderImpl(
   private val dataSource: DataSource,
-  private val downloadWorkManager: DownloadWorkManager
+  private val jsonDownloadWorkManager: JsonDownloadWorkManager
 ) : Downloader {
 
   override suspend fun download(): Flow<DownloadState> = flow {
-    downloadWorkManager.getNextRequestUrl()
+    emit(DownloadState.Started(type = "JSON"))
+    var url = jsonDownloadWorkManager.getNextRequestUrl()
+    while (url != null) {
+      try {
+        val response = dataSource.download(url)
+        val resourcesToSave = jsonDownloadWorkManager.processResponse(response).toList()
+        emit(DownloadState.Success(resourcesToSave))
+      } catch (exception: Exception) {
+        emit(DownloadState.Failure(ResourceSyncException(exception)))
+      }
+      url = jsonDownloadWorkManager.getNextRequestUrl()
+    }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,34 +22,29 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.search.Order
-import com.google.android.fhir.search.Search
-import com.google.android.fhir.search.StringFilterModifier
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.json.JsonEngine
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.RiskAssessment
 
 /**
  * The ViewModel helper class for PatientItemRecyclerViewAdapter, that is responsible for preparing
  * data for UI.
  */
-class PatientListViewModel(application: Application, private val fhirEngine: FhirEngine) :
+class PatientListViewModel(application: Application, private val jsonEngine: JsonEngine) :
   AndroidViewModel(application) {
 
   val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
   val patientCount = MutableLiveData<Long>()
+  val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
   init {
     updatePatientListAndPatientCount({ getSearchResults() }, { count() })
-  }
-
-  fun searchPatientsByName(nameQuery: String) {
-    updatePatientListAndPatientCount({ getSearchResults(nameQuery) }, { count(nameQuery) })
   }
 
   /**
@@ -72,63 +67,17 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
    * which only returns a fixed range.
    */
   private suspend fun count(nameQuery: String = ""): Long {
-    return fhirEngine.count<Patient> {
-      if (nameQuery.isNotEmpty()) {
-        filter(
-          Patient.NAME,
-          {
-            modifier = StringFilterModifier.CONTAINS
-            value = nameQuery
-          }
-        )
-      }
-      filterCity(this)
-    }
+    return jsonEngine.count()
   }
 
   private suspend fun getSearchResults(nameQuery: String = ""): List<PatientItem> {
     val patients: MutableList<PatientItem> = mutableListOf()
-    fhirEngine
-      .search<Patient> {
-        if (nameQuery.isNotEmpty()) {
-          filter(
-            Patient.NAME,
-            {
-              modifier = StringFilterModifier.CONTAINS
-              value = nameQuery
-            }
-          )
-        }
-        filterCity(this)
-        sort(Patient.GIVEN, Order.ASCENDING)
-        count = 100
-        from = 0
-      }
+    jsonEngine
+      .search()
+      .map { parser.parseResource(Patient::class.java, it.toString()) }
       .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
       .let { patients.addAll(it) }
-
-    val risks = getRiskAssessments()
-    patients.forEach { patient ->
-      risks["Patient/${patient.resourceId}"]?.let {
-        patient.risk = it.prediction?.first()?.qualitativeRisk?.coding?.first()?.code
-      }
-    }
     return patients
-  }
-
-  private fun filterCity(search: Search) {
-    search.filter(Patient.ADDRESS_CITY, { value = "NAIROBI" })
-  }
-
-  private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {
-    return fhirEngine.search<RiskAssessment> {}.groupBy { it.subject.reference }.mapValues { entry
-      ->
-      entry
-        .value
-        .filter { it.hasOccurrence() }
-        .sortedByDescending { it.occurrenceDateTimeType.value }
-        .firstOrNull()
-    }
   }
 
   /** The Patient's details for display purposes. */
@@ -170,12 +119,12 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
 
   class PatientListViewModelFactory(
     private val application: Application,
-    private val fhirEngine: FhirEngine
+    private val jsonEngine: JsonEngine
   ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
       if (modelClass.isAssignableFrom(PatientListViewModel::class.java)) {
-        return PatientListViewModel(application, fhirEngine) as T
+        return PatientListViewModel(application, jsonEngine) as T
       }
       throw IllegalArgumentException("Unknown ViewModel class")
     }

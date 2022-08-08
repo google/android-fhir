@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.demo
 
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -27,7 +26,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
-import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -40,16 +38,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
-import com.google.android.fhir.sync.State
-import kotlinx.coroutines.flow.collect
+import com.google.android.fhir.json.JsonEngine
+import com.google.android.fhir.json.sync.State
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class PatientListFragment : Fragment() {
-  private lateinit var fhirEngine: FhirEngine
+  private lateinit var jsonEngine: JsonEngine
   private lateinit var patientListViewModel: PatientListViewModel
   private lateinit var searchView: SearchView
   private lateinit var topBanner: LinearLayout
@@ -75,11 +72,11 @@ class PatientListFragment : Fragment() {
       title = resources.getString(R.string.title_patient_list)
       setDisplayHomeAsUpEnabled(true)
     }
-    fhirEngine = FhirApplication.fhirEngine(requireContext())
+    jsonEngine = JsonApplication.jsonEngine(requireContext())
     patientListViewModel =
       ViewModelProvider(
           this,
-          PatientListViewModelFactory(requireActivity().application, fhirEngine)
+          PatientListViewModelFactory(requireActivity().application, jsonEngine)
         )
         .get(PatientListViewModel::class.java)
     val recyclerView: RecyclerView = binding.patientListContainer.patientList
@@ -106,26 +103,6 @@ class PatientListFragment : Fragment() {
     searchView = binding.search
     topBanner = binding.syncStatusContainer.linearLayoutSyncStatus
     syncStatus = binding.syncStatusContainer.tvSyncingStatus
-    searchView.setOnQueryTextListener(
-      object : SearchView.OnQueryTextListener {
-        override fun onQueryTextChange(newText: String): Boolean {
-          patientListViewModel.searchPatientsByName(newText)
-          return true
-        }
-
-        override fun onQueryTextSubmit(query: String): Boolean {
-          patientListViewModel.searchPatientsByName(query)
-          return true
-        }
-      }
-    )
-    searchView.setOnQueryTextFocusChangeListener { view, focused ->
-      if (!focused) {
-        // hide soft keyboard
-        (requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
-          .hideSoftInputFromWindow(view.windowToken, 0)
-      }
-    }
     requireActivity()
       .onBackPressedDispatcher
       .addCallback(
@@ -158,18 +135,16 @@ class PatientListFragment : Fragment() {
             fadeInTopBanner()
           }
           is State.InProgress -> {
-            Timber.i("Sync: ${it::class.java.simpleName} with ${it.resourceType?.name}")
+            Timber.i("Sync: ${it::class.java.simpleName} with ${it.resourceType}")
             fadeInTopBanner()
           }
           is State.Finished -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
-            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
           is State.Failed -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
-            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }

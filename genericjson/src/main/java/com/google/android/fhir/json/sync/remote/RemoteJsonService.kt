@@ -79,7 +79,7 @@ internal interface RemoteJsonService : DataSource {
       return Retrofit.Builder()
         .baseUrl(baseUrl)
         .client(client)
-        .addConverterFactory(FhirConverterFactory.create())
+        .addConverterFactory(JsonConverterFactory.create())
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(RemoteJsonService::class.java)

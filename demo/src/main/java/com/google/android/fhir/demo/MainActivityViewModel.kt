@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
-import com.google.android.fhir.demo.data.FhirPeriodicSyncWorker
-import com.google.android.fhir.sync.PeriodicSyncConfiguration
-import com.google.android.fhir.sync.RepeatInterval
-import com.google.android.fhir.sync.State
-import com.google.android.fhir.sync.Sync
+import com.google.android.fhir.demo.data.JsonPeriodicSyncWorker
+import com.google.android.fhir.json.sync.PeriodicSyncConfiguration
+import com.google.android.fhir.json.sync.RepeatInterval
+import com.google.android.fhir.json.sync.State
+import com.google.android.fhir.json.sync.Sync
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.Flow
@@ -60,7 +60,7 @@ class MainActivityViewModel(application: Application, private val state: SavedSt
             syncConstraints = Constraints.Builder().build(),
             repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
           ),
-          FhirPeriodicSyncWorker::class.java
+          JsonPeriodicSyncWorker::class.java
         )
         .collect { _pollState.emit(it) }
     }

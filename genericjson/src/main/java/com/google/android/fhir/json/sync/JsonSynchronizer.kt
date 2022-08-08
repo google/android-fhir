@@ -50,7 +50,7 @@ internal class JsonSynchronizer(
   context: Context,
   private val jsonEngine: JsonEngine,
   private val dataSource: DataSource,
-  private val downloadManager: DownloadWorkManager,
+  private val downloadManager: JsonDownloadWorkManager,
   private val uploader: Uploader = NoOpUploader(),
   private val downloader: Downloader = DownloaderImpl(dataSource, downloadManager),
   private val conflictResolver: ConflictResolver

@@ -40,7 +40,7 @@ import timber.log.Timber
 abstract class JsonSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
   abstract fun getJsonEngine(): JsonEngine
-  abstract fun getDownloadWorkManager(): DownloadWorkManager
+  abstract fun getDownloadWorkManager(): JsonDownloadWorkManager
   abstract fun getConflictResolver(): ConflictResolver
 
   private val gson =

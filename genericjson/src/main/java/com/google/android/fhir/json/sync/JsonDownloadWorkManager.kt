@@ -24,7 +24,7 @@ import org.json.JSONObject
  * TODO(jingtang10): What happens after the end of a download job. Should a new download work
  * manager be created or should there be an API to restart a new download job.
  */
-interface DownloadWorkManager {
+interface JsonDownloadWorkManager {
   /**
    * Returns the URL for the next download request, or `null` if there is no more download request
    * to be issued.

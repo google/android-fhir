@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,15 +29,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.databinding.PatientDetailBinding
+import com.google.android.fhir.json.JsonEngine
 
 /**
  * A fragment representing a single Patient detail screen. This fragment is contained in a
  * [MainActivity].
  */
 class PatientDetailsFragment : Fragment() {
-  private lateinit var fhirEngine: FhirEngine
+  private lateinit var jsonEngine: JsonEngine
   private lateinit var patientDetailsViewModel: PatientDetailsViewModel
   private val args: PatientDetailsFragmentArgs by navArgs()
   private var _binding: PatientDetailBinding? = null
@@ -60,11 +60,11 @@ class PatientDetailsFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    fhirEngine = FhirApplication.fhirEngine(requireContext())
+    jsonEngine = JsonApplication.jsonEngine(requireContext())
     patientDetailsViewModel =
       ViewModelProvider(
           this,
-          PatientDetailsViewModelFactory(requireActivity().application, fhirEngine, args.patientId)
+          PatientDetailsViewModelFactory(requireActivity().application, jsonEngine, args.patientId)
         )
         .get(PatientDetailsViewModel::class.java)
     val adapter = PatientDetailsRecyclerViewAdapter(::onAddScreenerClick)

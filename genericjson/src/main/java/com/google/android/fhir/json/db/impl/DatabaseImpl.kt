@@ -134,6 +134,23 @@ internal class DatabaseImpl(context: Context, databaseConfig: DatabaseConfig) : 
     }
   }
 
+  override suspend fun search(): List<JSONObject> {
+    return db.withTransaction {
+      resourceDao.getAllResources().map { JSONObject(it) }.distinctBy { it.get("id") }
+    }
+  }
+
+  override suspend fun count(): Long {
+    return db.withTransaction {
+      resourceDao
+        .getAllResources()
+        .map { JSONObject(it) }
+        .distinctBy { it.get("id") }
+        .count()
+        .toLong()
+    }
+  }
+
   /**
    * @returns a list of pairs. Each pair is a token + squashed local change. Each token is a list of
    * [LocalChangeEntity.id] s of rows of the [LocalChangeEntity].

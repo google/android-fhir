@@ -67,6 +67,7 @@ dependencies {
   implementation(Dependencies.timber)
   implementation(project(":engine"))
   implementation(project(":datacapture"))
+  implementation(project(":genericjson"))
 
   testImplementation(Dependencies.junit)
 }

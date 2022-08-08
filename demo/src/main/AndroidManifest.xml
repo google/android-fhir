@@ -20,7 +20,7 @@
 >
 
     <application
-        android:name="com.google.android.fhir.demo.FhirApplication"
+        android:name="com.google.android.fhir.demo.JsonApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_fire_engine"
         android:label="@string/app_name"

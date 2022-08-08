@@ -98,7 +98,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
    */
   override suspend fun run(
     jsonEngine: JsonEngine,
-    downloadManager: DownloadWorkManager,
+    downloadManager: JsonDownloadWorkManager,
     resolver: ConflictResolver,
     subscribeTo: MutableSharedFlow<State>?
   ): Result {

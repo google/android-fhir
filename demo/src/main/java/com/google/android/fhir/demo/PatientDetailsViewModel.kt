@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,29 +20,25 @@ import android.app.Application
 import android.content.res.Resources
 import android.icu.text.DateFormat
 import android.os.Build
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.google.android.fhir.FhirEngine
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.get
+import com.google.android.fhir.json.JsonEngine
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.search.search
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.launch
-import org.apache.commons.lang3.StringUtils
 import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.RiskAssessment
-import org.hl7.fhir.r4.model.codesystems.RiskProbability
 
 /**
  * The ViewModel helper class for PatientItemRecyclerViewAdapter, that is responsible for preparing
@@ -50,10 +46,12 @@ import org.hl7.fhir.r4.model.codesystems.RiskProbability
  */
 class PatientDetailsViewModel(
   application: Application,
-  private val fhirEngine: FhirEngine,
+  private val jsonEngine: JsonEngine,
   private val patientId: String
 ) : AndroidViewModel(application) {
   val livePatientData = MutableLiveData<List<PatientDetailData>>()
+
+  val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
   /** Emits list of [PatientDetailData]. */
   fun getPatientDetailData() {
@@ -61,38 +59,13 @@ class PatientDetailsViewModel(
   }
 
   private suspend fun getPatient(): PatientListViewModel.PatientItem {
-    val patient = fhirEngine.get<Patient>(patientId)
-    return patient.toPatientItem(0)
-  }
-
-  private suspend fun getPatientObservations(): List<PatientListViewModel.ObservationItem> {
-    val observations: MutableList<PatientListViewModel.ObservationItem> = mutableListOf()
-    fhirEngine
-      .search<Observation> { filter(Observation.SUBJECT, { value = "Patient/$patientId" }) }
-      .take(MAX_RESOURCE_COUNT)
-      .map { createObservationItem(it, getApplication<Application>().resources) }
-      .let { observations.addAll(it) }
-    return observations
-  }
-
-  private suspend fun getPatientConditions(): List<PatientListViewModel.ConditionItem> {
-    val conditions: MutableList<PatientListViewModel.ConditionItem> = mutableListOf()
-    fhirEngine
-      .search<Condition> { filter(Condition.SUBJECT, { value = "Patient/$patientId" }) }
-      .take(MAX_RESOURCE_COUNT)
-      .map { createConditionItem(it, getApplication<Application>().resources) }
-      .let { conditions.addAll(it) }
-    return conditions
+    val patient = jsonEngine.get(patientId)
+    return parser.parseResource(Patient::class.java, patient.toString()).toPatientItem(0)
   }
 
   private suspend fun getPatientDetailDataModel(): List<PatientDetailData> {
     val data = mutableListOf<PatientDetailData>()
     val patient = getPatient()
-    patient.riskItem = getPatientRiskAssessment()
-
-    val observations = getPatientObservations()
-    val conditions = getPatientConditions()
-
     patient.let {
       data.add(PatientDetailOverview(it, firstInGroup = true))
       data.add(
@@ -128,34 +101,6 @@ class PatientDetailsViewModel(
         )
       )
     }
-
-    if (observations.isNotEmpty()) {
-      data.add(PatientDetailHeader(getString(R.string.header_observation)))
-
-      val observationDataModel =
-        observations.mapIndexed { index, observationItem ->
-          PatientDetailObservation(
-            observationItem,
-            firstInGroup = index == 0,
-            lastInGroup = index == observations.size - 1
-          )
-        }
-      data.addAll(observationDataModel)
-    }
-
-    if (conditions.isNotEmpty()) {
-      data.add(PatientDetailHeader(getString(R.string.header_conditions)))
-      val conditionDataModel =
-        conditions.mapIndexed { index, conditionItem ->
-          PatientDetailCondition(
-            conditionItem,
-            firstInGroup = index == 0,
-            lastInGroup = index == conditions.size - 1
-          )
-        }
-      data.addAll(conditionDataModel)
-    }
-
     return data
   }
 
@@ -171,69 +116,6 @@ class PatientDetailsViewModel(
   private fun isAndroidIcuSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
 
   private fun getString(resId: Int) = getApplication<Application>().resources.getString(resId)
-
-  private suspend fun getPatientRiskAssessment(): RiskAssessmentItem {
-    val riskAssessment =
-      fhirEngine
-        .search<RiskAssessment> { filter(RiskAssessment.SUBJECT, { value = "Patient/$patientId" }) }
-        .filter { it.hasOccurrence() }
-        .sortedByDescending { it.occurrenceDateTimeType.value }
-        .firstOrNull()
-    return RiskAssessmentItem(
-      getRiskAssessmentStatusColor(riskAssessment),
-      getRiskAssessmentStatus(riskAssessment),
-      getLastContactedDate(riskAssessment),
-      getPatientDetailsCardColor(riskAssessment)
-    )
-  }
-
-  private fun getRiskAssessmentStatusColor(riskAssessment: RiskAssessment?): Int {
-    riskAssessment?.let {
-      return when (it.prediction.first().qualitativeRisk.coding.first().code) {
-        RiskProbability.LOW.toCode() -> ContextCompat.getColor(getApplication(), R.color.low_risk)
-        RiskProbability.MODERATE.toCode() ->
-          ContextCompat.getColor(getApplication(), R.color.moderate_risk)
-        RiskProbability.HIGH.toCode() -> ContextCompat.getColor(getApplication(), R.color.high_risk)
-        else -> ContextCompat.getColor(getApplication(), R.color.unknown_risk)
-      }
-    }
-    return ContextCompat.getColor(getApplication(), R.color.unknown_risk)
-  }
-
-  private fun getPatientDetailsCardColor(riskAssessment: RiskAssessment?): Int {
-    riskAssessment?.let {
-      return when (it.prediction.first().qualitativeRisk.coding.first().code) {
-        RiskProbability.LOW.toCode() ->
-          ContextCompat.getColor(getApplication(), R.color.low_risk_background)
-        RiskProbability.MODERATE.toCode() ->
-          ContextCompat.getColor(getApplication(), R.color.moderate_risk_background)
-        RiskProbability.HIGH.toCode() ->
-          ContextCompat.getColor(getApplication(), R.color.high_risk_background)
-        else -> ContextCompat.getColor(getApplication(), R.color.unknown_risk_background)
-      }
-    }
-    return ContextCompat.getColor(getApplication(), R.color.unknown_risk_background)
-  }
-
-  private fun getRiskAssessmentStatus(riskAssessment: RiskAssessment?): String {
-    riskAssessment?.let {
-      return StringUtils.upperCase(it.prediction.first().qualitativeRisk.coding.first().display)
-    }
-    return getString(R.string.unknown)
-  }
-
-  private fun getLastContactedDate(riskAssessment: RiskAssessment?): String {
-    riskAssessment?.let {
-      if (it.hasOccurrence()) {
-        return LocalDate.parse(
-            it.occurrenceDateTimeType.valueAsString,
-            DateTimeFormatter.ISO_DATE_TIME
-          )
-          .localizedString
-      }
-    }
-    return getString(R.string.none)
-  }
 
   companion object {
     /**
@@ -345,7 +227,7 @@ data class PatientProperty(val header: String, val value: String)
 
 class PatientDetailsViewModelFactory(
   private val application: Application,
-  private val fhirEngine: FhirEngine,
+  private val jsonEngine: JsonEngine,
   private val patientId: String
 ) : ViewModelProvider.Factory {
   @Suppress("UNCHECKED_CAST")
@@ -353,7 +235,7 @@ class PatientDetailsViewModelFactory(
     require(modelClass.isAssignableFrom(PatientDetailsViewModel::class.java)) {
       "Unknown ViewModel class"
     }
-    return PatientDetailsViewModel(application, fhirEngine, patientId) as T
+    return PatientDetailsViewModel(application, jsonEngine, patientId) as T
   }
 }
 

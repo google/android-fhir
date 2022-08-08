@@ -20,6 +20,7 @@ import com.google.android.fhir.json.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.json.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.json.db.impl.entities.JsonObjectEntity
 import java.time.Instant
+import org.hl7.fhir.r4.model.Resource
 import org.json.JSONObject
 
 /** The interface for the FHIR resource database. */
@@ -81,6 +82,10 @@ internal interface Database {
    * @param <R> The resource type
    */
   suspend fun delete(id: String)
+
+  suspend fun search(): List<JSONObject>
+
+  suspend fun count(): Long
 
   /**
    * Retrieves all [LocalChangeEntity] s for all [Resource] s, which can be used to update the

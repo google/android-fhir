@@ -89,6 +89,12 @@ internal abstract class JsonObjectDao {
     resourceId: String,
   ): JsonObjectEntity?
 
+  @Query("""
+        SELECT serializedResource
+        FROM JsonObjectEntity
+    """)
+  abstract suspend fun getAllResources(): List<String>
+
   private suspend fun insertResource(resource: JSONObject): String {
     val resourceUuid = UUID.randomUUID()
 

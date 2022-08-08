@@ -21,8 +21,9 @@ import okhttp3.MediaType.Companion.toMediaType
 object ContentTypes {
   const val APPLICATION_JSON_PATCH = "application/json-patch+json"
   const val APPLICATION_FHIR_JSON = "application/fhir+json"
+  const val APPLICATION_JSON = "application/json"
 }
 
 object MediaTypes {
-  val MEDIA_TYPE_FHIR_JSON = ContentTypes.APPLICATION_FHIR_JSON.toMediaType()
+  val MEDIA_TYPE_JSON = ContentTypes.APPLICATION_JSON.toMediaType()
 }

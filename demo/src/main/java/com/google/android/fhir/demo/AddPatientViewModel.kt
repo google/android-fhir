@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,15 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
+import com.google.android.fhir.json.JsonEngine
 import java.util.UUID
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.json.JSONObject
 
 /** ViewModel for patient registration screen {@link AddPatientFragment}. */
 class AddPatientViewModel(application: Application, private val state: SavedStateHandle) :
@@ -40,11 +41,11 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
     get() = getQuestionnaireJson()
   val isPatientSaved = MutableLiveData<Boolean>()
 
+  val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+
   private val questionnaireResource: Questionnaire
-    get() =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire) as
-        Questionnaire
-  private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
+    get() = parser.parseResource(questionnaire) as Questionnaire
+  private var jsonEngine: JsonEngine = JsonApplication.jsonEngine(application.applicationContext)
   private var questionnaireJson: String? = null
 
   /**
@@ -73,7 +74,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
       }
       val patient = entry.resource as Patient
       patient.id = generateUuid()
-      fhirEngine.create(patient)
+      jsonEngine.create(JSONObject(parser.encodeResourceToString(patient)))
       isPatientSaved.value = true
     }
   }

@@ -73,7 +73,7 @@ object TestingUtils {
   //
   // open class TestDownloadManagerImpl(
   //   queries: List<String> = listOf("Patient?address-city=NAIROBI")
-  // ) : DownloadWorkManager {
+  // ) : JsonDownloadWorkManager {
   //   private val urls = LinkedList(queries)
   //
   //   override suspend fun getNextRequestUrl(): String? = urls.poll()

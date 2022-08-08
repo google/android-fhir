@@ -49,6 +49,14 @@ internal class JsonEngineImpl(private val database: Database, private val contex
     database.delete(id)
   }
 
+  override suspend fun search(): List<JSONObject> {
+    return database.search()
+  }
+
+  override suspend fun count(): Long {
+    return database.count()
+  }
+
   override suspend fun getLastSyncTimeStamp(): OffsetDateTime? {
     return DatastoreUtil(context).readLastSyncTimestamp()
   }

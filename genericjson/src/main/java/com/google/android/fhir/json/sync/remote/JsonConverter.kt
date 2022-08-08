@@ -16,50 +16,44 @@
 
 package com.google.android.fhir.json.sync.remote
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
-import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.json.MediaTypes
 import java.lang.reflect.Type
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
-import org.hl7.fhir.r4.model.Resource
+import org.json.JSONObject
 import retrofit2.Converter
 import retrofit2.Retrofit
 
-internal class FhirConverterFactory private constructor(val fhirContext: FhirContext) :
-  Converter.Factory() {
+internal class JsonConverterFactory private constructor() : Converter.Factory() {
   override fun responseBodyConverter(
     type: Type,
     annotations: Array<Annotation>,
     retrofit: Retrofit
-  ): Converter<ResponseBody, *> = FhirResponseBodyConverter(fhirContext.newJsonParser())
+  ): Converter<ResponseBody, *> = JsonResponseBodyConverter()
 
   override fun requestBodyConverter(
     type: Type,
     parameterAnnotations: Array<out Annotation>,
     methodAnnotations: Array<out Annotation>,
     retrofit: Retrofit
-  ): Converter<*, RequestBody> = FhirRequestBodyConverter(fhirContext.newJsonParser())
+  ): Converter<*, RequestBody> = JsonRequestBodyConverter()
 
   companion object {
-    fun create() = FhirConverterFactory(FhirContext.forCached(FhirVersionEnum.R4))
+    fun create() = JsonConverterFactory()
   }
 }
 
 /** Retrofit converter that allows us to parse FHIR resources in the response. */
-private class FhirResponseBodyConverter(private val parser: IParser) :
-  Converter<ResponseBody, Resource> {
-  override fun convert(value: ResponseBody): Resource {
-    return parser.parseResource(value.string()) as Resource
+private class JsonResponseBodyConverter() : Converter<ResponseBody, JSONObject> {
+  override fun convert(value: ResponseBody): JSONObject {
+    return JSONObject(value.string())
   }
 }
 
 /** Retrofit converter that allows us to parse FHIR resources in the requests. */
-private class FhirRequestBodyConverter(private val parser: IParser) :
-  Converter<Resource, RequestBody> {
-  override fun convert(value: Resource): RequestBody {
-    return parser.encodeResourceToString(value).toRequestBody(MediaTypes.MEDIA_TYPE_FHIR_JSON)
+private class JsonRequestBodyConverter() : Converter<JSONObject, RequestBody> {
+  override fun convert(value: JSONObject): RequestBody {
+    return value.toString().toRequestBody(MediaTypes.MEDIA_TYPE_JSON)
   }
 }

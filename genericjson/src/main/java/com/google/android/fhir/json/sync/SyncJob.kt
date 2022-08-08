@@ -32,7 +32,7 @@ interface SyncJob {
 
   suspend fun run(
     jsonEngine: JsonEngine,
-    downloadManager: DownloadWorkManager,
+    downloadManager: JsonDownloadWorkManager,
     resolver: ConflictResolver,
     subscribeTo: MutableSharedFlow<State>?
   ): Result

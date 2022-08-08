@@ -40,7 +40,7 @@ object Sync {
   suspend fun oneTimeSync(
     context: Context,
     jsonEngine: JsonEngine,
-    downloadManager: DownloadWorkManager,
+    downloadManager: JsonDownloadWorkManager,
     resolver: ConflictResolver
   ): Result {
     return JsonEngineProvider.getDataSource(context)?.let {
