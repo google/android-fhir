@@ -86,7 +86,6 @@ jobs:
           disable-animations: true
           script: |
             ./gradlew :datacapture:connectedCheck --stacktrace --scan
-            ./gradlew :catalog:connectedCheck  --stacktrace --scan
             ./gradlew :engine:connectedCheck  --stacktrace --scan
             ./gradlew :workflow:connectedCheck --stacktrace --scan
 
