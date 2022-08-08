@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.db
+package com.google.android.fhir
 
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import org.hl7.fhir.r4.model.Resource
