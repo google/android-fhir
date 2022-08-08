@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,3 +38,6 @@ val Questionnaire.targetStructureMap: String?
  */
 private const val TARGET_STRUCTURE_MAP: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap"
+
+val Questionnaire.isPaginated: Boolean
+  get() = item.any { item -> item.displayItemControl == DisplayItemControlType.PAGE }
