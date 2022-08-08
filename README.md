@@ -1,6 +1,6 @@
 # Android FHIR SDK
 
-[![master](https://github.com/google/android-fhir/workflows/CI/badge.svg?branch=master)](https://github.com/google/android-fhir/actions?query=workflow%3ACI) [![codecov](https://codecov.io/gh/google/android-fhir/branch/master/graph/badge.svg?token=PDSC4WRDTQ)](https://codecov.io/gh/google/android-fhir/branch/master) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![project chat](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://chat.fhir.org/#narrow/stream/276344-android)
+[![master](https://github.com/google/android-fhir/workflows/build/badge.svg?branch=master)](https://github.com/google/android-fhir/actions/workflows/ci.yml) [![master](https://github.com/google/android-fhir/workflows/device-tests/badge.svg?branch=master)](https://github.com/google/android-fhir/actions/workflows/device-tests.yml) [![codecov](https://codecov.io/gh/google/android-fhir/branch/master/graph/badge.svg?token=PDSC4WRDTQ)](https://codecov.io/gh/google/android-fhir/branch/master) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![project chat](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://chat.fhir.org/#narrow/stream/276344-android)
 
 The Android FHIR SDK is a set of Kotlin libraries for building offline-capable, mobile-first
 healthcare applications using the [HL7® FHIR® standard](https://www.hl7.org/fhir/) on Android. It
