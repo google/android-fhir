@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ object Releases {
 
   object DataCapture : LibraryArtifact {
     override val artifactId = "data-capture"
-    override val version = "0.1.0-beta03"
+    override val version = "0.1.0-beta04"
     override val name = "Android FHIR Structured Data Capture Library"
   }
 
