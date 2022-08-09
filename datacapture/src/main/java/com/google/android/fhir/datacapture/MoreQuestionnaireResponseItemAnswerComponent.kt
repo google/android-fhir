@@ -16,9 +16,11 @@
 
 package com.google.android.fhir.datacapture
 
+import android.content.Context
 import com.google.android.fhir.datacapture.utilities.localizedString
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem.Companion.NOT_ANSWERED
+import com.google.android.fhir.datacapture.utilities.toLocalizedString
 import com.google.android.fhir.datacapture.views.localDate
+import com.google.android.fhir.datacapture.views.localTime
 import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
@@ -33,28 +35,37 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.UriType
 
-internal val QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.displayString: String
-  get() {
-    return when (value) {
-      is Attachment -> valueAttachment.url ?: NOT_ANSWERED
-      is BooleanType -> valueBooleanType.valueAsString ?: NOT_ANSWERED
-      is Coding -> {
-        val display = valueCoding.displayElement.getLocalizedText() ?: valueCoding.display
-        if (display.isNullOrEmpty()) {
-          valueCoding.code
-        } else {
-          display
-        }
+internal fun QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.displayString(
+  context: Context
+): String {
+  return when (value) {
+    is Attachment -> valueAttachment.url ?: context.getString(R.string.not_answered)
+    is BooleanType -> {
+      when (valueBooleanType.value) {
+        true -> context.getString(R.string.yes)
+        false -> context.getString(R.string.no)
+        null -> context.getString(R.string.not_answered)
       }
-      is DateType -> valueDateType?.localDate?.localizedString ?: NOT_ANSWERED
-      is DateTimeType -> valueDateTimeType.valueAsString ?: NOT_ANSWERED
-      is DecimalType -> valueDecimalType.valueAsString ?: NOT_ANSWERED
-      is IntegerType -> valueIntegerType.valueAsString ?: NOT_ANSWERED
-      is Quantity -> valueQuantity.value.toString()
-      is StringType -> valueStringType.getLocalizedText()
-          ?: valueStringType.valueAsString ?: NOT_ANSWERED
-      is TimeType -> valueTimeType.valueAsString ?: NOT_ANSWERED
-      is UriType -> valueUriType.valueAsString ?: NOT_ANSWERED
-      else -> NOT_ANSWERED
     }
+    is Coding -> {
+      val display = valueCoding.displayElement.getLocalizedText() ?: valueCoding.display
+      if (display.isNullOrEmpty()) {
+        valueCoding.code ?: context.getString(R.string.not_answered)
+      } else {
+        display
+      }
+    }
+    is DateType -> valueDateType?.localDate?.localizedString
+        ?: context.getString(R.string.not_answered)
+    is DateTimeType ->
+      "${valueDateTimeType.localDate.localizedString} ${valueDateTimeType.localTime.toLocalizedString(context)}"
+    is DecimalType -> valueDecimalType.valueAsString ?: context.getString(R.string.not_answered)
+    is IntegerType -> valueIntegerType.valueAsString ?: context.getString(R.string.not_answered)
+    is Quantity -> valueQuantity.value.toString()
+    is StringType -> valueStringType.getLocalizedText()
+        ?: valueStringType.valueAsString ?: context.getString(R.string.not_answered)
+    is TimeType -> valueTimeType.valueAsString ?: context.getString(R.string.not_answered)
+    is UriType -> valueUriType.valueAsString ?: context.getString(R.string.not_answered)
+    else -> context.getString(R.string.not_answered)
   }
+}

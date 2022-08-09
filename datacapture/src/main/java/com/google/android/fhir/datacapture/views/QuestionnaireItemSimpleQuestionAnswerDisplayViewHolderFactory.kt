@@ -67,7 +67,7 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
               Questionnaire.QuestionnaireItemType.DISPLAY -> GONE
               else -> VISIBLE
             }
-          text = questionnaireItemViewItem.answerString
+          text = questionnaireItemViewItem.answerString(context)
         }
 
         divider.visibility =

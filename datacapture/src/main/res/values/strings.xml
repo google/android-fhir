@@ -38,5 +38,6 @@
     <string
         name="answers_required_text"
     >"Please answer all required fields!"</string>
+    <string name="not_answered">"Not Answered"</string>
 
 </resources>

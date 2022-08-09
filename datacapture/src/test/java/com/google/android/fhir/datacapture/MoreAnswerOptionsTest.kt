@@ -27,7 +27,6 @@ import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.utils.ToolingExtensions
@@ -181,29 +180,5 @@ class MoreAnswerOptionsTest {
       }
 
     assertThat(questionnaire.item.single().answerOption.single().optionExclusive).isTrue()
-  }
-
-  @Test
-  fun getDisplayString_answerCodingType_answerShouldReturnValueCodingDisplayValue() {
-    val answer =
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-        .setValue(Coding().setCode("test-code").setDisplay("Test Code"))
-
-    assertThat(answer.displayString).isEqualTo("Test Code")
-  }
-
-  @Test
-  fun getDisplayString_answerCodingType_answerShouldReturnValueCodingCodeValue() {
-    val answer =
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-        .setValue(Coding().setCode("test-code"))
-
-    assertThat(answer.displayString).isEqualTo("test-code")
-  }
-
-  @Test
-  fun getDisplayString_answerCodingType_answerShouldReturnNull() {
-    val answer = QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(Coding())
-    assertThat(answer.displayString).isNull()
   }
 }

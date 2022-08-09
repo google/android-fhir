@@ -16,7 +16,9 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import kotlinx.coroutines.Dispatchers
@@ -92,11 +94,10 @@ data class QuestionnaireItemViewItem(
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
   }
 
-  internal val answerString: String
-    get() {
-      if (!questionnaireResponseItem.hasAnswer()) return NOT_ANSWERED
-      return questionnaireResponseItem.answer.map { it.displayString }.joinToString()
-    }
+  internal fun answerString(context: Context): String {
+    if (!questionnaireResponseItem.hasAnswer()) return context.getString(R.string.not_answered)
+    return questionnaireResponseItem.answer.joinToString { it.displayString(context) }
+  }
 
   internal fun addAnswer(
     questionnaireResponseItemAnswerComponent:
@@ -199,9 +200,5 @@ data class QuestionnaireItemViewItem(
       return other.validationResult == null || other.validationResult.isValid
     }
     return validationResult == other.validationResult
-  }
-
-  companion object {
-    const val NOT_ANSWERED = "Not Answered"
   }
 }

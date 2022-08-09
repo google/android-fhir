@@ -16,26 +16,18 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.app.Application
 import android.os.Build
-import com.google.android.fhir.datacapture.utilities.localizedString
+import androidx.test.core.app.ApplicationProvider
+import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.common.truth.Truth.assertThat
-import java.time.LocalDate
-import java.util.Date
 import kotlin.test.assertFailsWith
-import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.DateTimeType
-import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.DecimalType
-import org.hl7.fhir.r4.model.IntegerType
-import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
-import org.hl7.fhir.r4.model.TimeType
-import org.hl7.fhir.r4.model.UriType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -44,6 +36,8 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class QuestionnaireItemViewItemTest {
+  private val context = ApplicationProvider.getApplicationContext<Application>()
+
   @Test
   fun addAnswer_questionnaireItemDoesNotRepeat_shouldThrowIllegalArgument() {
     val questionnaireItemViewItem =
@@ -630,8 +624,8 @@ class QuestionnaireItemViewItemTest {
         validationResult = null,
         answersChangedCallback = { _, _, _ -> },
       )
-    assertThat(questionnaireItemViewItem.answerString)
-      .isEqualTo(QuestionnaireItemViewItem.NOT_ANSWERED)
+    assertThat(questionnaireItemViewItem.answerString(context))
+      .isEqualTo(context.getString(R.string.not_answered))
   }
 
   @Test
@@ -647,7 +641,7 @@ class QuestionnaireItemViewItemTest {
         validationResult = null,
         answersChangedCallback = { _, _, _ -> },
       )
-    assertThat(questionnaireItemViewItem.answerString).isEqualTo("Answer")
+    assertThat(questionnaireItemViewItem.answerString(context)).isEqualTo("Answer")
   }
 
   @Test
@@ -667,213 +661,6 @@ class QuestionnaireItemViewItemTest {
         validationResult = null,
         answersChangedCallback = { _, _, _ -> },
       )
-    assertThat(questionnaireItemViewItem.answerString).isEqualTo("Answer1, Answer2")
-  }
-
-  @Test
-  fun answerString_booleanTypeTrueAnswer_shouldReturnAnswerAsYes() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true))
-          ),
-        validationResult = null,
-        answersChangedCallback = { _, _, _ -> },
-      )
-    assertThat(questionnaireItemViewItem.answerString).isEqualTo("Yes")
-  }
-
-  @Test
-  fun answerString_booleanTypeFalseAnswer_shouldReturnAnswerAsNo() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(false))
-          ),
-        validationResult = null,
-        answersChangedCallback = { _, _, _ -> },
-      )
-    assertThat(questionnaireItemViewItem.answerString).isEqualTo("No")
-  }
-
-  @Test
-  fun answerString_booleanTypeNullAnswer_shouldReturnAnswerAsNotAnswered() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType())
-          ),
-        validationResult = null,
-        answersChangedCallback = { _, _, _ -> },
-      )
-    assertThat(questionnaireItemViewItem.answerString)
-      .isEqualTo(QuestionnaireItemViewItem.NOT_ANSWERED)
-  }
-
-  @Test
-  fun answerString_stringTypeAnswer_shouldReturnAnswer() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(StringType("StringAnswer"))
-          ),
-        validationResult = null,
-        answersChangedCallback = { _, _, _ -> },
-      )
-    assertThat(questionnaireItemViewItem.answerString).isEqualTo("StringAnswer")
-  }
-
-  @Test
-  fun answerString_integerTypeAnswer_shouldReturnAnswer() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(IntegerType(12))
-          ),
-        validationResult = null,
-        answersChangedCallback = { _, _, _ -> },
-      )
-    assertThat(questionnaireItemViewItem.answerString).isEqualTo("12")
-  }
-
-  @Test
-  fun answerString_decimalTypeAnswer_shouldReturnAnswer() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DecimalType(12.5612))
-          ),
-        validationResult = null,
-        answersChangedCallback = { _, _, _ -> },
-      )
-    assertThat(questionnaireItemViewItem.answerString).isEqualTo("12.5612")
-  }
-
-  @Test
-  fun answerString_dateTypeAnswer_shouldReturnAnswer() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(Date()))
-          ),
-        validationResult = null,
-        answersChangedCallback = { _, _, _ -> },
-      )
-    assertThat(questionnaireItemViewItem.answerString).isEqualTo(LocalDate.now().localizedString)
-  }
-
-  @Test
-  fun answerString_dateTimeTypeAnswer_shouldReturnAnswer() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateTimeType(Date()))
-          ),
-        validationResult = null,
-        answersChangedCallback = { _, _, _ -> },
-      )
-  }
-
-  @Test
-  fun answerString_timeTypeAnswer_shouldReturnAnswer() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(TimeType("03:00"))
-          ),
-        validationResult = null,
-        answersChangedCallback = { _, _, _ -> },
-      )
-    assertThat(questionnaireItemViewItem.answerString).isEqualTo("03:00")
-  }
-
-  @Test
-  fun answerString_quantityTypeAnswer_shouldReturnAnswer() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(Quantity(59.125))
-          ),
-        validationResult = null,
-        answersChangedCallback = { _, _, _ -> },
-      )
-    assertThat(questionnaireItemViewItem.answerString).isEqualTo("59.125")
-  }
-
-  @Test
-  fun answerString_uriTypeAnswer_shouldReturnAnswer() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(UriType("./a"))
-          ),
-        validationResult = null,
-        answersChangedCallback = { _, _, _ -> },
-      )
-    assertThat(questionnaireItemViewItem.answerString).isEqualTo("./a")
-  }
-
-  @Test
-  fun answerString_attachmentTypeAnswer_shouldReturnAnswer() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(Attachment().setUrl("http://photos.com/a.png"))
-          ),
-        validationResult = null,
-        answersChangedCallback = { _, _, _ -> },
-      )
-    assertThat(questionnaireItemViewItem.answerString).isEqualTo("http://photos.com/a.png")
-  }
-
-  @Test
-  fun answerString_codingTypeAnswer_shouldReturnAnswer() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(Coding("http:/a.b", "a", "A"))
-          ),
-        validationResult = null,
-        answersChangedCallback = { _, _, _ -> },
-      )
-    assertThat(questionnaireItemViewItem.answerString).isEqualTo("A")
+    assertThat(questionnaireItemViewItem.answerString(context)).isEqualTo("Answer1, Answer2")
   }
 }
