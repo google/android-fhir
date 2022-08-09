@@ -39,7 +39,6 @@ import java.time.OffsetDateTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
@@ -163,6 +162,7 @@ class SyncJobTest {
     syncJob.run(
       fhirEngine,
       TestingUtils.TestDownloadManagerImpl(),
+      TestingUtils.TestUploadManagerImpl(),
       AcceptRemoteConflictResolver,
       flow
     )
@@ -198,6 +198,7 @@ class SyncJobTest {
     syncJob.run(
       fhirEngine,
       TestingUtils.TestDownloadManagerImpl(),
+      TestingUtils.TestUploadManagerImpl(),
       AcceptRemoteConflictResolver,
       flow
     )
@@ -290,6 +291,7 @@ class SyncJobTest {
       TestingUtils.TestDownloadManagerImplWithQueue(
         listOf("Patient/bob", "Encounter/doc", "Observation/obs")
       ),
+      TestingUtils.TestUploadManagerImpl(),
       AcceptRemoteConflictResolver,
       flow
     )
@@ -331,6 +333,7 @@ class SyncJobTest {
       TestingUtils.TestDownloadManagerImplWithQueue(
         listOf("Patient/bob", "Encounter/doc", "Observation/obs")
       ),
+      TestingUtils.TestUploadManagerImpl(),
       AcceptRemoteConflictResolver,
       flow
     )
@@ -362,6 +365,7 @@ class SyncJobTest {
       syncJob.run(
         fhirEngine,
         TestingUtils.TestDownloadManagerImplWithQueue(),
+        TestingUtils.TestUploadManagerImpl(),
         AcceptRemoteConflictResolver,
         flow
       )

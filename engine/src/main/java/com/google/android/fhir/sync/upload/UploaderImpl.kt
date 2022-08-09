@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.UploadResult
+import com.google.android.fhir.sync.UploadWorkManager
 import com.google.android.fhir.sync.Uploader
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -31,15 +32,15 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /** [Uploader] implementation to work with Fhir [Bundle]. */
-internal class BundleUploader(
+internal class UploaderImpl(
   private val dataSource: DataSource,
-  private val bundleGenerator: TransactionBundleGenerator
+  private val uploadWorkManager: UploadWorkManager
 ) : Uploader {
 
   override suspend fun upload(
     localChanges: List<SquashedLocalChange>,
   ): Flow<UploadResult> = flow {
-    bundleGenerator.generate(listOf(localChanges)).forEach { (bundle, localChangeTokens) ->
+    uploadWorkManager.generate(listOf(localChanges)).forEach { (bundle, localChangeTokens) ->
       try {
         val response = dataSource.upload(bundle)
         emit(getUploadResult(response, localChangeTokens))

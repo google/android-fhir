@@ -22,12 +22,17 @@ import com.google.android.fhir.demo.FhirApplication
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
+import com.google.android.fhir.sync.UploadWorkManager
 
 class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   FhirSyncWorker(appContext, workerParams) {
 
   override fun getDownloadWorkManager(): DownloadWorkManager {
     return DownloadWorkManagerImpl()
+  }
+
+  override fun getUploadWorkManager(): UploadWorkManager {
+    return TransactionBundleGenerator.getDefault()
   }
 
   override fun getConflictResolver() = AcceptLocalConflictResolver

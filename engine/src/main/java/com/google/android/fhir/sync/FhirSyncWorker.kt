@@ -43,6 +43,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDownloadWorkManager(): DownloadWorkManager
+  abstract fun getUploadWorkManager(): UploadWorkManager
   abstract fun getConflictResolver(): ConflictResolver
 
   private val gson =
@@ -71,6 +72,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         getFhirEngine(),
         dataSource,
         getDownloadWorkManager(),
+        getUploadWorkManager(),
         conflictResolver = getConflictResolver()
       )
     val flow = MutableSharedFlow<State>()

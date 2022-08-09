@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -38,7 +37,7 @@ internal interface RemoteFhirService : DataSource {
 
   @GET override suspend fun download(@Url path: String): Resource
 
-  @POST(".") override suspend fun upload(@Body bundle: Bundle): Resource
+  @POST(".") override suspend fun <T : Resource> upload(@Body uploadResource: T): Resource
 
   class Builder(
     private val baseUrl: String,

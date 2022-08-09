@@ -20,8 +20,7 @@ import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.sync.download.DownloaderImpl
-import com.google.android.fhir.sync.upload.BundleUploader
-import com.google.android.fhir.sync.upload.TransactionBundleGenerator
+import com.google.android.fhir.sync.upload.UploaderImpl
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
@@ -51,15 +50,16 @@ data class ResourceSyncException(val resourceType: ResourceType, val exception: 
 internal class FhirSynchronizer(
   context: Context,
   private val fhirEngine: FhirEngine,
-  private val dataSource: DataSource,
-  private val downloadManager: DownloadWorkManager,
-  private val uploader: Uploader =
-    BundleUploader(dataSource, TransactionBundleGenerator.getDefault()),
-  private val downloader: Downloader = DownloaderImpl(dataSource, downloadManager),
+  dataSource: DataSource,
+  downloadManager: DownloadWorkManager,
+  uploadManager: UploadWorkManager,
   private val conflictResolver: ConflictResolver
 ) {
+
   private var syncState: MutableSharedFlow<State>? = null
   private val datastoreUtil = DatastoreUtil(context)
+  private val downloader: Downloader = DownloaderImpl(dataSource, downloadManager)
+  private val uploader: Uploader = UploaderImpl(dataSource, uploadManager)
 
   private fun isSubscribed(): Boolean {
     return syncState != null

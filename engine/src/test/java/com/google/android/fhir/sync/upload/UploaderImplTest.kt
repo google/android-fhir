@@ -37,16 +37,15 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class BundleUploaderTest {
+class UploaderImplTest {
 
   @Test
   fun `upload Bundle transaction should emit Success`() = runBlocking {
     val result =
-      BundleUploader(
+      UploaderImpl(
           TestingUtils.BundleDataSource {
             Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
           },
-          TransactionBundleGenerator.getDefault()
         )
         .upload(localChanges)
         .toList()
@@ -58,7 +57,7 @@ class BundleUploaderTest {
   @Test
   fun `upload Bundle Transaction server error should emit Failure`() = runBlocking {
     val result =
-      BundleUploader(
+      UploaderImpl(
           TestingUtils.BundleDataSource {
             OperationOutcome().apply {
               addIssue(
@@ -69,7 +68,6 @@ class BundleUploaderTest {
               )
             }
           },
-          TransactionBundleGenerator.getDefault()
         )
         .upload(localChanges)
         .toList()
@@ -81,9 +79,8 @@ class BundleUploaderTest {
   @Test
   fun `upload Bundle transaction error during upload should emit Failure`() = runBlocking {
     val result =
-      BundleUploader(
+      UploaderImpl(
           TestingUtils.BundleDataSource { throw ConnectException("Failed to connect to server.") },
-          TransactionBundleGenerator.getDefault()
         )
         .upload(localChanges)
         .toList()

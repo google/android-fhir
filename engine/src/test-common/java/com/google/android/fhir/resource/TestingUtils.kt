@@ -27,6 +27,7 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadWorkManager
+import com.google.android.fhir.sync.UploadWorkManager
 import com.google.common.truth.Truth.assertThat
 import java.time.OffsetDateTime
 import java.util.Date
@@ -95,7 +96,7 @@ class TestingUtils constructor(private val iParser: IParser) {
       return Bundle().apply { type = Bundle.BundleType.SEARCHSET }
     }
 
-    override suspend fun upload(bundle: Bundle): Resource {
+    override suspend fun <T : Resource> upload(uploadResource: T): Resource {
       return Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
     }
   }
@@ -110,6 +111,14 @@ class TestingUtils constructor(private val iParser: IParser) {
     override suspend fun processResponse(response: Resource): Collection<Resource> {
       val patient = Patient().setMeta(Meta().setLastUpdated(Date()))
       return listOf(patient)
+    }
+  }
+
+  open class TestUploadManagerImpl() : UploadWorkManager {
+    override fun generate(
+      localChanges: List<List<SquashedLocalChange>>
+    ): List<Pair<Resource, List<LocalChangeToken>>> {
+      return emptyList()
     }
   }
 
@@ -178,7 +187,7 @@ class TestingUtils constructor(private val iParser: IParser) {
       throw Exception(hugeStackTraceMessage)
     }
 
-    override suspend fun upload(bundle: Bundle): Resource {
+    override suspend fun <T : Resource> upload(uploadResource: T): Resource {
       throw Exception("Posting Bundle failed...")
     }
   }
@@ -189,6 +198,8 @@ class TestingUtils constructor(private val iParser: IParser) {
       TODO("Not yet implemented")
     }
 
-    override suspend fun upload(bundle: Bundle) = onPostBundle(bundle)
+    override suspend fun <T : Resource> upload(uploadResource: T): Resource {
+      return onPostBundle(uploadResource as Bundle)
+    }
   }
 }

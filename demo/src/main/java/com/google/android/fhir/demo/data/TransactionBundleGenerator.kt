@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync.upload
+package com.google.android.fhir.demo.data
 
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.sync.UploadWorkManager
 import org.hl7.fhir.r4.model.Bundle
 
 typealias ResourceBundleAndAssociatedLocalChangeTokens = Pair<Bundle, List<LocalChangeToken>>
@@ -30,9 +31,9 @@ typealias ResourceBundleAndAssociatedLocalChangeTokens = Pair<Bundle, List<Local
 internal open class TransactionBundleGenerator(
   val getBundleEntryComponentGeneratorForLocalChangeType:
     (type: LocalChangeEntity.Type) -> HttpVerbBasedBundleEntryComponentGenerator
-) {
+) : UploadWorkManager {
 
-  fun generate(
+  override fun generate(
     localChanges: List<List<SquashedLocalChange>>
   ): List<ResourceBundleAndAssociatedLocalChangeTokens> {
     return localChanges.filter { it.isNotEmpty() }.map { generateBundle(it) }
