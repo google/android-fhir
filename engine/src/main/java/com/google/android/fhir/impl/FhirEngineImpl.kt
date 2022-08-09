@@ -101,6 +101,7 @@ internal class FhirEngineImpl(
     Timber.i("COLLECTED FROM REARRANGE ${squashedChanges.size}")
     upload(squashedChanges).collect {
       val idsToDeleteFromUpdate = it.first.ids as MutableList
+      Timber.i("IDs to delete $idsToDeleteFromUpdate")
 
       // Check server for resource before delete.
       try {

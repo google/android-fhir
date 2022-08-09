@@ -20,6 +20,7 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import org.hl7.fhir.r4.model.Bundle
+import timber.log.Timber
 
 typealias ResourceBundleAndAssociatedLocalChangeTokens = Pair<Bundle, List<LocalChangeToken>>
 
@@ -35,13 +36,15 @@ internal open class TransactionBundleGenerator(
   fun generate(
     localChanges: List<List<SquashedLocalChange>>
   ): List<ResourceBundleAndAssociatedLocalChangeTokens> {
-    return localChanges.filter { it.isNotEmpty() }.map { generateBundle(it) }
+    val mapToReturn = localChanges.filter { it.isNotEmpty() }.map { generateBundle(it) }
+    Timber.i("List of ResourceBundleAndAssociatedLocalChangeTokens $mapToReturn")
+    return mapToReturn
   }
 
   private fun generateBundle(
     localChanges: List<SquashedLocalChange>
   ): ResourceBundleAndAssociatedLocalChangeTokens {
-    localChanges.forEach { it.localChange.resourceId }
+
     return Bundle().apply {
       type = Bundle.BundleType.TRANSACTION
       localChanges.forEach {

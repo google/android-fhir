@@ -51,7 +51,7 @@ abstract class SyncStrategy {
 class SequentialSyncStrategy() : SyncStrategy() {
   override val syncStrategyTypes: SyncStrategyTypes = SyncStrategyTypes.SEQUENTIAL
   private lateinit var database: Database
-  private val idsDone = mutableListOf<String>()
+  private var idsDone = mutableListOf<String>()
   private var listOfLocalChange = mutableListOf<SquashedLocalChange>()
   private lateinit var mapOfResourceIdLocalChange: MutableMap<String, SquashedLocalChange>
   private lateinit var collectAndEmitLocalChange:
@@ -70,20 +70,29 @@ class SequentialSyncStrategy() : SyncStrategy() {
         suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit,
     upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
+
     this.database = database
     this.upload = upload
     this.collectAndEmitLocalChange = collectAndEmitLocalChange
     mapOfResourceIdLocalChange =
       localChanges.associateBy { it.localChange.resourceId } as
         MutableMap<String, SquashedLocalChange>
+    Timber.i("Ids of ${mapOfResourceIdLocalChange.keys}")
+    Timber.i("number of local changes ${localChanges.size}")
+
     if (mapOfResourceIdLocalChange.isNotEmpty()) {
       walkAndReturnLocalChange(mapOfResourceIdLocalChange, ::collectAndEmitLocalChangesList)
     }
-    Timber.i("number of local changes ${localChanges.size}")
     if (listOfLocalChange.isNotEmpty()) {
       Timber.i("not empty function exit ${listOfLocalChange.size}")
       collectAndEmitLocalChange(listOfLocalChange, upload)
-      idsDone.drop(listOfLocalChange.size)
+      val listDropped = idsDone.drop(listOfLocalChange.size)
+      idsDone =
+        if (listDropped.isEmpty()) {
+          mutableListOf()
+        } else {
+          listDropped as MutableList<String>
+        }
       listOfLocalChange = mutableListOf()
     }
   }
@@ -94,7 +103,13 @@ class SequentialSyncStrategy() : SyncStrategy() {
       mapOfResourceIdLocalChange[resourceId]?.let { it -> listOfLocalChange.add(it) }
       Timber.i("emitting ${listOfLocalChange.size}")
       collectAndEmitLocalChange(listOfLocalChange, upload)
-      idsDone.drop(listOfLocalChange.size)
+      val listDropped = idsDone.drop(listOfLocalChange.size)
+      idsDone =
+        if (listDropped.isEmpty()) {
+          mutableListOf()
+        } else {
+          listDropped as MutableList<String>
+        }
       listOfLocalChange = mutableListOf()
     } else {
       mapOfResourceIdLocalChange[resourceId]?.let { it -> listOfLocalChange.add(it) }

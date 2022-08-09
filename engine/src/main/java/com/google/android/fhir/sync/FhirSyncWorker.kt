@@ -36,6 +36,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 
 /** A WorkManager Worker that handles periodic sync. */
@@ -43,7 +45,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDownloadWorkManager(): DownloadWorkManager
-
+  private val mutex = Mutex()
   private val gson =
     GsonBuilder()
       .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeTypeAdapter().nullSafe())
@@ -54,60 +56,62 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   internal open fun getDataSource() = FhirEngineProvider.getDataSource(applicationContext)
 
   override suspend fun doWork(): Result {
-    val dataSource =
-      getDataSource()
-        ?: return Result.failure(
-          buildWorkData(
-            IllegalStateException(
-              "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration."
+    mutex.withLock {
+      val dataSource =
+        getDataSource()
+          ?: return Result.failure(
+            buildWorkData(
+              IllegalStateException(
+                "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration."
+              )
             )
           )
-        )
 
-    val fhirSynchronizer =
-      FhirSynchronizer(applicationContext, getFhirEngine(), dataSource, getDownloadWorkManager())
-    val flow = MutableSharedFlow<State>()
+      val fhirSynchronizer =
+        FhirSynchronizer(applicationContext, getFhirEngine(), dataSource, getDownloadWorkManager())
+      val flow = MutableSharedFlow<State>()
 
-    val job =
-      CoroutineScope(Dispatchers.IO).launch {
-        flow.collect {
-          // now send Progress to work manager so caller app can listen
-          setProgress(buildWorkData(it))
+      val job =
+        CoroutineScope(Dispatchers.IO).launch {
+          flow.collect {
+            // now send Progress to work manager so caller app can listen
+            setProgress(buildWorkData(it))
 
-          if (it is State.Finished || it is State.Failed) {
-            this@launch.cancel()
+            if (it is State.Finished || it is State.Failed) {
+              this@launch.cancel()
+            }
           }
         }
-      }
 
-    fhirSynchronizer.subscribe(flow)
+      fhirSynchronizer.subscribe(flow)
 
-    Timber.v("Subscribed to flow for progress")
+      Timber.v("Subscribed to flow for progress")
 
-    val result = fhirSynchronizer.synchronize()
-    val output = buildOutput(result)
+      val result = fhirSynchronizer.synchronize()
+      val output = buildOutput(result)
 
-    // await/join is needed to collect states completely
-    kotlin.runCatching { job.join() }.onFailure(Timber::w)
+      // await/join is needed to collect states completely
+      kotlin.runCatching { job.join() }.onFailure(Timber::w)
 
-    setProgress(output)
+      setProgress(output)
 
-    Timber.d("Received result from worker $result and sending output $output")
+      Timber.d("Received result from worker $result and sending output $output")
 
-    /**
-     * In case of failure, we can check if its worth retrying and do retry based on
-     * [RetryConfiguration.maxRetries] set by user.
-     */
-    val retries = inputData.getInt(MAX_RETRIES_ALLOWED, 0)
-    return when {
-      result is Success -> {
-        Result.success(output)
-      }
-      retries > runAttemptCount -> {
-        Result.retry()
-      }
-      else -> {
-        Result.failure(output)
+      /**
+       * In case of failure, we can check if its worth retrying and do retry based on
+       * [RetryConfiguration.maxRetries] set by user.
+       */
+      val retries = inputData.getInt(MAX_RETRIES_ALLOWED, 0)
+      return when {
+        result is Success -> {
+          Result.success(output)
+        }
+        retries > runAttemptCount -> {
+          Result.retry()
+        }
+        else -> {
+          Result.failure(output)
+        }
       }
     }
   }

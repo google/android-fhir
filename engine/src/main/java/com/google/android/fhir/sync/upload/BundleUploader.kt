@@ -16,6 +16,8 @@
 
 package com.google.android.fhir.sync.upload
 
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.sync.DataSource
@@ -30,6 +32,7 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import retrofit2.HttpException
 import timber.log.Timber
 
 /** [Uploader] implementation to work with Fhir [Bundle]. */
@@ -45,12 +48,20 @@ internal class BundleUploader(
       Timber.i("uploading ${listOfLocalChanges.size}")
       bundleGenerator.generate(listOf(listOfLocalChanges)).forEach { (bundle, localChangeTokens) ->
         Timber.i("uploading ${bundle.entry.size}")
+        Timber.i(
+          "Bundle to be uploaded ${FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().encodeResourceToString(bundle)}"
+        )
+        Timber.i("Local Change Tokens $localChangeTokens")
         val response = dataSource.upload(bundle)
         emit(getUploadResult(response, localChangeTokens))
       }
     }
       .catch { exception ->
         Timber.i("exception stacktrace ${exception.stackTraceToString()}")
+        Timber.i("exception localised message ${exception.localizedMessage}")
+        if (exception.cause is HttpException) {
+          Timber.i("exception cause ${(exception as HttpException).response()}")
+        }
         emit(
           UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, exception as Exception))
         )
