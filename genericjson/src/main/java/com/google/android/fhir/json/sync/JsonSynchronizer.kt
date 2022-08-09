@@ -20,7 +20,7 @@ import android.content.Context
 import com.google.android.fhir.json.DatastoreUtil
 import com.google.android.fhir.json.JsonEngine
 import com.google.android.fhir.json.sync.download.DownloaderImpl
-import com.google.android.fhir.json.sync.upload.NoOpUploader
+import com.google.android.fhir.json.sync.upload.UploaderImpl
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
@@ -51,7 +51,7 @@ internal class JsonSynchronizer(
   private val jsonEngine: JsonEngine,
   private val dataSource: DataSource,
   private val downloadManager: JsonDownloadWorkManager,
-  private val uploader: Uploader = NoOpUploader(),
+  private val uploader: Uploader = UploaderImpl(dataSource),
   private val downloader: Downloader = DownloaderImpl(dataSource, downloadManager),
   private val conflictResolver: ConflictResolver
 ) {

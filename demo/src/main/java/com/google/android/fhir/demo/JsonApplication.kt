@@ -40,7 +40,7 @@ class JsonApplication : Application() {
       JsonEngineConfiguration(
         enableEncryptionIfSupported = false,
         RECREATE_AT_OPEN,
-        ServerConfiguration("https://hapi.fhir.org/baseR4/")
+        ServerConfiguration("http://localhost:8080/fhir/")
       )
     )
     Sync.oneTimeSync<JsonPeriodicSyncWorker>(this)
