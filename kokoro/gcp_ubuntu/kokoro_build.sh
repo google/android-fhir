@@ -107,9 +107,9 @@ function device_tests() {
       --app demo/build/outputs/apk/androidTest/debug/demo-debug-androidTest.apk \
       --test $lib_name/build/outputs/apk/androidTest/debug/$lib_name-debug-androidTest.apk \
       --timeout 30m \
-      --device model=Nexus6P,version=24 \
-      --device model=Nexus6P,version=27 \
-      --device model=Pixel2,version=30 \
+      --device model=Nexus6P,version=24,locale=en_US \
+      --device model=Nexus6P,version=27,locale=en_US \
+      --device model=Pixel2,version=30,locale=en_US \
       --environment-variables coverage=true,coverageFile="/sdcard/Download/coverage.ec" \
       --directories-to-pull /sdcard/Download  \
       --results-bucket=$GCS_BUCKET \
@@ -125,7 +125,7 @@ function device_tests() {
 
   mkdir -p {datacapture,engine,workflow}/build/outputs/code_coverage/debugAndroidTest/connected/firebase
   for lib_name in "${lib_names[@]}"; do
-    gsutil -m cp -R gs://$GCS_BUCKET/$KOKORO_BUILD_ARTIFACTS_SUBDIR/firebase/$lib_name/Pixel2-30-en-portrait/**/coverage.ec \
+    gsutil -m cp -R gs://$GCS_BUCKET/$KOKORO_BUILD_ARTIFACTS_SUBDIR/firebase/$lib_name/Pixel2-30-en_US-portrait/**/coverage.ec \
       $lib_name/build/outputs/code_coverage/debugAndroidTest/connected/firebase
   done
 }
