@@ -22,6 +22,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemSimpleQuestion
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 
+/** List Adapter used to bind answers to [QuestionnaireItemViewHolder] in review mode. */
 internal class QuestionnaireReviewPageItemAdapter :
   ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
