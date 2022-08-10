@@ -39,6 +39,9 @@ val Questionnaire.targetStructureMap: String?
 private const val TARGET_STRUCTURE_MAP: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap"
 
+val Questionnaire.isPaginated: Boolean
+  get() = item.any { item -> item.displayItemControl == DisplayItemControlType.PAGE }
+
 /**
  * See
  * [Extension: Entry mode](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-entryMode.html)
