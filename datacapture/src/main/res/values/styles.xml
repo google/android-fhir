@@ -44,6 +44,9 @@
             name="questionnaireSubtitleTextStyle"
         >@style/TextAppearance.Material3.BodyMedium</item>
         <item
+            name="questionnaireAnswerTextStyle"
+        >@style/Questionnaire.AnswerStyle</item>
+        <item
             name="questionnaireCheckBoxStyle"
         >@style/Questionnaire.CheckBoxStyle
         </item>
@@ -94,6 +97,13 @@
             name="questionnaireAddAnotherAnswerButtonStyle"
         >@style/Widget.Material3.Button
         </item>
+    </style>
+
+    <style
+        name="Questionnaire.AnswerStyle"
+        parent="TextAppearance.Material3.BodyMedium"
+    >
+        <item name="android:alpha">0.5</item>
     </style>
 
     <style

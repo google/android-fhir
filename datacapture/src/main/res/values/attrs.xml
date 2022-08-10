@@ -21,6 +21,8 @@
     <attr name="questionnaireQuestionTextStyle" format="reference" />
     <!--   Style for subtitle text. -->
     <attr name="questionnaireSubtitleTextStyle" format="reference" />
+    <!--   Style for answer text. -->
+    <attr name="questionnaireAnswerTextStyle" format="reference" />
 
     <!--   Style for radio buttons. -->
     <attr name="questionnaireRadioButtonStyle" format="reference" />
