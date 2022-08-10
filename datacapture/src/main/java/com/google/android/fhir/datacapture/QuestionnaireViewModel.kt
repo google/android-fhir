@@ -271,11 +271,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   internal fun setReviewMode(reviewModeFlag: Boolean) {
     reviewFlow.value = reviewModeFlag
-
-    // When Fragment enters into review mode pageflow is initially set
-    // to null, so when toggled into data collection mode pageflow is
-    // implicitly set with getInitialPagination.
-    if (pageFlow.value == null) pageFlow.value = questionnaire.getInitialPagination()
   }
 
   internal fun setShowSubmitButtonFlag(showSubmitButton: Boolean) {
@@ -284,17 +279,19 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** StateFlow whether to show review button or not */
   internal val showReviewButtonStateFlow: StateFlow<Boolean> =
-    combine(reviewFlow, pageFlow) { reviewFlow, pagination ->
-        enableReviewPage && !reviewFlow && (pagination == null || !pagination.hasNextPage)
+    combine(reviewFlow, currentPageIndexFlow) { reviewFlow, pagination ->
+        enableReviewPage &&
+          !reviewFlow &&
+          (pagination == null || !QuestionnairePagination(pages!!, pagination).hasNextPage)
       }
       .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = showReviewPageFirst)
 
   /** StateFlow whether to show submit button or not */
   internal val showSubmitButtonStateFlow: StateFlow<Boolean> =
-    combine(reviewFlow, pageFlow) { _, pagination ->
+    combine(reviewFlow, currentPageIndexFlow) { _, pagination ->
         showSubmitButtonFlag &&
           !showReviewButtonStateFlow.value &&
-          (pagination == null || !pagination.hasNextPage)
+          (pagination == null || !QuestionnairePagination(pages!!, pagination).hasNextPage)
       }
       .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = showSubmitButtonFlag)
 
@@ -304,12 +301,21 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: Flow<QuestionnaireState> =
     combine(modificationCount, currentPageIndexFlow, reviewFlow) { _, pagination, reviewFlow ->
-        getQuestionnaireState(
-          questionnaireItemList = questionnaire.item,
-          questionnaireResponseItemList = questionnaireResponse.item,
-          currentPageIndex = pagination,
-          reviewMode = reviewFlow
-        )
+        if (reviewFlow) {
+          getQuestionnaireState(
+            questionnaireItemList = questionnaire.item,
+            questionnaireResponseItemList = questionnaireResponse.item,
+            currentPageIndex = null,
+            reviewMode = reviewFlow
+          )
+        } else {
+          getQuestionnaireState(
+            questionnaireItemList = questionnaire.item,
+            questionnaireResponseItemList = questionnaireResponse.item,
+            currentPageIndex = pagination,
+            reviewMode = reviewFlow
+          )
+        }
       }
       .stateIn(
         viewModelScope,
@@ -322,40 +328,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             reviewMode = enableReviewPage
           )
       )
-  /*
-   internal val questionnaireStateFlow: Flow<QuestionnaireState> =
-    combine(modificationCount, pageFlow, reviewFlow) { _, pagination, reviewFlow ->
-        if (reviewFlow) {
-          getQuestionnaireState(
-            questionnaireItemList = questionnaire.item,
-            questionnaireResponseItemList = questionnaireResponse.item,
-            pagination = null,
-            modificationCount = modificationCount.value,
-            reviewMode = reviewFlow
-          )
-        } else {
-          getQuestionnaireState(
-            questionnaireItemList = questionnaire.item,
-            questionnaireResponseItemList = questionnaireResponse.item,
-            pagination = pagination,
-            modificationCount = modificationCount.value,
-            reviewMode = reviewFlow
-          )
-        }
-      }
-      .stateIn(
-        viewModelScope,
-        SharingStarted.Lazily,
-        initialValue =
-          getQuestionnaireState(
-            questionnaireItemList = questionnaire.item,
-            questionnaireResponseItemList = questionnaireResponse.item,
-            pagination = questionnaire.getInitialPagination(),
-            modificationCount = 0,
-            reviewMode = enableReviewPage
-          )
-      )
-   */
 
   @PublishedApi
   internal suspend fun resolveAnswerValueSet(
@@ -573,26 +545,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    *
    * If this questionnaire uses pagination, returns the [QuestionnairePagination] that you would see
    * when first opening this questionnaire. Otherwise, returns `null`.
-   */
-  /*
-  private fun Questionnaire.getInitialPagination(): QuestionnairePagination? {
-    val usesPagination =
-      item.any { item ->
-        item.extension.any { extension ->
-          (extension.value as? CodeableConcept)?.coding?.any { coding -> coding.code == "page" } ==
-            true
-        }
-      } && !reviewFlow.value
-
-    return if (usesPagination) {
-      QuestionnairePagination(
-        currentPageIndex = 0,
-        lastPageIndex = item.size - 1,
-      )
-    } else {
-      null
-    }
-  }
    */
   private fun getInitialPageIndex(): Int? =
     if (questionnaire.isPaginated) {
