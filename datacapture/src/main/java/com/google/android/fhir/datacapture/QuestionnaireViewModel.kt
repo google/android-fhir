@@ -223,7 +223,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     modificationCount.update { it + 1 }
   }
 
-
   @VisibleForTesting fun getPageFlow() = pages
 
   private val answerValueSetMap =
@@ -432,48 +431,49 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       return emptyList()
     }
 
-          val validationResult =
-            if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
-                isPaginationButtonPressed
-            ) {
-              QuestionnaireResponseItemValidator.validate(
-                questionnaireItem,
-                questionnaireResponseItem.answer,
-                this@QuestionnaireViewModel.getApplication()
-              )
-            } else {
-              ValidationResult(true, listOf())
-            }
+    val validationResult =
+      if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
+          isPaginationButtonPressed
+      ) {
+        QuestionnaireResponseItemValidator.validate(
+          questionnaireItem,
+          questionnaireResponseItem.answer,
+          this@QuestionnaireViewModel.getApplication()
+        )
+      } else {
+        ValidationResult(true, listOf())
+      }
 
-    val items = listOf(
-      QuestionnaireItemViewItem(
-        questionnaireItem,
-        questionnaireResponseItem,
-        validationResult = validationResult,
-        answersChangedCallback = answersChangedCallback,
-        resolveAnswerValueSet = { resolveAnswerValueSet(it) },
-      )
-    ) +
-      getQuestionnaireItemViewItems(
-        // Nested display item is subtitle text for parent questionnaire item if data type
-        // is not group.
-        // If nested display item is identified as subtitle text, then do not create
-        // questionnaire state for it.
-        questionnaireItemList =
-          when (questionnaireItem.type) {
-            Questionnaire.QuestionnaireItemType.GROUP -> questionnaireItem.item
-            else ->
-              questionnaireItem.item.filterNot {
-                it.type == Questionnaire.QuestionnaireItemType.DISPLAY
-              }
-          },
-        questionnaireResponseItemList =
-          if (questionnaireResponseItem.answer.isEmpty()) {
-            questionnaireResponseItem.item
-          } else {
-            questionnaireResponseItem.answer.first().item
-          },
-      )
+    val items =
+      listOf(
+        QuestionnaireItemViewItem(
+          questionnaireItem,
+          questionnaireResponseItem,
+          validationResult = validationResult,
+          answersChangedCallback = answersChangedCallback,
+          resolveAnswerValueSet = { resolveAnswerValueSet(it) },
+        )
+      ) +
+        getQuestionnaireItemViewItems(
+          // Nested display item is subtitle text for parent questionnaire item if data type
+          // is not group.
+          // If nested display item is identified as subtitle text, then do not create
+          // questionnaire state for it.
+          questionnaireItemList =
+            when (questionnaireItem.type) {
+              Questionnaire.QuestionnaireItemType.GROUP -> questionnaireItem.item
+              else ->
+                questionnaireItem.item.filterNot {
+                  it.type == Questionnaire.QuestionnaireItemType.DISPLAY
+                }
+            },
+          questionnaireResponseItemList =
+            if (questionnaireResponseItem.answer.isEmpty()) {
+              questionnaireResponseItem.item
+            } else {
+              questionnaireResponseItem.answer.first().item
+            },
+        )
     // holding updated items state
     currentPageItems = items
     return items
