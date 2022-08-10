@@ -358,7 +358,10 @@ class DatabaseImplTest {
     val testPatient2String = services.parser.encodeResourceToString(TEST_PATIENT_2)
     database.insert(TEST_PATIENT_2)
     val (_, resourceType, resourceId, _, type, payload, _) =
-      database.getAllLocalChanges().single { it.localChange.resourceId.equals(TEST_PATIENT_2_ID) }.localChange
+      database
+        .getAllLocalChanges()
+        .single { it.localChange.resourceId.equals(TEST_PATIENT_2_ID) }
+        .localChange
     assertThat(type).isEqualTo(LocalChangeType.INSERT)
     assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
     assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
@@ -433,7 +436,10 @@ class DatabaseImplTest {
   fun delete_shouldAddDeleteLocalChange() = runBlocking {
     database.delete(ResourceType.Patient, TEST_PATIENT_1_ID)
     val (_, resourceType, resourceId, _, type, payload, _) =
-      database.getAllLocalChanges().single { it.localChange.resourceId.equals(TEST_PATIENT_1_ID) }.localChange
+      database
+        .getAllLocalChanges()
+        .single { it.localChange.resourceId.equals(TEST_PATIENT_1_ID) }
+        .localChange
     assertThat(type).isEqualTo(LocalChangeType.DELETE)
     assertThat(resourceId).isEqualTo(TEST_PATIENT_1_ID)
     assertThat(resourceType).isEqualTo(TEST_PATIENT_1.resourceType.name)
@@ -604,7 +610,11 @@ class DatabaseImplTest {
     database.insertRemote(TEST_PATIENT_2)
     database.delete(ResourceType.Patient, TEST_PATIENT_2_ID)
     val (_, resourceType, resourceId, _, type, payload, versionId) =
-      database.getAllLocalChanges().map { it }.single { it.localChange.resourceId.equals(TEST_PATIENT_2_ID) }.localChange
+      database
+        .getAllLocalChanges()
+        .map { it }
+        .single { it.localChange.resourceId.equals(TEST_PATIENT_2_ID) }
+        .localChange
     assertThat(type).isEqualTo(LocalChangeType.DELETE)
     assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
     assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
@@ -620,8 +630,12 @@ class DatabaseImplTest {
     TEST_PATIENT_2.name = listOf(HumanName().addGiven("Jimmy").setFamily("Doe"))
     database.update(TEST_PATIENT_2)
     database.delete(ResourceType.Patient, TEST_PATIENT_2_ID)
-    val (_,resourceType, resourceId, _, type, payload, _) =
-      database.getAllLocalChanges().map { it }.single { it.localChange.resourceId.equals(TEST_PATIENT_2_ID) }.localChange
+    val (_, resourceType, resourceId, _, type, payload, _) =
+      database
+        .getAllLocalChanges()
+        .map { it }
+        .single { it.localChange.resourceId.equals(TEST_PATIENT_2_ID) }
+        .localChange
     assertThat(type).isEqualTo(LocalChangeType.DELETE)
     assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
     assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
