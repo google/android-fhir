@@ -23,6 +23,7 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.material.divider.MaterialDivider
 import org.hl7.fhir.r4.model.Questionnaire
 
 /**
@@ -36,7 +37,7 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
       private lateinit var header: QuestionnaireItemHeaderView
       private lateinit var flyOverTextView: TextView
       private lateinit var answerTextView: TextView
-      private lateinit var divider: View
+      private lateinit var divider: MaterialDivider
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
@@ -57,7 +58,7 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
             } else {
               VISIBLE
             }
-          text = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
+          text = localizedFlyoverSpanned
         }
 
         answerTextView.apply {
