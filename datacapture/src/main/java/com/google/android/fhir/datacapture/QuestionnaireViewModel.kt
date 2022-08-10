@@ -223,9 +223,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     modificationCount.update { it + 1 }
   }
 
-  private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
 
-  @VisibleForTesting fun getPageFlow() = pageFlow
+  @VisibleForTesting fun getPageFlow() = pages
 
   private val answerValueSetMap =
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
@@ -262,7 +261,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         isPaginationButtonPressed = true
         modificationCount.update { it + 1 }
 
-        if (currentPageItems.none { !it.validationResult!!.isValid }) {
+        if (currentPageItems.all { it.validationResult!!.isValid }) {
           isPaginationButtonPressed = false
           val nextPageIndex =
             pages!!.indexOfFirst { it.index > currentPageIndexFlow.value!! && it.enabled }
@@ -446,7 +445,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               ValidationResult(true, listOf())
             }
 
-    return listOf(
+    val items = listOf(
       QuestionnaireItemViewItem(
         questionnaireItem,
         questionnaireResponseItem,
@@ -475,6 +474,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             questionnaireResponseItem.answer.first().item
           },
       )
+    // holding updated items state
+    currentPageItems = items
+    return items
   }
 
   private fun getEnabledResponseItems(
