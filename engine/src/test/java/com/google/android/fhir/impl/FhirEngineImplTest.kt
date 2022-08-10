@@ -18,7 +18,7 @@ package com.google.android.fhir.impl
 
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirServices.Companion.builder
-import com.google.android.fhir.db.LocalChange
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.LocalChangeType
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken

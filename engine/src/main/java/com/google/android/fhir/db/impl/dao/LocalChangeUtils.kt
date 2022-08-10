@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.JsonPatch
 import com.github.fge.jsonpatch.diff.JsonDiff
-import com.google.android.fhir.db.LocalChange
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.LocalChangeType
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import org.hl7.fhir.r4.model.Resource

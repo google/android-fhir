@@ -19,7 +19,7 @@ package com.google.android.fhir.sync.upload
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.ContentTypes
-import com.google.android.fhir.db.LocalChange
+import com.google.android.fhir.LocalChange
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Bundle

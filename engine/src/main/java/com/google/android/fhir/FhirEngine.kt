@@ -16,7 +16,6 @@
 
 package com.google.android.fhir
 
-import com.google.android.fhir.db.LocalChange
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.search.Search

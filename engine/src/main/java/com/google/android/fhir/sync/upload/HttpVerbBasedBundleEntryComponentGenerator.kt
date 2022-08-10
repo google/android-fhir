@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.sync.upload
 
-import com.google.android.fhir.db.LocalChange
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle

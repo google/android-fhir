@@ -21,7 +21,6 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.SyncDownloadContext
-import com.google.android.fhir.db.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver

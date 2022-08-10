@@ -22,7 +22,6 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
-import com.google.android.fhir.db.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
