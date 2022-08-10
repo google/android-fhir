@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package com.google.android.fhir.datacapture
 
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.junit.Test
@@ -43,5 +45,38 @@ class MoreQuestionnairesTest {
       )
 
     assertThat(questionnaire.targetStructureMap).isEqualTo(structureMapUrl)
+  }
+
+  @Test
+  fun `isPaginated should return true`() {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            addExtension(
+              Extension()
+                .setUrl(EXTENSION_ITEM_CONTROL_URL)
+                .setValue(
+                  CodeableConcept()
+                    .addCoding(
+                      Coding()
+                        .setCode(DisplayItemControlType.PAGE.extensionCode)
+                        .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                    )
+                )
+            )
+          }
+        )
+      }
+
+    assertThat(questionnaire.isPaginated).isTrue()
+  }
+
+  @Test
+  fun `isPaginated should return false`() {
+    val questionnaire =
+      Questionnaire().apply { addItem(Questionnaire.QuestionnaireItemComponent()) }
+
+    assertThat(questionnaire.isPaginated).isFalse()
   }
 }

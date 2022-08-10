@@ -23,7 +23,7 @@ import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.DatabaseErrorStrategy
-import com.google.android.fhir.db.LocalChange
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.LocalChangeToken

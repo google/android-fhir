@@ -19,6 +19,7 @@ package com.google.android.fhir.impl
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.LocalChange
