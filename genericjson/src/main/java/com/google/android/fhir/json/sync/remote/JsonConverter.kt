@@ -52,8 +52,8 @@ private class JsonResponseBodyConverter() : Converter<ResponseBody, JSONObject> 
 }
 
 /** Retrofit converter that allows us to parse FHIR resources in the requests. */
-private class JsonRequestBodyConverter() : Converter<JSONObject, RequestBody> {
-  override fun convert(value: JSONObject): RequestBody {
-    return value.toString().toRequestBody(MediaTypes.MEDIA_TYPE_JSON)
+private class JsonRequestBodyConverter() : Converter<String, RequestBody> {
+  override fun convert(value: String): RequestBody {
+    return value.toRequestBody(MediaTypes.MEDIA_TYPE_JSON)
   }
 }

@@ -104,7 +104,7 @@ internal class JsonSynchronizer(
     val exceptions = mutableListOf<ResourceSyncException>()
     jsonEngine.syncDownload(conflictResolver) {
       flow {
-        downloader.download().collect {
+        downloader.download(it).collect {
           when (it) {
             is DownloadState.Started -> {
               setSyncState(State.InProgress())

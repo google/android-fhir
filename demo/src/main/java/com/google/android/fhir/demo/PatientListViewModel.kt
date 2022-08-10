@@ -25,6 +25,7 @@ import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.json.JsonEngine
+import com.google.android.fhir.json.sync.JsonResource
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
 import java.time.LocalDate
@@ -44,7 +45,11 @@ class PatientListViewModel(application: Application, private val jsonEngine: Jso
   val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
   init {
-    updatePatientListAndPatientCount({ getSearchResults() }, { count() })
+    // updatePatientListAndPatientCount({ getSearchResults() }, { count() })
+  }
+
+  fun showUpdatedPatientList() {
+    // updatePatientListAndPatientCount({ getSearchResults() }, { count() })
   }
 
   /**
@@ -73,7 +78,7 @@ class PatientListViewModel(application: Application, private val jsonEngine: Jso
   private suspend fun getSearchResults(nameQuery: String = ""): List<PatientItem> {
     val patients: MutableList<PatientItem> = mutableListOf()
     jsonEngine
-      .search()
+      .search<JsonResource>()
       .map { parser.parseResource(Patient::class.java, it.toString()) }
       .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
       .let { patients.addAll(it) }

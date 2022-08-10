@@ -16,10 +16,10 @@
 
 package com.google.android.fhir.json.sync
 
+import com.google.android.fhir.json.LocalChange
 import com.google.android.fhir.json.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.json.db.impl.dao.SquashedLocalChange
 import kotlinx.coroutines.flow.Flow
-import org.json.JSONObject
 
 /** Module for uploading local changes to a [DataSource]. */
 internal interface Uploader {
@@ -29,12 +29,12 @@ internal interface Uploader {
    * transforming the [SquashedLocalChange]s to particular network operations.
    */
   suspend fun upload(
-    localChanges: List<SquashedLocalChange>,
+    localChanges: List<LocalChange>,
   ): Flow<UploadResult>
 }
 
 internal sealed class UploadResult {
-  data class Success(val localChangeToken: LocalChangeToken, val resource: JSONObject) :
+  data class Success(val localChangeToken: LocalChangeToken, val resource: JsonResource) :
     UploadResult()
   data class Failure(val syncError: ResourceSyncException) : UploadResult()
 }

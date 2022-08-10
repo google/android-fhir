@@ -19,18 +19,21 @@ package com.google.android.fhir.json.db.impl
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.google.android.fhir.json.db.impl.dao.JsonObjectDao
+import com.google.android.fhir.json.db.impl.dao.JsonResourceDao
 import com.google.android.fhir.json.db.impl.dao.LocalChangeDao
-import com.google.android.fhir.json.db.impl.entities.JsonObjectEntity
+import com.google.android.fhir.json.db.impl.dao.SyncedResourceDao
+import com.google.android.fhir.json.db.impl.entities.JsonResourceEntity
 import com.google.android.fhir.json.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.json.db.impl.entities.SyncedResourceEntity
 
 @Database(
-  entities = [JsonObjectEntity::class, LocalChangeEntity::class],
+  entities = [JsonResourceEntity::class, SyncedResourceEntity::class, LocalChangeEntity::class],
   version = 1,
   exportSchema = false
 )
 @TypeConverters(DbTypeConverters::class)
 internal abstract class ResourceDatabase : RoomDatabase() {
-  abstract fun resourceDao(): JsonObjectDao
+  abstract fun resourceDao(): JsonResourceDao
+  abstract fun syncedResourceDao(): SyncedResourceDao
   abstract fun localChangeDao(): LocalChangeDao
 }

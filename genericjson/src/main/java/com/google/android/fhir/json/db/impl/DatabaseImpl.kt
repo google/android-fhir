@@ -26,7 +26,9 @@ import com.google.android.fhir.json.db.ResourceNotFoundException
 import com.google.android.fhir.json.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.json.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.json.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.json.db.impl.entities.JsonObjectEntity
+import com.google.android.fhir.json.db.impl.entities.JsonResourceEntity
+import com.google.android.fhir.json.db.impl.entities.SyncedResourceEntity
+import com.google.android.fhir.json.sync.JsonResource
 import java.time.Instant
 import org.json.JSONObject
 
@@ -85,9 +87,10 @@ internal class DatabaseImpl(context: Context, databaseConfig: DatabaseConfig) : 
   }
 
   private val resourceDao by lazy { db.resourceDao() }
+  private val syncedResourceDao = db.syncedResourceDao()
   private val localChangeDao = db.localChangeDao()
 
-  override suspend fun insert(vararg resource: JSONObject): List<String> {
+  override suspend fun <R : JsonResource> insert(vararg resource: R): List<String> {
     val logicalIds = mutableListOf<String>()
     db.withTransaction {
       logicalIds.addAll(resourceDao.insertAll(resource.toList()))
@@ -96,59 +99,82 @@ internal class DatabaseImpl(context: Context, databaseConfig: DatabaseConfig) : 
     return logicalIds
   }
 
-  override suspend fun insertRemote(vararg resource: JSONObject) {
+  override suspend fun <R : JsonResource> insertRemote(vararg resource: R) {
     db.withTransaction { resourceDao.insertAll(resource.toList()) }
   }
 
-  override suspend fun update(vararg resources: JSONObject) {
+  override suspend fun update(vararg resources: JsonResource) {
     db.withTransaction {
       resources.forEach {
-        val oldResourceEntity = selectEntity(it["id"].toString())
+        val oldResourceEntity = selectEntity(it.resourceType, it.id)
         resourceDao.update(it)
         localChangeDao.addUpdate(oldResourceEntity, it)
       }
     }
   }
 
-  override suspend fun updateVersionIdAndLastUpdated(resourceId: String, lastUpdated: Instant) {
-    db.withTransaction { resourceDao.updateRemoteVersionIdAndLastUpdate(resourceId, lastUpdated) }
-  }
-
-  override suspend fun select(id: String): JSONObject {
-    return db.withTransaction {
-      resourceDao.getResource(id)?.let { JSONObject(it) } ?: throw ResourceNotFoundException(id)
+  override suspend fun updateVersionIdAndLastUpdated(
+    resourceId: String,
+    resourceType: String,
+    versionId: String,
+    lastUpdated: Instant
+  ) {
+    db.withTransaction {
+      resourceDao.updateRemoteVersionIdAndLastUpdate(
+        resourceId,
+        resourceType,
+        versionId,
+        lastUpdated
+      )
     }
   }
 
-  override suspend fun insertSyncedResources(resources: List<JSONObject>) {
-    db.withTransaction { insertRemote(*resources.toTypedArray()) }
+  override suspend fun select(type: String, id: String): JsonResource {
+    return db.withTransaction {
+      resourceDao.getResource(resourceId = id, resourceType = type)?.let { JSONObject(it) }
+        ?: throw ResourceNotFoundException(type, id)
+    } as
+      JsonResource
   }
 
-  override suspend fun delete(id: String) {
+  override suspend fun lastUpdate(resourceType: String): String? {
+    return db.withTransaction { syncedResourceDao.getLastUpdate(resourceType) }
+  }
+
+  override suspend fun insertSyncedResources(
+    syncedResources: List<SyncedResourceEntity>,
+    resources: List<JsonResource>
+  ) {
     db.withTransaction {
-      val rowsDeleted = resourceDao.deleteResource(resourceId = id)
+      syncedResourceDao.insertAll(syncedResources)
+      insertRemote(*resources.toTypedArray())
+    }
+  }
+
+  override suspend fun delete(type: String, id: String) {
+    db.withTransaction {
+      val remoteVersionId: String? =
+        try {
+          selectEntity(type, id).versionId
+        } catch (e: ResourceNotFoundException) {
+          null
+        }
+      val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
       if (rowsDeleted > 0)
         localChangeDao.addDelete(
           resourceId = id,
+          resourceType = type,
+          remoteVersionId = remoteVersionId
         )
     }
   }
 
-  override suspend fun search(): List<JSONObject> {
-    return db.withTransaction {
-      resourceDao.getAllResources().map { JSONObject(it) }.distinctBy { it.get("id") }
-    }
+  override suspend fun <R : JsonResource> search(): List<R> {
+    throw NotImplementedError("Can't be bothered")
   }
 
   override suspend fun count(): Long {
-    return db.withTransaction {
-      resourceDao
-        .getAllResources()
-        .map { JSONObject(it) }
-        .distinctBy { it.get("id") }
-        .count()
-        .toLong()
-    }
+    throw NotImplementedError("Can't be bothered")
   }
 
   /**
@@ -157,7 +183,7 @@ internal class DatabaseImpl(context: Context, databaseConfig: DatabaseConfig) : 
    */
   override suspend fun getAllLocalChanges(): List<SquashedLocalChange> {
     return db.withTransaction {
-      localChangeDao.getAllLocalChanges().groupBy { it.resourceId }.values.map {
+      localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
         SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
       }
     }
@@ -167,9 +193,10 @@ internal class DatabaseImpl(context: Context, databaseConfig: DatabaseConfig) : 
     db.withTransaction { localChangeDao.discardLocalChanges(token) }
   }
 
-  override suspend fun selectEntity(id: String): JsonObjectEntity {
+  override suspend fun selectEntity(type: String, id: String): JsonResourceEntity {
     return db.withTransaction {
-      resourceDao.getResourceEntity(resourceId = id) ?: throw ResourceNotFoundException(id)
+      resourceDao.getResourceEntity(resourceId = id, resourceType = type)
+        ?: throw ResourceNotFoundException(type, id)
     }
   }
 
@@ -177,12 +204,56 @@ internal class DatabaseImpl(context: Context, databaseConfig: DatabaseConfig) : 
     db.withTransaction(block)
   }
 
-  override suspend fun deleteUpdates(resources: List<JSONObject>) {
+  override suspend fun deleteUpdates(resources: List<JsonResource>) {
     localChangeDao.discardLocalChanges(resources)
   }
 
   override fun close() {
     db.close()
+  }
+
+  override suspend fun clearDatabase() {
+    db.clearAllTables()
+  }
+
+  override suspend fun getLocalChange(type: String, id: String): SquashedLocalChange? {
+    return db.withTransaction {
+      val localChangeEntityList =
+        localChangeDao.getLocalChanges(resourceType = type, resourceId = id)
+      if (localChangeEntityList.isEmpty()) {
+        return@withTransaction null
+      }
+      SquashedLocalChange(
+        LocalChangeToken(localChangeEntityList.map { it.id }),
+        LocalChangeUtils.squash(localChangeEntityList)
+      )
+    }
+  }
+
+  override suspend fun purge(type: String, id: String, forcePurge: Boolean) {
+    db.withTransaction {
+      // To check resource is present in DB else throw ResourceNotFoundException()
+      selectEntity(type, id)
+      val localChangeEntityList = localChangeDao.getLocalChanges(type, id)
+      // If local change is not available simply delete resource
+      if (localChangeEntityList.isEmpty()) {
+        resourceDao.deleteResource(resourceId = id, resourceType = type)
+      } else {
+        // local change is available with FORCE_PURGE the delete resource and discard changes from
+        // localChangeEntity table
+        if (forcePurge) {
+          resourceDao.deleteResource(resourceId = id, resourceType = type)
+          localChangeDao.discardLocalChanges(
+            token = LocalChangeToken(localChangeEntityList.map { it.id })
+          )
+        } else {
+          // local change is available but FORCE_PURGE = false then throw exception
+          throw IllegalStateException(
+            "Resource with type $type and id $id has local changes, either sync with server or FORCE_PURGE required"
+          )
+        }
+      }
+    }
   }
 
   companion object {

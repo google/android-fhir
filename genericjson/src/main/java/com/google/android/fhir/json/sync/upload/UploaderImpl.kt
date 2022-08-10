@@ -16,12 +16,14 @@
 
 package com.google.android.fhir.json.sync.upload
 
+import com.google.android.fhir.json.LocalChange
 import com.google.android.fhir.json.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.json.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.json.sync.DataSource
+import com.google.android.fhir.json.sync.JsonResource
 import com.google.android.fhir.json.sync.ResourceSyncException
 import com.google.android.fhir.json.sync.UploadResult
 import com.google.android.fhir.json.sync.Uploader
+import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.json.JSONObject
@@ -29,12 +31,15 @@ import org.json.JSONObject
 /** [Uploader] implementation to work with Fhir [Bundle]. */
 internal class UploaderImpl(private val dataSource: DataSource) : Uploader {
 
+  val resourceTypeToUpload = "Patient"
+
   override suspend fun upload(
-    localChanges: List<SquashedLocalChange>,
+    localChanges: List<LocalChange>,
   ): Flow<UploadResult> = flow {
-    generate(localChanges).forEach { (jsonObject, localChangeTokens) ->
+    generate(localChanges).forEach { (jsonResource, localChangeTokens) ->
       try {
-        val response = dataSource.upload(jsonObject)
+        val response =
+          dataSource.upload(resourceTypeToUpload, jsonResource.id, jsonResource.payload)
         emit(getUploadResult(response, localChangeTokens))
       } catch (e: Exception) {
         emit(UploadResult.Failure(ResourceSyncException(e)))
@@ -46,24 +51,28 @@ internal class UploaderImpl(private val dataSource: DataSource) : Uploader {
     response: JSONObject,
     localChangeTokens: List<LocalChangeToken>
   ): UploadResult {
-    if (response.getString("resourceType").equals("Bundle")) {
-      return UploadResult.Success(LocalChangeToken(localChangeTokens.flatMap { it.ids }), response)
-    }
-
-    if (response.getString("resourceType").equals("OperationOutcome")) {
-      return UploadResult.Failure(
-        ResourceSyncException(
-          Exception(response.getJSONArray("issue").getJSONObject(0)?.getString("diagnostics"))
-        )
-      )
-    }
-
-    return UploadResult.Failure(ResourceSyncException(Exception("Unknown response")))
+    return UploadResult.Failure(ResourceSyncException(Exception("No imp")))
   }
 
   private fun generate(
-    listOfLocalChanges: List<SquashedLocalChange>
-  ): List<Pair<JSONObject, List<LocalChangeToken>>> {
-    return listOfLocalChanges.map { JSONObject(it.localChange.payload) to listOf(it.token) }
+    listOfLocalChanges: List<LocalChange>
+  ): List<Pair<JsonResource, List<LocalChangeToken>>> {
+    return listOfLocalChanges.map {
+      UploadJsonResource(
+        it.resourceId,
+        it.resourceType,
+        it.versionId,
+        null,
+        JSONObject(it.payload)
+      ) to listOf(it.token)
+    }
   }
 }
+
+data class UploadJsonResource(
+  override val id: String,
+  override val resourceType: String,
+  override val versionId: String?,
+  override val lastUpdated: Date?,
+  override val payload: JSONObject
+) : JsonResource

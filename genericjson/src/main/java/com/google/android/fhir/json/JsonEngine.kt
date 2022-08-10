@@ -17,11 +17,10 @@
 package com.google.android.fhir.json
 
 import com.google.android.fhir.json.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.json.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.json.sync.ConflictResolver
+import com.google.android.fhir.json.sync.JsonResource
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
-import org.json.JSONObject
 
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface JsonEngine {
@@ -30,18 +29,18 @@ interface JsonEngine {
    *
    * @return the logical IDs of the newly created resources.
    */
-  suspend fun create(vararg resource: JSONObject): List<String>
+  suspend fun create(vararg resource: JsonResource): List<String>
 
   /** Loads a FHIR resource given the class and the logical ID. */
-  suspend fun get(id: String): JSONObject
+  suspend fun get(type: String, id: String): JsonResource
 
   /** Updates a FHIR [resource] in the local storage. */
-  suspend fun update(vararg resource: JSONObject)
+  suspend fun update(vararg resource: JsonResource)
 
   /** Removes a FHIR resource given the class and the logical ID. */
-  suspend fun delete(id: String)
+  suspend fun delete(type: String, id: String)
 
-  suspend fun search(): List<JSONObject>
+  suspend fun <R : JsonResource> search(): List<R>
 
   suspend fun count(): Long
 
@@ -51,7 +50,7 @@ interface JsonEngine {
    * api caller should [Flow.collect] it.
    */
   suspend fun syncUpload(
-    upload: (suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, JSONObject>>)
+    upload: (suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, JsonResource>>)
   )
 
   /**
@@ -60,9 +59,19 @@ interface JsonEngine {
    */
   suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend () -> Flow<List<JSONObject>>
+    download: suspend (SyncDownloadContext) -> Flow<List<JsonResource>>
   )
 
   /** Returns the timestamp when data was last synchronized. */
   suspend fun getLastSyncTimeStamp(): OffsetDateTime?
+
+  suspend fun clearDatabase()
+
+  suspend fun getLocalChange(type: String, id: String): LocalChange?
+
+  suspend fun purge(type: String, id: String, forcePurge: Boolean = false)
+}
+
+interface SyncDownloadContext {
+  suspend fun getLatestTimestampFor(type: String): String?
 }

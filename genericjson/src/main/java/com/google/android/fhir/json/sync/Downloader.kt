@@ -16,8 +16,8 @@
 
 package com.google.android.fhir.json.sync
 
+import com.google.android.fhir.json.SyncDownloadContext
 import kotlinx.coroutines.flow.Flow
-import org.json.JSONObject
 
 /** Module for downloading the resources from the server. */
 internal interface Downloader {
@@ -25,14 +25,14 @@ internal interface Downloader {
    * @return Flow of the [DownloadState] which keeps emitting [Resource]s or Error based on the
    * response of each page download request.
    */
-  suspend fun download(): Flow<DownloadState>
+  suspend fun download(context: SyncDownloadContext): Flow<DownloadState>
 }
 
 internal sealed class DownloadState {
 
   data class Started(val type: String) : DownloadState()
 
-  data class Success(val resources: List<JSONObject>) : DownloadState()
+  data class Success(val resources: List<JsonResource>) : DownloadState()
 
   data class Failure(val syncError: ResourceSyncException) : DownloadState()
 }

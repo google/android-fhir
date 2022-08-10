@@ -27,16 +27,26 @@ import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
+import retrofit2.http.Body
 import retrofit2.http.POST
-import retrofit2.http.Url
+import retrofit2.http.PUT
+import retrofit2.http.Path
 
 /** Interface to make http requests to the FHIR server. */
 internal interface RemoteJsonService : DataSource {
 
-  @GET override suspend fun download(@Url path: String): JSONObject
+  @POST("/{path}")
+  override suspend fun download(
+    @Path("path") path: String,
+    @Body extraBody: String,
+  ): JSONObject
 
-  @POST(".") override suspend fun upload(jsonObject: JSONObject): JSONObject
+  @PUT("{type}/{id}")
+  override suspend fun upload(
+    @Path("type") type: String,
+    @Path("id") id: String,
+    @Body jsonObject: JSONObject,
+  ): JSONObject
 
   class Builder(
     private val baseUrl: String,
@@ -60,6 +70,20 @@ internal interface RemoteJsonService : DataSource {
             readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
             writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
             addInterceptor(logger)
+            addInterceptor(
+              Interceptor { chain: Interceptor.Chain ->
+                val request =
+                  chain
+                    .request()
+                    .newBuilder()
+                    .addHeader(
+                      "x-access-token",
+                      "TOKEN_HERE"
+                    )
+                    .build()
+                chain.proceed(request)
+              }
+            )
             authenticator?.let {
               addInterceptor(
                 Interceptor { chain: Interceptor.Chain ->

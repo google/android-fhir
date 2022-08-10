@@ -24,12 +24,16 @@ import java.util.UUID
 
 @Entity(
   indices =
-    [Index(value = ["resourceUuid"], unique = true), Index(value = ["resourceId"], unique = true)]
+    [
+      Index(value = ["resourceUuid"], unique = true),
+      Index(value = ["resourceType", "resourceId"], unique = true)]
 )
-internal data class JsonObjectEntity(
+internal data class JsonResourceEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceUuid: UUID,
+  val resourceType: String,
   val resourceId: String,
   val serializedResource: String,
+  val versionId: String?,
   val lastUpdatedRemote: Instant?
 )

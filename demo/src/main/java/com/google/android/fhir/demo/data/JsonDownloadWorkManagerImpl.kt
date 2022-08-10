@@ -16,58 +16,72 @@
 
 package com.google.android.fhir.demo.data
 
+import com.google.android.fhir.json.SyncDownloadContext
 import com.google.android.fhir.json.sync.JsonDownloadWorkManager
+import com.google.android.fhir.json.sync.JsonResource
+import java.time.Instant
+import java.util.Date
 import java.util.LinkedList
-import org.hl7.fhir.exceptions.FHIRException
+import org.json.JSONArray
 import org.json.JSONObject
 
 class JsonDownloadWorkManagerImpl : JsonDownloadWorkManager {
-  private val urls = LinkedList(listOf("Patient?address-city=NAIROBI"))
+  private val urls =
+    LinkedList(listOf("mobile_api_get_family_data", "mobile_api_get_clinical_data"))
 
-  override suspend fun getNextRequestUrl(): String? {
+  override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? {
     return urls.poll() ?: return null
   }
 
   // App developer implements this logic
-  override suspend fun processResponse(response: JSONObject): Collection<JSONObject> {
-
-    val resourceType = response.get("resourceType")
-
-    if (resourceType.equals("OperationOutcome")) {
-      throw FHIRException(response.getJSONArray("issue").getJSONObject(0)?.getString("diagnostics"))
+  override suspend fun processResponse(response: JSONObject): Collection<JsonResource> {
+    val statusCode = response.getInt("status_code")
+    if (statusCode != 200) {
+      throw Exception(response.getString("message"))
     }
 
-    // If the resource returned is a List containing Patients, extract Patient references and fetch
-    // all resources related to the patient using the $everything operation.
-    if (resourceType.equals("ListResource")) {
-      for (i in 0 until response.getJSONArray("entry").length()) {
-        val entry = response.getJSONArray("entry").getJSONObject(i)
-        urls.add(entry.getJSONObject("item").getString("reference"))
-      }
+    val message = response.getString("message")
+    val bundleCollection = mutableListOf<JsonResource>()
+    // Extract resource type from the message field as it will contain what resource was retrieved
+    if (message.contains("Family Data")){
+       bundleCollection.addAll(extractResource(response.getJSONArray("data"), "Family", "family_id" ))
+    } else if (message.contains("Clinical Data")) {
+      val clinicalJsonObject= response.getJSONObject("data")
+      bundleCollection.addAll(extractResource(clinicalJsonObject.getJSONArray("VACCINATION_MASTER"),
+                           "VaccinationMaster",
+                           "vaccination_id" ))
+      bundleCollection.addAll(extractResource(clinicalJsonObject.getJSONArray("PROTOCOL_MASTER"),
+                                              "ProtocolMaster",
+                                              "protocol_id" ))
+
+      bundleCollection.addAll(extractResource(clinicalJsonObject.getJSONArray("DRUGS_MASTER"),
+                                              "DrugsMaster",
+                                              "drug_id" ))
+      // There are other resources that can be extracted but I got bored, and as this is a demo, I stopped
+      // I also assumed that all fields were populated and are not empty. Need to implement a check for this
     }
 
-    // If the resource returned is a Bundle, check to see if there is a "next" relation referenced
-    // in the Bundle.link component, if so, append the URL referenced to list of URLs to download.
-    if (resourceType.equals("Bundle")) {
-      var nextUrl: String? = null
-      for (i in 0 until response.getJSONArray("link").length()) {
-        val link = response.getJSONArray("link").getJSONObject(i)
-        if (link.getString("relation").equals("next")) {
-          nextUrl = link.getString("url")
-        }
-      }
-
-      nextUrl?.let { urls.add(nextUrl) }
-    }
-
-    // Finally, extract the downloaded resources from the bundle.
-    val bundleCollection = mutableListOf<JSONObject>()
-    if (resourceType.equals("Bundle") && response.getString("type").equals("searchset")) {
-      for (i in 0 until response.getJSONArray("entry").length()) {
-        val entry = response.getJSONArray("entry").getJSONObject(i)
-        bundleCollection.add(entry.getJSONObject("resource"))
-      }
-    }
     return bundleCollection
+
+  }
+
+  private fun extractResource(jsonArray: JSONArray, resourceType: String, id: String): Collection<JsonResource> {
+    val resources = mutableListOf<JsonResource>()
+    for (i in 0 until jsonArray.length()) {
+      resources.add(object : JsonResource {
+        override val id: String
+          get() = jsonArray.getJSONObject(i).getString(id)
+        override val resourceType: String
+          get() = resourceType
+        override val versionId: String?
+          get() = null
+        override val lastUpdated: Date?
+          get() = Date.from(Instant.now())
+        override val payload: JSONObject
+          get() = jsonArray.getJSONObject(i)
+      }
+      )
+    }
+    return resources
   }
 }

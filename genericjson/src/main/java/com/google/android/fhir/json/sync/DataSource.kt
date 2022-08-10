@@ -27,12 +27,12 @@ internal interface DataSource {
    * @return [Bundle] of type [BundleType.SEARCHSET] for a successful operation, [OperationOutcome]
    * otherwise. Call this api with the relative path of the resource search url to be downloaded.
    */
-  suspend fun download(path: String): JSONObject
+  suspend fun download(path: String, extraBody: String): JSONObject
 
   /**
    * @return [Bundle] of type [BundleType.TRANSACTIONRESPONSE] for a successful operation,
    * [OperationOutcome] otherwise. Call this api with the [Bundle] that needs to be uploaded to the
    * server.
    */
-  suspend fun upload(jsonObject: JSONObject): JSONObject
+  suspend fun upload(type: String, id: String, jsonObject: JSONObject): JSONObject
 }

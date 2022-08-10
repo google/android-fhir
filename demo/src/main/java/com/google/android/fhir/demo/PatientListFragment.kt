@@ -30,7 +30,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -48,7 +47,6 @@ import timber.log.Timber
 class PatientListFragment : Fragment() {
   private lateinit var jsonEngine: JsonEngine
   private lateinit var patientListViewModel: PatientListViewModel
-  private lateinit var searchView: SearchView
   private lateinit var topBanner: LinearLayout
   private lateinit var syncStatus: TextView
   private var _binding: FragmentPatientListBinding? = null
@@ -100,7 +98,6 @@ class PatientListFragment : Fragment() {
       viewLifecycleOwner,
       { binding.patientListContainer.patientCount.text = "$it Patient(s)" }
     )
-    searchView = binding.search
     topBanner = binding.syncStatusContainer.linearLayoutSyncStatus
     syncStatus = binding.syncStatusContainer.tvSyncingStatus
     requireActivity()
@@ -109,12 +106,9 @@ class PatientListFragment : Fragment() {
         viewLifecycleOwner,
         object : OnBackPressedCallback(true) {
           override fun handleOnBackPressed() {
-            if (searchView.query.isNotEmpty()) {
-              searchView.setQuery("", true)
-            } else {
-              isEnabled = false
-              activity?.onBackPressed()
-            }
+            patientListViewModel.showUpdatedPatientList()
+            isEnabled = false
+            activity?.onBackPressed()
           }
         }
       )
@@ -140,11 +134,13 @@ class PatientListFragment : Fragment() {
           }
           is State.Finished -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
+            patientListViewModel.showUpdatedPatientList()
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
           is State.Failed -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
+            patientListViewModel.showUpdatedPatientList()
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
@@ -163,7 +159,6 @@ class PatientListFragment : Fragment() {
     return when (item.itemId) {
       android.R.id.home -> {
         // hide the soft keyboard when the navigation drawer is shown on the screen.
-        searchView.clearFocus()
         (requireActivity() as MainActivity).openNavigationDrawer()
         true
       }

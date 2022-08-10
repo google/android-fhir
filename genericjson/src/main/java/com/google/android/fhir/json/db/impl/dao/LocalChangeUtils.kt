@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.JsonPatch
 import com.github.fge.jsonpatch.diff.JsonDiff
+import com.google.android.fhir.json.LocalChange
 import com.google.android.fhir.json.db.impl.entities.LocalChangeEntity
 import org.json.JSONArray
 import org.json.JSONObject
@@ -63,6 +64,7 @@ internal object LocalChangeUtils {
     return LocalChangeEntity(
       id = 0,
       resourceId = second.resourceId,
+      resourceType = second.resourceType,
       type = type,
       payload = payload,
     )
@@ -137,6 +139,35 @@ internal object LocalChangeUtils {
     }
 }
 
+/** Method to convert LocalChangeEntity to LocalChange instance. */
+internal fun LocalChangeEntity.toLocalChange(): LocalChange {
+  return LocalChange(
+    resourceType,
+    resourceId,
+    versionId,
+    timestamp,
+    LocalChange.Type.from(type.value),
+    payload,
+    LocalChangeToken(listOf(id))
+  )
+}
+
 data class LocalChangeToken(val ids: List<Long>)
 
-data class SquashedLocalChange(val token: LocalChangeToken, val localChange: LocalChangeEntity)
+internal data class SquashedLocalChange(
+  val token: LocalChangeToken,
+  val localChange: LocalChangeEntity
+)
+
+/** Method to convert internal SquashedLocalChange to LocalChange instance. */
+internal fun SquashedLocalChange.toLocalChange(): LocalChange {
+  return LocalChange(
+    localChange.resourceType,
+    localChange.resourceId,
+    localChange.versionId,
+    localChange.timestamp,
+    LocalChange.Type.from(localChange.type.value),
+    localChange.payload,
+    token
+  )
+}

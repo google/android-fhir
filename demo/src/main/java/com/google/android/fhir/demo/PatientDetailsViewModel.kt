@@ -59,7 +59,7 @@ class PatientDetailsViewModel(
   }
 
   private suspend fun getPatient(): PatientListViewModel.PatientItem {
-    val patient = jsonEngine.get(patientId)
+    val patient = jsonEngine.get("Patient", patientId)
     return parser.parseResource(Patient::class.java, patient.toString()).toPatientItem(0)
   }
 

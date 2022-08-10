@@ -20,8 +20,10 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
-import com.google.android.fhir.json.db.impl.entities.JsonObjectEntity
+import com.google.android.fhir.json.db.impl.entities.JsonResourceEntity
 import com.google.android.fhir.json.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.json.db.impl.entities.LocalChangeEntity.Type
+import com.google.android.fhir.json.sync.JsonResource
 import com.google.android.fhir.json.toTimeZoneString
 import java.util.Date
 import org.json.JSONObject
@@ -39,64 +41,73 @@ internal abstract class LocalChangeDao {
   @Insert abstract suspend fun addLocalChange(localChangeEntity: LocalChangeEntity)
 
   @Transaction
-  open suspend fun addInsertAll(resources: List<JSONObject>) {
+  open suspend fun addInsertAll(resources: List<JsonResource>) {
     resources.forEach { resource -> addInsert(resource) }
   }
 
-  suspend fun addInsert(resource: JSONObject) {
-    val resourceId = resource["id"].toString()
+  suspend fun addInsert(resource: JsonResource) {
+    val resourceId = resource.id
+    val resourceType = resource.resourceType
     val timestamp = Date().toTimeZoneString()
-    val resourceString = resource.toString()
+    val resourceString = resource.payload.toString()
 
     addLocalChange(
       LocalChangeEntity(
         id = 0,
+        resourceType = resourceType,
         resourceId = resourceId,
         timestamp = timestamp,
-        type = LocalChangeEntity.Type.INSERT,
+        type = Type.INSERT,
         payload = resourceString,
+        versionId = resource.versionId
       )
     )
   }
 
-  suspend fun addUpdate(oldEntity: JsonObjectEntity, resource: JSONObject) {
-    val resourceId = resource["id"].toString()
+  suspend fun addUpdate(oldEntity: JsonResourceEntity, resource: JsonResource) {
+    val resourceId = resource.id
+    val resourceType = resource.resourceType
     val timestamp = Date().toTimeZoneString()
 
-    if (!localChangeIsEmpty(resourceId) &&
-        lastChangeType(resourceId)!!.equals(LocalChangeEntity.Type.DELETE)
+    if (!localChangeIsEmpty(resourceId, resourceType) &&
+        lastChangeType(resourceId, resourceType)!!.equals(Type.DELETE)
     ) {
       throw InvalidLocalChangeException(
-        "Unexpected DELETE when updating $resourceId. UPDATE failed."
+        "Unexpected DELETE when updating $resourceType/$resourceId. UPDATE failed."
       )
     }
-    val jsonDiff = LocalChangeUtils.diff(JSONObject(oldEntity.serializedResource), resource)
+    val jsonDiff = LocalChangeUtils.diff(JSONObject(oldEntity.serializedResource), resource.payload)
     if (jsonDiff.length() == 0) {
       Timber.i(
-        "New resource $resourceId is same as old resource. " + "Not inserting UPDATE LocalChange."
+        "New resource ${resource.resourceType}/${resource.id} is same as old resource. " +
+          "Not inserting UPDATE LocalChange."
       )
       return
     }
     addLocalChange(
       LocalChangeEntity(
         id = 0,
+        resourceType = resourceType,
         resourceId = resourceId,
         timestamp = timestamp,
-        type = LocalChangeEntity.Type.UPDATE,
+        type = Type.UPDATE,
         payload = jsonDiff.toString(),
+        versionId = oldEntity.versionId
       )
     )
   }
 
-  suspend fun addDelete(resourceId: String) {
+  suspend fun addDelete(resourceId: String, resourceType: String, remoteVersionId: String?) {
     val timestamp = Date().toTimeZoneString()
     addLocalChange(
       LocalChangeEntity(
         id = 0,
+        resourceType = resourceType,
         resourceId = resourceId,
         timestamp = timestamp,
-        type = LocalChangeEntity.Type.DELETE,
+        type = Type.DELETE,
         payload = "",
+        versionId = remoteVersionId
       )
     )
   }
@@ -106,24 +117,26 @@ internal abstract class LocalChangeDao {
         SELECT type 
         FROM LocalChangeEntity 
         WHERE resourceId = :resourceId 
+        AND resourceType = :resourceType 
         ORDER BY id ASC
         LIMIT 1
     """
   )
-  abstract suspend fun lastChangeType(resourceId: String): LocalChangeEntity.Type?
+  abstract suspend fun lastChangeType(resourceId: String, resourceType: String): Type?
 
   @Query(
     """
         SELECT COUNT(type) 
         FROM LocalChangeEntity 
         WHERE resourceId = :resourceId 
+        AND resourceType = :resourceType
         LIMIT 1
     """
   )
-  abstract suspend fun countLastChange(resourceId: String): Int
+  abstract suspend fun countLastChange(resourceId: String, resourceType: String): Int
 
-  private suspend fun localChangeIsEmpty(resourceId: String): Boolean =
-    countLastChange(resourceId) == 0
+  private suspend fun localChangeIsEmpty(resourceId: String, resourceType: String): Boolean =
+    countLastChange(resourceId, resourceType) == 0
 
   @Query(
     """
@@ -146,15 +159,30 @@ internal abstract class LocalChangeDao {
     token.ids.forEach { discardLocalChanges(it) }
   }
 
-  @Query("""
+  @Query(
+    """
         DELETE FROM LocalChangeEntity
         WHERE resourceId = (:resourceId)
-    """)
-  abstract suspend fun discardLocalChanges(resourceId: String)
+        AND resourceType = :resourceType
+    """
+  )
+  abstract suspend fun discardLocalChanges(resourceId: String, resourceType: String)
 
-  suspend fun discardLocalChanges(resources: List<JSONObject>) {
-    resources.forEach { discardLocalChanges(it["id"].toString()) }
+  suspend fun discardLocalChanges(resources: List<JsonResource>) {
+    resources.forEach { discardLocalChanges(it.id, it.resourceType) }
   }
+
+  @Query(
+    """
+        SELECT *
+        FROM LocalChangeEntity
+        WHERE resourceId = :resourceId AND resourceType = :resourceType
+    """
+  )
+  abstract suspend fun getLocalChanges(
+    resourceType: String,
+    resourceId: String
+  ): List<LocalChangeEntity>
 
   class InvalidLocalChangeException(message: String?) : Exception(message)
 }

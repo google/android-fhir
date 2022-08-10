@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.json.sync
 
+import com.google.android.fhir.json.SyncDownloadContext
 import org.json.JSONObject
 
 /**
@@ -29,10 +30,10 @@ interface JsonDownloadWorkManager {
    * Returns the URL for the next download request, or `null` if there is no more download request
    * to be issued.
    */
-  suspend fun getNextRequestUrl(): String?
+  suspend fun getNextRequestUrl(context: SyncDownloadContext): String?
 
   /**
    * Processes the download response and returns the resources to be saved to the local database.
    */
-  suspend fun processResponse(response: JSONObject): Collection<JSONObject>
+  suspend fun processResponse(response: JSONObject): Collection<JsonResource>
 }

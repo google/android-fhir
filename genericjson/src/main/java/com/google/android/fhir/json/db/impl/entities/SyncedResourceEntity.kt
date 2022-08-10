@@ -14,24 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.json.db
+package com.google.android.fhir.json.db.impl.entities
 
-/** Thrown to indicate that the requested resource is not found. */
-class ResourceNotFoundException : Exception {
-  val type: String
-  val id: String
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-  constructor(
-    type: String,
-    id: String,
-    cause: Throwable
-  ) : super("Resource not found with type $type and id $id!", cause) {
-    this.type = type
-    this.id = id
-  }
-
-  constructor(type: String, id: String) : super("Resource not found with type $type and id $id!") {
-    this.type = type
-    this.id = id
-  }
-}
+@Entity
+internal data class SyncedResourceEntity(
+  /** Resource synced */
+  @PrimaryKey val resourceType: String,
+  /** The highest `_lastUpdate` value of the resources synced of a specific type */
+  val lastUpdate: String
+)

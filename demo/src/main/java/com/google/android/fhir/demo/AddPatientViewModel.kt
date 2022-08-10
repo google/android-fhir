@@ -26,11 +26,15 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.android.fhir.json.JsonEngine
+import com.google.android.fhir.json.sync.JsonResource
+import com.google.android.fhir.logicalId
+import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.ResourceType
 import org.json.JSONObject
 
 /** ViewModel for patient registration screen {@link AddPatientFragment}. */
@@ -74,7 +78,20 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
       }
       val patient = entry.resource as Patient
       patient.id = generateUuid()
-      jsonEngine.create(JSONObject(parser.encodeResourceToString(patient)))
+      jsonEngine.create( object:  JsonResource {
+        override val id: String
+          get() = patient.logicalId
+        override val resourceType: String
+          get() = ResourceType.Patient.name
+        override val versionId: String?
+          get() = patient.meta.versionId
+        override val lastUpdated: Date?
+          get() = patient.meta.lastUpdated
+        override val payload: JSONObject
+          get() = JSONObject(parser.encodeResourceToString(patient))
+
+      }
+      )
       isPatientSaved.value = true
     }
   }

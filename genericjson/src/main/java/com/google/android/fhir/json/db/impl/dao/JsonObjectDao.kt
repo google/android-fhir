@@ -20,103 +20,104 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.google.android.fhir.json.db.impl.entities.JsonObjectEntity
+import com.google.android.fhir.json.db.impl.entities.JsonResourceEntity
+import com.google.android.fhir.json.sync.JsonResource
 import java.time.Instant
 import java.util.UUID
-import org.json.JSONObject
 
 @Dao
-internal abstract class JsonObjectDao {
+internal abstract class JsonResourceDao {
 
-  open suspend fun update(resource: JSONObject) {
-    val logicalId = resource["id"].toString()
-    updateResource(logicalId, resource.toString())
+  open suspend fun update(resource: JsonResource) {
+    updateResource(
+      resource.id,
+      resource.resourceType,
+      resource.payload.toString(),
+    )
   }
 
-  open suspend fun insert(resource: JSONObject): String {
+  open suspend fun insert(resource: JsonResource): String {
     return insertResource(resource)
   }
 
-  open suspend fun insertAll(resources: List<JSONObject>): List<String> {
+  open suspend fun insertAll(resources: List<JsonResource>): List<String> {
     return resources.map { resource -> insertResource(resource) }
   }
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract suspend fun insertResource(resource: JsonObjectEntity)
+  abstract suspend fun insertResource(resource: JsonResourceEntity)
 
   @Query(
     """
-        UPDATE JsonObjectEntity
+        UPDATE JsonResourceEntity
         SET serializedResource = :serializedResource
         WHERE resourceId = :resourceId
+        AND resourceType = :resourceType
         """
   )
-  abstract suspend fun updateResource(resourceId: String, serializedResource: String)
+  abstract suspend fun updateResource(
+    resourceId: String,
+    resourceType: String,
+    serializedResource: String
+  )
 
   @Query(
     """
-        UPDATE JsonObjectEntity
-        SET lastUpdatedRemote = :lastUpdatedRemote
+        UPDATE JsonResourceEntity
+        SET versionId = :versionId,
+            lastUpdatedRemote = :lastUpdatedRemote
         WHERE resourceId = :resourceId
+        AND resourceType = :resourceType
     """
   )
   abstract suspend fun updateRemoteVersionIdAndLastUpdate(
     resourceId: String,
+    resourceType: String,
+    versionId: String?,
     lastUpdatedRemote: Instant?
   )
 
-  @Query("""
-        DELETE FROM JsonObjectEntity
-        WHERE resourceId = :resourceId""")
-  abstract suspend fun deleteResource(resourceId: String): Int
+  @Query(
+    """
+        DELETE FROM JsonResourceEntity
+        WHERE resourceId = :resourceId AND resourceType = :resourceType"""
+  )
+  abstract suspend fun deleteResource(resourceId: String, resourceType: String): Int
 
   @Query(
     """
         SELECT serializedResource
-        FROM JsonObjectEntity
-        WHERE resourceId = :resourceId"""
+        FROM JsonResourceEntity
+        WHERE resourceId = :resourceId AND resourceType = :resourceType"""
   )
-  abstract suspend fun getResource(resourceId: String): String?
+  abstract suspend fun getResource(resourceId: String, resourceType: String): String?
 
   @Query(
     """
         SELECT *
-        FROM JsonObjectEntity
-        WHERE resourceId = :resourceId
+        FROM JsonResourceEntity
+        WHERE resourceId = :resourceId AND resourceType = :resourceType
     """
   )
   abstract suspend fun getResourceEntity(
     resourceId: String,
-  ): JsonObjectEntity?
+    resourceType: String
+  ): JsonResourceEntity?
 
-  @Query("""
-        SELECT serializedResource
-        FROM JsonObjectEntity
-    """)
-  abstract suspend fun getAllResources(): List<String>
-
-  private suspend fun insertResource(resource: JSONObject): String {
+  private suspend fun insertResource(resource: JsonResource): String {
     val resourceUuid = UUID.randomUUID()
 
-    val resourceId =
-      if (!resource.has("id")) {
-        resourceUuid.toString()
-      } else {
-        resource.get("id").toString()
-      }
-
-    //    val lastUpdatedRemote =
-    //      resource.get("lastUpdated").let { Instant.parse(it.toString()) }
-
     val entity =
-      JsonObjectEntity(
+      JsonResourceEntity(
         id = 0,
+        resourceType = resource.resourceType,
         resourceUuid = resourceUuid,
-        resourceId = resourceId,
-        serializedResource = resource.toString(),
-        lastUpdatedRemote = Instant.now()
+        resourceId = resource.id,
+        serializedResource = resource.payload.toString(),
+        versionId = resource.versionId,
+        lastUpdatedRemote = resource.lastUpdated?.toInstant()
       )
     insertResource(entity)
-    return resourceId
+    return resource.id
   }
 }

@@ -40,7 +40,7 @@ class JsonApplication : Application() {
       JsonEngineConfiguration(
         enableEncryptionIfSupported = false,
         RECREATE_AT_OPEN,
-        ServerConfiguration("http://localhost:8080/fhir/")
+        ServerConfiguration("https://roshneedev.tnphr.in/")
       )
     )
     Sync.oneTimeSync<JsonPeriodicSyncWorker>(this)
