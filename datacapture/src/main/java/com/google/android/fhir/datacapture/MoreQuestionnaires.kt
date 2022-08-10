@@ -43,3 +43,6 @@ internal val Questionnaire.variableExpressions: List<Expression>
  */
 private const val TARGET_STRUCTURE_MAP: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap"
+
+val Questionnaire.isPaginated: Boolean
+  get() = item.any { item -> item.displayItemControl == DisplayItemControlType.PAGE }

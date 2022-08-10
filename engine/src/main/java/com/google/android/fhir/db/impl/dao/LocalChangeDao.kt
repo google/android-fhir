@@ -182,5 +182,17 @@ internal abstract class LocalChangeDao {
     resources.forEach { discardLocalChanges(it.logicalId, it.resourceType) }
   }
 
+  @Query(
+    """
+        SELECT *
+        FROM LocalChangeEntity
+        WHERE resourceId = :resourceId AND resourceType = :resourceType
+    """
+  )
+  abstract suspend fun getLocalChanges(
+    resourceType: ResourceType,
+    resourceId: String
+  ): List<LocalChangeEntity>
+
   class InvalidLocalChangeException(message: String?) : Exception(message)
 }
