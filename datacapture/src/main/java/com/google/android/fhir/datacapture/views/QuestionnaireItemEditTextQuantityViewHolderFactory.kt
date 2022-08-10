@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views
 
 import android.text.InputType
+import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -25,9 +26,11 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * is being handled right now. Will use a separate layout to handle the unit in the quantity.
  */
 internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
-  QuestionnaireItemEditTextViewHolderFactory() {
+  QuestionnaireItemEditTextViewHolderFactory(
+    R.layout.questionnaire_item_edit_text_single_line_view
+  ) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemEditTextViewHolderDelegate(QUANTITY_INPUT_TYPE, isSingleLine = true) {
+    object : QuestionnaireItemEditTextViewHolderDelegate(QUANTITY_INPUT_TYPE) {
       override fun getValue(
         text: String
       ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
