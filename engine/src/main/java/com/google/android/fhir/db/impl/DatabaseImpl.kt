@@ -23,12 +23,11 @@ import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.DatabaseErrorStrategy
-import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
-import com.google.android.fhir.db.impl.dao.toLocalChange
+import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
@@ -201,12 +200,10 @@ internal class DatabaseImpl(
    * @returns a list of pairs. Each pair is a token + squashed local change. Each token is a list of
    * [LocalChangeEntity.id] s of rows of the [LocalChangeEntity].
    */
-  override suspend fun getAllLocalChanges(): List<LocalChange> {
+  override suspend fun getAllLocalChanges(): List<SquashedLocalChange> {
     return db.withTransaction {
       localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
-        LocalChangeUtils.squash(it).toLocalChange().apply {
-          token = LocalChangeToken(it.map { it.id })
-        }
+        SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
       }
     }
   }
@@ -238,16 +235,17 @@ internal class DatabaseImpl(
     db.clearAllTables()
   }
 
-  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange? {
+  override suspend fun getLocalChange(type: ResourceType, id: String): SquashedLocalChange? {
     return db.withTransaction {
       val localChangeEntityList =
         localChangeDao.getLocalChanges(resourceType = type, resourceId = id)
       if (localChangeEntityList.isEmpty()) {
         return@withTransaction null
       }
-      LocalChangeUtils.squash(localChangeEntityList).toLocalChange().apply {
-        token = LocalChangeToken(localChangeEntityList.map { it.id })
-      }
+      SquashedLocalChange(
+        LocalChangeToken(localChangeEntityList.map { it.id }),
+        LocalChangeUtils.squash(localChangeEntityList)
+      )
     }
   }
 

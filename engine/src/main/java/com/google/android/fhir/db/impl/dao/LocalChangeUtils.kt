@@ -157,3 +157,21 @@ internal fun LocalChangeEntity.toLocalChange(): LocalChange {
 }
 
 data class LocalChangeToken(val ids: List<Long>)
+
+internal data class SquashedLocalChange(
+  val token: LocalChangeToken,
+  val localChange: LocalChangeEntity
+)
+
+/** Method to convert internal SquashedLocalChange to LocalChange instance. */
+internal fun SquashedLocalChange.toLocalChange(): LocalChange {
+  return LocalChange(
+    this.localChange.resourceType,
+    this.localChange.resourceId,
+    this.localChange.timestamp,
+    this.localChange.type,
+    this.localChange.payload,
+    this.localChange.versionId,
+    this.token
+  )
+}

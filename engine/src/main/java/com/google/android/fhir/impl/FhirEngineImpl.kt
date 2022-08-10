@@ -23,6 +23,7 @@ import com.google.android.fhir.LocalChange
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
@@ -75,7 +76,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange? {
-    return database.getLocalChange(type, id)
+    return database.getLocalChange(type, id)?.toLocalChange()
   }
 
   override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
@@ -136,14 +137,14 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     resources
       .map { it.logicalId }
       .toSet()
-      .intersect(database.getAllLocalChanges().map { it.resourceId }.toSet())
+      .intersect(database.getAllLocalChanges().map { it.localChange.resourceId }.toSet())
 
   override suspend fun syncUpload(
     upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
     val localChanges = database.getAllLocalChanges()
     if (localChanges.isNotEmpty()) {
-      upload(localChanges).collect {
+      upload(localChanges.map { it.toLocalChange() }).collect {
         database.deleteUpdates(it.first)
         when (it.second) {
           is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
