@@ -329,7 +329,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -356,7 +356,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
