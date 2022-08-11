@@ -26,7 +26,6 @@
     <string name="submit_questionnaire">Submit</string>
     <string name="save">Save</string>
     <string name="date">Date</string>
-    <string name="hint_date_format">dd/mm/yyyy</string>
     <string name="time">Time</string>
     <string name="select_date">Select date</string>
     <string name="select_time">Select time</string>

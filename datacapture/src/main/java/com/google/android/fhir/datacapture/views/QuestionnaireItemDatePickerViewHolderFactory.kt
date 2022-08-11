@@ -40,11 +40,6 @@ import java.time.chrono.IsoChronology
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.FormatStyle
 import java.util.Locale
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -57,6 +52,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private var textWatcher: TextWatcher? = null
+      // medium and long format styles use date names which isn't what we want. we want numerical
+      // date format.
       private val localePattern =
         DateTimeFormatterBuilder.getLocalizedDateTimePattern(
           FormatStyle.SHORT,
@@ -85,7 +82,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                     val localDate =
                       Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()
-                    value = DateType(localDate.year, localDate.monthValue - 1, localDate.dayOfMonth)
+                    value = localDate.dateType
                   }
                 )
                 // Clear focus so that the user can refocus to open the dialog
@@ -107,17 +104,20 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             ?.localDate
             ?.localizedString
         )
-        var parseJob: Job? = null
-        textWatcher =
-          textInputEditText.doAfterTextChanged { text ->
-            // allow user to enter the input, e.g year may be y, yy, yyyy
-            parseJob?.cancel()
-            parseJob =
-              CoroutineScope(Dispatchers.Main).launch {
-                delay(1000)
-                updateAnswer(text.toString())
-              }
-          }
+
+        textWatcher = textInputEditText.doAfterTextChanged { text -> updateAnswer(text.toString()) }
+
+        //        var parseJob: Job? = null
+        //        textWatcher =
+        //          textInputEditText.doAfterTextChanged { text ->
+        // //         allow user to enter the input, e.g year may be y, yy, yyyy
+        //            parseJob?.cancel()
+        //            parseJob =
+        //              CoroutineScope(Dispatchers.Main).launch {
+        //                delay(1000)
+        //                updateAnswer(text.toString())
+        //              }
+        //          }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
@@ -149,20 +149,16 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       }
 
       private fun updateAnswer(text: CharSequence?) {
-        var localDate: LocalDate? = null
         try {
           val date = parseDate(text, textInputEditText.context.applicationContext)
-          localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-        } catch (e: ParseException) {
-          questionnaireItemViewItem.clearAnswer()
-        }
-
-        localDate?.run {
+          val localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
           questionnaireItemViewItem.setAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DateType(localDate!!.year, localDate!!.monthValue - 1, localDate!!.dayOfMonth)
+              value = localDate.dateType
             }
           )
+        } catch (e: ParseException) {
+          questionnaireItemViewItem.clearAnswer()
         }
       }
     }
@@ -199,6 +195,9 @@ internal val DateType.localDate
       month + 1,
       day,
     )
+
+internal val LocalDate.dateType
+  get() = DateType(year, monthValue - 1, dayOfMonth)
 
 internal fun parseDate(text: CharSequence?, context: Context) =
   if (isAndroidIcuSupported()) {
