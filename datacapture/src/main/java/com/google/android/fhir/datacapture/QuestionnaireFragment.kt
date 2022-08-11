@@ -117,7 +117,11 @@ open class QuestionnaireFragment : Fragment() {
 
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.reviewModeStateFlow.collect { reviewMode ->
-        recyclerView.adapter = if (reviewMode) reviewPageItemAdapter else adapter
+        if (reviewMode) {
+          recyclerView.swapAdapter(reviewPageItemAdapter, false)
+        } else {
+          recyclerView.swapAdapter(adapter, false)
+        }
       }
     }
 
