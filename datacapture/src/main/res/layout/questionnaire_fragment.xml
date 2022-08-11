@@ -32,7 +32,7 @@
     />
 
     <Button
-        style="?attr/buttonStyleQuestionnaire"
+        style="?attr/questionnaireButtonStyle"
         android:id="@+id/pagination_previous_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
     />
 
     <Button
-        style="?attr/buttonStyleQuestionnaire"
+        style="?attr/questionnaireButtonStyle"
         android:id="@+id/pagination_next_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
     />
 
     <Button
-        style="?attr/submitButtonStyleQuestionnaire"
+        style="?attr/questionnaireSubmitButtonStyle"
         android:id="@+id/submit_questionnaire"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

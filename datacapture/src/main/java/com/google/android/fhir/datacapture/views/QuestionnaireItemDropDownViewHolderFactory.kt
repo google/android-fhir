@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,34 +44,30 @@ internal open class QuestionnaireItemDropDownViewHolderDelegate :
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
   private lateinit var context: Context
 
-  override fun init(itemView: View) {
-    header = itemView.findViewById(R.id.header)
-    textInputLayout = itemView.findViewById(R.id.text_input_layout)
-    autoCompleteTextView = itemView.findViewById(R.id.auto_complete)
-    context = itemView.context
-  }
 
-  override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-    header.bind(questionnaireItemViewItem.questionnaireItem)
-    textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
-    val answerOptionString =
-      this.questionnaireItemViewItem.answerOption.map { it.displayString }.toMutableList()
-    answerOptionString.add(0, context.getString(R.string.hyphen))
-    val adapter =
-      ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
-    autoCompleteTextView.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
-    autoCompleteTextView.setAdapter(adapter)
-    autoCompleteTextView.onItemClickListener =
-      AdapterView.OnItemClickListener { _, _, position, _ ->
-        if (position == 0) {
-          questionnaireItemViewItem.singleAnswerOrNull = null
-        } else {
-          questionnaireItemViewItem.singleAnswerOrNull =
-            getValue(questionnaireItemViewItem.answerOption[position - 1].value)
-        }
-        onAnswerChanged(autoCompleteTextView.context)
-      }
-  }
+      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        header.bind(questionnaireItemViewItem.questionnaireItem)
+        textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
+        val answerOptionString =
+          this.questionnaireItemViewItem.answerOption.map { it.displayString }.toMutableList()
+        answerOptionString.add(0, context.getString(R.string.hyphen))
+        val adapter =
+          ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
+        autoCompleteTextView.setText(
+          questionnaireItemViewItem.answers.singleOrNull()?.valueCoding?.display ?: ""
+        )
+        autoCompleteTextView.setAdapter(adapter)
+        autoCompleteTextView.onItemClickListener =
+          AdapterView.OnItemClickListener { _, _, position, _ ->
+            if (position == 0) {
+              questionnaireItemViewItem.clearAnswer()
+            } else {
+              questionnaireItemViewItem.setAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                  .setValue(questionnaireItemViewItem.answerOption[position - 1].value)
+              )
+            }
+          }
 
   override fun displayValidationResult(validationResult: ValidationResult) {
     textInputLayout.error =

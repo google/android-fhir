@@ -8,7 +8,7 @@
 
     <TextView
         android:id="@+id/prefix"
-        style="?attr/headerTextAppearanceQuestionnaire"
+        style="?attr/questionnaireQuestionTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingEnd="@dimen/prefix_padding_end"
@@ -19,7 +19,7 @@
 
     <TextView
         android:id="@+id/question"
-        style="?attr/headerTextAppearanceQuestionnaire"
+        style="?attr/questionnaireQuestionTextStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -29,9 +29,10 @@
 
     <TextView
         android:id="@+id/hint"
-        style="?attr/subtitleTextAppearanceQuestionnaire"
+        style="?attr/questionnaireSubtitleTextStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/question"
     />

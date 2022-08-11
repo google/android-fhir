@@ -68,32 +68,28 @@
 
         <item name="colorOutline">@color/outline_neutral_variant_50</item>
 
-        <item name="headerTextAppearanceQuestionnaire">
-            @style/TextAppearance.Material3.HeadlineMedium
-        </item>
     </style>
 
     <style name="Theme.MyQuestionnaire.DefaultLayout">
         <item
-            name="headerTextAppearanceQuestionnaire"
-        >@style/TextAppearance.Material3.TitleMedium
-        </item>
-        <item
-            name="submitButtonStyleQuestionnaire"
+            name="questionnaireSubmitButtonStyle"
         >@style/App.Layout.SubmitButtonStyle
         </item>
     </style>
 
     <style name="Theme.MyQuestionnaire.PaginatedLayout">
+        <item name="questionnaireQuestionTextStyle">
+            @style/TextAppearance.Material3.HeadlineMedium
+        </item>
         <item
-            name="submitButtonStyleQuestionnaire"
+            name="questionnaireSubmitButtonStyle"
         >@style/App.Layout.SubmitButtonStyle
         </item>
     </style>
 
-    <style name="Theme.MyQuestionnaire.Component">
+    <style name="Theme.MyQuestionnaire.PaginatedLayout.Component">
         <item
-            name="submitButtonStyleQuestionnaire"
+            name="questionnaireSubmitButtonStyle"
         >@style/App.Component.SubmitButtonStyle
         </item>
     </style>
@@ -102,7 +98,7 @@
         name="App.Layout.SubmitButtonStyle"
         parent="Questionnaire.SubmitButtonStyle"
     >
-    <item name="android:visibility">visible</item>
+        <item name="android:visibility">visible</item>
     </style>
 
     <style
