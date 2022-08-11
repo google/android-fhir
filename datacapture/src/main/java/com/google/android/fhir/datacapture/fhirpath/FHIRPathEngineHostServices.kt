@@ -21,29 +21,29 @@ import org.hl7.fhir.r4.model.TypeDetails
 import org.hl7.fhir.r4.model.ValueSet
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 
-object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
+/**
+ * Resolves constants defined in the fhir path expressions beyond those defined in the specification
+ */
+internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
   override fun resolveConstant(appContext: Any?, name: String?, beforeContext: Boolean): Base? {
-    return if ((appContext as Map<*, *>).containsKey(name)) appContext[name] as Base else null
+    return if (appContext is Map<*, *> && appContext.containsKey(name)) appContext[name] as Base
+    else null
   }
 
-  @Throws(UnsupportedOperationException::class)
   override fun resolveConstantType(appContext: Any?, name: String?): TypeDetails {
     throw UnsupportedOperationException()
   }
 
-  @Throws(UnsupportedOperationException::class)
   override fun log(argument: String?, focus: MutableList<Base>?): Boolean {
     throw UnsupportedOperationException()
   }
 
-  @Throws(UnsupportedOperationException::class)
   override fun resolveFunction(
     functionName: String?
   ): FHIRPathEngine.IEvaluationContext.FunctionDetails {
     throw UnsupportedOperationException()
   }
 
-  @Throws(UnsupportedOperationException::class)
   override fun checkFunction(
     appContext: Any?,
     functionName: String?,
@@ -52,7 +52,6 @@ object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
     throw UnsupportedOperationException()
   }
 
-  @Throws(UnsupportedOperationException::class)
   override fun executeFunction(
     appContext: Any?,
     focus: MutableList<Base>?,
@@ -62,17 +61,14 @@ object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
     throw UnsupportedOperationException()
   }
 
-  @Throws(UnsupportedOperationException::class)
   override fun resolveReference(appContext: Any?, url: String?): Base {
     throw UnsupportedOperationException()
   }
 
-  @Throws(UnsupportedOperationException::class)
   override fun conformsToProfile(appContext: Any?, item: Base?, url: String?): Boolean {
     throw UnsupportedOperationException()
   }
 
-  @Throws(UnsupportedOperationException::class)
   override fun resolveValueSet(appContext: Any?, url: String?): ValueSet {
     throw UnsupportedOperationException()
   }
