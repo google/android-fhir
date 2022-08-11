@@ -692,7 +692,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun getQuestionnaireResponse_WithTextInQuestionnaire_shouldHaveText() {
+  fun `getQuestionnaireResponse() should have text in questionnaire response item`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -728,7 +728,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun getQuestionnaireResponse_WithTranslationTextInQuestionnaire_shouldHaveText() {
+  fun `getQuestionnaireResponse() should have translated text in questionnaire response item`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -771,7 +771,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun getQuestionnaireResponse_WithNestedItemsAndTextInQuestionnaire_shouldHaveText() {
+  fun `getQuestionnaireResponse() should have text in questionnaire response item for nested items`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
