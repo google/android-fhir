@@ -414,7 +414,8 @@ class ExpressionEvaluatorTest {
   }
 
   @Test
-  fun `should return not null value with ---- for questionnaire item level`() = runBlocking {
+  fun `should return not null value with expression dependent on answers of items for questionnaire item level`() =
+      runBlocking {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
