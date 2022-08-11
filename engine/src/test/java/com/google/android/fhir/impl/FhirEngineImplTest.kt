@@ -19,7 +19,7 @@ package com.google.android.fhir.impl
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.db.LocalChangeType
+import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.get
@@ -268,7 +268,7 @@ class FhirEngineImplTest {
     with(localChanges[0]) {
       assertThat(this.resourceType).isEqualTo(ResourceType.Patient.toString())
       assertThat(this.resourceId).isEqualTo(TEST_PATIENT_1.id)
-      assertThat(this.type).isEqualTo(LocalChangeType.INSERT)
+      assertThat(this.type).isEqualTo(Type.INSERT)
       assertThat(this.payload).isEqualTo(services.parser.encodeResourceToString(TEST_PATIENT_1))
     }
   }
@@ -301,7 +301,7 @@ class FhirEngineImplTest {
     with(squashedLocalChange) {
       assertThat(this!!.resourceId).isEqualTo(patient.logicalId)
       assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(type).isEqualTo(LocalChangeType.INSERT)
+      assertThat(type).isEqualTo(Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
   }
@@ -321,7 +321,7 @@ class FhirEngineImplTest {
     with(squashedLocalChange) {
       assertThat(this!!.resourceId).isEqualTo(patient.logicalId)
       assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(type).isEqualTo(LocalChangeType.INSERT)
+      assertThat(type).isEqualTo(Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
   }
@@ -350,7 +350,7 @@ class FhirEngineImplTest {
     with(squashedLocalChange) {
       assertThat(this!!.resourceId).isEqualTo(patient.logicalId)
       assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(type).isEqualTo(LocalChangeType.INSERT)
+      assertThat(type).isEqualTo(Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
     testingUtils.assertResourceEquals(
@@ -443,7 +443,9 @@ class FhirEngineImplTest {
     fhirEngine.syncDownload(AcceptRemoteConflictResolver) { flowOf((listOf(remoteChange))) }
 
     assertThat(
-        services.database.getAllLocalChanges().filter { it.resourceId == "Patient/original-001" }
+        services.database.getAllLocalChanges().filter {
+          it.localChange.resourceId == "Patient/original-001"
+        }
       )
       .isEmpty()
     testingUtils.assertResourceEquals(fhirEngine.get<Patient>("original-001"), remoteChange)
@@ -498,7 +500,12 @@ class FhirEngineImplTest {
     val localChangeDiff =
       """[{"op":"remove","path":"\/address\/0\/country"},{"op":"add","path":"\/address\/0\/city","value":"Malibu"},{"op":"add","path":"\/address\/-","value":{"city":"Malibu","state":"California"}}]"""
     assertThat(
-        services.database.getAllLocalChanges().first { it.resourceId == "original-002" }.payload
+        services
+          .database
+          .getAllLocalChanges()
+          .first { it.localChange.resourceId == "original-002" }
+          .localChange
+          .payload
       )
       .isEqualTo(localChangeDiff)
     testingUtils.assertResourceEquals(fhirEngine.get<Patient>("original-002"), localChange)

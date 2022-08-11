@@ -18,7 +18,7 @@ package com.google.android.fhir.db.impl.dao
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.db.LocalChangeType
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.common.truth.Truth.assertThat
 import junit.framework.TestCase
@@ -41,7 +41,7 @@ class LocalChangeUtilsTest : TestCase() {
         id = 1,
         resourceType = ResourceType.Patient.name,
         resourceId = "Patient-001",
-        type = LocalChangeType.INSERT,
+        type = LocalChangeEntity.Type.INSERT,
         payload =
           jsonParser.encodeResourceToString(
             Patient().apply {
@@ -61,7 +61,7 @@ class LocalChangeUtilsTest : TestCase() {
     assertThat(localChangeEntity.resourceType).isEqualTo(localChange.resourceType)
     assertThat(localChangeEntity.resourceId).isEqualTo(localChange.resourceId)
     assertThat(localChangeEntity.timestamp).isEqualTo(localChange.timestamp)
-    assertThat(localChangeEntity.type).isEqualTo(localChange.type)
+    assertThat(LocalChange.Type.from(localChangeEntity.type.value)).isEqualTo(localChange.type)
     assertThat(localChangeEntity.payload).isEqualTo(localChange.payload)
     assertThat(localChangeEntity.versionId).isEqualTo(localChange.versionId)
   }

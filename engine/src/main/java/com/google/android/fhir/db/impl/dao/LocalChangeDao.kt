@@ -21,8 +21,8 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.db.LocalChangeType
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.toTimeZoneString
@@ -62,7 +62,7 @@ internal abstract class LocalChangeDao {
         resourceType = resourceType.name,
         resourceId = resourceId,
         timestamp = timestamp,
-        type = LocalChangeType.INSERT,
+        type = Type.INSERT,
         payload = resourceString,
         versionId = resource.versionId
       )
@@ -75,7 +75,7 @@ internal abstract class LocalChangeDao {
     val timestamp = Date().toTimeZoneString()
 
     if (!localChangeIsEmpty(resourceId, resourceType) &&
-        lastChangeType(resourceId, resourceType)!!.equals(LocalChangeType.DELETE)
+        lastChangeType(resourceId, resourceType)!!.equals(Type.DELETE)
     ) {
       throw InvalidLocalChangeException(
         "Unexpected DELETE when updating $resourceType/$resourceId. UPDATE failed."
@@ -100,7 +100,7 @@ internal abstract class LocalChangeDao {
         resourceType = resourceType.name,
         resourceId = resourceId,
         timestamp = timestamp,
-        type = LocalChangeType.UPDATE,
+        type = Type.UPDATE,
         payload = jsonDiff.toString(),
         versionId = oldEntity.versionId
       )
@@ -115,7 +115,7 @@ internal abstract class LocalChangeDao {
         resourceType = resourceType.name,
         resourceId = resourceId,
         timestamp = timestamp,
-        type = LocalChangeType.DELETE,
+        type = Type.DELETE,
         payload = "",
         versionId = remoteVersionId
       )
@@ -132,10 +132,7 @@ internal abstract class LocalChangeDao {
         LIMIT 1
     """
   )
-  abstract suspend fun lastChangeType(
-    resourceId: String,
-    resourceType: ResourceType
-  ): LocalChangeType?
+  abstract suspend fun lastChangeType(resourceId: String, resourceType: ResourceType): Type?
 
   @Query(
     """

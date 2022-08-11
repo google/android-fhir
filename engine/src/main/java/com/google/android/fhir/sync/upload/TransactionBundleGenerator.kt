@@ -17,7 +17,7 @@
 package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.db.LocalChangeType
+import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import org.hl7.fhir.r4.model.Bundle
 
@@ -29,7 +29,7 @@ typealias ResourceBundleAndAssociatedLocalChangeTokens = Pair<Bundle, List<Local
  */
 internal open class TransactionBundleGenerator(
   val getBundleEntryComponentGeneratorForLocalChangeType:
-    (type: LocalChangeType) -> HttpVerbBasedBundleEntryComponentGenerator
+    (type: Type) -> HttpVerbBasedBundleEntryComponentGenerator
 ) {
 
   fun generate(
@@ -79,8 +79,8 @@ internal open class TransactionBundleGenerator(
 internal object PutForCreateAndPatchForUpdateBasedTransactionGenerator :
   TransactionBundleGenerator({ type ->
     when (type) {
-      LocalChangeType.INSERT -> HttpPutForCreateEntryComponentGenerator
-      LocalChangeType.UPDATE -> HttpPatchForUpdateEntryComponentGenerator
-      LocalChangeType.DELETE -> HttpDeleteEntryComponentGenerator
+      Type.INSERT -> HttpPutForCreateEntryComponentGenerator
+      Type.UPDATE -> HttpPatchForUpdateEntryComponentGenerator
+      Type.DELETE -> HttpDeleteEntryComponentGenerator
     }
   })

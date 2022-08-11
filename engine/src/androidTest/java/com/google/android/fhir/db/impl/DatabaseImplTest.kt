@@ -22,9 +22,10 @@ import androidx.test.filters.MediumTest
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.FhirServices
-import com.google.android.fhir.db.LocalChangeType
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.toLocalChange
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.search.Operation
@@ -150,7 +151,7 @@ class DatabaseImplTest {
     with(squashedLocalChange.localChange) {
       assertThat(resourceId).isEqualTo(patient.logicalId)
       assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(type).isEqualTo(LocalChangeType.INSERT)
+      assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
     // update patient with no local change
@@ -161,7 +162,7 @@ class DatabaseImplTest {
     with(squashedLocalChangeWithNoFurtherUpdate.toLocalChange()) {
       assertThat(resourceId).isEqualTo(patient.logicalId)
       assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(type).isEqualTo(LocalChangeType.INSERT)
+      assertThat(LocalChange.Type.from(type.value)).isEqualTo(LocalChange.Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
   }
@@ -175,7 +176,7 @@ class DatabaseImplTest {
     with(squashedLocalChange!!.localChange) {
       assertThat(resourceId).isEqualTo(patient.logicalId)
       assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(type).isEqualTo(LocalChangeType.INSERT)
+      assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
   }
@@ -195,7 +196,7 @@ class DatabaseImplTest {
     with(squashedLocalChange!!.toLocalChange()) {
       assertThat(resourceId).isEqualTo(patient.logicalId)
       assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(type).isEqualTo(LocalChangeType.INSERT)
+      assertThat(type).isEqualTo(LocalChange.Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
   }
@@ -223,7 +224,7 @@ class DatabaseImplTest {
     with(squashedLocalChange!!.toLocalChange()) {
       assertThat(resourceId).isEqualTo(patient.logicalId)
       assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(type).isEqualTo(LocalChangeType.INSERT)
+      assertThat(LocalChange.Type.from(type.value)).isEqualTo(LocalChange.Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
     testingUtils.assertResourceEquals(
@@ -362,7 +363,7 @@ class DatabaseImplTest {
         .getAllLocalChanges()
         .single { it.localChange.resourceId.equals(TEST_PATIENT_2_ID) }
         .localChange
-    assertThat(type).isEqualTo(LocalChangeType.INSERT)
+    assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
     assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
     assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
     assertThat(payload).isEqualTo(testPatient2String)
@@ -380,7 +381,7 @@ class DatabaseImplTest {
         .getAllLocalChanges()
         .single { it.localChange.resourceId.equals(patient.logicalId) }
         .localChange
-    assertThat(type).isEqualTo(LocalChangeType.INSERT)
+    assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
     assertThat(resourceId).isEqualTo(patient.logicalId)
     assertThat(resourceType).isEqualTo(patient.resourceType.name)
     assertThat(payload).isEqualTo(patientString)
@@ -440,7 +441,7 @@ class DatabaseImplTest {
         .getAllLocalChanges()
         .single { it.localChange.resourceId.equals(TEST_PATIENT_1_ID) }
         .localChange
-    assertThat(type).isEqualTo(LocalChangeType.DELETE)
+    assertThat(type).isEqualTo(LocalChangeEntity.Type.DELETE)
     assertThat(resourceId).isEqualTo(TEST_PATIENT_1_ID)
     assertThat(resourceType).isEqualTo(TEST_PATIENT_1.resourceType.name)
     assertThat(payload).isEmpty()
@@ -451,7 +452,7 @@ class DatabaseImplTest {
     database.delete(ResourceType.Patient, "nonexistent_patient")
     assertThat(
         database.getAllLocalChanges().map { it }.none {
-          it.localChange.type.equals(LocalChangeType.DELETE) &&
+          it.localChange.type.equals(LocalChangeEntity.Type.DELETE) &&
             it.localChange.resourceId.equals("nonexistent_patient")
         }
       )
@@ -571,7 +572,7 @@ class DatabaseImplTest {
         .getAllLocalChanges()
         .single { it.localChange.resourceId.equals(patient.logicalId) }
         .localChange
-    assertThat(type).isEqualTo(LocalChangeType.UPDATE)
+    assertThat(type).isEqualTo(LocalChangeEntity.Type.UPDATE)
     assertThat(resourceId).isEqualTo(patient.logicalId)
     assertThat(resourceType).isEqualTo(patient.resourceType.name)
     testingUtils.assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
@@ -597,7 +598,7 @@ class DatabaseImplTest {
         .getAllLocalChanges()
         .single { it.localChange.resourceId.equals(patient.logicalId) }
         .localChange
-    assertThat(type).isEqualTo(LocalChangeType.UPDATE)
+    assertThat(type).isEqualTo(LocalChangeEntity.Type.UPDATE)
     assertThat(resourceId).isEqualTo(patient.logicalId)
     assertThat(resourceType).isEqualTo(patient.resourceType.name)
     assertThat(resourceType).isEqualTo(patient.resourceType.name)
@@ -615,7 +616,7 @@ class DatabaseImplTest {
         .map { it }
         .single { it.localChange.resourceId.equals(TEST_PATIENT_2_ID) }
         .localChange
-    assertThat(type).isEqualTo(LocalChangeType.DELETE)
+    assertThat(type).isEqualTo(LocalChangeEntity.Type.DELETE)
     assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
     assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
     assertThat(versionId).isEqualTo(TEST_PATIENT_2.versionId)
@@ -636,7 +637,7 @@ class DatabaseImplTest {
         .map { it }
         .single { it.localChange.resourceId.equals(TEST_PATIENT_2_ID) }
         .localChange
-    assertThat(type).isEqualTo(LocalChangeType.DELETE)
+    assertThat(type).isEqualTo(LocalChangeEntity.Type.DELETE)
     assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
     assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
     assertThat(payload).isEmpty()

@@ -22,8 +22,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.JsonPatch
 import com.github.fge.jsonpatch.diff.JsonDiff
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.db.LocalChangeType
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
 import org.hl7.fhir.r4.model.Resource
 import org.json.JSONArray
 import org.json.JSONObject
@@ -36,17 +36,17 @@ internal object LocalChangeUtils {
 
   fun mergeLocalChanges(first: LocalChangeEntity, second: LocalChangeEntity): LocalChangeEntity {
     // TODO (maybe this should throw exception when two entities don't have the same versionID)
-    val type: LocalChangeType
+    val type: Type
     val payload: String
     when (second.type) {
-      LocalChangeType.UPDATE ->
+      Type.UPDATE ->
         when (first.type) {
-          LocalChangeType.UPDATE -> {
-            type = LocalChangeType.UPDATE
+          Type.UPDATE -> {
+            type = Type.UPDATE
             payload = mergePatches(first.payload, second.payload)
           }
-          LocalChangeType.INSERT -> {
-            type = LocalChangeType.INSERT
+          Type.INSERT -> {
+            type = Type.INSERT
             payload = applyPatch(first.payload, second.payload)
           }
           else -> {
@@ -55,12 +55,12 @@ internal object LocalChangeUtils {
             )
           }
         }
-      LocalChangeType.DELETE -> {
-        type = LocalChangeType.DELETE
+      Type.DELETE -> {
+        type = Type.DELETE
         payload = ""
       }
-      LocalChangeType.INSERT -> {
-        type = LocalChangeType.INSERT
+      Type.INSERT -> {
+        type = Type.INSERT
         payload = second.payload
       }
     }
@@ -146,13 +146,13 @@ internal object LocalChangeUtils {
 /** Method to convert LocalChangeEntity to LocalChange instance. */
 internal fun LocalChangeEntity.toLocalChange(): LocalChange {
   return LocalChange(
-    this.resourceType,
-    this.resourceId,
-    this.timestamp,
-    this.type,
-    this.payload,
-    this.versionId,
-    LocalChangeToken(listOf(this.id))
+    resourceType,
+    resourceId,
+    versionId,
+    timestamp,
+    LocalChange.Type.from(type.value),
+    payload,
+    LocalChangeToken(listOf(id))
   )
 }
 
@@ -166,12 +166,12 @@ internal data class SquashedLocalChange(
 /** Method to convert internal SquashedLocalChange to LocalChange instance. */
 internal fun SquashedLocalChange.toLocalChange(): LocalChange {
   return LocalChange(
-    this.localChange.resourceType,
-    this.localChange.resourceId,
-    this.localChange.timestamp,
-    this.localChange.type,
-    this.localChange.payload,
-    this.localChange.versionId,
-    this.token
+    localChange.resourceType,
+    localChange.resourceId,
+    localChange.versionId,
+    localChange.timestamp,
+    LocalChange.Type.from(localChange.type.value),
+    localChange.payload,
+    token
   )
 }

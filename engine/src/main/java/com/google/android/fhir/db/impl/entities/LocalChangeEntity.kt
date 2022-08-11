@@ -19,7 +19,6 @@ package com.google.android.fhir.db.impl.entities
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.google.android.fhir.db.LocalChangeType
 
 /**
  * When a local change to a resource happens, the lastUpdated timestamp in [ResourceEntity] is
@@ -57,7 +56,17 @@ internal data class LocalChangeEntity(
   val resourceType: String,
   val resourceId: String,
   val timestamp: String = "",
-  val type: LocalChangeType,
+  val type: Type,
   val payload: String,
   val versionId: String? = null
-)
+) {
+  enum class Type(val value: Int) {
+    INSERT(1), // create a new resource. payload is the entire resource json.
+    UPDATE(2), // patch. payload is the json patch.
+    DELETE(3); // delete. payload is empty string.
+
+    companion object {
+      fun from(input: Int): Type = values().first { it.value == input }
+    }
+  }
+}

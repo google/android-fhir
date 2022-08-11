@@ -18,11 +18,11 @@ package com.google.android.fhir.sync.upload
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.db.LocalChangeType
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
@@ -52,7 +52,7 @@ class TransactionBundleGeneratorTest {
             id = 1,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
-            type = LocalChangeType.INSERT,
+            type = Type.INSERT,
             payload =
               jsonParser.encodeResourceToString(
                 Patient().apply {
@@ -72,7 +72,7 @@ class TransactionBundleGeneratorTest {
             id = 2,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-002",
-            type = LocalChangeType.UPDATE,
+            type = Type.UPDATE,
             payload =
               LocalChangeUtils.diff(
                   jsonParser,
@@ -103,7 +103,7 @@ class TransactionBundleGeneratorTest {
             id = 3,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-003",
-            type = LocalChangeType.DELETE,
+            type = Type.DELETE,
             payload =
               jsonParser.encodeResourceToString(
                 Patient().apply {
