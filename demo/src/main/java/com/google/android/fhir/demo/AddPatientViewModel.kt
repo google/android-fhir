@@ -25,6 +25,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
+import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import java.util.UUID
 import kotlinx.coroutines.launch
@@ -61,7 +62,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
           )
           .values
           .flatten()
-          .any { !it.isValid }
+          .any { it is Invalid }
       ) {
         isPatientSaved.value = false
         return@launch
