@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: DeviceTests
+name: "GitHub Actions: Build"
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events for the `master` branch
@@ -20,7 +20,7 @@ on:
   push:
     branches: [ master ]
     tags:
-      run_ci*
+      build*
   pull_request:
     branches: [ master ]
 env:
@@ -33,11 +33,7 @@ jobs:
   # Build will compile APK, test APK and run tests, lint, etc.
   build:
 
-    runs-on: macos-latest # use mac build for emulator hardware accelerator
-
-    strategy:
-      matrix:
-        api-level: [ 24, 27, 30 ]
+    runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -56,47 +52,22 @@ jobs:
       - name: Setup machine
         uses: ./.github/actions/commonSetup
 
-      - name: Load AVD cache
-        uses: actions/cache@v2
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ matrix.api-level }}
+      - name: Spotless check
+        run: ./gradlew spotlessCheck --scan --stacktrace
 
-      - name: Create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: x86_64
-          target: default
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
-      - name: Run instrumentation tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: x86_64
-          target: default
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: |
-            ./gradlew :datacapture:connectedCheck --stacktrace --scan
-            ./gradlew :catalog:connectedCheck  --stacktrace --scan
-            ./gradlew :engine:connectedCheck  --stacktrace --scan
-            ./gradlew :workflow:connectedCheck --stacktrace --scan
+      - name: Build with Gradle
+        run: ./gradlew build --scan --stacktrace
 
-      - name: Generate Jacoco test coverage reports
-        if: matrix.api-level == 30 # Only generate coverage report on API level 30
-        uses: reactivecircus/android-emulator-runner@v2
+      - name: Check with Gradle
+        run: ./gradlew check --scan --stacktrace
+
+      - name: Release artifacts to local repo
+        run: ./gradlew publishReleasePublicationToCIRepository --scan
+      - name: Upload maven repo
+        uses: actions/upload-artifact@v2
         with:
-          api-level: ${{ matrix.api-level }}
-          arch: x86_64
-          script: ./gradlew jacocoTestReport --info --scan
+          name: maven-repository
+          path: build/ci-repo
 
       - name: Zip artifact for debugging
         if: ${{ failure() }}
@@ -109,16 +80,3 @@ jobs:
         with:
           name: build
           path: build.zip
-
-      - name: Copy test results
-        if: always()
-        run: |
-          mkdir -p test-results
-          find . -type f -regex ".*[t|androidT]est-results/.*xml" -exec cp {} test-results/ \;
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-results
-          path: test-results
