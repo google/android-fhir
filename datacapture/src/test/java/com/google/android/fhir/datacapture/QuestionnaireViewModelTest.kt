@@ -824,7 +824,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun questionnaireHasMoreThanOneInitialValuesAndNotRepeating_shouldThrowError() {
+  fun `createQuestionnaireViewModel() should throw IllegalArgumentException for multiple initial values with non repeating item`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
