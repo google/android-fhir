@@ -232,7 +232,6 @@ object ExpressionEvaluator {
     inputVariables: Map<String, Base?> = mapOf()
   ) =
     try {
-
       require(!expression.name.isNullOrEmpty()) {
         "Expression name should be a valid expression name"
       }

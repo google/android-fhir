@@ -16,10 +16,11 @@
 
 package com.google.android.fhir.datacapture.fhirpath
 
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
+import com.google.android.fhir.datacapture.common.datatype.asStringValue
+import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.Type
 import org.junit.Assert.assertThrows
 import org.junit.Test
 
@@ -27,31 +28,27 @@ class FHIRPathEngineHostServicesTest {
 
   @Test
   fun testFHIRPathHostServices_resolveConstantValueNotPresent_returnsNull() {
-
     val answer = FHIRPathEngineHostServices.resolveConstant(mapOf("A" to IntegerType(1)), "B", true)
 
-    assertNull(answer)
+    assertThat(answer).isNull()
   }
 
   @Test
   fun testFHIRPathHostServices_resolveConstantValuePresent_returnsNotNull() {
-
     val answer = FHIRPathEngineHostServices.resolveConstant(mapOf("A" to IntegerType(1)), "A", true)
 
-    assertNotNull(answer)
+    assertThat((answer as Type).asStringValue()).isEqualTo("1")
   }
 
   @Test
-  fun testFHIRPathHostServices_resolveConstantNullAppContext_throwsNullPointerException() {
+  fun testFHIRPathHostServices_resolveConstantNullAppContext_returnsNull() {
+    val answer = FHIRPathEngineHostServices.resolveConstant(null, "A", true)
 
-    assertThrows(NullPointerException::class.java) {
-      FHIRPathEngineHostServices.resolveConstant(null, "A", true)
-    }
+    assertThat(answer).isNull()
   }
 
   @Test
   fun testFHIRPathHostServices_resolveConstantType_throwsUnsupportedOperationException() {
-
     assertThrows(UnsupportedOperationException::class.java) {
       FHIRPathEngineHostServices.resolveConstantType(mapOf<Any, Any>(), "")
     }
@@ -59,7 +56,6 @@ class FHIRPathEngineHostServicesTest {
 
   @Test
   fun testFHIRPathHostServices_log_throwsUnsupportedOperationException() {
-
     assertThrows(UnsupportedOperationException::class.java) {
       FHIRPathEngineHostServices.log("", mutableListOf())
     }
@@ -67,7 +63,6 @@ class FHIRPathEngineHostServicesTest {
 
   @Test
   fun testFHIRPathHostServices_resolveFunction_throwsUnsupportedOperationException() {
-
     assertThrows(UnsupportedOperationException::class.java) {
       FHIRPathEngineHostServices.resolveFunction("")
     }
@@ -75,7 +70,6 @@ class FHIRPathEngineHostServicesTest {
 
   @Test
   fun testFHIRPathHostServices_checkFunction_throwsUnsupportedOperationException() {
-
     assertThrows(UnsupportedOperationException::class.java) {
       FHIRPathEngineHostServices.checkFunction(mapOf<Any, Any>(), "", mutableListOf())
     }
@@ -83,7 +77,6 @@ class FHIRPathEngineHostServicesTest {
 
   @Test
   fun testFHIRPathHostServices_executeFunction_throwsUnsupportedOperationException() {
-
     assertThrows(UnsupportedOperationException::class.java) {
       FHIRPathEngineHostServices.executeFunction(
         mapOf<Any, Any>(),
@@ -96,7 +89,6 @@ class FHIRPathEngineHostServicesTest {
 
   @Test
   fun testFHIRPathHostServices_resolveReference_throwsUnsupportedOperationException() {
-
     assertThrows(UnsupportedOperationException::class.java) {
       FHIRPathEngineHostServices.resolveReference(mapOf<Any, Any>(), "")
     }
@@ -104,7 +96,6 @@ class FHIRPathEngineHostServicesTest {
 
   @Test
   fun testFHIRPathHostServices_conformsToProfile_throwsUnsupportedOperationException() {
-
     assertThrows(UnsupportedOperationException::class.java) {
       FHIRPathEngineHostServices.conformsToProfile(mapOf<Any, Any>(), StringType(""), "")
     }
@@ -112,7 +103,6 @@ class FHIRPathEngineHostServicesTest {
 
   @Test
   fun testFHIRPathHostServices_resolveValueSet_throwsUnsupportedOperationException() {
-
     assertThrows(UnsupportedOperationException::class.java) {
       FHIRPathEngineHostServices.resolveValueSet(mapOf<Any, Any>(), "")
     }
