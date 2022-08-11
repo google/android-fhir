@@ -43,23 +43,23 @@ object ExpressionEvaluator {
     }
 
   /**
-   * Evaluates variable expression and return the evaluated result. To evaluate root [Questionnaire]
-   * level variable expressions, we pass only an expression to this function and for variables
-   * expressions defined at questionnaire item [Questionnaire.QuestionnaireItemComponent] level, we
-   * pass expression and respective questionnaire item to this function
+   * Evaluates variable expression defined at questionnaire item level and return the evaluated
+   * result.
    *
-   * If an expression is simple and evaluates on first evaluation, the function returns the
-   * evaluated value otherwise we parse the expression using regex [Regex] for variable (For
-   * example: A variable name could be %weight) and build a list of variables that the expression
-   * contains and for every variable, we first find it at origin, then up in the parent hierarchy
-   * and then at root/questionnaire level, if found we get their expressions and pass them into the
-   * same function to evaluate its value recursively, we put the variable name and its evaluated
-   * value into the map [Map] to use this map to pass into fhirPathEngine's evaluate method to apply
-   * the evaluated values to the expression being evaluated.
+   * Parses the expression using regex [Regex] for variable (For example: A variable name could be
+   * %weight) and build a list of variables that the expression contains and for every variable, we
+   * first find it at origin, then up in the parent hierarchy and then at root/questionnaire level,
+   * if found we get their expressions and pass them into the same function to evaluate its value
+   * recursively, we put the variable name and its evaluated value into the map [Map] to use this
+   * map to pass into fhirPathEngine's evaluate method to apply the evaluated values to the
+   * expression being evaluated.
    *
    * @param expression the [Expression] Variable expression
+   * @param questionnaire the [Questionnaire] respective questionnaire
+   * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
+   * @param questionnaireItemParentMap the [Map<Questionnaire.QuestionnaireItemComponent,
+   * Questionnaire.QuestionnaireItemComponent>] of child to parent
    * @param origin the [Questionnaire.QuestionnaireItemComponent] where this expression is defined,
-   * null if expression defined at questionnaire [Questionnaire] level
    *
    * @return [Base] the result of expression
    */
@@ -109,7 +109,7 @@ object ExpressionEvaluator {
           findVariableAtRoot(variableName, questionnaire)?.also { expression ->
             put(
               expression.name,
-              evaluateQuestionnaireVariableExpression(
+              evaluateQuestionnaireRootVariableExpression(
                 expression,
                 questionnaire,
                 questionnaireResponse
@@ -123,7 +123,24 @@ object ExpressionEvaluator {
       }
   }
 
-  internal fun evaluateQuestionnaireVariableExpression(
+  /**
+   * Evaluates variable expression defined at questionnaire root level and return the evaluated
+   * result.
+   *
+   * Parses the expression using regex [Regex] for variable (For example: A variable name could be
+   * %weight) and build a list of variables that the expression contains and for every variable, we
+   * first find it at root/questionnaire level, if found we get their expressions and pass them into
+   * the same function to evaluate its value recursively, we put the variable name and its evaluated
+   * value into the map [Map] to use this map to pass into fhirPathEngine's evaluate method to apply
+   * the evaluated values to the expression being evaluated.
+   *
+   * @param expression the [Expression] Variable expression
+   * @param questionnaire the [Questionnaire] respective questionnaire
+   * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
+   *
+   * @return [Base] the result of expression
+   */
+  internal fun evaluateQuestionnaireRootVariableExpression(
     expression: Expression,
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse
@@ -138,7 +155,7 @@ object ExpressionEvaluator {
           findVariableAtRoot(variableName, questionnaire)?.also { expression ->
             put(
               expression.name,
-              evaluateQuestionnaireVariableExpression(
+              evaluateQuestionnaireRootVariableExpression(
                 expression,
                 questionnaire,
                 questionnaireResponse
@@ -178,10 +195,12 @@ object ExpressionEvaluator {
    * Finds the specific variable name [String] in the parent hierarchy of origin
    * [Questionnaire.QuestionnaireItemComponent]
    *
+   * @param variableName the [String] to match the variable in the parent hierarchy
+   * @param
    * @param origin the [Questionnaire.QuestionnaireItemComponent] from where we have to track
    * hierarchy up in the parent
-   * @param variableName the [String] to match the variable in the parent hierarchy
-   *
+   * @param questionnaireItemParentMap the [Map<Questionnaire.QuestionnaireItemComponent,
+   * Questionnaire.QuestionnaireItemComponent>] of child to parent
    * @return [Pair] containing [Questionnaire.QuestionnaireItemComponent] and [Expression]
    */
   private fun findVariableInParent(
@@ -206,7 +225,7 @@ object ExpressionEvaluator {
    * Finds the specific variable name [String] at root/questionnaire [Questionnaire] level
    *
    * @param variableName the [String] to match the variable at questionnaire [Questionnaire] level
-   *
+   * @param questionnaire the [Questionnaire] respective questionnaire
    * @return [Expression] the matching expression
    */
   private fun findVariableAtRoot(variableName: String, questionnaire: Questionnaire): Expression? {
@@ -222,6 +241,7 @@ object ExpressionEvaluator {
    * Evaluates the value of variable expression and return the evaluated value
    *
    * @param expression the [Expression] the expression to evaluate
+   * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
    * @param inputVariables the [Map] of Variable names to their values
    *
    * @return [Base] the result of expression

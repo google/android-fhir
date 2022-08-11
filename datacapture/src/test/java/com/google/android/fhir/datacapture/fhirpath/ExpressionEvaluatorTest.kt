@@ -22,6 +22,7 @@ import com.google.android.fhir.datacapture.variableExpressions
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
@@ -47,7 +48,7 @@ class ExpressionEvaluatorTest {
       }
 
     val result =
-      ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+      ExpressionEvaluator.evaluateQuestionnaireRootVariableExpression(
         questionnaire.variableExpressions.first(),
         questionnaire,
         QuestionnaireResponse()
@@ -84,7 +85,7 @@ class ExpressionEvaluatorTest {
       }
 
     val result =
-      ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+      ExpressionEvaluator.evaluateQuestionnaireRootVariableExpression(
         questionnaire.variableExpressions.last(),
         questionnaire,
         QuestionnaireResponse()
@@ -185,7 +186,7 @@ class ExpressionEvaluatorTest {
       }
 
     val result =
-      ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+      ExpressionEvaluator.evaluateQuestionnaireRootVariableExpression(
         questionnaire.variableExpressions.last(),
         questionnaire,
         QuestionnaireResponse()
@@ -212,7 +213,7 @@ class ExpressionEvaluatorTest {
       }
 
     val result =
-      ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+      ExpressionEvaluator.evaluateQuestionnaireRootVariableExpression(
         questionnaire.variableExpressions.last(),
         questionnaire,
         QuestionnaireResponse()
@@ -321,7 +322,7 @@ class ExpressionEvaluatorTest {
             }
           }
 
-        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+        ExpressionEvaluator.evaluateQuestionnaireRootVariableExpression(
           questionnaire.variableExpressions.first(),
           questionnaire,
           QuestionnaireResponse()
@@ -348,7 +349,7 @@ class ExpressionEvaluatorTest {
             }
           }
 
-        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+        ExpressionEvaluator.evaluateQuestionnaireRootVariableExpression(
           questionnaire.variableExpressions.first(),
           questionnaire,
           QuestionnaireResponse()
@@ -376,7 +377,7 @@ class ExpressionEvaluatorTest {
             }
           }
 
-        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+        ExpressionEvaluator.evaluateQuestionnaireRootVariableExpression(
           questionnaire.variableExpressions.first(),
           questionnaire,
           QuestionnaireResponse()
@@ -403,12 +404,70 @@ class ExpressionEvaluatorTest {
             }
           }
 
-        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+        ExpressionEvaluator.evaluateQuestionnaireRootVariableExpression(
           questionnaire.variableExpressions.first(),
           questionnaire,
           QuestionnaireResponse()
         )
       }
     }
+  }
+
+  @Test
+  fun `should return not null value with ---- for questionnaire item level`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-group-item"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension().apply {
+              url = EXTENSION_VARIABLE_URL
+              setValue(
+                Expression().apply {
+                  name = "M"
+                  language = "text/fhirpath"
+                  expression = "%resource.repeat(item).where(linkId='an-item').answer.first().value"
+                }
+              )
+            }
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "an-item"
+                text = "a question"
+                type = Questionnaire.QuestionnaireItemType.TEXT
+              }
+            )
+          }
+        )
+      }
+
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "an-item"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = IntegerType(2)
+              }
+            )
+          }
+        )
+      }
+
+    val result =
+      ExpressionEvaluator.evaluateQuestionnaireItemVariableExpression(
+        questionnaire.item[0].variableExpressions.last(),
+        questionnaire,
+        questionnaireResponse,
+        mapOf(),
+        questionnaire.item[0]
+      )
+
+    assertThat((result as Type).asStringValue()).isEqualTo("2")
   }
 }
