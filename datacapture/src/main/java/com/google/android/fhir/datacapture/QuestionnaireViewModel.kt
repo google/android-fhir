@@ -460,6 +460,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
       .map { (questionnaireItem, questionnaireResponseItem) ->
+        questionnaireResponseItem.text = questionnaireItem.localizedTextSpanned?.toString()
         // Nested group items
         questionnaireResponseItem.item =
           getEnabledResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
