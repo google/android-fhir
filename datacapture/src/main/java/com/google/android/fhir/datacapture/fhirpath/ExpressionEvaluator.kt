@@ -206,7 +206,7 @@ object ExpressionEvaluator {
    * Questionnaire.QuestionnaireItemComponent>] of child to parent
    * @return [Pair] containing [Questionnaire.QuestionnaireItemComponent] and [Expression]
    */
-  private fun findVariableInParent(
+  private fun findVariableInAncestor(
     variableName: String,
     questionnaireItemParentMap:
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
