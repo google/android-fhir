@@ -173,9 +173,7 @@ object ExpressionEvaluator {
           }
         }
     }
-      .also {
-        return evaluateVariable(expression, questionnaireResponse, it)
-      }
+      return evaluateVariable(expression, questionnaireResponse, variableMap)
   }
 
   /**
