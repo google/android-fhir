@@ -153,7 +153,8 @@ object ExpressionEvaluator {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse
   ): Base? {
-    buildMap<String, Base?> {
+    val variableMap = buildMap<String, Base?> {
+      ....
       variableRegex
         .findAll(expression.expression)
         .map { it.groupValues[1] }
