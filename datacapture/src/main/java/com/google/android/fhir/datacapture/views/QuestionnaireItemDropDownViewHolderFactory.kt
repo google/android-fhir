@@ -24,8 +24,10 @@ import android.widget.AutoCompleteTextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -73,8 +75,10 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         textInputLayout.error =
-          if (validationResult.getSingleStringValidationMessage() == "") null
-          else validationResult.getSingleStringValidationMessage()
+          when (validationResult) {
+            is NotValidated, Valid -> null
+            is Invalid -> validationResult.getSingleStringValidationMessage()
+          }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

@@ -32,6 +32,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.utilities.clickIcon
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.common.truth.Truth.assertThat
 import org.hamcrest.CoreMatchers.allOf
 import org.hl7.fhir.r4.model.Questionnaire
@@ -64,7 +65,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -106,7 +107,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
