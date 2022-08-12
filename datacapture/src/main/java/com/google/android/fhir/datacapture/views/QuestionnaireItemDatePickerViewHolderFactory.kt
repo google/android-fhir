@@ -98,26 +98,16 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = localePattern
         textInputEditText.removeTextChangedListener(textWatcher)
-        textInputEditText.setText(
-          questionnaireItemViewItem.answers.singleOrNull()
-            ?.valueDateType
-            ?.localDate
-            ?.localizedString
-        )
 
+        if (textInputEditText.text.isNullOrEmpty()) {
+          textInputEditText.setText(
+            questionnaireItemViewItem.answers.singleOrNull()
+              ?.valueDateType
+              ?.localDate
+              ?.localizedString
+          )
+        }
         textWatcher = textInputEditText.doAfterTextChanged { text -> updateAnswer(text.toString()) }
-
-        //        var parseJob: Job? = null
-        //        textWatcher =
-        //          textInputEditText.doAfterTextChanged { text ->
-        // //         allow user to enter the input, e.g year may be y, yy, yyyy
-        //            parseJob?.cancel()
-        //            parseJob =
-        //              CoroutineScope(Dispatchers.Main).launch {
-        //                delay(1000)
-        //                updateAnswer(text.toString())
-        //              }
-        //          }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {

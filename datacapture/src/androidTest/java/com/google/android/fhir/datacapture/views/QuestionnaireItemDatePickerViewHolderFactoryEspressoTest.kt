@@ -20,15 +20,21 @@ import android.content.Context
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
+import com.google.android.fhir.datacapture.utilities.clickIcon
 import com.google.common.truth.Truth.assertThat
 import java.util.Locale
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers.allOf
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -55,7 +61,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun textInputEditText_dateInput_localeUs() = runBlocking {
+  fun parseDateTextInputAsPerUsLocale() {
     activityScenarioRule.scenario.onActivity { activity -> setLocale(Locale.US, activity) }
 
     val item =
@@ -69,15 +75,15 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
       viewHolder.bind(item)
       viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text = "11/19/20"
     }
-    delay(3000)
     val answer = item.answers.singleOrNull()?.value as DateType
+
     assertThat(answer.day).isEqualTo(19)
     assertThat(answer.month).isEqualTo(10)
     assertThat(answer.year).isEqualTo(2020)
   }
 
   @Test
-  fun textInputTextField_dateInput_localeJapan() = runBlocking {
+  fun parseDateTextInputAsPerJapanLocale() {
     activityScenarioRule.getScenario().onActivity { activity -> setLocale(Locale.JAPAN, activity) }
     val item =
       QuestionnaireItemViewItem(
@@ -90,11 +96,33 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
       viewHolder.bind(item)
       viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text = "2020/11/19"
     }
-    delay(3000)
     val answer = item.answers.singleOrNull()?.value as DateType
+
     assertThat(answer.day).isEqualTo(19)
     assertThat(answer.month).isEqualTo(10)
     assertThat(answer.year).isEqualTo(2020)
+  }
+
+  @Test
+  fun updateCalendarViewAsPerDateTextInput() {
+    activityScenarioRule.scenario.onActivity { activity -> setLocale(Locale.US, activity) }
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI {
+      viewHolder.bind(questionnaireItemView)
+      viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text = "11/19/20"
+    }
+
+    onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
+    onView(allOf(withText("Nov 19, 2020")))
+      .inRoot(RootMatchers.isDialog())
+      .check(matches(ViewMatchers.isDisplayed()))
   }
 
   /** Runs code snippet on UI/main thread */
