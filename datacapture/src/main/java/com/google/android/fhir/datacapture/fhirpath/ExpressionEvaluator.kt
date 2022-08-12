@@ -34,7 +34,7 @@ import timber.log.Timber
  * Expressions can be defined at questionnaire root level and questionnaire item level. This
  * [ExpressionEvaluator] supports evaluation of
  * [variable expression](http://hl7.org/fhir/R4/extension-variable.html) defined at either root
- * level or questionnaire item level
+ * level or questionnaire item level.
  */
 object ExpressionEvaluator {
 
