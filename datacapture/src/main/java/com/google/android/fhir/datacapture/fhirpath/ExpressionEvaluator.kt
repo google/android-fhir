@@ -132,7 +132,7 @@ object ExpressionEvaluator {
   }
 
   /**
-   * Evaluates variable expression defined at questionnaire root level and return the evaluated
+   * Evaluates variable expression defined at questionnaire root level and returns the evaluated
    * result.
    *
    * Parses the expression using regex [Regex] for variable (For example: A variable name could be
