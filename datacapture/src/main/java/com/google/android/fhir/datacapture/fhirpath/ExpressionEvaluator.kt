@@ -29,7 +29,7 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
 import timber.log.Timber
 
 /**
- * Evaluates an expression and return its result
+ * Evaluates an expression and returns its result.
  *
  * Expressions can be defined at questionnaire root level and questionnaire item level This
  * [ExpressionEvaluator] supports evaluation of
