@@ -38,7 +38,7 @@ internal enum class ItemControlTypes(
   OPEN_CHOICE("open-choice", QuestionnaireItemViewHolderType.DIALOG_SELECT),
   RADIO_BUTTON("radio-button", QuestionnaireItemViewHolderType.RADIO_GROUP),
   SLIDER("slider", QuestionnaireItemViewHolderType.SLIDER),
-  PHONE_NUMBER("phone-number", QuestionnaireItemViewHolderType.PHONE_NUMBER)
+  PHONE_NUMBER("phone-number", QuestionnaireItemViewHolderType.PHONE_NUMBER),
 }
 
 // Please note these URLs do not point to any FHIR Resource and are broken links. They are being
@@ -122,9 +122,10 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceO
     return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
   }
 
-/** UI controls relevant to rendering questionnaire display items. */
+/** UI controls relevant to rendering questionnaire items. */
 internal enum class DisplayItemControlType(val extensionCode: String) {
-  FLYOVER("flyover")
+  FLYOVER("flyover"),
+  PAGE("page"),
 }
 
 /** Item control to show instruction text */
