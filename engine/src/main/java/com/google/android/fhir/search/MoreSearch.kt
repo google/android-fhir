@@ -61,23 +61,42 @@ internal fun Search.getQuery(
   var sortOrderStatement = ""
   val sortArgs = mutableListOf<Any>()
   sort?.let { sort ->
-    val sortTableName =
+    val sortTableNames =
       when (sort) {
-        is StringClientParam -> SortTableInfo.STRING_SORT_TABLE_INFO
-        is NumberClientParam -> SortTableInfo.NUMBER_SORT_TABLE_INFO
-        is DateClientParam -> SortTableInfo.DATE_SORT_TABLE_INFO
+        is StringClientParam -> listOf(SortTableInfo.STRING_SORT_TABLE_INFO)
+        is NumberClientParam -> listOf(SortTableInfo.NUMBER_SORT_TABLE_INFO)
+        // The DateClientParam maps to two index tables (Date without timezone info and DateTime
+        // with timezone info). Any data field in any resource will only have index records in one
+        // of the two tables. So we simply sort by both in the SQL query.
+        is DateClientParam ->
+          listOf(SortTableInfo.DATE_SORT_TABLE_INFO, SortTableInfo.DATE_TIME_SORT_TABLE_INFO)
         else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
       }
-    sortJoinStatement =
+    sortJoinStatement = ""
+
+    sortTableNames.forEachIndexed { index, sortTableName ->
+      val tableAlias = 'b' + index
+
+      sortJoinStatement +=
+        """
+      LEFT JOIN ${sortTableName.tableName} $tableAlias
+      ON a.resourceType = $tableAlias.resourceType AND a.resourceUuid = $tableAlias.resourceUuid AND $tableAlias.index_name = ?
       """
-      LEFT JOIN ${sortTableName.tableName} b
-      ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
-      """.trimIndent()
-    sortOrderStatement =
-      """
-      ORDER BY b.${sortTableName.columnName} ${order.sqlString}
-      """.trimIndent()
-    sortArgs += sort.paramName
+
+      sortArgs += sort.paramName
+    }
+
+    sortTableNames.forEachIndexed { index, sortTableName ->
+      val tableAlias = 'b' + index
+      sortOrderStatement +=
+        if (index == 0) {
+          """
+            ORDER BY $tableAlias.${sortTableName.columnName} ${order.sqlString}
+          """.trimIndent()
+        } else {
+          ", $tableAlias.${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.columnName} ${order.sqlString}"
+        }
+    }
   }
 
   var filterStatement = ""
@@ -402,7 +421,8 @@ data class ConditionParam<T>(val condition: String, val params: List<T>) {
 private enum class SortTableInfo(val tableName: String, val columnName: String) {
   STRING_SORT_TABLE_INFO("StringIndexEntity", "index_value"),
   NUMBER_SORT_TABLE_INFO("NumberIndexEntity", "index_value"),
-  DATE_SORT_TABLE_INFO("DateIndexEntity", "index_from")
+  DATE_SORT_TABLE_INFO("DateIndexEntity", "index_from"),
+  DATE_TIME_SORT_TABLE_INFO("DateTimeIndexEntity", "index_from")
 }
 
 private fun getApproximateDateRange(

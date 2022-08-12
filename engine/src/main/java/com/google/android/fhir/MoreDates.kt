@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,8 @@
 package com.google.android.fhir
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Date
 
 @Suppress("DEPRECATION") // java.util.Date API used by HAPI
 internal val Date.epochDay
   get() = LocalDate.of(year + 1900, month + 1, date).toEpochDay()
-
-/** Validates if given string matches ISO_DATE format i.e. yyyy-MM-dd or yyyy-MM-dd+00:00 */
-internal val String.isValidDateOnly
-  get() = kotlin.runCatching { LocalDate.parse(this, DateTimeFormatter.ISO_DATE) }.isSuccess

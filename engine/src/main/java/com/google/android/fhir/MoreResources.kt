@@ -42,6 +42,7 @@ fun <R : Resource> getResourceType(clazz: Class<R>): ResourceType {
   }
 }
 
+/** Returns the {@link Class} object for the resource type. */
 fun <R : Resource> getResourceClass(resourceType: ResourceType): Class<R> =
   getResourceClass(resourceType.name)
 

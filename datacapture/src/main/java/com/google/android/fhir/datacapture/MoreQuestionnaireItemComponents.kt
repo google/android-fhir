@@ -22,7 +22,7 @@ import com.google.android.fhir.datacapture.common.datatype.asBooleanValue
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.enablement.fhirPathEngine
 import com.google.android.fhir.getLocalizedText
-import org.hl7.fhir.r4.model.Base
+import com.google.android.fhir.logicalId
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -30,6 +30,7 @@ import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions
 
@@ -45,7 +46,7 @@ internal enum class ItemControlTypes(
   OPEN_CHOICE("open-choice", QuestionnaireItemViewHolderType.DIALOG_SELECT),
   RADIO_BUTTON("radio-button", QuestionnaireItemViewHolderType.RADIO_GROUP),
   SLIDER("slider", QuestionnaireItemViewHolderType.SLIDER),
-  PHONE_NUMBER("phone-number", QuestionnaireItemViewHolderType.PHONE_NUMBER)
+  PHONE_NUMBER("phone-number", QuestionnaireItemViewHolderType.PHONE_NUMBER),
 }
 
 // Please note these URLs do not point to any FHIR Resource and are broken links. They are being
@@ -113,9 +114,10 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceO
     return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
   }
 
-/** UI controls relevant to rendering questionnaire display items. */
+/** UI controls relevant to rendering questionnaire items. */
 internal enum class DisplayItemControlType(val extensionCode: String) {
-  FLYOVER("flyover")
+  FLYOVER("flyover"),
+  PAGE("page"),
 }
 
 /** Item control to show instruction text */
@@ -289,37 +291,41 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
 
 internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expression?
   get() =
-    ToolingExtensions.getExtension(this, EXTENSION_ANSWER_EXPRESSION_URL)?.value?.let { it.castToExpression(it) }
-
+    ToolingExtensions.getExtension(this, EXTENSION_ANSWER_EXPRESSION_URL)?.value?.let {
+      it.castToExpression(it)
+    }
 
 internal val Expression.isXFhirQuery: Boolean
   get() = this.language == Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
 
-// TODO implement full functionality of choice column https://github.com/google/android-fhir/issues/1495
+// TODO implement full functionality of choice column
+// https://github.com/google/android-fhir/issues/1495
 /**
- *  Choice column extension https://build.fhir.org/ig/HL7/sdc/examples.html#choiceColumn
+ * Choice column extension https://build.fhir.org/ig/HL7/sdc/examples.html#choiceColumn
  *
- *  The extension choice-column defines its internal elements as nested extension with table properties
- *  - path -> the field in answerOption
- *  - width -> the width of given column if widget generates a table; TBD in #1495
- *  - label -> the label of given column of table or answerOption
- *  - forDisplay -> if the column should be shown on UI
+ * The extension choice-column defines its internal elements as nested extension with table
+ * properties
+ * - path -> the field in answerOption
+ * - width -> the width of given column if widget generates a table; TBD in #1495
+ * - label -> the label of given column of table or answerOption
+ * - forDisplay -> if the column should be shown on UI
  */
 internal val Questionnaire.QuestionnaireItemComponent.choiceColumn: List<ChoiceColumn>?
   get() =
-     ToolingExtensions.getExtensions(this, EXTENSION_CHOICE_COLUMN_URL)?.map {
-       it.extension.let {
-         ChoiceColumn(
-                 path = it.find { it.url == "path" }!!.asStringValue(),
-                 label = it.find { it.url == "label" }?.asStringValue(),
-                 forDisplay = it.find { it.url == "forDisplay" }?.asBooleanValue() ?: true
-         )
-       }
-     }
+    ToolingExtensions.getExtensions(this, EXTENSION_CHOICE_COLUMN_URL)?.map {
+      it.extension.let {
+        ChoiceColumn(
+          path = it.find { it.url == "path" }!!.value.asStringValue(),
+          label = it.find { it.url == "label" }?.value?.asStringValue(),
+          forDisplay = it.find { it.url == "forDisplay" }?.value?.asBooleanValue() ?: true
+        )
+      }
+    }
 
 data class ChoiceColumn(val path: String, val label: String?, val forDisplay: Boolean)
 
-// TODO implement full functionality of choice column https://github.com/google/android-fhir/issues/1495
+// TODO implement full functionality of choice column
+// https://github.com/google/android-fhir/issues/1495
 /**
  * Apply and add each choice-column mapping to answer options
  * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-choiceColumn.html
@@ -328,27 +334,23 @@ data class ChoiceColumn(val path: String, val label: String?, val forDisplay: Bo
  * - With choice/open-choice -> allows selection of display and/or code in answerOption
  * - With reference -> allows selection of fields from the resource for display and reference
  */
-internal fun Questionnaire.QuestionnaireItemComponent.applyChoiceColumns(
-        answerOptions: Questionnaire.QuestionnaireItemAnswerOptionComponent,
-        choiceColumns: List<ChoiceColumn>?, dataList: List<Base>
-)
-{
-  choiceColumns?.forEach { choiceColumn ->
+internal fun Questionnaire.QuestionnaireItemComponent.applyChoiceColumns(dataList: List<Resource>) {
+  this.choiceColumn?.forEach { choiceColumn ->
     dataList
-            .map { data ->
-              if (this.type == Questionnaire.QuestionnaireItemType.REFERENCE)
-                Reference().apply {
-                  reference = "${resource.resourceType.name}/${resource.logicalId}"
-                  display = fhirPathEngine.evaluateToString(resource, choiceColumn.path)
-                }
-              else fhirPathEngine.evaluate(resource, choiceColumn.path).first()
-            }
-            .map {
-              Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-                this.value = it.castToType(it)
-              }
-            }
-            .also { this.answerOption.addAll(it) }
+      .map { data ->
+        if (this.type == Questionnaire.QuestionnaireItemType.REFERENCE)
+          Reference().apply {
+            reference = "${data.resourceType.name}/${data.logicalId}"
+            display = fhirPathEngine.evaluateToString(data, choiceColumn.path)
+          }
+        else fhirPathEngine.evaluate(data, choiceColumn.path).first()
+      }
+      .map {
+        Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+          this.value = it.castToType(it)
+        }
+      }
+      .also { this.answerOption.addAll(it) }
   }
 }
 

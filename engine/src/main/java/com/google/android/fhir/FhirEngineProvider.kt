@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import com.google.android.fhir.sync.DataSource
 object FhirEngineProvider {
   private var fhirEngineConfiguration: FhirEngineConfiguration? = null
   private var fhirServices: FhirServices? = null
-
-  fun isInitialized() = fhirServices != null
 
   /**
    * Initializes the [FhirEngine] singleton with a custom Configuration.

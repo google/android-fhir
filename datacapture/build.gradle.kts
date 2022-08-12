@@ -93,5 +93,9 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(project(":testing"))
+
   androidTestImplementation(Dependencies.Espresso.espressoCore)
 }
+
+configureDokka(Releases.DataCapture.artifactId, Releases.DataCapture.version)

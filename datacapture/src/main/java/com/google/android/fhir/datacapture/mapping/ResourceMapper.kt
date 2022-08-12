@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,20 +53,23 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 
 /**
- * Maps [QuestionnaireResponse] s to FHIR resources and vice versa.
+ * Maps a [QuestionnaireResponse] to FHIR resources and vice versa.
  *
  * The process of converting [QuestionnaireResponse] s to other FHIR resources is called
  * [extraction](http://build.fhir.org/ig/HL7/sdc/extraction.html). The reverse process of converting
  * existing FHIR resources to [QuestionnaireResponse] s to be used to pre-fill the UI is called
  * [population](http://build.fhir.org/ig/HL7/sdc/populate.html).
  *
+ * This class supports
  * [Definition-based extraction](http://build.fhir.org/ig/HL7/sdc/extraction.html#definition-based-extraction)
- * and
+ * ,
+ * [StructureMap-based extraction](http://hl7.org/fhir/uv/sdc/extraction.html#structuremap-based-extraction)
+ * , and
  * [expression-based population](http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population)
- * are used because these approaches are generic enough to work with any FHIR resource types, and at
- * the same time relatively easy to implement.
+ * .
  *
- * WARNING: This is not production-ready.
+ * See the [developer guide](https://github.com/google/android-fhir/wiki/SDCL%3A-Use-ResourceMapper)
+ * for more information.
  */
 object ResourceMapper {
 
@@ -76,15 +79,20 @@ object ResourceMapper {
     }
 
   /**
-   * Extract a FHIR resource from the [questionnaire] and [questionnaireResponse].
+   * Extract FHIR resources from a [questionnaire] and [questionnaireResponse].
    *
-   * This method supports both Definition-based and StructureMap-based extraction.
+   * This method will perform
+   * [StructureMap-based extraction](http://hl7.org/fhir/uv/sdc/extraction.html#structuremap-based-extraction)
+   * if the [Questionnaire] specified by [questionnaire] includes a `targetStructureMap` extension.
+   * In this case [structureMapExtractionContext] is required; extraction will fail and an empty
+   * [Bundle] is returned if [structureMapExtractionContext] is not provided.
    *
-   * StructureMap-based extraction will be invoked if the [Questionnaire] declares a
-   * targetStructureMap extension otherwise Definition-based extraction is used. StructureMap-based
-   * extraction will fail and an empty [Bundle] will be returned if the [structureMapProvider] is
-   * not passed.
+   * Otherwise, this method will perform
+   * [Definition-based extraction](http://hl7.org/fhir/uv/sdc/extraction.html#definition-based-extraction)
+   * .
    *
+   * @param questionnaire A [Questionnaire] with data extraction extensions.
+   * @param questionnaireResponse A [QuestionnaireResponse] with answers for [questionnaire].
    * @param structureMapExtractionContext The [IWorkerContext] may be used along with
    * [StructureMapUtilities] to parse the script and convert it into [StructureMap].
    *
@@ -174,8 +182,10 @@ object ResourceMapper {
   }
 
   /**
-   * Returns a `QuestionnaireResponse` to the [questionnaire] that is pre-filled from the
-   * [resources] See http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population.
+   * Performs
+   * [Expression-based population](http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population)
+   * and returns a [QuestionnaireResponse] for the [questionnaire] that is populated from the
+   * [resources].
    */
   suspend fun populate(
     questionnaire: Questionnaire,

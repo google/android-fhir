@@ -27,7 +27,6 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerView
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDateTimePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDialogSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDisplayViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemDropDownReferenceViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDropDownViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextDecimalViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextIntegerViewHolderFactory
@@ -79,9 +78,9 @@ internal class QuestionnaireItemAdapter(
         QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL ->
           QuestionnaireItemEditTextDecimalViewHolderFactory
         QuestionnaireItemViewHolderType.RADIO_GROUP -> QuestionnaireItemRadioGroupViewHolderFactory
-        QuestionnaireItemViewHolderType.DROP_DOWN -> QuestionnaireItemDropDownViewHolderFactory()
+        QuestionnaireItemViewHolderType.DROP_DOWN -> QuestionnaireItemDropDownViewHolderFactory
         QuestionnaireItemViewHolderType.REFERENCE ->
-          QuestionnaireItemDropDownReferenceViewHolderFactory
+          QuestionnaireItemDropDownViewHolderFactory // TODO check it
         QuestionnaireItemViewHolderType.DISPLAY -> QuestionnaireItemDisplayViewHolderFactory
         QuestionnaireItemViewHolderType.QUANTITY ->
           QuestionnaireItemEditTextQuantityViewHolderFactory
@@ -200,13 +199,25 @@ internal class QuestionnaireItemAdapter(
 }
 
 internal object DiffCallback : DiffUtil.ItemCallback<QuestionnaireItemViewItem>() {
+  /**
+   * [QuestionnaireItemViewItem] is a transient object for the UI only. Whenever the user makes any
+   * change via the UI, a new list of [QuestionnaireItemViewItem]s will be created, each holding
+   * references to the underlying [QuestionnaireItem] and [QuestionnaireResponseItem], both of which
+   * should be read-only, and the current answers. To help recycler view handle update and/or
+   * animations, we consider two [QuestionnaireItemViewItem]s to be the same if they have the same
+   * underlying [QuestionnaireItem] and [QuestionnaireResponseItem].
+   */
   override fun areItemsTheSame(
     oldItem: QuestionnaireItemViewItem,
     newItem: QuestionnaireItemViewItem
-  ) = oldItem == newItem
+  ) = oldItem.hasTheSameItem(newItem)
 
   override fun areContentsTheSame(
     oldItem: QuestionnaireItemViewItem,
     newItem: QuestionnaireItemViewItem
-  ) = oldItem.equalsDeep(newItem)
+  ): Boolean {
+    return oldItem.hasTheSameItem(newItem) &&
+      oldItem.hasTheSameAnswer(newItem) &&
+      oldItem.hasTheSameValidationResult(newItem)
+  }
 }
