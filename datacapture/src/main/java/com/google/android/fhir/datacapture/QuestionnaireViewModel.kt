@@ -83,6 +83,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
 
+  /**
+   * marks true when user taps on next/previous pagination buttons for triggering validation on
+   * items of the page. Once validation is processed, this field will be marked false
+   */
   private var isPaginationButtonPressed = false
   init {
     when {
