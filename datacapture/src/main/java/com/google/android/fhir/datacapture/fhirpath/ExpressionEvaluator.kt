@@ -28,6 +28,14 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 import timber.log.Timber
 
+/**
+ * Evaluates an expression and return its result
+ *
+ * Expressions can be defined at questionnaire root level and questionnaire item level This
+ * [ExpressionEvaluator] supports evaluation of
+ * [variable expression](http://hl7.org/fhir/R4/extension-variable.html) defined at either root
+ * level or questionnaire item level
+ */
 object ExpressionEvaluator {
 
   private val reservedVariables =
