@@ -1552,11 +1552,10 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val pageList = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true))
     viewModel.goToNextPage()
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-    assertTrue(viewModel.currentPageIndexFlow.value == pageList.last().index)
+    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.last()?.index)
   }
 
   @Test
@@ -1600,12 +1599,11 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val pageList = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true))
     viewModel.goToNextPage()
     viewModel.goToPreviousPage()
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-    assertTrue(viewModel.currentPageIndexFlow.value == pageList.first().index)
+    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.first()?.index)
   }
 
   @Test
@@ -1649,11 +1647,10 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val pageList = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true))
     viewModel.goToNextPage()
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertTrue(viewModel.currentPageIndexFlow.value == pageList.last().index)
+    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.last()?.index)
   }
 
   @Test
@@ -1697,12 +1694,11 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val pageList = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true))
     viewModel.goToNextPage()
     viewModel.goToPreviousPage()
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertTrue(viewModel.currentPageIndexFlow.value == pageList.first().index)
+    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.first()?.index)
   }
 
   @Test
@@ -1740,11 +1736,10 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val pageList = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true))
     viewModel.goToNextPage()
 
     assertThat(viewModel.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertTrue(viewModel.currentPageIndexFlow.value == pageList.last().index)
+    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.last()?.index)
   }
 
   @Test
@@ -1782,12 +1777,11 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val pageList = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true))
     viewModel.goToNextPage()
     viewModel.goToPreviousPage()
 
     assertThat(viewModel.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertTrue(viewModel.currentPageIndexFlow.value == pageList.first().index)
+    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.first()?.index)
   }
 
   @Test
@@ -1831,11 +1825,10 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val pageList = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true))
     viewModel.goToNextPage()
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
-    assertTrue(viewModel.currentPageIndexFlow.value == pageList.last().index)
+    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.last()?.index)
   }
 
   @Test
@@ -1879,12 +1872,11 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val pageList = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true))
     viewModel.goToNextPage()
     viewModel.goToPreviousPage()
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
-    assertTrue(viewModel.currentPageIndexFlow.value == pageList.last().index)
+    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.last()?.index)
   }
 
   @Test
