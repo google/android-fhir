@@ -36,6 +36,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -1369,11 +1370,6 @@ class QuestionnaireViewModelTest(
 
   @Test
   fun `should allow user to move forward and back using prior entry-mode`() = runBlocking {
-    val paginationExtension =
-      Extension().apply {
-        url = EXTENSION_ITEM_CONTROL_URL
-        setValue(CodeableConcept(Coding().apply { code = "page" }))
-      }
     val entryModeExtension =
       Extension().apply {
         url = EXTENSION_ENTRY_MODE_URL
@@ -1413,29 +1409,16 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val state = viewModel.questionnaireStateFlow.first()
-    assertThat(state.pagination)
-      .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
-    assertThat(state.items).hasSize(2)
+    val pageList = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true))
     viewModel.goToNextPage()
+    viewModel.goToPreviousPage()
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-    assertTrue(
-      viewModel.getPageFlow().value!!.currentPageIndex ==
-        viewModel.getPageFlow().value!!.lastPageIndex
-    )
-
-    viewModel.goToPreviousPage()
-    assertTrue(viewModel.getPageFlow().value!!.currentPageIndex == 0)
+    assertTrue(viewModel.currentPageIndexFlow.value == pageList.first().index)
   }
 
   @Test
   fun `should allow user to move forward and back using random entry-mode`() = runBlocking {
-    val paginationExtension =
-      Extension().apply {
-        url = EXTENSION_ITEM_CONTROL_URL
-        setValue(CodeableConcept(Coding().apply { code = "page" }))
-      }
     val entryModeExtension =
       Extension().apply {
         url = EXTENSION_ENTRY_MODE_URL
@@ -1475,30 +1458,16 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val state = viewModel.questionnaireStateFlow.first()
-    assertThat(state.pagination)
-      .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
-    assertThat(state.items).hasSize(2)
+    val pageList = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true))
     viewModel.goToNextPage()
+    viewModel.goToPreviousPage()
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertTrue(
-      viewModel.getPageFlow().value!!.currentPageIndex ==
-        viewModel.getPageFlow().value!!.lastPageIndex
-    )
-
-    viewModel.goToPreviousPage()
-    assertTrue(viewModel.getPageFlow().value!!.currentPageIndex == 0)
+    assertTrue(viewModel.currentPageIndexFlow.value == pageList.first().index)
   }
 
   @Test
   fun `should allow user to move forward and back when no entry-mode is defined`() = runBlocking {
-    val paginationExtension =
-      Extension().apply {
-        url = EXTENSION_ITEM_CONTROL_URL
-        setValue(CodeableConcept(Coding().apply { code = "page" }))
-      }
-
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1532,29 +1501,16 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val state = viewModel.questionnaireStateFlow.first()
-    assertThat(state.pagination)
-      .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
-    assertThat(state.items).hasSize(2)
+    val pageList = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true))
     viewModel.goToNextPage()
+    viewModel.goToPreviousPage()
 
     assertThat(viewModel.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertTrue(
-      viewModel.getPageFlow().value!!.currentPageIndex ==
-        viewModel.getPageFlow().value!!.lastPageIndex
-    )
-
-    viewModel.goToPreviousPage()
-    assertTrue(viewModel.getPageFlow().value!!.currentPageIndex == 0)
+    assertTrue(viewModel.currentPageIndexFlow.value == pageList.first().index)
   }
 
   @Test
   fun `should allow user to move forward only using sequential entry-mode`() = runBlocking {
-    val paginationExtension =
-      Extension().apply {
-        url = EXTENSION_ITEM_CONTROL_URL
-        setValue(CodeableConcept(Coding().apply { code = "page" }))
-      }
     val entryModeExtension =
       Extension().apply {
         url = EXTENSION_ENTRY_MODE_URL
@@ -1594,23 +1550,12 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val state = viewModel.questionnaireStateFlow.first()
-    assertThat(state.pagination)
-      .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
-    assertThat(state.items).hasSize(2)
+    val pageList = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true))
     viewModel.goToNextPage()
+    viewModel.goToPreviousPage()
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
-    assertTrue(
-      viewModel.getPageFlow().value!!.currentPageIndex ==
-        viewModel.getPageFlow().value!!.lastPageIndex
-    )
-
-    viewModel.goToPreviousPage()
-    assertTrue(
-      viewModel.getPageFlow().value!!.currentPageIndex ==
-        viewModel.getPageFlow().value!!.lastPageIndex
-    )
+    assertTrue(viewModel.currentPageIndexFlow.value == pageList.last().index)
   }
 
   @Test

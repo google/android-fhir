@@ -177,7 +177,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * The flow representing the index of the current page, or null if the questionnaire is not
    * paginated.
    */
-  private val currentPageIndexFlow = MutableStateFlow(getInitialPageIndex())
+  @VisibleForTesting val currentPageIndexFlow = MutableStateFlow(getInitialPageIndex())
 
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
