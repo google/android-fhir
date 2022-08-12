@@ -41,6 +41,14 @@ internal object QuestionnaireItemEditTextDecimalViewHolderFactory :
       ): String {
         return answer?.valueDecimalType?.value?.toString() ?: ""
       }
+
+      override fun isTextUpdatesRequired(answerText: String, inputText: String): Boolean {
+        return if (answerText.isNotEmpty() && inputText.isNotEmpty()) {
+          answerText.toDouble() != inputText.toDouble()
+        } else {
+          true
+        }
+      }
     }
 }
 

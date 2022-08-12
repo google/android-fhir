@@ -82,16 +82,10 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
 
     textInputEditText.removeTextChangedListener(textWatcher)
     val text = getText(questionnaireItemViewItem.answers.singleOrNull())
-    when (rawInputType) {
-      DECIMAL_INPUT_TYPE, QUANTITY_INPUT_TYPE -> {
-        updateDecimalAnswer(text)
-      }
-      else -> {
-        if (text != textInputEditText.text.toString()) {
-          textInputEditText.setText(getText(questionnaireItemViewItem.answers.singleOrNull()))
-        }
-      }
+    if (isTextUpdatesRequired(text, textInputEditText.text.toString())) {
+      textInputEditText.setText(getText(questionnaireItemViewItem.answers.singleOrNull()))
     }
+
     textWatcher =
       textInputEditText.doAfterTextChanged { editable: Editable? -> updateAnswer(editable) }
   }
@@ -105,17 +99,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     }
   }
 
-  private fun updateDecimalAnswer(answer: String) {
-    if (answer.isNotEmpty() && textInputEditText.text.toString().isNotEmpty()) {
-      if (answer.toDouble() != textInputEditText.text.toString().toDouble()) {
-        textInputEditText.setText(getText(questionnaireItemViewItem.answers.singleOrNull()))
-      } else {
-        // values are same, not required to update the input text.
-      }
-    } else {
-      textInputEditText.setText(getText(questionnaireItemViewItem.answers.singleOrNull()))
-    }
-  }
+  open fun isTextUpdatesRequired(answerText: String, inputText: String) = (answerText != inputText)
 
   override fun displayValidationResult(validationResult: ValidationResult) {
     textInputLayout.error =

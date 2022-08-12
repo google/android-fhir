@@ -44,6 +44,14 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
       ): String {
         return answer?.valueQuantity?.value?.toString() ?: ""
       }
+
+      override fun isTextUpdatesRequired(answerText: String, inputText: String): Boolean {
+        return if (answerText.isNotEmpty() && inputText.isNotEmpty()) {
+          answerText.toDouble() != inputText.toDouble()
+        } else {
+          true
+        }
+      }
     }
 }
 
