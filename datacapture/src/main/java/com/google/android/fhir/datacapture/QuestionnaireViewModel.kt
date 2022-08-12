@@ -235,10 +235,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
     }
 
-    //    val result =
-    // ExpressionEvaluator.evaluateQuestionnaireItemVariableExpression(questionnaireItem.variableExpressions.last(), questionnaire, questionnaireResponse, questionnaireItemParentMap, questionnaireItem)
-    //    println(result)
-
     modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
     modificationCount.update { it + 1 }
   }

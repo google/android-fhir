@@ -191,12 +191,7 @@ object ExpressionEvaluator {
     variableName: String,
     origin: Questionnaire.QuestionnaireItemComponent
   ): Pair<Questionnaire.QuestionnaireItemComponent, Expression>? {
-    origin.variableExpressions.find { it.name == variableName }.also {
-      it?.let {
-        return Pair(origin, it)
-      }
-    }
-    return null
+    return origin.variableExpressions.find { it.name == variableName }?.let { Pair(origin, it) }
   }
 
   /**
@@ -219,11 +214,10 @@ object ExpressionEvaluator {
   ): Pair<Questionnaire.QuestionnaireItemComponent, Expression>? {
     var parent = questionnaireItemParentMap[origin]
     while (parent != null) {
-      parent.variableExpressions.find { it.name == variableName }.also {
-        it?.let {
-          return Pair(parent!!, it)
-        }
+      parent.variableExpressions.find { it.name == variableName }?.let {
+        return Pair(parent!!, it)
       }
+
       parent = questionnaireItemParentMap[parent]
     }
     return null
@@ -236,14 +230,8 @@ object ExpressionEvaluator {
    * @param questionnaire the [Questionnaire] respective questionnaire
    * @return [Expression] the matching expression
    */
-  private fun findVariableAtRoot(variableName: String, questionnaire: Questionnaire): Expression? {
-    questionnaire.variableExpressions.find { it.name == variableName }.also {
-      it?.let {
-        return it
-      }
-    }
-    return null
-  }
+  private fun findVariableAtRoot(variableName: String, questionnaire: Questionnaire): Expression? =
+    questionnaire.variableExpressions.find { it.name == variableName }
 
   /**
    * Evaluates the value of variable expression and return the evaluated value
@@ -260,7 +248,7 @@ object ExpressionEvaluator {
     inputVariables: Map<String, Base?> = mapOf()
   ) =
     try {
-      require(!expression.name.isNullOrEmpty()) {
+      require(expression.name?.isNotBlank() == true) {
         "Expression name should be a valid expression name"
       }
 
