@@ -26,9 +26,9 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
-import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -445,7 +445,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           this@QuestionnaireViewModel.getApplication()
         )
       } else {
-        ValidationResult(true, listOf())
+        NotValidated
       }
 
     val items =

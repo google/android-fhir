@@ -19,7 +19,8 @@ package com.google.android.fhir.datacapture.views
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.material.slider.Slider
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.IntegerType
@@ -44,7 +45,7 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -65,7 +66,7 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -79,7 +80,7 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -106,7 +107,7 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -135,7 +136,7 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -164,7 +165,7 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
             }
           )
         },
-        validationResult = ValidationResult(false, listOf("Minimum value allowed is:50")),
+        validationResult = Invalid(listOf("Minimum value allowed is:50")),
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -179,7 +180,7 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )

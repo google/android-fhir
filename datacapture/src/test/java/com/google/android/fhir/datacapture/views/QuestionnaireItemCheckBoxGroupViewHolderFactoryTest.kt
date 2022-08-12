@@ -26,7 +26,8 @@ import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
 import com.google.android.fhir.datacapture.EXTENSION_OPTION_EXCLUSIVE_URL
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
@@ -56,7 +57,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           text = "Question?"
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -89,7 +90,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         questionnaire,
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -126,7 +127,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         questionnaire,
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -152,7 +153,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -189,7 +190,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -216,7 +217,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -254,7 +255,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -293,7 +294,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -340,7 +341,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
             emptyList()
           }
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -360,7 +361,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           required = true
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
+        validationResult = Invalid(listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -389,7 +390,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -411,7 +412,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )

@@ -28,7 +28,8 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
 import java.io.File
@@ -1042,8 +1043,7 @@ class QuestionnaireViewModelTest(
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    assertThat(questionnaireItemViewItemList.single().validationResult)
-      .isEqualTo(ValidationResult(true, listOf()))
+    assertThat(questionnaireItemViewItemList.single().validationResult).isEqualTo(NotValidated)
   }
 
   @Test
@@ -1074,7 +1074,7 @@ class QuestionnaireViewModelTest(
 
       ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
       assertThat(questionnaireItemViewItem!!.validationResult)
-        .isEqualTo(ValidationResult(false, listOf("Missing answer for required field.")))
+        .isEqualTo(Invalid(listOf("Missing answer for required field.")))
     } finally {
       observer.cancel()
       ShadowLooper.runUiThreadTasksIncludingDelayedTasks()

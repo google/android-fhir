@@ -21,7 +21,8 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -48,7 +49,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
           text = "Question?"
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -63,7 +64,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -77,7 +78,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -99,7 +100,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
               value = BooleanType(true)
             }
           ),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -118,7 +119,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
               value = BooleanType(true)
             }
           ),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -140,7 +141,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
               value = BooleanType(false)
             }
           ),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -159,7 +160,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
               value = BooleanType(false)
             }
           ),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -176,7 +177,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -191,7 +192,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -212,7 +213,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -233,7 +234,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -257,7 +258,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -278,7 +279,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -296,7 +297,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
+        validationResult = Invalid(listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -317,7 +318,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -340,7 +341,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
