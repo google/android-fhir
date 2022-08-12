@@ -1607,6 +1607,64 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
+  fun `should not allow user to move forward using prior entry-mode`() = runBlocking {
+    val entryModeExtension =
+      Extension().apply {
+        url = EXTENSION_ENTRY_MODE_URL
+        setValue(StringType("prior-edit"))
+      }
+    val questionnaire =
+      Questionnaire().apply {
+        addExtension(entryModeExtension)
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                required = true
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    var pagination: QuestionnairePagination? = null
+    val observer =
+      launch(Dispatchers.Main) {
+        viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
+      }
+    try {
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      viewModel.goToNextPage()
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+
+      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.getPages()!!, 0))
+    } finally {
+      observer.cancel()
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      observer.cancelAndJoin()
+    }
+  }
+
+  @Test
   fun `should allow user to move forward using random entry-mode`() = runBlocking {
     val entryModeExtension =
       Extension().apply {
@@ -1829,6 +1887,64 @@ class QuestionnaireViewModelTest(
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
     assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.last()?.index)
+  }
+
+  @Test
+  fun `should not allow user to move forward using sequential entry-mode`() = runBlocking {
+    val entryModeExtension =
+      Extension().apply {
+        url = EXTENSION_ENTRY_MODE_URL
+        setValue(StringType("sequential"))
+      }
+    val questionnaire =
+      Questionnaire().apply {
+        addExtension(entryModeExtension)
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                required = true
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    var pagination: QuestionnairePagination? = null
+    val observer =
+      launch(Dispatchers.Main) {
+        viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
+      }
+    try {
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      viewModel.goToNextPage()
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+
+      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.getPages()!!, 0))
+    } finally {
+      observer.cancel()
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      observer.cancelAndJoin()
+    }
   }
 
   @Test
