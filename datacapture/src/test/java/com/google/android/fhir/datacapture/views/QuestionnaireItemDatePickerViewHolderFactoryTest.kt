@@ -134,6 +134,67 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
   }
 
   @Test
+  fun `parse date text input as per US locale`() {
+    setLocale(Locale.US)
+    val item =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    viewHolder.bind(item)
+    viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text = "11/19/2020"
+
+    val answer = item.answers.singleOrNull()?.value as DateType
+
+    assertThat(answer.day).isEqualTo(19)
+    assertThat(answer.month).isEqualTo(10)
+    assertThat(answer.year).isEqualTo(2020)
+  }
+
+  @Test
+  fun `parse date text input as per Japan locale`() {
+    setLocale(Locale.JAPAN)
+    val item =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    viewHolder.bind(item)
+    viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text = "2020/11/19"
+    val answer = item.answers.singleOrNull()?.value as DateType
+
+    assertThat(answer.day).isEqualTo(19)
+    assertThat(answer.month).isEqualTo(10)
+    assertThat(answer.year).isEqualTo(2020)
+  }
+
+  @Test
+  fun `clear the answer if date input is invalid`() {
+    setLocale(Locale.US)
+    val questionnaireItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateType(2020, 10, 19))
+          ),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    viewHolder.bind(questionnaireItem)
+
+    viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text = "11/19/"
+    val answer = questionnaireItem.answers.singleOrNull()?.value
+    assertThat(answer).isNull()
+  }
+
+  @Test
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
