@@ -48,7 +48,7 @@ class ExpressionEvaluatorTest {
       }
 
     val result =
-      ExpressionEvaluator.evaluateQuestionnaireRootVariableExpression(
+      ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
         questionnaire.variableExpressions.first(),
         questionnaire,
         QuestionnaireResponse()
@@ -85,7 +85,7 @@ class ExpressionEvaluatorTest {
       }
 
     val result =
-      ExpressionEvaluator.evaluateQuestionnaireRootVariableExpression(
+      ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
         questionnaire.variableExpressions.last(),
         questionnaire,
         QuestionnaireResponse()
@@ -186,7 +186,7 @@ class ExpressionEvaluatorTest {
       }
 
     val result =
-      ExpressionEvaluator.evaluateQuestionnaireRootVariableExpression(
+      ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
         questionnaire.variableExpressions.last(),
         questionnaire,
         QuestionnaireResponse()
@@ -213,7 +213,7 @@ class ExpressionEvaluatorTest {
       }
 
     val result =
-      ExpressionEvaluator.evaluateQuestionnaireRootVariableExpression(
+      ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
         questionnaire.variableExpressions.last(),
         questionnaire,
         QuestionnaireResponse()
@@ -322,7 +322,7 @@ class ExpressionEvaluatorTest {
             }
           }
 
-        ExpressionEvaluator.evaluateQuestionnaireRootVariableExpression(
+        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.first(),
           questionnaire,
           QuestionnaireResponse()
@@ -349,7 +349,7 @@ class ExpressionEvaluatorTest {
             }
           }
 
-        ExpressionEvaluator.evaluateQuestionnaireRootVariableExpression(
+        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.first(),
           questionnaire,
           QuestionnaireResponse()
@@ -377,7 +377,7 @@ class ExpressionEvaluatorTest {
             }
           }
 
-        ExpressionEvaluator.evaluateQuestionnaireRootVariableExpression(
+        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.first(),
           questionnaire,
           QuestionnaireResponse()
@@ -404,7 +404,7 @@ class ExpressionEvaluatorTest {
             }
           }
 
-        ExpressionEvaluator.evaluateQuestionnaireRootVariableExpression(
+        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.first(),
           questionnaire,
           QuestionnaireResponse()

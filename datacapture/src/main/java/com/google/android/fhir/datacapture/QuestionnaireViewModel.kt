@@ -145,25 +145,24 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /** The map from each item in the [Questionnaire] to its parent. */
-  private var questionnaireItemParentMap =
-    mapOf<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>()
+  private var questionnaireItemParentMap:
+    Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>
 
   init {
-    val questionnaireItemParentMapMutable =
-      mutableMapOf<
-        Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>()
     /** Adds each child-parent pair in the [Questionnaire] to the parent map. */
-    fun buildParentList(item: Questionnaire.QuestionnaireItemComponent) {
+    fun buildParentList(item: Questionnaire.QuestionnaireItemComponent, map: ItemToParentMap) {
       for (child in item.item) {
-        questionnaireItemParentMapMutable[child] = item
-        buildParentList(child)
+        map[child] = item
+        buildParentList(child, map)
       }
     }
 
-    for (item in questionnaire.item) {
-      buildParentList(item)
-    }
-    questionnaireItemParentMap = questionnaireItemParentMapMutable.toMap()
+    questionnaireItemParentMap =
+      buildMap {
+        for (item in questionnaire.item) {
+          buildParentList(item, this)
+        }
+      }
   }
 
   /** The map from each item in the [QuestionnaireResponse] to its parent. */
@@ -565,6 +564,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 }
 
+typealias ItemToParentMap =
+  MutableMap<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>
+
 /** Questionnaire state for the Fragment to consume. */
 internal data class QuestionnaireState(
   /** The items that should be currently-rendered into the Fragment. */
@@ -590,11 +592,6 @@ internal data class QuestionnairePage(
 
 internal val QuestionnairePagination.hasPreviousPage: Boolean
   get() = pages.any { it.index < currentPageIndex && it.enabled }
-
-internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
-  check(hasNextPage) { "Can't call nextPage() if hasNextPage is false ($this)" }
-  return copy(currentPageIndex = currentPageIndex + 1)
-}
 
 internal val QuestionnairePagination.hasNextPage: Boolean
   get() = pages.any { it.index > currentPageIndex && it.enabled }
