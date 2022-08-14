@@ -44,7 +44,8 @@ object Sync {
     downloadManager: DownloadWorkManager
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
-      FhirSynchronizer(context, fhirEngine, it, downloadManager).synchronize()
+      FhirSynchronizer(context, fhirEngine, it, downloadManager)
+        .synchronize(SyncWorkType.DOWNLOAD_UPLOAD)
     }
       ?: Result.Error(
         listOf(

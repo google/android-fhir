@@ -105,7 +105,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
     return FhirEngineProvider.getDataSource(context)?.let {
       FhirSynchronizer(context, fhirEngine, it, downloadManager)
         .apply { if (subscribeTo != null) subscribe(subscribeTo) }
-        .synchronize()
+        .synchronize(SyncWorkType.DOWNLOAD_UPLOAD)
     }
       ?: Result.Error(
         listOf(

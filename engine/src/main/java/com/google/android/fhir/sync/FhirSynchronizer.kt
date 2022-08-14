@@ -87,19 +87,37 @@ internal class FhirSynchronizer(
     return result
   }
 
-  suspend fun synchronize(): Result {
+  suspend fun synchronize(syncWorkType: SyncWorkType): Result {
     setSyncState(State.Started)
-
-    return listOf(upload(), download())
-      .filterIsInstance<Result.Error>()
-      .flatMap { it.exceptions }
-      .let {
-        if (it.isEmpty()) {
-          setSyncState(Result.Success())
-        } else {
-          setSyncState(Result.Error(it))
+    return when (syncWorkType) {
+      SyncWorkType.DOWNLOAD_UPLOAD ->
+        listOf(upload(), download())
+          .filterIsInstance<Result.Error>()
+          .flatMap { it.exceptions }
+          .let {
+            if (it.isEmpty()) {
+              setSyncState(Result.Success())
+            } else {
+              setSyncState(Result.Error(it))
+            }
+          }
+      SyncWorkType.UPLOAD ->
+        listOf(upload()).filterIsInstance<Result.Error>().flatMap { it.exceptions }.let {
+          if (it.isEmpty()) {
+            setSyncState(Result.Success())
+          } else {
+            setSyncState(Result.Error(it))
+          }
         }
-      }
+      SyncWorkType.DOWNLOAD ->
+        listOf(download()).filterIsInstance<Result.Error>().flatMap { it.exceptions }.let {
+          if (it.isEmpty()) {
+            setSyncState(Result.Success())
+          } else {
+            setSyncState(Result.Error(it))
+          }
+        }
+    }
   }
 
   private suspend fun download(): Result {

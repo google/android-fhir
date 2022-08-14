@@ -87,7 +87,12 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
 
       Timber.v("Subscribed to flow for progress")
 
-      val result = fhirSynchronizer.synchronize()
+      val result =
+        fhirSynchronizer.synchronize(
+          SyncWorkType.valueOf(
+            inputData.getString(SYNC_TYPE) ?: "fhir-engine-download-upload-worker"
+          )
+        )
       val output = buildOutput(result)
 
       // await/join is needed to collect states completely
@@ -146,5 +151,9 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
     override fun shouldSkipField(field: FieldAttributes) = field.name.equals("exceptions")
 
     override fun shouldSkipClass(clazz: Class<*>?) = false
+  }
+
+  companion object {
+    const val SYNC_TYPE = "sync-type"
   }
 }
