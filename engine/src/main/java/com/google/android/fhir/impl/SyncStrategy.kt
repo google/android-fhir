@@ -22,6 +22,7 @@ import com.google.android.fhir.SyncStrategyTypes
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ReferenceIndexEntity
 import com.google.android.fhir.index.entities.ReferenceIndex
 import java.util.Map.entry
@@ -198,6 +199,9 @@ class SequentialSyncStrategy() : SyncStrategy() {
     localChange: SquashedLocalChange
   ): List<ReferenceIndexEntity> {
     val resourceType = ResourceType.fromCode(localChange.localChange.resourceType)
+    if (localChange.localChange.type == LocalChangeEntity.Type.DELETE) {
+      return mutableListOf()
+    }
     val resourceEntity = database.selectEntity(resourceType, localChange.localChange.resourceId)
     return database.getAllReferences(resourceEntity.resourceUuid, resourceType)
   }
