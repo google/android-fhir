@@ -22,8 +22,10 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.CQF_CALCULATED_EXPRESSION_URL
 import com.google.common.truth.Truth.assertThat
-import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
+import kotlin.test.assertTrue
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -35,7 +37,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import kotlin.test.assertTrue
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
@@ -122,13 +123,8 @@ class MinValueConstraintValidatorTest {
           }
         )
       }
-
-    val answers =
-      listOf(
-        QuestionnaireResponseItemAnswerComponent().apply {
-          value = DateType(SimpleDateFormat("yyyy-MM-dd").parse("2021-06-01"))
-        }
-      )
+    val answerDate = (DateTimeType.today().apply { add(Calendar.YEAR, -1) })
+    val answers = listOf(QuestionnaireResponseItemAnswerComponent().apply { value = answerDate })
 
     val validationResult =
       MinValueConstraintValidator.validate(
@@ -138,7 +134,7 @@ class MinValueConstraintValidatorTest {
       )
 
     assertThat(validationResult.isValid).isFalse()
-    assertTrue(validationResult.message.equals("Minimum value allowed is:2022-08-01"))
+    assertTrue(validationResult.message.equals("Minimum value allowed is:$answerDate"))
   }
 
   @Test

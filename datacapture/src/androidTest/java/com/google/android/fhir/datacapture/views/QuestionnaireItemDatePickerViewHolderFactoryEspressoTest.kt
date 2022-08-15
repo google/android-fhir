@@ -32,12 +32,11 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.utilities.clickIcon
-import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
 import com.google.common.truth.Truth.assertThat
+import java.util.Calendar
 import org.hamcrest.CoreMatchers.allOf
-import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
@@ -69,11 +68,13 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            setValue(DateType(2020, 0, 1))
+            val minDate = DateTimeType.today().apply { add(Calendar.YEAR, -1) }
+            setValue(minDate)
           }
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(DateType(2025, 0, 1))
+            val maxDate = DateTimeType.today().apply { add(Calendar.YEAR, 4) }
+            setValue(maxDate)
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
