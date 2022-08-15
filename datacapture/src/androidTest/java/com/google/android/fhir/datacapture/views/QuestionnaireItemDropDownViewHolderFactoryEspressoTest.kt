@@ -31,6 +31,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.utilities.showDropDown
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -61,7 +62,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
       QuestionnaireItemViewItem(
         answerOptions("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -79,7 +80,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
       QuestionnaireItemViewItem(
         answerOptions("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }

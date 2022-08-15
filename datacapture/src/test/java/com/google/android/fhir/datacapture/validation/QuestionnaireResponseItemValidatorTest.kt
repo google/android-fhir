@@ -72,11 +72,10 @@ class QuestionnaireResponseItemValidatorTest {
         }
       )
 
-    val validateAggregationFromChildValidators =
+    val validationResult =
       QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
 
-    assertThat(validateAggregationFromChildValidators.isValid).isTrue()
-    assertThat(validateAggregationFromChildValidators.validationMessages).isEmpty()
+    assertThat(validationResult).isEqualTo(Valid)
   }
 
   @Test
@@ -104,15 +103,13 @@ class QuestionnaireResponseItemValidatorTest {
         }
       )
 
-    val validateAggregationFromChildValidators =
+    val validationResult =
       QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
 
-    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
-    assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(2)
-    assertThat(validateAggregationFromChildValidators.validationMessages[0])
-      .isEqualTo("Maximum value allowed is:500")
-    assertThat(validateAggregationFromChildValidators.validationMessages[1])
-      .isEqualTo("Minimum value allowed is:600")
+    assertThat(validationResult).isInstanceOf(Invalid::class.java)
+    val invalidValidationResult = validationResult as Invalid
+    assertThat(invalidValidationResult.getSingleStringValidationMessage())
+      .isEqualTo("Maximum value allowed is:500\nMinimum value allowed is:600")
   }
 
   @Test
@@ -134,15 +131,15 @@ class QuestionnaireResponseItemValidatorTest {
         }
       )
 
-    val validateAggregationFromChildValidators =
+    val validationResult =
       QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
 
-    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
-    assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(2)
-    assertThat(validateAggregationFromChildValidators.validationMessages[0])
-      .isEqualTo("The maximum number of characters that are permitted in the answer is: 10")
-    assertThat(validateAggregationFromChildValidators.validationMessages[1])
-      .isEqualTo("The minimum number of characters that are permitted in the answer is: 20")
+    assertThat(validationResult).isInstanceOf(Invalid::class.java)
+    val invalidValidationResult = validationResult as Invalid
+    assertThat(invalidValidationResult.getSingleStringValidationMessage())
+      .isEqualTo(
+        "The maximum number of characters that are permitted in the answer is: 10\nThe minimum number of characters that are permitted in the answer is: 20"
+      )
   }
 
   @Test
@@ -164,12 +161,12 @@ class QuestionnaireResponseItemValidatorTest {
         }
       )
 
-    val validateAggregationFromChildValidators =
+    val validationResult =
       QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
 
-    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
-    assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(1)
-    assertThat(validateAggregationFromChildValidators.validationMessages[0])
+    assertThat(validationResult).isInstanceOf(Invalid::class.java)
+    val invalidValidationResult = validationResult as Invalid
+    assertThat(invalidValidationResult.getSingleStringValidationMessage())
       .isEqualTo("The answer doesn't match regular expression: $regex")
   }
 }
