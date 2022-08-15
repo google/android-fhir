@@ -31,7 +31,6 @@ import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.android.fhir.search.search
-import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -315,17 +314,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     item: Questionnaire.QuestionnaireItemComponent,
     expression: Expression
   ) {
-    println("Starting scope ${Date()}")
-
     if (expression.isXFhirQuery)
       fhirEngine.search(expression.expression).let { resources ->
-        item.applyChoiceColumns(resources)
+        item.populateAnswerOptions(resources)
       }
+    else if (expression.isFhirPath) item.populateAnswerOptions(expression, questionnaireResponse)
     else
       throw UnsupportedOperationException(
         "${expression.language} not supported for answer-expression yet"
       )
-    println("Ended scope ${Date()}")
   }
 
   /**

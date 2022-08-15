@@ -18,9 +18,8 @@ package com.google.android.fhir.datacapture
 
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
-import com.google.android.fhir.datacapture.common.datatype.asBooleanValue
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
-import com.google.android.fhir.datacapture.enablement.fhirPathEngine
+import com.google.android.fhir.datacapture.mapping.ResourceMapper.fhirPathEngine
 import com.google.android.fhir.getLocalizedText
 import com.google.android.fhir.logicalId
 import org.hl7.fhir.r4.model.BooleanType
@@ -295,9 +294,6 @@ internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expressi
       it.castToExpression(it)
     }
 
-internal val Expression.isXFhirQuery: Boolean
-  get() = this.language == Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
-
 // TODO implement full functionality of choice column
 // https://github.com/google/android-fhir/issues/1495
 /**
@@ -317,7 +313,8 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceColumn: List<ChoiceC
         ChoiceColumn(
           path = it.find { it.url == "path" }!!.value.asStringValue(),
           label = it.find { it.url == "label" }?.value?.asStringValue(),
-          forDisplay = it.find { it.url == "forDisplay" }?.value?.asBooleanValue() ?: true
+          forDisplay =
+            it.any { it.url == "forDisplay" && it.castToBoolean(it.value).booleanValue() }
         )
       }
     }
@@ -330,29 +327,43 @@ data class ChoiceColumn(val path: String, val label: String?, val forDisplay: Bo
  * Apply and add each choice-column mapping to answer options
  * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-choiceColumn.html
  *
- * Control the information displayed in list. It has two modes:
- * - With choice/open-choice -> allows selection of display and/or code in answerOption
- * - With reference -> allows selection of fields from the resource for display and reference
+ * Control the information displayed in list. With reference it allows selection of fields from the
+ * resource for display and reference
  */
-internal fun Questionnaire.QuestionnaireItemComponent.applyChoiceColumns(dataList: List<Resource>) {
-  this.choiceColumn?.forEach { choiceColumn ->
-    dataList
-      .map { data ->
-        if (this.type == Questionnaire.QuestionnaireItemType.REFERENCE)
+internal fun Questionnaire.QuestionnaireItemComponent.populateAnswerOptions(
+  dataList: List<Resource>
+) {
+  this.choiceColumn
+    ?.also {
+      require(this.type == Questionnaire.QuestionnaireItemType.REFERENCE) {
+        "$EXTENSION_CHOICE_COLUMN_URL can not be applied on '${this.type}'. Only type reference is allowed with resource."
+      }
+    }
+    ?.also { choiceColumns ->
+      dataList
+        .map { data ->
           Reference().apply {
-            reference = "${data.resourceType.name}/${data.logicalId}"
-            display = fhirPathEngine.evaluateToString(data, choiceColumn.path)
+            reference = "${data.resourceType}/${data.logicalId}"
+            display =
+              choiceColumns.filter { it.forDisplay }.joinToString(" ") {
+                fhirPathEngine.evaluateToString(data, it.path)
+              }
           }
-        else fhirPathEngine.evaluate(data, choiceColumn.path).first()
-      }
-      .map {
-        Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-          this.value = it.castToType(it)
         }
-      }
-      .also { this.answerOption.addAll(it) }
-  }
+        .map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
+        .also { this.answerOption.addAll(it) }
+    }
 }
+
+/** Populates answer options from given [Expression] with [QuestionnaireResponse] as base. */
+internal fun Questionnaire.QuestionnaireItemComponent.populateAnswerOptions(
+  expression: Expression,
+  questionnaireResponse: QuestionnaireResponse
+) =
+  fhirPathEngine
+    .evaluate(questionnaireResponse, expression.expression)
+    .map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it.castToType(it)) }
+    .run { this@populateAnswerOptions.answerOption = this }
 
 /**
  * Creates a list of [QuestionnaireResponse.QuestionnaireResponseItemComponent]s from the nested

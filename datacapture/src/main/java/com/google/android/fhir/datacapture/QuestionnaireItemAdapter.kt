@@ -79,8 +79,7 @@ internal class QuestionnaireItemAdapter(
           QuestionnaireItemEditTextDecimalViewHolderFactory
         QuestionnaireItemViewHolderType.RADIO_GROUP -> QuestionnaireItemRadioGroupViewHolderFactory
         QuestionnaireItemViewHolderType.DROP_DOWN -> QuestionnaireItemDropDownViewHolderFactory
-        QuestionnaireItemViewHolderType.REFERENCE ->
-          QuestionnaireItemDropDownViewHolderFactory // TODO check it
+        QuestionnaireItemViewHolderType.REFERENCE -> QuestionnaireItemDropDownViewHolderFactory
         QuestionnaireItemViewHolderType.DISPLAY -> QuestionnaireItemDisplayViewHolderFactory
         QuestionnaireItemViewHolderType.QUANTITY ->
           QuestionnaireItemEditTextQuantityViewHolderFactory

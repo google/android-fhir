@@ -33,7 +33,6 @@ import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import java.util.UUID
@@ -58,7 +57,6 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.ValueSet
 import org.junit.Before
 import org.junit.Ignore
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
@@ -74,8 +72,6 @@ class QuestionnaireViewModelTest(
   private val questionnaireSource: QuestionnaireSource,
   private val questionnaireResponseSource: QuestionnaireResponseSource
 ) {
-  @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
-
   private lateinit var fhirEngine: FhirEngine
   private lateinit var state: SavedStateHandle
   private val context = ApplicationProvider.getApplicationContext<Application>()

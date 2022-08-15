@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.common.datatype
+package com.google.android.fhir.datacapture
 
-import org.hl7.fhir.r4.model.PrimitiveType
-import org.hl7.fhir.r4.model.Type
+import org.hl7.fhir.r4.model.Expression
 
-/**
- * Returns the string representation of a [PrimitiveType].
- *
- * <p>If the type isn't a [PrimitiveType], an empty string is returned.
- */
-fun Type.asStringValue(): String {
-  if (!isPrimitive) return ""
-  return (this as PrimitiveType<*>).asStringValue()
-}
+internal val Expression.isXFhirQuery: Boolean
+  get() = this.language == Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+
+internal val Expression.isFhirPath: Boolean
+  get() = this.language == Expression.ExpressionLanguage.TEXT_FHIRPATH.toCode()
