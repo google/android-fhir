@@ -35,6 +35,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import kotlin.test.assertTrue
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
@@ -137,7 +138,7 @@ class MinValueConstraintValidatorTest {
       )
 
     assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.message.isNullOrBlank()).isFalse()
+    assertTrue(validationResult.message.equals("Minimum value allowed is:2022-08-01"))
   }
 
   @Test
