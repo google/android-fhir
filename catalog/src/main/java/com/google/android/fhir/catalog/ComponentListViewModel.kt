@@ -108,7 +108,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
     ),
     IMAGE(R.drawable.ic_image, R.string.component_name_image, "", ""),
     AUTO_COMPLETE(
-      R.drawable.ic_textfield,
+      R.drawable.ic_autocomplete,
       R.string.component_name_auto_complete,
       "auto_complete_questionnaire.json",
       "auto_complete_with_validation_questionnaire.json"
