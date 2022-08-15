@@ -266,7 +266,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         modificationCount.update { it + 1 }
 
         if (currentPageItems.all {
-            it.validationResult is Valid || it.validationResult is NotValidated
+            it.validationResult is NotValidated || it.validationResult is Valid
           }
         ) {
           isPaginationButtonPressed = false
