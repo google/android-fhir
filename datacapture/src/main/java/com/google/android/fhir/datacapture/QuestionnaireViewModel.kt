@@ -29,6 +29,7 @@ import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -264,7 +265,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         isPaginationButtonPressed = true
         modificationCount.update { it + 1 }
 
-        if (currentPageItems.all { it.validationResult!!.isValid }) {
+        if (currentPageItems.all {
+            it.validationResult is Valid || it.validationResult is NotValidated
+          }
+        ) {
           isPaginationButtonPressed = false
           val nextPageIndex =
             pages!!.indexOfFirst { it.index > currentPageIndexFlow.value!! && it.enabled }
@@ -478,7 +482,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               questionnaireResponseItem.answer.first().item
             },
         )
-    // holding updated items state
     currentPageItems = items
     return items
   }
