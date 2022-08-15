@@ -25,7 +25,8 @@ import androidx.core.view.children
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
@@ -50,7 +51,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -82,7 +83,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         questionnaire,
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -118,7 +119,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         questionnaire,
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -143,7 +144,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -177,7 +178,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -208,7 +209,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -243,7 +244,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
             emptyList()
           }
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -290,7 +291,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -328,7 +329,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -355,7 +356,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -375,7 +376,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
+        validationResult = Invalid(listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -403,7 +404,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -424,7 +425,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )

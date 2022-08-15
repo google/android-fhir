@@ -19,7 +19,8 @@ package com.google.android.fhir.datacapture.views
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.util.Locale
@@ -44,7 +45,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -59,7 +60,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -81,7 +82,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(DateType(2020, 10, 19))
           ),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -102,7 +103,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(DateType(2020, 10, 19))
           ),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -123,7 +124,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(DateType(2020, 10, 19))
           ),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -154,7 +155,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
               .setValue(DateType(2026, 0, 1))
           )
         },
-        validationResult = ValidationResult(false, listOf("Maximum value allowed is:2025-01-01")),
+        validationResult = Invalid(listOf("Maximum value allowed is:2025-01-01")),
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -183,7 +184,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
               .setValue(DateType(2023, 0, 1))
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -198,7 +199,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
