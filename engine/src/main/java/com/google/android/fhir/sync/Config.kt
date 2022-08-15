@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit
 typealias ParamMap = Map<String, String>
 
 /** Constant for the max number of retries in case of sync failure */
-@PublishedApi internal const val MAX_RETRIES_ALLOWED = "max_retires"
+const val MAX_RETRIES_ALLOWED = "max_retires"
 
 val defaultRetryConfiguration =
   RetryConfiguration(BackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3)

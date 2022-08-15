@@ -72,6 +72,7 @@ class SequentialSyncStrategy() : SyncStrategy() {
     upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
 
+    idsDone = mutableListOf()
     this.database = database
     this.upload = upload
     this.collectAndEmitLocalChange = collectAndEmitLocalChange
@@ -87,13 +88,13 @@ class SequentialSyncStrategy() : SyncStrategy() {
     if (listOfLocalChange.isNotEmpty()) {
       Timber.i("not empty function exit ${listOfLocalChange.size}")
       collectAndEmitLocalChange(listOfLocalChange, upload)
-      val listDropped = idsDone.drop(listOfLocalChange.size)
-      idsDone =
-        if (listDropped.isEmpty()) {
-          mutableListOf()
-        } else {
-          listDropped as MutableList<String>
-        }
+      //      val listDropped = idsDone.drop(listOfLocalChange.size)
+      //      idsDone =
+      //        if (listDropped.isEmpty()) {
+      //          mutableListOf()
+      //        } else {
+      //          listDropped as MutableList<String>
+      //        }
       listOfLocalChange = mutableListOf()
     }
   }
@@ -104,13 +105,13 @@ class SequentialSyncStrategy() : SyncStrategy() {
       mapOfResourceIdLocalChange[resourceId]?.let { it -> listOfLocalChange.add(it) }
       Timber.i("emitting ${listOfLocalChange.size}")
       collectAndEmitLocalChange(listOfLocalChange, upload)
-      val listDropped = idsDone.drop(listOfLocalChange.size)
-      idsDone =
-        if (listDropped.isEmpty()) {
-          mutableListOf()
-        } else {
-          listDropped as MutableList<String>
-        }
+      //      val listDropped = idsDone.drop(listOfLocalChange.size)
+      //      idsDone =
+      //        if (listDropped.isEmpty()) {
+      //          mutableListOf()
+      //        } else {
+      //          listDropped as MutableList<String>
+      //        }
       listOfLocalChange = mutableListOf()
     } else {
       mapOfResourceIdLocalChange[resourceId]?.let { it -> listOfLocalChange.add(it) }
