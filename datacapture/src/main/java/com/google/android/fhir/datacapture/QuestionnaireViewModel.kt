@@ -265,10 +265,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         isPaginationButtonPressed = true
         modificationCount.update { it + 1 }
 
-        if (currentPageItems.all {
-            it.validationResult is NotValidated || it.validationResult is Valid
-          }
-        ) {
+        if (currentPageItems.all { it.validationResult is Valid }) {
           isPaginationButtonPressed = false
           val nextPageIndex =
             pages!!.indexOfFirst { it.index > currentPageIndexFlow.value!! && it.enabled }

@@ -1552,10 +1552,23 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.goToNextPage()
+    var pagination: QuestionnairePagination? = null
+    val observer =
+      launch(Dispatchers.Main) {
+        viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
+      }
+    try {
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      viewModel.goToNextPage()
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
-    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.last()?.index)
+      assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
+      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.getPages()!!, 1))
+    } finally {
+      observer.cancel()
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      observer.cancelAndJoin()
+    }
   }
 
   @Test
@@ -1599,11 +1612,24 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.goToNextPage()
-    viewModel.goToPreviousPage()
+    var pagination: QuestionnairePagination? = null
+    val observer =
+      launch(Dispatchers.Main) {
+        viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
+      }
+    try {
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      viewModel.goToNextPage()
+      viewModel.goToPreviousPage()
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
-    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.first()?.index)
+      assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
+      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.getPages()!!, 0))
+    } finally {
+      observer.cancel()
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      observer.cancelAndJoin()
+    }
   }
 
   @Test
@@ -1883,10 +1909,23 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.goToNextPage()
+    var pagination: QuestionnairePagination? = null
+    val observer =
+      launch(Dispatchers.Main) {
+        viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
+      }
+    try {
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      viewModel.goToNextPage()
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
-    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
-    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.last()?.index)
+      assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
+      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.getPages()!!, 1))
+    } finally {
+      observer.cancel()
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      observer.cancelAndJoin()
+    }
   }
 
   @Test
@@ -1988,11 +2027,23 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.goToNextPage()
-    viewModel.goToPreviousPage()
+    var pagination: QuestionnairePagination? = null
+    val observer =
+      launch(Dispatchers.Main) {
+        viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
+      }
+    try {
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      viewModel.goToNextPage()
+      viewModel.goToPreviousPage()
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
-    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
-    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.last()?.index)
+      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.getPages()!!, 1))
+    } finally {
+      observer.cancel()
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      observer.cancelAndJoin()
+    }
   }
 
   @Test
