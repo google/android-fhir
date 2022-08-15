@@ -44,9 +44,9 @@ object ExpressionEvaluator {
   /**
    * Finds all the matching occurrences of variables. For example, when we apply regex to the
    * expression "%X + %Y", if we simply groupValues, it returns [%X, X], [%Y, Y] The group with
-   * index 0 is always the entire matched string (%X and %Y) The indices greater than 0 represent
+   * index 0 is always the entire matched string (%X and %Y). The indices greater than 0 represent
    * groups in the regular expression (X and Y) so we groupValues by first index to get only the
-   * variables name without % ([X, Y])
+   * variables name without % as prefix i.e, ([X, Y])
    *
    * If we apply regex to the expression "X + Y", it returns nothing as there are no matching groups
    * in this expression
