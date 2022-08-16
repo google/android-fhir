@@ -39,16 +39,12 @@ internal object QuestionnaireResponseItemValidator {
     answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
     context: Context
   ): ValidationResult {
-    val validationResults = mutableListOf<ConstraintValidator.ConstraintValidationResult>()
-    validators.forEach { validationResults.add(it.validate(questionnaireItem, answers, context)) }
-    return ValidationResult(
-      validationResults.all { it.isValid },
-      validationResults.mapNotNull { it.message }.toList()
-    )
+    val validationResults = validators.map { it.validate(questionnaireItem, answers, context) }
+
+    return if (validationResults.all { it.isValid }) {
+      Valid
+    } else {
+      Invalid(validationResults.mapNotNull { it.message })
+    }
   }
 }
-
-data class ValidationResult(var isValid: Boolean, val validationMessages: List<String>)
-
-fun ValidationResult.getSingleStringValidationMessage() =
-  this.validationMessages.joinToString(separator = "\n")
