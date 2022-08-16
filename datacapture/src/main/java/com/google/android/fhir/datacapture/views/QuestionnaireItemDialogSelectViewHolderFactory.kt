@@ -29,8 +29,10 @@ import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.itemControl
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -101,7 +103,10 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         holder.summaryHolder.error =
-          validationResult.getSingleStringValidationMessage().takeIf { it.isNotEmpty() }
+          when (validationResult) {
+            is NotValidated, Valid -> null
+            is Invalid -> validationResult.getSingleStringValidationMessage()
+          }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

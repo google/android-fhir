@@ -25,8 +25,10 @@ import androidx.appcompat.view.ContextThemeWrapper
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.entryFormat
 import com.google.android.fhir.datacapture.utilities.localizedString
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -94,8 +96,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         textInputLayout.error =
-          if (validationResult.getSingleStringValidationMessage() == "") null
-          else validationResult.getSingleStringValidationMessage()
+          when (validationResult) {
+            is NotValidated, Valid -> null
+            is Invalid -> validationResult.getSingleStringValidationMessage()
+          }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
