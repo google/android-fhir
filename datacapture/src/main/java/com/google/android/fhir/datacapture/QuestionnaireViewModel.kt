@@ -262,6 +262,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   internal fun goToNextPage() {
     when (entryMode) {
       EntryMode.PRIOR_EDIT, EntryMode.SEQUENTIAL -> {
+        // Force update validation results for all questions on the current page
         isPaginationButtonPressed = true
         modificationCount.update { it + 1 }
 
