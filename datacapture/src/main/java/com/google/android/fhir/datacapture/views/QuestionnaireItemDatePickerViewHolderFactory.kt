@@ -40,6 +40,8 @@ import java.time.chrono.IsoChronology
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.FormatStyle
 import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.log10
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -52,8 +54,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private var textWatcher: TextWatcher? = null
-      // medium and long format styles use date names which isn't what we want. we want numerical
-      // date format.
+      // Medium and long format styles use alphabetical month names which are difficult for the user
+      // to input. Use short format style which is always numerical.
       private val localePattern =
         DateTimeFormatterBuilder.getLocalizedDateTimePattern(
           FormatStyle.SHORT,
@@ -142,11 +144,18 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         try {
           val date = parseDate(text, textInputEditText.context.applicationContext)
           val localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-          questionnaireItemViewItem.setAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = localDate.dateType
-            }
-          )
+          // date/localDate with year more than 4 digit throws data format exception if deep copy
+          // operation get performed on QuestionnaireResponse
+          // QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent in org.hl7.fhir.r4.model
+          // e.g ca.uhn.fhir.parser.DataFormatException: Invalid date/time format: "19843-12-21":
+          // Expected character '-' at index 4 but found 3
+          if (localDate.year.length() <= 4) {
+            questionnaireItemViewItem.setAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = localDate.dateType
+              }
+            )
+          }
         } catch (e: ParseException) {
           questionnaireItemViewItem.clearAnswer()
         }
@@ -194,4 +203,11 @@ internal fun parseDate(text: CharSequence?, context: Context) =
     DateFormat.getDateInstance(DateFormat.SHORT).parse(text.toString())
   } else {
     android.text.format.DateFormat.getDateFormat(context).parse(text.toString())
+  }
+
+// https://stackoverflow.com/questions/42950812/count-number-of-digits-in-kotlin
+internal fun Int.length() =
+  when (this) {
+    0 -> 1
+    else -> log10(abs(toDouble())).toInt() + 1
   }

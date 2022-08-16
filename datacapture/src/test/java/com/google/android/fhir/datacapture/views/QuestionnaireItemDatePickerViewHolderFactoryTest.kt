@@ -134,7 +134,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `parse date text input as per US locale`() {
+  fun `parse date text input in US locale`() {
     setLocale(Locale.US)
     val item =
       QuestionnaireItemViewItem(
@@ -155,7 +155,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `parse date text input as per Japan locale`() {
+  fun `parse date text input in Japan locale`() {
     setLocale(Locale.JAPAN)
     val item =
       QuestionnaireItemViewItem(
