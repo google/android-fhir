@@ -23,7 +23,8 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
@@ -43,7 +44,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         answerOptions("Coding 1", "Coding 2"),
         responseOptions(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -57,7 +58,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         answerOptions("Coding 1", "Coding 2", "Coding 3"),
         responseOptions("Coding 1", "Coding 3"),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -75,7 +76,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
           required = true
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
+        validationResult = Invalid(listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -107,7 +108,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -127,7 +128,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
           readOnly = true
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
