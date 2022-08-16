@@ -22,6 +22,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.CQF_CALCULATED_EXPRESSION_URL
 import com.google.common.truth.Truth.assertThat
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import kotlin.test.assertTrue
@@ -123,7 +124,18 @@ class MinValueConstraintValidatorTest {
           }
         )
       }
-    val answerDate = (DateTimeType.today().apply { add(Calendar.YEAR, -1) })
+    val answerDate =
+      DateType(
+        SimpleDateFormat("yyyy-MM-dd")
+          .parse(
+            (DateTimeType.today()
+              .apply {
+                add(Calendar.YEAR, -1)
+                add(Calendar.DAY_OF_MONTH, -1)
+              }
+              .valueAsString)
+          )
+      )
     val answers = listOf(QuestionnaireResponseItemAnswerComponent().apply { value = answerDate })
 
     val validationResult =
@@ -132,9 +144,10 @@ class MinValueConstraintValidatorTest {
         answers,
         InstrumentationRegistry.getInstrumentation().context
       )
-
+    val expectedDateRange =
+      (MinValueConstraintValidator.getMinValue(questionnaireItem) as? DateType)?.valueAsString
     assertThat(validationResult.isValid).isFalse()
-    assertTrue(validationResult.message.equals("Minimum value allowed is:$answerDate"))
+    assertTrue(validationResult.message.equals("Minimum value allowed is:$expectedDateRange"))
   }
 
   @Test

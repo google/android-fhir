@@ -125,36 +125,6 @@
                 "expression": "Patient.birthDate",
                 "name": "patientBirthDate"
               }
-            },
-            {
-              "url" : "http://hl7.org/fhir/StructureDefinition/minValue",
-              "_valueDate" : {
-                "extension" : [
-                  {
-                    "url": "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue",
-                    "valueExpression" : {
-                      "description" : "current date",
-                      "language" : "text/fhirpath",
-                      "expression" : "today() - 1 'days'"
-                    }
-                  }
-                ]
-              }
-            },
-            {
-              "url" : "http://hl7.org/fhir/StructureDefinition/maxValue",
-              "_valueDate" : {
-                "extension" : [
-                  {
-                    "url": "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue",
-                    "valueExpression" : {
-                      "description" : "current date",
-                      "language" : "text/fhirpath",
-                      "expression" : "today() + 1 'days'"
-                    }
-                  }
-                ]
-              }
             }
           ],
           "linkId": "patient-0-birth-date",
