@@ -101,4 +101,10 @@ class MoreQuestionnairesTest {
     questionnaire.extension = listOf(Extension(EXTENSION_ENTRY_MODE_URL, StringType("random")))
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
   }
+
+  @Test
+  fun `entryMode should return null if no EntryMode is defined`() {
+    val questionnaire = Questionnaire()
+    assertThat(questionnaire.entryMode).isNull()
+  }
 }
