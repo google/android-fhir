@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2378,10 +2378,11 @@ class ResourceMapperTest {
   }
 
   @Test
-  fun extract_should_perform_defination_based_extraction_for_custom_extensions() = runBlocking {
+  fun `extract() should perform definition based extraction for custom extensions with valueAsPrimitive`():
+    Unit = runBlocking {
     @Language("JSON")
     val questionnaire =
-    """{
+      """{
       "resourceType": "Questionnaire",
       "subjectType": [
         "Encounter"
@@ -2405,7 +2406,7 @@ class ResourceMapperTest {
         }
       ]
     }
-    """.trimIndent()
+      """.trimIndent()
 
     @Language("JSON")
     val response =
@@ -2433,7 +2434,284 @@ class ResourceMapperTest {
     val encounter = bundle.entry[0].resource as Encounter
 
     assertThat(encounter).isNotNull()
-    assertThat(encounter.getExtensionByUrl("http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-encounter#Encounter.contactNumber").valueAsPrimitive.value).isEqualTo(9)
+    assertThat(
+        encounter.getExtensionByUrl(
+            "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-encounter#Encounter.contactNumber"
+          )
+          .valueAsPrimitive
+          .value
+      )
+      .isEqualTo(9)
+  }
+
+  @Test
+  fun `extract() should perform definition based extraction for custom extensions with valueCodeableConcept`():
+    Unit = runBlocking {
+    @Language("JSON")
+    val questionnaire =
+      """{
+  "resourceType": "Questionnaire",
+  "id": "ANCOYO",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+      "valueExpression": {
+        "name": "patient",
+        "language": "application/x-fhir-query",
+        "expression": "Patient"
+      }
+    }
+  ],
+  "url": "Questionnaire/ANCOYO",
+  "version": "0.1.0",
+  "name": "ANCOYO",
+  "title": "Patient Registration",
+  "status": "active",
+  "experimental": false,
+  "date": "2022-03-18T18:49:37+05:30",
+  "publisher": "Intellectual Property Research and Deployment (IPRD)",
+  "description": "The registration of a patient for the purpose of maternal workflow.",
+  "useContext": [
+    {
+      "code": {
+        "system": "http://terminology.hl7.org/CodeSystem/usage-context-type",
+        "code": "task",
+        "display": "Workflow Task"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "https://www.iprdsolutions.com/Nigeria/Oyo/Clinic/CodeSystem/lab-activity-codes",
+            "code": "ANC.OYO",
+            "display": "Patient-Reg"
+          }
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "type": "group",
+      "linkId": "patient-basic-details",
+      "text": "Patient details",
+      "item": [
+        {
+          "linkId": "patient-name",
+          "type": "group",
+          "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                  "valueExpression": {
+                    "language": "text/fhirpath",
+                    "expression": "Patient.name.given[0]",
+                    "name": "patientName"
+                  }
+                }
+              ],
+              "type": "string",
+              "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.given",
+              "linkId": "first-name",
+              "required": true,
+              "text": "First name"
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                  "valueExpression": {
+                    "language": "text/fhirpath",
+                    "expression": "Patient.name.family",
+                    "name": "patientFamilyName"
+                  }
+                }
+              ],
+              "type": "string",
+              "linkId": "last-name",
+              "required": true,
+              "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.family",
+              "text": "Last name"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "type": "group",
+      "linkId": "patient-other-details",
+      "item": [
+        {
+          "type": "choice",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "open-choice",
+                    "display": "Open Choice"
+                  }
+                ],
+                "text": "Open Choice"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": {
+                "language": "text/fhirpath",
+                "expression": "Patient.extension.where(url=\"http://iprdgroup.org/fhir/extention/tribe\").value",
+                "name": "patientTribe"
+              }
+            }
+          ],
+          "linkId": "tribe",
+          "text": "Tribe",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension:tribe",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "hausa",
+                "display": "Hausa"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "yoruba",
+                "display": "Yoruba"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "igbo",
+                "display": "Igbo"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+      """.trimIndent()
+
+    @Language("JSON")
+    val response =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "patient-basic-details",
+              "item": [
+                {
+                  "linkId": "patient-name",
+                  "item": [
+                    {
+                      "linkId": "first-name",
+                      "answer": [
+                        {
+                          "valueString": "Pallavi"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "last-name",
+                      "answer": [
+                        {
+                          "valueString": "Ganorkar"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "linkId": "patient-other-details",
+              "item": [
+                {
+                  "linkId": "tribe",
+                  "answer": [
+                    {
+                      "valueCoding": {
+                        "code": "hausa",
+                        "display": "Hausa"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+    val questionnaireObj =
+      iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
+    val temperatureQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
+    val bundle = ResourceMapper.extract(questionnaireObj, temperatureQuestionnaireResponse)
+    val patient = bundle.entry[0].resource as Patient
+
+    assertThat(patient).isNotNull()
+    assertThat(
+        patient.getExtensionByUrl(
+            "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension:tribe"
+          )
+          .value
+      )
+      .isInstanceOf(Coding::class.java)
+    assertThat(
+        (patient.getExtensionByUrl(
+              "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension:tribe"
+            )
+            .value as
+            Coding)
+          .code
+      )
+      .isEqualTo("hausa")
+    assertThat(
+        (patient.getExtensionByUrl(
+              "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension:tribe"
+            )
+            .value as
+            Coding)
+          .display
+      )
+      .isEqualTo("Hausa")
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)

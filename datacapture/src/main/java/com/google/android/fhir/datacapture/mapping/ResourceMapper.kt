@@ -29,7 +29,7 @@ import com.google.android.fhir.datacapture.utilities.toUriType
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
-import java.util.*
+import java.util.Locale
 import org.hl7.fhir.r4.context.IWorkerContext
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
@@ -450,13 +450,10 @@ object ResourceMapper {
       // Do nothing
     }
 
-    if(base.javaClass.getFieldOrNull(fieldName) == null){
-      //If field not found in resource class add definition based extension
-      addDefinitionBasedCustomExtension( questionnaireItem,
-        questionnaireResponseItem,
-        base)
+    if (base.javaClass.getFieldOrNull(fieldName) == null) {
+      // If field not found in resource class add definition based extension
+      addDefinitionBasedCustomExtension(questionnaireItem, questionnaireResponseItem, base)
     }
-
   }
 }
 
@@ -464,15 +461,17 @@ object ResourceMapper {
  * Adds definition based custom extension for Resource.
  * @param questionnaireItem QuestionnaireItemComponent with details for extension
  * @param questionnaireResponseItem QuestionnaireResponseItemComponent for response value
- * @param base - resource's Base class instance
- * See https://hapifhir.io/hapi-fhir/docs/model/profiles_and_extensions.html#extensions for more on
+ * @param base
+ * - resource's Base class instance See
+ * https://hapifhir.io/hapi-fhir/docs/model/profiles_and_extensions.html#extensions for more on
  * custom extensions
  */
 private fun addDefinitionBasedCustomExtension(
   questionnaireItem: Questionnaire.QuestionnaireItemComponent,
   questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-  base: Base){
-  if(base is DomainResource){
+  base: Base
+) {
+  if (base is DomainResource) {
     // Create an extension
     val ext = Extension()
     ext.url = questionnaireItem.definition
