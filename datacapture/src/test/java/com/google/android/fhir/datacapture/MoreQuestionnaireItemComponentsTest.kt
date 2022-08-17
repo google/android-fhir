@@ -1137,7 +1137,7 @@ class MoreQuestionnaireItemComponentsTest {
       .run {
         assertThat(this.message)
           .isEqualTo(
-            "$EXTENSION_CHOICE_COLUMN_URL can not be applied on choice. Only type reference is allowed with resource."
+            "$EXTENSION_CHOICE_COLUMN_URL not applicable for 'choice'. Only type reference is allowed with resource."
           )
       }
   }
