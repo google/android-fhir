@@ -141,7 +141,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -162,7 +162,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(item)
@@ -185,7 +185,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(DateType(2020, 10, 19))
           ),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItem)
