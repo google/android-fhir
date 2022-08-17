@@ -26,6 +26,7 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.utilities.fhirPathEngine
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
@@ -314,15 +315,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     item: Questionnaire.QuestionnaireItemComponent,
     expression: Expression
   ) {
-    if (expression.isXFhirQuery)
-      fhirEngine.search(expression.expression).let { resources ->
-        item.populateAnswerOptions(resources)
-      }
-    else if (expression.isFhirPath) item.populateAnswerOptions(expression, questionnaireResponse)
-    else
-      throw UnsupportedOperationException(
-        "${expression.language} not supported for answer-expression yet"
-      )
+    val data =
+      if (expression.isXFhirQuery) fhirEngine.search(expression.expression)
+      else if (expression.isFhirPath)
+        fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
+      else
+        throw UnsupportedOperationException(
+          "${expression.language} not supported for answer-expression yet"
+        )
+
+    item.populateAnswerOptions(data)
   }
 
   /**

@@ -58,8 +58,11 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
           ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
         autoCompleteTextView.setText(
           questionnaireItemViewItem.answers.singleOrNull()?.let {
-            if (it.hasValueReference()) it.valueReference.display
-            else if (it.hasValueCoding()) it.valueCoding.display else null
+            when {
+              it.hasValueReference() -> it.valueReference.display
+              it.hasValueCoding() -> it.valueCoding.display
+              else -> null
+            }
           }
             ?: ""
         )

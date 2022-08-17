@@ -19,9 +19,10 @@ package com.google.android.fhir.datacapture
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
-import com.google.android.fhir.datacapture.mapping.ResourceMapper.fhirPathEngine
+import com.google.android.fhir.datacapture.utilities.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
 import com.google.android.fhir.logicalId
+import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -41,7 +42,6 @@ internal enum class ItemControlTypes(
   AUTO_COMPLETE("autocomplete", QuestionnaireItemViewHolderType.AUTO_COMPLETE),
   CHECK_BOX("check-box", QuestionnaireItemViewHolderType.CHECK_BOX_GROUP),
   DROP_DOWN("drop-down", QuestionnaireItemViewHolderType.DROP_DOWN),
-  REFERENCE("reference", QuestionnaireItemViewHolderType.REFERENCE),
   OPEN_CHOICE("open-choice", QuestionnaireItemViewHolderType.DIALOG_SELECT),
   RADIO_BUTTON("radio-button", QuestionnaireItemViewHolderType.RADIO_GROUP),
   SLIDER("slider", QuestionnaireItemViewHolderType.SLIDER),
@@ -327,43 +327,39 @@ data class ChoiceColumn(val path: String, val label: String?, val forDisplay: Bo
  * Apply and add each choice-column mapping to answer options
  * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-choiceColumn.html
  *
- * Control the information displayed in list. With reference it allows selection of fields from the
- * resource for display and reference
+ * Control the information displayed in list.
+ * - With reference it allows selection of fields from the resource for display and reference
+ * - With other types it adds the options as is
  */
-internal fun Questionnaire.QuestionnaireItemComponent.populateAnswerOptions(
-  dataList: List<Resource>
-) {
-  this.choiceColumn
-    ?.also {
-      require(this.type == Questionnaire.QuestionnaireItemType.REFERENCE) {
-        "$EXTENSION_CHOICE_COLUMN_URL can not be applied on '${this.type}'. Only type reference is allowed with resource."
-      }
-    }
-    ?.also { choiceColumns ->
-      dataList
-        .map { data ->
-          Reference().apply {
-            reference = "${data.resourceType}/${data.logicalId}"
-            display =
-              choiceColumns.filter { it.forDisplay }.joinToString(" ") {
-                fhirPathEngine.evaluateToString(data, it.path)
-              }
-          }
-        }
-        .map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
-        .also { this.answerOption.addAll(it) }
-    }
-}
+internal fun Questionnaire.QuestionnaireItemComponent.populateAnswerOptions(dataList: List<Base>) {
+  val choiceColumns =
+    this.choiceColumn.also {
+      if (it.isNullOrEmpty() || dataList.isEmpty()) return@populateAnswerOptions
+    }!!
 
-/** Populates answer options from given [Expression] with [QuestionnaireResponse] as base. */
-internal fun Questionnaire.QuestionnaireItemComponent.populateAnswerOptions(
-  expression: Expression,
-  questionnaireResponse: QuestionnaireResponse
-) =
-  fhirPathEngine
-    .evaluate(questionnaireResponse, expression.expression)
-    .map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it.castToType(it)) }
-    .run { this@populateAnswerOptions.answerOption = this }
+  if (this.type != Questionnaire.QuestionnaireItemType.REFERENCE && dataList.first().isResource) {
+    throw IllegalArgumentException(
+      "$EXTENSION_CHOICE_COLUMN_URL not applicable for '${this.type.toCode()}'. Only type reference is allowed with resource."
+    )
+  }
+
+  dataList
+    .map { data ->
+      if (data.isResource) {
+        data as Resource
+        Reference().apply {
+          reference = "${data.resourceType}/${data.logicalId}"
+          choiceColumns
+            .filter { it.forDisplay }
+            .map { it.path }
+            .let { evaluateToDisplay(it, data) }
+            .also { display = it }
+        }
+      } else data.castToType(data)
+    }
+    .map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
+    .also { this.answerOption.addAll(it) }
+}
 
 /**
  * Creates a list of [QuestionnaireResponse.QuestionnaireResponseItemComponent]s from the nested

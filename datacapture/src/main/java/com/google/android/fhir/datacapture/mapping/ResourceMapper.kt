@@ -16,11 +16,10 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
+import com.google.android.fhir.datacapture.utilities.fhirPathEngine
 import com.google.android.fhir.datacapture.utilities.toCodeType
 import com.google.android.fhir.datacapture.utilities.toCoding
 import com.google.android.fhir.datacapture.utilities.toIdType
@@ -30,7 +29,6 @@ import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.util.Locale
 import org.hl7.fhir.r4.context.IWorkerContext
-import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeType
@@ -49,7 +47,6 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
-import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 
 /**
@@ -72,12 +69,6 @@ import org.hl7.fhir.r4.utils.StructureMapUtilities
  * for more information.
  */
 object ResourceMapper {
-
-  internal val fhirPathEngine: FHIRPathEngine =
-    with(FhirContext.forCached(FhirVersionEnum.R4)) {
-      FHIRPathEngine(HapiWorkerContext(this, this.validationSupport))
-    }
-
   /**
    * Extract FHIR resources from a [questionnaire] and [questionnaireResponse].
    *

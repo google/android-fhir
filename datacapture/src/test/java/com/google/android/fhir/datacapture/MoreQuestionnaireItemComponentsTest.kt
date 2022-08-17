@@ -29,7 +29,6 @@ import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Assert.assertThrows
@@ -1030,21 +1029,31 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `populateAnswerOptions should fill answer options for expression`() {
+  fun `populateAnswerOptions should fill answer options for coding`() {
     val questionItem =
       Questionnaire()
         .addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "first-name"
             type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(EXTENSION_CHOICE_COLUMN_URL).apply {
+                  addExtension(Extension("path", StringType("code")))
+                  addExtension(Extension("label", StringType("CODE")))
+                  addExtension(Extension("forDisplay", BooleanType(false)))
+                },
+                Extension(EXTENSION_CHOICE_COLUMN_URL).apply {
+                  addExtension(Extension("path", StringType("display")))
+                  addExtension(Extension("label", StringType("DESCRIPTION")))
+                  addExtension(Extension("forDisplay", BooleanType(true)))
+                }
+              )
           }
         )
 
     questionItem.itemFirstRep.populateAnswerOptions(
-      Expression().apply { this.expression = "%resource.meta.tag" },
-      QuestionnaireResponse().apply {
-        this.meta.tag = listOf(Coding("a.com", "a", "A"), Coding("b.com", "b", "B"))
-      }
+      listOf(Coding("a.com", "a", "A"), Coding("b.com", "b", "B"))
     )
 
     val answers =
@@ -1104,7 +1113,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `populateAnswerOptions should throw IllegalArgumentException when item type is not reference`() {
+  fun `populateAnswerOptions should throw IllegalArgumentException when item type is not reference and data type is resource`() {
     val questionItem =
       Questionnaire()
         .addItem(
@@ -1123,12 +1132,12 @@ class MoreQuestionnaireItemComponentsTest {
         )
 
     assertThrows(IllegalArgumentException::class.java) {
-      questionItem.itemFirstRep.populateAnswerOptions(listOf())
+      questionItem.itemFirstRep.populateAnswerOptions(listOf(Patient()))
     }
       .run {
         assertThat(this.message)
           .isEqualTo(
-            "$EXTENSION_CHOICE_COLUMN_URL can not be applied on 'CHOICE'. Only type reference is allowed with resource."
+            "$EXTENSION_CHOICE_COLUMN_URL can not be applied on choice. Only type reference is allowed with resource."
           )
       }
   }

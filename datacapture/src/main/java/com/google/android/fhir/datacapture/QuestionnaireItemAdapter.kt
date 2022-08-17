@@ -79,7 +79,6 @@ internal class QuestionnaireItemAdapter(
           QuestionnaireItemEditTextDecimalViewHolderFactory
         QuestionnaireItemViewHolderType.RADIO_GROUP -> QuestionnaireItemRadioGroupViewHolderFactory
         QuestionnaireItemViewHolderType.DROP_DOWN -> QuestionnaireItemDropDownViewHolderFactory
-        QuestionnaireItemViewHolderType.REFERENCE -> QuestionnaireItemDropDownViewHolderFactory
         QuestionnaireItemViewHolderType.DISPLAY -> QuestionnaireItemDisplayViewHolderFactory
         QuestionnaireItemViewHolderType.QUANTITY ->
           QuestionnaireItemEditTextQuantityViewHolderFactory
@@ -137,7 +136,7 @@ internal class QuestionnaireItemAdapter(
       QuestionnaireItemType.CHOICE -> getChoiceViewHolderType(questionnaireItemViewItem)
       QuestionnaireItemType.DISPLAY -> QuestionnaireItemViewHolderType.DISPLAY
       QuestionnaireItemType.QUANTITY -> QuestionnaireItemViewHolderType.QUANTITY
-      QuestionnaireItemType.REFERENCE -> QuestionnaireItemViewHolderType.REFERENCE
+      QuestionnaireItemType.REFERENCE -> getChoiceViewHolderType(questionnaireItemViewItem)
       else -> throw NotImplementedError("Question type $type not supported.")
     }.value
   }
