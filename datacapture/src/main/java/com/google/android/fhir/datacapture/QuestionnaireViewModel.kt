@@ -389,7 +389,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
 
         // If there is an enabled questionnaire response available then we use that. Or else we
-        // just use an empty questionnaireResponse Item
+        // just use an empty questionnaire response item.
         val questionnaireResponseItem =
           questionnaireResponseItemList.find { it.linkId == questionnaireItem.linkId }?.also {
             responseIndex += 1
