@@ -205,7 +205,7 @@ object ExpressionEvaluator {
             questionnaireItem
           )
       }
-      // 3-Check at Questionnaire level
+      // Finally, check the variables defined on the questionnaire itself
       ?: findVariableAtQuestionnaireLevel(variableName, questionnaire)?.also { expression ->
         map[expression.name] =
           evaluateQuestionnaireVariableExpression(expression, questionnaire, questionnaireResponse)
