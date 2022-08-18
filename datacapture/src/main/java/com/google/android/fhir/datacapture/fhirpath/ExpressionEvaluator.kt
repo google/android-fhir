@@ -193,7 +193,7 @@ object ExpressionEvaluator {
           questionnaireItem
         )
     }
-    // 2- Check in Ancestor
+    // Secondly, check the anscestors of the questionnaire item
     ?: findVariableInAncestor(variableName, questionnaireItemParentMap, questionnaireItem)?.also {
         (questionnaireItem, expression) ->
         map[expression.name] =
