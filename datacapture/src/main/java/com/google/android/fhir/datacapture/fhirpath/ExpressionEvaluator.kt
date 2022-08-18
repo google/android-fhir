@@ -92,7 +92,7 @@ object ExpressionEvaluator {
   ): Base? {
     require(
       questionnaireItem.variableExpressions.any {
-        it.name.equals(expression.name) && it.expression == expression.expression
+        it.name == expression.name && it.expression == expression.expression
       }
     ) { "The expression should comes from the same questionnaire item" }
 
