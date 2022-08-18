@@ -181,7 +181,7 @@ object ExpressionEvaluator {
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
     map: MutableMap<String, Base?>
   ) {
-    // 1- Check at Origin
+    // First, check the questionnaire item itself
     findVariableInQuestionnaireItem(variableName, questionnaireItem)?.also {
       (questionnaireItem, expression) ->
       map[expression.name] =
