@@ -43,11 +43,14 @@ internal object QuestionnaireItemEditTextDecimalViewHolderFactory :
       }
 
       override fun isTextUpdatesRequired(answerText: String, inputText: String): Boolean {
-        return if (answerText.isNotEmpty() && inputText.isNotEmpty()) {
-          answerText.toDouble() != inputText.toDouble()
-        } else {
-          true
+        if (answerText.isEmpty() && inputText.isEmpty()) {
+          return false
         }
+        if (answerText.isEmpty() || inputText.isEmpty()) {
+          return true
+        }
+        // Avoid shifting focus by updating text field if the values are the same
+        return answerText.toDouble() != inputText.toDouble()
       }
     }
 }
