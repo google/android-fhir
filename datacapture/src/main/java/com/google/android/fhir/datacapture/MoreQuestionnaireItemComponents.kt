@@ -68,6 +68,20 @@ internal val Questionnaire.QuestionnaireItemComponent.variableExpressions: List<
   get() =
     this.extension.filter { it.url == EXTENSION_VARIABLE_URL }.map { it.castToExpression(it.value) }
 
+/**
+ * Finds the specific variable name [String] at the questionnaire item
+ * [Questionnaire.QuestionnaireItemComponent]
+ *
+ * @param variableName the [String] to match the variable
+ *
+ * @return an [Expression]
+ */
+internal fun Questionnaire.QuestionnaireItemComponent.findVariableExpression(
+  variableName: String
+): Expression? {
+  return variableExpressions.find { it.name == variableName }
+}
+
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
   get() {

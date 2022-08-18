@@ -37,6 +37,15 @@ internal val Questionnaire.variableExpressions: List<Expression>
     this.extension.filter { it.url == EXTENSION_VARIABLE_URL }.map { it.castToExpression(it.value) }
 
 /**
+ * Finds the specific variable name [String] at questionnaire [Questionnaire] level
+ *
+ * @param variableName the [String] to match the variable at questionnaire [Questionnaire] level
+ * @return [Expression] the matching expression
+ */
+internal fun Questionnaire.findVariableExpression(variableName: String): Expression? =
+  variableExpressions.find { it.name == variableName }
+
+/**
  * See
  * [Extension: target structure map](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-targetStructureMap.html)
  * .

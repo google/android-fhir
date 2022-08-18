@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.fhirpath
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.datacapture.findVariableExpression
 import com.google.android.fhir.datacapture.variableExpressions
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
@@ -97,21 +98,16 @@ object ExpressionEvaluator {
     ) { "The expression should comes from the same questionnaire item" }
 
     val variableMap = buildMap {
-      variableRegex
-        .findAll(expression.expression)
-        .map { it.groupValues[1] }
-        .toList()
-        .filterNot { variable -> reservedVariables.contains(variable) }
-        .forEach { variableName ->
-          findVariables(
-            variableName,
-            questionnaireItem,
-            questionnaire,
-            questionnaireResponse,
-            questionnaireItemParentMap,
-            this
-          )
-        }
+      findDependentVariables(expression).forEach { variableName ->
+        findAndEvaluateVariables(
+          variableName,
+          questionnaireItem,
+          questionnaire,
+          questionnaireResponse,
+          questionnaireItemParentMap,
+          this
+        )
+      }
     }
     return evaluateVariable(expression, questionnaireResponse, variableMap)
   }
@@ -139,26 +135,27 @@ object ExpressionEvaluator {
   ): Base? {
     val variableMap =
       buildMap<String, Base?> {
-        variableRegex
-          .findAll(expression.expression)
-          .map { it.groupValues[1] }
-          .toList()
-          .filterNot { variable -> reservedVariables.contains(variable) }
-          .forEach { variableName ->
-            findVariableAtQuestionnaireLevel(variableName, questionnaire)?.also { expression ->
-              put(
-                expression.name,
-                evaluateQuestionnaireVariableExpression(
-                  expression,
-                  questionnaire,
-                  questionnaireResponse
-                )
+        findDependentVariables(expression).forEach { variableName ->
+          questionnaire.findVariableExpression(variableName)?.let { expression ->
+            put(
+              expression.name,
+              evaluateQuestionnaireVariableExpression(
+                expression,
+                questionnaire,
+                questionnaireResponse
               )
-            }
+            )
           }
+        }
       }
     return evaluateVariable(expression, questionnaireResponse, variableMap)
   }
+
+  private fun findDependentVariables(expression: Expression) =
+    variableRegex.findAll(expression.expression).map { it.groupValues[1] }.toList().filterNot {
+      variable ->
+      reservedVariables.contains(variable)
+    }
 
   /**
    * Finds the dependent variables at questionnaire item level first, then in ancestors and then at
@@ -172,73 +169,65 @@ object ExpressionEvaluator {
    * @param questionnaireItemParentMap the [Map<Questionnaire.QuestionnaireItemComponent,
    * Questionnaire.QuestionnaireItemComponent>] of child to parent
    */
-  private fun findVariables(
+  private fun findAndEvaluateVariables(
     variableName: String,
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     questionnaireItemParentMap:
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
-    map: MutableMap<String, Base?>
+    variablesMap: MutableMap<String, Base?>
   ) {
-    // First, check the questionnaire item itself
-    findVariableInQuestionnaireItem(variableName, questionnaireItem)?.also {
-      (questionnaireItem, expression) ->
-      map[expression.name] =
-        evaluateQuestionnaireItemVariableExpression(
-          expression,
-          questionnaire,
-          questionnaireResponse,
-          questionnaireItemParentMap,
-          questionnaireItem
-        )
-    }
-    // Secondly, check the anscestors of the questionnaire item
-    ?: findVariableInAncestor(variableName, questionnaireItemParentMap, questionnaireItem)?.also {
-        (questionnaireItem, expression) ->
-        map[expression.name] =
-          evaluateQuestionnaireItemVariableExpression(
-            expression,
-            questionnaire,
-            questionnaireResponse,
-            questionnaireItemParentMap,
-            questionnaireItem
-          )
+    when {
+      // First, check the questionnaire item itself
+      questionnaireItem.findVariableExpression(variableName) != null -> {
+        questionnaireItem.findVariableExpression(variableName)?.let { expression ->
+          variablesMap[expression.name] =
+            evaluateQuestionnaireItemVariableExpression(
+              expression,
+              questionnaire,
+              questionnaireResponse,
+              questionnaireItemParentMap,
+              questionnaireItem
+            )
+        }
+      }
+      // Secondly, check the ancestors of the questionnaire item
+      findVariableInAncestors(variableName, questionnaireItemParentMap, questionnaireItem) !=
+        null -> {
+        findVariableInAncestors(variableName, questionnaireItemParentMap, questionnaireItem)?.let {
+          (questionnaireItem, expression) ->
+          variablesMap[expression.name] =
+            evaluateQuestionnaireItemVariableExpression(
+              expression,
+              questionnaire,
+              questionnaireResponse,
+              questionnaireItemParentMap,
+              questionnaireItem
+            )
+        }
       }
       // Finally, check the variables defined on the questionnaire itself
-      ?: findVariableAtQuestionnaireLevel(variableName, questionnaire)?.also { expression ->
-        map[expression.name] =
-          evaluateQuestionnaireVariableExpression(expression, questionnaire, questionnaireResponse)
+      else -> {
+        questionnaire.findVariableExpression(variableName)?.also { expression ->
+          variablesMap[expression.name] =
+            evaluateQuestionnaireVariableExpression(
+              expression,
+              questionnaire,
+              questionnaireResponse
+            )
+        }
       }
-  }
-
-  /**
-   * Finds the specific variable name [String] at the origin
-   * [Questionnaire.QuestionnaireItemComponent]
-   *
-   * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] from where we have to
-   * track hierarchy up in the ancestors
-   * @param variableName the [String] to match the variable in the ancestors
-   *
-   * @return [Pair] containing [Questionnaire.QuestionnaireItemComponent] and [Expression]
-   */
-  private fun findVariableInQuestionnaireItem(
-    variableName: String,
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent
-  ): Pair<Questionnaire.QuestionnaireItemComponent, Expression>? {
-    return questionnaireItem.variableExpressions.find { it.name == variableName }?.let {
-      Pair(questionnaireItem, it)
     }
   }
 
   /**
-   * Finds the specific variable name [String] in the ancestors of questionnaire item
-   * [Questionnaire.QuestionnaireItemComponent]
+   * Finds the questionnaire item having specific variable name [String] in the ancestors of
+   * questionnaire item [Questionnaire.QuestionnaireItemComponent]
    *
    * @param variableName the [String] to match the variable in the ancestors
-   * @param
-   * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] from where we have to
-   * track hierarchy up in the ancestors
+   * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] whose ancestors we
+   * visit
    * @param questionnaireItemParentMap the [Map<Questionnaire.QuestionnaireItemComponent,
    * Questionnaire.QuestionnaireItemComponent>] of child to parent
    * @return [Pair] containing [Questionnaire.QuestionnaireItemComponent] and [Expression]
@@ -251,26 +240,13 @@ object ExpressionEvaluator {
   ): Pair<Questionnaire.QuestionnaireItemComponent, Expression>? {
     var parent = questionnaireItemParentMap[questionnaireItem]
     while (parent != null) {
-      parent.variableExpressions.find { it.name == variableName }?.let {
-        return Pair(parent!!, it)
-      }
+      val expression = parent.findVariableExpression(variableName)
+      if (expression != null) return Pair(parent, expression)
 
       parent = questionnaireItemParentMap[parent]
     }
     return null
   }
-
-  /**
-   * Finds the specific variable name [String] at questionnaire [Questionnaire] level
-   *
-   * @param variableName the [String] to match the variable at questionnaire [Questionnaire] level
-   * @param questionnaire the [Questionnaire] respective questionnaire
-   * @return [Expression] the matching expression
-   */
-  private fun findVariableAtQuestionnaireLevel(
-    variableName: String,
-    questionnaire: Questionnaire
-  ): Expression? = questionnaire.variableExpressions.find { it.name == variableName }
 
   /**
    * Evaluates the value of variable expression and return the evaluated value
