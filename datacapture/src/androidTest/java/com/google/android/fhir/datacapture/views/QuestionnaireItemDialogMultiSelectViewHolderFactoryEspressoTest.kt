@@ -27,6 +27,7 @@ import com.google.android.fhir.datacapture.utilities.assertQuestionnaireResponse
 import com.google.android.fhir.datacapture.utilities.clickOnText
 import com.google.android.fhir.datacapture.utilities.clickOnTextInDialog
 import com.google.android.fhir.datacapture.utilities.endIconClickInTextInputLayout
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.common.truth.StringSubject
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
@@ -58,7 +59,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -85,7 +86,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -104,7 +105,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -125,7 +126,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3"),
         responseOptions(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -146,7 +147,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -166,7 +167,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -185,7 +186,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 

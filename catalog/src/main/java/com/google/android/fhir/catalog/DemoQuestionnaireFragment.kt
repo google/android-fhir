@@ -185,10 +185,7 @@ class DemoQuestionnaireFragment : Fragment() {
 
   private fun onSubmitQuestionnaireClick() {
     val questionnaireFragment =
-      childFragmentManager.findFragmentByTag(
-        QuestionnaireContainerFragment.QUESTIONNAIRE_FRAGMENT_TAG
-      ) as
-        QuestionnaireFragment
+      childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
     launchQuestionnaireResponseFragment(
       viewModel.getQuestionnaireResponseJson(questionnaireFragment.getQuestionnaireResponse())
     )
