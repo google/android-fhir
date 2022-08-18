@@ -170,7 +170,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     /** Adds each child-parent pair in the [Questionnaire] to the parent map. */
     fun buildParentList(
       item: Questionnaire.QuestionnaireItemComponent,
-      questionnaireItemToParentMap: ItemToParentMap
+      questionnaireItemToParentMap: ItemToParentMap,
     ) {
       for (child in item.item) {
         questionnaireItemToParentMap[child] = item
@@ -628,8 +628,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       } else {
         NotValidated
       }
-    val items =
-      listOf(
+    val items = buildList {
+      add(
         QuestionnaireItemViewItem(
           questionnaireItem,
           questionnaireResponseItem,
@@ -638,22 +638,27 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           resolveAnswerValueSet = { resolveAnswerValueSet(it) },
           resolveAnswerExpression = { resolveAnswerExpression(it) }
         )
-      ) +
-        getQuestionnaireItemViewItems(
-          // If nested display item is identified as instructions or flyover, then do not create
-          // questionnaire state for it.
-          questionnaireItemList =
-            questionnaireItem.item.filterNot {
-              it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-                (it.isInstructionsCode || it.isFlyoverCode || it.isHelpCode)
-            },
-          questionnaireResponseItemList =
-            if (questionnaireResponseItem.answer.isEmpty()) {
-              questionnaireResponseItem.item
-            } else {
-              questionnaireResponseItem.answer.first().item
-            },
-        )
+      )
+      questionnaireResponseItem.answer
+        .map { it.item }
+        .ifEmpty {
+          if (questionnaireItem.repeats) emptyList() else listOf(questionnaireResponseItem.item)
+        }
+        .forEach { nestedResponse ->
+          addAll(
+            getQuestionnaireItemViewItems(
+              // If nested display item is identified as instructions or flyover, then do not create
+              // questionnaire state for it.
+              questionnaireItemList =
+                questionnaireItem.item.filterNot {
+                  it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+                    (it.isInstructionsCode || it.isFlyoverCode || it.isHelpCode)
+                },
+              questionnaireResponseItemList = nestedResponse,
+            )
+          )
+        }
+    }
     currentPageItems = items
     return items
   }
@@ -676,18 +681,58 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           findEnableWhenQuestionnaireResponseItem(item, linkId) ?: return@evaluate null
         }
       }
-      .map { (questionnaireItem, questionnaireResponseItem) ->
-        questionnaireResponseItem.text = questionnaireItem.localizedTextSpanned?.toString()
-        // Nested group items
-        questionnaireResponseItem.item =
-          getEnabledResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
-        // Nested question items
-        questionnaireResponseItem.answer.forEach {
-          it.item = getEnabledResponseItems(questionnaireItem.item, it.item)
+      .flatMap { (questionnaireItem, questionnaireResponseItem) ->
+        val isRepeatedGroup =
+          questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+            questionnaireItem.repeats
+        if (isRepeatedGroup) {
+          createRepeatedGroupResponse(questionnaireItem, questionnaireResponseItem)
+        } else {
+          listOf(
+            questionnaireResponseItem.apply {
+              text = questionnaireItem.localizedTextSpanned?.toString()
+              // Nested group items
+              item = getEnabledResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
+              // Nested question items
+              answer.forEach { it.item = getEnabledResponseItems(questionnaireItem.item, it.item) }
+            }
+          )
         }
-        questionnaireResponseItem
       }
       .toList()
+  }
+
+  /**
+   * Repeated groups need some massaging for their returned data-format; each instance of the group
+   * should be flattened out to be its own item in the parent, rather than an answer to the main
+   * item. See discussion:
+   * http://community.fhir.org/t/questionnaire-repeating-groups-what-is-the-correct-format/2276/3
+   *
+   * For example, if the group contains 2 questions, and the user answered the group 3 times, this
+   * function will return a list with 3 responses; each of those responses will have the linkId of
+   * the provided group, and each will contain an item array with 2 items (the answers to the
+   * individual questions within this particular group instance).
+   */
+  private fun createRepeatedGroupResponse(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+  ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+    val individualQuestions = questionnaireItem.item
+    return questionnaireResponseItem.answer.map { repeatedGroupInstance ->
+      val responsesToIndividualQuestions = repeatedGroupInstance.item
+      check(responsesToIndividualQuestions.size == individualQuestions.size) {
+        "Repeated groups responses must have the same # of responses as the group has questions"
+      }
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = questionnaireItem.linkId
+        text = questionnaireItem.localizedTextSpanned?.toString()
+        item =
+          getEnabledResponseItems(
+            questionnaireItemList = individualQuestions,
+            questionnaireResponseItemList = responsesToIndividualQuestions,
+          )
+      }
+    }
   }
 
   /**

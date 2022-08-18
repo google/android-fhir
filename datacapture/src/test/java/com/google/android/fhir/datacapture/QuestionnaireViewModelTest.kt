@@ -83,7 +83,7 @@ import org.robolectric.util.ReflectionHelpers
 @Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
 class QuestionnaireViewModelTest(
   private val questionnaireSource: QuestionnaireSource,
-  private val questionnaireResponseSource: QuestionnaireResponseSource
+  private val questionnaireResponseSource: QuestionnaireResponseSource,
 ) {
   @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
 
@@ -1526,6 +1526,170 @@ class QuestionnaireViewModelTest(
       )
 
     assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+  }
+
+  @Test
+  fun questionnaireHasNestedItem_ofTypeRepeatedGroup_shouldNestMultipleItems() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "repeated-group-a"
+            text = "Group question A"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            repeats = true
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-item-a"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "another-nested-item-a"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "repeated-group-b"
+            text = "Group question B"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            repeats = true
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-item-b"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "another-nested-item-b"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    val repeatedGroupA = viewModel.getQuestionnaireItemViewItemList()[0]
+    val repeatedGroupB = viewModel.getQuestionnaireItemViewItemList()[1]
+    assertThat(repeatedGroupA.questionnaireItem.linkId).isEqualTo("repeated-group-a")
+    assertThat(repeatedGroupB.questionnaireItem.linkId).isEqualTo("repeated-group-b")
+
+    // Calling addAnswer out of order should not result in the answers in the response being out of
+    // order; all of the answers to repeated-group-a should come before repeated-group-b.
+    repeatedGroupA.addAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        item = repeatedGroupA.questionnaireItem.getNestedQuestionnaireResponseItems()
+      }
+    )
+    repeatedGroupB.addAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        item = repeatedGroupB.questionnaireItem.getNestedQuestionnaireResponseItems()
+      }
+    )
+    repeatedGroupA.addAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        item = repeatedGroupA.questionnaireItem.getNestedQuestionnaireResponseItems()
+      }
+    )
+    repeatedGroupB.addAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        item = repeatedGroupB.questionnaireItem.getNestedQuestionnaireResponseItems()
+      }
+    )
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList().map { it.questionnaireItem.linkId })
+      .containsExactly("repeated-group-a", "repeated-group-b")
+      .inOrder()
+
+    assertResourceEquals(
+      actual = viewModel.getQuestionnaireResponse(),
+      expected =
+        QuestionnaireResponse().apply {
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "repeated-group-a"
+              text = "Group question A"
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "nested-item-a"
+                  text = "Basic question"
+                }
+              )
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "another-nested-item-a"
+                  text = "Basic question"
+                }
+              )
+            }
+          )
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "repeated-group-a"
+              text = "Group question A"
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "nested-item-a"
+                  text = "Basic question"
+                }
+              )
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "another-nested-item-a"
+                  text = "Basic question"
+                }
+              )
+            }
+          )
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "repeated-group-b"
+              text = "Group question B"
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "nested-item-b"
+                  text = "Basic question"
+                }
+              )
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "another-nested-item-b"
+                  text = "Basic question"
+                }
+              )
+            }
+          )
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "repeated-group-b"
+              text = "Group question B"
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "nested-item-b"
+                  text = "Basic question"
+                }
+              )
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "another-nested-item-b"
+                  text = "Basic question"
+                }
+              )
+            }
+          )
+        }
+    )
   }
 
   @Test
@@ -3351,7 +3515,7 @@ class QuestionnaireViewModelTest(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse? = null,
     enableReviewPage: Boolean = false,
-    showReviewPageFirst: Boolean = false
+    showReviewPageFirst: Boolean = false,
   ): QuestionnaireViewModel {
     if (questionnaireSource == QuestionnaireSource.STRING) {
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
@@ -3415,8 +3579,9 @@ class QuestionnaireViewModelTest(
 
     val printer: IParser = FhirContext.forR4().newJsonParser()
 
-    fun assertResourceEquals(r1: IBaseResource, r2: IBaseResource) {
-      assertThat(printer.encodeResourceToString(r1)).isEqualTo(printer.encodeResourceToString(r2))
+    fun <T : IBaseResource> assertResourceEquals(actual: T, expected: T) {
+      assertThat(printer.encodeResourceToString(actual))
+        .isEqualTo(printer.encodeResourceToString(expected))
     }
 
     @JvmStatic
