@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
+import com.google.android.fhir.r4.R4FhirEngine
 import java.math.BigDecimal
 import java.util.UUID
 import kotlinx.coroutines.launch
@@ -54,7 +54,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
       FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire) as
         Questionnaire
   private var questionnaireJson: String? = null
-  private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
+  private var fhirEngine: R4FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
 
   /**
    * Saves screener encounter questionnaire response into the application database.

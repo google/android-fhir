@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,23 @@
 
 package com.google.android.fhir.testing
 
-import com.google.android.fhir.FhirEngineConfiguration
-import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.r4.FhirEngineConfiguration
+import com.google.android.fhir.r4.R4FhirEngineProvider
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
-/** A [TestRule] that cleans up [FhirEngineProvider] instance after each test run. */
+/** A [TestRule] that cleans up [R4FhirEngineProvider] instance after each test run. */
 class FhirEngineProviderTestRule : TestRule {
 
   override fun apply(base: Statement, description: Description): Statement {
     return object : Statement() {
       override fun evaluate() {
-        FhirEngineProvider.init(FhirEngineConfiguration(testMode = true))
+        R4FhirEngineProvider.init(FhirEngineConfiguration(testMode = true))
         try {
           base.evaluate()
         } finally {
-          FhirEngineProvider.cleanup()
+          R4FhirEngineProvider.cleanup()
         }
       }
     }

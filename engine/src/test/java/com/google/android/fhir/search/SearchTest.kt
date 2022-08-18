@@ -21,6 +21,14 @@ import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.epochDay
+import com.google.android.fhir.r4.search.Operation
+import com.google.android.fhir.r4.search.Order
+import com.google.android.fhir.r4.search.Search
+import com.google.android.fhir.r4.search.StringFilterModifier
+import com.google.android.fhir.r4.search.getQuery
+import com.google.android.fhir.r4.search.has
+import com.google.android.fhir.r4.search.rangeEpochDays
+import com.google.android.fhir.r4.search.rangeEpochMillis
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant

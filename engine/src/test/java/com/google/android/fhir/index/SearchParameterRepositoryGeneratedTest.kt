@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package com.google.android.fhir.index
 
+import com.google.android.fhir.r4.index.SearchParamDefinition
+import com.google.android.fhir.r4.index.getSearchParamList
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Resource

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,36 +18,37 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.content.Context
-import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
-import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.FhirEngineConfiguration
-import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.ServerConfiguration
-import com.google.android.fhir.demo.data.FhirPeriodicSyncWorker
-import com.google.android.fhir.sync.Sync
+import com.google.android.fhir.BuildConfig
+import com.google.android.fhir.demo.data.R4FhirPeriodicSyncWorker
+import com.google.android.fhir.r4.DatabaseErrorStrategy.RECREATE_AT_OPEN
+import com.google.android.fhir.r4.FhirEngineConfiguration
+import com.google.android.fhir.r4.R4FhirEngine
+import com.google.android.fhir.r4.R4FhirEngineProvider
+import com.google.android.fhir.r4.ServerConfiguration
+import com.google.android.fhir.r4.sync.R4Sync
 import timber.log.Timber
 
 class FhirApplication : Application() {
   // Only initiate the FhirEngine when used for the first time, not when the app is created.
-  private val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
+  private val fhirEngine: R4FhirEngine by lazy { constructFhirEngine() }
 
   override fun onCreate() {
     super.onCreate()
     if (BuildConfig.DEBUG) {
       Timber.plant(Timber.DebugTree())
     }
-    FhirEngineProvider.init(
+    R4FhirEngineProvider.init(
       FhirEngineConfiguration(
         enableEncryptionIfSupported = true,
         RECREATE_AT_OPEN,
         ServerConfiguration("https://hapi.fhir.org/baseR4/")
       )
     )
-    Sync.oneTimeSync<FhirPeriodicSyncWorker>(this)
+    R4Sync.oneTimeSync<R4FhirPeriodicSyncWorker>(this)
   }
 
-  private fun constructFhirEngine(): FhirEngine {
-    return FhirEngineProvider.getInstance(this)
+  private fun constructFhirEngine(): R4FhirEngine {
+    return R4FhirEngineProvider.getInstance(this)
   }
 
   companion object {

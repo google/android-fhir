@@ -21,7 +21,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
-import org.hl7.fhir.r4.model.ResourceType
 
 @Dao
 internal interface SyncedResourceDao {
@@ -39,5 +38,5 @@ internal interface SyncedResourceDao {
     """SELECT lastUpdate FROM SyncedResourceEntity 
         WHERE resourceType = :resourceType LIMIT 1"""
   )
-  suspend fun getLastUpdate(resourceType: ResourceType): String?
+  suspend fun getLastUpdate(resourceType: String): String?
 }

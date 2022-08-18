@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.search.Order
-import com.google.android.fhir.search.Search
-import com.google.android.fhir.search.StringFilterModifier
-import com.google.android.fhir.search.count
-import com.google.android.fhir.search.search
+import com.google.android.fhir.r4.R4FhirEngine
+import com.google.android.fhir.r4.search.Order
+import com.google.android.fhir.r4.search.Search
+import com.google.android.fhir.r4.search.StringFilterModifier
+import com.google.android.fhir.r4.search.count
+import com.google.android.fhir.r4.search.search
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.launch
@@ -38,7 +38,7 @@ import org.hl7.fhir.r4.model.RiskAssessment
  * The ViewModel helper class for PatientItemRecyclerViewAdapter, that is responsible for preparing
  * data for UI.
  */
-class PatientListViewModel(application: Application, private val fhirEngine: FhirEngine) :
+class PatientListViewModel(application: Application, private val fhirEngine: R4FhirEngine) :
   AndroidViewModel(application) {
 
   val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
@@ -170,7 +170,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
 
   class PatientListViewModelFactory(
     private val application: Application,
-    private val fhirEngine: FhirEngine
+    private val fhirEngine: R4FhirEngine
   ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {

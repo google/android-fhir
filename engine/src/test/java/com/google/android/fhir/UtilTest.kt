@@ -17,6 +17,9 @@
 package com.google.android.fhir
 
 import android.os.Build
+import com.google.android.fhir.r4.isUploadSuccess
+import com.google.android.fhir.r4.isValidDateOnly
+import com.google.android.fhir.r4.logicalId
 import com.google.common.truth.Truth.assertThat
 import junit.framework.TestCase
 import org.hl7.fhir.r4.model.IdType

@@ -53,7 +53,7 @@ internal data class SearchParamDefinition(
 
 internal object SearchParameterRepositoryGenerator {
 
-  private const val indexPackage = "com.google.android.fhir.index"
+  private const val indexPackage = "com.google.android.fhir.r4.index"
   private const val hapiPackage = "org.hl7.fhir.r4.model"
   private const val generatedClassName = "SearchParameterRepository_Generated"
   private const val indexTestPackage = "com.google.android.fhir.index"

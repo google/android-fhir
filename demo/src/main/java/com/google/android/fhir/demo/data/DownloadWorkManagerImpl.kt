@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package com.google.android.fhir.demo.data
 
 import com.google.android.fhir.SyncDownloadContext
-import com.google.android.fhir.sync.DownloadWorkManager
+import com.google.android.fhir.r4.sync.R4DownloadWorkManager
 import java.util.LinkedList
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
@@ -27,11 +27,11 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
-class DownloadWorkManagerImpl : DownloadWorkManager {
+class DownloadWorkManagerImpl : R4DownloadWorkManager {
   private val resourceTypeList = ResourceType.values().map { it.name }
   private val urls = LinkedList(listOf("Patient?address-city=NAIROBI"))
 
-  override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? {
+  override suspend fun getNextRequestUrl(context: SyncDownloadContext<ResourceType>): String? {
     var url = urls.poll() ?: return null
 
     val resourceTypeToDownload =

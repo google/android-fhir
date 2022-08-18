@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.r4.R4FhirEngineProvider
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
@@ -54,7 +54,7 @@ class FhirOperatorLibraryEvaluateTest {
 
   @Before
   fun setUp() = runBlocking {
-    fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+    fhirEngine = R4FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
     fhirOperator = FhirOperator(fhirContext, fhirEngine)
   }
 

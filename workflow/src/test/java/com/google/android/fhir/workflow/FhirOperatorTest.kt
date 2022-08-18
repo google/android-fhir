@@ -19,7 +19,7 @@ package com.google.android.fhir.workflow
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.r4.R4FhirEngineProvider
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.util.Base64
@@ -69,7 +69,7 @@ class FhirOperatorTest {
 
   @Before
   fun setUp() = runBlocking {
-    fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+    fhirEngine = R4FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
     fhirOperator = FhirOperator(fhirContext, fhirEngine)
   }
 

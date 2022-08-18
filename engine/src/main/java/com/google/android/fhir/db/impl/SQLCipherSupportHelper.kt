@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ package com.google.android.fhir.db.impl
 
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
-import com.google.android.fhir.DatabaseErrorStrategy
 import com.google.android.fhir.db.DatabaseEncryptionException
 import com.google.android.fhir.db.DatabaseEncryptionException.DatabaseEncryptionErrorCode.TIMEOUT
 import com.google.android.fhir.db.DatabaseEncryptionException.DatabaseEncryptionErrorCode.UNKNOWN
-import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
+import com.google.android.fhir.r4.DatabaseErrorStrategy
+import com.google.android.fhir.r4.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import java.lang.Exception
 import java.time.Duration
 import kotlinx.coroutines.delay

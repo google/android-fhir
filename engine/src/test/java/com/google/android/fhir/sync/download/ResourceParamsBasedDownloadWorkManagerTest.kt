@@ -17,7 +17,8 @@
 package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.SyncDownloadContext
-import com.google.android.fhir.logicalId
+import com.google.android.fhir.r4.logicalId
+import com.google.android.fhir.r4.sync.download.ResourceParamsBasedDownloadWorkManager
 import com.google.android.fhir.sync.SyncDataParams
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runBlockingTest
@@ -49,7 +50,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
     do {
       val url =
         downloadManager.getNextRequestUrl(
-          object : SyncDownloadContext {
+          object : SyncDownloadContext<ResourceType> {
             override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-03-20"
           }
         )
@@ -77,7 +78,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
     do {
       val url =
         downloadManager.getNextRequestUrl(
-          object : SyncDownloadContext {
+          object : SyncDownloadContext<ResourceType> {
             override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-03-20"
           }
         )
@@ -120,7 +121,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       ResourceParamsBasedDownloadWorkManager(mapOf(ResourceType.Patient to emptyMap()))
     val url =
       downloadManager.getNextRequestUrl(
-        object : SyncDownloadContext {
+        object : SyncDownloadContext<ResourceType> {
           override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-28"
         }
       )
@@ -142,7 +143,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       )
     val url =
       downloadManager.getNextRequestUrl(
-        object : SyncDownloadContext {
+        object : SyncDownloadContext<ResourceType> {
           override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-07-07"
         }
       )
@@ -158,7 +159,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       )
     val url =
       downloadManager.getNextRequestUrl(
-        object : SyncDownloadContext {
+        object : SyncDownloadContext<ResourceType> {
           override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-07-07"
         }
       )
@@ -174,7 +175,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       )
     val actual =
       downloadManager.getNextRequestUrl(
-        object : SyncDownloadContext {
+        object : SyncDownloadContext<ResourceType> {
           override suspend fun getLatestTimestampFor(type: ResourceType) = null
         }
       )
@@ -190,7 +191,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       )
     val actual =
       downloadManager.getNextRequestUrl(
-        object : SyncDownloadContext {
+        object : SyncDownloadContext<ResourceType> {
           override suspend fun getLatestTimestampFor(type: ResourceType) = ""
         }
       )

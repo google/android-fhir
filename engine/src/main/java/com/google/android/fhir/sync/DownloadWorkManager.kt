@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync
 
 import com.google.android.fhir.SyncDownloadContext
-import org.hl7.fhir.r4.model.Resource
 
 /**
  * Manager that generates the FHIR requests and handles the FHIR responses of a download job.
@@ -25,15 +24,15 @@ import org.hl7.fhir.r4.model.Resource
  * TODO(jingtang10): What happens after the end of a download job. Should a new download work
  * manager be created or should there be an API to restart a new download job.
  */
-interface DownloadWorkManager {
+interface DownloadWorkManager<R, T> {
   /**
    * Returns the URL for the next download request, or `null` if there is no more download request
    * to be issued.
    */
-  suspend fun getNextRequestUrl(context: SyncDownloadContext): String?
+  suspend fun getNextRequestUrl(context: SyncDownloadContext<T>): String?
 
   /**
    * Processes the download response and returns the resources to be saved to the local database.
    */
-  suspend fun processResponse(response: Resource): Collection<Resource>
+  suspend fun processResponse(response: R): Collection<R>
 }

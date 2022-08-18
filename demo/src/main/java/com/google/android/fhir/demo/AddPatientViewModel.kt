@@ -23,10 +23,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
+import com.google.android.fhir.r4.R4FhirEngine
 import java.util.UUID
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
@@ -45,7 +45,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
     get() =
       FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire) as
         Questionnaire
-  private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
+  private var fhirEngine: R4FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
   private var questionnaireJson: String? = null
 
   /**

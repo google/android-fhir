@@ -40,16 +40,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
-import com.google.android.fhir.sync.State
+import com.google.android.fhir.r4.R4FhirEngine
+import com.google.android.fhir.r4.sync.State
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class PatientListFragment : Fragment() {
-  private lateinit var fhirEngine: FhirEngine
+  private lateinit var fhirEngine: R4FhirEngine
   private lateinit var patientListViewModel: PatientListViewModel
   private lateinit var searchView: SearchView
   private lateinit var topBanner: LinearLayout
@@ -154,26 +154,26 @@ class PatientListFragment : Fragment() {
         Timber.d("onViewCreated: pollState Got status $it")
         when (it) {
           is State.Started -> {
-            Timber.i("Sync: ${it::class.java.simpleName}")
+            Timber.i("R4Sync: ${it::class.java.simpleName}")
             fadeInTopBanner()
           }
           is State.InProgress -> {
-            Timber.i("Sync: ${it::class.java.simpleName} with ${it.resourceType?.name}")
+            Timber.i("R4Sync: ${it::class.java.simpleName} with ${it.resourceType?.name}")
             fadeInTopBanner()
           }
           is State.Finished -> {
-            Timber.i("Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
+            Timber.i("R4Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
           is State.Failed -> {
-            Timber.i("Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
+            Timber.i("R4Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
-          else -> Timber.i("Sync: Unknown state.")
+          else -> Timber.i("R4Sync: Unknown state.")
         }
       }
     }

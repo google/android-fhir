@@ -16,46 +16,41 @@
 
 package com.google.android.fhir
 
-import com.google.android.fhir.db.ResourceNotFoundException
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.search.Search
+import com.google.android.fhir.db.impl.entities.LocalChangeToken
 import com.google.android.fhir.sync.ConflictResolver
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
-interface FhirEngine {
+interface FhirEngine<R, T, S> {
   /**
    * Creates one or more FHIR [resource]s in the local storage.
    *
    * @return the logical IDs of the newly created resources.
    */
-  suspend fun create(vararg resource: Resource): List<String>
+  suspend fun create(vararg resource: R): List<String>
 
   /** Loads a FHIR resource given the class and the logical ID. */
-  suspend fun get(type: ResourceType, id: String): Resource
+  suspend fun get(type: T, id: String): R
 
   /** Updates a FHIR [resource] in the local storage. */
-  suspend fun update(vararg resource: Resource)
+  suspend fun update(vararg resource: R)
 
   /** Removes a FHIR resource given the class and the logical ID. */
-  suspend fun delete(type: ResourceType, id: String)
+  suspend fun delete(type: T, id: String)
 
   /**
    * Searches the database and returns a list resources according to the [search] specifications.
    */
-  suspend fun <R : Resource> search(search: Search): List<R>
+  suspend fun <Q : R> search(search: S): List<Q>
 
   /**
    * Synchronizes the [upload] result in the database. [upload] operation may result in multiple
    * calls to the server to upload the data. Result of each call will be emitted by [upload] and the
    * api caller should [Flow.collect] it.
    */
-  suspend fun syncUpload(
-    upload: (suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>)
-  )
+  suspend fun syncUpload(upload: (suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, R>>))
 
   /**
    * Synchronizes the [download] result in the database. The database will be updated to reflect the
@@ -63,7 +58,7 @@ interface FhirEngine {
    */
   suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+    download: suspend (SyncDownloadContext<T>) -> Flow<List<R>>
   )
 
   /**
@@ -71,7 +66,7 @@ interface FhirEngine {
    *
    * @param search
    */
-  suspend fun count(search: Search): Long
+  suspend fun count(search: S): Long
 
   /** Returns the timestamp when data was last synchronized. */
   suspend fun getLastSyncTimeStamp(): OffsetDateTime?
@@ -88,46 +83,28 @@ interface FhirEngine {
    * Retrieve [LocalChange] for [Resource] with given type and id, which can be used to purge
    * resource from database. Each resource will have at most one
    * [LocalChange](multiple
-   * changes are squashed). If there is no local change for given
-   * [resourceType] and [Resource.id], return `null`.
-   * @param type The [ResourceType]
+   * changes are squashed). If there is no local change for given [T]
+   * and [Resource.id], return `null`.
+   * @param type The [T]
    * @param id The resource id [Resource.id]
-   * @return [LocalChange] A squashed local changes for given [resourceType] and [Resource.id] . If
-   * there is no local change for given [resourceType] and [Resource.id], return `null`.
+   * @return [LocalChange] A squashed local changes for given [T] and [Resource.id] . If there is no
+   * local change for given [T] and [Resource.id], return `null`.
    */
-  suspend fun getLocalChange(type: ResourceType, id: String): LocalChange?
+  suspend fun getLocalChange(type: T, id: String): LocalChange?
 
   /**
    * Purges a resource from the database based on resource type and id without any deletion of data
    * from the server.
-   * @param type The [ResourceType]
+   * @param type The [T]
    * @param id The resource id [Resource.id]
    * @param isLocalPurge default value is false here resource will not be deleted from
    * LocalChangeEntity table but it will throw IllegalStateException("Resource has local changes
    * either sync with server or FORCE_PURGE required") if local change exists. If true this API will
    * delete resource entry from LocalChangeEntity table.
    */
-  suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
+  suspend fun purge(type: T, id: String, forcePurge: Boolean = false)
 }
 
-/**
- * Returns a FHIR resource of type [R] with [id] from the local storage.
- * @param <R> The resource type which should be a subtype of [Resource].
- * @throws ResourceNotFoundException if the resource is not found
- */
-@Throws(ResourceNotFoundException::class)
-suspend inline fun <reified R : Resource> FhirEngine.get(id: String): R {
-  return get(getResourceType(R::class.java), id) as R
-}
-
-/**
- * Deletes a FHIR resource of type [R] with [id] from the local storage.
- * @param <R> The resource type which should be a subtype of [Resource].
- */
-suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
-  delete(getResourceType(R::class.java), id)
-}
-
-interface SyncDownloadContext {
-  suspend fun getLatestTimestampFor(type: ResourceType): String?
+interface SyncDownloadContext<T> {
+  suspend fun getLatestTimestampFor(type: T): String?
 }

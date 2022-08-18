@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.android.fhir.index.entities.TokenIndex
 import java.util.UUID
-import org.hl7.fhir.r4.model.ResourceType
 
 @Entity(
   indices =
@@ -45,6 +44,6 @@ import org.hl7.fhir.r4.model.ResourceType
 internal data class TokenIndexEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceUuid: UUID,
-  val resourceType: ResourceType,
+  val resourceType: String,
   @Embedded(prefix = "index_") val index: TokenIndex,
 )

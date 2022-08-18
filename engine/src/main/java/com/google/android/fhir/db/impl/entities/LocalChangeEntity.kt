@@ -19,6 +19,7 @@ package com.google.android.fhir.db.impl.entities
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.google.android.fhir.LocalChange
 
 /**
  * When a local change to a resource happens, the lastUpdated timestamp in [ResourceEntity] is
@@ -69,4 +70,37 @@ internal data class LocalChangeEntity(
       fun from(input: Int): Type = values().first { it.value == input }
     }
   }
+}
+
+/** Method to convert LocalChangeEntity to LocalChange instance. */
+internal fun LocalChangeEntity.toLocalChange(): LocalChange {
+  return LocalChange(
+    resourceType,
+    resourceId,
+    versionId,
+    timestamp,
+    LocalChange.Type.from(type.value),
+    payload,
+    LocalChangeToken(listOf(id))
+  )
+}
+
+data class LocalChangeToken(val ids: List<Long>)
+
+internal data class SquashedLocalChange(
+  val token: LocalChangeToken,
+  val localChange: LocalChangeEntity
+)
+
+/** Method to convert internal SquashedLocalChange to LocalChange instance. */
+internal fun SquashedLocalChange.toLocalChange(): LocalChange {
+  return LocalChange(
+    localChange.resourceType,
+    localChange.resourceId,
+    localChange.versionId,
+    localChange.timestamp,
+    LocalChange.Type.from(localChange.type.value),
+    localChange.payload,
+    token
+  )
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,15 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import ca.uhn.fhir.context.FhirContext
-import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
-import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
-import com.google.android.fhir.db.impl.DatabaseImpl.Companion.DATABASE_PASSPHRASE_NAME
-import com.google.android.fhir.db.impl.DatabaseImpl.Companion.ENCRYPTED_DATABASE_NAME
-import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
-import com.google.android.fhir.search.Order
-import com.google.android.fhir.search.Search
-import com.google.android.fhir.search.getQuery
+import com.google.android.fhir.r4.DatabaseErrorStrategy
+import com.google.android.fhir.r4.db.impl.DatabaseConfig
+import com.google.android.fhir.r4.db.impl.DatabaseImpl
+import com.google.android.fhir.r4.db.impl.DatabaseImpl.Companion.DATABASE_PASSPHRASE_NAME
+import com.google.android.fhir.r4.db.impl.DatabaseImpl.Companion.ENCRYPTED_DATABASE_NAME
+import com.google.android.fhir.r4.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
+import com.google.android.fhir.r4.search.Order
+import com.google.android.fhir.r4.search.Search
+import com.google.android.fhir.r4.search.getQuery
 import com.google.common.truth.Truth.assertThat
 import java.security.KeyStore
 import kotlinx.coroutines.runBlocking
@@ -64,7 +65,7 @@ class EncryptedDatabaseErrorTest {
             DatabaseConfig(
               inMemory = false,
               enableEncryption = false,
-              databaseErrorStrategy = UNSPECIFIED
+              databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
             )
           )
           .let {
@@ -80,7 +81,7 @@ class EncryptedDatabaseErrorTest {
             DatabaseConfig(
               inMemory = false,
               enableEncryption = true,
-              databaseErrorStrategy = UNSPECIFIED
+              databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
             )
           )
           .let {
@@ -109,7 +110,7 @@ class EncryptedDatabaseErrorTest {
             DatabaseConfig(
               inMemory = false,
               enableEncryption = true,
-              databaseErrorStrategy = UNSPECIFIED
+              databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
             )
           )
           .let {
@@ -131,7 +132,7 @@ class EncryptedDatabaseErrorTest {
             DatabaseConfig(
               inMemory = false,
               enableEncryption = true,
-              databaseErrorStrategy = UNSPECIFIED
+              databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
             )
           )
           .let {
@@ -159,7 +160,7 @@ class EncryptedDatabaseErrorTest {
           DatabaseConfig(
             inMemory = false,
             enableEncryption = true,
-            databaseErrorStrategy = UNSPECIFIED
+            databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
           )
         )
         .let {
@@ -181,7 +182,7 @@ class EncryptedDatabaseErrorTest {
           DatabaseConfig(
             inMemory = false,
             enableEncryption = true,
-            databaseErrorStrategy = RECREATE_AT_OPEN
+            databaseErrorStrategy = DatabaseErrorStrategy.RECREATE_AT_OPEN
           )
         )
         .let {
@@ -212,7 +213,7 @@ class EncryptedDatabaseErrorTest {
             DatabaseConfig(
               inMemory = false,
               enableEncryption = true,
-              databaseErrorStrategy = UNSPECIFIED
+              databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
             )
           )
           .let {
@@ -228,7 +229,7 @@ class EncryptedDatabaseErrorTest {
             DatabaseConfig(
               inMemory = false,
               enableEncryption = false,
-              databaseErrorStrategy = UNSPECIFIED
+              databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
             )
           )
           .let {

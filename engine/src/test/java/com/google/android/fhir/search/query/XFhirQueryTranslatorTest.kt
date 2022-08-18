@@ -17,12 +17,12 @@
 package com.google.android.fhir.search.query
 
 import android.os.Build
-import com.google.android.fhir.index.SearchParamDefinition
-import com.google.android.fhir.search.Order
-import com.google.android.fhir.search.Search
-import com.google.android.fhir.search.query.XFhirQueryTranslator.applyFilterParam
-import com.google.android.fhir.search.query.XFhirQueryTranslator.applySortParam
-import com.google.android.fhir.search.query.XFhirQueryTranslator.translate
+import com.google.android.fhir.r4.index.SearchParamDefinition
+import com.google.android.fhir.r4.search.Order
+import com.google.android.fhir.r4.search.Search
+import com.google.android.fhir.r4.search.query.XFhirQueryTranslator.applyFilterParam
+import com.google.android.fhir.r4.search.query.XFhirQueryTranslator.applySortParam
+import com.google.android.fhir.r4.search.query.XFhirQueryTranslator.translate
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.ResourceType

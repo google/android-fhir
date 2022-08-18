@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
-import com.google.android.fhir.get
+import com.google.android.fhir.r4.R4FhirEngine
+import com.google.android.fhir.r4.get
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
@@ -38,7 +38,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  */
 class EditPatientViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
-  private val fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
+  private val fhirEngine: R4FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
 
   private val patientId: String = requireNotNull(state["patient_id"])
   val livePatientData = liveData { emit(prepareEditPatient()) }

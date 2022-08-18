@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.get
-import com.google.android.fhir.logicalId
-import com.google.android.fhir.search.search
+import com.google.android.fhir.r4.R4FhirEngine
+import com.google.android.fhir.r4.get
+import com.google.android.fhir.r4.logicalId
+import com.google.android.fhir.r4.search.search
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
@@ -50,7 +50,7 @@ import org.hl7.fhir.r4.model.codesystems.RiskProbability
  */
 class PatientDetailsViewModel(
   application: Application,
-  private val fhirEngine: FhirEngine,
+  private val fhirEngine: R4FhirEngine,
   private val patientId: String
 ) : AndroidViewModel(application) {
   val livePatientData = MutableLiveData<List<PatientDetailData>>()
@@ -345,7 +345,7 @@ data class PatientProperty(val header: String, val value: String)
 
 class PatientDetailsViewModelFactory(
   private val application: Application,
-  private val fhirEngine: FhirEngine,
+  private val fhirEngine: R4FhirEngine,
   private val patientId: String
 ) : ViewModelProvider.Factory {
   @Suppress("UNCHECKED_CAST")

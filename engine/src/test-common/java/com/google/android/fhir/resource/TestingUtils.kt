@@ -21,17 +21,16 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.SyncDownloadContext
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.search.Search
+import com.google.android.fhir.db.impl.entities.LocalChangeToken
+import com.google.android.fhir.r4.search.Search
+import com.google.android.fhir.r4.sync.R4DataSource
 import com.google.android.fhir.sync.ConflictResolver
-import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.common.truth.Truth.assertThat
 import java.time.OffsetDateTime
 import java.util.Date
 import java.util.LinkedList
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
@@ -88,7 +87,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     return JSONArray(content)
   }
 
-  object TestDataSourceImpl : DataSource {
+  object TestR4DataSourceImpl : R4DataSource {
 
     override suspend fun download(path: String): Resource {
       return Bundle().apply { type = Bundle.BundleType.SEARCHSET }
@@ -101,10 +100,11 @@ class TestingUtils constructor(private val iParser: IParser) {
 
   open class TestDownloadManagerImpl(
     queries: List<String> = listOf("Patient?address-city=NAIROBI")
-  ) : DownloadWorkManager {
+  ) : DownloadWorkManager<Resource, ResourceType> {
     private val urls = LinkedList(queries)
 
-    override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? = urls.poll()
+    override suspend fun getNextRequestUrl(context: SyncDownloadContext<ResourceType>): String? =
+      urls.poll()
 
     override suspend fun processResponse(response: Resource): Collection<Resource> {
       val patient = Patient().setMeta(Meta().setLastUpdated(Date()))
@@ -116,7 +116,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     queries: List<String> = listOf("Patient/bob", "Encounter/doc")
   ) : TestDownloadManagerImpl(queries)
 
-  object TestFhirEngineImpl : FhirEngine {
+  object TestFhirEngineImpl : FhirEngine<Resource, ResourceType, Search> {
     override suspend fun create(vararg resource: Resource) = emptyList<String>()
 
     override suspend fun update(vararg resource: Resource) {}
@@ -139,10 +139,10 @@ class TestingUtils constructor(private val iParser: IParser) {
 
     override suspend fun syncDownload(
       conflictResolver: ConflictResolver,
-      download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+      download: suspend (SyncDownloadContext<ResourceType>) -> Flow<List<Resource>>
     ) {
       download(
-        object : SyncDownloadContext {
+        object : SyncDownloadContext<ResourceType> {
           override suspend fun getLatestTimestampFor(type: ResourceType): String {
             return "123456788"
           }
@@ -167,7 +167,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {}
   }
 
-  object TestFailingDatasource : DataSource {
+  object TestFailingDatasource : R4DataSource {
 
     override suspend fun download(path: String): Resource {
       val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
@@ -182,7 +182,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
   }
 
-  class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSource {
+  class BundleR4DataSource(val onPostBundle: suspend (Bundle) -> Resource) : R4DataSource {
 
     override suspend fun download(path: String): Resource {
       TODO("Not yet implemented")
