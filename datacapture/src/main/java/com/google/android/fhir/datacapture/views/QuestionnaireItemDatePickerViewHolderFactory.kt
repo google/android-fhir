@@ -146,20 +146,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
       private fun updateAnswer(text: CharSequence?) {
         try {
-          val date = parseDate(text, textInputEditText.context.applicationContext)
-          val localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-          // date/localDate with year more than 4 digit throws data format exception if deep copy
-          // operation get performed on QuestionnaireResponse
-          // QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent in org.hl7.fhir.r4.model
-          // e.g ca.uhn.fhir.parser.DataFormatException: Invalid date/time format: "19843-12-21":
-          // Expected character '-' at index 4 but found 3
-          if (localDate.year.length() <= 4) {
-            questionnaireItemViewItem.setAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = localDate.dateType
-              }
-            )
-          }
+          val localDate = parseDate(text, textInputEditText.context.applicationContext)
+          questionnaireItemViewItem.setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = localDate.dateType
+            }
+          )
         } catch (e: ParseException) {
           questionnaireItemViewItem.clearAnswer()
         }
@@ -202,12 +194,24 @@ internal val DateType.localDate
 internal val LocalDate.dateType
   get() = DateType(year, monthValue - 1, dayOfMonth)
 
-internal fun parseDate(text: CharSequence?, context: Context) =
-  if (isAndroidIcuSupported()) {
-    DateFormat.getDateInstance(DateFormat.SHORT).parse(text.toString())
-  } else {
-    android.text.format.DateFormat.getDateFormat(context).parse(text.toString())
+internal fun parseDate(text: CharSequence?, context: Context): LocalDate {
+  val date =
+    if (isAndroidIcuSupported()) {
+      DateFormat.getDateInstance(DateFormat.SHORT).parse(text.toString())
+    } else {
+      android.text.format.DateFormat.getDateFormat(context).parse(text.toString())
+    }
+  val localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+  // date/localDate with year more than 4 digit throws data format exception if deep copy
+  // operation get performed on QuestionnaireResponse,
+  // QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent in org.hl7.fhir.r4.model
+  // e.g ca.uhn.fhir.parser.DataFormatException: Invalid date/time format: "19843-12-21":
+  // Expected character '-' at index 4 but found 3
+  if (localDate.year.length() > 4) {
+    throw ParseException("Year has more than 4 digits.", 4)
   }
+  return localDate
+}
 
 // https://stackoverflow.com/questions/42950812/count-number-of-digits-in-kotlin
 internal fun Int.length() =
