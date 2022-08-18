@@ -29,7 +29,8 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
 import java.io.File
@@ -49,6 +50,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.ValueSet
+import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -126,7 +128,10 @@ class QuestionnaireViewModelTest(
       viewModel.getQuestionnaireResponse(),
       QuestionnaireResponse().apply {
         addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "a-link-id" }
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Yes or no?"
+          }
         )
       }
     )
@@ -160,9 +165,11 @@ class QuestionnaireViewModelTest(
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
+            text = "Basic questions"
             addItem(
               QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
                 linkId = "another-link-id"
+                text = "Name?"
               }
             )
           }
@@ -510,6 +517,7 @@ class QuestionnaireViewModelTest(
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
+            text = "Basic question which allows multiple answers"
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = StringType("string 1")
@@ -600,6 +608,7 @@ class QuestionnaireViewModelTest(
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
+            text = "Basic question"
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(false)
@@ -638,6 +647,7 @@ class QuestionnaireViewModelTest(
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
+            text = "Basic question"
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(true)
@@ -684,7 +694,139 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun questionnaireHasMoreThanOneInitialValuesAndNotRepeating_shouldThrowError() {
+  fun `getQuestionnaireResponse() should have text in questionnaire response item`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addInitial(
+              Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(false) }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun `getQuestionnaireResponse() should have translated text in questionnaire response item`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            textElement.apply {
+              addExtension(
+                Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                  addExtension(Extension("lang", StringType("en-US")))
+                  addExtension(Extension("content", StringType("Basic Question")))
+                }
+              )
+            }
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addInitial(
+              Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(false) }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic Question"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun `getQuestionnaireResponse() should have text in questionnaire response item for nested items`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "a.1-link-id"
+                text = "Basic Nested question"
+                type = Questionnaire.QuestionnaireItemType.STRING
+                initial =
+                  mutableListOf(
+                    Questionnaire.QuestionnaireItemInitialComponent().apply {
+                      value = StringType("Test Value")
+                    }
+                  )
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "a.1-link-id"
+                text = "Basic Nested question"
+                answer =
+                  listOf(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = StringType("Test Value")
+                    }
+                  )
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun `createQuestionnaireViewModel() should throw IllegalArgumentException for multiple initial values with non repeating item`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -900,8 +1042,7 @@ class QuestionnaireViewModelTest(
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    assertThat(questionnaireItemViewItemList.single().validationResult)
-      .isEqualTo(ValidationResult(true, listOf()))
+    assertThat(questionnaireItemViewItemList.single().validationResult).isEqualTo(NotValidated)
   }
 
   @Test
@@ -932,7 +1073,7 @@ class QuestionnaireViewModelTest(
 
       ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
       assertThat(questionnaireItemViewItem!!.validationResult)
-        .isEqualTo(ValidationResult(false, listOf("Missing answer for required field.")))
+        .isEqualTo(Invalid(listOf("Missing answer for required field.")))
     } finally {
       observer.cancel()
       ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
@@ -1028,9 +1169,11 @@ class QuestionnaireViewModelTest(
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-group-item"
+            text = "Group question"
             addItem(
               QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
                 linkId = "a-nested-item"
+                text = "Basic question"
                 addAnswer(
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                     this.value = valueBooleanType.setValue(false)
