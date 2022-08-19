@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,10 @@ fun <R : Resource> getResourceType(clazz: Class<R>): ResourceType {
     throw IllegalArgumentException("Cannot resolve resource type for " + clazz.name, e)
   }
 }
+
+/** Returns the {@link Class} object for the resource type. */
+fun <R : Resource> getResourceClass(resourceType: ResourceType): Class<R> =
+  getResourceClass(resourceType.name)
 
 /** Returns the {@link Class} object for the resource type. */
 fun <R : Resource> getResourceClass(resourceType: String): Class<R> {

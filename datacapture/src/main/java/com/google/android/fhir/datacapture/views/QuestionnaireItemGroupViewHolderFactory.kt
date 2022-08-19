@@ -19,8 +19,10 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 
 internal object QuestionnaireItemGroupViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_group_header_view) {
@@ -40,11 +42,13 @@ internal object QuestionnaireItemGroupViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        error.text =
-          if (validationResult.getSingleStringValidationMessage() == "") null
-          else validationResult.getSingleStringValidationMessage()
-
-        error.visibility = if (error.text.isNotEmpty()) View.VISIBLE else View.GONE
+        when (validationResult) {
+          is NotValidated, Valid -> error.visibility = View.GONE
+          is Invalid -> {
+            error.text = validationResult.getSingleStringValidationMessage()
+            error.visibility = View.VISIBLE
+          }
+        }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
