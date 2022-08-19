@@ -103,7 +103,7 @@ open class QuestionnaireFragment : Fragment() {
           reviewModeEditButton.visibility = View.GONE
         }
 
-        if (state.pagination != null) {
+        if (state.pagination.isPaginated && !state.reviewMode) {
           paginationPreviousButton.visibility = View.VISIBLE
           paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage
           paginationNextButton.visibility = View.VISIBLE
@@ -112,28 +112,17 @@ open class QuestionnaireFragment : Fragment() {
           paginationPreviousButton.visibility = View.GONE
           paginationNextButton.visibility = View.GONE
         }
+
+        reviewModeButton.visibility =
+          if (state.pagination.showReviewButton) View.VISIBLE else View.GONE
+
+        submitButton.visibility = if (state.pagination.showSubmitButton) View.VISIBLE else View.GONE
       }
     }
 
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-      viewModel.reviewModeStateFlow.collect { reviewMode ->
-        if (reviewMode) {
-          recyclerView.swapAdapter(reviewPageItemAdapter, false)
-        } else {
-          recyclerView.swapAdapter(adapter, false)
-        }
-      }
-    }
-
-    viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-      viewModel.showReviewButtonStateFlow.collect { showReviewButton ->
-        reviewModeButton.visibility = if (showReviewButton) View.VISIBLE else View.GONE
-      }
-    }
-
-    viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-      viewModel.showSubmitButtonStateFlow.collect { showSubmitButton ->
-        submitButton.visibility = if (showSubmitButton) View.VISIBLE else View.GONE
+      viewModel.reviewFlow.collect { reviewMode ->
+        recyclerView.adapter = if (reviewMode) reviewPageItemAdapter else adapter
       }
     }
   }

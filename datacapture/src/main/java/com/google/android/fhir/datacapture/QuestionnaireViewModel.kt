@@ -32,8 +32,6 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -194,7 +192,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val modificationCount = MutableStateFlow(0)
 
   /** Toggles review mode. */
-  private val reviewFlow = MutableStateFlow(showReviewPageFirst)
+  val reviewFlow = MutableStateFlow(showReviewPageFirst)
 
   /** Flag to show/hide submit button. */
   private var showSubmitButtonFlag = false
@@ -276,27 +274,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   internal fun setShowSubmitButtonFlag(showSubmitButton: Boolean) {
     showSubmitButtonFlag = showSubmitButton
   }
-
-  /** StateFlow whether to show review button or not */
-  internal val showReviewButtonStateFlow: StateFlow<Boolean> =
-    combine(reviewFlow, currentPageIndexFlow) { reviewFlow, pagination ->
-        enableReviewPage &&
-          !reviewFlow &&
-          (pagination == null || !QuestionnairePagination(pages!!, pagination).hasNextPage)
-      }
-      .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = showReviewPageFirst)
-
-  /** StateFlow whether to show submit button or not */
-  internal val showSubmitButtonStateFlow: StateFlow<Boolean> =
-    combine(reviewFlow, currentPageIndexFlow) { _, pagination ->
-        showSubmitButtonFlag &&
-          !showReviewButtonStateFlow.value &&
-          (pagination == null || !QuestionnairePagination(pages!!, pagination).hasNextPage)
-      }
-      .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = showSubmitButtonFlag)
-
-  /** StateFlow to toggle UI between answer or review mode */
-  internal val reviewModeStateFlow: StateFlow<Boolean> = reviewFlow.asStateFlow()
 
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: Flow<QuestionnaireState> =
@@ -381,11 +358,27 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     currentPageIndex: Int?,
     reviewMode: Boolean
   ): QuestionnaireState {
+
+    val showReviewButton =
+      enableReviewPage &&
+        !reviewFlow.value &&
+        (currentPageIndex == null ||
+          !QuestionnairePagination(pages = pages!!, currentPageIndex = currentPageIndex)
+            .hasNextPage)
+
+    val showSubmitButton =
+      showSubmitButtonFlag &&
+        !showReviewButton &&
+        (currentPageIndex == null ||
+          !QuestionnairePagination(pages = pages!!, currentPageIndex = currentPageIndex)
+            .hasNextPage)
+
     if (currentPageIndex == null) {
       // Single-page questionnaire
       return QuestionnaireState(
         items = getQuestionnaireItemViewItems(questionnaireItemList, questionnaireResponseItemList),
-        pagination = null,
+        pagination =
+          QuestionnairePagination(false, emptyList(), -1, showSubmitButton, showReviewButton),
         reviewMode = reviewMode
       )
     }
@@ -412,7 +405,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireItemList[currentPageIndex],
           questionnaireResponseItemList[currentPageIndex]
         ),
-      pagination = QuestionnairePagination(pages!!, currentPageIndex),
+      pagination =
+        QuestionnairePagination(
+          true,
+          pages!!,
+          currentPageIndex,
+          showSubmitButton,
+          showReviewButton
+        ),
       reviewMode = reviewMode
     )
   }
@@ -612,8 +612,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 internal data class QuestionnaireState(
   /** The items that should be currently-rendered into the Fragment. */
   val items: List<QuestionnaireItemViewItem>,
-  /** The pagination state of the questionnaire. If `null`, the questionnaire is not paginated. */
-  val pagination: QuestionnairePagination?,
+  /** The pagination state of the questionnaire. */
+  val pagination: QuestionnairePagination,
   /** Tracks reviewMode in order to update the UI. */
   val reviewMode: Boolean,
 )
@@ -623,8 +623,11 @@ internal data class QuestionnaireState(
  * controls. Includes information for each page and the current page index.
  */
 internal data class QuestionnairePagination(
+  val isPaginated: Boolean = false,
   val pages: List<QuestionnairePage>,
   val currentPageIndex: Int,
+  val showSubmitButton: Boolean = false,
+  val showReviewButton: Boolean = false
 )
 
 /** A single page in the questionnaire. This is used for the UI to render pagination controls. */
