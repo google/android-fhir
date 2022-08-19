@@ -17,6 +17,9 @@
 package com.google.android.fhir.datacapture.views
 
 import android.os.Build
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.BooleanType
@@ -42,7 +45,7 @@ class QuestionnaireItemViewItemTest {
               .setValue(BooleanType(true))
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -73,7 +76,7 @@ class QuestionnaireItemViewItemTest {
               .setValue(BooleanType(true))
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -99,7 +102,7 @@ class QuestionnaireItemViewItemTest {
               .setValue(BooleanType(true))
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -138,7 +141,7 @@ class QuestionnaireItemViewItemTest {
               .setValue(BooleanType(false))
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -171,7 +174,7 @@ class QuestionnaireItemViewItemTest {
               .setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -201,7 +204,7 @@ class QuestionnaireItemViewItemTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -212,5 +215,399 @@ class QuestionnaireItemViewItemTest {
         )
       )
       .isFalse()
+  }
+
+  @Test
+  fun `hasTheSameItem() should return false if questionnaire items are different`() {
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+
+    assertThat(
+        QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            questionnaireResponseItem,
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .hasTheSameItem(
+            QuestionnaireItemViewItem(
+              Questionnaire.QuestionnaireItemComponent(),
+              questionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> }
+            )
+          )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun `hasTheSameItem() should return false if questionnaire response items are different`() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+
+    assertThat(
+        QuestionnaireItemViewItem(
+            questionnaireItem,
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .hasTheSameItem(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> }
+            )
+          )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun `hasTheSameItem() should return true if questionnaire items and questionnaire response items are the same`() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+
+    assertThat(
+        QuestionnaireItemViewItem(
+            questionnaireItem,
+            questionnaireResponseItem,
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .hasTheSameItem(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> }
+            )
+          )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun `hasTheSameAnswer() should return false for different answer list sizes`() {
+    assertThat(
+        QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .apply {
+            setAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+          .hasTheSameAnswer(
+            QuestionnaireItemViewItem(
+              Questionnaire.QuestionnaireItemComponent(),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> }
+            )
+          )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun `hasTheSameAnswer() should return true for two empty answer lists`() {
+    assertThat(
+        QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .hasTheSameAnswer(
+            QuestionnaireItemViewItem(
+              Questionnaire.QuestionnaireItemComponent(),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> }
+            )
+          )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun `hasTheSameAnswer() should return false for different answers`() {
+    assertThat(
+        QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .apply {
+            setAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+          .hasTheSameAnswer(
+            QuestionnaireItemViewItem(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+                validationResult = NotValidated,
+                answersChangedCallback = { _, _, _ -> }
+              )
+              .apply {
+                setAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = BooleanType(false)
+                  }
+                )
+              }
+          )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun `hasTheSameAnswer() should return false for null and non-null answers`() {
+    assertThat(
+        QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .apply { setAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()) }
+          .hasTheSameAnswer(
+            QuestionnaireItemViewItem(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+                validationResult = NotValidated,
+                answersChangedCallback = { _, _, _ -> }
+              )
+              .apply {
+                setAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = BooleanType(false)
+                  }
+                )
+              }
+          )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun `hasTheSameAnswer() should return false for non-null and null answers`() {
+    assertThat(
+        QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .apply {
+            setAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+          .hasTheSameAnswer(
+            QuestionnaireItemViewItem(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+                validationResult = NotValidated,
+                answersChangedCallback = { _, _, _ -> }
+              )
+              .apply { setAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()) }
+          )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun `hasTheSameAnswer() should return true for the same answers`() {
+    assertThat(
+        QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .apply {
+            setAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+          .hasTheSameAnswer(
+            QuestionnaireItemViewItem(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+                validationResult = NotValidated,
+                answersChangedCallback = { _, _, _ -> }
+              )
+              .apply {
+                setAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = BooleanType(true)
+                  }
+                )
+              }
+          )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun `hasTheSameValidationResult() should return true for null validation results`() {
+    assertThat(
+        QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .hasTheSameValidationResult(
+            QuestionnaireItemViewItem(
+              Questionnaire.QuestionnaireItemComponent(),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> }
+            )
+          )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun `hasTheSameValidationResult() should return true for null and valid validation results`() {
+    assertThat(
+        QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .hasTheSameValidationResult(
+            QuestionnaireItemViewItem(
+              Questionnaire.QuestionnaireItemComponent(),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+              validationResult = Valid,
+              answersChangedCallback = { _, _, _ -> }
+            )
+          )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun `hasTheSameValidationResult() should return false for valid and null validation results`() {
+    assertThat(
+        QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = Valid,
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .hasTheSameValidationResult(
+            QuestionnaireItemViewItem(
+              Questionnaire.QuestionnaireItemComponent(),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> }
+            )
+          )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun `hasTheSameValidationResult() should return true for two valid validation results`() {
+    assertThat(
+        QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = Valid,
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .hasTheSameValidationResult(
+            QuestionnaireItemViewItem(
+              Questionnaire.QuestionnaireItemComponent(),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+              validationResult = Valid,
+              answersChangedCallback = { _, _, _ -> }
+            )
+          )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun `hasTheSameValidationResult() should return false for different validation results`() {
+    assertThat(
+        QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = Valid,
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .hasTheSameValidationResult(
+            QuestionnaireItemViewItem(
+              Questionnaire.QuestionnaireItemComponent(),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+              validationResult = Invalid(listOf("error")),
+              answersChangedCallback = { _, _, _ -> }
+            )
+          )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun `hasTheSameValidationResult() should return false for validation results with different messages`() {
+    assertThat(
+        QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = Invalid(listOf("error 1")),
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .hasTheSameValidationResult(
+            QuestionnaireItemViewItem(
+              Questionnaire.QuestionnaireItemComponent(),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+              validationResult = Invalid(listOf("error 2")),
+              answersChangedCallback = { _, _, _ -> }
+            )
+          )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun `hasTheSameValidationResult() should return true for same validation results`() {
+    assertThat(
+        QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = Invalid(listOf("error")),
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .hasTheSameValidationResult(
+            QuestionnaireItemViewItem(
+              Questionnaire.QuestionnaireItemComponent(),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+              validationResult = Invalid(listOf("error")),
+              answersChangedCallback = { _, _, _ -> }
+            )
+          )
+      )
+      .isTrue()
   }
 }

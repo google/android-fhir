@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,9 +69,12 @@ internal object EnablementEvaluator {
    */
   fun evaluate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     questionnaireResponse: QuestionnaireResponse,
     questionnaireResponseItemRetriever:
-      (linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
+      (
+        item: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+        linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhen
     val enableWhenExpression = questionnaireItem.enableWhenExpression
@@ -89,7 +92,11 @@ internal object EnablementEvaluator {
 
     // Evaluate single `enableWhen` constraint.
     if (enableWhenList.size == 1) {
-      return evaluateEnableWhen(enableWhenList.single(), questionnaireResponseItemRetriever)
+      return evaluateEnableWhen(
+        enableWhenList.single(),
+        questionnaireResponseItem,
+        questionnaireResponseItemRetriever
+      )
     }
 
     // Evaluate multiple `enableWhen` constraints and aggregate the results according to
@@ -98,9 +105,13 @@ internal object EnablementEvaluator {
     // enabled if ANY `enableWhen` constraint is satisfied.
     return when (val value = questionnaireItem.enableBehavior) {
       Questionnaire.EnableWhenBehavior.ALL ->
-        enableWhenList.all { evaluateEnableWhen(it, questionnaireResponseItemRetriever) }
+        enableWhenList.all {
+          evaluateEnableWhen(it, questionnaireResponseItem, questionnaireResponseItemRetriever)
+        }
       Questionnaire.EnableWhenBehavior.ANY ->
-        enableWhenList.any { evaluateEnableWhen(it, questionnaireResponseItemRetriever) }
+        enableWhenList.any {
+          evaluateEnableWhen(it, questionnaireResponseItem, questionnaireResponseItemRetriever)
+        }
       else -> throw IllegalStateException("Unrecognized enable when behavior $value")
     }
   }
@@ -114,10 +125,14 @@ internal object EnablementEvaluator {
  */
 private fun evaluateEnableWhen(
   enableWhen: Questionnaire.QuestionnaireItemEnableWhenComponent,
+  questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   questionnaireResponseItemRetriever:
-    (linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
+    (
+      item: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+      linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
 ): Boolean {
-  val questionnaireResponseItem = questionnaireResponseItemRetriever(enableWhen.question)
+  val questionnaireResponseItem =
+    questionnaireResponseItemRetriever(questionnaireResponseItem, enableWhen.question)
   return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
     (questionnaireResponseItem == null || questionnaireResponseItem.answer.isEmpty()) !=
       enableWhen.answerBooleanType.booleanValue()

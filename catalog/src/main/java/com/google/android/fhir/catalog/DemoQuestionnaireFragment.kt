@@ -19,6 +19,8 @@ package com.google.android.fhir.catalog
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -92,6 +94,11 @@ class DemoQuestionnaireFragment : Fragment() {
       }
       else -> super.onOptionsItemSelected(item)
     }
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    super.onCreateOptionsMenu(menu, inflater)
+    inflater.inflate(getMenu(), menu)
   }
 
   private fun setUpActionBar() {
@@ -178,10 +185,7 @@ class DemoQuestionnaireFragment : Fragment() {
 
   private fun onSubmitQuestionnaireClick() {
     val questionnaireFragment =
-      childFragmentManager.findFragmentByTag(
-        QuestionnaireContainerFragment.QUESTIONNAIRE_FRAGMENT_TAG
-      ) as
-        QuestionnaireFragment
+      childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
     launchQuestionnaireResponseFragment(
       viewModel.getQuestionnaireResponseJson(questionnaireFragment.getQuestionnaireResponse())
     )

@@ -25,8 +25,10 @@ import androidx.core.view.get
 import androidx.core.view.isEmpty
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -90,10 +92,16 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         // https://github.com/material-components/material-components-android/issues/1435
         // Because of the above issue, we use separate error textview. But we still use
         // textInputLayout to show the error icon and the box color.
-        validationResult.getSingleStringValidationMessage().let {
-          errorTextView.text = it
-          errorTextView.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
-          textInputLayout.error = if (it.isEmpty()) null else " " // non empty text
+        when (validationResult) {
+          is NotValidated, Valid -> {
+            errorTextView.visibility = View.GONE
+            textInputLayout.error = null
+          }
+          is Invalid -> {
+            errorTextView.text = validationResult.getSingleStringValidationMessage()
+            errorTextView.visibility = View.VISIBLE
+            textInputLayout.error = " " // non empty text
+          }
         }
       }
 
@@ -132,7 +140,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       ): Boolean {
         if (chipIsAlreadyPresent(answer)) return false
 
-        val chip = Chip(chipContainer.context, null, R.attr.chipStyleQuestionnaire)
+        val chip = Chip(chipContainer.context, null, R.attr.questionnaireChipStyle)
         chip.id = View.generateViewId()
         chip.text = answer.valueCoding.display
         chip.isCloseIconVisible = true
