@@ -43,16 +43,16 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
   private var hint: TextView = findViewById(R.id.hint)
 
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
-    prefix.updateText(questionnaireItem.localizedPrefixSpanned)
-    question.updateText(questionnaireItem.localizedTextSpanned)
-    hint.updateText(questionnaireItem.localizedHintSpanned)
+    prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
+    question.updateTextAndVisibility(questionnaireItem.localizedTextSpanned)
+    hint.updateTextAndVisibility(questionnaireItem.localizedHintSpanned)
     //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
     visibility = isViewVisible(prefix, question, hint)
   }
 }
 
-internal fun TextView.updateText(localizedText: Spanned?) {
+internal fun TextView.updateTextAndVisibility(localizedText: Spanned?) {
   text = localizedText
   visibility =
     if (localizedText.isNullOrEmpty()) {
@@ -64,10 +64,8 @@ internal fun TextView.updateText(localizedText: Spanned?) {
 
 /** Returns [VISIBLE] if any of the [view] is visible, else returns [GONE]. */
 internal fun isViewVisible(vararg view: TextView): Int {
-  view.forEach {
-    if (it.visibility == VISIBLE) {
-      return VISIBLE
-    }
+  if (view.any { it.visibility == VISIBLE }) {
+    return VISIBLE
   }
   return GONE
 }

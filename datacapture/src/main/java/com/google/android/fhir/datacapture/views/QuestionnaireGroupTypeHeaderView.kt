@@ -38,9 +38,9 @@ internal class QuestionnaireGroupTypeHeaderView(context: Context, attrs: Attribu
     val prefix = findViewById<TextView>(R.id.prefix)
     val question = findViewById<TextView>(R.id.question)
     val hint = findViewById<TextView>(R.id.hint)
-    prefix.updateText(questionnaireItem.localizedPrefixSpanned)
-    question.updateText(questionnaireItem.localizedTextSpanned)
-    hint.updateText(questionnaireItem.localizedHintSpanned)
+    prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
+    question.updateTextAndVisibility(questionnaireItem.localizedTextSpanned)
+    hint.updateTextAndVisibility(questionnaireItem.localizedHintSpanned)
     visibility = isViewVisible(prefix, question, hint)
   }
 }
