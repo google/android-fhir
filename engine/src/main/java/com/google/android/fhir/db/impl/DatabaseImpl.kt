@@ -23,7 +23,6 @@ import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.DatabaseErrorStrategy
-import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
@@ -236,21 +235,16 @@ internal class DatabaseImpl(
     db.clearAllTables()
   }
 
-  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange? {
+  override suspend fun getLocalChange(type: ResourceType, id: String): SquashedLocalChange? {
     return db.withTransaction {
       val localChangeEntityList =
         localChangeDao.getLocalChanges(resourceType = type, resourceId = id)
       if (localChangeEntityList.isEmpty()) {
         return@withTransaction null
       }
-      val localChangeEntity = LocalChangeUtils.squash(localChangeEntityList)
-      LocalChange(
-        localChangeEntity.resourceType,
-        localChangeEntity.resourceId,
-        localChangeEntity.timestamp,
-        localChangeEntity.type,
-        localChangeEntity.payload,
-        localChangeEntity.versionId
+      SquashedLocalChange(
+        LocalChangeToken(localChangeEntityList.map { it.id }),
+        LocalChangeUtils.squash(localChangeEntityList)
       )
     }
   }
