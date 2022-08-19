@@ -41,6 +41,6 @@ internal class QuestionnaireGroupTypeHeaderView(context: Context, attrs: Attribu
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
     question.updateTextAndVisibility(questionnaireItem.localizedTextSpanned)
     hint.updateTextAndVisibility(questionnaireItem.localizedHintSpanned)
-    visibility = isViewVisible(prefix, question, hint)
+    visibility = getVisibility(prefix, question, hint)
   }
 }
