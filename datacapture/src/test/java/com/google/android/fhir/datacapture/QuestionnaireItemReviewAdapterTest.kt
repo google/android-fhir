@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Build
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
@@ -28,56 +29,56 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class QuestionnaireReviewPageItemAdapterTest {
+class QuestionnaireItemReviewAdapterTest {
   @Test
   fun getItemCount_withEmptyList_shouldReturnZero() {
-    val questionnaireReviewPageItemAdapter = QuestionnaireReviewPageItemAdapter()
-    questionnaireReviewPageItemAdapter.submitList(listOf())
+    val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
+    questionnaireItemReviewAdapter.submitList(listOf())
 
-    assertThat(questionnaireReviewPageItemAdapter.itemCount).isEqualTo(0)
+    assertThat(questionnaireItemReviewAdapter.itemCount).isEqualTo(0)
   }
 
   @Test
   fun getItemCount_withSingleItemList_shouldReturnOne() {
-    val questionnaireReviewPageItemAdapter = QuestionnaireReviewPageItemAdapter()
-    questionnaireReviewPageItemAdapter.submitList(
+    val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
+    questionnaireItemReviewAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.GROUP),
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = null,
+          validationResult = Valid,
           answersChangedCallback = { _, _, _ -> },
         )
       )
     )
 
-    assertThat(questionnaireReviewPageItemAdapter.itemCount).isEqualTo(1)
+    assertThat(questionnaireItemReviewAdapter.itemCount).isEqualTo(1)
   }
 
   @Test
   fun getItemCount_withMultipleItemList_shouldReturnGreaterThanZero() {
-    val questionnaireReviewPageItemAdapter = QuestionnaireReviewPageItemAdapter()
-    questionnaireReviewPageItemAdapter.submitList(
+    val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
+    questionnaireItemReviewAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.GROUP),
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = null,
+          validationResult = Valid,
           answersChangedCallback = { _, _, _ -> },
         ),
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.DISPLAY),
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = null,
+          validationResult = Valid,
           answersChangedCallback = { _, _, _ -> },
         )
       )
     )
 
-    assertThat(questionnaireReviewPageItemAdapter.itemCount).isEqualTo(2)
-    assertThat(questionnaireReviewPageItemAdapter.itemCount).isGreaterThan(0)
+    assertThat(questionnaireItemReviewAdapter.itemCount).isEqualTo(2)
+    assertThat(questionnaireItemReviewAdapter.itemCount).isGreaterThan(0)
   }
 }

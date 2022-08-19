@@ -73,8 +73,9 @@ open class QuestionnaireFragment : Fragment() {
     requireView().findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
       setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
     }
-    val adapter = QuestionnaireItemAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
-    val reviewPageItemAdapter = QuestionnaireReviewPageItemAdapter()
+    val questionnaireItemEditAdapter =
+      QuestionnaireItemEditAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
+    val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
 
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
     // Reads submit button visibility value initially defined in
@@ -96,10 +97,10 @@ open class QuestionnaireFragment : Fragment() {
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.questionnaireStateFlow.collect { state ->
         if (state.reviewMode) {
-          reviewPageItemAdapter.submitList(state.items)
+          questionnaireItemReviewAdapter.submitList(state.items)
           reviewModeEditButton.visibility = View.VISIBLE
         } else {
-          adapter.submitList(state.items)
+          questionnaireItemEditAdapter.submitList(state.items)
           reviewModeEditButton.visibility = View.GONE
         }
 
@@ -122,7 +123,8 @@ open class QuestionnaireFragment : Fragment() {
 
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.reviewFlow.collect { reviewMode ->
-        recyclerView.adapter = if (reviewMode) reviewPageItemAdapter else adapter
+        recyclerView.adapter =
+          if (reviewMode) questionnaireItemReviewAdapter else questionnaireItemEditAdapter
       }
     }
   }
