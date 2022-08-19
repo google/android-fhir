@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.db
 
-import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -144,7 +143,7 @@ internal interface Database {
    * @return [LocalChangeEntity] A squashed local changes for given [resourceType] and [Resource.id]
    * . If there is no local change for given [resourceType] and [Resource.id], return `null`.
    */
-  suspend fun getLocalChange(type: ResourceType, id: String): LocalChange?
+  suspend fun getLocalChange(type: ResourceType, id: String): SquashedLocalChange?
 
   /**
    * Purge resource from database based on resource type and id without any deletion of data from

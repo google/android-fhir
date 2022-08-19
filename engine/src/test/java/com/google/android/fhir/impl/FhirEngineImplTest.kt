@@ -18,10 +18,10 @@ package com.google.android.fhir.impl
 
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirServices.Companion.builder
+import com.google.android.fhir.LocalChange
+import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.get
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
@@ -255,7 +255,7 @@ class FhirEngineImplTest {
 
   @Test
   fun syncUpload_uploadLocalChange() = runBlocking {
-    val localChanges = mutableListOf<SquashedLocalChange>()
+    val localChanges = mutableListOf<LocalChange>()
     fhirEngine.syncUpload {
       flow {
         localChanges.addAll(it)
@@ -264,12 +264,13 @@ class FhirEngineImplTest {
     }
 
     assertThat(localChanges).hasSize(1)
-    val localChange = localChanges[0].localChange
-    assertThat(localChange.resourceType).isEqualTo(ResourceType.Patient.toString())
-    assertThat(localChange.resourceId).isEqualTo(TEST_PATIENT_1.id)
-    assertThat(localChange.type).isEqualTo(LocalChangeEntity.Type.INSERT)
-    assertThat(localChange.payload)
-      .isEqualTo(services.parser.encodeResourceToString(TEST_PATIENT_1))
+    // val localChange = localChanges[0].localChange
+    with(localChanges[0]) {
+      assertThat(this.resourceType).isEqualTo(ResourceType.Patient.toString())
+      assertThat(this.resourceId).isEqualTo(TEST_PATIENT_1.id)
+      assertThat(this.type).isEqualTo(Type.INSERT)
+      assertThat(this.payload).isEqualTo(services.parser.encodeResourceToString(TEST_PATIENT_1))
+    }
   }
 
   @Test
@@ -300,7 +301,7 @@ class FhirEngineImplTest {
     with(squashedLocalChange) {
       assertThat(this!!.resourceId).isEqualTo(patient.logicalId)
       assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
+      assertThat(type).isEqualTo(Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
   }
@@ -320,7 +321,7 @@ class FhirEngineImplTest {
     with(squashedLocalChange) {
       assertThat(this!!.resourceId).isEqualTo(patient.logicalId)
       assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
+      assertThat(type).isEqualTo(Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
   }
@@ -349,7 +350,7 @@ class FhirEngineImplTest {
     with(squashedLocalChange) {
       assertThat(this!!.resourceId).isEqualTo(patient.logicalId)
       assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
+      assertThat(type).isEqualTo(Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
     testingUtils.assertResourceEquals(
