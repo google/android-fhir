@@ -2,252 +2,230 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>FhirEngine</title>
-<link href="../../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script><script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" async="async"></script>  </head>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><link href="../../../styles/prism.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script><script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>  </head>
   <body>
+    <div class="navigation-wrapper" id="navigation-wrapper">
+      <div id="leftToggler"><span class="icon-toggler"></span></div>
+      <div class="library-name"><a href="../../../index.html">engine</a></div>
+      <div>0.1.0-beta01</div>
+      <div class="pull-right d-flex"><button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+      </div>
+    </div>
     <div id="container">
-      <div id="leftColumn"><a href="../../../index.html">
-          <div id="logo"></div>
-        </a>
-        <div id="paneSearch"></div>
+      <div id="leftColumn">
         <div id="sideMenu"></div>
       </div>
       <div id="main">
-        <div id="leftToggler"><span class="icon-toggler"></span></div>
-<script type="text/javascript" src="../../../scripts/main.js"></script>        <div class="main-content" id="content" pageIds="engine::com.google.android.fhir/FhirEngine///PointingToDeclaration//-1683276876">
-          <div class="navigation-wrapper" id="navigation-wrapper">
-            <div class="breadcrumbs"><a href="../../../index.html">engine</a>/<a href="../index.html">com.google.android.fhir</a>/<a href="index.html">FhirEngine</a></div>
-            <div class="pull-right d-flex">
-              <div id="searchBar"></div>
-            </div>
-          </div>
+        <div class="main-content" id="content" pageIds="engine::com.google.android.fhir/FhirEngine///PointingToDeclaration//1317381881">
+          <div class="breadcrumbs"><a href="../../../index.html">engine</a>/<a href="../index.html">com.google.android.fhir</a>/<a href="index.html">FhirEngine</a></div>
           <div class="cover ">
-            <h1 class="cover"><span>Fhir</span><wbr></wbr><span>Engine</span></h1>
-            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">interface <a href="index.html">FhirEngine</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">The FHIR Engine interface that handles the local storage of FHIR resources.</p></div></div>
+            <h1 class="cover"><span>Fhir</span><wbr></wbr><span><span>Engine</span></span></h1>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">FhirEngine</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">The FHIR Engine interface that handles the local storage of FHIR resources.</p></div></div>
           </div>
           <div class="tabbedcontent">
             <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Extensions">Extensions</button></div>
             <div class="tabs-section-body">
               <h2 class="">Functions</h2>
-              <div class="table" data-togglable="Functions"><a data-name="319765629%2FFunctions%2F-1683276876" anchor-label="count" id="319765629%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
+              <div class="table" data-togglable="Functions"><a data-name="319765629%2FFunctions%2F1317381881" anchor-label="count" id="319765629%2FFunctions%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="count.html">count</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="319765629%2FFunctions%2F-1683276876"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="count.html"><span><span>count</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="319765629%2FFunctions%2F1317381881"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">abstract suspend fun <a href="count.html">count</a>(search: <a href="../../com.google.android.fhir.search/-search/index.html">Search</a>): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<a data-name="319765629%2FFunctions%2F-1683276876" anchor-label="count" id="319765629%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a><div class="brief "><a data-name="319765629%2FFunctions%2F-1683276876" anchor-label="count" id="319765629%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>Returns the total count of entities available for given search.</div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="count.html"><span class="token function">count</span></a><span class="token punctuation">(</span>search<span class="token operator">: </span><a href="../../com.google.android.fhir.search/-search/index.html">Search</a><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Returns the total count of entities available for given search.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="-1555325233%2FFunctions%2F-1683276876" anchor-label="create" id="-1555325233%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
+<a data-name="468376732%2FFunctions%2F1317381881" anchor-label="create" id="468376732%2FFunctions%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="create.html">create</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1555325233%2FFunctions%2F-1683276876"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="create.html"><span><span>create</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="468376732%2FFunctions%2F1317381881"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">abstract suspend fun <a href="create.html">create</a>(vararg resource: <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Resource.html">Resource</a>): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<a data-name="-1555325233%2FFunctions%2F-1683276876" anchor-label="create" id="-1555325233%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a><div class="brief "><a data-name="-1555325233%2FFunctions%2F-1683276876" anchor-label="create" id="-1555325233%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>Creates one or more FHIR <a href="create.html">resource</a>s in the local storage.</div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="create.html"><span class="token function">create</span></a><span class="token punctuation">(</span><span class="token keyword">vararg </span>resource<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Creates one or more FHIR <a href="create.html">resource</a>s in the local storage.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="-1023916279%2FFunctions%2F-1683276876" anchor-label="getLastSyncTimeStamp" id="-1023916279%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
+<a data-name="-1023916279%2FFunctions%2F1317381881" anchor-label="getLastSyncTimeStamp" id="-1023916279%2FFunctions%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="get-last-sync-time-stamp.html">getLastSyncTimeStamp</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1023916279%2FFunctions%2F-1683276876"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="get-last-sync-time-stamp.html"><span>get</span><wbr></wbr><span>Last</span><wbr></wbr><span>Sync</span><wbr></wbr><span>Time</span><wbr></wbr><span><span>Stamp</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1023916279%2FFunctions%2F1317381881"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">abstract suspend fun <a href="get-last-sync-time-stamp.html">getLastSyncTimeStamp</a>(): <a href="https://developer.android.com/reference/kotlin/java/time/OffsetDateTime.html">OffsetDateTime</a>?<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<a data-name="-1023916279%2FFunctions%2F-1683276876" anchor-label="getLastSyncTimeStamp" id="-1023916279%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a><div class="brief "><a data-name="-1023916279%2FFunctions%2F-1683276876" anchor-label="getLastSyncTimeStamp" id="-1023916279%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>Returns the timestamp when data was last synchronized.</div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-last-sync-time-stamp.html"><span class="token function">getLastSyncTimeStamp</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/time/OffsetDateTime.html">OffsetDateTime</a><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Returns the timestamp when data was last synchronized.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="1646989604%2FFunctions%2F-1683276876" anchor-label="load" id="1646989604%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
+<a data-name="938593543%2FFunctions%2F1317381881" anchor-label="load" id="938593543%2FFunctions%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="load.html">load</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1646989604%2FFunctions%2F-1683276876"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="load.html"><span><span>load</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="938593543%2FFunctions%2F1317381881"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace strikethrough">abstract suspend fun &lt;<a href="load.html">R</a> : <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Resource.html">Resource</a>&gt; <a href="load.html">load</a>(clazz: <a href="https://developer.android.com/reference/kotlin/java/lang/Class.html">Class</a>&lt;<a href="load.html">R</a>&gt;, id: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>): <a href="load.html">R</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<a data-name="1646989604%2FFunctions%2F-1683276876" anchor-label="load" id="1646989604%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a><div class="brief "><a data-name="1646989604%2FFunctions%2F-1683276876" anchor-label="load" id="1646989604%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>Loads a FHIR resource given the class and the logical ID.</div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace strikethrough"><strike><span class="token keyword">abstract </span></strike><strike><span class="token keyword">suspend </span></strike><strike><span class="token keyword">fun </span></strike><strike><span class="token operator">&lt;</span></strike><span class="token keyword"></span><a href="load.html">R</a><strike><span class="token operator">&gt; </span></strike><a href="load.html"><strike><span class="token function">load</span></strike></a><strike><span class="token punctuation">(</span></strike><strike>clazz</strike><strike><span class="token operator">: </span></strike><a href="https://developer.android.com/reference/kotlin/java/lang/Class.html">Class</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="load.html">R</a><span class="token operator">&gt;</span><strike><span class="token punctuation">, </span></strike><strike>id</strike><strike><span class="token operator">: </span></strike><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><strike><span class="token punctuation">)</span></strike><strike><span class="token operator">: </span></strike><a href="load.html"><strike>R</strike></a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Loads a FHIR resource given the class and the logical ID.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="823165442%2FFunctions%2F-1683276876" anchor-label="remove" id="823165442%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
+<a data-name="1019165929%2FFunctions%2F1317381881" anchor-label="remove" id="1019165929%2FFunctions%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="remove.html">remove</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="823165442%2FFunctions%2F-1683276876"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="remove.html"><span><span>remove</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1019165929%2FFunctions%2F1317381881"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace strikethrough">abstract suspend fun &lt;<a href="remove.html">R</a> : <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Resource.html">Resource</a>&gt; <a href="remove.html">remove</a>(clazz: <a href="https://developer.android.com/reference/kotlin/java/lang/Class.html">Class</a>&lt;<a href="remove.html">R</a>&gt;, id: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<a data-name="823165442%2FFunctions%2F-1683276876" anchor-label="remove" id="823165442%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a><div class="brief "><a data-name="823165442%2FFunctions%2F-1683276876" anchor-label="remove" id="823165442%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>Removes a FHIR resource given the class and the logical ID.</div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace strikethrough"><strike><span class="token keyword">abstract </span></strike><strike><span class="token keyword">suspend </span></strike><strike><span class="token keyword">fun </span></strike><strike><span class="token operator">&lt;</span></strike><span class="token keyword"></span><a href="remove.html">R</a><strike><span class="token operator">&gt; </span></strike><a href="remove.html"><strike><span class="token function">remove</span></strike></a><strike><span class="token punctuation">(</span></strike><strike>clazz</strike><strike><span class="token operator">: </span></strike><a href="https://developer.android.com/reference/kotlin/java/lang/Class.html">Class</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="remove.html">R</a><span class="token operator">&gt;</span><strike><span class="token punctuation">, </span></strike><strike>id</strike><strike><span class="token operator">: </span></strike><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><strike><span class="token punctuation">)</span></strike><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Removes a FHIR resource given the class and the logical ID.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="355512448%2FFunctions%2F-1683276876" anchor-label="search" id="355512448%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
+<a data-name="355512448%2FFunctions%2F1317381881" anchor-label="search" id="355512448%2FFunctions%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="search.html">search</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="355512448%2FFunctions%2F-1683276876"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="search.html"><span><span>search</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="355512448%2FFunctions%2F1317381881"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">abstract suspend fun &lt;<a href="search.html">R</a> : <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Resource.html">Resource</a>&gt; <a href="search.html">search</a>(search: <a href="../../com.google.android.fhir.search/-search/index.html">Search</a>): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="search.html">R</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<a data-name="355512448%2FFunctions%2F-1683276876" anchor-label="search" id="355512448%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a><div class="brief "><a data-name="355512448%2FFunctions%2F-1683276876" anchor-label="search" id="355512448%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>Searches the database and returns a list resources according to the <a href="search.html">search</a> specifications.</div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="search.html">R</a><span class="token operator">&gt; </span><a href="search.html"><span class="token function">search</span></a><span class="token punctuation">(</span>search<span class="token operator">: </span><a href="../../com.google.android.fhir.search/-search/index.html">Search</a><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="search.html">R</a><span class="token operator">&gt;</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Searches the database and returns a list resources according to the <a href="search.html">search</a> specifications.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="177229757%2FFunctions%2F-1683276876" anchor-label="syncDownload" id="177229757%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
+<a data-name="1530342398%2FFunctions%2F1317381881" anchor-label="syncDownload" id="1530342398%2FFunctions%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="sync-download.html">syncDownload</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="177229757%2FFunctions%2F-1683276876"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="sync-download.html"><span>sync</span><wbr></wbr><span><span>Download</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1530342398%2FFunctions%2F1317381881"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">abstract suspend fun <a href="sync-download.html">syncDownload</a>(download: suspend (<a href="../-sync-download-context/index.html">SyncDownloadContext</a>) -&gt; <span data-unresolved-link="kotlinx.coroutines.flow/Flow///PointingToDeclaration/">Flow</span>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Resource.html">Resource</a>&gt;&gt;)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<a data-name="177229757%2FFunctions%2F-1683276876" anchor-label="syncDownload" id="177229757%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a><div class="brief "><a data-name="177229757%2FFunctions%2F-1683276876" anchor-label="syncDownload" id="177229757%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>Synchronizes the <a href="sync-download.html">download</a> result in the database.</div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="sync-download.html"><span class="token function">syncDownload</span></a><span class="token punctuation">(</span>download<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="../-sync-download-context/index.html">SyncDownloadContext</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Synchronizes the <a href="sync-download.html">download</a> result in the database. The database will be updated to reflect the result of the <a href="sync-download.html">download</a> operation.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="385526220%2FFunctions%2F-1683276876" anchor-label="syncUpload" id="385526220%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
+<a data-name="-1810818074%2FFunctions%2F1317381881" anchor-label="syncUpload" id="-1810818074%2FFunctions%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="sync-upload.html">syncUpload</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="385526220%2FFunctions%2F-1683276876"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="sync-upload.html"><span>sync</span><wbr></wbr><span><span>Upload</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1810818074%2FFunctions%2F1317381881"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">abstract suspend fun <a href="sync-upload.html">syncUpload</a>(upload: suspend (<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="../../com.google.android.fhir.db.impl.dao/-squashed-local-change/index.html">SquashedLocalChange</a>&gt;) -&gt; <span data-unresolved-link="kotlinx.coroutines.flow/Flow///PointingToDeclaration/">Flow</span>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a>&lt;<a href="../../com.google.android.fhir.db.impl.dao/-local-change-token/index.html">LocalChangeToken</a>, <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Resource.html">Resource</a>&gt;&gt;)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<a data-name="385526220%2FFunctions%2F-1683276876" anchor-label="syncUpload" id="385526220%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a><div class="brief "><a data-name="385526220%2FFunctions%2F-1683276876" anchor-label="syncUpload" id="385526220%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>Synchronizes the <a href="sync-upload.html">upload</a> result in the database.</div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="sync-upload.html"><span class="token function">syncUpload</span></a><span class="token punctuation">(</span>upload<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.google.android.fhir.db.impl.dao/-squashed-local-change/index.html">SquashedLocalChange</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.google.android.fhir.db.impl.dao/-local-change-token/index.html">LocalChangeToken</a><span class="token punctuation">, </span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Synchronizes the <a href="sync-upload.html">upload</a> result in the database. <a href="sync-upload.html">upload</a> operation may result in multiple calls to the server to upload the data. Result of each call will be emitted by <a href="sync-upload.html">upload</a> and the api caller should Flow.collect it.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="1235011362%2FFunctions%2F-1683276876" anchor-label="update" id="1235011362%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
+<a data-name="1791952175%2FFunctions%2F1317381881" anchor-label="update" id="1791952175%2FFunctions%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="update.html">update</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1235011362%2FFunctions%2F-1683276876"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="update.html"><span><span>update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1791952175%2FFunctions%2F1317381881"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">abstract suspend fun <a href="update.html">update</a>(vararg resource: <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Resource.html">Resource</a>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<a data-name="1235011362%2FFunctions%2F-1683276876" anchor-label="update" id="1235011362%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a><div class="brief "><a data-name="1235011362%2FFunctions%2F-1683276876" anchor-label="update" id="1235011362%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>Updates a FHIR <a href="update.html">resource</a> in the local storage.</div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="update.html"><span class="token function">update</span></a><span class="token punctuation">(</span><span class="token keyword">vararg </span>resource<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Updates a FHIR <a href="update.html">resource</a> in the local storage.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
               <h2 class="tabbedcontent">Extensions</h2>
-              <div class="table" data-togglable="Extensions"><a data-name="882966290%2FExtensions%2F-1683276876" anchor-label="count" id="882966290%2FExtensions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
+              <div class="table" data-togglable="Extensions"><a data-name="882966290%2FExtensions%2F1317381881" anchor-label="count" id="882966290%2FExtensions%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="../../com.google.android.fhir.search/count.html">count</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="882966290%2FExtensions%2F-1683276876"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="../../com.google.android.fhir.search/count.html"><span><span>count</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="882966290%2FExtensions%2F1317381881"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">inline suspend fun &lt;<a href="../../com.google.android.fhir.search/count.html">R</a> : <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Resource.html">Resource</a>&gt; <a href="index.html">FhirEngine</a>.<a href="../../com.google.android.fhir.search/count.html">count</a>(init: <a href="../../com.google.android.fhir.search/-search/index.html">Search</a>.() -&gt; <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a>): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-</div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">inline suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.google.android.fhir.search/count.html">R</a><span class="token operator">&gt; </span><a href="index.html">FhirEngine</a><span class="token punctuation">.</span><a href="../../com.google.android.fhir.search/count.html"><span class="token function">count</span></a><span class="token punctuation">(</span>init<span class="token operator">: </span><span class="token keyword"></span><a href="../../com.google.android.fhir.search/-search/index.html">Search</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="-879902309%2FExtensions%2F-1683276876" anchor-label="delete" id="-879902309%2FExtensions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
+<a data-name="-879902309%2FExtensions%2F1317381881" anchor-label="delete" id="-879902309%2FExtensions%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="../delete.html">delete</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-879902309%2FExtensions%2F-1683276876"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="../delete.html"><span><span>delete</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-879902309%2FExtensions%2F1317381881"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">inline suspend fun &lt;<a href="../delete.html">R</a> : <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Resource.html">Resource</a>&gt; <a href="index.html">FhirEngine</a>.<a href="../delete.html">delete</a>(id: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<a data-name="-879902309%2FExtensions%2F-1683276876" anchor-label="delete" id="-879902309%2FExtensions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a><div class="brief "><a data-name="-879902309%2FExtensions%2F-1683276876" anchor-label="delete" id="-879902309%2FExtensions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>Deletes a FHIR resource of type <a href="../delete.html">R</a> with <a href="../delete.html">id</a> from the local storage.</div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">inline suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../delete.html">R</a><span class="token operator">&gt; </span><a href="index.html">FhirEngine</a><span class="token punctuation">.</span><a href="../delete.html"><span class="token function">delete</span></a><span class="token punctuation">(</span>id<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Deletes a FHIR resource of type <a href="../delete.html">R</a> with <a href="../delete.html">id</a> from the local storage.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="-873509022%2FExtensions%2F-1683276876" anchor-label="get" id="-873509022%2FExtensions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
+<a data-name="-873509022%2FExtensions%2F1317381881" anchor-label="get" id="-873509022%2FExtensions%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="../get.html">get</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-873509022%2FExtensions%2F-1683276876"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="../get.html"><span><span>get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-873509022%2FExtensions%2F1317381881"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">inline suspend fun &lt;<a href="../get.html">R</a> : <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Resource.html">Resource</a>&gt; <a href="index.html">FhirEngine</a>.<a href="../get.html">get</a>(id: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>): <a href="../get.html">R</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<a data-name="-873509022%2FExtensions%2F-1683276876" anchor-label="get" id="-873509022%2FExtensions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a><div class="brief "><a data-name="-873509022%2FExtensions%2F-1683276876" anchor-label="get" id="-873509022%2FExtensions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>Returns a FHIR resource of type <a href="../get.html">R</a> with <a href="../get.html">id</a> from the local storage.</div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">inline suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../get.html">R</a><span class="token operator">&gt; </span><a href="index.html">FhirEngine</a><span class="token punctuation">.</span><a href="../get.html"><span class="token function">get</span></a><span class="token punctuation">(</span>id<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">)</span><span class="token operator">: </span><a href="../get.html">R</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Returns a FHIR resource of type <a href="../get.html">R</a> with <a href="../get.html">id</a> from the local storage.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="-1031916557%2FExtensions%2F-1683276876" anchor-label="search" id="-1031916557%2FExtensions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
+<a data-name="-1031916557%2FExtensions%2F1317381881" anchor-label="search" id="-1031916557%2FExtensions%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="../../com.google.android.fhir.search/search.html">search</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1031916557%2FExtensions%2F-1683276876"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="../../com.google.android.fhir.search/search.html"><span><span>search</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1031916557%2FExtensions%2F1317381881"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">inline suspend fun &lt;<a href="../../com.google.android.fhir.search/search.html">R</a> : <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Resource.html">Resource</a>&gt; <a href="index.html">FhirEngine</a>.<a href="../../com.google.android.fhir.search/search.html">search</a>(init: <a href="../../com.google.android.fhir.search/-search/index.html">Search</a>.() -&gt; <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a>): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="../../com.google.android.fhir.search/search.html">R</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-</div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">inline suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.google.android.fhir.search/search.html">R</a><span class="token operator">&gt; </span><a href="index.html">FhirEngine</a><span class="token punctuation">.</span><a href="../../com.google.android.fhir.search/search.html"><span class="token function">search</span></a><span class="token punctuation">(</span>init<span class="token operator">: </span><span class="token keyword"></span><a href="../../com.google.android.fhir.search/-search/index.html">Search</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../com.google.android.fhir.search/search.html">R</a><span class="token operator">&gt;</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -255,7 +233,7 @@
             </div>
           </div>
         </div>
-        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
       </div>
     </div>
   </body>

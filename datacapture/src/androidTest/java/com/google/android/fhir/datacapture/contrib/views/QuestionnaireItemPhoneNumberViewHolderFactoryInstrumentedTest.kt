@@ -25,7 +25,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.QuestionnaireItemAdapter
 import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.android.material.textfield.TextInputEditText
@@ -72,7 +73,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -92,7 +93,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
               value = StringType("+12345678910")
             }
           ),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -119,7 +120,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
               value = StringType("+12345678910")
             }
           ),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -127,7 +128,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -150,7 +151,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -169,7 +170,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -196,7 +197,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -219,8 +220,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
           )
         },
         validationResult =
-          ValidationResult(
-            false,
+          Invalid(
             listOf("The maximum number of characters that are permitted in the answer is: 10")
           ),
         answersChangedCallback = { _, _, _ -> },
@@ -237,7 +237,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )

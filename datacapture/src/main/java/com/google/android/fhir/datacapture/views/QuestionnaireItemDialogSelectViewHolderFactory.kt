@@ -29,10 +29,13 @@ import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.itemControl
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -47,12 +50,14 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var holder: DialogSelectViewHolder
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      private var selectedOptionsJob: Job? = null
 
       override fun init(itemView: View) {
         holder = DialogSelectViewHolder(itemView)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        cleanupOldState()
         val activity =
           requireNotNull(holder.header.context.tryUnwrapContext()) {
             "Can only use dialog select in an AppCompatActivity context"
@@ -64,19 +69,20 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
         // Bind static data
         holder.header.bind(item)
 
-        activity.lifecycleScope.launch {
-          // Set the initial selected options state from the FHIR data model
-          viewModel.updateSelectedOptions(
-            item.linkId,
-            questionnaireItemViewItem.extractInitialOptions()
-          )
+        selectedOptionsJob =
+          activity.lifecycleScope.launch {
+            // Set the initial selected options state from the FHIR data model
+            viewModel.updateSelectedOptions(
+              item.linkId,
+              questionnaireItemViewItem.extractInitialOptions()
+            )
 
-          // Listen for changes to selected options to update summary + FHIR data model
-          viewModel.getSelectedOptionsFlow(item.linkId).collect { selectedOptions ->
-            holder.summary.text = selectedOptions.selectedSummary
-            updateAnswers(selectedOptions)
+            // Listen for changes to selected options to update summary + FHIR data model
+            viewModel.getSelectedOptionsFlow(item.linkId).collect { selectedOptions ->
+              holder.summary.text = selectedOptions.selectedSummary
+              updateAnswers(selectedOptions)
+            }
           }
-        }
 
         // When dropdown is clicked, show dialog
         val onClick =
@@ -102,11 +108,18 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         holder.summaryHolder.error =
-          validationResult.getSingleStringValidationMessage().takeIf { it.isNotEmpty() }
+          when (validationResult) {
+            is NotValidated, Valid -> null
+            is Invalid -> validationResult.getSingleStringValidationMessage()
+          }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
         holder.summaryHolder.isEnabled = !isReadOnly
+      }
+
+      private fun cleanupOldState() {
+        selectedOptionsJob?.cancel()
       }
 
       private fun updateAnswers(selectedOptions: SelectedOptions) {
