@@ -75,8 +75,10 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
       viewHolder.bind(
         QuestionnaireItemViewItem(
           questionnaireItemComponent,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     }
 
@@ -96,8 +98,10 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
       viewHolder.bind(
         QuestionnaireItemViewItem(
           questionnaireItemComponent,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     }
 
