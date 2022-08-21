@@ -25,6 +25,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -76,7 +77,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
         QuestionnaireItemViewItem(
           questionnaireItemComponent,
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = null,
+          validationResult = NotValidated,
           answersChangedCallback = { _, _, _ -> },
         )
       )
@@ -99,7 +100,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
         QuestionnaireItemViewItem(
           questionnaireItemComponent,
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = null,
+          validationResult = NotValidated,
           answersChangedCallback = { _, _, _ -> },
         )
       )
