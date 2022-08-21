@@ -30,6 +30,16 @@
         android:layout_marginBottom="@dimen/padding_default"
     />
 
+    <ImageView
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/itemImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/item_margin_vertical"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+        android:visibility="gone"
+    />
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_input_layout"
         style="?attr/questionnaireTextInputLayoutStyle"
