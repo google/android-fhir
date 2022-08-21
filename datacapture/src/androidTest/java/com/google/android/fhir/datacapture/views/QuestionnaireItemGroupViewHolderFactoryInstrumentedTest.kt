@@ -23,6 +23,7 @@ import android.widget.ImageView
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.fhir.datacapture.EXTENSION_ITEM_MEDIA
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -57,7 +58,7 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun shouldShowImage_whenItemImageExtensionIsSet() = runBlocking {
+  fun shouldShowImage_whenItemMediaExtensionIsSet_withImageContentType() = runBlocking {
     val attachment =
       Attachment().apply {
         data =
@@ -67,10 +68,7 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
     val questionnaireItemComponent =
       Questionnaire.QuestionnaireItemComponent().apply {
         text = "Kindly collect the reading as shown below in the figure"
-        extension =
-          listOf(
-            Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/cpg-itemImage", attachment)
-          )
+        extension = listOf(Extension(EXTENSION_ITEM_MEDIA, attachment))
       }
     runOnUI {
       viewHolder.bind(
@@ -90,20 +88,17 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun shouldHideImageView_whenItemImageExtensionIsSet_withNonImageContentType() = runBlocking {
+  fun shouldHideImageView_whenItemMediaExtensionIsSet_withNonImageContentType() = runBlocking {
     val attachment =
       Attachment().apply {
         data =
           Base64.decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", Base64.DEFAULT)
-        contentType = "document/pdf"
+        contentType = "video/mp4"
       }
     val questionnaireItemComponent =
       Questionnaire.QuestionnaireItemComponent().apply {
         text = "Kindly collect the reading as shown below in the figure"
-        extension =
-          listOf(
-            Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/cpg-itemImage", attachment)
-          )
+        extension = listOf(Extension(EXTENSION_ITEM_MEDIA, attachment))
       }
     runOnUI {
       viewHolder.bind(
@@ -123,7 +118,7 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun shouldHideImageView_whenItemImageExtensionIsNotSet() = runBlocking {
+  fun shouldHideImageView_whenItemMediaExtensionIsNotSet() = runBlocking {
     val questionnaireItemComponent =
       Questionnaire.QuestionnaireItemComponent().apply {
         text = "Kindly collect the reading as shown below in the figure"

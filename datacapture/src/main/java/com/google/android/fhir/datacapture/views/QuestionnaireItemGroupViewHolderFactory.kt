@@ -22,7 +22,7 @@ import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.fetchBitmap
-import com.google.android.fhir.datacapture.itemImage
+import com.google.android.fhir.datacapture.itemMedia
 import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -51,7 +51,7 @@ internal object QuestionnaireItemGroupViewHolderFactory :
 
         itemImageView.setImageBitmap(null)
 
-        questionnaireItemViewItem.questionnaireItem.itemImage?.let {
+        questionnaireItemViewItem.questionnaireItem.itemMedia?.let {
           val activity = itemImageView.context.tryUnwrapContext()!!
           activity.lifecycleScope.launch(Dispatchers.IO) {
             it.fetchBitmap(itemImageView.context)?.run {

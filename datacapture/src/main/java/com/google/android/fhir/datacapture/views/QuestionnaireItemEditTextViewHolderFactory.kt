@@ -29,7 +29,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.fetchBitmap
-import com.google.android.fhir.datacapture.itemImage
+import com.google.android.fhir.datacapture.itemMedia
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -104,7 +104,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     // images from previous questions
     itemImageView.setImageBitmap(null)
 
-    questionnaireItemViewItem.questionnaireItem.itemImage?.let {
+    questionnaireItemViewItem.questionnaireItem.itemMedia?.let {
       val activity = itemImageView.context.tryUnwrapContext()!!
       activity.lifecycleScope.launch(Dispatchers.IO) {
         it.fetchBitmap(itemImageView.context)?.run {

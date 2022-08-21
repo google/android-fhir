@@ -19,10 +19,8 @@ package com.google.android.fhir.datacapture
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.text.Html.FROM_HTML_MODE_COMPACT
 import android.text.Spanned
 import android.util.Base64
-import android.util.Log
 import androidx.core.text.HtmlCompat
 import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.Attachment
@@ -34,6 +32,7 @@ import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
+import timber.log.Timber
 
 /** UI controls relevant to capturing question data. */
 internal enum class ItemControlTypes(
@@ -63,8 +62,8 @@ internal const val EXTENSION_ITEM_CONTROL_SYSTEM = "http://hl7.org/fhir/question
 
 internal const val EXTENSION_HIDDEN_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
-internal const val EXTENSION_ITEM_IMAGE =
-  "http://hl7.org/fhir/uv/sdc/StructureDefinition/cpg-itemImage"
+internal const val EXTENSION_ITEM_MEDIA =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemMedia"
 
 internal const val EXTENSION_ENTRY_FORMAT_URL =
   "http://hl7.org/fhir/StructureDefinition/entryFormat"
@@ -295,10 +294,10 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
 private inline fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
   item.map { it.createQuestionnaireResponseItem() }
 
-/** The Attachment defined in the [EXTENSION_ITEM_IMAGE] extension where applicable */
-internal val Questionnaire.QuestionnaireItemComponent.itemImage: Attachment?
+/** The Attachment defined in the [EXTENSION_ITEM_MEDIA] extension where applicable */
+internal val Questionnaire.QuestionnaireItemComponent.itemMedia: Attachment?
   get() {
-    val extension = this.extension.singleOrNull { it.url == EXTENSION_ITEM_IMAGE }
+    val extension = this.extension.singleOrNull { it.url == EXTENSION_ITEM_MEDIA }
     return if (extension != null) extension.value as Attachment else null
   }
 
@@ -316,7 +315,7 @@ fun Binary.getBitmap(): Bitmap? {
       BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     }
   } else {
-    Log.e("Binary", "Binary does not have a contentType image")
+    Timber.e("Binary does not have a contentType image")
     null
   }
 }
@@ -333,7 +332,7 @@ suspend fun Attachment.fetchBitmap(context: Context): Bitmap? {
     if (isImage) {
       return BitmapFactory.decodeByteArray(data, 0, data.size)
     }
-    Log.e("Attachment", "Attachment is not of contentType image/**")
+    Timber.e("Attachment of contentType ${this.contentType} is not supported")
     return null
   } else if (url != null && (url.startsWith("https") || url.startsWith("http"))) {
     // Points to a Binary resource on a FHIR compliant server
@@ -345,6 +344,6 @@ suspend fun Attachment.fetchBitmap(context: Context): Bitmap? {
     }
   }
 
-  Log.e("Attachment", "Could not determine the Bitmap in Attachment $id")
+  Timber.e("Could not determine the Bitmap in Attachment $id")
   return null
 }
