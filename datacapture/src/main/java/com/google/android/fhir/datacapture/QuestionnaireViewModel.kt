@@ -263,7 +263,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     when (entryMode) {
       EntryMode.PRIOR_EDIT, EntryMode.SEQUENTIAL -> {
         if (!isPaginationButtonPressed) {
-          // Force update validation results for all questions on the current page
+          // Force update validation results for all questions on the current page. This is needed when the user has not answered any questions so no validation has been done.
           isPaginationButtonPressed = true
           modificationCount.update { it + 1 }
         }
