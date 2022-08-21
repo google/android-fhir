@@ -85,7 +85,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val questionnaireResponse: QuestionnaireResponse
 
   /**
-   * True if the user has tapped the next/previous pagination buttons on the current page. This is needed to avoid spewing validation errors before any questions are answered.
+   * True if the user has tapped the next/previous pagination buttons on the current page. This is
+   * needed to avoid spewing validation errors before any questions are answered.
    */
   private var isPaginationButtonPressed = false
   init {
@@ -175,7 +176,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /** The pages of the questionnaire, or null if the questionnaire is not paginated. */
-  private var pages: List<QuestionnairePage>? = questionnaire.getInitialPages()
+  @VisibleForTesting var pages: List<QuestionnairePage>? = questionnaire.getInitialPages()
 
   /**
    * The flow representing the index of the current page, or null if the questionnaire is not
@@ -226,8 +227,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
     modificationCount.update { it + 1 }
   }
-
-  @VisibleForTesting fun getPages() = pages
 
   private val answerValueSetMap =
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()

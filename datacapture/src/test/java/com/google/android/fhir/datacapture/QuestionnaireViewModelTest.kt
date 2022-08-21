@@ -1563,7 +1563,7 @@ class QuestionnaireViewModelTest(
       ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.getPages()!!, 1))
+      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.pages!!, 1))
     } finally {
       observer.cancel()
       ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
@@ -1624,7 +1624,7 @@ class QuestionnaireViewModelTest(
       ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.getPages()!!, 0))
+      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.pages!!, 0))
     } finally {
       observer.cancel()
       ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
@@ -1682,7 +1682,7 @@ class QuestionnaireViewModelTest(
       viewModel.goToNextPage()
       ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
-      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.getPages()!!, 0))
+      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.pages!!, 0))
     } finally {
       observer.cancel()
       ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
@@ -1734,7 +1734,7 @@ class QuestionnaireViewModelTest(
     viewModel.goToNextPage()
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.last()?.index)
+    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.pages?.last()?.index)
   }
 
   @Test
@@ -1782,7 +1782,7 @@ class QuestionnaireViewModelTest(
     viewModel.goToPreviousPage()
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.first()?.index)
+    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.pages?.first()?.index)
   }
 
   @Test
@@ -1823,7 +1823,7 @@ class QuestionnaireViewModelTest(
     viewModel.goToNextPage()
 
     assertThat(viewModel.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.last()?.index)
+    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.pages?.last()?.index)
   }
 
   @Test
@@ -1865,7 +1865,7 @@ class QuestionnaireViewModelTest(
     viewModel.goToPreviousPage()
 
     assertThat(viewModel.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.getPages()?.first()?.index)
+    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.pages?.first()?.index)
   }
 
   @Test
@@ -1920,7 +1920,7 @@ class QuestionnaireViewModelTest(
       ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
-      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.getPages()!!, 1))
+      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.pages!!, 1))
     } finally {
       observer.cancel()
       ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
@@ -1978,7 +1978,7 @@ class QuestionnaireViewModelTest(
       viewModel.goToNextPage()
       ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
-      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.getPages()!!, 0))
+      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.pages!!, 0))
     } finally {
       observer.cancel()
       ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
@@ -2038,7 +2038,7 @@ class QuestionnaireViewModelTest(
       viewModel.goToPreviousPage()
       ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
-      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.getPages()!!, 1))
+      assertThat(pagination).isEqualTo(QuestionnairePagination(viewModel.pages!!, 1))
     } finally {
       observer.cancel()
       ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
