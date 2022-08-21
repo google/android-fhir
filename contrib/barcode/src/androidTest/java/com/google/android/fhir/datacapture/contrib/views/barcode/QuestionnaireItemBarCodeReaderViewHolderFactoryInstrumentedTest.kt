@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
@@ -56,8 +57,10 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
@@ -71,8 +74,10 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
@@ -84,8 +89,10 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -104,8 +111,10 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = StringType("Barcode Result")
             }
-          )
-      ) {}
+          ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> }
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString())

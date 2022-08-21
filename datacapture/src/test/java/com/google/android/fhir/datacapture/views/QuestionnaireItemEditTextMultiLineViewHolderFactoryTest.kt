@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package com.google.android.fhir.datacapture.views
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
@@ -26,6 +28,7 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -44,8 +47,10 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -63,8 +68,10 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
               value = StringType("Answer")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
@@ -88,14 +95,18 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
               value = StringType("Answer")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
@@ -109,17 +120,22 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
   }
 
   @Test
+  @Ignore(
+    "Needs to be moved to instrumentation tests https://github.com/google/android-fhir/issues/1494"
+  )
   fun shouldSetQuestionnaireResponseItemAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("Answer")
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
+    val answer = questionnaireItemViewItem.answers
     assertThat(answer.size).isEqualTo(1)
     assertThat(answer[0].valueStringType.value).isEqualTo("Answer")
   }
@@ -129,13 +145,15 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
+    assertThat(questionnaireItemViewItem.answers.size).isEqualTo(0)
   }
 
   @Test
@@ -154,8 +172,10 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
               value = StringType("hello there")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -178,8 +198,13 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
               value = StringType("hello")
             }
           )
-        }
-      ) {}
+        },
+        validationResult =
+          Invalid(
+            listOf("The minimum number of characters that are permitted in the answer is: 10")
+          ),
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -191,8 +216,10 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(

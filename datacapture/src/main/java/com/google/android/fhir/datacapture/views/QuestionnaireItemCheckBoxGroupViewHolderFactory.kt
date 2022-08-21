@@ -28,8 +28,10 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.optionExclusive
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -51,7 +53,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        val (questionnaireItem, _) = questionnaireItemViewItem
+        val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         val choiceOrientation =
           questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
 
@@ -78,9 +80,13 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        error.text =
-          if (validationResult.getSingleStringValidationMessage() == "") null
-          else validationResult.getSingleStringValidationMessage()
+        when (validationResult) {
+          is NotValidated, Valid -> error.visibility = View.GONE
+          is Invalid -> {
+            error.text = validationResult.getSingleStringValidationMessage()
+            error.visibility = View.VISIBLE
+          }
+        }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
@@ -158,8 +164,6 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
                   )
                 }
               }
-
-              onAnswerChanged(checkboxGroup.context)
             }
           }
         checkboxGroup.addView(checkbox)

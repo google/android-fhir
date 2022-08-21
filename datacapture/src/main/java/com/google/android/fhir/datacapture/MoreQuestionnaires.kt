@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,3 +38,35 @@ val Questionnaire.targetStructureMap: String?
  */
 private const val TARGET_STRUCTURE_MAP: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap"
+
+val Questionnaire.isPaginated: Boolean
+  get() = item.any { item -> item.displayItemControl == DisplayItemControlType.PAGE }
+
+/**
+ * See
+ * [Extension: Entry mode](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-entryMode.html)
+ * .
+ */
+internal const val EXTENSION_ENTRY_MODE_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-entryMode"
+
+val Questionnaire.entryMode: EntryMode?
+  get() {
+    val entryMode =
+      this.extension
+        .firstOrNull { it.url == EXTENSION_ENTRY_MODE_URL }
+        ?.value
+        ?.toString()
+        ?.lowercase()
+    return EntryMode.from(entryMode)
+  }
+
+enum class EntryMode(val value: String) {
+  PRIOR_EDIT("prior-edit"),
+  RANDOM("random"),
+  SEQUENTIAL("sequential");
+
+  companion object {
+    fun from(type: String?): EntryMode? = values().find { it.value == type }
+  }
+}

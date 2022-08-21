@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package com.google.android.fhir.datacapture.views
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.material.slider.Slider
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.IntegerType
@@ -42,8 +44,10 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -61,8 +65,10 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
               value = IntegerType(10)
             }
           )
-        }
-      ) {}
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(10)
@@ -73,15 +79,15 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<Slider>(R.id.slider).value = 10.0F
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
-    assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueIntegerType.value).isEqualTo(10)
+    assertThat(questionnaireItemViewItem.answers.single().valueIntegerType.value).isEqualTo(10)
   }
 
   @Test
@@ -100,8 +106,10 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
               value = IntegerType(10)
             }
           )
-        }
-      ) {}
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(0.0F)
@@ -127,8 +135,10 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
               value = IntegerType("75")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.toString()).isEqualTo("")
@@ -154,8 +164,10 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
               value = IntegerType("25")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = Invalid(listOf("Minimum value allowed is:50")),
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.toString())
@@ -167,8 +179,10 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).isEnabled).isFalse()
