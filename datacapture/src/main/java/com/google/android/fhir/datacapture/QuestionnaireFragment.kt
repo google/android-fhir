@@ -123,8 +123,11 @@ open class QuestionnaireFragment : Fragment() {
 
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.reviewFlow.collect { reviewMode ->
-        recyclerView.adapter =
-          if (reviewMode) questionnaireItemReviewAdapter else questionnaireItemEditAdapter
+        if (reviewMode) {
+          recyclerView.swapAdapter(questionnaireItemReviewAdapter, false)
+        } else {
+          recyclerView.swapAdapter(questionnaireItemEditAdapter, false)
+        }
       }
     }
   }
