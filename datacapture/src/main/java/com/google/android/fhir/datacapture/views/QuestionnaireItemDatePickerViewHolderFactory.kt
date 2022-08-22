@@ -151,12 +151,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private fun getCalenderConstraint(): CalendarConstraints {
         val min =
           (MinValueConstraintValidator.getMinValue(questionnaireItemViewItem.questionnaireItem) as?
-                  DateType)
+              DateType)
             ?.value
             ?.time
         val max =
           (MaxValueConstraintValidator.getMaxValue(questionnaireItemViewItem.questionnaireItem) as?
-                  DateType)
+              DateType)
             ?.value
             ?.time
 
