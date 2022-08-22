@@ -41,3 +41,32 @@ private const val TARGET_STRUCTURE_MAP: String =
 
 val Questionnaire.isPaginated: Boolean
   get() = item.any { item -> item.displayItemControl == DisplayItemControlType.PAGE }
+
+/**
+ * See
+ * [Extension: Entry mode](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-entryMode.html)
+ * .
+ */
+internal const val EXTENSION_ENTRY_MODE_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-entryMode"
+
+val Questionnaire.entryMode: EntryMode?
+  get() {
+    val entryMode =
+      this.extension
+        .firstOrNull { it.url == EXTENSION_ENTRY_MODE_URL }
+        ?.value
+        ?.toString()
+        ?.lowercase()
+    return EntryMode.from(entryMode)
+  }
+
+enum class EntryMode(val value: String) {
+  PRIOR_EDIT("prior-edit"),
+  RANDOM("random"),
+  SEQUENTIAL("sequential");
+
+  companion object {
+    fun from(type: String?): EntryMode? = values().find { it.value == type }
+  }
+}
