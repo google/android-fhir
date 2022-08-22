@@ -25,6 +25,7 @@ import com.google.android.fhir.datacapture.DisplayItemControlType
 import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_URL
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.material.divider.MaterialDivider
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.BooleanType
@@ -46,12 +47,12 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
     QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory.create(parent)
 
   @Test
-  fun bind_shouldSetQuestionHeader() {
+  fun `bind() should set question header`() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = Valid,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -61,7 +62,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
   }
 
   @Test
-  fun bind_shouldSetFlyoverTextVisibilityGone() {
+  fun `bind() should set fly over text visibility gone`() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -70,7 +71,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
           type = Questionnaire.QuestionnaireItemType.BOOLEAN
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = Valid,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -80,7 +81,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
   }
 
   @Test
-  fun bind_shouldSetFlyoverText() {
+  fun `bind() should set fly over text`() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -105,7 +106,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
             )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = Valid,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -115,7 +116,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
   }
 
   @Test
-  fun bind_withQuestionTypeDisplay_shouldSetAnswerTextVisibilityGone() {
+  fun `bind() should set answer text visibility gone when question type display`() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -124,7 +125,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
           type = Questionnaire.QuestionnaireItemType.DISPLAY
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = Valid,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -134,7 +135,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
   }
 
   @Test
-  fun bind_withQuestionTypeGroup_shouldSetAnswerTextVisibilityGone() {
+  fun `bind() should set answer text visibility gone when question type group`() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -143,7 +144,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
           type = Questionnaire.QuestionnaireItemType.GROUP
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = Valid,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -153,7 +154,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
   }
 
   @Test
-  fun bind_withEmptyAnswer_shouldSetAnswerTextNotAnswered() {
+  fun `bind() should set answer text not answered when empty answer`() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -162,7 +163,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
           type = Questionnaire.QuestionnaireItemType.BOOLEAN
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = Valid,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -174,7 +175,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
   }
 
   @Test
-  fun bind_shouldSetAnswerText() {
+  fun `bind() should set answer text when answered`() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -188,7 +189,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
               value = BooleanType(true)
             }
           ),
-        validationResult = null,
+        validationResult = Valid,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -198,7 +199,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
   }
 
   @Test
-  fun bind_shouldSetDividerVisibilityGone() {
+  fun `bind() should set divider visibility gone`() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -206,7 +207,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
           type = Questionnaire.QuestionnaireItemType.DISPLAY
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = Valid,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -216,12 +217,12 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
   }
 
   @Test
-  fun bind_withHeader_shouldSetDividerVisible() {
+  fun `bind() should show divider with header`() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = Valid,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -231,7 +232,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
   }
 
   @Test
-  fun bind_withFlyOverText_shouldSetDividerVisible() {
+  fun `bind() should show divider with fly over text`() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -256,7 +257,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
             )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = Valid,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -266,7 +267,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
   }
 
   @Test
-  fun bind_withAnswer_shouldSetDividerVisible() {
+  fun `bind() should show divider with answer`() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -279,7 +280,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
               value = BooleanType(true)
             }
           ),
-        validationResult = null,
+        validationResult = Valid,
         answersChangedCallback = { _, _, _ -> },
       )
     )

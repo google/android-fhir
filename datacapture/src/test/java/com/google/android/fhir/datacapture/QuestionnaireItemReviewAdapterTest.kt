@@ -31,7 +31,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class QuestionnaireItemReviewAdapterTest {
   @Test
-  fun getItemCount_withEmptyList_shouldReturnZero() {
+  fun `submitting empty list to adapter should return itemCount zero`() {
     val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
     questionnaireItemReviewAdapter.submitList(listOf())
 
@@ -39,7 +39,7 @@ class QuestionnaireItemReviewAdapterTest {
   }
 
   @Test
-  fun getItemCount_withSingleItemList_shouldReturnOne() {
+  fun `submitting single items to adapter should return itemCount one`() {
     val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
     questionnaireItemReviewAdapter.submitList(
       listOf(
@@ -57,7 +57,7 @@ class QuestionnaireItemReviewAdapterTest {
   }
 
   @Test
-  fun getItemCount_withMultipleItemList_shouldReturnGreaterThanZero() {
+  fun `submitting multiple items to adapter should return itemCount greater than zero`() {
     val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
     questionnaireItemReviewAdapter.submitList(
       listOf(

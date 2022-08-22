@@ -618,7 +618,7 @@ class QuestionnaireItemViewItemTest {
   }
 
   @Test
-  fun answerString_noAnswer_shouldReturnNotAnswered() {
+  fun `answerString() should return not answered with no answer`() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -631,7 +631,7 @@ class QuestionnaireItemViewItemTest {
   }
 
   @Test
-  fun answerString_singleAnswer_shouldReturnSingleAnswer() {
+  fun `answerString() should return answer value with single answer`() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -647,7 +647,7 @@ class QuestionnaireItemViewItemTest {
   }
 
   @Test
-  fun answerString_multipleAnswer_shouldReturnAnswerSeparatedWithCommas() {
+  fun `answerString() should return comma separated answer value with multiple answers`() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),

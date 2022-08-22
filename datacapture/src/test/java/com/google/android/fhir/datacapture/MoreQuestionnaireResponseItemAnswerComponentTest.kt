@@ -48,7 +48,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   private val context = ApplicationProvider.getApplicationContext<Application>()
 
   @Test
-  fun displayString_attachmentType_shouldReturnUrlValue() {
+  fun `displayString() should return url value for attachment`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(Attachment().setUrl("http://photos.com/a.png"))
@@ -57,7 +57,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_attachmentTypeNull_shouldReturnNotAnswered() {
+  fun `displayString() should return not answered for null attachment`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(Attachment())
 
@@ -65,7 +65,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_booleanTypeTrueAnswer_shouldReturnYes() {
+  fun `displayString() should return yes for boolean type with true`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType(true))
 
@@ -73,7 +73,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_booleanTypeTrueAnswer_shouldReturnNo() {
+  fun `displayString() should return no for boolean type with false`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType(false))
 
@@ -81,15 +81,15 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_booleanTypeNullAnswer_shouldReturnNotAnswered() {
+  fun `displayString() should return not answered for null boolean type`() {
     val answer =
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType(false))
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType())
 
-    assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.no))
+    assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.not_answered))
   }
 
   @Test
-  fun displayString_codingType_shouldReturnValueCodingDisplayValue() {
+  fun `displayString() should return coding display value for coding type`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(Coding().setCode("test-code").setDisplay("Test Code"))
@@ -98,7 +98,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_codingType_shouldReturnValueCodingCodeValue() {
+  fun `displayString() should return coding code value for coding type`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(Coding().setCode("test-code"))
@@ -107,14 +107,14 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_codingTypeNull_shouldReturnNotAnswered() {
+  fun `displayString() should return not answered for null coding type`() {
     val answer = QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(Coding())
 
     assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.not_answered))
   }
 
   @Test
-  fun displayString_dateType_shouldReturnLocalizedDateString() {
+  fun `displayString() should return localized date string value for date type`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(DateType(Date()))
 
@@ -122,7 +122,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_dateTimeType_shouldReturnLocalizedDateTimeString() {
+  fun `displayString() should return localized date time string value for date time type`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(DateTimeType(Date()))
@@ -132,7 +132,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_decimalType_shouldReturnDecimalString() {
+  fun `displayString() should return decimal value for decimal type`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(DecimalType(12.5612))
@@ -141,7 +141,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_decimalTypeNull_shouldReturnNotAnswered() {
+  fun `displayString() should return not answered string for null decimal type`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(DecimalType())
 
@@ -149,7 +149,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_integerType_shouldReturnIntegerString() {
+  fun `displayString() should return integer value for integer type`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(IntegerType(12))
 
@@ -157,7 +157,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_integerTypeNull_shouldReturnNotAnswered() {
+  fun `displayString() should return not answered string for null integer type`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(IntegerType())
 
@@ -165,7 +165,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_quantityType_shouldReturnQuantityString() {
+  fun `displayString() should return quantity string value for quantity type`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(Quantity(59.125))
 
@@ -173,7 +173,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_stringType_shouldReturnString() {
+  fun `displayString() should return string value for string type`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(StringType("Answer"))
@@ -182,7 +182,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_stringType_shouldReturnNotAnswered() {
+  fun `displayString() should return not answered value for null string type`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(StringType())
 
@@ -190,7 +190,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_timeType_shouldReturnTimeString() {
+  fun `displayString() should return time value for time type`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(TimeType("03:00:56"))
@@ -199,7 +199,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_timeType_shouldReturnNotAnswered() {
+  fun `displayString() should return not answered value for null time type`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(TimeType())
 
@@ -207,7 +207,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_uriType_shouldReturnString() {
+  fun `displayString() should return uri value for uri type`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(UriType("./a"))
 
@@ -215,7 +215,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
-  fun displayString_uriType_shouldReturnNotAnswered() {
+  fun `displayString() should return not answered for null uri type`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(UriType())
 
