@@ -169,7 +169,7 @@ object ExpressionEvaluator {
    * @param questionnaireItemParentMap the [Map<Questionnaire.QuestionnaireItemComponent,
    * Questionnaire.QuestionnaireItemComponent>] of child to parent
    */
-  private fun findAndEvaluateVariables(
+  private fun findAndEvaluateVariable(
     variableName: String,
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaire: Questionnaire,
