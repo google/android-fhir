@@ -49,6 +49,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        cleanupOldState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
         val answerOptionString =
@@ -90,6 +91,10 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
 
       override fun setReadOnly(isReadOnly: Boolean) {
         textInputLayout.isEnabled = !isReadOnly
+      }
+
+      private fun cleanupOldState() {
+        autoCompleteTextView.setAdapter(null)
       }
     }
 }
