@@ -161,10 +161,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   init {
     /** Adds each child-parent pair in the [Questionnaire] to the parent map. */
-    fun buildParentList(item: Questionnaire.QuestionnaireItemComponent, map: ItemToParentMap) {
+    fun buildParentList(
+      item: Questionnaire.QuestionnaireItemComponent,
+      questionnaireItemToParentMap: ItemToParentMap
+    ) {
       for (child in item.item) {
-        map[child] = item
-        buildParentList(child, map)
+        questionnaireItemToParentMap[child] = item
+        buildParentList(child, questionnaireItemToParentMap)
       }
     }
 
