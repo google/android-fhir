@@ -161,7 +161,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             } catch (e: ParseException) {
               this.questionnaireItemViewItem.clearAnswer()
               localDate = null
-              localTime = null
               enableOrDisableTimePicker(enableIt = false)
             }
           }
