@@ -196,7 +196,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       /** Update the date and time input fields in the UI. */
-      private fun updateDateTimeInput(localDateTime: LocalDateTime? = null) {
+      private fun updateDateTimeInput(localDateTime: LocalDateTime?) {
         enableOrDisableTimePicker(enableIt = localDateTime != null)
         if (dateInputEditText.text.isNullOrEmpty()) {
           dateInputEditText.setText(localDateTime?.localizedDateString ?: "")

@@ -86,6 +86,31 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
   }
 
   @Test
+  fun shouldSetDateTimeInput() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
+          ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.date_input_edit_text).text.toString()
+      )
+      .isEqualTo("2/5/20")
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.time_input_edit_text).text.toString()
+      )
+      .isEqualTo("1:30 AM")
+  }
+
+  @Test
   fun `parse date text input in US locale`() {
     val itemViewItem =
       QuestionnaireItemViewItem(
