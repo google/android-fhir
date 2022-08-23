@@ -93,7 +93,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
       Attachment().apply {
         data =
           Base64.decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", Base64.DEFAULT)
-        contentType = "video/mp4"
+        contentType = "document/pdf"
       }
     val questionnaireItemComponent =
       Questionnaire.QuestionnaireItemComponent().apply {
