@@ -203,7 +203,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val modificationCount = MutableStateFlow(0)
 
   /** Toggles review mode. */
-  val reviewFlow = MutableStateFlow(showReviewPageFirst)
+  private val reviewFlow = MutableStateFlow(showReviewPageFirst)
 
   /** Flag to show/hide submit button. */
   private var showSubmitButtonFlag = false
