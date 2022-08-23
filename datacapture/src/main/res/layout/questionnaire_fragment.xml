@@ -36,7 +36,16 @@
     />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+        android:id="@+id/questionnaire_edit_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_buttons"
+        app:layout_constraintTop_toBottomOf="@+id/review_mode_edit_button"
+    />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/questionnaire_review_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scrollbars="vertical"

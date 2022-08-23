@@ -65,7 +65,10 @@ open class QuestionnaireFragment : Fragment() {
 
   /** @suppress */
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
+    val questionnaireEditRecyclerView =
+      view.findViewById<RecyclerView>(R.id.questionnaire_edit_recycler_view)
+    val questionnaireReviewRecyclerView =
+      view.findViewById<RecyclerView>(R.id.questionnaire_review_recycler_view)
     val paginationPreviousButton = view.findViewById<View>(R.id.pagination_previous_button)
     paginationPreviousButton.setOnClickListener { viewModel.goToPreviousPage() }
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
@@ -89,9 +92,10 @@ open class QuestionnaireFragment : Fragment() {
     val reviewModeButton = view.findViewById<View>(R.id.review_mode_button)
     reviewModeButton.setOnClickListener { viewModel.setReviewMode(true) }
 
-    recyclerView.layoutManager = LinearLayoutManager(view.context)
+    questionnaireEditRecyclerView.layoutManager = LinearLayoutManager(view.context)
+    questionnaireReviewRecyclerView.layoutManager = LinearLayoutManager(view.context)
     // Animation does work well with views that could gain focus
-    recyclerView.itemAnimator = null
+    questionnaireEditRecyclerView.itemAnimator = null
 
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
@@ -124,9 +128,13 @@ open class QuestionnaireFragment : Fragment() {
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.reviewFlow.collect { reviewMode ->
         if (reviewMode) {
-          recyclerView.swapAdapter(questionnaireItemReviewAdapter, false)
+          questionnaireReviewRecyclerView.adapter = questionnaireItemReviewAdapter
+          questionnaireReviewRecyclerView.visibility = View.VISIBLE
+          questionnaireEditRecyclerView.visibility = View.GONE
         } else {
-          recyclerView.swapAdapter(questionnaireItemEditAdapter, false)
+          questionnaireEditRecyclerView.adapter = questionnaireItemEditAdapter
+          questionnaireEditRecyclerView.visibility = View.VISIBLE
+          questionnaireReviewRecyclerView.visibility = View.GONE
         }
       }
     }
