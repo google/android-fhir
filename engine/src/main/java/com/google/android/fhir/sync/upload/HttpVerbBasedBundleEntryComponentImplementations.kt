@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@ package com.google.android.fhir.sync.upload
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.ContentTypes
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.LocalChange
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Bundle
 
 internal object HttpPutForCreateEntryComponentGenerator :
   HttpVerbBasedBundleEntryComponentGenerator(Bundle.HTTPVerb.PUT) {
-  override fun getEntryResource(localChange: LocalChangeEntity): IBaseResource {
+  override fun getEntryResource(localChange: LocalChange): IBaseResource {
     return FhirContext.forCached(FhirVersionEnum.R4)
       .newJsonParser()
       .parseResource(localChange.payload)
@@ -35,7 +35,7 @@ internal object HttpPutForCreateEntryComponentGenerator :
 
 internal object HttpPatchForUpdateEntryComponentGenerator :
   HttpVerbBasedBundleEntryComponentGenerator(Bundle.HTTPVerb.PATCH) {
-  override fun getEntryResource(localChange: LocalChangeEntity): IBaseResource {
+  override fun getEntryResource(localChange: LocalChange): IBaseResource {
     return Binary().apply {
       contentType = ContentTypes.APPLICATION_JSON_PATCH
       data = localChange.payload.toByteArray()
@@ -45,5 +45,5 @@ internal object HttpPatchForUpdateEntryComponentGenerator :
 
 internal object HttpDeleteEntryComponentGenerator :
   HttpVerbBasedBundleEntryComponentGenerator(Bundle.HTTPVerb.DELETE) {
-  override fun getEntryResource(localChange: LocalChangeEntity): IBaseResource? = null
+  override fun getEntryResource(localChange: LocalChange): IBaseResource? = null
 }
