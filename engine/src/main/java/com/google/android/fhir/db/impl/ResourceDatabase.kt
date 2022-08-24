@@ -31,6 +31,7 @@ import com.google.android.fhir.db.impl.entities.QuantityIndexEntity
 import com.google.android.fhir.db.impl.entities.ReferenceIndexEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.StringIndexEntity
+import com.google.android.fhir.db.impl.entities.StringIndexEntityFts
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
@@ -40,6 +41,7 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
     [
       ResourceEntity::class,
       StringIndexEntity::class,
+      StringIndexEntityFts::class,
       ReferenceIndexEntity::class,
       TokenIndexEntity::class,
       QuantityIndexEntity::class,
