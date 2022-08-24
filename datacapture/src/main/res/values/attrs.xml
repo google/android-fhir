@@ -21,6 +21,8 @@
     <attr name="questionnaireQuestionTextStyle" format="reference" />
     <!--   Style for subtitle text. -->
     <attr name="questionnaireSubtitleTextStyle" format="reference" />
+    <!--   Style for answer text. -->
+    <attr name="questionnaireAnswerTextStyle" format="reference" />
 
     <!--   Style for radio buttons. -->
     <attr name="questionnaireRadioButtonStyle" format="reference" />
@@ -59,6 +61,8 @@
     <attr name="questionnaireButtonStyle" format="reference" />
     <!--   Style for submit button. -->
     <attr name="questionnaireSubmitButtonStyle" format="reference" />
+    <!--   Style for edit button. -->
+    <attr name="questionnaireEditButtonStyle" format="reference" />
 
     <declare-styleable name="QuestionnaireTheme">
         <!-- The ID of the theme to be applied to the questionnaire. The referenced theme must
