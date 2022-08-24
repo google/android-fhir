@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,10 @@ internal data class FhirServices(
       val remoteDataSource =
         serverConfiguration?.let {
           RemoteFhirService.builder(it.baseUrl, it.networkConfiguration)
-            .apply { setAuthenticator(it.authenticator) }
+            .apply {
+              setAuthenticator(it.authenticator)
+              setHttpLogger(it.httpLogger)
+            }
             .build()
         }
       return FhirServices(

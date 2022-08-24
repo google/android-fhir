@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import android.content.Context
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.remote.HttpLogger
 
 /** The provider for [FhirEngine] instance. */
 object FhirEngineProvider {
@@ -124,13 +125,15 @@ enum class DatabaseErrorStrategy {
 }
 
 /**
- * A configuration to provide the remote FHIR server url and an [Authenticator] for supplying any
- * auth token that may be necessary to communicate with the server.
+ * A configuration to provide the remote FHIR server url, an [Authenticator] for supplying any auth
+ * token that may be necessary to communicate with the server and a [HttpLogger] to log the
+ * communication between the engine and the remote server.
  */
 data class ServerConfiguration(
   val baseUrl: String,
   val networkConfiguration: NetworkConfiguration = NetworkConfiguration(),
-  val authenticator: Authenticator? = null
+  val authenticator: Authenticator? = null,
+  val httpLogger: HttpLogger = HttpLogger.DEFAULT
 )
 
 /** A configuration to provide the network connection parameters. */
