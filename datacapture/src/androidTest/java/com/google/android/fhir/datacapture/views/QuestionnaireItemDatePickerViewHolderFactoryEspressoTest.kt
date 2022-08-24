@@ -35,12 +35,16 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.utilities.clickIcon
+import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 import org.hamcrest.CoreMatchers.allOf
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
@@ -91,6 +95,30 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
   fun shouldSetDateInput() {
     val questionnaireItemView =
       QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
+    onView(allOf(withText("OK")))
+      .inRoot(isDialog())
+      .check(matches(isDisplayed()))
+      .perform(ViewActions.click())
+
+    val today = DateTimeType.today().valueAsString
+
+    assertThat(questionnaireItemView.answers.singleOrNull()?.valueDateType?.valueAsString)
+      .isEqualTo(today)
+  }
+
+  @Test
+  fun shouldSetDateInput_withinRange() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minValue"
@@ -110,10 +138,40 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
+    onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
+    onView(allOf(withText("OK")))
+      .inRoot(isDialog())
+      .check(matches(isDisplayed()))
+      .perform(ViewActions.click())
+
+    val today = DateTimeType.today().valueAsString
+
+    assertThat(questionnaireItemView.answers.singleOrNull()?.valueDateType?.valueAsString)
+      .isEqualTo(today)
+  }
+
+  @Test
+  fun shouldNotSetDateInput_outsideRange() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            val minDate = DateType(Date()).apply { add(Calendar.YEAR, -4) }
+            setValue(minDate)
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            val maxDate = DateType(Date()).apply { add(Calendar.YEAR, -2) }
+            setValue(maxDate)
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
       )
-      .isEmpty()
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
 
     onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
     onView(allOf(withText("OK")))
@@ -121,10 +179,50 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
       .check(matches(isDisplayed()))
       .perform(ViewActions.click())
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
+    val maxDateAllowed = DateType(Date()).apply { add(Calendar.YEAR, -2) }.valueAsString
+    val validationResult =
+      QuestionnaireResponseItemValidator.validate(
+        questionnaireItemView.questionnaireItem,
+        questionnaireItemView.answers,
+        viewHolder.itemView.context
       )
-      .isNotEmpty()
+
+    assertThat((validationResult as Invalid).getSingleStringValidationMessage())
+      .isEqualTo("Maximum value allowed is:$maxDateAllowed")
+  }
+
+  @Test
+  fun shouldThrowException_withMinRangeGreaterThanMaxRange() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            val minDate = DateType(Date()).apply { add(Calendar.YEAR, 0) }
+            setValue(minDate)
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            val maxDate = DateType(Date()).apply { add(Calendar.YEAR, -1) }
+            setValue(maxDate)
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    try {
+      onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
+      onView(allOf(withText("OK")))
+        .inRoot(isDialog())
+        .check(matches(isDisplayed()))
+        .perform(ViewActions.click())
+    } catch (e: Exception) {
+      // expecting crash `currentPage cannot be after lastPage`
+    }
   }
 
   /** Runs code snippet on UI/main thread */
