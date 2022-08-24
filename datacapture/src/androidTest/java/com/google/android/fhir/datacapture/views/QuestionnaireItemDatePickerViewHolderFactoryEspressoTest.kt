@@ -47,6 +47,7 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -198,7 +199,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            val minDate = DateType(Date()).apply { add(Calendar.YEAR, 0) }
+            val minDate = DateType(Date()).apply { add(Calendar.YEAR, 1) }
             setValue(minDate)
           }
           addExtension().apply {
@@ -214,15 +215,15 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
-    try {
-      onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
-      onView(allOf(withText("OK")))
-        .inRoot(isDialog())
-        .check(matches(isDisplayed()))
-        .perform(ViewActions.click())
-    } catch (e: Exception) {
-      // expecting crash `currentPage cannot be after lastPage`
-    }
+    val exception =
+      Assert.assertThrows(IllegalArgumentException::class.java) {
+        onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
+        onView(allOf(withText("OK")))
+          .inRoot(isDialog())
+          .check(matches(isDisplayed()))
+          .perform(ViewActions.click())
+      }
+    assertThat(exception.message).isEqualTo("currentPage cannot be after lastPage")
   }
 
   /** Runs code snippet on UI/main thread */
