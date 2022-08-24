@@ -23,7 +23,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
-import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
@@ -66,7 +65,10 @@ open class QuestionnaireFragment : Fragment() {
 
   /** @suppress */
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
+    val questionnaireEditRecyclerView =
+      view.findViewById<RecyclerView>(R.id.questionnaire_edit_recycler_view)
+    val questionnaireReviewRecyclerView =
+      view.findViewById<RecyclerView>(R.id.questionnaire_review_recycler_view)
     val paginationPreviousButton = view.findViewById<View>(R.id.pagination_previous_button)
     paginationPreviousButton.setOnClickListener { viewModel.goToPreviousPage() }
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
@@ -74,44 +76,59 @@ open class QuestionnaireFragment : Fragment() {
     requireView().findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
       setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
     }
-    val adapter = QuestionnaireItemAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
+    val questionnaireItemEditAdapter =
+      QuestionnaireItemEditAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
+    val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
+
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
     // Reads submit button visibility value initially defined in
     // [R.attr.submitButtonStyleQuestionnaire] style.
     val submitButtonVisibilityInStyle = submitButton.visibility
+    viewModel.setShowSubmitButtonFlag(submitButtonVisibilityInStyle == View.VISIBLE)
 
-    recyclerView.adapter = adapter
-    recyclerView.layoutManager = LinearLayoutManager(view.context)
+    val reviewModeEditButton = view.findViewById<View>(R.id.review_mode_edit_button)
+    reviewModeEditButton.setOnClickListener { viewModel.setReviewMode(false) }
+
+    val reviewModeButton = view.findViewById<View>(R.id.review_mode_button)
+    reviewModeButton.setOnClickListener { viewModel.setReviewMode(true) }
+
+    questionnaireEditRecyclerView.adapter = questionnaireItemEditAdapter
+    questionnaireEditRecyclerView.layoutManager = LinearLayoutManager(view.context)
     // Animation does work well with views that could gain focus
-    recyclerView.itemAnimator = null
+    questionnaireEditRecyclerView.itemAnimator = null
+
+    questionnaireReviewRecyclerView.adapter = questionnaireItemReviewAdapter
+    questionnaireReviewRecyclerView.layoutManager = LinearLayoutManager(view.context)
 
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.questionnaireStateFlow.collect { state ->
-        adapter.submitList(state.items)
+        if (state.reviewMode) {
+          questionnaireItemReviewAdapter.submitList(state.items)
+          questionnaireReviewRecyclerView.visibility = View.VISIBLE
+          questionnaireEditRecyclerView.visibility = View.GONE
+          reviewModeEditButton.visibility = View.VISIBLE
+        } else {
+          questionnaireItemEditAdapter.submitList(state.items)
+          questionnaireEditRecyclerView.visibility = View.VISIBLE
+          questionnaireReviewRecyclerView.visibility = View.GONE
+          reviewModeEditButton.visibility = View.GONE
+        }
 
-        if (state.pagination != null) {
+        if (state.pagination.isPaginated && !state.reviewMode) {
           paginationPreviousButton.visibility = View.VISIBLE
           paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage
           paginationNextButton.visibility = View.VISIBLE
           paginationNextButton.isEnabled = state.pagination.hasNextPage
-          if (!state.pagination.hasNextPage && submitButtonVisibilityInStyle == View.VISIBLE) {
-            paginationNextButton.visibility = View.GONE
-            submitButton.visibility = View.VISIBLE
-          } else {
-            submitButton.visibility = View.GONE
-          }
         } else {
           paginationPreviousButton.visibility = View.GONE
           paginationNextButton.visibility = View.GONE
-          if (submitButtonVisibilityInStyle == View.VISIBLE) {
-            recyclerView.updatePadding(
-              bottom = resources.getDimensionPixelOffset(R.dimen.recyclerview_bottom_padding)
-            )
-          } else {
-            recyclerView.updatePadding(bottom = 0)
-          }
         }
+
+        reviewModeButton.visibility =
+          if (state.pagination.showReviewButton) View.VISIBLE else View.GONE
+
+        submitButton.visibility = if (state.pagination.showSubmitButton) View.VISIBLE else View.GONE
       }
     }
   }
@@ -182,6 +199,18 @@ open class QuestionnaireFragment : Fragment() {
      * precedence.
      */
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI = "questionnaire-response-uri"
+
+    /**
+     * A [Boolean] extra to control if a review page is shown. By default it will be shown at the
+     * end of the questionnaire.
+     */
+    const val EXTRA_ENABLE_REVIEW_PAGE = "enable-review-page"
+
+    /**
+     * An [Boolean] extra to control if the review page is to be opened first. This has no effect if
+     * review page is not enabled.
+     */
+    const val EXTRA_SHOW_REVIEW_PAGE_FIRST = "show-review-page-first"
 
     const val SUBMIT_REQUEST_KEY = "submit-request-key"
   }
