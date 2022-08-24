@@ -168,6 +168,7 @@ object ExpressionEvaluator {
    * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
    * @param questionnaireItemParentMap the [Map<Questionnaire.QuestionnaireItemComponent,
    * Questionnaire.QuestionnaireItemComponent>] of child to parent
+   * @param dependentVariablesMap the [Map<String, Base>] of dependent variables
    */
   private fun findAndEvaluateVariable(
     variableName: String,
