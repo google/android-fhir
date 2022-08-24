@@ -2714,6 +2714,146 @@ class ResourceMapperTest {
       .isEqualTo("Hausa")
   }
 
+  @Test
+  fun `extract() should perform definition based extraction for Complex DataType with custom extensions`():
+    Unit = runBlocking {
+    @Language("JSON")
+    val questionnaire =
+      """{
+  "resourceType": "Questionnaire",
+  "id": "ANCOYO",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+      "valueExpression": {
+        "name": "patient",
+        "language": "application/x-fhir-query",
+        "expression": "Patient"
+      }
+    }
+  ],
+  "item": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "type": "group",
+      "linkId": "patient-basic-details",
+      "text": "Patient details",
+      "item": [
+        {
+          "linkId": "patient-name",
+          "type": "group",
+          "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name",
+          "item": [
+            {
+              "type": "string",
+              "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.given",
+              "linkId": "first-name",
+              "required": true,
+              "text": "First name"
+            },
+             {
+              "type": "string",
+              "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.middle",
+              "linkId": "middle-name",
+              "required": true,
+              "text": "Middle name"
+            },
+            {
+              "type": "string",
+              "linkId": "last-name",
+              "required": true,
+              "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.family",
+              "text": "Last name"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+      """.trimIndent()
+
+    @Language("JSON")
+    val response =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "patient-basic-details",
+              "item": [
+                {
+                  "linkId": "patient-name",
+                  "item": [
+                    {
+                      "linkId": "first-name",
+                      "answer": [
+                        {
+                          "valueString": "Pallavi"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "middle-name",
+                      "answer": [
+                        {
+                          "valueString": "Prabhakar"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "last-name",
+                      "answer": [
+                        {
+                          "valueString": "Ganorkar"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+    val questionnaireObj =
+      iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
+    val temperatureQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
+    val bundle = ResourceMapper.extract(questionnaireObj, temperatureQuestionnaireResponse)
+    val patient = bundle.entry[0].resource as Patient
+
+    assertThat(patient).isNotNull()
+    assertThat(patient.name.first().given.first().value).isEqualTo("Pallavi")
+    assertThat(patient.name.first().family).isEqualTo("Ganorkar")
+    assertThat(
+        patient
+          .name
+          .first()
+          .getExtensionByUrl(
+            "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.middle"
+          )
+          .valueAsPrimitive
+          .valueAsString
+      )
+      .isEqualTo("Prabhakar")
+  }
+
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)
 
   class TransformSupportServices(private val outputs: MutableList<Base>) :

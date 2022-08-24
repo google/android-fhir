@@ -39,6 +39,7 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.DomainResource
+import org.hl7.fhir.r4.model.Element
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -289,7 +290,7 @@ object ResourceMapper {
         currentQuestionnaireItem = questionnaireItemListIterator.next()
       }
       if (currentQuestionnaireItem.linkId == currentQuestionnaireResponseItem.linkId) {
-        extractByDefinition(
+        extractByDefinitionFromQuestionnaireItemType(
           currentQuestionnaireItem,
           currentQuestionnaireResponseItem,
           extractionContext,
@@ -308,7 +309,7 @@ object ResourceMapper {
    * Handles nested questionnaire items recursively. New extraction contexts may be defined in the
    * recursion.
    */
-  private fun extractByDefinition(
+  private fun extractByDefinitionFromQuestionnaireItemType(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     extractionContext: Base?,
@@ -428,7 +429,7 @@ object ResourceMapper {
     if (questionnaireResponseItem.answer.isEmpty()) return
 
     // Set the primitive type value if the field exists
-    val fieldName = getFieldNameByDefinition(questionnaireItem.definition)
+    val fieldName = getFieldNameByDefinition(questionnaireItem.definition) // 1111111111111
     base.javaClass.getFieldOrNull(fieldName)?.let { field ->
       if (field.nonParameterizedType.isEnum) {
         updateFieldWithEnum(base, field, questionnaireResponseItem.answer.first().value)
@@ -471,6 +472,14 @@ private fun addDefinitionBasedCustomExtension(
   questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   base: Base
 ) {
+  if (base is Element) {
+    // Create an extension
+    val ext = Extension()
+    ext.url = questionnaireItem.definition
+    ext.setValue(questionnaireResponseItem.answer.first().value)
+    // Add the extension to the resource
+    base.addExtension(ext)
+  }
   if (base is DomainResource) {
     // Create an extension
     val ext = Extension()
@@ -542,7 +551,7 @@ private fun updateField(
     updateFieldWithAnswer(base, field, answersOfFieldType.first())
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
-    updateListFieldWithAnswer(base, field, answersOfFieldType)
+    updateListFieldWithAnswer(base, field, answersOfFieldType) // given name updated here
   }
 }
 
