@@ -276,7 +276,7 @@ object QuestionnaireResponseValidator {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
       Questionnaire.QuestionnaireItemType.CHOICE ->
-        require(answerType == "Coding") {
+        require(answerType == "Coding" || answerType == "string") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
       Questionnaire.QuestionnaireItemType.OPENCHOICE ->
