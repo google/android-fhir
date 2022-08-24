@@ -25,7 +25,6 @@ import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import kotlin.test.assertTrue
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Expression
@@ -147,7 +146,7 @@ class MinValueConstraintValidatorTest {
     val expectedDateRange =
       (MinValueConstraintValidator.getMinValue(questionnaireItem) as? DateType)?.valueAsString
     assertThat(validationResult.isValid).isFalse()
-    assertTrue(validationResult.message.equals("Minimum value allowed is:$expectedDateRange"))
+    assertThat(validationResult.message).isEqualTo("Minimum value allowed is:$expectedDateRange")
   }
 
   @Test

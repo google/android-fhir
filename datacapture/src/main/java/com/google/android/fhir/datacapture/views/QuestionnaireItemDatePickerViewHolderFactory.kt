@@ -29,7 +29,8 @@ import com.google.android.fhir.datacapture.utilities.isAndroidIcuSupported
 import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.MaxValueConstraintValidator
-import com.google.android.fhir.datacapture.validation.MinValueConstraintValidator
+import com.google.android.fhir.datacapture.validation.MaxValueConstraintValidator.getMaxValue
+import com.google.android.fhir.datacapture.validation.MinValueConstraintValidator.getMinValue
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -150,12 +151,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
       private fun getCalenderConstraint(): CalendarConstraints {
         val min =
-          (MinValueConstraintValidator.getMinValue(questionnaireItemViewItem.questionnaireItem) as?
+          (getMinValue(questionnaireItemViewItem.questionnaireItem) as?
               DateType)
             ?.value
             ?.time
         val max =
-          (MaxValueConstraintValidator.getMaxValue(questionnaireItemViewItem.questionnaireItem) as?
+          (getMaxValue(questionnaireItemViewItem.questionnaireItem) as?
               DateType)
             ?.value
             ?.time

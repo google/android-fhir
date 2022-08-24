@@ -47,7 +47,7 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.junit.Assert
+import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -216,7 +216,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
     val exception =
-      Assert.assertThrows(IllegalArgumentException::class.java) {
+      assertThrows(IllegalArgumentException::class.java) {
         onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
         onView(allOf(withText("OK")))
           .inRoot(isDialog())
