@@ -472,7 +472,7 @@ private fun addDefinitionBasedCustomExtension(
   questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   base: Base
 ) {
-  if (base is Element) {
+  if (base is Type) {
     // Create an extension
     val ext = Extension()
     ext.url = questionnaireItem.definition
