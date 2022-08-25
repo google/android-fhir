@@ -38,6 +38,7 @@ import com.google.android.fhir.datacapture.utilities.clickIcon
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
 import java.util.Date
@@ -123,12 +124,12 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            val minDate = DateTimeType.today().apply { add(Calendar.YEAR, -1) }
+            val minDate = DateType(Date()).apply { add(Calendar.YEAR, -1) }
             setValue(minDate)
           }
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            val maxDate = DateTimeType.today().apply { add(Calendar.YEAR, 4) }
+            val maxDate = DateType(Date()).apply { add(Calendar.YEAR, 4) }
             setValue(maxDate)
           }
         },
@@ -146,13 +147,21 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
       .perform(ViewActions.click())
 
     val today = DateTimeType.today().valueAsString
+    val validationResult =
+      QuestionnaireResponseItemValidator.validate(
+        questionnaireItemView.questionnaireItem,
+        questionnaireItemView.answers,
+        viewHolder.itemView.context
+      )
 
     assertThat(questionnaireItemView.answers.singleOrNull()?.valueDateType?.valueAsString)
       .isEqualTo(today)
+    assertThat(validationResult).isEqualTo(Valid)
   }
 
   @Test
-  fun shouldNotSetDateInput_outsideRange() {
+  fun shouldNotSetDateInput_outsideMaxRange() {
+    val maxDate = DateType(Date()).apply { add(Calendar.YEAR, -2) }
     val questionnaireItemView =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -163,7 +172,6 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
           }
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            val maxDate = DateType(Date()).apply { add(Calendar.YEAR, -2) }
             setValue(maxDate)
           }
         },
@@ -180,7 +188,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
       .check(matches(isDisplayed()))
       .perform(ViewActions.click())
 
-    val maxDateAllowed = DateType(Date()).apply { add(Calendar.YEAR, -2) }.valueAsString
+    val maxDateAllowed = maxDate.valueAsString
     val validationResult =
       QuestionnaireResponseItemValidator.validate(
         questionnaireItemView.questionnaireItem,
@@ -193,7 +201,48 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shouldThrowException_withMinRangeGreaterThanMaxRange() {
+  fun shouldNotSetDateInput_outsideMinRange() {
+    val minDate = DateType(Date()).apply { add(Calendar.YEAR, 1) }
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue(minDate)
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            val maxDate = DateType(Date()).apply { add(Calendar.YEAR, 2) }
+            setValue(maxDate)
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
+    onView(allOf(withText("OK")))
+      .inRoot(isDialog())
+      .check(matches(isDisplayed()))
+      .perform(ViewActions.click())
+
+    val minDateAllowed = minDate.valueAsString
+    val validationResult =
+      QuestionnaireResponseItemValidator.validate(
+        questionnaireItemView.questionnaireItem,
+        questionnaireItemView.answers,
+        viewHolder.itemView.context
+      )
+
+    assertThat((validationResult as Invalid).getSingleStringValidationMessage())
+      .isEqualTo("Minimum value allowed is:$minDateAllowed")
+  }
+
+  @Test
+  fun shouldThrowException_whenMinValueRangeIsGreaterThanMaxValueRange() {
     val questionnaireItemView =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
