@@ -36,6 +36,7 @@ import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -96,6 +97,28 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
       .isEqualTo("Coding 3")
   }
 
+  @Test
+  fun shouldSetDropDownValueStringToAutoCompleteTextView() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        answerOptionsValueString("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
+        responseValueStringOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+
+    onView(withId(R.id.auto_complete)).perform(showDropDown())
+    onView(withText("Coding 1"))
+      .inRoot(isPlatformPopup())
+      .check(matches(isDisplayed()))
+      .perform(click())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
+      .isEqualTo("Coding 1")
+    assertThat((questionnaireItemViewItem.answers.single().value as StringType).valueAsString)
+      .isEqualTo("Coding 1")
+  }
+
   /** Method to run code snippet on UI/main thread */
   private fun runOnUI(action: () -> Unit) {
     activityScenarioRule.scenario.onActivity { action() }
@@ -128,6 +151,28 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
         addAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
             value = Coding().apply { display = response }
+          }
+        )
+      }
+    }
+
+  private fun answerOptionsValueString(vararg options: String) =
+    Questionnaire.QuestionnaireItemComponent().apply {
+      options.forEach { option ->
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = StringType().apply { valueAsString = option }
+          }
+        )
+      }
+    }
+
+  private fun responseValueStringOptions(vararg responses: String) =
+    QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+      responses.forEach { response ->
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = StringType().apply { valueAsString = response }
           }
         )
       }
