@@ -254,14 +254,14 @@ object ExpressionEvaluator {
    *
    * @param expression the [Expression] the expression to evaluate
    * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
-   * @param inputVariables the [Map] of Variable names to their values
+   * @param dependentVariables the [Map] of Variable names to their values
    *
    * @return [Base] the result of expression
    */
   private fun evaluateVariable(
     expression: Expression,
     questionnaireResponse: QuestionnaireResponse,
-    inputVariables: Map<String, Base?> = mapOf()
+    dependentVariables: Map<String, Base?> = mapOf()
   ) =
     try {
       require(expression.name?.isNotBlank() == true) {
@@ -273,7 +273,7 @@ object ExpressionEvaluator {
       }
 
       fhirPathEngine
-        .evaluate(inputVariables, questionnaireResponse, null, null, expression.expression)
+        .evaluate(dependentVariables, questionnaireResponse, null, null, expression.expression)
         .firstOrNull()
     } catch (exception: FHIRException) {
       Timber.w("Could not evaluate expression with FHIRPathEngine", exception)
