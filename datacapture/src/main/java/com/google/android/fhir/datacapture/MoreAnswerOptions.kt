@@ -22,6 +22,7 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 
@@ -33,6 +34,28 @@ internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
  * option is [IntegerType] or [StringType] or [Coding] type.
  */
 internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
+  get() {
+    return when (value) {
+      is IntegerType, is DateType, is TimeType -> value.primitiveValue()
+      is StringType -> (value as StringType).getLocalizedText() ?: value.toString()
+      is Coding -> {
+        val display = valueCoding.displayElement.getLocalizedText() ?: valueCoding.display
+        if (display.isNullOrEmpty()) {
+          valueCoding.code
+        } else {
+          display
+        }
+      }
+      else -> throw IllegalArgumentException("$value is not supported.")
+    }
+  }
+
+/**
+ * Text value for response item answer option
+ * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] if answer option is
+ * [IntegerType] or [StringType] or [Coding] type.
+ */
+internal val QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.displayString: String
   get() {
     return when (value) {
       is IntegerType, is DateType, is TimeType -> value.primitiveValue()
