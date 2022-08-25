@@ -48,7 +48,7 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
     hint.updateTextAndVisibility(questionnaireItem.localizedHintSpanned)
     //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
-    visibility = getVisibility(prefix, question, hint)
+    visibility = getViewGroupVisibility(prefix, question, hint)
   }
 }
 
@@ -63,7 +63,7 @@ internal fun TextView.updateTextAndVisibility(localizedText: Spanned?) {
 }
 
 /** Returns [VISIBLE] if any of the [view] is visible, else returns [GONE]. */
-internal fun getVisibility(vararg view: TextView): Int {
+internal fun getViewGroupVisibility(vararg view: TextView): Int {
   if (view.any { it.visibility == VISIBLE }) {
     return VISIBLE
   }
