@@ -51,8 +51,9 @@ internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString:
   }
 
 /**
- * Text value for response item answer option [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] if answer
- * option is [IntegerType] or [StringType] or [Coding] type.
+ * Text value for response item answer option
+ * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] if answer option is
+ * [IntegerType] or [StringType] or [Coding] type.
  */
 internal val QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.displayString: String
   get() {
