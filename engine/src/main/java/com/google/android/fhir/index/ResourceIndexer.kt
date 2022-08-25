@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,10 +48,13 @@ import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Location
 import org.hl7.fhir.r4.model.Money
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.SearchParameter
+import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
@@ -98,6 +101,30 @@ internal object ResourceIndexer {
         }
       }
 
+    addIndexesFromResourceClass(resource, indexBuilder)
+    return indexBuilder.build()
+  }
+
+  /**
+   * Manually add indexes for [SearchParameter]s defined in [Resource] class. This is because:
+   * 1. There is no clear way defined in the search parameter definitions to figure out the class
+   * hierarchy of the model classes in codegen.
+   * 2. Common [SearchParameter]'s paths are defined for [Resource] class e.g even for the [Patient]
+   * model, the [SearchParameter] expression for id would be `Resource.id` and
+   * [FHIRPathEngine.evaluate] doesn't return anything when [Patient] is passed to the function.
+   */
+  private fun <R : Resource> addIndexesFromResourceClass(
+    resource: R,
+    indexBuilder: ResourceIndices.Builder
+  ) {
+    indexBuilder.addTokenIndex(
+      TokenIndex(
+        "_id",
+        arrayOf(resource.fhirType(), "id").joinToString(separator = "."),
+        null,
+        resource.logicalId
+      )
+    )
     // Add 'lastUpdated' index to all resources.
     if (resource.meta.hasLastUpdated()) {
       val lastUpdatedElement = resource.meta.lastUpdatedElement
@@ -135,7 +162,6 @@ internal object ResourceIndexer {
         )
       }
     }
-    return indexBuilder.build()
   }
 
   private fun numberIndex(searchParam: SearchParamDefinition, value: Base): NumberIndex? =
@@ -184,12 +210,31 @@ internal object ResourceIndexer {
       }
       "Timing" -> {
         val timing = value as Timing
-        DateTimeIndex(
-          searchParam.name,
-          searchParam.path,
-          timing.event.minOf { it.value.time },
-          timing.event.maxOf { it.precision.add(it.value, 1).time } - 1
-        )
+        // Skip for now if its is repeating.
+        if (timing.hasEvent()) {
+          DateTimeIndex(
+            searchParam.name,
+            searchParam.path,
+            timing.event.minOf { it.value.time },
+            timing.event.maxOf { it.precision.add(it.value, 1).time } - 1
+          )
+        } else null
+      }
+      "string" -> {
+        // e.g. CarePlan may have schedule as a string value 2011-06-27T09:30:10+01:00 (see
+        // https://www.hl7.org/fhir/careplan-example-f001-heart.json.html)
+        // OR 'daily' (see https://www.hl7.org/fhir/careplan-example-f201-renal.json.html)
+        try {
+          val dateTime = DateTimeType((value as StringType).value)
+          DateTimeIndex(
+            searchParam.name,
+            searchParam.path,
+            dateTime.value.time,
+            dateTime.precision.add(dateTime.value, 1).time - 1
+          )
+        } catch (e: IllegalArgumentException) {
+          null
+        }
       }
       else -> null
     }

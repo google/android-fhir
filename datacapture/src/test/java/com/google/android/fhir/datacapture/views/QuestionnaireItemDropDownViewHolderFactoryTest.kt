@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,13 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
-import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -46,8 +46,10 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -63,8 +65,10 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
@@ -87,8 +91,10 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
@@ -115,8 +121,10 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
@@ -153,8 +161,10 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
           } else {
             emptyList()
           }
-        }
-      ) {}
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
@@ -164,33 +174,14 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
   }
 
   @Test
-  fun shouldThrowErrorForAnswerOptionWithoutCoding() {
-    val answerOption =
-      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply { value = StringType("test") }
-
-    assertFailsWith<IllegalArgumentException> {
-      viewHolder.bind(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = answerOption.value
-              }
-            )
-          }
-        ) {}
-      )
-    }
-  }
-
-  @Test
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = Invalid(listOf("Missing answer for required field.")),
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -214,8 +205,10 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = Coding().apply { display = "display" }
             }
-          )
-      ) {}
+          ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -227,8 +220,10 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).isEnabled)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,6 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.UriType
-import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -120,395 +119,6 @@ class SearchTest {
         """.trimIndent()
       )
     assertThat(query.args).isEqualTo(listOf(ResourceType.Patient.name, 10, 20))
-  }
-
-  @Test
-  fun search_filter_number_equals() {
-    /* x contains pairs of values and their corresponding range (see BigDecimal.getRange() in
-    MoreSearch.KT) */
-    for (x in
-      listOf(
-        BigDecimal("100") to BigDecimal("0.5"),
-        BigDecimal("100.00") to BigDecimal("0.005"),
-        BigDecimal("1e3") to BigDecimal("5")
-      )) {
-      val query =
-        Search(ResourceType.RiskAssessment)
-          .apply {
-            filter(
-              RiskAssessment.PROBABILITY,
-              {
-                prefix = ParamPrefixEnum.EQUAL
-                value = x.first
-              }
-            )
-          }
-          .getQuery()
-      assertThat(query.query)
-        .isEqualTo(
-          """ 
-          SELECT a.serializedResource
-          FROM ResourceEntity a
-          WHERE a.resourceType = ?
-          AND a.resourceUuid IN (
-          SELECT resourceUuid FROM NumberIndexEntity
-          WHERE resourceType = ? AND index_name = ? AND (index_value >= ? AND index_value < ?)
-          )
-          """.trimIndent()
-        )
-
-      assertThat(query.args)
-        .isEqualTo(
-          listOf(
-            ResourceType.RiskAssessment.name,
-            ResourceType.RiskAssessment.name,
-            RiskAssessment.PROBABILITY.paramName,
-            (x.first - x.second).toDouble(),
-            (x.first + x.second).toDouble()
-          )
-        )
-    }
-  }
-
-  @Test
-  fun search_filter_number_notEquals() {
-    val query =
-      Search(ResourceType.RiskAssessment)
-        .apply {
-          filter(
-            RiskAssessment.PROBABILITY,
-            {
-              prefix = ParamPrefixEnum.NOT_EQUAL
-              value = BigDecimal("100.00")
-            }
-          )
-        }
-        .getQuery()
-    assertThat(query.query)
-      .isEqualTo(
-        """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
-        SELECT resourceUuid FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value < ? OR index_value >= ?)
-        )
-        """.trimIndent()
-      )
-
-    assertThat(query.args)
-      .isEqualTo(
-        listOf(
-          ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
-          RiskAssessment.PROBABILITY.paramName,
-          BigDecimal.valueOf(99.995).toDouble(),
-          BigDecimal.valueOf(100.005).toDouble()
-        )
-      )
-  }
-
-  @Test
-  fun search_filter_number_greater() {
-    val query =
-      Search(ResourceType.RiskAssessment)
-        .apply {
-          filter(
-            RiskAssessment.PROBABILITY,
-            {
-              prefix = ParamPrefixEnum.GREATERTHAN
-              value = BigDecimal("100.00")
-            }
-          )
-        }
-        .getQuery()
-    assertThat(query.query)
-      .isEqualTo(
-        """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
-        SELECT resourceUuid FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value > ?
-        )
-        """.trimIndent()
-      )
-
-    assertThat(query.args)
-      .isEqualTo(
-        listOf(
-          ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
-          RiskAssessment.PROBABILITY.paramName,
-          BigDecimal("100.00").toDouble()
-        )
-      )
-  }
-  @Test
-  fun search_filter_number_greaterThanEqual() {
-    val query =
-      Search(ResourceType.RiskAssessment)
-        .apply {
-          filter(
-            RiskAssessment.PROBABILITY,
-            {
-              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-              value = BigDecimal("100.00")
-            }
-          )
-        }
-        .getQuery()
-    assertThat(query.query)
-      .isEqualTo(
-        """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
-        SELECT resourceUuid FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value >= ?
-        )
-        """.trimIndent()
-      )
-
-    assertThat(query.args)
-      .isEqualTo(
-        listOf(
-          ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
-          RiskAssessment.PROBABILITY.paramName,
-          BigDecimal("100.00").toDouble()
-        )
-      )
-  }
-  @Test
-  fun search_filter_number_less() {
-    val query =
-      Search(ResourceType.RiskAssessment)
-        .apply {
-          filter(
-            RiskAssessment.PROBABILITY,
-            {
-              prefix = ParamPrefixEnum.LESSTHAN
-              value = BigDecimal("100.00")
-            }
-          )
-        }
-        .getQuery()
-    assertThat(query.query)
-      .isEqualTo(
-        """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
-        SELECT resourceUuid FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value < ?
-        )
-        """.trimIndent()
-      )
-
-    assertThat(query.args)
-      .isEqualTo(
-        listOf(
-          ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
-          RiskAssessment.PROBABILITY.paramName,
-          BigDecimal("100.00").toDouble()
-        )
-      )
-  }
-  @Test
-  fun search_filter_number_lessThanEquals() {
-    val query =
-      Search(ResourceType.RiskAssessment)
-        .apply {
-          filter(
-            RiskAssessment.PROBABILITY,
-            {
-              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
-              value = BigDecimal("100.00")
-            }
-          )
-        }
-        .getQuery()
-    assertThat(query.query)
-      .isEqualTo(
-        """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
-        SELECT resourceUuid FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value <= ?
-        )
-        """.trimIndent()
-      )
-
-    assertThat(query.args)
-      .isEqualTo(
-        listOf(
-          ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
-          RiskAssessment.PROBABILITY.paramName,
-          BigDecimal("100.00").toDouble()
-        )
-      )
-  }
-
-  @Test
-  fun search_filter_integer_endsBefore_error() {
-    val illegalArgumentException =
-      assertThrows(java.lang.IllegalArgumentException::class.java) {
-        Search(ResourceType.RiskAssessment)
-          .apply {
-            filter(
-              RiskAssessment.PROBABILITY,
-              {
-                prefix = ParamPrefixEnum.ENDS_BEFORE
-                value = BigDecimal("100")
-              }
-            )
-          }
-          .getQuery()
-      }
-    assertThat(illegalArgumentException.message)
-      .isEqualTo("Prefix ENDS_BEFORE not allowed for Integer type")
-  }
-  @Test
-  fun search_filter_decimal_endsBefore() {
-    val query =
-      Search(ResourceType.RiskAssessment)
-        .apply {
-          filter(
-            RiskAssessment.PROBABILITY,
-            {
-              prefix = ParamPrefixEnum.ENDS_BEFORE
-              value = BigDecimal("100.00")
-            }
-          )
-        }
-        .getQuery()
-    assertThat(query.query)
-      .isEqualTo(
-        """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
-        SELECT resourceUuid FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value < ?
-        )
-        """.trimIndent()
-      )
-
-    assertThat(query.args)
-      .isEqualTo(
-        listOf(
-          ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
-          RiskAssessment.PROBABILITY.paramName,
-          BigDecimal("100.00").toDouble()
-        )
-      )
-  }
-
-  @Test
-  fun search_filter_integer_startsAfter_error() {
-    val illegalArgumentException =
-      assertThrows(java.lang.IllegalArgumentException::class.java) {
-        Search(ResourceType.RiskAssessment)
-          .apply {
-            filter(
-              RiskAssessment.PROBABILITY,
-              {
-                prefix = ParamPrefixEnum.STARTS_AFTER
-                value = BigDecimal("100")
-              }
-            )
-          }
-          .getQuery()
-      }
-    assertThat(illegalArgumentException.message)
-      .isEqualTo("Prefix STARTS_AFTER not allowed for Integer type")
-  }
-
-  @Test
-  fun search_filter_decimal_startsAfter() {
-    val query =
-      Search(ResourceType.RiskAssessment)
-        .apply {
-          filter(
-            RiskAssessment.PROBABILITY,
-            {
-              prefix = ParamPrefixEnum.STARTS_AFTER
-              value = BigDecimal("100.00")
-            }
-          )
-        }
-        .getQuery()
-    assertThat(query.query)
-      .isEqualTo(
-        """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
-        SELECT resourceUuid FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value > ?
-        )
-        """.trimIndent()
-      )
-
-    assertThat(query.args)
-      .isEqualTo(
-        listOf(
-          ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
-          RiskAssessment.PROBABILITY.paramName,
-          BigDecimal("100.00").toDouble()
-        )
-      )
-  }
-  @Test
-  fun search_filter_number_approximate() {
-    val query =
-      Search(ResourceType.RiskAssessment)
-        .apply {
-          filter(
-            RiskAssessment.PROBABILITY,
-            {
-              prefix = ParamPrefixEnum.APPROXIMATE
-              value = BigDecimal("100.00")
-            }
-          )
-        }
-        .getQuery()
-    assertThat(query.query)
-      .isEqualTo(
-        """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
-        SELECT resourceUuid FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value >= ? AND index_value <= ?)
-        )
-        """.trimIndent()
-      )
-
-    assertThat(query.args)
-      .isEqualTo(
-        listOf(
-          ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
-          RiskAssessment.PROBABILITY.paramName,
-          BigDecimal("90.00").toDouble(),
-          BigDecimal("110.00").toDouble()
-        )
-      )
   }
 
   @Test
@@ -1535,7 +1145,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
       )
@@ -1545,8 +1155,7 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.TELECOM.paramName,
-          "test@gmail.com",
-          ""
+          "test@gmail.com"
         )
       )
   }
@@ -1565,7 +1174,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
       )
@@ -1575,8 +1184,7 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.GENDER.paramName,
-          "male",
-          ""
+          "male"
         )
       )
   }
@@ -1594,7 +1202,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
       )
@@ -1604,8 +1212,7 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.ACTIVE.paramName,
-          "true",
-          ""
+          "true"
         )
       )
   }
@@ -1630,7 +1237,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
       )
@@ -1640,8 +1247,7 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.IDENTIFIER.paramName,
-          "16009886-bd57-11eb-8529-0242ac130003",
-          ""
+          "16009886-bd57-11eb-8529-0242ac130003"
         )
       )
   }
@@ -1661,7 +1267,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
       )
@@ -1671,8 +1277,7 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.PHONE.paramName,
-          "+14845219791",
-          ""
+          "+14845219791"
         )
       )
   }
@@ -2374,8 +1979,10 @@ class SearchTest {
         FROM ResourceEntity a
         LEFT JOIN DateIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
+        LEFT JOIN DateTimeIndexEntity c
+        ON a.resourceType = c.resourceType AND a.resourceUuid = c.resourceUuid AND c.index_name = ?
         WHERE a.resourceType = ?
-        ORDER BY b.index_from ASC
+        ORDER BY b.index_from ASC, c.index_from ASC
         """.trimIndent()
       )
   }
@@ -2392,8 +1999,10 @@ class SearchTest {
         FROM ResourceEntity a
         LEFT JOIN DateIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
+        LEFT JOIN DateTimeIndexEntity c
+        ON a.resourceType = c.resourceType AND a.resourceUuid = c.resourceUuid AND c.index_name = ?
         WHERE a.resourceType = ?
-        ORDER BY b.index_from DESC
+        ORDER BY b.index_from DESC, c.index_from DESC
         """.trimIndent()
       )
   }
@@ -2509,6 +2118,78 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(listOf("Patient", "Patient", "given", "John", "Patient", "family", "Doe", "Roe"))
   }
+
+  @Test
+  fun `search filter should append index name only for token filter with code only`() {
+    val query =
+      Search(ResourceType.Condition)
+        .apply {
+          filter(Condition.CLINICAL_STATUS, { value = of(Coding().apply { code = "test-code" }) })
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(listOf("Condition", "Condition", "clinical-status", "test-code"))
+  }
+
+  @Test
+  fun `search filter should append index name and index system for token filter with code and system`() {
+    val query =
+      Search(ResourceType.Condition)
+        .apply {
+          filter(
+            Condition.CLINICAL_STATUS,
+            {
+              value =
+                of(
+                  Coding().apply {
+                    code = "test-code"
+                    system = "http://my-code-system.org"
+                  }
+                )
+            }
+          )
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          "Condition",
+          "Condition",
+          "clinical-status",
+          "test-code",
+          "http://my-code-system.org"
+        )
+      )
+  }
+
   private companion object {
     const val mockEpochTimeStamp = 1628516301000
     const val APPROXIMATION_COEFFICIENT = 0.1

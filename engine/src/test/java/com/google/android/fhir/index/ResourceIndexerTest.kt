@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.hl7.fhir.r4.model.ActivityDefinition
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.CarePlan
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
@@ -75,6 +76,14 @@ import org.robolectric.annotation.Config
 class ResourceIndexerTest {
 
   /** Unit tests for resource indexer */
+  @Test
+  fun index_id() {
+    val patient = Patient().apply { id = "3f511720-43c4-451a-830b-7f4817c619fb" }
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.tokenIndices)
+      .contains(TokenIndex("_id", "Patient.id", null, "3f511720-43c4-451a-830b-7f4817c619fb"))
+  }
+
   @Test
   fun index_lastUpdated() {
     val patient =
@@ -345,6 +354,7 @@ class ResourceIndexerTest {
     assertThat(resourceIndices.dateTimeIndices)
       .contains(DateTimeIndex("date", "Observation.effective", period.start.time, Long.MAX_VALUE))
   }
+
   @Test
   fun index_dateTime_timing() {
     val timing =
@@ -368,6 +378,55 @@ class ResourceIndexerTest {
           "Observation.effective",
           timing.event.minOf { it.value.time },
           timing.event.maxOf { it.precision.add(it.value, 1).time } - 1
+        )
+      )
+  }
+
+  @Test
+  fun index_dateTime_repeated_timing_is_ignored() {
+    val timing =
+      Timing().apply {
+        repeat =
+          Timing.TimingRepeatComponent().apply {
+            frequency = 1
+            period = BigDecimal.ONE
+            periodUnit = Timing.UnitsOfTime.D
+          }
+      }
+    val observation =
+      Observation().apply {
+        id = "non-null ID"
+        effective = timing
+      }
+
+    val resourceIndices = ResourceIndexer.index(observation)
+    assertThat(resourceIndices.dateTimeIndices).isEmpty()
+  }
+
+  @Test
+  fun index_dateTime_string() {
+    val observation =
+      CarePlan().apply {
+        id = "non-null ID"
+        addActivity(
+          CarePlan.CarePlanActivityComponent().apply {
+            detail =
+              CarePlan.CarePlanActivityDetailComponent().apply {
+                scheduled = StringType("2011-06-27T09:30:10+01:00")
+              }
+          }
+        )
+      }
+
+    val resourceIndices = ResourceIndexer.index(observation)
+    val dateTime = DateTimeType("2011-06-27T09:30:10+01:00")
+    assertThat(resourceIndices.dateTimeIndices)
+      .contains(
+        DateTimeIndex(
+          "activity-date",
+          "CarePlan.activity.detail.scheduled",
+          dateTime.value.time,
+          dateTime.precision.add(dateTime.value, 1).time - 1
         )
       )
   }
@@ -924,7 +983,8 @@ class ResourceIndexerTest {
           testInvoice.participantFirstRep.role.codingFirstRep.system,
           testInvoice.participantFirstRep.role.codingFirstRep.code
         ),
-        TokenIndex("status", "Invoice.status", "http://hl7.org/fhir/invoice-status", "issued")
+        TokenIndex("status", "Invoice.status", "http://hl7.org/fhir/invoice-status", "issued"),
+        TokenIndex("_id", "Invoice.id", null, "example")
       )
 
     assertThat(resourceIndices.uriIndices).isEmpty()
@@ -982,7 +1042,8 @@ class ResourceIndexerTest {
           "Questionnaire.status",
           "http://hl7.org/fhir/publication-status",
           "draft"
-        )
+        ),
+        TokenIndex("_id", "Questionnaire.id", null, "3141")
       )
 
     assertThat(resourceIndices.dateTimeIndices)
@@ -1061,7 +1122,8 @@ class ResourceIndexerTest {
           "Patient.address.use",
           testPatient.addressFirstRep.use.system,
           testPatient.addressFirstRep.use.toCode()
-        )
+        ),
+        TokenIndex("_id", "Patient.id", null, "f001")
       )
 
     assertThat(resourceIndices.uriIndices).isEmpty()
@@ -1129,7 +1191,8 @@ class ResourceIndexerTest {
           "Location.status",
           testLocation.status.system,
           testLocation.status.toCode()
-        )
+        ),
+        TokenIndex("_id", "Location.id", null, "hl7")
       )
 
     assertThat(resourceIndices.uriIndices).isEmpty()

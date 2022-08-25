@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,9 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
@@ -47,13 +48,11 @@ class TransactionBundleGeneratorTest {
     val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
     val changes =
       listOf(
-        SquashedLocalChange(
-          LocalChangeToken(listOf(1)),
-          LocalChangeEntity(
+        LocalChangeEntity(
             id = 1,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
-            type = LocalChangeEntity.Type.INSERT,
+            type = Type.INSERT,
             payload =
               jsonParser.encodeResourceToString(
                 Patient().apply {
@@ -67,14 +66,13 @@ class TransactionBundleGeneratorTest {
                 }
               )
           )
-        ),
-        SquashedLocalChange(
-          LocalChangeToken(listOf(2)),
-          LocalChangeEntity(
+          .toLocalChange()
+          .apply { token = LocalChangeToken(listOf(1)) },
+        LocalChangeEntity(
             id = 2,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-002",
-            type = LocalChangeEntity.Type.UPDATE,
+            type = Type.UPDATE,
             payload =
               LocalChangeUtils.diff(
                   jsonParser,
@@ -99,14 +97,13 @@ class TransactionBundleGeneratorTest {
                 )
                 .toString()
           )
-        ),
-        SquashedLocalChange(
-          LocalChangeToken(listOf(3)),
-          LocalChangeEntity(
+          .toLocalChange()
+          .apply { LocalChangeToken(listOf(2)) },
+        LocalChangeEntity(
             id = 3,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-003",
-            type = LocalChangeEntity.Type.DELETE,
+            type = Type.DELETE,
             payload =
               jsonParser.encodeResourceToString(
                 Patient().apply {
@@ -120,7 +117,8 @@ class TransactionBundleGeneratorTest {
                 }
               )
           )
-        )
+          .toLocalChange()
+          .apply { LocalChangeToken(listOf(3)) }
       )
     val generator = TransactionBundleGenerator.Factory.getDefault()
     val result = generator.generate(listOf(changes))

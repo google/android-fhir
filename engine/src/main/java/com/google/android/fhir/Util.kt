@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -37,6 +38,13 @@ internal fun Date.toTimeZoneString(): String {
       .withZone(ZoneId.systemDefault())
   return simpleDateFormat.format(this.toInstant())
 }
+
+/**
+ * Returns true if given string matches ISO_DATE format i.e. "yyyy-MM-dd" or "yyyy-MM-dd+00:00",
+ * false otherwise.
+ */
+internal fun isValidDateOnly(date: String) =
+  runCatching { LocalDate.parse(date, DateTimeFormatter.ISO_DATE) }.isSuccess
 
 /**
  * The logical (unqualified) part of the ID. For example, if the ID is

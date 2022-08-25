@@ -1,0 +1,77 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "Do you have any existing conditions",
+      "type": "choice",
+      "repeats": true,
+      "required": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "autocomplete",
+                "display": "Auto-complete"
+              }
+            ],
+            "text": "Auto-complete"
+          }
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "asthma",
+            "display": "Asthma"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "copd",
+            "display": "Chronic Lung Disease"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "depression",
+            "display": "Depression"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "t2dm",
+            "display": "Diabetes"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "hypertension",
+            "display": "Hypertension"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "hypertension",
+            "display": "High Blood Pressure"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "hypercholesterolaemia",
+            "display": "High Cholesterol"
+          }
+        }
+      ],
+      "initial": {
+        "valueCoding": {
+          "code": "asthma",
+          "display": "Asthma"
+        }
+      }
+    }
+  ]
+}

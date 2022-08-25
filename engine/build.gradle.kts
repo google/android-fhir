@@ -1,4 +1,4 @@
-import Releases.useApache2License
+import codegen.GenerateSourcesTask
 
 plugins {
   id(Plugins.BuildPlugins.androidLib)
@@ -8,31 +8,24 @@ plugins {
   jacoco
 }
 
-afterEvaluate {
-  publishing {
-    publications {
-      register("release", MavenPublication::class) {
-        from(components["release"])
-        groupId = Releases.groupId
-        artifactId = Releases.Engine.artifactId
-        version = Releases.Engine.version
-        // Also publish source code for developers' convenience
-        artifact(
-          tasks.create<Jar>("androidSourcesJar") {
-            archiveClassifier.set("sources")
-            from(android.sourceSets.getByName("main").java.srcDirs)
-          }
-        )
-        pom {
-          name.set(Releases.Engine.name)
-          useApache2License()
-        }
-      }
-    }
-  }
-}
+publishArtifact(Releases.Engine)
 
 createJacocoTestReportTask()
+
+val generateSourcesTask =
+  project.tasks.register("generateSearchParamsTask", GenerateSourcesTask::class) {
+    srcOutputDir.set(project.layout.buildDirectory.dir("gen/main"))
+    testOutputDir.set(project.layout.buildDirectory.dir("gen/test"))
+  }
+
+kotlin {
+  sourceSets {
+    val main by getting
+    val test by getting
+    main.kotlin.srcDirs(generateSourcesTask.map { it.srcOutputDir })
+    test.kotlin.srcDirs(generateSourcesTask.map { it.testOutputDir })
+  }
+}
 
 android {
   compileSdk = Sdk.compileSdk
@@ -143,5 +136,4 @@ dependencies {
   testImplementation(Dependencies.truth)
 }
 
-// Generate SearchParameterRepositoryGenerated.kt.
-tasks.getByName("build") { dependsOn(":codegen:runCodeGenerator") }
+configureDokka(Releases.Engine.artifactId, Releases.Engine.version)

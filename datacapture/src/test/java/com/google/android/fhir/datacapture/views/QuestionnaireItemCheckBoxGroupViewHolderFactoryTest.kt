@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
 import com.google.android.fhir.datacapture.EXTENSION_OPTION_EXCLUSIVE_URL
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
@@ -54,8 +56,10 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           repeats = true
           text = "Question?"
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -85,8 +89,10 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         questionnaire,
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
@@ -120,8 +126,10 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         questionnaire,
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
@@ -144,8 +152,10 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
             }
           )
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
@@ -179,8 +189,10 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
                 }
             }
           )
-        }
-      ) {}
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
@@ -204,16 +216,16 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
             }
           )
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
     checkBox.performClick()
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
-    assertThat(answer).hasSize(1)
-    assertThat(answer[0].valueCoding.display).isEqualTo("Coding 1")
+    assertThat(questionnaireItemViewItem.answers.single().valueCoding.display).isEqualTo("Coding 1")
   }
 
   @Test
@@ -242,15 +254,17 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
             }
           )
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     (checkBoxGroup.getChildAt(2) as CheckBox).performClick()
     (checkBoxGroup.getChildAt(1) as CheckBox).performClick()
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
-    assertThat(answer.single().valueCoding.display).isEqualTo("display-1")
+    assertThat(questionnaireItemViewItem.answers.single().valueCoding.display)
+      .isEqualTo("display-1")
   }
 
   @Test
@@ -279,16 +293,18 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
             }
           )
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     (checkBoxGroup.getChildAt(1) as CheckBox).performClick()
     (checkBoxGroup.getChildAt(2) as CheckBox).performClick()
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
-    assertThat(answer.single().valueCoding.display).isEqualTo("display-2")
+    assertThat(questionnaireItemViewItem.answers.single().valueCoding.display)
+      .isEqualTo("display-2")
   }
 
   @Test
@@ -324,15 +340,16 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           } else {
             emptyList()
           }
-        }
-      ) {}
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
     checkBox.performClick()
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
-    assertThat(answer).isEmpty()
+    assertThat(questionnaireItemViewItem.answers).isEmpty()
   }
 
   @Test
@@ -343,8 +360,10 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           repeats = true
           required = true
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = Invalid(listOf("Missing answer for required field.")),
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
@@ -370,8 +389,10 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
               value = Coding().apply { display = "display" }
             }
           )
-        }
-      ) {}
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.isEmpty()).isTrue()
@@ -390,8 +411,10 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
             }
           )
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(

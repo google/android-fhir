@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,26 +19,35 @@ package com.google.android.fhir.datacapture.views
 import android.annotation.SuppressLint
 import android.content.Context
 import android.text.InputType
+import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.entryFormat
 import com.google.android.fhir.datacapture.utilities.localizedDateString
 import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.utilities.toLocalizedString
 import com.google.android.fhir.datacapture.utilities.toLocalizedTimeString
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import java.text.ParseException
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.chrono.IsoChronology
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.FormatStyle
 import java.util.Date
+import java.util.Locale
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -54,19 +63,35 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private var localDate: LocalDate? = null
       private var localTime: LocalTime? = null
+      private var textWatcher: TextWatcher? = null
+      private val localeDatePattern =
+        DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+          FormatStyle.SHORT,
+          null,
+          IsoChronology.INSTANCE,
+          Locale.getDefault()
+        )
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         dateInputLayout = itemView.findViewById(R.id.date_input_layout)
         dateInputEditText = itemView.findViewById(R.id.date_input_edit_text)
-        dateInputEditText.inputType = InputType.TYPE_NULL
+        dateInputEditText.setOnFocusChangeListener { view, hasFocus ->
+          if (!hasFocus) {
+            (view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+              .hideSoftInputFromWindow(view.windowToken, 0)
+          }
+        }
         dateInputLayout.setEndIconOnClickListener {
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
           // necessary to access the base context twice to retrieve the application object
           // from the view's context.
           val context = itemView.context.tryUnwrapContext()!!
-          createMaterialDatePicker()
+          val localDateInput =
+            localDate
+              ?: questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType?.localDate
+          createMaterialDatePicker(localDateInput)
             .apply {
               addOnPositiveButtonClickListener { epochMilli ->
                 with(Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()) {
@@ -116,24 +141,42 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         clearPreviousState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
-        questionnaireItemViewItem.questionnaireItem.entryFormat?.let {
-          dateInputLayout.helperText = it
-        }
-        val dateTime = questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType
+        dateInputLayout.hint = localeDatePattern
+        dateInputEditText.removeTextChangedListener(textWatcher)
+        val dateTime = questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType
         updateDateTimeInput(
           dateTime?.let {
             LocalDateTime.of(it.year, it.month + 1, it.day, it.hour, it.minute, it.second)
           }
         )
+        textWatcher =
+          dateInputEditText.doAfterTextChanged { text ->
+            try {
+              localDate = parseDate(text.toString(), dateInputEditText.context.applicationContext)
+              enableOrDisableTimePicker(enableIt = true)
+              generateLocalDateTime(localDate, localTime)?.run {
+                updateDateTimeInput(this)
+                updateDateTimeAnswer(this)
+              }
+            } catch (e: ParseException) {
+              this.questionnaireItemViewItem.clearAnswer()
+              localDate = null
+              enableOrDisableTimePicker(enableIt = false)
+            }
+          }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         dateInputLayout.error =
-          if (validationResult.getSingleStringValidationMessage() == "") null
-          else validationResult.getSingleStringValidationMessage()
+          when (validationResult) {
+            is NotValidated, Valid -> null
+            is Invalid -> validationResult.getSingleStringValidationMessage()
+          }
         timeInputLayout.error =
-          if (validationResult.getSingleStringValidationMessage() == "") null
-          else validationResult.getSingleStringValidationMessage()
+          when (validationResult) {
+            is NotValidated, Valid -> null
+            is Invalid -> validationResult.getSingleStringValidationMessage()
+          }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
@@ -154,7 +197,9 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       /** Update the date and time input fields in the UI. */
       private fun updateDateTimeInput(localDateTime: LocalDateTime?) {
         enableOrDisableTimePicker(enableIt = localDateTime != null)
-        dateInputEditText.setText(localDateTime?.localizedDateString ?: "")
+        if (dateInputEditText.text.isNullOrEmpty()) {
+          dateInputEditText.setText(localDateTime?.localizedDateString ?: "")
+        }
         timeInputEditText.setText(
           localDateTime?.toLocalizedTimeString(timeInputEditText.context) ?: ""
         )
@@ -162,7 +207,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
 
       /** Updates the recorded answer. */
       private fun updateDateTimeAnswer(localDateTime: LocalDateTime) {
-        questionnaireItemViewItem.singleAnswerOrNull =
+        questionnaireItemViewItem.setAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
             .setValue(
               DateTimeType(
@@ -176,7 +221,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 )
               )
             )
-        onAnswerChanged(header.context)
+        )
       }
 
       private fun generateLocalDateTime(
@@ -188,7 +233,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             LocalDateTime.of(localDate, localTime)
           }
           localDate != null -> {
-            questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
+            questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType?.let {
               LocalDateTime.of(localDate, it.localTime)
             }
           }
@@ -196,15 +241,9 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         }
       }
 
-      private fun createMaterialDatePicker(): MaterialDatePicker<Long> {
+      private fun createMaterialDatePicker(localDate: LocalDate?): MaterialDatePicker<Long> {
         val selectedDateMillis =
-          questionnaireItemViewItem
-            .singleAnswerOrNull
-            ?.valueDateTimeType
-            ?.localDate
-            ?.atStartOfDay(ZONE_ID_UTC)
-            ?.toInstant()
-            ?.toEpochMilli()
+          localDate?.atStartOfDay(ZONE_ID_UTC)?.toInstant()?.toEpochMilli()
             ?: MaterialDatePicker.todayInUtcMilliseconds()
 
         return MaterialDatePicker.Builder.datePicker()
@@ -215,7 +254,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
 
       private fun createMaterialTimePicker(context: Context): MaterialTimePicker {
         val selectedTime =
-          questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.localTime
+          questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType?.localTime
             ?: LocalTime.now()
 
         return MaterialTimePicker.Builder()

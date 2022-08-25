@@ -1,0 +1,183 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>LocalChangeEntity</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><link href="../../../styles/prism.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script><script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>  </head>
+  <body>
+    <div class="navigation-wrapper" id="navigation-wrapper">
+      <div id="leftToggler"><span class="icon-toggler"></span></div>
+      <div class="library-name"><a href="../../../index.html">engine</a></div>
+      <div>0.1.0-beta01</div>
+      <div class="pull-right d-flex"><button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+      </div>
+    </div>
+    <div id="container">
+      <div id="leftColumn">
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main">
+        <div class="main-content" id="content" pageIds="engine::com.google.android.fhir.db.impl.entities/LocalChangeEntity///PointingToDeclaration//1317381881">
+          <div class="breadcrumbs"><a href="../../../index.html">engine</a>/<a href="../index.html">com.google.android.fhir.db.impl.entities</a>/<a href="index.html">LocalChangeEntity</a></div>
+          <div class="cover ">
+            <h1 class="cover"><span>Local</span><wbr></wbr><span>Change</span><wbr></wbr><span><span>Entity</span></span></h1>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">LocalChangeEntity</a><span class="token punctuation">(</span>id<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span>resourceType<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>resourceId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>timestamp<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>type<span class="token operator">: </span><a href="-type/index.html">LocalChangeEntity.Type</a><span class="token punctuation">, </span>payload<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>versionId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">When a local change to a resource happens, the lastUpdated timestamp in <span data-unresolved-link="com.google.android.fhir.db.impl.entities/ResourceEntity///PointingToDeclaration/">ResourceEntity</span> is updated and the diff itself is inserted in this table. The value of the diff depends upon the type of change and can be:</p><ul><li><p class="paragraph">DELETE: The empty string, &quot;&quot;.</p></li><li><p class="paragraph">INSERT: The full resource in JSON form, e.g. {</p></li></ul><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">    &quot;resourceType&quot;: &quot;Patient&quot;,<br>    &quot;id&quot;: &quot;animal&quot;,<br>    &quot;name&quot;: [<br>            {<br>             &quot;use&quot;: &quot;usual&quot;,<br>             &quot;given&quot;: [<br>             &quot;Kenzi&quot;<br>            ]<br>            }<br>      ],<br>    ...</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">}</p><ul><li><p class="paragraph">UPDATE: A RFC 6902 JSON patch. e.g. a patch that changes the given name of a patient: [</p></li></ul><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">    {<br>    &quot;op&quot;: &quot;replace&quot;,<br>    &quot;path&quot;: &quot;/name/0/given/0&quot;,<br>    &quot;value&quot;: &quot;Binny&quot;<br>    }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">] For resource that is fully synced with server this table should not have any rows.</p></div></div>
+          </div>
+          <div class="tabbedcontent">
+            <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+            <div class="tabs-section-body">
+              <h2 class="tabbedcontent">Constructors</h2>
+              <div class="table" data-togglable="Constructors"><a data-name="1331142255%2FConstructors%2F1317381881" anchor-label="LocalChangeEntity" id="1331142255%2FConstructors%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
+                  <div class="main-subrow keyValue TabbedContent">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="-local-change-entity.html"><span>Local</span><wbr></wbr><span>Change</span><wbr></wbr><span><span>Entity</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1331142255%2FConstructors%2F1317381881"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-local-change-entity.html"><span class="token function">LocalChangeEntity</span></a><span class="token punctuation">(</span>id<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span>resourceType<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>resourceId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>timestamp<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">&quot;&quot;</span><span class="token punctuation">, </span>type<span class="token operator">: </span><a href="-type/index.html">LocalChangeEntity.Type</a><span class="token punctuation">, </span>payload<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>versionId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Types</h2>
+              <div class="table" data-togglable="Types"><a data-name="784746579%2FClasslikes%2F1317381881" anchor-label="Type" id="784746579%2FClasslikes%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="-type/index.html"><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="784746579%2FClasslikes%2F1317381881"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">enum </span><a href="-type/index.html">Type</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-type/index.html">LocalChangeEntity.Type</a><span class="token operator">&gt; </span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Properties</h2>
+              <div class="table" data-togglable="Properties"><a data-name="-942522979%2FProperties%2F1317381881" anchor-label="id" id="-942522979%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="id.html">id</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-942522979%2FProperties%2F1317381881"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><a data-name="-942522979%2FProperties%2F1317381881" anchor-label="id" id="-942522979%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="id.html">id</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1358505012%2FProperties%2F1317381881" anchor-label="payload" id="1358505012%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="payload.html">payload</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1358505012%2FProperties%2F1317381881"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><a data-name="1358505012%2FProperties%2F1317381881" anchor-label="payload" id="1358505012%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="payload.html">payload</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="675642799%2FProperties%2F1317381881" anchor-label="resourceId" id="675642799%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="resource-id.html">resourceId</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="675642799%2FProperties%2F1317381881"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><a data-name="675642799%2FProperties%2F1317381881" anchor-label="resourceId" id="675642799%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="resource-id.html">resourceId</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1711254224%2FProperties%2F1317381881" anchor-label="resourceType" id="-1711254224%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="resource-type.html">resourceType</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1711254224%2FProperties%2F1317381881"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><a data-name="-1711254224%2FProperties%2F1317381881" anchor-label="resourceType" id="-1711254224%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="resource-type.html">resourceType</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1962764396%2FProperties%2F1317381881" anchor-label="timestamp" id="1962764396%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="timestamp.html">timestamp</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1962764396%2FProperties%2F1317381881"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><a data-name="1962764396%2FProperties%2F1317381881" anchor-label="timestamp" id="1962764396%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="timestamp.html">timestamp</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1990405730%2FProperties%2F1317381881" anchor-label="type" id="-1990405730%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="type.html">type</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1990405730%2FProperties%2F1317381881"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><a data-name="-1990405730%2FProperties%2F1317381881" anchor-label="type" id="-1990405730%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="type.html">type</a><span class="token operator">: </span><a href="-type/index.html">LocalChangeEntity.Type</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="88287247%2FProperties%2F1317381881" anchor-label="versionId" id="88287247%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="version-id.html">versionId</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="88287247%2FProperties%2F1317381881"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><a data-name="88287247%2FProperties%2F1317381881" anchor-label="versionId" id="88287247%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="version-id.html">versionId</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  </body>
+</html>
+

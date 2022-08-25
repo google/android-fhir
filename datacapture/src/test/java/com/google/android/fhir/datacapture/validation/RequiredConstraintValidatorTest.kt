@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,19 +34,17 @@ class RequiredConstraintValidatorTest {
   @Test
   fun shouldReturnValidResult() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = IntegerType(9)
-          }
-        )
-      }
+    val response =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = IntegerType(9)
+        }
+      )
 
     val validationResult =
       RequiredConstraintValidator.validate(
         questionnaireItem,
-        questionnaireResponseItem,
+        response,
         InstrumentationRegistry.getInstrumentation().context
       )
     assertThat(validationResult.isValid).isTrue()
@@ -55,12 +53,32 @@ class RequiredConstraintValidatorTest {
   @Test
   fun shouldReturnInvalidResult() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
-    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
 
     val validationResult =
       RequiredConstraintValidator.validate(
         questionnaireItem,
-        questionnaireResponseItem,
+        listOf(),
+        InstrumentationRegistry.getInstrumentation().context
+      )
+    assertThat(validationResult.isValid).isFalse()
+    assertThat(validationResult.message).isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  fun noAnswerHasValue_shouldReturnInvalidResult() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
+    val response =
+      listOf(
+        // one answer with no value
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent(),
+        // second answer with no value
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+      )
+
+    val validationResult =
+      RequiredConstraintValidator.validate(
+        questionnaireItem,
+        response,
         InstrumentationRegistry.getInstrumentation().context
       )
     assertThat(validationResult.isValid).isFalse()

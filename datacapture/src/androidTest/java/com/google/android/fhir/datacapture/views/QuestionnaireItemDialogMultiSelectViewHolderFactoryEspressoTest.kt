@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import com.google.android.fhir.datacapture.utilities.assertQuestionnaireResponse
 import com.google.android.fhir.datacapture.utilities.clickOnText
 import com.google.android.fhir.datacapture.utilities.clickOnTextInDialog
 import com.google.android.fhir.datacapture.utilities.endIconClickInTextInputLayout
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.common.truth.StringSubject
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
@@ -53,12 +54,14 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun multipleChoice_selectMultiple_clickOK_shouldSaveMultipleOptions() {
+  fun multipleChoice_selectMultiple_clickSave_shouldSaveMultipleOptions() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -66,7 +69,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnTextInDialog("Coding 1")
     clickOnText("Coding 3")
     clickOnText("Coding 5")
-    clickOnText("OK")
+    clickOnText("Save")
 
     assertDisplayedText().isEqualTo("Coding 1, Coding 3, Coding 5")
     assertQuestionnaireResponseAtIndex(
@@ -78,20 +81,22 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun multipleChoice_SelectNothing_clickOK_shouldSaveNothing() {
+  fun multipleChoice_SelectNothing_clickSave_shouldSaveNothing() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
     endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("OK")
+    clickOnTextInDialog("Save")
 
     assertDisplayedText().isEmpty()
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
+    assertThat(questionnaireItemViewItem.answers).isEmpty()
   }
 
   @Test
@@ -99,8 +104,10 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -110,7 +117,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnText("Cancel")
 
     assertDisplayedText().isEmpty()
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
+    assertThat(questionnaireItemViewItem.answers).isEmpty()
   }
 
   @Test
@@ -118,53 +125,59 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3"),
-        responseOptions()
-      ) {}
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
     endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
     clickOnTextInDialog("Coding 2")
     clickOnText("Coding 1")
-    clickOnText("OK")
+    clickOnText("Save")
 
     assertDisplayedText().isEqualTo("Coding 1")
     assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, "Coding 1")
   }
 
   @Test
-  fun singleOption_select_clickOK_shouldSaveSingleOption() {
+  fun singleOption_select_clickSave_shouldSaveSingleOption() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
     endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
     clickOnTextInDialog("Coding 2")
-    clickOnText("OK")
+    clickOnText("Save")
 
     assertDisplayedText().isEqualTo("Coding 2")
     assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, "Coding 2")
   }
 
   @Test
-  fun singleOption_selectNothing_clickOK_shouldSaveNothing() {
+  fun singleOption_selectNothing_clickSave_shouldSaveNothing() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
     endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("OK")
+    clickOnTextInDialog("Save")
 
     assertDisplayedText().isEmpty()
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
+    assertThat(questionnaireItemViewItem.answers).isEmpty()
   }
 
   @Test
@@ -172,8 +185,10 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
     endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
@@ -181,7 +196,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnText("Cancel")
 
     assertDisplayedText().isEmpty()
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
+    assertThat(questionnaireItemViewItem.answers).isEmpty()
   }
 
   /** Method to run code snippet on UI/main thread */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,11 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
 
 /**
@@ -30,8 +28,8 @@ import com.google.android.fhir.datacapture.validation.ValidationResult
  *
  * @param resId the layout resource for the view
  */
-abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId: Int) {
-  internal open fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
+abstract class QuestionnaireItemViewHolderFactory(@LayoutRes open val resId: Int) {
+  fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
     return QuestionnaireItemViewHolder(
       LayoutInflater.from(parent.context).inflate(resId, parent, false),
       getQuestionnaireItemViewHolderDelegate()
@@ -62,7 +60,9 @@ open class QuestionnaireItemViewHolder(
     delegate.questionnaireItemViewItem = questionnaireItemViewItem
     delegate.bind(questionnaireItemViewItem)
     delegate.setReadOnly(questionnaireItemViewItem.questionnaireItem.readOnly)
-    delegate.displayValidationResult(delegate.getValidationResult(itemView.context))
+    delegate.questionnaireItemViewItem.validationResult?.let {
+      delegate.displayValidationResult(it)
+    }
   }
 }
 
@@ -94,22 +94,4 @@ interface QuestionnaireItemViewHolderDelegate {
 
   /** Sets view read only if [isReadOnly] is true. */
   fun setReadOnly(isReadOnly: Boolean)
-
-  /**
-   * Runs validation to display the correct message and calls the
-   * questionnaireResponseChangedCallback
-   */
-  fun onAnswerChanged(context: Context) {
-    questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-    displayValidationResult(getValidationResult(context))
-  }
-
-  /** Run the [QuestionnaireResponseItemValidator.validate] function. */
-  fun getValidationResult(context: Context): ValidationResult {
-    return QuestionnaireResponseItemValidator.validate(
-      questionnaireItemViewItem.questionnaireItem,
-      questionnaireItemViewItem.questionnaireResponseItem,
-      context
-    )
-  }
 }
