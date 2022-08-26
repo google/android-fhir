@@ -37,6 +37,9 @@
         name="Theme.Questionnaire"
         parent="Theme.Material3.DayNight.NoActionBar"
     >
+      <item name="questionnaireGroupTypeQuestionTextStyle">
+        @style/TextAppearance.Material3.TitleMedium
+      </item>
       <item
             name="questionnaireQuestionTextStyle"
         >@style/TextAppearance.Material3.TitleMedium</item>

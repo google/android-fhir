@@ -119,7 +119,7 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
     assertThat(
         viewHolder
           .itemView
-          .findViewById<QuestionnaireItemHeaderView>(R.id.header)
+          .findViewById<QuestionnaireGroupTypeHeaderView>(R.id.header)
           .findViewById<TextView>(R.id.hint)
           .text
           .isNullOrEmpty()
@@ -128,7 +128,7 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
     assertThat(
         viewHolder
           .itemView
-          .findViewById<QuestionnaireItemHeaderView>(R.id.header)
+          .findViewById<QuestionnaireGroupTypeHeaderView>(R.id.header)
           .findViewById<TextView>(R.id.hint)
           .visibility
       )
@@ -146,7 +146,7 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
       )
     )
     assertThat(
-        viewHolder.itemView.findViewById<QuestionnaireItemHeaderView>(R.id.header).visibility
+        viewHolder.itemView.findViewById<QuestionnaireGroupTypeHeaderView>(R.id.header).visibility
       )
       .isEqualTo(View.VISIBLE)
   }
@@ -163,7 +163,7 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<QuestionnaireItemHeaderView>(R.id.header).visibility
+        viewHolder.itemView.findViewById<QuestionnaireGroupTypeHeaderView>(R.id.header).visibility
       )
       .isEqualTo(View.GONE)
   }
