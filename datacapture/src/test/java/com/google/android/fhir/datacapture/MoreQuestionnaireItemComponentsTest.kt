@@ -422,13 +422,20 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedHintSpanned_noNestedDisplayItem_shouldReturnNull() {
+  fun `nested display item without instructions code returns null`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
           linkId = "parent-question"
           text = "parent question text"
           type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "text"
+              }
+            )
         }
       )
 
@@ -436,24 +443,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedHintSpanned_groupType_shouldReturnNull() {
-    val questionnaireItemComponent =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        type = Questionnaire.QuestionnaireItemType.GROUP
-        item =
-          listOf(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "nested-display-question"
-              text = "text"
-            }
-          )
-      }
-
-    assertThat(questionnaireItemComponent.localizedInstructionsSpanned).isNull()
-  }
-
-  @Test
-  fun localizedHintSpanned_shouldReturnText() {
+  fun localizedInstructionsSpanned_shouldReturnText() {
     val displayCategoryExtension =
       Extension().apply {
         url = EXTENSION_DISPLAY_CATEGORY_URL
@@ -493,7 +483,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedHintSpanned_nonMatchingLocale_shouldReturnText() {
+  fun localizedInstructionsSpanned_nonMatchingLocale_shouldReturnText() {
     val displayCategoryExtension =
       Extension().apply {
         url = EXTENSION_DISPLAY_CATEGORY_URL
@@ -541,7 +531,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedHintSpanned_matchingLocale_shouldReturnLocalizedText() {
+  fun localizedInstructionsSpanned_matchingLocale_shouldReturnLocalizedText() {
     val displayCategoryExtension =
       Extension().apply {
         url = EXTENSION_DISPLAY_CATEGORY_URL
@@ -588,7 +578,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedHintSpanned_matchingLocaleWithoutCountryCode_shouldReturnLocalizedText() {
+  fun localizedInstructionsSpanned_matchingLocaleWithoutCountryCode_shouldReturnLocalizedText() {
     val displayCategoryExtension =
       Extension().apply {
         url = EXTENSION_DISPLAY_CATEGORY_URL
