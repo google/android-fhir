@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedHintSpanned
+import com.google.android.fhir.datacapture.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
 import org.hl7.fhir.r4.model.Questionnaire
@@ -59,7 +59,7 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
       }
     question.text = localizedTextSpanned
 
-    val localizedHintSpanned = questionnaireItem.localizedHintSpanned
+    val localizedHintSpanned = questionnaireItem.localizedInstructionsSpanned
     hint.visibility =
       if (localizedHintSpanned.isNullOrEmpty()) {
         View.GONE

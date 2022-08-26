@@ -1655,8 +1655,24 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun nestedDisplayItem_parentQuestionItemIsNotGroup_doesNotCreateQuestionnaireStateItem() =
+  fun `nested display item with instructions code should not be created as questionnaire state item`() =
       runBlocking {
+    val displayCategoryExtension =
+      Extension().apply {
+        url = EXTENSION_DISPLAY_CATEGORY_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = INSTRUCTIONS
+                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+                }
+              )
+          }
+        )
+      }
+
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1671,6 +1687,7 @@ class QuestionnaireViewModelTest(
                   linkId = "nested-display-question"
                   text = "subtitle text"
                   type = Questionnaire.QuestionnaireItemType.DISPLAY
+                  extension = listOf(displayCategoryExtension)
                 }
               )
           }

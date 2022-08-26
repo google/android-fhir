@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,14 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
+import com.google.android.fhir.datacapture.EXTENSION_DISPLAY_CATEGORY_SYSTEM
+import com.google.android.fhir.datacapture.EXTENSION_DISPLAY_CATEGORY_URL
+import com.google.android.fhir.datacapture.INSTRUCTIONS
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -64,7 +70,22 @@ class QuestionnaireItemHeaderViewTest {
   }
 
   @Test
-  fun shouldShowHint() {
+  fun shouldShowInstructions() {
+    val displayCategoryExtension =
+      Extension().apply {
+        url = EXTENSION_DISPLAY_CATEGORY_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = INSTRUCTIONS
+                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+                }
+              )
+          }
+        )
+      }
     view.bind(
       Questionnaire.QuestionnaireItemComponent().apply {
         item =
@@ -72,6 +93,7 @@ class QuestionnaireItemHeaderViewTest {
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "nested-display-question"
               text = "subtitle text"
+              extension = listOf(displayCategoryExtension)
               type = Questionnaire.QuestionnaireItemType.DISPLAY
             }
           )
@@ -101,6 +123,21 @@ class QuestionnaireItemHeaderViewTest {
 
   @Test
   fun shouldShowHeaderView() {
+    val displayCategoryExtension =
+      Extension().apply {
+        url = EXTENSION_DISPLAY_CATEGORY_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = INSTRUCTIONS
+                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+                }
+              )
+          }
+        )
+      }
     view.bind(
       Questionnaire.QuestionnaireItemComponent().apply {
         item =
@@ -108,6 +145,7 @@ class QuestionnaireItemHeaderViewTest {
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "nested-display-question"
               text = "subtitle text"
+              extension = listOf(displayCategoryExtension)
               type = Questionnaire.QuestionnaireItemType.DISPLAY
             }
           )

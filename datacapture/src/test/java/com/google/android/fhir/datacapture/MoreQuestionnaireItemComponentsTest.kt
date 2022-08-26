@@ -432,7 +432,7 @@ class MoreQuestionnaireItemComponentsTest {
         }
       )
 
-    assertThat(questionItemList.first().localizedHintSpanned).isNull()
+    assertThat(questionItemList.first().localizedInstructionsSpanned).isNull()
   }
 
   @Test
@@ -449,11 +449,26 @@ class MoreQuestionnaireItemComponentsTest {
           )
       }
 
-    assertThat(questionnaireItemComponent.localizedHintSpanned).isNull()
+    assertThat(questionnaireItemComponent.localizedInstructionsSpanned).isNull()
   }
 
   @Test
   fun localizedHintSpanned_shouldReturnText() {
+    val displayCategoryExtension =
+      Extension().apply {
+        url = EXTENSION_DISPLAY_CATEGORY_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = INSTRUCTIONS
+                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+                }
+              )
+          }
+        )
+      }
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -465,6 +480,7 @@ class MoreQuestionnaireItemComponentsTest {
               Questionnaire.QuestionnaireItemComponent().apply {
                 linkId = "nested-display-question"
                 text = "subtitle text"
+                extension = listOf(displayCategoryExtension)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
               }
             )
@@ -472,11 +488,27 @@ class MoreQuestionnaireItemComponentsTest {
       )
     Locale.setDefault(Locale.US)
 
-    assertThat(questionItemList.first().localizedHintSpanned.toString()).isEqualTo("subtitle text")
+    assertThat(questionItemList.first().localizedInstructionsSpanned.toString())
+      .isEqualTo("subtitle text")
   }
 
   @Test
   fun localizedHintSpanned_nonMatchingLocale_shouldReturnText() {
+    val displayCategoryExtension =
+      Extension().apply {
+        url = EXTENSION_DISPLAY_CATEGORY_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = INSTRUCTIONS
+                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+                }
+              )
+          }
+        )
+      }
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -496,6 +528,7 @@ class MoreQuestionnaireItemComponentsTest {
                     }
                   )
                 }
+                extension = listOf(displayCategoryExtension)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
               }
             )
@@ -503,11 +536,27 @@ class MoreQuestionnaireItemComponentsTest {
       )
     Locale.setDefault(Locale.US)
 
-    assertThat(questionItemList.first().localizedHintSpanned.toString()).isEqualTo("subtitle text")
+    assertThat(questionItemList.first().localizedInstructionsSpanned.toString())
+      .isEqualTo("subtitle text")
   }
 
   @Test
   fun localizedHintSpanned_matchingLocale_shouldReturnLocalizedText() {
+    val displayCategoryExtension =
+      Extension().apply {
+        url = EXTENSION_DISPLAY_CATEGORY_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = INSTRUCTIONS
+                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+                }
+              )
+          }
+        )
+      }
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -527,6 +576,7 @@ class MoreQuestionnaireItemComponentsTest {
                     }
                   )
                 }
+                extension = listOf(displayCategoryExtension)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
               }
             )
@@ -534,11 +584,26 @@ class MoreQuestionnaireItemComponentsTest {
       )
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
-    assertThat(questionItemList.first().localizedHintSpanned.toString()).isEqualTo("phụ đề")
+    assertThat(questionItemList.first().localizedInstructionsSpanned.toString()).isEqualTo("phụ đề")
   }
 
   @Test
   fun localizedHintSpanned_matchingLocaleWithoutCountryCode_shouldReturnLocalizedText() {
+    val displayCategoryExtension =
+      Extension().apply {
+        url = EXTENSION_DISPLAY_CATEGORY_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = INSTRUCTIONS
+                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+                }
+              )
+          }
+        )
+      }
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -558,6 +623,7 @@ class MoreQuestionnaireItemComponentsTest {
                     }
                   )
                 }
+                extension = listOf(displayCategoryExtension)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
               }
             )
@@ -565,7 +631,7 @@ class MoreQuestionnaireItemComponentsTest {
       )
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
-    assertThat(questionItemList.first().localizedHintSpanned.toString()).isEqualTo("phụ đề")
+    assertThat(questionItemList.first().localizedInstructionsSpanned.toString()).isEqualTo("phụ đề")
   }
 
   @Test
