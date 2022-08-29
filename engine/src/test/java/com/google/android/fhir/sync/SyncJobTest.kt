@@ -38,10 +38,11 @@ import com.google.common.truth.Truth.assertThat
 import java.time.OffsetDateTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.r4.model.Bundle
 import org.junit.After
@@ -108,9 +109,11 @@ class SyncJobTest {
   fun `should poll accurately with given delay`() = runBlockingTest {
     val worker = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
 
+    val scope = TestCoroutineScope()
+
     // Get flows return by work manager wrapper
-    val workInfoFlow = syncJob.workInfoFlow()
-    val stateFlow = syncJob.stateFlow()
+    val workInfoFlow = syncJob.workInfoFlow(scope)
+    val stateFlow = syncJob.stateFlow(scope)
 
     val workInfoList = mutableListOf<WorkInfo>()
     val stateList = mutableListOf<State>()
@@ -147,13 +150,13 @@ class SyncJobTest {
 
     job1.cancel()
     job2.cancel()
+    scope.cancel()
   }
 
   @Test
   fun `should run synchronizer and emit states accurately in sequence`() = runBlockingTest {
     whenever(database.getAllLocalChanges()).thenReturn(listOf())
-    whenever(dataSource.download(any()))
-      .thenReturn(Bundle().apply { type = Bundle.BundleType.SEARCHSET })
+    whenever(dataSource.download(any())).thenReturn(Bundle().apply { total = 1 })
 
     val res = mutableListOf<State>()
 
@@ -229,8 +232,10 @@ class SyncJobTest {
   fun `sync time should update on every sync call`() = runBlockingTest {
     val worker1 = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
 
+    val scope = TestCoroutineScope()
+
     // Get flows return by work manager wrapper
-    val stateFlow1 = syncJob.stateFlow()
+    val stateFlow1 = syncJob.stateFlow(scope)
 
     val stateList1 = mutableListOf<State>()
 
@@ -254,7 +259,7 @@ class SyncJobTest {
 
     // Run sync for second time
     val worker2 = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
-    val stateFlow2 = syncJob.stateFlow()
+    val stateFlow2 = syncJob.stateFlow(scope)
     val stateList2 = mutableListOf<State>()
     val job2 = launch { stateFlow2.toList(stateList2) }
     workManager
@@ -270,14 +275,15 @@ class SyncJobTest {
     assertThat(secondSyncResult.timestamp).isGreaterThan(firstSyncResult.timestamp)
     assertThat(datastoreUtil.readLastSyncTimestamp()!!).isGreaterThan(firstSyncResult.timestamp)
     job2.cancel()
+    scope.cancel()
   }
 
   @Test
   fun `while loop in download keeps running after first exception`() = runBlockingTest {
     whenever(dataSource.download(any()))
-      .thenReturn(Bundle()) // counts of Patient
-      .thenReturn(Bundle()) // counts of Encounter
-      .thenReturn(Bundle()) // counts of Observation
+      .thenReturn(Bundle().apply { total = 1 }) // counts of Patient
+      .thenReturn(Bundle().apply { total = 1 }) // counts of Encounter
+      .thenReturn(Bundle().apply { total = 1 }) // counts of Observation
       .thenReturn(Bundle())
       .thenThrow(RuntimeException("test"))
       .thenThrow(RuntimeException("anotherOne"))
@@ -324,7 +330,7 @@ class SyncJobTest {
   fun `number of resources loaded equals number of resources in TestDownloaderImpl`() =
       runBlockingTest {
     whenever(database.getAllLocalChanges()).thenReturn(listOf())
-    whenever(dataSource.download(any())).thenReturn(Bundle())
+    whenever(dataSource.download(any())).thenReturn(Bundle().apply { total = 1 })
 
     val res = mutableListOf<State>()
 

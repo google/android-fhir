@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,17 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.content.Context
+import androidx.work.Constraints
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.demo.data.FhirPeriodicSyncWorker
+import com.google.android.fhir.sync.PeriodicSyncConfiguration
+import com.google.android.fhir.sync.RepeatInterval
 import com.google.android.fhir.sync.Sync
+import java.util.concurrent.TimeUnit
 import timber.log.Timber
 
 class FhirApplication : Application() {
@@ -43,7 +47,14 @@ class FhirApplication : Application() {
         ServerConfiguration("https://hapi.fhir.org/baseR4/")
       )
     )
-    Sync.oneTimeSync<FhirPeriodicSyncWorker>(this)
+    Sync.basicSyncJob(this)
+      .poll(
+        PeriodicSyncConfiguration(
+          syncConstraints = Constraints.Builder().build(),
+          repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
+        ),
+        FhirPeriodicSyncWorker::class.java
+      )
   }
 
   private fun constructFhirEngine(): FhirEngine {

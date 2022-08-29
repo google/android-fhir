@@ -19,6 +19,7 @@ package com.google.android.fhir.sync
 import android.content.Context
 import androidx.lifecycle.asFlow
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
@@ -28,12 +29,15 @@ import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.gson.GsonBuilder
 import java.time.OffsetDateTime
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.shareIn
 import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
@@ -49,7 +53,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
   override fun <W : FhirSyncWorker> poll(
     periodicSyncConfiguration: PeriodicSyncConfiguration,
     clazz: Class<W>
-  ): Flow<State> {
+  ) {
     val workerUniqueName = syncWorkType.workerName
 
     Timber.d("Configuring polling for $workerUniqueName")
@@ -57,29 +61,26 @@ class SyncJobImpl(private val context: Context) : SyncJob {
     val periodicWorkRequest = Sync.createPeriodicWorkRequest(periodicSyncConfiguration, clazz)
     val workManager = WorkManager.getInstance(context)
 
-    val flow = stateFlow()
-
     workManager.enqueueUniquePeriodicWork(
       workerUniqueName,
       ExistingPeriodicWorkPolicy.REPLACE,
       periodicWorkRequest
     )
-
-    return flow
   }
 
-  override fun stateFlow(): Flow<State> {
-    return workInfoFlow().mapNotNull { convertToState(it) }
+  override suspend fun stateFlow(scope: CoroutineScope): Flow<State> {
+    return workInfoFlow(scope).mapNotNull { convertToState(it) }
   }
 
   override fun lastSyncTimestamp(): OffsetDateTime? {
     return DatastoreUtil(context).readLastSyncTimestamp()
   }
 
-  override fun workInfoFlow(): Flow<WorkInfo> {
+  override suspend fun workInfoFlow(scope: CoroutineScope): Flow<WorkInfo> {
     return WorkManager.getInstance(context)
       .getWorkInfosForUniqueWorkLiveData(syncWorkType.workerName)
       .asFlow()
+      .shareIn(scope, SharingStarted.Eagerly, 1)
       .flatMapConcat { it.asFlow() }
   }
 
@@ -118,5 +119,19 @@ class SyncJobImpl(private val context: Context) : SyncJob {
           )
         )
       )
+  }
+
+  override fun <W : FhirSyncWorker> runAsync(
+    clazz: Class<W>,
+    retryConfiguration: RetryConfiguration?
+  ) {
+    val workerUniqueName = syncWorkType.workerName
+
+    Timber.d("Configuring worker for $workerUniqueName")
+
+    val workRequest = Sync.createOneTimeWorkRequest(retryConfiguration, clazz)
+    val workManager = WorkManager.getInstance(context)
+
+    workManager.enqueueUniqueWork(workerUniqueName, ExistingWorkPolicy.REPLACE, workRequest)
   }
 }

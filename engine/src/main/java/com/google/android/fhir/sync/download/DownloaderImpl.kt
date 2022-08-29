@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.sync.download
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.percentof
 import com.google.android.fhir.sync.DataSource
@@ -73,7 +71,7 @@ internal class DownloaderImpl(
           }
       }
 
-    val totalRecords = progressSummary?.sumOf { it.total }
+    if (progressSummary?.sumOf { it.total } == 0) return@flow
 
     var url =
       downloadWorkManager.getNextRequestUrl(context).also { progressCallback?.onProgress(0.0) }
@@ -83,22 +81,10 @@ internal class DownloaderImpl(
         resourceTypeToDownload =
           ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
 
-        downloadWorkManager
-          .processResponse(
-            dataSource.download(url).also {
-              Timber.i(
-                "Sync: " +
-                  FhirContext.forCached(FhirVersionEnum.R4)
-                    .newJsonParser()
-                    .encodeResourceToString(it)
-              )
-            }
-          )
-          .toList()
-          .let { resources ->
-            reportProgress(progressCallback, progressSummary, resources)
-            emit(DownloadState.Success(resources))
-          }
+        downloadWorkManager.processResponse(dataSource.download(url)).toList().let { resources ->
+          reportProgress(progressCallback, progressSummary, resources)
+          emit(DownloadState.Success(resources))
+        }
       } catch (exception: Exception) {
         Timber.e(exception)
         emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
@@ -122,7 +108,6 @@ internal class DownloaderImpl(
         it.completed = it.completed + list.count()
 
         progressCallback?.onProgress(percentof(it.completed, totalRecords), it)
-        Timber.i("Sync: " + it.toString() + " ->>> " + list.count())
       }
     }
   }

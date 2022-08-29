@@ -60,7 +60,8 @@ internal interface RemoteFhirService : DataSource {
     fun build(): RemoteFhirService {
       val logger = HttpLoggingInterceptor()
       logger.level =
-        if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+        if (BuildConfig.DEBUG)
+          HttpLoggingInterceptor.Level.BASIC // TODO change it ??????????????????
         else HttpLoggingInterceptor.Level.BASIC
       val client =
         OkHttpClient.Builder()

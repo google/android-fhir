@@ -105,7 +105,7 @@ internal class FhirSynchronizer(
   suspend fun synchronize(): Result {
     setSyncState(State.Started)
 
-    return listOf(download(), upload()) // TODO ????????????? upload first or download
+    return listOf(download(), upload())
       .filterIsInstance<Result.Error>()
       .flatMap { it.exceptions }
       .let {

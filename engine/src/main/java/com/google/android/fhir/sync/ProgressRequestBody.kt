@@ -43,14 +43,14 @@ internal class ProgressRequestBody(
 
   private inner class CountingSink(delegate: Sink) : ForwardingSink(delegate) {
     private val handler = Handler(Looper.getMainLooper())
-    private val total = contentLength()
-    private var uploaded = 0L
+    private val totalBytes = contentLength()
+    private var uploadedBytes = 0L
 
     override fun write(source: Buffer, byteCount: Long) {
       super.write(source, byteCount)
-      uploaded += byteCount
+      uploadedBytes += byteCount
 
-      handler.post { runBlocking { callback.onProgress(percentof(uploaded, total)) } }
+      handler.post { runBlocking { callback.onProgress(percentof(uploadedBytes, totalBytes)) } }
     }
   }
 }

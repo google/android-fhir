@@ -19,25 +19,40 @@ package com.google.android.fhir.sync
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
+import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
+/**
+ * Adds an interceptor to notify progress for requests if request is tagged with [ProgressCallback].
+ */
 internal class ProgressInterceptor : Interceptor {
   override fun intercept(chain: Interceptor.Chain): Response {
     val request = chain.request()
 
-    val progressCallback = request.tag(ProgressCallback::class.java)
-    if (progressCallback != null) {
-      return chain.proceed(wrapRequest(request, progressCallback))
+    return request.tag(ProgressCallback::class.java)?.let { callback ->
+      chain.proceed(wrapRequest(request, callback))
     }
-
-    return chain.proceed(request)
+      ?: chain.proceed(request)
   }
 
   private fun wrapRequest(request: Request, progressCallback: ProgressCallback): Request {
-    return request
-      .newBuilder()
-      // TODO ??????????? Assume that any request tagged with a ProgressCallback is a POST
-      // request and has a non-null body
-      .post(ProgressRequestBody(request.body!!, progressCallback))
-      .build()
+    // do request wrapping for non GET requests only
+    return if (HttpVerb.fromCode(request.method) == HttpVerb.GET) request
+    else
+      request
+        .newBuilder()
+        .let {
+          val wrappedBody = ProgressRequestBody(request.body!!, progressCallback)
+          when (HttpVerb.fromCode(request.method)) {
+            HttpVerb.POST -> it.post(wrappedBody)
+            HttpVerb.PUT -> it.put(wrappedBody)
+            HttpVerb.DELETE -> it.delete(wrappedBody)
+            HttpVerb.PATCH -> it.patch(wrappedBody)
+            else ->
+              throw IllegalArgumentException(
+                "${request.method} not allowed for progress update request wrapper"
+              )
+          }
+        }
+        .build()
   }
 }
