@@ -19,7 +19,8 @@ package com.google.android.fhir.sync.download
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
-import com.google.android.fhir.sync.ProgressCallback
+import com.google.android.fhir.sync.progress.Progress
+import com.google.android.fhir.sync.progress.ProgressCallback
 import com.google.common.truth.Truth.assertThat
 import java.net.UnknownHostException
 import kotlinx.coroutines.flow.collectIndexed
@@ -252,5 +253,103 @@ class DownloaderImplTest {
           .filterIsInstance<Observation>()
       )
       .hasSize(2)
+  }
+
+  @Test
+  fun `downloader should call progress on-start`() = runBlocking {
+    val downloader =
+      DownloaderImpl(
+        object : DataSource {
+          override suspend fun download(path: String): Resource {
+            return when {
+              path.contains("patient-page1") ->
+                searchPageParamToSearchResponseBundleMap["patient-page1"]!!
+              else -> OperationOutcome()
+            }
+          }
+
+          override suspend fun upload(
+            bundle: Bundle,
+            progressCallback: ProgressCallback?
+          ): Resource {
+            throw UnsupportedOperationException()
+          }
+        },
+        ResourceParamsBasedDownloadWorkManager(
+          mapOf(ResourceType.Patient to mapOf("param" to "patient-page1"))
+        )
+      )
+
+    var onStartCalled = false
+
+    val progressCallback =
+      object : ProgressCallback {
+        override suspend fun onStart(totalRecords: Int, details: Map<String, Number>) {
+          onStartCalled = true
+        }
+        override suspend fun onProgress(percentCompleted: Double, details: Progress?) {}
+      }
+
+    val result = mutableListOf<DownloadState>()
+    downloader.download(
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
+        },
+        progressCallback
+      )
+      .collectIndexed { index, value -> result.add(value) }
+
+    assertThat(onStartCalled).isTrue()
+  }
+
+  @Test
+  fun `downloader should call progress on-progress`() = runBlocking {
+    val downloader =
+      DownloaderImpl(
+        object : DataSource {
+          override suspend fun download(path: String): Resource {
+            return when {
+              path.contains("patient-page1") ->
+                searchPageParamToSearchResponseBundleMap["patient-page1"]!!.apply { total = 1 }
+              else -> OperationOutcome()
+            }
+          }
+
+          override suspend fun upload(
+            bundle: Bundle,
+            progressCallback: ProgressCallback?
+          ): Resource {
+            throw UnsupportedOperationException()
+          }
+        },
+        ResourceParamsBasedDownloadWorkManager(
+          mapOf(ResourceType.Patient to mapOf("param" to "patient-page1"))
+        )
+      )
+
+    var onStartCalled = false
+    var onProgressCalled = false
+
+    val progressCallback =
+      object : ProgressCallback {
+        override suspend fun onStart(totalRecords: Int, details: Map<String, Number>) {
+          onStartCalled = true
+        }
+        override suspend fun onProgress(percentCompleted: Double, details: Progress?) {
+          onProgressCalled = true
+        }
+      }
+
+    val result = mutableListOf<DownloadState>()
+    downloader.download(
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
+        },
+        progressCallback
+      )
+      .collectIndexed { index, value -> result.add(value) }
+
+    assertThat(onStartCalled).isTrue()
+    assertThat(onProgressCalled).isTrue()
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync
+package com.google.android.fhir.sync.progress
 
 import okhttp3.Interceptor
 import okhttp3.Request

@@ -198,6 +198,33 @@ class ResourceParamsBasedDownloadWorkManagerTest {
   }
 
   @Test
+  fun `getSummaryRequestUrls should return resource summary urls`() = runBlockingTest {
+    val downloadManager =
+      ResourceParamsBasedDownloadWorkManager(
+        mapOf(
+          ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"),
+          ResourceType.Immunization to emptyMap(),
+          ResourceType.Observation to emptyMap(),
+        )
+      )
+
+    val urls =
+      downloadManager.getSummaryRequestUrls(
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-03-20"
+        }
+      )
+
+    assertThat(urls.map { it.first }).containsExactly("Patient", "Observation", "Immunization")
+    assertThat(urls.map { it.second })
+      .containsExactly(
+        "Patient?address-city=NAIROBI&_sort=_lastUpdated&_lastUpdated=gt2022-03-20&_summary=count",
+        "Observation?_sort=_lastUpdated&_lastUpdated=gt2022-03-20&_summary=count",
+        "Immunization?_sort=_lastUpdated&_lastUpdated=gt2022-03-20&_summary=count"
+      )
+  }
+
+  @Test
   fun processResponse_withBundleTypeSearchSet_shouldReturnPatient() = runBlockingTest {
     val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
     val response =

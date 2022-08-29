@@ -20,6 +20,8 @@ import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.sync.download.DownloaderImpl
+import com.google.android.fhir.sync.progress.Progress
+import com.google.android.fhir.sync.progress.ProgressCallback
 import com.google.android.fhir.sync.upload.BundleUploader
 import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import java.time.OffsetDateTime
@@ -43,16 +45,20 @@ sealed class Result {
 sealed class State {
   object Started : State()
 
+  /** A new sub process of type [SyncOperation] was started during the process. */
   data class Spawned(
     val syncOperation: SyncOperation,
     val total: Number,
     val details: Map<String, Number>
   ) : State()
+
+  /** The progress stats of current sub process [SyncOperation] */
   data class InProgress(
     val syncOperation: SyncOperation,
     val percentCompleted: Double,
     val details: Progress?
   ) : State()
+
   data class Glitch(val exceptions: List<ResourceSyncException>) : State()
 
   data class Finished(val result: Result.Success) : State()
@@ -161,7 +167,7 @@ internal class FhirSynchronizer(
     }
   }
 
-  fun progressCallback(syncOperation: SyncOperation) =
+  private fun progressCallback(syncOperation: SyncOperation) =
     object : ProgressCallback {
       override suspend fun onStart(totalRecords: Int, details: Map<String, Number>) {
         setSyncState(State.Spawned(syncOperation, totalRecords, details))

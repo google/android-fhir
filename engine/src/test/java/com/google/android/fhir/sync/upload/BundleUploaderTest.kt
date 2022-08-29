@@ -23,6 +23,8 @@ import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.sync.UploadResult
+import com.google.android.fhir.sync.progress.Progress
+import com.google.android.fhir.sync.progress.ProgressCallback
 import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
 import kotlinx.coroutines.flow.toList
@@ -53,6 +55,54 @@ class BundleUploaderTest {
 
     assertThat(result).hasSize(1)
     assertThat(result.first()).isInstanceOf(UploadResult.Success::class.java)
+  }
+
+  @Test
+  fun `upload Bundle transaction should call on-start`() = runBlocking {
+    var onStartCalled = false
+
+    val progressCallback =
+      object : ProgressCallback {
+        override suspend fun onStart(totalRecords: Int, details: Map<String, Number>) {
+          onStartCalled = true
+        }
+        override suspend fun onProgress(percentCompleted: Double, details: Progress?) {}
+      }
+
+    BundleUploader(
+        TestingUtils.BundleDataSource { Bundle() },
+        TransactionBundleGenerator.getDefault()
+      )
+      .upload(localChanges, progressCallback)
+      .toList()
+
+    assertThat(onStartCalled).isTrue()
+  }
+
+  @Test
+  fun `upload Bundle transaction should call on-progress`() = runBlocking {
+    var onStartCalled = false
+    var onProgressCalled = false
+
+    val progressCallback =
+      object : ProgressCallback {
+        override suspend fun onStart(totalRecords: Int, details: Map<String, Number>) {
+          onStartCalled = true
+        }
+        override suspend fun onProgress(percentCompleted: Double, details: Progress?) {
+          onProgressCalled = true
+        }
+      }
+
+    BundleUploader(
+        TestingUtils.BundleDataSource { Bundle() },
+        TransactionBundleGenerator.getDefault()
+      )
+      .upload(localChanges, progressCallback)
+      .toList()
+
+    assertThat(onStartCalled).isTrue()
+    assertThat(onProgressCalled).isTrue()
   }
 
   @Test

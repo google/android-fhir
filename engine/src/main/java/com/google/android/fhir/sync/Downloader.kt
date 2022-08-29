@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync
 
 import com.google.android.fhir.SyncDownloadContext
+import com.google.android.fhir.sync.progress.ProgressCallback
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
 

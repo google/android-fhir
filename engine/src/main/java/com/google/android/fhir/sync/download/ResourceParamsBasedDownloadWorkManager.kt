@@ -85,7 +85,7 @@ class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
     return newParams
   }
 
-  internal fun getSummaryParam(params: ParamMap): MutableMap<String, String> {
+  private fun getSummaryParam(params: ParamMap): MutableMap<String, String> {
     val newParams = mutableMapOf<String, String>()
     if (!params.containsKey(SyncDataParams.SUMMARY_KEY)) {
       newParams[SyncDataParams.SUMMARY_KEY] = SyncDataParams.SUMMARY_COUNT_VALUE

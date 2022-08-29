@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync
+package com.google.android.fhir.sync.progress
 
-interface ProgressCallback {
-  suspend fun onStart(totalRecords: Int, details: Map<String, Number> = emptyMap())
-  suspend fun onProgress(percentCompleted: Double, details: Progress? = null)
-}
+data class Progress(val type: String, val total: Int, var completed: Int = 0)

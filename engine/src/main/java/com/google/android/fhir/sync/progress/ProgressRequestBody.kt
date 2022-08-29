@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync
+package com.google.android.fhir.sync.progress
 
 import android.os.Handler
 import android.os.Looper
-import com.google.android.fhir.percentof
+import com.google.android.fhir.percentOf
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType
 import okhttp3.RequestBody
@@ -50,7 +50,7 @@ internal class ProgressRequestBody(
       super.write(source, byteCount)
       uploadedBytes += byteCount
 
-      handler.post { runBlocking { callback.onProgress(percentof(uploadedBytes, totalBytes)) } }
+      handler.post { runBlocking { callback.onProgress(percentOf(uploadedBytes, totalBytes)) } }
     }
   }
 }

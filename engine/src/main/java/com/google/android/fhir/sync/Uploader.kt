@@ -18,6 +18,7 @@ package com.google.android.fhir.sync
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.sync.progress.ProgressCallback
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Bundle
 

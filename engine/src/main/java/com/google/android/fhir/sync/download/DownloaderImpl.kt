@@ -17,14 +17,14 @@
 package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.SyncDownloadContext
-import com.google.android.fhir.percentof
+import com.google.android.fhir.percentOf
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.Downloader
-import com.google.android.fhir.sync.Progress
-import com.google.android.fhir.sync.ProgressCallback
 import com.google.android.fhir.sync.ResourceSyncException
+import com.google.android.fhir.sync.progress.Progress
+import com.google.android.fhir.sync.progress.ProgressCallback
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.Bundle
@@ -107,7 +107,7 @@ internal class DownloaderImpl(
       progressSummary.find { it.type == type.name }?.let {
         it.completed = it.completed + list.count()
 
-        progressCallback?.onProgress(percentof(it.completed, totalRecords), it)
+        progressCallback?.onProgress(percentOf(it.completed, totalRecords), it)
       }
     }
   }

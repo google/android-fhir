@@ -48,7 +48,7 @@ class MainActivityViewModel(application: Application, private val state: SavedSt
     viewModelScope.launch { _pollState.emitAll(job.stateFlow(this)) }
   }
 
-  /** Requests periodic sync. */
+  /** Requests sync and the sync state is emitted along with existing scheduled worker */
   fun poll() {
     viewModelScope.launch { job.runAsync(FhirPeriodicSyncWorker::class.java, null) }
   }

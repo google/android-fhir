@@ -80,5 +80,5 @@ class OffsetDateTimeTypeAdapter : TypeAdapter<OffsetDateTime>() {
 /** Url for the UCUM system of measures. */
 const val ucumUrl = "http://unitsofmeasure.org"
 
-fun percentof(value: Number, total: Number) =
+fun percentOf(value: Number, total: Number) =
   if (total == 0) 0.0 else 1.0 * value.toDouble() / total.toDouble()

@@ -20,8 +20,8 @@ import com.google.android.fhir.BuildConfig
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.ProgressCallback
-import com.google.android.fhir.sync.ProgressInterceptor
+import com.google.android.fhir.sync.progress.ProgressCallback
+import com.google.android.fhir.sync.progress.ProgressInterceptor
 import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -60,8 +60,7 @@ internal interface RemoteFhirService : DataSource {
     fun build(): RemoteFhirService {
       val logger = HttpLoggingInterceptor()
       logger.level =
-        if (BuildConfig.DEBUG)
-          HttpLoggingInterceptor.Level.BASIC // TODO change it ??????????????????
+        if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
         else HttpLoggingInterceptor.Level.BASIC
       val client =
         OkHttpClient.Builder()

@@ -23,6 +23,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.Configuration
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -139,6 +140,47 @@ class SyncJobTest {
         WorkInfo.State.RUNNING, // Worker launched
         WorkInfo.State.RUNNING, // Progresses emitted Started, InProgress..State.Success
         WorkInfo.State.ENQUEUED // Waiting again for next turn
+      )
+      .inOrder()
+
+    // States are Started, InProgress .... , Finished (Success)
+    assertThat(stateList.map { it::class.java }).contains(State.Finished::class.java)
+
+    val success = (stateList[stateList.size - 1] as State.Finished).result
+    assertThat(success.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
+
+    job1.cancel()
+    job2.cancel()
+    scope.cancel()
+  }
+
+  @Test
+  fun `runAsync() should run accurately`() = runBlockingTest {
+    val worker = OneTimeWorkRequestBuilder<TestSyncWorker>().build()
+
+    val scope = TestCoroutineScope()
+
+    // Get flows return by work manager wrapper
+    val workInfoFlow = syncJob.workInfoFlow(scope)
+    val stateFlow = syncJob.stateFlow(scope)
+
+    val workInfoList = mutableListOf<WorkInfo>()
+    val stateList = mutableListOf<State>()
+
+    // Convert flows to list to assert later
+    val job1 = launch { workInfoFlow.toList(workInfoList) }
+    val job2 = launch { stateFlow.toList(stateList) }
+
+    syncJob.runAsync(TestSyncWorker::class.java)
+
+    Thread.sleep(5000)
+
+    assertThat(workInfoList.map { it.state })
+      .containsAtLeast(
+        WorkInfo.State.ENQUEUED, // Waiting for turn
+        WorkInfo.State.RUNNING, // Worker launched
+        WorkInfo.State.RUNNING, // Progresses emitted Started, InProgress..State.Success
+        WorkInfo.State.SUCCEEDED // Waiting again for next turn
       )
       .inOrder()
 
