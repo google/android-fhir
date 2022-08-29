@@ -22,6 +22,7 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.StringType
 import org.junit.Test
 
 class MoreQuestionnairesTest {
@@ -78,5 +79,32 @@ class MoreQuestionnairesTest {
       Questionnaire().apply { addItem(Questionnaire.QuestionnaireItemComponent()) }
 
     assertThat(questionnaire.isPaginated).isFalse()
+  }
+
+  @Test
+  fun `entryMode should return prior-edit EntryMode`() {
+    val questionnaire = Questionnaire()
+    questionnaire.extension = listOf(Extension(EXTENSION_ENTRY_MODE_URL, StringType("prior-edit")))
+    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
+  }
+
+  @Test
+  fun `entryMode should return sequential EntryMode`() {
+    val questionnaire = Questionnaire()
+    questionnaire.extension = listOf(Extension(EXTENSION_ENTRY_MODE_URL, StringType("sequential")))
+    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
+  }
+
+  @Test
+  fun `entryMode should return random EntryMode`() {
+    val questionnaire = Questionnaire()
+    questionnaire.extension = listOf(Extension(EXTENSION_ENTRY_MODE_URL, StringType("random")))
+    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
+  }
+
+  @Test
+  fun `entryMode should return null if no EntryMode is defined`() {
+    val questionnaire = Questionnaire()
+    assertThat(questionnaire.entryMode).isNull()
   }
 }

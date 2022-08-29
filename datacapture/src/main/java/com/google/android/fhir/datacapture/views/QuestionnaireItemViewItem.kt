@@ -16,7 +16,12 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -51,7 +56,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
   private val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-  val validationResult: ValidationResult?,
+  val validationResult: ValidationResult,
   internal val answersChangedCallback:
     (
       Questionnaire.QuestionnaireItemComponent,
@@ -89,6 +94,11 @@ data class QuestionnaireItemViewItem(
     }
     answers = listOf(questionnaireResponseItemAnswerComponent)
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
+  }
+
+  internal fun answerString(context: Context): String {
+    if (!questionnaireResponseItem.hasAnswer()) return context.getString(R.string.not_answered)
+    return questionnaireResponseItem.answer.joinToString { it.displayString(context) }
   }
 
   internal fun addAnswer(
@@ -188,8 +198,8 @@ data class QuestionnaireItemViewItem(
    * [ValidationResult] and therefore needs to be updated in the [RecyclerView] UI.
    */
   internal fun hasTheSameValidationResult(other: QuestionnaireItemViewItem): Boolean {
-    if (validationResult == null || validationResult.isValid) {
-      return other.validationResult == null || other.validationResult.isValid
+    if (validationResult is NotValidated || validationResult is Valid) {
+      return other.validationResult is NotValidated || other.validationResult is Valid
     }
     return validationResult == other.validationResult
   }

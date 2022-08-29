@@ -27,8 +27,10 @@ import androidx.annotation.LayoutRes
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -82,9 +84,10 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
 
     textInputEditText.removeTextChangedListener(textWatcher)
     val text = getText(questionnaireItemViewItem.answers.singleOrNull())
-    if (text != textInputEditText.text.toString()) {
+    if (isTextUpdatesRequired(text, textInputEditText.text.toString())) {
       textInputEditText.setText(getText(questionnaireItemViewItem.answers.singleOrNull()))
     }
+
     textWatcher =
       textInputEditText.doAfterTextChanged { editable: Editable? -> updateAnswer(editable) }
   }
@@ -98,10 +101,14 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     }
   }
 
+  open fun isTextUpdatesRequired(answerText: String, inputText: String) = (answerText != inputText)
+
   override fun displayValidationResult(validationResult: ValidationResult) {
     textInputLayout.error =
-      if (validationResult.getSingleStringValidationMessage() == "") null
-      else validationResult.getSingleStringValidationMessage()
+      when (validationResult) {
+        is NotValidated, Valid -> null
+        is Invalid -> validationResult.getSingleStringValidationMessage()
+      }
   }
 
   override fun setReadOnly(isReadOnly: Boolean) {

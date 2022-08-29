@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.hl7.fhir.r4.model.ResourceType
  * `_lastUpdate` value of each resource type.
  */
 @Entity
-data class SyncedResourceEntity(
+internal data class SyncedResourceEntity(
   /** Resource synced */
   @PrimaryKey val resourceType: ResourceType,
   /** The highest `_lastUpdate` value of the resources synced of a specific type */
