@@ -141,11 +141,11 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       }
 
       private fun updateAnswer(answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent) {
-          questionnaireItemViewItem.setAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = answerOption.value
-            }
-          )
+        questionnaireItemViewItem.setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = answerOption.value
+          }
+        )
       }
     }
 }
