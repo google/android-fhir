@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,20 @@ package com.google.android.fhir.sync
 import com.google.android.fhir.SyncDownloadContext
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 
 /** Module for downloading the resources from the server. */
 internal interface Downloader {
   /**
    * @return Flow of the [DownloadState] which keeps emitting [Resource]s or Error based on the
-   * response of each page download request.
+   * response of each page download request. It also updates progress if [ProgressCallback] exists
    */
-  suspend fun download(context: SyncDownloadContext): Flow<DownloadState>
+  suspend fun download(
+    context: SyncDownloadContext,
+    progressCallback: ProgressCallback?
+  ): Flow<DownloadState>
 }
 
 internal sealed class DownloadState {
-
-  data class Started(val type: ResourceType) : DownloadState()
-
   data class Success(val resources: List<Resource>) : DownloadState()
 
   data class Failure(val syncError: ResourceSyncException) : DownloadState()

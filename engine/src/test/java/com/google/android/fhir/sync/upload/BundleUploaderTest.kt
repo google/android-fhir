@@ -48,7 +48,7 @@ class BundleUploaderTest {
           },
           TransactionBundleGenerator.getDefault()
         )
-        .upload(localChanges)
+        .upload(localChanges, null)
         .toList()
 
     assertThat(result).hasSize(1)
@@ -71,7 +71,7 @@ class BundleUploaderTest {
           },
           TransactionBundleGenerator.getDefault()
         )
-        .upload(localChanges)
+        .upload(localChanges, null)
         .toList()
 
     assertThat(result).hasSize(1)
@@ -85,7 +85,7 @@ class BundleUploaderTest {
           TestingUtils.BundleDataSource { throw ConnectException("Failed to connect to server.") },
           TransactionBundleGenerator.getDefault()
         )
-        .upload(localChanges)
+        .upload(localChanges, null)
         .toList()
 
     assertThat(result).hasSize(1)

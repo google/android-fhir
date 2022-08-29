@@ -29,6 +29,7 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -44,6 +45,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
 import com.google.android.fhir.sync.State
+import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -54,6 +56,8 @@ class PatientListFragment : Fragment() {
   private lateinit var searchView: SearchView
   private lateinit var topBanner: LinearLayout
   private lateinit var syncStatus: TextView
+  private lateinit var syncPercent: TextView
+  private lateinit var syncProgress: ProgressBar
   private var _binding: FragmentPatientListBinding? = null
   private val binding
     get() = _binding!!
@@ -106,6 +110,8 @@ class PatientListFragment : Fragment() {
     searchView = binding.search
     topBanner = binding.syncStatusContainer.linearLayoutSyncStatus
     syncStatus = binding.syncStatusContainer.tvSyncingStatus
+    syncPercent = binding.syncStatusContainer.tvSyncingPercent
+    syncProgress = binding.syncStatusContainer.progressSyncing
     searchView.setOnQueryTextListener(
       object : SearchView.OnQueryTextListener {
         override fun onQueryTextChange(newText: String): Boolean {
@@ -155,11 +161,15 @@ class PatientListFragment : Fragment() {
         when (it) {
           is State.Started -> {
             Timber.i("Sync: ${it::class.java.simpleName}")
-            fadeInTopBanner()
+            fadeInTopBanner(it)
+          }
+          is State.Spawned -> {
+            Timber.i("Sync: ${it::class.java.simpleName} with data $it")
+            fadeInTopBanner(it)
           }
           is State.InProgress -> {
-            Timber.i("Sync: ${it::class.java.simpleName} with ${it.resourceType?.name}")
-            fadeInTopBanner()
+            Timber.i("Sync: ${it::class.java.simpleName} with data $it")
+            fadeInTopBanner(it)
           }
           is State.Finished -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
@@ -206,16 +216,24 @@ class PatientListFragment : Fragment() {
       .navigate(PatientListFragmentDirections.actionPatientListToAddPatientFragment())
   }
 
-  private fun fadeInTopBanner() {
+  private fun fadeInTopBanner(state: State) {
     if (topBanner.visibility != View.VISIBLE) {
       syncStatus.text = resources.getString(R.string.syncing).uppercase()
+      syncPercent.text = ""
+      syncProgress.progress = 0
       topBanner.visibility = View.VISIBLE
       val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_in)
       topBanner.startAnimation(animation)
+    } else if (state is State.InProgress) {
+      val progress = state.percentCompleted.times(100).roundToInt()
+      syncPercent.text = "${state.syncOperation.name.lowercase()}ing ..   $progress %"
+      syncProgress.progress = progress
     }
   }
 
   private fun fadeOutTopBanner(state: State) {
+    if (state is State.Finished) syncPercent.text = ""
+
     if (topBanner.visibility == View.VISIBLE) {
       syncStatus.text = state::class.java.simpleName.uppercase()
       val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_out)

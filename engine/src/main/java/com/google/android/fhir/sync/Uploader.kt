@@ -26,10 +26,12 @@ internal interface Uploader {
 
   /**
    * Uploads the local changes to the [DataSource]. Particular implementations should take care of
-   * transforming the [SquashedLocalChange]s to particular network operations.
+   * transforming the [SquashedLocalChange]s to particular network operations. If [ProgressCallback]
+   * is provided it also reports the intermediate progress
    */
   suspend fun upload(
     localChanges: List<LocalChange>,
+    progressCallback: ProgressCallback?
   ): Flow<UploadResult>
 }
 

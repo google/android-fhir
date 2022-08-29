@@ -172,12 +172,13 @@ class SyncJobTest {
     assertThat(res.map { it::class.java })
       .containsExactly(
         State.Started::class.java,
+        State.Spawned::class.java,
         State.InProgress::class.java,
         State.Finished::class.java
       )
       .inOrder()
 
-    val success = (res[2] as State.Finished).result
+    val success = (res[3] as State.Finished).result
 
     assertThat(success.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
 
@@ -206,13 +207,14 @@ class SyncJobTest {
     assertThat(res.map { it::class.java })
       .containsExactly(
         State.Started::class.java,
+        State.Spawned::class.java,
         State.InProgress::class.java,
         State.Glitch::class.java,
         State.Failed::class.java
       )
       .inOrder()
 
-    val error = (res[3] as State.Failed).result
+    val error = (res[4] as State.Failed).result
 
     assertThat(error.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
 
@@ -273,6 +275,9 @@ class SyncJobTest {
   @Test
   fun `while loop in download keeps running after first exception`() = runBlockingTest {
     whenever(dataSource.download(any()))
+      .thenReturn(Bundle()) // counts of Patient
+      .thenReturn(Bundle()) // counts of Encounter
+      .thenReturn(Bundle()) // counts of Observation
       .thenReturn(Bundle())
       .thenThrow(RuntimeException("test"))
       .thenThrow(RuntimeException("anotherOne"))
@@ -297,13 +302,14 @@ class SyncJobTest {
     assertThat(res.map { it::class.java })
       .containsExactly(
         State.Started::class.java,
+        State.Spawned::class.java,
         State.InProgress::class.java,
         State.Glitch::class.java,
         State.Failed::class.java
       )
       .inOrder()
 
-    val error = (res[3] as State.Failed).result
+    val error = (res[4] as State.Failed).result
 
     assertThat(error.exceptions.size).isEqualTo(2)
 
@@ -338,13 +344,15 @@ class SyncJobTest {
     assertThat(res.map { it::class.java })
       .containsExactly(
         State.Started::class.java,
+        State.Spawned::class.java,
         State.InProgress::class.java,
         State.Finished::class.java
       )
       .inOrder()
     job.cancel()
 
-    verify(dataSource, times(3)).download(any())
+    // one for counts of each and one for data download
+    verify(dataSource, times(3 * 2)).download(any())
   }
 
   @Test

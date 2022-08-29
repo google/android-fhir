@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import com.google.android.fhir.BuildConfig
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.ProgressCallback
+import com.google.android.fhir.sync.ProgressInterceptor
 import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -31,6 +33,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Tag
 import retrofit2.http.Url
 
 /** Interface to make http requests to the FHIR server. */
@@ -38,7 +41,11 @@ internal interface RemoteFhirService : DataSource {
 
   @GET override suspend fun download(@Url path: String): Resource
 
-  @POST(".") override suspend fun upload(@Body bundle: Bundle): Resource
+  @POST(".")
+  override suspend fun upload(
+    @Body bundle: Bundle,
+    @Tag progressCallback: ProgressCallback?
+  ): Resource
 
   class Builder(
     private val baseUrl: String,
@@ -75,6 +82,7 @@ internal interface RemoteFhirService : DataSource {
                   chain.proceed(request)
                 }
               )
+              addNetworkInterceptor(ProgressInterceptor())
             }
           }
           .build()

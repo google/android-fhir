@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,9 @@ interface DownloadWorkManager {
    * to be issued.
    */
   suspend fun getNextRequestUrl(context: SyncDownloadContext): String?
+
+  /** Returns the pairs of type and URL for summary of total count for each download request */
+  suspend fun getSummaryRequestUrls(context: SyncDownloadContext): List<Pair<String, String>>
 
   /**
    * Processes the download response and returns the resources to be saved to the local database.

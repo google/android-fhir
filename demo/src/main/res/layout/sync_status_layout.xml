@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/linearLayoutSyncStatus"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -13,20 +14,46 @@
     android:elevation="@dimen/status_margin"
     android:visibility="gone"
 >
-
-    <TextView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/tvSyncingStatus"
-        android:layout_width="wrap_content"
+    <ProgressBar
+        android:id="@+id/progressSyncing"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/syncing_background"
-        android:drawableLeft="@drawable/ic_baseline_sync_24"
-        android:drawablePadding="@dimen/status_margin"
-        android:gravity="center"
-        android:layout_marginTop="@dimen/small_text_margin"
-        android:layout_marginBottom="@dimen/small_text_margin"
-        android:text="@string/syncing"
-        android:textColor="?attr/colorControlNormal"
-        android:textSize="16sp"
+        android:padding="10dp"
     />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+    >
+
+        <TextView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/tvSyncingStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/syncing_background"
+            android:drawableLeft="@drawable/ic_baseline_sync_24"
+            android:drawablePadding="@dimen/status_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="5dp"
+            android:text="@string/syncing"
+            android:textColor="?attr/colorControlNormal"
+            android:textSize="16sp"
+        />
+        <TextView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/tvSyncingPercent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginEnd="5dp"
+            android:text="0 %"
+            android:textColor="?attr/colorControlNormal"
+            android:textSize="16sp"
+        />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

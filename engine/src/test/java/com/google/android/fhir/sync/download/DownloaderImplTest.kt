@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@ package com.google.android.fhir.sync.download
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
+import com.google.android.fhir.sync.ProgressCallback
 import com.google.common.truth.Truth.assertThat
 import java.net.UnknownHostException
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
@@ -95,7 +96,10 @@ class DownloaderImplTest {
             }
           }
 
-          override suspend fun upload(bundle: Bundle): Resource {
+          override suspend fun upload(
+            bundle: Bundle,
+            progressCallback: ProgressCallback?
+          ): Resource {
             TODO("Not yet implemented")
           }
         },
@@ -111,14 +115,10 @@ class DownloaderImplTest {
     downloader.download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
-        }
+        },
+        null
       )
-      .collect { result.add(it) }
-
-    assertThat(result.filterIsInstance<DownloadState.Started>())
-      .containsExactly(
-        DownloadState.Started(ResourceType.Bundle),
-      )
+      .collectIndexed { index, value -> result.add(value) }
 
     assertThat(
         result.filterIsInstance<DownloadState.Success>().flatMap { it.resources }.map { it.id }
@@ -155,7 +155,10 @@ class DownloaderImplTest {
             }
           }
 
-          override suspend fun upload(bundle: Bundle): Resource {
+          override suspend fun upload(
+            bundle: Bundle,
+            progressCallback: ProgressCallback?
+          ): Resource {
             TODO("Upload not tested in this path")
           }
         },
@@ -171,14 +174,10 @@ class DownloaderImplTest {
     downloader.download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType) = null
-        }
+        },
+        null
       )
-      .collect { result.add(it) }
-
-    assertThat(result.filterIsInstance<DownloadState.Started>())
-      .containsExactly(
-        DownloadState.Started(ResourceType.Bundle),
-      )
+      .collectIndexed { index, value -> result.add(value) }
 
     assertThat(result.filterIsInstance<DownloadState.Failure>()).hasSize(2)
 
@@ -219,7 +218,10 @@ class DownloaderImplTest {
             }
           }
 
-          override suspend fun upload(bundle: Bundle): Resource {
+          override suspend fun upload(
+            bundle: Bundle,
+            progressCallback: ProgressCallback?
+          ): Resource {
             TODO("Not yet implemented")
           }
         },
@@ -235,14 +237,10 @@ class DownloaderImplTest {
     downloader.download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType) = null
-        }
+        },
+        null
       )
-      .collect { result.add(it) }
-
-    assertThat(result.filterIsInstance<DownloadState.Started>())
-      .containsExactly(
-        DownloadState.Started(ResourceType.Bundle),
-      )
+      .collectIndexed { index, value -> result.add(value) }
 
     assertThat(result.filterIsInstance<DownloadState.Failure>().map { it.syncError.resourceType })
       .containsExactly(ResourceType.Patient)

@@ -28,6 +28,11 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.ResourceType
 
+enum class SyncOperation {
+  DOWNLOAD,
+  UPLOAD
+}
+
 sealed class Result {
   val timestamp: OffsetDateTime = OffsetDateTime.now()
 
@@ -38,7 +43,16 @@ sealed class Result {
 sealed class State {
   object Started : State()
 
-  data class InProgress(val resourceType: ResourceType?) : State()
+  data class Spawned(
+    val syncOperation: SyncOperation,
+    val total: Number,
+    val details: Map<String, Number>
+  ) : State()
+  data class InProgress(
+    val syncOperation: SyncOperation,
+    val percentCompleted: Double,
+    val details: Progress?
+  ) : State()
   data class Glitch(val exceptions: List<ResourceSyncException>) : State()
 
   data class Finished(val result: Result.Success) : State()
@@ -91,7 +105,7 @@ internal class FhirSynchronizer(
   suspend fun synchronize(): Result {
     setSyncState(State.Started)
 
-    return listOf(download(), upload())
+    return listOf(download(), upload()) // TODO ????????????? upload first or download
       .filterIsInstance<Result.Error>()
       .flatMap { it.exceptions }
       .let {
@@ -107,11 +121,8 @@ internal class FhirSynchronizer(
     val exceptions = mutableListOf<ResourceSyncException>()
     fhirEngine.syncDownload(conflictResolver) {
       flow {
-        downloader.download(it).collect {
+        downloader.download(it, progressCallback(SyncOperation.DOWNLOAD)).collect {
           when (it) {
-            is DownloadState.Started -> {
-              setSyncState(State.InProgress(it.type))
-            }
             is DownloadState.Success -> {
               emit(it.resources)
             }
@@ -134,7 +145,7 @@ internal class FhirSynchronizer(
     val exceptions = mutableListOf<ResourceSyncException>()
     fhirEngine.syncUpload { list ->
       flow {
-        uploader.upload(list).collect {
+        uploader.upload(list, progressCallback(SyncOperation.UPLOAD)).collect {
           when (it) {
             is UploadResult.Success -> emit(it.localChangeToken to it.resource)
             is UploadResult.Failure -> exceptions.add(it.syncError)
@@ -149,4 +160,15 @@ internal class FhirSynchronizer(
       Result.Error(exceptions)
     }
   }
+
+  fun progressCallback(syncOperation: SyncOperation) =
+    object : ProgressCallback {
+      override suspend fun onStart(totalRecords: Int, details: Map<String, Number>) {
+        setSyncState(State.Spawned(syncOperation, totalRecords, details))
+      }
+
+      override suspend fun onProgress(percentCompleted: Double, details: Progress?) {
+        setSyncState(State.InProgress(syncOperation, percentCompleted, details))
+      }
+    }
 }

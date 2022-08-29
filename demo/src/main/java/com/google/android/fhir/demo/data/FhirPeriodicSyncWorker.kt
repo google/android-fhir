@@ -22,12 +22,16 @@ import com.google.android.fhir.demo.FhirApplication
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
+import com.google.android.fhir.sync.download.ResourceParamsBasedDownloadWorkManager
+import org.hl7.fhir.r4.model.ResourceType
 
 class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   FhirSyncWorker(appContext, workerParams) {
 
   override fun getDownloadWorkManager(): DownloadWorkManager {
-    return DownloadWorkManagerImpl()
+    return ResourceParamsBasedDownloadWorkManager(
+      mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
+    )
   }
 
   override fun getConflictResolver() = AcceptLocalConflictResolver
