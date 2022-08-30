@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture
 /**
  * Questionnaire item view holder types supported by default by the data capture library.
  *
- * This is used in [QuestionnaireItemAdapter] to determine how each [Questionnaire.Item] is
+ * This is used in [QuestionnaireItemEditAdapter] to determine how each [Questionnaire.Item] is
  * rendered.
  *
  * This list should provide sufficient coverage for values in

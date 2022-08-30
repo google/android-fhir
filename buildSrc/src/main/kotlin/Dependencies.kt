@@ -102,6 +102,8 @@ object Dependencies {
   }
 
   const val androidFhirCommon = "com.google.android.fhir:common:${Versions.androidFhirCommon}"
+  const val androidFhirEngine = "com.google.android.fhir:engine:${Versions.androidFhirEngine}"
+
   const val lifecycleExtensions =
     "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
@@ -174,6 +176,7 @@ object Dependencies {
     }
 
     const val androidFhirCommon = "0.1.0-alpha03"
+    const val androidFhirEngine = "0.1.0-beta02"
     const val desugarJdkLibs = "1.1.5"
     const val fhirUcum = "1.0.3"
     const val guava = "28.2-android"

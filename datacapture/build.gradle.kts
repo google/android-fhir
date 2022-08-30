@@ -68,6 +68,7 @@ dependencies {
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.androidFhirCommon)
+  implementation(Dependencies.androidFhirEngine)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)
   implementation(Dependencies.Androidx.coreKtx)
@@ -83,7 +84,6 @@ dependencies {
   implementation(Dependencies.material)
   implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.timber)
-  implementation(project(path = ":engine"))
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)
@@ -94,7 +94,6 @@ dependencies {
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
   testImplementation(project(":testing"))
-
   androidTestImplementation(Dependencies.Espresso.espressoCore)
 }
 

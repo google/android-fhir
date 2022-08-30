@@ -358,7 +358,7 @@ internal fun Questionnaire.QuestionnaireItemComponent.populateAnswerOptions(data
       } else data.castToType(data)
     }
     .map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
-    .also { this.answerOption.addAll(it) }
+    .also { this.answerOption.also { it.clear() }.addAll(it) }
 }
 
 /**
