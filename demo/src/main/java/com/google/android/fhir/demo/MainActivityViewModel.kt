@@ -24,9 +24,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.demo.data.FhirPeriodicSyncWorker
+import com.google.android.fhir.demo.data.FhirPeriodicSyncWorker.Companion.periodicSyncConfiguration
 import com.google.android.fhir.sync.State
 import com.google.android.fhir.sync.Sync
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emitAll
@@ -40,7 +42,8 @@ class MainActivityViewModel(application: Application, private val state: SavedSt
     get() = _lastSyncTimestampLiveData
 
   private val job = Sync.basicSyncJob(application.applicationContext)
-  private val _pollState = MutableSharedFlow<State>()
+  private val _pollState =
+    MutableSharedFlow<State>(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
   val pollState: Flow<State>
     get() = _pollState
 
@@ -50,7 +53,9 @@ class MainActivityViewModel(application: Application, private val state: SavedSt
 
   /** Requests sync and the sync state is emitted along with existing scheduled worker */
   fun poll() {
-    viewModelScope.launch { job.runAsync(FhirPeriodicSyncWorker::class.java, null) }
+    viewModelScope.launch {
+      job.poll(periodicSyncConfiguration, FhirPeriodicSyncWorker::class.java)
+    }
   }
 
   /** Emits last sync time. */

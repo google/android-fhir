@@ -19,7 +19,6 @@ package com.google.android.fhir.sync
 import android.content.Context
 import androidx.lifecycle.asFlow
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
@@ -59,13 +58,12 @@ class SyncJobImpl(private val context: Context) : SyncJob {
     Timber.d("Configuring polling for $workerUniqueName")
 
     val periodicWorkRequest = Sync.createPeriodicWorkRequest(periodicSyncConfiguration, clazz)
-    val workManager = WorkManager.getInstance(context)
-
-    workManager.enqueueUniquePeriodicWork(
-      workerUniqueName,
-      ExistingPeriodicWorkPolicy.REPLACE,
-      periodicWorkRequest
-    )
+    WorkManager.getInstance(context)
+      .enqueueUniquePeriodicWork(
+        workerUniqueName,
+        ExistingPeriodicWorkPolicy.REPLACE,
+        periodicWorkRequest
+      )
   }
 
   override suspend fun stateFlow(scope: CoroutineScope): Flow<State> {
@@ -119,19 +117,5 @@ class SyncJobImpl(private val context: Context) : SyncJob {
           )
         )
       )
-  }
-
-  override fun <W : FhirSyncWorker> runAsync(
-    clazz: Class<W>,
-    retryConfiguration: RetryConfiguration?
-  ) {
-    val workerUniqueName = syncWorkType.workerName
-
-    Timber.d("Configuring worker for $workerUniqueName")
-
-    val workRequest = Sync.createOneTimeWorkRequest(retryConfiguration, clazz)
-    val workManager = WorkManager.getInstance(context)
-
-    workManager.enqueueUniqueWork(workerUniqueName, ExistingWorkPolicy.REPLACE, workRequest)
   }
 }

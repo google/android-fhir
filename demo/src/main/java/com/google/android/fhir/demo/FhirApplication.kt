@@ -18,17 +18,14 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.content.Context
-import androidx.work.Constraints
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.demo.data.FhirPeriodicSyncWorker
-import com.google.android.fhir.sync.PeriodicSyncConfiguration
-import com.google.android.fhir.sync.RepeatInterval
+import com.google.android.fhir.demo.data.FhirPeriodicSyncWorker.Companion.periodicSyncConfiguration
 import com.google.android.fhir.sync.Sync
-import java.util.concurrent.TimeUnit
 import timber.log.Timber
 
 class FhirApplication : Application() {
@@ -47,14 +44,7 @@ class FhirApplication : Application() {
         ServerConfiguration("https://hapi.fhir.org/baseR4/")
       )
     )
-    Sync.basicSyncJob(this)
-      .poll(
-        PeriodicSyncConfiguration(
-          syncConstraints = Constraints.Builder().build(),
-          repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
-        ),
-        FhirPeriodicSyncWorker::class.java
-      )
+    Sync.basicSyncJob(this).poll(periodicSyncConfiguration, FhirPeriodicSyncWorker::class.java)
   }
 
   private fun constructFhirEngine(): FhirEngine {

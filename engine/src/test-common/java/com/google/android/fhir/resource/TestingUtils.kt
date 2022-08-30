@@ -154,7 +154,6 @@ class TestingUtils constructor(private val iParser: IParser) {
           }
         }
       )
-        .collect {}
     }
     override suspend fun count(search: Search): Long {
       return 0

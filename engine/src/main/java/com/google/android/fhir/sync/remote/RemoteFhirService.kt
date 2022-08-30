@@ -69,6 +69,7 @@ internal interface RemoteFhirService : DataSource {
             readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
             writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
             addInterceptor(logger)
+            addNetworkInterceptor(ProgressInterceptor())
             authenticator?.let {
               addInterceptor(
                 Interceptor { chain: Interceptor.Chain ->
@@ -82,7 +83,6 @@ internal interface RemoteFhirService : DataSource {
                   chain.proceed(request)
                 }
               )
-              addNetworkInterceptor(ProgressInterceptor())
             }
           }
           .build()

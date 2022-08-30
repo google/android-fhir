@@ -41,5 +41,4 @@ interface SyncJob {
   suspend fun stateFlow(scope: CoroutineScope): Flow<State>
   suspend fun workInfoFlow(scope: CoroutineScope): Flow<WorkInfo>
   fun lastSyncTimestamp(): OffsetDateTime?
-  fun <W : FhirSyncWorker> runAsync(clazz: Class<W>, retryConfiguration: RetryConfiguration? = null)
 }
