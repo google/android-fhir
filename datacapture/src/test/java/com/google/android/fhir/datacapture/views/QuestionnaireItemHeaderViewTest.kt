@@ -70,7 +70,7 @@ class QuestionnaireItemHeaderViewTest {
   }
 
   @Test
-  fun shouldShowInstructions() {
+  fun `shows instructions`() {
     val displayCategoryExtension =
       Extension().apply {
         url = EXTENSION_DISPLAY_CATEGORY_URL
@@ -122,7 +122,7 @@ class QuestionnaireItemHeaderViewTest {
   }
 
   @Test
-  fun shouldShowHeaderView() {
+  fun `shows header item view`() {
     val displayCategoryExtension =
       Extension().apply {
         url = EXTENSION_DISPLAY_CATEGORY_URL

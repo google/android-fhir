@@ -526,13 +526,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         )
       ) +
         getQuestionnaireItemViewItems(
-          // Nested display item with display category extension with instructions code is
-          // instructions for parent questionnaire item.
-          // If nested display item is identified as instructions, then do not create
+          // If nested display item is identified as instructions or flyover, then do not create
           // questionnaire state for it.
           questionnaireItemList =
             questionnaireItem.item.filterNot {
-              it.type == Questionnaire.QuestionnaireItemType.DISPLAY && it.isInstructions
+              it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+                (it.isInstructions || it.isFlyoverItem)
             },
           questionnaireResponseItemList =
             if (questionnaireResponseItem.answer.isEmpty()) {

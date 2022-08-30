@@ -398,6 +398,21 @@
           "prefix":"4.",
           "item": [
             {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-display-category",
+                        "code": "instructions",
+                        "display": "Instructions"
+                      }
+                    ],
+                    "text": "The text provides guidance on how the information will be handled from a instructions perspective."
+                  }
+                }
+              ],
               "linkId": "15.1",
               "text": "The alternative contact would be used in the case of an emergency situation and could be next of kin (e.g. partner, mother, sibling.)",
               "type": "display"

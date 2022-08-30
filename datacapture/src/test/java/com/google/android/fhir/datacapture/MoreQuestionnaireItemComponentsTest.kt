@@ -176,6 +176,68 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun `isFlyover item returns true`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DISPLAY
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(DisplayItemControlType.FLYOVER.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
+            )
+        )
+      }
+
+    assertThat(questionnaireItem.isFlyoverItem).isTrue()
+  }
+
+  @Test
+  fun `isFlyover item returns false if type is not display`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.STRING
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(DisplayItemControlType.FLYOVER.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
+            )
+        )
+      }
+
+    assertThat(questionnaireItem.isFlyoverItem).isFalse()
+  }
+
+  @Test
+  fun `isFlyover item returns false if code is not flyover`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.STRING
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(Coding().setCode("random-code").setSystem(EXTENSION_ITEM_CONTROL_SYSTEM))
+            )
+        )
+      }
+
+    assertThat(questionnaireItem.isFlyoverItem).isFalse()
+  }
+
+  @Test
   fun `displayItemControl should return page type`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
@@ -443,7 +505,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedInstructionsSpanned_shouldReturnText() {
+  fun `localizedInstructionsSpanned returns text`() {
     val displayCategoryExtension =
       Extension().apply {
         url = EXTENSION_DISPLAY_CATEGORY_URL
@@ -483,7 +545,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedInstructionsSpanned_nonMatchingLocale_shouldReturnText() {
+  fun `localizedInstructionsSpanned returns text for non matching locale`() {
     val displayCategoryExtension =
       Extension().apply {
         url = EXTENSION_DISPLAY_CATEGORY_URL
@@ -531,7 +593,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedInstructionsSpanned_matchingLocale_shouldReturnLocalizedText() {
+  fun `localizedInstructionsSpanned returns localized text for matching locale`() {
     val displayCategoryExtension =
       Extension().apply {
         url = EXTENSION_DISPLAY_CATEGORY_URL
@@ -578,7 +640,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedInstructionsSpanned_matchingLocaleWithoutCountryCode_shouldReturnLocalizedText() {
+  fun `localizedInstructionsSpanned returns localized text for matching locale without country code`() {
     val displayCategoryExtension =
       Extension().apply {
         url = EXTENSION_DISPLAY_CATEGORY_URL
@@ -622,6 +684,87 @@ class MoreQuestionnaireItemComponentsTest {
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
     assertThat(questionItemList.first().localizedInstructionsSpanned.toString()).isEqualTo("phụ đề")
+  }
+
+  @Test
+  fun `isInstructionsItem returns true`() {
+    val displayCategoryExtension =
+      Extension().apply {
+        url = EXTENSION_DISPLAY_CATEGORY_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = INSTRUCTIONS
+                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+                }
+              )
+          }
+        )
+      }
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "nested-display-question"
+        text = "subtitle text"
+        extension = listOf(displayCategoryExtension)
+        type = Questionnaire.QuestionnaireItemType.DISPLAY
+      }
+    assertThat(questionnaireItem.isInstructions).isTrue()
+  }
+
+  @Test
+  fun `isInstructionsItem returns false if item type is not display`() {
+    val displayCategoryExtension =
+      Extension().apply {
+        url = EXTENSION_DISPLAY_CATEGORY_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = INSTRUCTIONS
+                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+                }
+              )
+          }
+        )
+      }
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "nested-display-question"
+        text = "subtitle text"
+        extension = listOf(displayCategoryExtension)
+        type = Questionnaire.QuestionnaireItemType.STRING
+      }
+    assertThat(questionnaireItem.isInstructions).isFalse()
+  }
+
+  @Test
+  fun `isInstructionsItem returns false if instructions code is not present`() {
+    val displayCategoryExtension =
+      Extension().apply {
+        url = EXTENSION_DISPLAY_CATEGORY_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = "some random code"
+                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+                }
+              )
+          }
+        )
+      }
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "nested-display-question"
+        text = "subtitle text"
+        extension = listOf(displayCategoryExtension)
+        type = Questionnaire.QuestionnaireItemType.STRING
+      }
+    assertThat(questionnaireItem.isInstructions).isFalse()
   }
 
   @Test

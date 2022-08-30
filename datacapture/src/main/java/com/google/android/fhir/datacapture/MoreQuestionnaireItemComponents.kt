@@ -203,12 +203,37 @@ internal const val INSTRUCTIONS = "instructions"
 /** Returns [true] if extension is display category extension and contains 'instructions' code. */
 internal val Questionnaire.QuestionnaireItemComponent.isInstructions: Boolean
   get() {
-    val codeableConcept =
-      this.extension.firstOrNull { it.url == EXTENSION_DISPLAY_CATEGORY_URL }?.value as
-        CodeableConcept?
-    val code =
-      codeableConcept?.coding?.firstOrNull { it.system == EXTENSION_DISPLAY_CATEGORY_SYSTEM }?.code
-    return code == INSTRUCTIONS
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.DISPLAY -> {
+        val codeableConcept =
+          this.extension.firstOrNull { it.url == EXTENSION_DISPLAY_CATEGORY_URL }?.value as
+            CodeableConcept?
+        val code =
+          codeableConcept?.coding
+            ?.firstOrNull { it.system == EXTENSION_DISPLAY_CATEGORY_SYSTEM }
+            ?.code
+        code == INSTRUCTIONS
+      }
+      else -> {
+        false
+      }
+    }
+  }
+
+/**
+ * Returns [true] if item type is display and [displayItemControl] is
+ * [DisplayItemControlType.FLYOVER].
+ */
+internal val Questionnaire.QuestionnaireItemComponent.isFlyoverItem: Boolean
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.DISPLAY -> {
+        displayItemControl == DisplayItemControlType.FLYOVER
+      }
+      else -> {
+        false
+      }
+    }
   }
 
 /**
