@@ -36,6 +36,9 @@ import timber.log.Timber
  * [ExpressionEvaluator] supports evaluation of
  * [variable expression](http://hl7.org/fhir/R4/extension-variable.html) defined at either
  * questionnaire level or questionnaire item level.
+ *
+ * TODO(https://github.com/google/android-fhir/issues/1575): Add a global map to apply variable
+ * values if already evaluated to avoid re-calculation
  */
 object ExpressionEvaluator {
 
