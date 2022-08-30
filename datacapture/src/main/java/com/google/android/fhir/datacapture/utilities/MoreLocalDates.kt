@@ -34,5 +34,10 @@ internal val LocalDate.localizedString: String
     }
   }
 
+fun LocalDate.formattedString(format: String): String {
+  val date = Date.from(atStartOfDay(ZoneId.systemDefault())?.toInstant())
+  return SimpleDateFormat(format, Locale.ENGLISH).format(date)
+}
+
 // Android ICU is supported API level 24 onwards.
 internal fun isAndroidIcuSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N

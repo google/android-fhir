@@ -149,7 +149,7 @@ data class QuestionnaireItemViewItem(
    * options are defined in `Questionnaire.item.answerValueSet`, the answer value set will be
    * expanded.
    */
-  internal val answerOption: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
+  val answerOption: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
     get() =
       runBlocking(Dispatchers.IO) {
         when {

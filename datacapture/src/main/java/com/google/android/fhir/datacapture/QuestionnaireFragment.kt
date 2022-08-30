@@ -84,7 +84,9 @@ open class QuestionnaireFragment : Fragment() {
     // Reads submit button visibility value initially defined in
     // [R.attr.submitButtonStyleQuestionnaire] style.
     val submitButtonVisibilityInStyle = submitButton.visibility
-    viewModel.setShowSubmitButtonFlag(submitButtonVisibilityInStyle == View.VISIBLE)
+    viewModel.setShowSubmitButtonFlag(
+      requireArguments().getBoolean(EXTRA_ENABLE_SUBMIT_BUTTON, false)
+    )
 
     val reviewModeEditButton = view.findViewById<View>(R.id.review_mode_edit_button)
     reviewModeEditButton.setOnClickListener { viewModel.setReviewMode(false) }
@@ -211,6 +213,8 @@ open class QuestionnaireFragment : Fragment() {
      * review page is not enabled.
      */
     const val EXTRA_SHOW_REVIEW_PAGE_FIRST = "show-review-page-first"
+
+    const val EXTRA_ENABLE_SUBMIT_BUTTON = "enable-submit-button"
 
     const val SUBMIT_REQUEST_KEY = "submit-request-key"
   }

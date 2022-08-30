@@ -25,8 +25,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.utilities.localizedDateString
-import com.google.android.fhir.datacapture.utilities.localizedString
+import com.google.android.fhir.datacapture.utilities.formattedString
 import com.google.android.fhir.datacapture.utilities.toLocalizedString
 import com.google.android.fhir.datacapture.utilities.toLocalizedTimeString
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -43,11 +42,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.chrono.IsoChronology
-import java.time.format.DateTimeFormatterBuilder
-import java.time.format.FormatStyle
 import java.util.Date
-import java.util.Locale
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -64,18 +59,19 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       private var localDate: LocalDate? = null
       private var localTime: LocalTime? = null
       private var textWatcher: TextWatcher? = null
-      private val localeDatePattern =
-        DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-          FormatStyle.SHORT,
-          null,
-          IsoChronology.INSTANCE,
-          Locale.getDefault()
-        )
+      private val localeDatePattern = "dd-MM-yyyy"
+      //        DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+      //          FormatStyle.SHORT,
+      //          null,
+      //          IsoChronology.INSTANCE,
+      //          Locale.getDefault()
+      //        )
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         dateInputLayout = itemView.findViewById(R.id.date_input_layout)
         dateInputEditText = itemView.findViewById(R.id.date_input_edit_text)
+        dateInputEditText.inputType = InputType.TYPE_NULL
         dateInputEditText.setOnFocusChangeListener { view, hasFocus ->
           if (!hasFocus) {
             (view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
@@ -96,7 +92,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               addOnPositiveButtonClickListener { epochMilli ->
                 with(Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()) {
                   localDate = this
-                  dateInputEditText.setText(this.localizedString)
+                  dateInputEditText.setText(this.formattedString(localeDatePattern))
                   enableOrDisableTimePicker(enableIt = true)
                   generateLocalDateTime(this, localTime)?.let {
                     updateDateTimeInput(it)
@@ -198,7 +194,9 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       private fun updateDateTimeInput(localDateTime: LocalDateTime?) {
         enableOrDisableTimePicker(enableIt = localDateTime != null)
         if (dateInputEditText.text.isNullOrEmpty()) {
-          dateInputEditText.setText(localDateTime?.localizedDateString ?: "")
+          dateInputEditText.setText(
+            localDateTime?.toLocalDate()?.formattedString(localeDatePattern) ?: ""
+          )
         }
         timeInputEditText.setText(
           localDateTime?.toLocalizedTimeString(timeInputEditText.context) ?: ""

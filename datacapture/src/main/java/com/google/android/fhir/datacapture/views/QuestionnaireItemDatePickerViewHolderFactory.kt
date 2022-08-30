@@ -19,14 +19,15 @@ package com.google.android.fhir.datacapture.views
 import android.annotation.SuppressLint
 import android.content.Context
 import android.icu.text.DateFormat
+import android.text.InputType
 import android.text.TextWatcher
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.utilities.formattedString
 import com.google.android.fhir.datacapture.utilities.isAndroidIcuSupported
-import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -38,10 +39,6 @@ import java.text.ParseException
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.chrono.IsoChronology
-import java.time.format.DateTimeFormatterBuilder
-import java.time.format.FormatStyle
-import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.log10
 import org.hl7.fhir.r4.model.DateType
@@ -58,18 +55,19 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private var textWatcher: TextWatcher? = null
       // Medium and long format styles use alphabetical month names which are difficult for the user
       // to input. Use short format style which is always numerical.
-      private val localePattern =
-        DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-          FormatStyle.SHORT,
-          null,
-          IsoChronology.INSTANCE,
-          Locale.getDefault()
-        )
+      private val localePattern = "dd-MM-yyyy"
+      //        DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+      //          FormatStyle.SHORT,
+      //          null,
+      //          IsoChronology.INSTANCE,
+      //          Locale.getDefault()
+      //        )
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
+        textInputEditText.inputType = InputType.TYPE_NULL
         textInputLayout.setEndIconOnClickListener {
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
@@ -80,7 +78,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             .apply {
               addOnPositiveButtonClickListener { epochMilli ->
                 textInputEditText.setText(
-                  Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate().localizedString
+                  Instant.ofEpochMilli(epochMilli)
+                    .atZone(ZONE_ID_UTC)
+                    .toLocalDate()
+                    .formattedString(localePattern)
                 )
                 questionnaireItemViewItem.setAnswer(
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -105,10 +106,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
         if (textInputEditText.text.isNullOrEmpty()) {
           textInputEditText.setText(
-            questionnaireItemViewItem.answers.singleOrNull()
+            questionnaireItemViewItem
+              .answers
+              .singleOrNull()
               ?.valueDateType
               ?.localDate
-              ?.localizedString
+              ?.formattedString(localePattern)
           )
         }
         textWatcher = textInputEditText.doAfterTextChanged { text -> updateAnswer(text.toString()) }
