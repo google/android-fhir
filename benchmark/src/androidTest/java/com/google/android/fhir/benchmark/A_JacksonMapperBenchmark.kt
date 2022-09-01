@@ -19,49 +19,23 @@ package com.google.android.fhir.benchmark
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import ca.uhn.fhir.context.FhirContext
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.Enumerations
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.opencds.cqf.cql.engine.execution.JsonCqlLibraryReader
 
 @RunWith(AndroidJUnit4::class)
-class BFhirContextLoaderBenchmark {
-
+class A_JacksonMapperBenchmark {
   @get:Rule val benchmarkRule = BenchmarkRule()
 
   /**
-   * FhirContexts generally take 2 seconds to load completely. This test mimics that loading time.
-   * getResourceDefinition forces the initialization of the Context.
+   * The JSONMapper and the XMLMapper take 800ms to initialize the first time on Desktop. They seem
+   * to take less time on mobile or there is something pre-loading this object. Either way, it's
+   * important to keep an eye on it.
    */
   @Test
-  fun loadR4() {
-    benchmarkRule.measureRepeated {
-      assertThat(
-          FhirContext.forR4().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
-        )
-        .isNotNull()
-    }
-  }
-
-  @Test
-  fun loadR5() {
-    benchmarkRule.measureRepeated {
-      assertThat(
-          FhirContext.forR5().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
-        )
-        .isNotNull()
-    }
-  }
-
-  @Test
-  fun loadDstu3() {
-    benchmarkRule.measureRepeated {
-      assertThat(
-          FhirContext.forDstu3().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
-        )
-        .isNotNull()
-    }
+  fun loadJsonMapper() {
+    benchmarkRule.measureRepeated { assertThat(JsonCqlLibraryReader.mapper()).isNotNull() }
   }
 }

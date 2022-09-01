@@ -28,7 +28,7 @@ import org.opencds.cqf.cql.engine.fhir.model.Dstu3FhirModelResolver
 import org.opencds.cqf.cql.engine.fhir.model.R4FhirModelResolver
 
 @RunWith(AndroidJUnit4::class)
-class CCqlEngineFhirContextLoaderBenchmark {
+class C_CqlEngineFhirContextLoaderBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()
 
@@ -38,11 +38,6 @@ class CCqlEngineFhirContextLoaderBenchmark {
    * from the Engine.
    */
   @Test
-  fun loadR4FhirModelResolver() {
-    benchmarkRule.measureRepeated { assertThat(R4FhirModelResolver()).isNotNull() }
-  }
-
-  @Test
   fun loadDstu2FhirModelResolver() {
     benchmarkRule.measureRepeated { assertThat(Dstu2FhirModelResolver()).isNotNull() }
   }
@@ -50,5 +45,10 @@ class CCqlEngineFhirContextLoaderBenchmark {
   @Test
   fun loadDstu3FhirModelResolver() {
     benchmarkRule.measureRepeated { assertThat(Dstu3FhirModelResolver()).isNotNull() }
+  }
+  
+  @Test
+  fun loadR4FhirModelResolver() {
+    benchmarkRule.measureRepeated { assertThat(R4FhirModelResolver()).isNotNull() }
   }
 }

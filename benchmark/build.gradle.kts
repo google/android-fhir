@@ -36,7 +36,7 @@ android {
   testBuildType = "release"
   buildTypes {
     debug {
-      // Since isDebuggable can"t be modified by gradle for library modules,
+      // Since isDebuggable can't be modified by gradle for library modules,
       // it must be done in a manifest - see src/androidTest/AndroidManifest.xml
       isMinifyEnabled = true
       proguardFiles(
@@ -44,7 +44,6 @@ android {
         "benchmark-proguard-rules.pro"
       )
     }
-    release { isDefault = true }
   }
   packagingOptions {
     resources.excludes.addAll(
@@ -79,10 +78,6 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.benchmarkJunit)
   androidTestImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
-
-  androidTestImplementation(Dependencies.Room.ktx)
-  androidTestImplementation(Dependencies.Room.runtime)
-  kapt(Dependencies.Room.compiler)
 
   androidTestImplementation(Dependencies.Cql.evaluator)
   androidTestImplementation(Dependencies.Cql.evaluatorBuilder)
