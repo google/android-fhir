@@ -2390,7 +2390,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun `instructions code in nested display item should not be created as questionnaire state item`() =
+  fun `nested display item with instructions code should not be created as questionnaire state item`() =
       runBlocking {
     val displayCategoryExtension =
       Extension().apply {
@@ -2437,7 +2437,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun `flyover code in nested display item should not be created as questionnaire state item`() =
+  fun `nested display item with flyover code should not be created as questionnaire state item`() =
       runBlocking {
     val itemControlExtensionWithFlyOverCode =
       Extension().apply {

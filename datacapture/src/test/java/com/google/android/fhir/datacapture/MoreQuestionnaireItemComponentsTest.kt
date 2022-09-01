@@ -176,7 +176,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `isFlyover item returns true`() {
+  fun `isFlyoverCode item returns true`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         type = Questionnaire.QuestionnaireItemType.DISPLAY
@@ -194,11 +194,11 @@ class MoreQuestionnaireItemComponentsTest {
         )
       }
 
-    assertThat(questionnaireItem.isFlyoverItem).isTrue()
+    assertThat(questionnaireItem.isFlyoverCode).isTrue()
   }
 
   @Test
-  fun `isFlyover item returns false if type is not display`() {
+  fun `isFlyoverCode item returns false if type is not display`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         type = Questionnaire.QuestionnaireItemType.STRING
@@ -216,11 +216,11 @@ class MoreQuestionnaireItemComponentsTest {
         )
       }
 
-    assertThat(questionnaireItem.isFlyoverItem).isFalse()
+    assertThat(questionnaireItem.isFlyoverCode).isFalse()
   }
 
   @Test
-  fun `isFlyover item returns false if code is not flyover`() {
+  fun `isFlyoverCode item returns false if code is not flyover`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         type = Questionnaire.QuestionnaireItemType.STRING
@@ -234,7 +234,7 @@ class MoreQuestionnaireItemComponentsTest {
         )
       }
 
-    assertThat(questionnaireItem.isFlyoverItem).isFalse()
+    assertThat(questionnaireItem.isFlyoverCode).isFalse()
   }
 
   @Test
@@ -687,7 +687,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `isInstructionsItem returns true`() {
+  fun `isInstructionsCode returns true`() {
     val displayCategoryExtension =
       Extension().apply {
         url = EXTENSION_DISPLAY_CATEGORY_URL
@@ -710,11 +710,11 @@ class MoreQuestionnaireItemComponentsTest {
         extension = listOf(displayCategoryExtension)
         type = Questionnaire.QuestionnaireItemType.DISPLAY
       }
-    assertThat(questionnaireItem.isInstructions).isTrue()
+    assertThat(questionnaireItem.isInstructionsCode).isTrue()
   }
 
   @Test
-  fun `isInstructionsItem returns false if item type is not display`() {
+  fun `isInstructionsCode returns false if item type is not display`() {
     val displayCategoryExtension =
       Extension().apply {
         url = EXTENSION_DISPLAY_CATEGORY_URL
@@ -737,11 +737,11 @@ class MoreQuestionnaireItemComponentsTest {
         extension = listOf(displayCategoryExtension)
         type = Questionnaire.QuestionnaireItemType.STRING
       }
-    assertThat(questionnaireItem.isInstructions).isFalse()
+    assertThat(questionnaireItem.isInstructionsCode).isFalse()
   }
 
   @Test
-  fun `isInstructionsItem returns false if instructions code is not present`() {
+  fun `isInstructionsCode returns false if instructions code is not present`() {
     val displayCategoryExtension =
       Extension().apply {
         url = EXTENSION_DISPLAY_CATEGORY_URL
@@ -764,7 +764,7 @@ class MoreQuestionnaireItemComponentsTest {
         extension = listOf(displayCategoryExtension)
         type = Questionnaire.QuestionnaireItemType.STRING
       }
-    assertThat(questionnaireItem.isInstructions).isFalse()
+    assertThat(questionnaireItem.isInstructionsCode).isFalse()
   }
 
   @Test

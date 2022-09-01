@@ -156,7 +156,7 @@ internal val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpann
     return item
       .firstOrNull { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-          questionnaireItem.isInstructions
+          questionnaireItem.isInstructionsCode
       }
       ?.localizedTextSpanned
   }
@@ -201,7 +201,7 @@ val Questionnaire.QuestionnaireItemComponent.entryFormat: String?
 internal const val INSTRUCTIONS = "instructions"
 
 /** Returns [true] if extension is display category extension and contains 'instructions' code. */
-internal val Questionnaire.QuestionnaireItemComponent.isInstructions: Boolean
+internal val Questionnaire.QuestionnaireItemComponent.isInstructionsCode: Boolean
   get() {
     return when (type) {
       Questionnaire.QuestionnaireItemType.DISPLAY -> {
@@ -224,7 +224,7 @@ internal val Questionnaire.QuestionnaireItemComponent.isInstructions: Boolean
  * Returns [true] if item type is display and [displayItemControl] is
  * [DisplayItemControlType.FLYOVER].
  */
-internal val Questionnaire.QuestionnaireItemComponent.isFlyoverItem: Boolean
+internal val Questionnaire.QuestionnaireItemComponent.isFlyoverCode: Boolean
   get() {
     return when (type) {
       Questionnaire.QuestionnaireItemType.DISPLAY -> {

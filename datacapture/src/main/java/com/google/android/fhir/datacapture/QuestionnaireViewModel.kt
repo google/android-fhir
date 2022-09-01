@@ -531,7 +531,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireItemList =
             questionnaireItem.item.filterNot {
               it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-                (it.isInstructions || it.isFlyoverItem)
+                (it.isInstructionsCode || it.isFlyoverCode)
             },
           questionnaireResponseItemList =
             if (questionnaireResponseItem.answer.isEmpty()) {

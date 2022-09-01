@@ -123,7 +123,7 @@ class QuestionnaireGroupTypeHeaderViewTest {
   }
 
   @Test
-  fun `shows header item view`() {
+  fun `shows headerItem view`() {
     val displayCategoryExtension =
       Extension().apply {
         url = EXTENSION_DISPLAY_CATEGORY_URL
