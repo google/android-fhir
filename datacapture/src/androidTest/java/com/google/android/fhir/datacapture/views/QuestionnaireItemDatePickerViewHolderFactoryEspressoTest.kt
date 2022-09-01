@@ -272,7 +272,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
           .check(matches(isDisplayed()))
           .perform(ViewActions.click())
       }
-    assertThat(exception.message).isEqualTo("currentPage cannot be after lastPage")
+    assertThat(exception.message).isEqualTo("minValue cannot be greater than maxValue")
   }
 
   /** Runs code snippet on UI/main thread */

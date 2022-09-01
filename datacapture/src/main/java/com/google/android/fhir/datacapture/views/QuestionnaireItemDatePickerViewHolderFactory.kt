@@ -154,6 +154,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         val max =
           (getMaxValue(questionnaireItemViewItem.questionnaireItem) as? DateType)?.value?.time
 
+        if (min != null && max != null && min > max) {
+          throw IllegalArgumentException("minValue cannot be greater than maxValue")
+        }
+
         val constraintsBuilder =
           CalendarConstraints.Builder()
             .apply {
