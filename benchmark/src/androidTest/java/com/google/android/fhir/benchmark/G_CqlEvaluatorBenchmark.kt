@@ -71,7 +71,6 @@ class G_CqlEvaluatorBenchmark {
         fhirOperator.loadLibs(lib)
         fhirOperator
       }
-
       val results =
         fhirOperator.evaluateLibrary(
           "http://localhost/Library/ImmunityCheck|1.0.0",

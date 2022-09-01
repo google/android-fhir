@@ -39,8 +39,8 @@ class B_FhirContextLoaderBenchmark {
   fun loadDstu2() {
     benchmarkRule.measureRepeated {
       assertThat(
-        FhirContext.forDstu2().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
-      )
+          FhirContext.forDstu2().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
+        )
         .isNotNull()
     }
   }
@@ -49,8 +49,8 @@ class B_FhirContextLoaderBenchmark {
   fun loadDstu3() {
     benchmarkRule.measureRepeated {
       assertThat(
-        FhirContext.forDstu3().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
-      )
+          FhirContext.forDstu3().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
+        )
         .isNotNull()
     }
   }

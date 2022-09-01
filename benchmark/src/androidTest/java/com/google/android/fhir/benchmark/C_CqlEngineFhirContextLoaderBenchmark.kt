@@ -46,7 +46,7 @@ class C_CqlEngineFhirContextLoaderBenchmark {
   fun loadDstu3FhirModelResolver() {
     benchmarkRule.measureRepeated { assertThat(Dstu3FhirModelResolver()).isNotNull() }
   }
-  
+
   @Test
   fun loadR4FhirModelResolver() {
     benchmarkRule.measureRepeated { assertThat(R4FhirModelResolver()).isNotNull() }
