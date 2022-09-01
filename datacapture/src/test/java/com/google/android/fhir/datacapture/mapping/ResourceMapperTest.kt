@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,12 @@ import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Annotation
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -2374,6 +2377,50 @@ class ResourceMapperTest {
       .isEqualTo(
         "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."
       )
+  }
+
+  @Test
+  fun `populate() should update QuestionnaireItem with first matching field when QuestionnaireItem has initialExpression on Bundle with list of resources`() =
+      runBlocking {
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "patient-gender"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression =
+                      "Bundle.entry.select(resource as Observation).where(code.coding.code='B2').code.coding"
+                  }
+                )
+              )
+          }
+        )
+
+    val resources =
+      listOf(
+        Patient().apply { id = "P1" },
+        Bundle().apply {
+          addEntry().resource = Encounter().apply { id = "E1" }
+          addEntry().resource =
+            Observation().apply {
+              id = "O1"
+              code = CodeableConcept().addCoding(Coding("http://cod.org", "A1", "A Code"))
+            }
+          addEntry().resource =
+            Observation().apply {
+              id = "O2"
+              code = CodeableConcept().addCoding(Coding("http://cod.org", "B2", "B Code"))
+            }
+        }
+      )
+    val result = ResourceMapper.populate(questionnaire, *resources.toTypedArray())
+    assertThat(questionnaire.itemFirstRep.initialFirstRep.valueCoding.code).isEqualTo("B2")
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)
