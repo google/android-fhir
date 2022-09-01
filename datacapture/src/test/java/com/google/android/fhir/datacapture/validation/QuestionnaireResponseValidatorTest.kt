@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ class QuestionnaireResponseValidatorTest {
         questionnaireResponse,
         context
       )
-    assertThat(result["a-question"]).isEqualTo(listOf(ValidationResult(true, listOf())))
+    assertThat(result["a-question"]!!.single()).isEqualTo(Valid)
   }
 
   @Test
@@ -115,14 +115,9 @@ class QuestionnaireResponseValidatorTest {
         questionnaireResponse,
         context
       )
-    assertThat(result["a-question"])
+    assertThat(result["a-question"]!!.single())
       .isEqualTo(
-        listOf(
-          ValidationResult(
-            false,
-            listOf("The maximum number of characters that are permitted in the answer is: 3")
-          )
-        )
+        Invalid(listOf("The maximum number of characters that are permitted in the answer is: 3"))
       )
   }
 
@@ -174,17 +169,11 @@ class QuestionnaireResponseValidatorTest {
       )
     assertThat(result["a-question"])
       .containsExactly(
-        ValidationResult(
-          false,
-          listOf("The maximum number of characters that are permitted in the answer is: 3")
-        )
+        Invalid(listOf("The maximum number of characters that are permitted in the answer is: 3"))
       )
     assertThat(result["a-nested-question"])
       .containsExactly(
-        ValidationResult(
-          false,
-          listOf("The maximum number of characters that are permitted in the answer is: 3")
-        )
+        Invalid(listOf("The maximum number of characters that are permitted in the answer is: 3"))
       )
   }
 
@@ -248,7 +237,7 @@ class QuestionnaireResponseValidatorTest {
         questionnaireResponse,
         context
       )
-    assertThat(result["question-1"]).isEqualTo(listOf(ValidationResult(true, listOf())))
+    assertThat(result["question-1"]!!.single()).isEqualTo(Valid)
   }
 
   @Test

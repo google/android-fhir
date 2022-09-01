@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
+import android.text.Spanned
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
@@ -41,42 +43,29 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
   private var hint: TextView = findViewById(R.id.hint)
 
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
-    val localizedPrefixSpanned = questionnaireItem.localizedPrefixSpanned
-    prefix.visibility =
-      if (localizedPrefixSpanned.isNullOrEmpty()) {
-        View.GONE
-      } else {
-        View.VISIBLE
-      }
-    prefix.text = localizedPrefixSpanned
-
-    val localizedTextSpanned = questionnaireItem.localizedTextSpanned
-    question.visibility =
-      if (localizedTextSpanned.isNullOrEmpty()) {
-        View.GONE
-      } else {
-        View.VISIBLE
-      }
-    question.text = localizedTextSpanned
-
-    val localizedHintSpanned = questionnaireItem.localizedHintSpanned
-    hint.visibility =
-      if (localizedHintSpanned.isNullOrEmpty()) {
-        View.GONE
-      } else {
-        View.VISIBLE
-      }
-    hint.text = localizedHintSpanned
+    prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
+    question.updateTextAndVisibility(questionnaireItem.localizedTextSpanned)
+    hint.updateTextAndVisibility(questionnaireItem.localizedHintSpanned)
     //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
-    visibility =
-      if (question.visibility == VISIBLE ||
-          prefix.visibility == VISIBLE ||
-          hint.visibility == VISIBLE
-      ) {
-        VISIBLE
-      } else {
-        GONE
-      }
+    visibility = getViewGroupVisibility(prefix, question, hint)
   }
+}
+
+internal fun TextView.updateTextAndVisibility(localizedText: Spanned?) {
+  text = localizedText
+  visibility =
+    if (localizedText.isNullOrEmpty()) {
+      GONE
+    } else {
+      VISIBLE
+    }
+}
+
+/** Returns [VISIBLE] if any of the [view] is visible, else returns [GONE]. */
+internal fun getViewGroupVisibility(vararg view: TextView): Int {
+  if (view.any { it.visibility == VISIBLE }) {
+    return VISIBLE
+  }
+  return GONE
 }

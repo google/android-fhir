@@ -21,14 +21,15 @@ object Plugins {
     const val application = "com.android.application"
     const val benchmark = "androidx.benchmark"
     const val jetbrainsKotlinAndroid = "org.jetbrains.kotlin.android"
+    // Use Dokka 1.6.10 until https://github.com/Kotlin/dokka/issues/2452 is resolved.
+    const val dokka = "org.jetbrains.dokka"
+    const val kotlin = "kotlin"
     const val kotlinAndroid = "kotlin-android"
     const val kotlinKapt = "kotlin-kapt"
     const val mavenPublish = "maven-publish"
-    const val javaLibrary = "java-library"
-    const val kotlin = "kotlin"
     const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
-    const val spotless = "com.diffplug.spotless"
     const val ruler = "com.spotify.ruler"
+    const val spotless = "com.diffplug.spotless"
   }
 
   // classpath plugins
@@ -44,5 +45,8 @@ object Plugins {
   object Versions {
     const val androidGradlePlugin = "7.0.2"
     const val benchmarkPlugin = "1.0.0"
+    const val androidGradlePlugin = "7.2.1"
+    // Use Dokka 1.6.10 until https://github.com/Kotlin/dokka/issues/2472 is resolved.
+    const val dokka = "1.6.10"
   }
 }

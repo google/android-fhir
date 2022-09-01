@@ -23,25 +23,27 @@ import android.view.View
 import android.view.View.FOCUS_DOWN
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.LayoutRes
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal abstract class QuestionnaireItemEditTextViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_edit_text_view) {
+internal abstract class QuestionnaireItemEditTextViewHolderFactory(
+  @LayoutRes override val resId: Int
+) : QuestionnaireItemViewHolderFactory(resId) {
   abstract override fun getQuestionnaireItemViewHolderDelegate():
     QuestionnaireItemEditTextViewHolderDelegate
 }
 
-abstract class QuestionnaireItemEditTextViewHolderDelegate(
-  private val rawInputType: Int,
-  private val isSingleLine: Boolean
-) : QuestionnaireItemViewHolderDelegate {
+abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputType: Int) :
+  QuestionnaireItemViewHolderDelegate {
   private lateinit var header: QuestionnaireItemHeaderView
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
@@ -53,7 +55,6 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
     textInputEditText.setRawInputType(rawInputType)
-    textInputEditText.isSingleLine = isSingleLine
     // Override `setOnEditorActionListener` to avoid crash with `IllegalStateException` if it's not
     // possible to move focus forward.
     // See
@@ -83,9 +84,10 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
 
     textInputEditText.removeTextChangedListener(textWatcher)
     val text = getText(questionnaireItemViewItem.answers.singleOrNull())
-    if (text != textInputEditText.text.toString()) {
+    if (isTextUpdatesRequired(text, textInputEditText.text.toString())) {
       textInputEditText.setText(getText(questionnaireItemViewItem.answers.singleOrNull()))
     }
+
     textWatcher =
       textInputEditText.doAfterTextChanged { editable: Editable? -> updateAnswer(editable) }
   }
@@ -99,10 +101,14 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
   }
 
+  open fun isTextUpdatesRequired(answerText: String, inputText: String) = (answerText != inputText)
+
   override fun displayValidationResult(validationResult: ValidationResult) {
     textInputLayout.error =
-      if (validationResult.getSingleStringValidationMessage() == "") null
-      else validationResult.getSingleStringValidationMessage()
+      when (validationResult) {
+        is NotValidated, Valid -> null
+        is Invalid -> validationResult.getSingleStringValidationMessage()
+      }
   }
 
   override fun setReadOnly(isReadOnly: Boolean) {
