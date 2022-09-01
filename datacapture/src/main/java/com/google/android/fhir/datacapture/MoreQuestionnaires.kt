@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture
 
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 
 /**
@@ -30,6 +31,19 @@ val Questionnaire.targetStructureMap: String?
       this.extension.singleOrNull { it.url == TARGET_STRUCTURE_MAP }?.value ?: return null
     return if (extensionValue is CanonicalType) extensionValue.valueAsString else null
   }
+
+internal val Questionnaire.variableExpressions: List<Expression>
+  get() =
+    this.extension.filter { it.url == EXTENSION_VARIABLE_URL }.map { it.castToExpression(it.value) }
+
+/**
+ * Finds the specific variable name [String] at questionnaire [Questionnaire] level
+ *
+ * @param variableName the [String] to match the variable at questionnaire [Questionnaire] level
+ * @return [Expression] the matching expression
+ */
+internal fun Questionnaire.findVariableExpression(variableName: String): Expression? =
+  variableExpressions.find { it.name == variableName }
 
 /**
  * See
