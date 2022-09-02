@@ -85,12 +85,14 @@ internal fun Questionnaire.QuestionnaireItemComponent.findVariableExpression(
   return variableExpressions.find { it.name == variableName }
 }
 
+/** Returns Calculated expression, or null */
 internal val Questionnaire.QuestionnaireItemComponent.calculatedExpression: Expression?
   get() =
     this.getExtensionByUrl(EXTENSION_CALCULATED_EXPRESSION_URL)?.let {
       it.castToExpression(it.value)
     }
 
+/** Returns list of extensions whose value is of type [Expression] */
 internal val Questionnaire.QuestionnaireItemComponent.expressionBasedExtensions
   get() = this.extension.filter { it.value is Expression }
 

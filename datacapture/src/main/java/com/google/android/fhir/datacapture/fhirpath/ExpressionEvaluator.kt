@@ -68,6 +68,7 @@ object ExpressionEvaluator {
       }
     }
 
+  /** Detects if any item into list is referencing a dependent item in its calculated expression */
   internal fun detectExpressionCyclicDependency(
     items: List<Questionnaire.QuestionnaireItemComponent>
   ) {
@@ -84,6 +85,10 @@ object ExpressionEvaluator {
     }
   }
 
+  /**
+   * Returns a pair of item and the calculated and evaluated value for all items with calculated
+   * expression extension, which is dependent on value of updated response
+   */
   fun evaluateCalculatedExpressions(
     updatedQuestionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaire: Questionnaire,

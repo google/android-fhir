@@ -709,7 +709,7 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `calculatedExpression should return expression for valid extension url`() {
-    val questionnaire =
+    val item =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
           EXTENSION_CALCULATED_EXPRESSION_URL,
@@ -719,13 +719,13 @@ class MoreQuestionnaireItemComponentsTest {
           }
         )
       }
-    assertThat(questionnaire.calculatedExpression).isNotNull()
-    assertThat(questionnaire.calculatedExpression!!.expression).isEqualTo("today()")
+    assertThat(item.calculatedExpression).isNotNull()
+    assertThat(item.calculatedExpression!!.expression).isEqualTo("today()")
   }
 
   @Test
   fun `calculatedExpression should return null for other extension url`() {
-    val questionnaire =
+    val item =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
           ITEM_INITIAL_EXPRESSION_URL,
@@ -735,7 +735,85 @@ class MoreQuestionnaireItemComponentsTest {
           }
         )
       }
-    assertThat(questionnaire.calculatedExpression).isNull()
+    assertThat(item.calculatedExpression).isNull()
+  }
+
+  @Test
+  fun `expressionBasedExtensions should return all extension of type expression`() {
+    val item =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_HIDDEN_URL, BooleanType(true))
+        addExtension(
+          EXTENSION_CALCULATED_EXPRESSION_URL,
+          Expression().apply {
+            this.expression = "today()"
+            this.language = "text/fhirpath"
+          }
+        )
+        addExtension(
+          EXTENSION_ENABLE_WHEN_EXPRESSION_URL,
+          Expression().apply {
+            this.expression = "%resource.status == 'draft'"
+            this.language = "text/fhirpath"
+          }
+        )
+      }
+
+    val result = item.expressionBasedExtensions
+
+    assertThat(result.count()).isEqualTo(2)
+    assertThat(result.first().url).isEqualTo(EXTENSION_CALCULATED_EXPRESSION_URL)
+    assertThat(result.last().url).isEqualTo(EXTENSION_ENABLE_WHEN_EXPRESSION_URL)
+  }
+
+  @Test
+  fun `isReferencedBy should return true`() {
+    val item1 =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "A"
+        addExtension(
+          EXTENSION_CALCULATED_EXPRESSION_URL,
+          Expression().apply {
+            this.expression = "%resource.item.where(linkId='B')"
+            this.language = "text/fhirpath"
+          }
+        )
+      }
+    val item2 = Questionnaire.QuestionnaireItemComponent().apply { linkId = "B" }
+    assertThat(item2.isReferencedBy(item1)).isTrue()
+  }
+
+  @Test
+  fun `isReferencedBy should return false`() {
+    val item1 =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "A"
+        addExtension(
+          EXTENSION_CALCULATED_EXPRESSION_URL,
+          Expression().apply {
+            this.expression = "%resource.item.where(answer.value.empty())"
+            this.language = "text/fhirpath"
+          }
+        )
+      }
+    val item2 = Questionnaire.QuestionnaireItemComponent().apply { linkId = "B" }
+    assertThat(item2.isReferencedBy(item1)).isFalse()
+  }
+
+  @Test
+  fun `flattened should return linear list`() {
+    val items =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "A" },
+        Questionnaire.QuestionnaireItemComponent()
+          .apply { linkId = "B" }
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent()
+              .apply { linkId = "C" }
+              .addItem(Questionnaire.QuestionnaireItemComponent().apply { linkId = "D" })
+          )
+      )
+    assertThat(items.flattened().map { it.linkId }).containsExactly("A", "B", "C", "D")
   }
 
   @Test
@@ -933,7 +1011,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `createQuestionResponse should not set answer for quantity type with missing value `() {
+  fun `createQuestionResponse should not set answer for quantity type with missing value`() {
     val question =
       Questionnaire.QuestionnaireItemComponent(
           StringType("age"),

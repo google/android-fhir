@@ -20,6 +20,7 @@ import com.google.android.fhir.datacapture.EXTENSION_CALCULATED_EXPRESSION_URL
 import com.google.android.fhir.datacapture.EXTENSION_VARIABLE_URL
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
 import com.google.android.fhir.datacapture.variableExpressions
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
@@ -28,6 +29,7 @@ import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
@@ -475,6 +477,136 @@ class ExpressionEvaluatorTest {
       )
 
     assertThat((result as Type).asStringValue()).isEqualTo("2")
+  }
+
+  @Test
+  fun `evaluateCalculatedExpressions should return list of calculated values`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-birthdate"
+            type = Questionnaire.QuestionnaireItemType.DATE
+            addExtension().apply {
+              url = EXTENSION_CALCULATED_EXPRESSION_URL
+              setValue(
+                Expression().apply {
+                  this.language = "text/fhirpath"
+                  this.expression =
+                    "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+                }
+              )
+            }
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-age-years"
+            type = Questionnaire.QuestionnaireItemType.QUANTITY
+          }
+        )
+      }
+
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-birthdate"
+          }
+        )
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-age-years"
+            answer =
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  this.value = Quantity(1).apply { unit = "year" }
+                }
+              )
+          }
+        )
+      }
+
+    val result =
+      evaluateCalculatedExpressions(
+        questionnaire.item.elementAt(1),
+        questionnaire,
+        questionnaireResponse,
+        emptySet(),
+        emptyMap()
+      )
+
+    assertThat(result.first().second.first().asStringValue())
+      .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -1) }.asStringValue())
+  }
+
+  @Test
+  fun `evaluateCalculatedExpressions should not include item in list when item has been modified`() =
+      runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-birthdate"
+            type = Questionnaire.QuestionnaireItemType.DATE
+            addExtension().apply {
+              url = EXTENSION_CALCULATED_EXPRESSION_URL
+              setValue(
+                Expression().apply {
+                  this.language = "text/fhirpath"
+                  this.expression =
+                    "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+                }
+              )
+            }
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-age-years"
+            type = Questionnaire.QuestionnaireItemType.QUANTITY
+          }
+        )
+      }
+
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-birthdate"
+            answer =
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = DateType(Date())
+                }
+              )
+          }
+        )
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-age-years"
+            answer =
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  this.value = Quantity(1).apply { unit = "year" }
+                }
+              )
+          }
+        )
+      }
+
+    val result =
+      evaluateCalculatedExpressions(
+        questionnaire.item.elementAt(1),
+        questionnaire,
+        questionnaireResponse,
+        setOf(questionnaireResponse.itemFirstRep),
+        emptyMap()
+      )
+
+    assertThat(result).isEmpty()
   }
 
   @Test
