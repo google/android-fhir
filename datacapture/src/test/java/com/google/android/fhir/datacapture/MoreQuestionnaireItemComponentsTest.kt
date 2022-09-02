@@ -44,20 +44,22 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun itemControl_shouldReturnItemControlCodeDropDown() {
     val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
-    questionnaireItem.addExtension(
-      Extension()
-        .setUrl(EXTENSION_ITEM_CONTROL_URL)
-        .setValue(
-          CodeableConcept()
-            .addCoding(
-              Coding()
-                .setCode(ItemControlTypes.DROP_DOWN.extensionCode)
-                .setDisplay("Drop Down")
-                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.CHOICE
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(ItemControlTypes.DROP_DOWN.extensionCode)
+                    .setDisplay("Drop Down")
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
             )
         )
-    )
+      }
 
     assertThat(questionnaireItem.itemControl).isEqualTo(ItemControlTypes.DROP_DOWN)
   }
@@ -65,20 +67,22 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun itemControl_shouldReturnItemControlCodeRadioButton() {
     val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
-    questionnaireItem.addExtension(
-      Extension()
-        .setUrl(EXTENSION_ITEM_CONTROL_URL)
-        .setValue(
-          CodeableConcept()
-            .addCoding(
-              Coding()
-                .setCode(ItemControlTypes.RADIO_BUTTON.extensionCode)
-                .setDisplay("Radio Group")
-                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.CHOICE
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(ItemControlTypes.RADIO_BUTTON.extensionCode)
+                    .setDisplay("Radio Group")
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
             )
         )
-    )
+      }
 
     assertThat(questionnaireItem.itemControl).isEqualTo(ItemControlTypes.RADIO_BUTTON)
   }
@@ -86,19 +90,21 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun itemControl_shouldReturnItemControlCodePhoneNumber() {
     val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.STRING)
-    questionnaireItem.addExtension(
-      Extension()
-        .setUrl(EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR)
-        .setValue(
-          CodeableConcept()
-            .addCoding(
-              Coding()
-                .setCode(ItemControlTypes.PHONE_NUMBER.extensionCode)
-                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR)
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.STRING
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(ItemControlTypes.PHONE_NUMBER.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR)
+                )
             )
         )
-    )
+      }
 
     assertThat(questionnaireItem.itemControl).isEqualTo(ItemControlTypes.PHONE_NUMBER)
   }
@@ -106,20 +112,22 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun itemControl_wrongExtensionUrl_shouldReturnNull() {
     val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
-    questionnaireItem.addExtension(
-      Extension()
-        .setUrl("null-test")
-        .setValue(
-          CodeableConcept()
-            .addCoding(
-              Coding()
-                .setCode(ItemControlTypes.DROP_DOWN.extensionCode)
-                .setDisplay("Drop Down")
-                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.CHOICE
+        addExtension(
+          Extension()
+            .setUrl("null-test")
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(ItemControlTypes.DROP_DOWN.extensionCode)
+                    .setDisplay("Drop Down")
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
             )
         )
-    )
+      }
 
     assertThat(questionnaireItem.itemControl).isNull()
   }
@@ -127,22 +135,107 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun itemControl_wrongExtensionCoding_shouldReturnNull() {
     val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
-    questionnaireItem.addExtension(
-      Extension()
-        .setUrl(EXTENSION_ITEM_CONTROL_URL)
-        .setValue(
-          CodeableConcept()
-            .addCoding(
-              Coding()
-                .setCode("null-test")
-                .setDisplay("Drop Down")
-                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.CHOICE
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode("null-test")
+                    .setDisplay("Drop Down")
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
             )
         )
-    )
+      }
 
     assertThat(questionnaireItem.itemControl).isNull()
+  }
+
+  @Test
+  fun `displayItemControl should return flyover type`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.STRING
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(DisplayItemControlType.FLYOVER.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
+            )
+        )
+      }
+
+    assertThat(questionnaireItem.displayItemControl).isEqualTo(DisplayItemControlType.FLYOVER)
+  }
+
+  @Test
+  fun `displayItemControl should return page type`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.STRING
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(DisplayItemControlType.PAGE.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
+            )
+        )
+      }
+
+    assertThat(questionnaireItem.displayItemControl).isEqualTo(DisplayItemControlType.PAGE)
+  }
+
+  @Test
+  fun `displayItemControl should return null if the extension url is missing`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.STRING
+        addExtension(
+          Extension()
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(DisplayItemControlType.PAGE.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
+            )
+        )
+      }
+
+    assertThat(questionnaireItem.displayItemControl).isNull()
+  }
+
+  @Test
+  fun `displayItemControl should return null if the extension system is missing`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.STRING
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(Coding().setCode(DisplayItemControlType.PAGE.extensionCode))
+            )
+        )
+      }
+
+    assertThat(questionnaireItem.displayItemControl).isNull()
   }
 
   @Test
@@ -575,7 +668,7 @@ class MoreQuestionnaireItemComponentsTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_ENABLE_WHEN_EXPRESSION_URL,
+                  EXTENSION_ENABLE_WHEN_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression =

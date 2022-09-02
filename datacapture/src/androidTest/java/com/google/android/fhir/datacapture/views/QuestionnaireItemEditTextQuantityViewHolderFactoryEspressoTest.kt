@@ -27,6 +27,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Quantity
@@ -68,7 +69,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -92,7 +93,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }

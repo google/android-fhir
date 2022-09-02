@@ -26,10 +26,7 @@ internal object QuestionnaireItemEditTextDecimalViewHolderFactory :
     R.layout.questionnaire_item_edit_text_single_line_view
   ) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object :
-      QuestionnaireItemEditTextViewHolderDelegate(
-        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL,
-      ) {
+    object : QuestionnaireItemEditTextViewHolderDelegate(DECIMAL_INPUT_TYPE) {
       override fun getValue(
         text: String
       ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
@@ -44,5 +41,18 @@ internal object QuestionnaireItemEditTextDecimalViewHolderFactory :
       ): String {
         return answer?.valueDecimalType?.value?.toString() ?: ""
       }
+
+      override fun isTextUpdatesRequired(answerText: String, inputText: String): Boolean {
+        if (answerText.isEmpty() && inputText.isEmpty()) {
+          return false
+        }
+        if (answerText.isEmpty() || inputText.isEmpty()) {
+          return true
+        }
+        // Avoid shifting focus by updating text field if the values are the same
+        return answerText.toDouble() != inputText.toDouble()
+      }
     }
 }
+
+const val DECIMAL_INPUT_TYPE = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL

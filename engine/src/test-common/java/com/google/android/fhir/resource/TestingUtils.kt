@@ -19,9 +19,9 @@ package com.google.android.fhir.resource
 import androidx.work.Data
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
@@ -132,7 +132,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
 
     override suspend fun syncUpload(
-      upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+      upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
     ) {
       upload(listOf())
     }
@@ -157,6 +157,14 @@ class TestingUtils constructor(private val iParser: IParser) {
     override suspend fun getLastSyncTimeStamp(): OffsetDateTime? {
       return OffsetDateTime.now()
     }
+
+    override suspend fun clearDatabase() {}
+
+    override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange? {
+      TODO("Not yet implemented")
+    }
+
+    override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {}
   }
 
   object TestFailingDatasource : DataSource {
