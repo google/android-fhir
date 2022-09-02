@@ -2946,9 +2946,7 @@ class QuestionnaireViewModelTest(
         createQuestionnaireViewModel(questionnaire)
       }
     assertThat(exception.message)
-      .isEqualTo(
-        "a-birthdate and a-age-years have cyclic dependency in expression based extension"
-      )
+      .isEqualTo("a-birthdate and a-age-years have cyclic dependency in expression based extension")
   }
 
   private fun createQuestionnaireViewModel(
