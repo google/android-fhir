@@ -2713,7 +2713,8 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun questionnaireItem_calculatedExpressionExtension_shouldCalculateValue_onStart() = runBlocking {
+  fun `should calculate value on start for questionnaire item with calculated expression extension`() =
+      runBlocking {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -2771,7 +2772,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun questionnaireItem_calculatedExpressionExtension_shouldCalculateValue_onChange() =
+  fun `should calculate value on change for questionnaire item with calculated expression extension`() =
       runBlocking {
     val questionnaire =
       Questionnaire().apply {
@@ -2833,7 +2834,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun questionnaireItem_calculatedExpressionExtensionInFlatList_shouldDetectCyclicDependency() =
+  fun `should detect cyclic dependency for questionnaire item with calculated expression extension in flat list`() =
       runBlocking {
     val questionnaire =
       Questionnaire().apply {
@@ -2887,7 +2888,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun questionnaireItem_calculatedExpressionExtensionInNestedItems_shouldDetectCyclicDependency() =
+  fun `should detect cyclic dependency for questionnaire item with calculated expression extension in nested list`() =
       runBlocking {
     val questionnaire =
       Questionnaire().apply {

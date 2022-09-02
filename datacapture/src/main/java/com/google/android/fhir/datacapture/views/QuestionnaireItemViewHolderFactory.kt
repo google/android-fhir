@@ -22,7 +22,6 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.common.annotations.VisibleForTesting
 
 /**
  * Factory for [QuestionnaireItemViewHolder].
@@ -51,7 +50,6 @@ abstract class QuestionnaireItemViewHolderFactory(@LayoutRes open val resId: Int
  */
 open class QuestionnaireItemViewHolder(
   itemView: View,
-  @org.jetbrains.annotations.VisibleForTesting
   private val delegate: QuestionnaireItemViewHolderDelegate
 ) : RecyclerView.ViewHolder(itemView) {
   init {

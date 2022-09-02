@@ -35,7 +35,7 @@ import org.robolectric.annotation.Config
 class QuestionnaireFragmentTest {
 
   @Test
-  fun testFragment_ShouldBeAbleToBuildQuestionnaireResponse() {
+  fun `fragment should have valid questionnaire response`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"

@@ -708,7 +708,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun calculatedExpression_shouldReturnExpression() {
+  fun `calculatedExpression should return expression for valid extension url`() {
     val questionnaire =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -724,7 +724,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun calculatedExpression_shouldReturnNull() {
+  fun `calculatedExpression should return null for other extension url`() {
     val questionnaire =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -933,7 +933,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun createQuestionResponseWithQuantityType_ShouldNotSetAnswer_WithValueEmpty() {
+  fun `createQuestionResponse should not set answer for quantity type with missing value `() {
     val question =
       Questionnaire.QuestionnaireItemComponent(
           StringType("age"),
@@ -960,7 +960,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun createQuestionResponseWithQuantityType_ShouldSetAnswer() {
+  fun `createQuestionResponse should set answer with quantity type`() {
     val question =
       Questionnaire.QuestionnaireItemComponent(
           StringType("age"),

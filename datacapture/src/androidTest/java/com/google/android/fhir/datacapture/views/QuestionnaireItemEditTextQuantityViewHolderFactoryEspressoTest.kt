@@ -54,7 +54,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun getValue_WithInitial_shouldReturnQuantityWithUnitAndSystem() {
+  fun getValue_WithInitial_shouldReturn_Quantity_With_UnitAndSystem() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -88,7 +88,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun getValue_WithoutInitial_shouldReturnQuantityWithoutUnitAndSystem() {
+  fun getValue_WithoutInitial_shouldReturn_Quantity_Without_UnitAndSystem() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
