@@ -17,63 +17,29 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
+import androidx.lifecycle.asFlow
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.sync.download.DownloaderImpl
-import com.google.android.fhir.sync.upload.BundleUploader
-import com.google.android.fhir.sync.upload.LocalChangesPaginator
-import com.google.android.fhir.sync.upload.TransactionBundleGenerator
-import org.hl7.fhir.r4.model.ResourceType
+import androidx.work.hasKeyWithValueOfType
+import com.google.android.fhir.OffsetDateTimeTypeAdapter
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import java.time.OffsetDateTime
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.mapNotNull
 
 object Sync {
-  fun basicSyncJob(context: Context): SyncJob {
-    return SyncJobImpl(context)
-  }
-
-  /**
-   * Does a one time sync based on [ResourceSearchParams]. Returns a [Result] that tells caller
-   * whether process was Success or Failure. In case of failure, caller needs to take care of the
-   * retry
-   */
-  // TODO: Check if this api is required anymore since we have SyncJob.run to do the same work.
-  suspend fun oneTimeSync(
-    context: Context,
-    fhirEngine: FhirEngine,
-    downloadManager: DownloadWorkManager,
-    uploadConfiguration: UploadConfiguration = UploadConfiguration(),
-    resolver: ConflictResolver
-  ): Result {
-    return FhirEngineProvider.getDataSource(context)?.let {
-      FhirSynchronizer(
-          context,
-          fhirEngine,
-          BundleUploader(
-            it,
-            TransactionBundleGenerator.getDefault(),
-            LocalChangesPaginator.create(uploadConfiguration)
-          ),
-          DownloaderImpl(it, downloadManager),
-          resolver
-        )
-        .synchronize()
-    }
-      ?: Result.Error(
-        listOf(
-          ResourceSyncException(
-            ResourceType.Bundle,
-            IllegalStateException(
-              "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration."
-            )
-          )
-        )
-      )
-  }
+  val gson: Gson =
+    GsonBuilder()
+      .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeTypeAdapter().nullSafe())
+      .create()
 
   /**
    * Starts a one time sync based on [FhirSyncWorker]. In case of a failure, [RetryConfiguration]
@@ -90,22 +56,40 @@ object Sync {
         createOneTimeWorkRequest(retryConfiguration, W::class.java)
       )
   }
+
   /**
    * Starts a periodic sync based on [FhirSyncWorker]. It takes [PeriodicSyncConfiguration] to
    * determine the sync frequency and [RetryConfiguration] to guide the retry mechanism. Caller can
    * set [retryConfiguration] to [null] to stop retry.
    */
+  @ExperimentalCoroutinesApi
   inline fun <reified W : FhirSyncWorker> periodicSync(
     context: Context,
     periodicSyncConfiguration: PeriodicSyncConfiguration
-  ) {
+  ): Flow<State> {
+    val flow =
+      WorkManager.getInstance(context)
+        .getWorkInfosForUniqueWorkLiveData(SyncWorkType.DOWNLOAD.workerName)
+        .asFlow()
+        .flatMapConcat { it.asFlow() }
+        .mapNotNull { workInfo ->
+          workInfo.progress
+            .takeIf { it.keyValueMap.isNotEmpty() && it.hasKeyWithValueOfType<String>("StateType") }
+            ?.let {
+              val state = it.getString("StateType")!!
+              val stateData = it.getString("State")
+              gson.fromJson(stateData, Class.forName(state)) as State
+            }
+        }
 
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
         SyncWorkType.DOWNLOAD.workerName,
-        ExistingPeriodicWorkPolicy.KEEP,
+        ExistingPeriodicWorkPolicy.REPLACE,
         createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java)
       )
+
+    return flow
   }
 
   @PublishedApi

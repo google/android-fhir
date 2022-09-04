@@ -44,7 +44,6 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
 import com.google.android.fhir.sync.State
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -91,13 +90,10 @@ class PatientListFragment : Fragment() {
       }
     )
 
-    patientListViewModel.liveSearchedPatients.observe(
-      viewLifecycleOwner,
-      {
-        Timber.d("Submitting ${it.count()} patient records")
-        adapter.submitList(it)
-      }
-    )
+    patientListViewModel.liveSearchedPatients.observe(viewLifecycleOwner) {
+      Timber.d("Submitting ${it.count()} patient records")
+      adapter.submitList(it)
+    }
 
     patientListViewModel.patientCount.observe(
       viewLifecycleOwner,
@@ -164,13 +160,13 @@ class PatientListFragment : Fragment() {
           is State.Finished -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp()
+            // mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
           is State.Failed -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp()
+            // mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
           else -> Timber.i("Sync: Unknown state.")

@@ -24,7 +24,9 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.fhir.demo.data.FhirSyncWorker
 import com.google.android.fhir.demo.databinding.ActivityMainBinding
+import com.google.android.fhir.sync.Sync
 
 const val MAX_RESOURCE_COUNT = 20
 
@@ -40,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     initActionBar()
     initNavigationDrawer()
     observeLastSyncTime()
-    viewModel.updateLastSyncTimestamp()
+    // viewModel.updateLastSyncTimestamp()
   }
 
   override fun onBackPressed() {
@@ -60,7 +62,7 @@ class MainActivity : AppCompatActivity() {
 
   fun openNavigationDrawer() {
     binding.drawer.openDrawer(GravityCompat.START)
-    viewModel.updateLastSyncTimestamp()
+    // viewModel.updateLastSyncTimestamp()
   }
 
   private fun initActionBar() {
@@ -78,7 +80,7 @@ class MainActivity : AppCompatActivity() {
   private fun onNavigationItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.menu_sync -> {
-        viewModel.poll()
+        Sync.oneTimeSync<FhirSyncWorker>(this)
         true
       }
     }
