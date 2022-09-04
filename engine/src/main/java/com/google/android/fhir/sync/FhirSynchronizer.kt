@@ -72,6 +72,8 @@ internal class FhirSynchronizer(
   }
 
   private suspend fun setSyncState(result: Result): Result {
+
+    // todo: emit this properly instead of using datastore?
     datastoreUtil.writeLastSyncTimestamp(result.timestamp)
 
     when (result) {
