@@ -83,7 +83,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
 
     delay(1000)
 
-    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.itemImage).visibility)
+    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.item_image).visibility)
       .isEqualTo(View.VISIBLE)
   }
 
@@ -113,7 +113,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
 
     delay(1000)
 
-    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.itemImage).visibility)
+    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.item_image).visibility)
       .isEqualTo(View.GONE)
   }
 
@@ -136,7 +136,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
 
     delay(1000)
 
-    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.itemImage).visibility)
+    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.item_image).visibility)
       .isEqualTo(View.GONE)
   }
 

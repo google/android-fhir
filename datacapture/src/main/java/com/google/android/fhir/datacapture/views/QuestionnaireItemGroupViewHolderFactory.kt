@@ -43,7 +43,7 @@ internal object QuestionnaireItemGroupViewHolderFactory :
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         error = itemView.findViewById(R.id.error)
-        itemImageView = itemView.findViewById(R.id.itemImage)
+        itemImageView = itemView.findViewById(R.id.item_image)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {

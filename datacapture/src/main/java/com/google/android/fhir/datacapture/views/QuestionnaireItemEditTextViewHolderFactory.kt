@@ -60,7 +60,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
 
   override fun init(itemView: View) {
     header = itemView.findViewById(R.id.header)
-    itemImageView = itemView.findViewById(R.id.itemImage)
+    itemImageView = itemView.findViewById(R.id.item_image)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
     textInputEditText.setRawInputType(rawInputType)
