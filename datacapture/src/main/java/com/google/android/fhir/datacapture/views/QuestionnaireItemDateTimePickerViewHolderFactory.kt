@@ -61,6 +61,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       private lateinit var timeInputLayout: TextInputLayout
       private lateinit var timeInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      private var previousQuestionnaireItemViewItem: QuestionnaireItemViewItem? = null
       private var localDate: LocalDate? = null
       private var localTime: LocalTime? = null
       private var textWatcher: TextWatcher? = null
@@ -142,7 +143,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         clearPreviousState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
         dateInputLayout.hint = localeDatePattern
-        dateInputEditText.removeTextChangedListener(textWatcher)
         val dateTime = questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType
         updateDateTimeInput(
           dateTime?.let {
@@ -272,9 +272,18 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       private fun clearPreviousState() {
-        localDate = null
-        localTime = null
         setReadOnlyInternal(isReadOnly = false)
+        dateInputEditText.removeTextChangedListener(textWatcher)
+        // Cleanup old state when the ViewHolder is now being used for a different questionnaireItem
+        if (previousQuestionnaireItemViewItem?.questionnaireItem !=
+            questionnaireItemViewItem.questionnaireItem
+        ) {
+          dateInputEditText.text = null
+          timeInputEditText.text = null
+          localDate = null
+          localTime = null
+        }
+        previousQuestionnaireItemViewItem = questionnaireItemViewItem
       }
 
       private fun enableOrDisableTimePicker(enableIt: Boolean) {

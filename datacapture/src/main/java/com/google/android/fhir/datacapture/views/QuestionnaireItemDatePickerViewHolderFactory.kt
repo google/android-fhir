@@ -55,6 +55,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      private var previousQuestionnaireItemViewItem: QuestionnaireItemViewItem? = null
       private var textWatcher: TextWatcher? = null
       // Medium and long format styles use alphabetical month names which are difficult for the user
       // to input. Use short format style which is always numerical.
@@ -102,6 +103,13 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = localePattern
         textInputEditText.removeTextChangedListener(textWatcher)
+        // Cleanup old state when the ViewHolder is now being used for a different questionnaireItem
+        if (previousQuestionnaireItemViewItem?.questionnaireItem !=
+            questionnaireItemViewItem.questionnaireItem
+        ) {
+          textInputEditText.text = null
+        }
+        previousQuestionnaireItemViewItem = questionnaireItemViewItem
 
         if (textInputEditText.text.isNullOrEmpty()) {
           textInputEditText.setText(
