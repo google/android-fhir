@@ -35,13 +35,23 @@
         app:layout_constraintTop_toTopOf="parent"
     />
 
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/questionnaire_progress_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/review_mode_edit_button"
+        app:layout_constraintBottom_toTopOf="@id/questionnaire_edit_recycler_view"
+    />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/questionnaire_edit_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@+id/bottom_buttons"
-        app:layout_constraintTop_toBottomOf="@+id/review_mode_edit_button"
+        app:layout_constraintTop_toBottomOf="@+id/questionnaire_progress_indicator"
     />
 
     <androidx.recyclerview.widget.RecyclerView

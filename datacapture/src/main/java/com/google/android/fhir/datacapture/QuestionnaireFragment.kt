@@ -30,6 +30,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import org.hl7.fhir.r4.model.Questionnaire
 
 /**
@@ -76,6 +77,8 @@ open class QuestionnaireFragment : Fragment() {
     requireView().findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
       setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
     }
+    val questionnaireProgressIndicator =
+      view.findViewById<LinearProgressIndicator>(R.id.questionnaire_progress_indicator)
     val questionnaireItemEditAdapter =
       QuestionnaireItemEditAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
     val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
@@ -108,11 +111,13 @@ open class QuestionnaireFragment : Fragment() {
           questionnaireReviewRecyclerView.visibility = View.VISIBLE
           questionnaireEditRecyclerView.visibility = View.GONE
           reviewModeEditButton.visibility = View.VISIBLE
+          questionnaireProgressIndicator.visibility = View.GONE
         } else {
           questionnaireItemEditAdapter.submitList(state.items)
           questionnaireEditRecyclerView.visibility = View.VISIBLE
           questionnaireReviewRecyclerView.visibility = View.GONE
           reviewModeEditButton.visibility = View.GONE
+          questionnaireProgressIndicator.visibility = View.VISIBLE
         }
 
         if (state.pagination.isPaginated && !state.reviewMode) {
@@ -120,6 +125,10 @@ open class QuestionnaireFragment : Fragment() {
           paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage
           paginationNextButton.visibility = View.VISIBLE
           paginationNextButton.isEnabled = state.pagination.hasNextPage
+          questionnaireProgressIndicator.apply {
+            max = state.pagination.pages.size
+            progress = state.pagination.currentPageIndex + 1
+          }
         } else {
           paginationPreviousButton.visibility = View.GONE
           paginationNextButton.visibility = View.GONE
