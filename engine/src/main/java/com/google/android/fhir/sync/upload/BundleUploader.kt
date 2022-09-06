@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.sync.upload
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.sync.DataSource
@@ -45,13 +43,7 @@ internal class BundleUploader(
     listOfLocalChanges: List<SquashedLocalChange>,
   ): Flow<UploadResult> =
     flow {
-      Timber.i("uploading ${listOfLocalChanges.size}")
       bundleGenerator.generate(listOf(listOfLocalChanges)).forEach { (bundle, localChangeTokens) ->
-        Timber.i("uploading ${bundle.entry.size}")
-        Timber.i(
-          "Bundle to be uploaded ${FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().encodeResourceToString(bundle)}"
-        )
-        Timber.i("Local Change Tokens $localChangeTokens")
         val response = dataSource.upload(bundle)
         emit(getUploadResult(response, localChangeTokens))
       }

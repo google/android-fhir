@@ -33,7 +33,6 @@ import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import timber.log.Timber
 
 abstract class SyncStrategy {
   abstract val syncStrategyTypes: SyncStrategyTypes
@@ -86,8 +85,6 @@ class SequentialSyncStrategy() : SyncStrategy() {
       localChanges.associateBy { it.localChange.resourceId } as
         MutableMap<String, SquashedLocalChange>
     val contextWorkSpace = ContextObject(idsDone, listOfLocalChange, mapOfResourceIdLocalChange)
-    Timber.i("Ids of ${mapOfResourceIdLocalChange.keys}")
-    Timber.i("number of local changes ${localChanges.size}")
 
     if (mapOfResourceIdLocalChange.isNotEmpty()) {
       walkAndReturnLocalChange(
@@ -97,19 +94,8 @@ class SequentialSyncStrategy() : SyncStrategy() {
       )
     }
     if (contextWorkSpace.listOfLocalChange.isNotEmpty()) {
-      Timber.i(
-        "emitting ${contextWorkSpace.listOfLocalChange.size} local change object ${contextWorkSpace.listOfLocalChange}"
-      )
       val uniqueList = ArrayList(contextWorkSpace.listOfLocalChange.toSet().toList())
-      Timber.i("emitting unique list size ${uniqueList.size} unique list object $uniqueList")
       collectAndEmitLocalChange(uniqueList, upload)
-      //      val listDropped = idsDone.drop(listOfLocalChange.size)
-      //      idsDone =
-      //        if (listDropped.isEmpty()) {
-      //          mutableListOf()
-      //        } else {
-      //          listDropped as MutableList<String>
-      //        }
       contextWorkSpace.listOfLocalChange.clear()
     }
   }
@@ -118,24 +104,13 @@ class SequentialSyncStrategy() : SyncStrategy() {
     resourceId: String,
     contextWorkSpace: ContextObject
   ) {
-    Timber.i("collected $resourceId $this")
     if (contextWorkSpace.listOfLocalChange.size >= 10) {
       contextWorkSpace.mapOfResourceIdLocalChange[resourceId]?.let { it ->
         contextWorkSpace.listOfLocalChange.add(it)
       }
-      Timber.i(
-        "emitting ${contextWorkSpace.listOfLocalChange.size} local change object ${contextWorkSpace.listOfLocalChange}"
-      )
+
       val uniqueList = ArrayList(contextWorkSpace.listOfLocalChange.toSet().toList())
-      Timber.i("emitting unique list size ${uniqueList.size} unique list object $uniqueList")
       collectAndEmitLocalChange(uniqueList, upload)
-      //      val listDropped = idsDone.drop(listOfLocalChange.size)
-      //      idsDone =
-      //        if (listDropped.isEmpty()) {
-      //          mutableListOf()
-      //        } else {
-      //          listDropped as MutableList<String>
-      //        }
       contextWorkSpace.listOfLocalChange.clear()
     } else {
       contextWorkSpace.mapOfResourceIdLocalChange[resourceId]?.let { it ->
@@ -190,7 +165,6 @@ class SequentialSyncStrategy() : SyncStrategy() {
       if (references.isEmpty()) {
         contextWorkSpace.idsDone.add(idSquashedLocalChange.key)
         runBlocking { collectAndEmit(idSquashedLocalChange.key, contextWorkSpace) }
-        Timber.i("Added ${idSquashedLocalChange.key} size ${contextWorkSpace.idsDone.size}")
       } else {
         if (localChange.localChange.resourceType == "Encounter") {
           val encounter =
@@ -229,7 +203,6 @@ class SequentialSyncStrategy() : SyncStrategy() {
         }
         contextWorkSpace.idsDone.add(idSquashedLocalChange.key)
         runBlocking { collectAndEmit(idSquashedLocalChange.key, contextWorkSpace) }
-        Timber.i("Added ${idSquashedLocalChange.key} size ${contextWorkSpace.idsDone.size}")
       }
     }
   }

@@ -17,8 +17,6 @@
 package com.google.android.fhir.impl
 
 import android.content.Context
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.SyncDownloadContext
@@ -98,25 +96,17 @@ internal class FhirEngineImpl(
     upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
     var resourceSuccessfullyUploaded = true
-    Timber.i("COLLECTED FROM REARRANGE ${squashedChanges.size}")
     upload(squashedChanges).collect {
       val idsToDeleteFromUpdate = it.first.ids as MutableList
-      Timber.i("IDs to delete $idsToDeleteFromUpdate")
 
       // Check server for resource before delete.
       try {
-        Timber.i(
-          "Bundle From server" +
-            FhirContext.forCached(FhirVersionEnum.R4)
-              .newJsonParser()
-              .encodeResourceToString(it.second)
-        )
+
         (it.second as Bundle).entry.forEachIndexed { index, bundleEntry ->
           val response = bundleEntry.response
           val url = response.location.toString() + "?_elements=identifier"
           val downloadBundle = dataSource?.download(url)
           if (downloadBundle == null) {
-            Timber.i("Resource failed in upload" + downloadBundle?.id.toString())
             idsToDeleteFromUpdate.remove(it.first.ids[index])
           } else {
             Timber.i("Resource Found after upload" + downloadBundle.id.toString())
