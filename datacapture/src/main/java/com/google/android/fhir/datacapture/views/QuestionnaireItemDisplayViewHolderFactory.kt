@@ -17,45 +17,25 @@
 package com.google.android.fhir.datacapture.views
 
 import android.view.View
-import android.widget.ImageView
-import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.fetchBitmap
-import com.google.android.fhir.datacapture.itemMedia
-import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 internal object QuestionnaireItemDisplayViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_display_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: QuestionnaireItemHeaderView
-      private lateinit var itemImageView: ImageView
+      private lateinit var itemMedia: QuestionnaireItemMediaView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
-        itemImageView = itemView.findViewById(R.id.itemImage)
+        itemMedia = itemView.findViewById(R.id.item_media)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
-
-        itemImageView.setImageBitmap(null)
-
-        questionnaireItemViewItem.questionnaireItem.itemMedia?.let {
-          val activity = itemImageView.context.tryUnwrapContext()!!
-          activity.lifecycleScope.launch(Dispatchers.IO) {
-            it.fetchBitmap(itemImageView.context)?.run {
-              activity.lifecycleScope.launch(Dispatchers.Main) {
-                itemImageView.visibility = View.VISIBLE
-                itemImageView.setImageBitmap(this@run)
-              }
-            }
-          }
-        }
+        itemMedia.bind(questionnaireItemViewItem.questionnaireItem)
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {

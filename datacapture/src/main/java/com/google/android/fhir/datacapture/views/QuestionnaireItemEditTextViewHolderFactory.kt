@@ -23,23 +23,16 @@ import android.view.View
 import android.view.View.FOCUS_DOWN
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.ImageView
 import androidx.annotation.LayoutRes
 import androidx.core.widget.doAfterTextChanged
-import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.fetchBitmap
-import com.google.android.fhir.datacapture.itemMedia
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
-import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal abstract class QuestionnaireItemEditTextViewHolderFactory(
@@ -52,7 +45,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderFactory(
 abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputType: Int) :
   QuestionnaireItemViewHolderDelegate {
   private lateinit var header: QuestionnaireItemHeaderView
-  private lateinit var itemImageView: ImageView
+  private lateinit var itemMedia: QuestionnaireItemMediaView
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
@@ -60,7 +53,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
 
   override fun init(itemView: View) {
     header = itemView.findViewById(R.id.header)
-    itemImageView = itemView.findViewById(R.id.item_image)
+    itemMedia = itemView.findViewById(R.id.item_media)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
     textInputEditText.setRawInputType(rawInputType)
@@ -89,6 +82,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
 
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     header.bind(questionnaireItemViewItem.questionnaireItem)
+    itemMedia.bind(questionnaireItemViewItem.questionnaireItem)
     textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
 
     textInputEditText.removeTextChangedListener(textWatcher)
@@ -99,22 +93,6 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
 
     textWatcher =
       textInputEditText.doAfterTextChanged { editable: Editable? -> updateAnswer(editable) }
-
-    // The RecyclerView is recycling the ImageView therefore making them visible and recycling
-    // images from previous questions
-    itemImageView.setImageBitmap(null)
-
-    questionnaireItemViewItem.questionnaireItem.itemMedia?.let {
-      val activity = itemImageView.context.tryUnwrapContext()!!
-      activity.lifecycleScope.launch(Dispatchers.IO) {
-        it.fetchBitmap(itemImageView.context)?.run {
-          activity.lifecycleScope.launch(Dispatchers.Main) {
-            itemImageView.visibility = View.VISIBLE
-            itemImageView.setImageBitmap(this@run)
-          }
-        }
-      }
-    }
   }
 
   private fun updateAnswer(editable: Editable?) {

@@ -17,51 +17,31 @@
 package com.google.android.fhir.datacapture.views
 
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.fetchBitmap
-import com.google.android.fhir.datacapture.itemMedia
-import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 internal object QuestionnaireItemGroupViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_group_header_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: QuestionnaireItemHeaderView
-      private lateinit var itemImageView: ImageView
+      private lateinit var itemMedia: QuestionnaireItemMediaView
       private lateinit var error: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
+        itemMedia = itemView.findViewById(R.id.item_media)
         error = itemView.findViewById(R.id.error)
-        itemImageView = itemView.findViewById(R.id.item_image)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
-
-        itemImageView.setImageBitmap(null)
-
-        questionnaireItemViewItem.questionnaireItem.itemMedia?.let {
-          val activity = itemImageView.context.tryUnwrapContext()!!
-          activity.lifecycleScope.launch(Dispatchers.IO) {
-            it.fetchBitmap(itemImageView.context)?.run {
-              activity.lifecycleScope.launch(Dispatchers.Main) {
-                itemImageView.visibility = View.VISIBLE
-                itemImageView.setImageBitmap(this@run)
-              }
-            }
-          }
-        }
+        itemMedia.bind(questionnaireItemViewItem.questionnaireItem)
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
