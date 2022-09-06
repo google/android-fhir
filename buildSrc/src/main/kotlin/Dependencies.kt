@@ -160,7 +160,7 @@ object Dependencies {
     }
 
     object Cql {
-      const val evaluator = "1.4.2"
+      const val evaluator = "2.0.0"
     }
 
     object JavaJsonTools {

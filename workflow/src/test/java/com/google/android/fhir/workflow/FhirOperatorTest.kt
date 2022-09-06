@@ -27,9 +27,9 @@ import java.util.Date
 import kotlinx.coroutines.runBlocking
 import org.cqframework.cql.cql2elm.CqlTranslator
 import org.cqframework.cql.cql2elm.CqlTranslatorOptions
-import org.cqframework.cql.cql2elm.FhirLibrarySourceProvider
 import org.cqframework.cql.cql2elm.LibraryManager
 import org.cqframework.cql.cql2elm.ModelManager
+import org.cqframework.cql.cql2elm.quick.FhirLibrarySourceProvider
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Library
@@ -452,7 +452,7 @@ class FhirOperatorTest {
         *CqlTranslatorOptions.defaultOptions().options.toTypedArray()
       )
 
-    return translator.toJxson()
+    return translator.toJson()
   }
 
   private fun String.readStringToBase64Encoded(): String {
