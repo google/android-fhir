@@ -992,7 +992,13 @@ class ResourceIndexerTest {
           "http://hl7.org/fhir/publication-status",
           "draft"
         ),
-        TokenIndex("_id", "Questionnaire.id", null, "3141")
+        TokenIndex("_id", "Questionnaire.id", null, "3141"),
+        TokenIndex(
+          "code",
+          "Questionnaire.item.code",
+          "http://example.org/system/code/sections",
+          "HISTOPATHOLOGY"
+        )
       )
 
     assertThat(resourceIndices.dateTimeIndices)
