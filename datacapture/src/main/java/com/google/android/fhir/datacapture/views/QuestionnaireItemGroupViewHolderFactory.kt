@@ -28,7 +28,7 @@ internal object QuestionnaireItemGroupViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_group_header_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var header: QuestionnaireItemHeaderView
+      private lateinit var header: QuestionnaireGroupTypeHeaderView
       private lateinit var itemMedia: QuestionnaireItemMediaView
       private lateinit var error: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem

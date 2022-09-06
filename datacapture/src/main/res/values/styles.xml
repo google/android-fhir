@@ -37,12 +37,18 @@
         name="Theme.Questionnaire"
         parent="Theme.Material3.DayNight.NoActionBar"
     >
+      <item name="questionnaireGroupTypeQuestionTextStyle">
+        @style/TextAppearance.Material3.TitleMedium
+      </item>
       <item
             name="questionnaireQuestionTextStyle"
         >@style/TextAppearance.Material3.TitleMedium</item>
         <item
             name="questionnaireSubtitleTextStyle"
         >@style/TextAppearance.Material3.BodyMedium</item>
+        <item
+            name="questionnaireAnswerTextStyle"
+        >@style/Questionnaire.AnswerStyle</item>
         <item
             name="questionnaireCheckBoxStyle"
         >@style/Questionnaire.CheckBoxStyle
@@ -80,6 +86,10 @@
             name="questionnaireSubmitButtonStyle"
         >@style/Questionnaire.SubmitButtonStyle
         </item>
+        <item
+            name="questionnaireEditButtonStyle"
+        >@style/Questionnaire.EditButtonStyle
+        </item>
         <item name="questionnaireDialogButtonStyle">
         @style/Widget.Material3.Button.TextButton.Dialog
         </item>
@@ -90,6 +100,13 @@
             name="questionnaireAddAnotherAnswerButtonStyle"
         >@style/Widget.Material3.Button
         </item>
+    </style>
+
+    <style
+        name="Questionnaire.AnswerStyle"
+        parent="TextAppearance.Material3.BodyMedium"
+    >
+        <item name="android:alpha">0.5</item>
     </style>
 
     <style
@@ -187,6 +204,14 @@
             name="android:background"
         >@drawable/questionnaire_item_checkbox_background</item>
         <item name="android:padding">@dimen/padding_default</item>
+    </style>
+
+    <style
+        name="Questionnaire.EditButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton.Icon"
+    >
+        <item name="android:text">@string/edit_button_text</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <style

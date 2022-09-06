@@ -16,7 +16,10 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.app.Application
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
+import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -26,6 +29,7 @@ import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -34,6 +38,8 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class QuestionnaireItemViewItemTest {
+  private val context = ApplicationProvider.getApplicationContext<Application>()
+
   @Test
   fun addAnswer_questionnaireItemDoesNotRepeat_shouldThrowIllegalArgument() {
     val questionnaireItemViewItem =
@@ -609,5 +615,54 @@ class QuestionnaireItemViewItemTest {
           )
       )
       .isTrue()
+  }
+
+  @Test
+  fun `answerString() should return not answered with no answer`() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = Valid,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    assertThat(questionnaireItemViewItem.answerString(context))
+      .isEqualTo(context.getString(R.string.not_answered))
+  }
+
+  @Test
+  fun `answerString() should return answer value with single answer`() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(StringType("Answer"))
+          ),
+        validationResult = Valid,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    assertThat(questionnaireItemViewItem.answerString(context)).isEqualTo("Answer")
+  }
+
+  @Test
+  fun `answerString() should return comma separated answer value with multiple answers`() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(StringType("Answer1"))
+          )
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(StringType("Answer2"))
+          ),
+        validationResult = Valid,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    assertThat(questionnaireItemViewItem.answerString(context)).isEqualTo("Answer1, Answer2")
   }
 }
