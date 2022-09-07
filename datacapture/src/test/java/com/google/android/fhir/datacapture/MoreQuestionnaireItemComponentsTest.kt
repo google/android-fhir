@@ -666,7 +666,7 @@ class MoreQuestionnaireItemComponentsTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_ENABLE_WHEN_EXPRESSION_URL,
+                  EXTENSION_ENABLE_WHEN_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression =
