@@ -57,7 +57,7 @@ object ExpressionEvaluator {
    */
   private val variableRegex = Regex("[%]([A-Za-z0-9\\-]{1,64})")
   private val globalVariablesMap: MutableMap<String, Base?> = mutableMapOf()
-  
+
   private val fhirPathEngine: FHIRPathEngine =
     with(FhirContext.forCached(FhirVersionEnum.R4)) {
       FHIRPathEngine(HapiWorkerContext(this, this.validationSupport)).apply {
@@ -100,7 +100,7 @@ object ExpressionEvaluator {
         it.name == expression.name && it.expression == expression.expression
       }
     ) { "The expression should come from the same questionnaire item" }
-    
+
     findDependentVariables(expression).forEach { variableName ->
       if (globalVariablesMap[variableName] == null) {
         findAndEvaluateVariable(
@@ -155,11 +155,10 @@ object ExpressionEvaluator {
   }
 
   private fun findDependentVariables(expression: Expression) =
-    variableRegex
-      .findAll(expression.expression)
-      .map { it.groupValues[1] }
-      .toList()
-      .filterNot { variable -> reservedVariables.contains(variable) }
+    variableRegex.findAll(expression.expression).map { it.groupValues[1] }.toList().filterNot {
+      variable ->
+      reservedVariables.contains(variable)
+    }
 
   /**
    * Finds the dependent variables at questionnaire item level first, then in ancestors and then at
@@ -186,13 +185,13 @@ object ExpressionEvaluator {
       questionnaireItem.findVariableExpression(variableName) != null -> {
         questionnaireItem.findVariableExpression(variableName)?.let { expression ->
           globalVariablesMap[expression.name] =
-              evaluateQuestionnaireItemVariableExpression(
-                expression,
-                questionnaire,
-                questionnaireResponse,
-                questionnaireItemParentMap,
-                questionnaireItem
-              )
+            evaluateQuestionnaireItemVariableExpression(
+              expression,
+              questionnaire,
+              questionnaireResponse,
+              questionnaireItemParentMap,
+              questionnaireItem
+            )
         }
       }
       // Secondly, check the ancestors of the questionnaire item
@@ -201,24 +200,24 @@ object ExpressionEvaluator {
         findVariableInAncestors(variableName, questionnaireItemParentMap, questionnaireItem)?.let {
           (questionnaireItem, expression) ->
           globalVariablesMap[expression.name] =
-              evaluateQuestionnaireItemVariableExpression(
-                expression,
-                questionnaire,
-                questionnaireResponse,
-                questionnaireItemParentMap,
-                questionnaireItem
-              )
+            evaluateQuestionnaireItemVariableExpression(
+              expression,
+              questionnaire,
+              questionnaireResponse,
+              questionnaireItemParentMap,
+              questionnaireItem
+            )
         }
       }
       // Finally, check the variables defined on the questionnaire itself
       else -> {
         questionnaire.findVariableExpression(variableName)?.also { expression ->
           globalVariablesMap[expression.name] =
-              evaluateQuestionnaireVariableExpression(
-                expression,
-                questionnaire,
-                questionnaireResponse
-              )
+            evaluateQuestionnaireVariableExpression(
+              expression,
+              questionnaire,
+              questionnaireResponse
+            )
         }
       }
     }
