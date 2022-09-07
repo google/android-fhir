@@ -56,7 +56,6 @@ object ExpressionEvaluator {
    * in this expression
    */
   private val variableRegex = Regex("[%]([A-Za-z0-9\\-]{1,64})")
-  private val variablesMap: MutableMap<String, Base?> = mutableMapOf()
 
   private val fhirPathEngine: FHIRPathEngine =
     with(FhirContext.forCached(FhirVersionEnum.R4)) {
@@ -93,7 +92,8 @@ object ExpressionEvaluator {
     questionnaireResponse: QuestionnaireResponse,
     questionnaireItemParentMap:
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    variablesMap: MutableMap<String, Base?> = mutableMapOf()
   ): Base? {
     require(
       questionnaireItem.variableExpressions.any {
@@ -108,7 +108,8 @@ object ExpressionEvaluator {
           questionnaireItem,
           questionnaire,
           questionnaireResponse,
-          questionnaireItemParentMap
+          questionnaireItemParentMap,
+          variablesMap
         )
       }
     }
@@ -135,7 +136,8 @@ object ExpressionEvaluator {
   internal fun evaluateQuestionnaireVariableExpression(
     expression: Expression,
     questionnaire: Questionnaire,
-    questionnaireResponse: QuestionnaireResponse
+    questionnaireResponse: QuestionnaireResponse,
+    variablesMap: MutableMap<String, Base?> = mutableMapOf()
   ): Base? {
 
     findDependentVariables(expression).forEach { variableName ->
@@ -145,7 +147,8 @@ object ExpressionEvaluator {
             evaluateQuestionnaireVariableExpression(
               expression,
               questionnaire,
-              questionnaireResponse
+              questionnaireResponse,
+              variablesMap
             )
         }
       }
@@ -178,7 +181,8 @@ object ExpressionEvaluator {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     questionnaireItemParentMap:
-      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>
+      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
+    variablesMap: MutableMap<String, Base?>
   ) {
     when {
       // First, check the questionnaire item itself
@@ -190,7 +194,8 @@ object ExpressionEvaluator {
               questionnaire,
               questionnaireResponse,
               questionnaireItemParentMap,
-              questionnaireItem
+              questionnaireItem,
+              variablesMap
             )
         }
       }
@@ -205,7 +210,8 @@ object ExpressionEvaluator {
               questionnaire,
               questionnaireResponse,
               questionnaireItemParentMap,
-              questionnaireItem
+              questionnaireItem,
+              variablesMap
             )
         }
       }
@@ -216,7 +222,8 @@ object ExpressionEvaluator {
             evaluateQuestionnaireVariableExpression(
               expression,
               questionnaire,
-              questionnaireResponse
+              questionnaireResponse,
+              variablesMap
             )
         }
       }
