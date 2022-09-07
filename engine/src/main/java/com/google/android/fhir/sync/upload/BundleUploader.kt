@@ -33,13 +33,14 @@ import org.hl7.fhir.r4.model.ResourceType
 /** [Uploader] implementation to work with Fhir [Bundle]. */
 internal class BundleUploader(
   private val dataSource: DataSource,
-  private val bundleGenerator: TransactionBundleGenerator
+  private val bundleGenerator: TransactionBundleGenerator,
+  private val splitter: Splitter
 ) : Uploader {
 
   override suspend fun upload(
     localChanges: List<LocalChange>,
   ): Flow<UploadResult> = flow {
-    bundleGenerator.generate(listOf(localChanges)).forEach { (bundle, localChangeTokens) ->
+    bundleGenerator.generate(splitter.split(localChanges)).forEach { (bundle, localChangeTokens) ->
       try {
         val response = dataSource.upload(bundle)
         emit(getUploadResult(response, localChangeTokens))
