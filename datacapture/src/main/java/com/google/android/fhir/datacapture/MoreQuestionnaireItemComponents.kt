@@ -64,8 +64,28 @@ internal const val EXTENSION_DISPLAY_CATEGORY_URL =
 internal const val EXTENSION_DISPLAY_CATEGORY_SYSTEM =
   "http://hl7.org/fhir/questionnaire-display-category"
 
-internal const val ITEM_ENABLE_WHEN_EXPRESSION_URL: String =
+internal const val EXTENSION_ENABLE_WHEN_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression"
+
+internal const val EXTENSION_VARIABLE_URL = "http://hl7.org/fhir/StructureDefinition/variable"
+
+internal val Questionnaire.QuestionnaireItemComponent.variableExpressions: List<Expression>
+  get() =
+    this.extension.filter { it.url == EXTENSION_VARIABLE_URL }.map { it.castToExpression(it.value) }
+
+/**
+ * Finds the specific variable name [String] at the questionnaire item
+ * [Questionnaire.QuestionnaireItemComponent]
+ *
+ * @param variableName the [String] to match the variable
+ *
+ * @return an [Expression]
+ */
+internal fun Questionnaire.QuestionnaireItemComponent.findVariableExpression(
+  variableName: String
+): Expression? {
+  return variableExpressions.find { it.name == variableName }
+}
 
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
@@ -263,7 +283,7 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
 // Return expression if QuestionnaireItemComponent has ENABLE WHEN EXPRESSION URL
 val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
   get() {
-    return this.extension.firstOrNull { it.url == ITEM_ENABLE_WHEN_EXPRESSION_URL }?.let {
+    return this.extension.firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }?.let {
       it.value as Expression
     }
   }
