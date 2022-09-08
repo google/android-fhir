@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,11 +46,10 @@ class DecimalTypeMaxDecimalValidatorTest {
     val validationResult =
       DecimalTypeMaxDecimalValidator.validate(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DecimalType("1.00"))
-          ),
+        listOf(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+            .setValue(DecimalType("1.00"))
+        ),
         context
       )
 
@@ -65,7 +64,7 @@ class DecimalTypeMaxDecimalValidatorTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           this.addExtension(Extension(MAX_DECIMAL_URL, IntegerType(1)))
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        listOf(),
         context
       )
 
@@ -80,11 +79,10 @@ class DecimalTypeMaxDecimalValidatorTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           this.addExtension(Extension(MAX_DECIMAL_URL, IntegerType(2)))
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DecimalType("1.00"))
-          ),
+        listOf(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+            .setValue(DecimalType("1.00"))
+        ),
         context
       )
 
@@ -99,11 +97,10 @@ class DecimalTypeMaxDecimalValidatorTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           this.addExtension(Extension(MAX_DECIMAL_URL, IntegerType(2)))
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DecimalType("1.000"))
-          ),
+        listOf(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+            .setValue(DecimalType("1.000"))
+        ),
         context
       )
 

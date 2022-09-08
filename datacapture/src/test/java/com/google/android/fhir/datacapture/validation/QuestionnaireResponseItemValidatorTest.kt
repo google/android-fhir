@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,24 +65,17 @@ class QuestionnaireResponseItemValidatorTest {
           }
         )
       }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = IntegerType(275)
-          }
-        )
-      }
-
-    val validateAggregationFromChildValidators =
-      QuestionnaireResponseItemValidator.validate(
-        questionnaireItem,
-        questionnaireResponseItem,
-        context
+    val answers =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = IntegerType(275)
+        }
       )
 
-    assertThat(validateAggregationFromChildValidators.isValid).isTrue()
-    assertThat(validateAggregationFromChildValidators.validationMessages).isEmpty()
+    val validationResult =
+      QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
+
+    assertThat(validationResult).isEqualTo(Valid)
   }
 
   @Test
@@ -103,29 +96,20 @@ class QuestionnaireResponseItemValidatorTest {
           }
         )
       }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        linkId = "a-question"
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = IntegerType(550)
-          }
-        )
-      }
-
-    val validateAggregationFromChildValidators =
-      QuestionnaireResponseItemValidator.validate(
-        questionnaireItem,
-        questionnaireResponseItem,
-        context
+    val answers =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = IntegerType(550)
+        }
       )
 
-    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
-    assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(2)
-    assertThat(validateAggregationFromChildValidators.validationMessages[0])
-      .isEqualTo("Maximum value allowed is:500")
-    assertThat(validateAggregationFromChildValidators.validationMessages[1])
-      .isEqualTo("Minimum value allowed is:600")
+    val validationResult =
+      QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
+
+    assertThat(validationResult).isInstanceOf(Invalid::class.java)
+    val invalidValidationResult = validationResult as Invalid
+    assertThat(invalidValidationResult.getSingleStringValidationMessage())
+      .isEqualTo("Maximum value allowed is:500\nMinimum value allowed is:600")
   }
 
   @Test
@@ -140,28 +124,22 @@ class QuestionnaireResponseItemValidatorTest {
           }
         )
       }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = StringType("Length: 15chars")
-          }
-        )
-      }
-
-    val validateAggregationFromChildValidators =
-      QuestionnaireResponseItemValidator.validate(
-        questionnaireItem,
-        questionnaireResponseItem,
-        context
+    val answers =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = StringType("Length: 15chars")
+        }
       )
 
-    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
-    assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(2)
-    assertThat(validateAggregationFromChildValidators.validationMessages[0])
-      .isEqualTo("The maximum number of characters that are permitted in the answer is: 10")
-    assertThat(validateAggregationFromChildValidators.validationMessages[1])
-      .isEqualTo("The minimum number of characters that are permitted in the answer is: 20")
+    val validationResult =
+      QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
+
+    assertThat(validationResult).isInstanceOf(Invalid::class.java)
+    val invalidValidationResult = validationResult as Invalid
+    assertThat(invalidValidationResult.getSingleStringValidationMessage())
+      .isEqualTo(
+        "The maximum number of characters that are permitted in the answer is: 10\nThe minimum number of characters that are permitted in the answer is: 20"
+      )
   }
 
   @Test
@@ -176,25 +154,19 @@ class QuestionnaireResponseItemValidatorTest {
           }
         )
       }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = IntegerType("3141516")
-          }
-        )
-      }
-
-    val validateAggregationFromChildValidators =
-      QuestionnaireResponseItemValidator.validate(
-        questionnaireItem,
-        questionnaireResponseItem,
-        context
+    val answers =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = IntegerType("3141516")
+        }
       )
 
-    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
-    assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(1)
-    assertThat(validateAggregationFromChildValidators.validationMessages[0])
+    val validationResult =
+      QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
+
+    assertThat(validationResult).isInstanceOf(Invalid::class.java)
+    val invalidValidationResult = validationResult as Invalid
+    assertThat(invalidValidationResult.getSingleStringValidationMessage())
       .isEqualTo("The answer doesn't match regular expression: $regex")
   }
 }

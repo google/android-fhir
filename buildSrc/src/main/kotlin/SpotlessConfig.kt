@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,11 @@ fun Project.configureSpotless() {
   val ktlintOptions = mapOf("indent_size" to "2", "continuation_indent_size" to "2")
   apply(plugin = Plugins.BuildPlugins.spotless)
   configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+    ratchetFrom = "origin/master" // only format files which have changed since origin/master
     kotlin {
       target("**/*.kt")
       targetExclude("**/build/")
+      targetExclude("**/*_Generated.kt")
       ktlint(ktlintVersion).userData(ktlintOptions)
       ktfmt().googleStyle()
       licenseHeaderFile(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,10 +100,11 @@ class SyncJobImpl(private val context: Context) : SyncJob {
   override suspend fun run(
     fhirEngine: FhirEngine,
     downloadManager: DownloadWorkManager,
+    resolver: ConflictResolver,
     subscribeTo: MutableSharedFlow<State>?
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
-      FhirSynchronizer(context, fhirEngine, it, downloadManager)
+      FhirSynchronizer(context, fhirEngine, it, downloadManager, conflictResolver = resolver)
         .apply { if (subscribeTo != null) subscribe(subscribeTo) }
         .synchronize(SyncWorkType.DOWNLOAD_UPLOAD)
     }

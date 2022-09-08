@@ -22,49 +22,99 @@
     android:layout_alignParentTop="true"
     xmlns:app="http://schemas.android.com/apk/res-auto"
 >
+
+    <Button
+        android:id="@+id/review_mode_edit_button"
+        style="?attr/questionnaireEditButtonStyle"
+        app:icon="@drawable/ic_outline_edit_24"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+        android:layout_marginVertical="@dimen/item_margin_vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+    />
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+        android:id="@+id/questionnaire_edit_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scrollbars="vertical"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/pagination_previous_button"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_buttons"
+        app:layout_constraintTop_toBottomOf="@+id/review_mode_edit_button"
     />
 
-    <Button
-        style="?attr/buttonStyleQuestionnaire"
-        android:id="@+id/pagination_previous_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-        android:layout_marginVertical="@dimen/item_margin_vertical"
-        android:text="@string/button_pagination_previous"
-        android:textAllCaps="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/questionnaire_review_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_buttons"
+        app:layout_constraintTop_toBottomOf="@+id/review_mode_edit_button"
     />
 
-    <Button
-        style="?attr/buttonStyleQuestionnaire"
-        android:id="@+id/pagination_next_button"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottom_buttons"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-        android:layout_marginVertical="@dimen/item_margin_vertical"
-        android:text="@string/button_pagination_next"
-        android:textAllCaps="false"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-    />
+    >
 
-    <Button
-        style="?attr/submitButtonStyleQuestionnaire"
-        android:id="@+id/submit_questionnaire"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-        android:layout_marginVertical="@dimen/item_margin_vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-    />
+        <Button
+            android:id="@+id/pagination_previous_button"
+            style="?attr/questionnaireButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+            android:layout_marginVertical="@dimen/item_margin_vertical"
+            android:text="@string/button_pagination_previous"
+            android:textAllCaps="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+        />
+
+        <Button
+            android:id="@+id/pagination_next_button"
+            style="?attr/questionnaireButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+            android:layout_marginVertical="@dimen/item_margin_vertical"
+            android:text="@string/button_pagination_next"
+            android:textAllCaps="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+        />
+
+        <Button
+            android:id="@+id/review_mode_button"
+            style="?attr/questionnaireButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+            android:layout_marginVertical="@dimen/item_margin_vertical"
+            android:text="@string/button_review"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+        />
+
+        <Button
+            style="?attr/questionnaireSubmitButtonStyle"
+            android:id="@+id/submit_questionnaire"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+            android:layout_marginVertical="@dimen/item_margin_vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+        />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

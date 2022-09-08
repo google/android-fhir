@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import org.hl7.fhir.r4.model.ResourceType
 
 @Dao
-interface SyncedResourceDao {
+internal interface SyncedResourceDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun insert(entity: SyncedResourceEntity)
 

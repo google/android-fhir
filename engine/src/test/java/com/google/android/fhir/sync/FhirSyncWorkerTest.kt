@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,112 +16,146 @@
 
 package com.google.android.fhir.sync
 
-// @RunWith(RobolectricTestRunner::class)
-// @Config(manifest = Config.NONE)
-// class FhirSyncWorkerTest {
-//  private lateinit var context: Context
-//  class PassingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
-//    FhirSyncWorker(appContext, workerParams) {
-//
-//    override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
-//    override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
-//    override fun getDownloadWorkManager(): DownloadWorkManager =
-//      TestingUtils.TestDownloadManagerImpl()
-//  }
-//
-//  class FailingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
-//    FhirSyncWorker(appContext, workerParams) {
-//
-//    override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
-//    override fun getDataSource(): DataSource = TestingUtils.TestFailingDatasource
-//    override fun getDownloadWorkManager(): DownloadWorkManager =
-//      TestingUtils.TestDownloadManagerImpl()
-//  }
-//
-//  class FailingPeriodicSyncWorkerWithoutDataSource(
-//    appContext: Context,
-//    workerParams: WorkerParameters
-//  ) : FhirSyncWorker(appContext, workerParams) {
-//
-//    override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
-//    override fun getDownloadWorkManager() = TestingUtils.TestDownloadManagerImpl()
-//    override fun getDataSource(): DataSource? = null
-//  }
-//
-//  @Before
-//  fun setUp() {
-//    context = ApplicationProvider.getApplicationContext()
-//  }
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
+import androidx.work.Data
+import androidx.work.ListenableWorker
+import androidx.work.WorkerParameters
+import androidx.work.testing.TestListenableWorkerBuilder
+import com.google.android.fhir.DataStoreRobolectricTestRunner
+import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.resource.TestingUtils
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 
+@RunWith(DataStoreRobolectricTestRunner::class)
+@Config(manifest = Config.NONE)
+class FhirSyncWorkerTest {
+  private lateinit var context: Context
+  class PassingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
+    FhirSyncWorker(appContext, workerParams) {
 
+    override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
+    override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
+    override fun getDownloadWorkManager(): DownloadWorkManager =
+      TestingUtils.TestDownloadManagerImpl()
+    override fun getConflictResolver() = AcceptRemoteConflictResolver
+  }
 
-//  @Test
-//  fun fhirSyncWorker_successfulTask_resultSuccess() {
-//    // In a ListenableWorker, runAttemptCount starts from 0. But in a TestListenableWorkerBuilder,
-//    // its set to start from 1. So overriding the default value when required in the test case.
-//    val worker =
-//      TestListenableWorkerBuilder<PassingPeriodicSyncWorker>(
-//          context,
-//          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 1).build(),
-//          runAttemptCount = 0
-//        )
-//        .build()
-//    val result = runBlocking { worker.doWork() }
-//    assertThat(result).isInstanceOf(ListenableWorker.Result.success()::class.java)
-//  }
-//
-//  @Test
-//  fun fhirSyncWorker_failedTaskWithZeroRetires_resultShouldBeFail() {
-//    val worker =
-//      TestListenableWorkerBuilder<FailingPeriodicSyncWorker>(
-//          context,
-//          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 0).build(),
-//          runAttemptCount = 0
-//        )
-//        .build()
-//    val result = runBlocking { worker.doWork() }
-//    assertThat(result).isInstanceOf(ListenableWorker.Result.failure()::class.java)
-//  }
-//
-//  @Test
-//  fun fhirSyncWorker_failedTaskWithCurrentRunAttemptSameAsTheReties_resultShouldBeFail() {
-//    val worker =
-//      TestListenableWorkerBuilder<FailingPeriodicSyncWorker>(
-//          context,
-//          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 2).build(),
-//          runAttemptCount = 2
-//        )
-//        .build()
-//    val result = runBlocking { worker.doWork() }
-//    assertThat(result).isInstanceOf(ListenableWorker.Result.failure()::class.java)
-//  }
-//
-//  @Test
-//  fun fhirSyncWorker_failedTaskWithCurrentRunAttemptSmallerThanTheReties_resultShouldBeRetry() {
-//    val worker =
-//      TestListenableWorkerBuilder<FailingPeriodicSyncWorker>(
-//          context,
-//          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 2).build(),
-//          runAttemptCount = 1
-//        )
-//        .build()
-//    val result = runBlocking { worker.doWork() }
-//    assertThat(result).isEqualTo(ListenableWorker.Result.retry())
-//  }
-//
-//  @Test
-//  fun fhirSyncWorker_nullDataSource_resultShouldBeFail() {
-//    val worker =
-//      TestListenableWorkerBuilder<FailingPeriodicSyncWorkerWithoutDataSource>(
-//          context,
-//          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 2).build(),
-//          runAttemptCount = 2
-//        )
-//        .build()
-//    val result = runBlocking { worker.doWork() }
-//    assertThat(result).isInstanceOf(ListenableWorker.Result.failure()::class.java)
-//    assertThat((result as ListenableWorker.Result.Failure).outputData).isNotNull()
-//    assertThat(result.outputData.keyValueMap)
-//      .containsEntry("error", "java.lang.IllegalStateException")
-//  }
-// }
+  class FailingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
+    FhirSyncWorker(appContext, workerParams) {
+
+    override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
+    override fun getDataSource(): DataSource = TestingUtils.TestFailingDatasource
+    override fun getDownloadWorkManager(): DownloadWorkManager =
+      TestingUtils.TestDownloadManagerImpl()
+    override fun getConflictResolver() = AcceptRemoteConflictResolver
+  }
+
+  class FailingPeriodicSyncWorkerWithoutDataSource(
+    appContext: Context,
+    workerParams: WorkerParameters
+  ) : FhirSyncWorker(appContext, workerParams) {
+
+    override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
+    override fun getDownloadWorkManager() = TestingUtils.TestDownloadManagerImpl()
+    override fun getDataSource(): DataSource? = null
+    override fun getConflictResolver() = AcceptRemoteConflictResolver
+  }
+
+  @Before
+  fun setUp() {
+    context = ApplicationProvider.getApplicationContext()
+  }
+
+  //  @Test
+  //  fun fhirSyncWorker_successfulTask_resultSuccess() {
+  //    // In a ListenableWorker, runAttemptCount starts from 0. But in a
+  // TestListenableWorkerBuilder,
+  //    // its set to start from 1. So overriding the default value when required in the test case.
+  //    val worker =
+  //      TestListenableWorkerBuilder<PassingPeriodicSyncWorker>(
+  //          context,
+  //          inputData =
+  //            Data.Builder()
+  //              .putInt(MAX_RETRIES_ALLOWED, 1)
+  //              .putString(FhirSyncWorker.SYNC_TYPE, SyncWorkType.DOWNLOAD_UPLOAD.name)
+  //              .build(),
+  //          runAttemptCount = 0
+  //        )
+  //        .build()
+  //    val result = runBlocking { worker.doWork() }
+  //    assertThat(result).isInstanceOf(ListenableWorker.Result.success()::class.java)
+  //  }
+
+  //  @Test
+  //  fun fhirSyncWorker_failedTaskWithZeroRetires_resultShouldBeFail() {
+  //    val worker =
+  //      TestListenableWorkerBuilder<FailingPeriodicSyncWorker>(
+  //          context,
+  //          inputData =
+  //            Data.Builder()
+  //              .putInt(MAX_RETRIES_ALLOWED, 0)
+  //              .putString(FhirSyncWorker.SYNC_TYPE, SyncWorkType.DOWNLOAD_UPLOAD.name)
+  //              .build(),
+  //          runAttemptCount = 0
+  //        )
+  //        .build()
+  //    val result = runBlocking { worker.doWork() }
+  //    assertThat(result).isInstanceOf(ListenableWorker.Result.failure()::class.java)
+  //  }
+
+  @Test
+  fun fhirSyncWorker_failedTaskWithCurrentRunAttemptSameAsTheReties_resultShouldBeFail() {
+    val worker =
+      TestListenableWorkerBuilder<FailingPeriodicSyncWorker>(
+          context,
+          inputData =
+            Data.Builder()
+              .putInt(MAX_RETRIES_ALLOWED, 2)
+              .putString(FhirSyncWorker.SYNC_TYPE, SyncWorkType.DOWNLOAD_UPLOAD.name)
+              .build(),
+          runAttemptCount = 2
+        )
+        .build()
+    val result = runBlocking { worker.doWork() }
+    assertThat(result).isInstanceOf(ListenableWorker.Result.failure()::class.java)
+  }
+
+  //  @Test
+  //  fun fhirSyncWorker_failedTaskWithCurrentRunAttemptSmallerThanTheReties_resultShouldBeRetry() {
+  //    val worker =
+  //      TestListenableWorkerBuilder<FailingPeriodicSyncWorker>(
+  //          context,
+  //          inputData =
+  //            Data.Builder()
+  //              .putInt(MAX_RETRIES_ALLOWED, 2)
+  //              .putString(FhirSyncWorker.SYNC_TYPE, SyncWorkType.DOWNLOAD_UPLOAD.name)
+  //              .build(),
+  //          runAttemptCount = 1
+  //        )
+  //        .build()
+  //    val result = runBlocking { worker.doWork() }
+  //    assertThat(result).isEqualTo(ListenableWorker.Result.retry())
+  //  }
+
+  @Test
+  fun fhirSyncWorker_nullDataSource_resultShouldBeFail() {
+    val worker =
+      TestListenableWorkerBuilder<FailingPeriodicSyncWorkerWithoutDataSource>(
+          context,
+          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 2).build(),
+          runAttemptCount = 2
+        )
+        .build()
+    val result = runBlocking { worker.doWork() }
+    assertThat(result).isInstanceOf(ListenableWorker.Result.failure()::class.java)
+    assertThat((result as ListenableWorker.Result.Failure).outputData).isNotNull()
+    assertThat(result.outputData.keyValueMap)
+      .containsEntry("error", "java.lang.IllegalStateException")
+  }
+}

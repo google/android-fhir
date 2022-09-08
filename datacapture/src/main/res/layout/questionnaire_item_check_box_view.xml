@@ -15,11 +15,10 @@
  limitations under the License.
 -->
 <CheckBox
-    style="?attr/checkBoxStyleQuestionnaire"
+    style="?attr/questionnaireCheckBoxStyle"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/check_box"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-    android:layout_marginVertical="@dimen/item_margin_vertical"
 />

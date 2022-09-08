@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.slider.Slider
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -51,7 +53,7 @@ internal object QuestionnaireItemSliderViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         addContentDescription()
         header.bind(questionnaireItemViewItem.questionnaireItem)
-        val answer = questionnaireItemViewItem.singleAnswerOrNull
+        val answer = questionnaireItemViewItem.answers.singleOrNull()
         slider.valueFrom = 0.0F
         slider.valueTo = 100.0F
         slider.stepSize = 10.0F
@@ -60,17 +62,19 @@ internal object QuestionnaireItemSliderViewHolderFactory :
 
         slider.addOnChangeListener { _, newValue, _ ->
           // Responds to when slider's value is changed
-          questionnaireItemViewItem.singleAnswerOrNull =
+          questionnaireItemViewItem.setAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(IntegerType(newValue.toInt()))
-          onAnswerChanged(slider.context)
+          )
         }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         error.text =
-          if (validationResult.getSingleStringValidationMessage() == "") null
-          else validationResult.getSingleStringValidationMessage()
+          when (validationResult) {
+            is NotValidated, Valid -> null
+            is Invalid -> validationResult.getSingleStringValidationMessage()
+          }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

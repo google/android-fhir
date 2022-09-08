@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package com.google.android.fhir.impl
 
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.SyncStrategyTypes
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
 
@@ -35,13 +35,13 @@ class SyncUploadContext {
   }
 
   suspend fun rearrangeSyncList(
-    localChanges: List<SquashedLocalChange>,
+    localChanges: List<LocalChange>,
     database: Database,
     collectAndEmitLocalChange:
       suspend (
-        List<SquashedLocalChange>,
-        suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit,
-    upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+        List<LocalChange>,
+        suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit,
+    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
     syncStrategy.rearrangeSyncList(localChanges, database, collectAndEmitLocalChange, upload)
   }

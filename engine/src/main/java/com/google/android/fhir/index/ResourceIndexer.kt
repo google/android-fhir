@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,7 @@ import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.SearchParameter
+import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
@@ -209,12 +210,31 @@ internal object ResourceIndexer {
       }
       "Timing" -> {
         val timing = value as Timing
-        DateTimeIndex(
-          searchParam.name,
-          searchParam.path,
-          timing.event.minOf { it.value.time },
-          timing.event.maxOf { it.precision.add(it.value, 1).time } - 1
-        )
+        // Skip for now if its is repeating.
+        if (timing.hasEvent()) {
+          DateTimeIndex(
+            searchParam.name,
+            searchParam.path,
+            timing.event.minOf { it.value.time },
+            timing.event.maxOf { it.precision.add(it.value, 1).time } - 1
+          )
+        } else null
+      }
+      "string" -> {
+        // e.g. CarePlan may have schedule as a string value 2011-06-27T09:30:10+01:00 (see
+        // https://www.hl7.org/fhir/careplan-example-f001-heart.json.html)
+        // OR 'daily' (see https://www.hl7.org/fhir/careplan-example-f201-renal.json.html)
+        try {
+          val dateTime = DateTimeType((value as StringType).value)
+          DateTimeIndex(
+            searchParam.name,
+            searchParam.path,
+            dateTime.value.time,
+            dateTime.precision.add(dateTime.value, 1).time - 1
+          )
+        } catch (e: IllegalArgumentException) {
+          null
+        }
       }
       else -> null
     }

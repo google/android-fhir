@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,12 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
+import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.optionExclusive
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -58,9 +61,8 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        this.questionnaireItemViewItem = questionnaireItemViewItem
+        val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         addContentDescription()
-        val (questionnaireItem, _) = questionnaireItemViewItem
         val choiceOrientation =
           questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
 
@@ -87,9 +89,13 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        error.text =
-          if (validationResult.getSingleStringValidationMessage() == "") null
-          else validationResult.getSingleStringValidationMessage()
+        when (validationResult) {
+          is NotValidated, Valid -> error.visibility = View.GONE
+          is Invalid -> {
+            error.text = validationResult.getSingleStringValidationMessage()
+            error.visibility = View.VISIBLE
+          }
+        }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
@@ -111,7 +117,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         val checkbox =
           checkboxLayout.findViewById<CheckBox>(R.id.check_box).apply {
             id = viewId
-            text = answerOption.valueCoding.display
+            text = answerOption.displayString
             isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
             layoutParams =
               ViewGroup.LayoutParams(
@@ -167,8 +173,6 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
                   )
                 }
               }
-
-              onAnswerChanged(checkboxGroup.context)
             }
           }
         checkboxGroup.addView(checkbox)

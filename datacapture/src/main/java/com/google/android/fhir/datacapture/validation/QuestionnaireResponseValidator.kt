@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,7 +124,7 @@ object QuestionnaireResponseValidator {
         linkIdToValidationResultMap[questionnaireItem.linkId]?.add(
           QuestionnaireResponseItemValidator.validate(
             questionnaireItem,
-            questionnaireResponseItem,
+            questionnaireResponseItem.answer,
             context
           )
         )
@@ -275,11 +275,7 @@ object QuestionnaireResponseValidator {
         require(answerType == "url") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
-      Questionnaire.QuestionnaireItemType.CHOICE ->
-        require(answerType == "Coding") {
-          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
-        }
-      Questionnaire.QuestionnaireItemType.OPENCHOICE ->
+      Questionnaire.QuestionnaireItemType.CHOICE, Questionnaire.QuestionnaireItemType.OPENCHOICE ->
         require(answerType == "Coding" || answerType == "string") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }

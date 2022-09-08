@@ -20,7 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-    android:layout_marginVertical="@dimen/item_margin_vertical"
+    android:layout_marginTop="@dimen/padding_default"
     android:orientation="vertical"
 >
 
@@ -28,10 +28,11 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding_default"
     />
 
     <com.google.android.material.textfield.TextInputLayout
-        style="?attr/questionnaireExposedMenuLayoutStyle"
+        style="?attr/questionnaireDropdownLayoutStyle"
         android:id="@+id/multi_select_summary_holder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

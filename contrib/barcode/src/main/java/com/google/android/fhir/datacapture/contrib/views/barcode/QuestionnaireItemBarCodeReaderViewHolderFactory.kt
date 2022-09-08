@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
                 val barcode =
                   result.getString(LiveBarcodeScanningFragment.RESULT_REQUEST_KEY)?.trim()
 
-                questionnaireItemViewItem.singleAnswerOrNull =
+                val answer =
                   barcode.let {
                     if (it!!.isEmpty()) {
                       null
@@ -74,8 +74,13 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
                     }
                   }
 
-                setInitial(questionnaireItemViewItem.singleAnswerOrNull, reScanView)
-                onAnswerChanged(context)
+                if (answer == null) {
+                  questionnaireItemViewItem.clearAnswer()
+                } else {
+                  questionnaireItemViewItem.setAnswer(answer)
+                }
+
+                setInitial(questionnaireItemViewItem.answers.singleOrNull(), reScanView)
               }
             }
           )
@@ -96,7 +101,7 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
           prefixTextView.visibility = View.GONE
         }
         textQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
-        setInitial(questionnaireItemViewItem.singleAnswerOrNull, reScanView)
+        setInitial(questionnaireItemViewItem.answers.singleOrNull(), reScanView)
       }
 
       private fun setInitial(

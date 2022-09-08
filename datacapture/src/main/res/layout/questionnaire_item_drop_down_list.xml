@@ -19,5 +19,5 @@
     android:ellipsize="end"
     android:maxLines="1"
     android:padding="@dimen/padding_drop_down"
-    android:textAppearance="?attr/dropDownTextAppearanceQuestionnaire"
+    android:textAppearance="?attr/questionnaireDropDownTextStyle"
 />

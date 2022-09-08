@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@ package com.google.android.fhir.impl
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.SyncStrategyTypes
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ReferenceIndexEntity
 import com.google.android.fhir.index.entities.ReferenceIndex
 import java.util.Map.entry
@@ -38,20 +37,20 @@ abstract class SyncStrategy {
   abstract val syncStrategyTypes: SyncStrategyTypes
 
   abstract suspend fun rearrangeSyncList(
-    localChanges: List<SquashedLocalChange>,
+    localChanges: List<LocalChange>,
     database: Database,
     collectAndEmitLocalChange:
       suspend (
-        List<SquashedLocalChange>,
-        suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit,
-    upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+        List<LocalChange>,
+        suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit,
+    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   )
 }
 
 data class ContextObject(
   val idsDone: MutableList<String>,
-  val listOfLocalChange: MutableList<SquashedLocalChange>,
-  val mapOfResourceIdLocalChange: MutableMap<String, SquashedLocalChange>
+  val listOfLocalChange: MutableList<LocalChange>,
+  val mapOfResourceIdLocalChange: MutableMap<String, LocalChange>
 )
 
 class SequentialSyncStrategy() : SyncStrategy() {
@@ -62,28 +61,26 @@ class SequentialSyncStrategy() : SyncStrategy() {
   //  private lateinit var mapOfResourceIdLocalChange: MutableMap<String, SquashedLocalChange>
   private lateinit var collectAndEmitLocalChange:
     suspend (
-      List<SquashedLocalChange>,
-      suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit
-  private lateinit var upload:
-    suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+      List<LocalChange>,
+      suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit
+  private lateinit var upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
 
   override suspend fun rearrangeSyncList(
-    localChanges: List<SquashedLocalChange>,
+    localChanges: List<LocalChange>,
     database: Database,
     collectAndEmitLocalChange:
       suspend (
-        List<SquashedLocalChange>,
-        suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit,
-    upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+        List<LocalChange>,
+        suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit,
+    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
     val idsDone = mutableListOf<String>()
-    val listOfLocalChange = mutableListOf<SquashedLocalChange>()
+    val listOfLocalChange = mutableListOf<LocalChange>()
     this.database = database
     this.upload = upload
     this.collectAndEmitLocalChange = collectAndEmitLocalChange
     val mapOfResourceIdLocalChange =
-      localChanges.associateBy { it.localChange.resourceId } as
-        MutableMap<String, SquashedLocalChange>
+      localChanges.associateBy { it.resourceId } as MutableMap<String, LocalChange>
     val contextWorkSpace = ContextObject(idsDone, listOfLocalChange, mapOfResourceIdLocalChange)
 
     if (mapOfResourceIdLocalChange.isNotEmpty()) {
@@ -120,7 +117,7 @@ class SequentialSyncStrategy() : SyncStrategy() {
   }
 
   private fun walkAndReturnLocalChange(
-    mapOfResourceIdLocalChange: MutableMap<String, SquashedLocalChange>,
+    mapOfResourceIdLocalChange: MutableMap<String, LocalChange>,
     collectAndEmitLocalChangesList: KSuspendFunction2<String, ContextObject, Unit>,
     contextWorkSpace: ContextObject
   ) {
@@ -149,28 +146,27 @@ class SequentialSyncStrategy() : SyncStrategy() {
   }
 
   private fun processLocalChange(
-    idSquashedLocalChange: Map.Entry<String, SquashedLocalChange>,
-    mapOfResourceIdLocalChange: MutableMap<String, SquashedLocalChange>,
+    localChange: Map.Entry<String, LocalChange>,
+    mapOfResourceIdLocalChange: MutableMap<String, LocalChange>,
     collectAndEmit: KSuspendFunction2<String, ContextObject, Unit>,
     contextWorkSpace: ContextObject
   ) {
-    if (contextWorkSpace.idsDone.contains(idSquashedLocalChange.key)) {
+    if (contextWorkSpace.idsDone.contains(localChange.key)) {
       return
     } else {
-      val localChange = idSquashedLocalChange.value
       var references: MutableList<ReferenceIndexEntity>
       runBlocking {
-        references = returnReferences(localChange) as MutableList<ReferenceIndexEntity>
+        references = returnReferences(localChange.value) as MutableList<ReferenceIndexEntity>
       }
       if (references.isEmpty()) {
-        contextWorkSpace.idsDone.add(idSquashedLocalChange.key)
-        runBlocking { collectAndEmit(idSquashedLocalChange.key, contextWorkSpace) }
+        contextWorkSpace.idsDone.add(localChange.key)
+        runBlocking { collectAndEmit(localChange.key, contextWorkSpace) }
       } else {
-        if (localChange.localChange.resourceType == "Encounter") {
+        if (localChange.value.resourceType == "Encounter") {
           val encounter =
             FhirContext.forCached(FhirVersionEnum.R4)
               .newJsonParser()
-              .parseResource(localChange.localChange.payload) as
+              .parseResource(localChange.value.payload) as
               Encounter
           if (encounter.location.size > 1) {
             encounter.location.forEach {
@@ -201,20 +197,18 @@ class SequentialSyncStrategy() : SyncStrategy() {
             }
           }
         }
-        contextWorkSpace.idsDone.add(idSquashedLocalChange.key)
-        runBlocking { collectAndEmit(idSquashedLocalChange.key, contextWorkSpace) }
+        contextWorkSpace.idsDone.add(localChange.key)
+        runBlocking { collectAndEmit(localChange.key, contextWorkSpace) }
       }
     }
   }
 
-  private suspend fun returnReferences(
-    localChange: SquashedLocalChange
-  ): List<ReferenceIndexEntity> {
-    val resourceType = ResourceType.fromCode(localChange.localChange.resourceType)
-    if (localChange.localChange.type == LocalChangeEntity.Type.DELETE) {
+  private suspend fun returnReferences(localChange: LocalChange): List<ReferenceIndexEntity> {
+    val resourceType = ResourceType.fromCode(localChange.resourceType)
+    if (localChange.type == LocalChange.Type.DELETE) {
       return mutableListOf()
     }
-    val resourceEntity = database.selectEntity(resourceType, localChange.localChange.resourceId)
+    val resourceEntity = database.selectEntity(resourceType, localChange.resourceId)
     return database.getAllReferences(resourceEntity.resourceUuid, resourceType)
   }
 }
@@ -222,12 +216,12 @@ class SequentialSyncStrategy() : SyncStrategy() {
 class AllLocalChangesSyncStrategy() : SyncStrategy() {
   override val syncStrategyTypes: SyncStrategyTypes = SyncStrategyTypes.ALL
   override suspend fun rearrangeSyncList(
-    localChanges: List<SquashedLocalChange>,
+    localChanges: List<LocalChange>,
     database: Database,
     collectAndEmitLocalChange:
       suspend (
-        List<SquashedLocalChange>,
-        suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit,
-    upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+        List<LocalChange>,
+        suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit,
+    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {}
 }

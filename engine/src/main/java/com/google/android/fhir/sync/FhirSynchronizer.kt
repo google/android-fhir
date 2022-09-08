@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,8 @@ internal class FhirSynchronizer(
   private val downloadManager: DownloadWorkManager,
   private val uploader: Uploader =
     BundleUploader(dataSource, TransactionBundleGenerator.getDefault()),
-  private val downloader: Downloader = DownloaderImpl(dataSource, downloadManager)
+  private val downloader: Downloader = DownloaderImpl(dataSource, downloadManager),
+  private val conflictResolver: ConflictResolver
 ) {
   private var syncState: MutableSharedFlow<State>? = null
   private val datastoreUtil = DatastoreUtil(context)
@@ -122,13 +123,19 @@ internal class FhirSynchronizer(
 
   private suspend fun download(): Result {
     val exceptions = mutableListOf<ResourceSyncException>()
-    fhirEngine.syncDownload {
+    fhirEngine.syncDownload(conflictResolver) {
       flow {
         downloader.download(it).collect {
           when (it) {
-            is DownloadState.Started -> setSyncState(State.InProgress(it.type))
-            is DownloadState.Success -> emit(it.resources)
-            is DownloadState.Failure -> exceptions.add(it.syncError)
+            is DownloadState.Started -> {
+              setSyncState(State.InProgress(it.type))
+            }
+            is DownloadState.Success -> {
+              emit(it.resources)
+            }
+            is DownloadState.Failure -> {
+              exceptions.add(it.syncError)
+            }
           }
         }
       }

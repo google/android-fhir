@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,14 @@ import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.itemControl
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -47,6 +49,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var holder: DialogSelectViewHolder
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      private var selectedOptionsJob: Job? = null
 
       override fun init(itemView: View) {
         holder = DialogSelectViewHolder(itemView)
@@ -58,6 +61,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        cleanupOldState()
         this.questionnaireItemViewItem = questionnaireItemViewItem
         addContentDescription()
         val activity =
@@ -66,25 +70,25 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
           }
         val viewModel: QuestionnaireItemDialogSelectViewModel by activity.viewModels()
 
-        val (item, response) = questionnaireItemViewItem
+        val item = questionnaireItemViewItem.questionnaireItem
 
         // Bind static data
         holder.header.bind(item)
 
-        activity.lifecycleScope.launch {
-          // Set the initial selected options state from the FHIR data model
-          viewModel.updateSelectedOptions(
-            item.linkId,
-            questionnaireItemViewItem.extractInitialOptions()
-          )
+        selectedOptionsJob =
+          activity.lifecycleScope.launch {
+            // Set the initial selected options state from the FHIR data model
+            viewModel.updateSelectedOptions(
+              item.linkId,
+              questionnaireItemViewItem.extractInitialOptions()
+            )
 
-          // Listen for changes to selected options to update summary + FHIR data model
-          viewModel.getSelectedOptionsFlow(item.linkId).collect { selectedOptions ->
-            holder.summary.text = selectedOptions.selectedSummary
-            response.updateAnswers(selectedOptions)
-            onAnswerChanged(holder.summaryHolder.context)
+            // Listen for changes to selected options to update summary + FHIR data model
+            viewModel.getSelectedOptionsFlow(item.linkId).collect { selectedOptions ->
+              holder.summary.text = selectedOptions.selectedSummary
+              updateAnswers(selectedOptions)
+            }
           }
-        }
 
         // When dropdown is clicked, show dialog
         val onClick =
@@ -110,11 +114,44 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         holder.summaryHolder.error =
-          validationResult.getSingleStringValidationMessage().takeIf { it.isNotEmpty() }
+          when (validationResult) {
+            is NotValidated, Valid -> null
+            is Invalid -> validationResult.getSingleStringValidationMessage()
+          }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
         holder.summaryHolder.isEnabled = !isReadOnly
+      }
+
+      private fun cleanupOldState() {
+        selectedOptionsJob?.cancel()
+      }
+
+      private fun updateAnswers(selectedOptions: SelectedOptions) {
+        questionnaireItemViewItem.clearAnswer()
+        selectedOptions.options.filter { it.selected }.map { option ->
+          val answer =
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = option.item.value
+            }
+          if (questionnaireItemViewItem.questionnaireItem.repeats) {
+            questionnaireItemViewItem.addAnswer(answer)
+          } else {
+            questionnaireItemViewItem.setAnswer(answer)
+          }
+        }
+        selectedOptions.otherOptions.map { otherOption ->
+          val otherAnswer =
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType(otherOption)
+            }
+          if (questionnaireItemViewItem.questionnaireItem.repeats) {
+            questionnaireItemViewItem.addAnswer(otherAnswer)
+          } else {
+            questionnaireItemViewItem.setAnswer(otherAnswer)
+          }
+        }
       }
     }
 
@@ -163,7 +200,7 @@ private fun QuestionnaireItemViewItem.extractInitialOptions(): SelectedOptions {
   return SelectedOptions(
     options = options,
     otherOptions =
-      questionnaireResponseItem.answer
+      answers
         // All of the Other options will be encoded as String value types
         .mapNotNull { if (it.hasValueStringType()) it.valueStringType.value else null }
         // We should also make sure that these values aren't present in the predefined options
@@ -177,23 +214,3 @@ private fun Questionnaire.QuestionnaireItemComponent.buildConfig() =
     // Client had to specify that they want an open-choice control to use "Other" options
     otherOptionsAllowed = itemControl == ItemControlTypes.OPEN_CHOICE,
   )
-
-private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.updateAnswers(
-  selectedOptions: SelectedOptions
-) {
-  answer.clear()
-  answer.addAll(
-    selectedOptions.options.filter { it.selected }.map { option ->
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-        value = option.item.value
-      }
-    }
-  )
-  answer.addAll(
-    selectedOptions.otherOptions.map { otherOption ->
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-        value = StringType(otherOption)
-      }
-    }
-  )
-}
