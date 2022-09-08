@@ -22,10 +22,11 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.fhir.datacapture.QuestionnaireItemAdapter
+import com.google.android.fhir.datacapture.QuestionnaireItemEditAdapter
 import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.android.material.textfield.TextInputEditText
@@ -45,7 +46,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
   private lateinit var context: ContextThemeWrapper
   private lateinit var parent: FrameLayout
   private lateinit var viewHolder: QuestionnaireItemViewHolder
-  private lateinit var itemAdapter: QuestionnaireItemAdapter
+  private lateinit var questionnaireItemEditAdapter: QuestionnaireItemEditAdapter
 
   @Before
   fun setUp() {
@@ -56,13 +57,16 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
       )
     parent = FrameLayout(context)
     viewHolder = QuestionnaireItemPhoneNumberViewHolderFactory.create(parent)
-    itemAdapter = QuestionnaireItemAdapter()
+    questionnaireItemEditAdapter = QuestionnaireItemEditAdapter()
   }
 
   @Test
   fun createViewHolder_shouldReturn_phoneNumberViewHolder() {
     val viewHolderFromAdapter =
-      itemAdapter.createViewHolder(parent, QuestionnaireItemViewHolderType.PHONE_NUMBER.value)
+      questionnaireItemEditAdapter.createViewHolder(
+        parent,
+        QuestionnaireItemViewHolderType.PHONE_NUMBER.value
+      )
     assertThat(viewHolderFromAdapter).isInstanceOf(viewHolder::class.java)
   }
 
@@ -72,7 +76,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -92,7 +96,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
               value = StringType("+12345678910")
             }
           ),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -119,7 +123,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
               value = StringType("+12345678910")
             }
           ),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -127,7 +131,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -150,7 +154,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -169,7 +173,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -196,7 +200,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -219,8 +223,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
           )
         },
         validationResult =
-          ValidationResult(
-            false,
+          Invalid(
             listOf("The maximum number of characters that are permitted in the answer is: 10")
           ),
         answersChangedCallback = { _, _, _ -> },
@@ -237,7 +240,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )

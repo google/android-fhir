@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1145,7 +1145,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
       )
@@ -1155,8 +1155,7 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.TELECOM.paramName,
-          "test@gmail.com",
-          ""
+          "test@gmail.com"
         )
       )
   }
@@ -1175,7 +1174,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
       )
@@ -1185,8 +1184,7 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.GENDER.paramName,
-          "male",
-          ""
+          "male"
         )
       )
   }
@@ -1204,7 +1202,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
       )
@@ -1214,8 +1212,7 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.ACTIVE.paramName,
-          "true",
-          ""
+          "true"
         )
       )
   }
@@ -1240,7 +1237,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
       )
@@ -1250,8 +1247,7 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.IDENTIFIER.paramName,
-          "16009886-bd57-11eb-8529-0242ac130003",
-          ""
+          "16009886-bd57-11eb-8529-0242ac130003"
         )
       )
   }
@@ -1271,7 +1267,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
       )
@@ -1281,8 +1277,7 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.PHONE.paramName,
-          "+14845219791",
-          ""
+          "+14845219791"
         )
       )
   }
@@ -1984,8 +1979,10 @@ class SearchTest {
         FROM ResourceEntity a
         LEFT JOIN DateIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
+        LEFT JOIN DateTimeIndexEntity c
+        ON a.resourceType = c.resourceType AND a.resourceUuid = c.resourceUuid AND c.index_name = ?
         WHERE a.resourceType = ?
-        ORDER BY b.index_from ASC
+        ORDER BY b.index_from ASC, c.index_from ASC
         """.trimIndent()
       )
   }
@@ -2002,8 +1999,10 @@ class SearchTest {
         FROM ResourceEntity a
         LEFT JOIN DateIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
+        LEFT JOIN DateTimeIndexEntity c
+        ON a.resourceType = c.resourceType AND a.resourceUuid = c.resourceUuid AND c.index_name = ?
         WHERE a.resourceType = ?
-        ORDER BY b.index_from DESC
+        ORDER BY b.index_from DESC, c.index_from DESC
         """.trimIndent()
       )
   }
@@ -2119,6 +2118,78 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(listOf("Patient", "Patient", "given", "John", "Patient", "family", "Doe", "Roe"))
   }
+
+  @Test
+  fun `search filter should append index name only for token filter with code only`() {
+    val query =
+      Search(ResourceType.Condition)
+        .apply {
+          filter(Condition.CLINICAL_STATUS, { value = of(Coding().apply { code = "test-code" }) })
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(listOf("Condition", "Condition", "clinical-status", "test-code"))
+  }
+
+  @Test
+  fun `search filter should append index name and index system for token filter with code and system`() {
+    val query =
+      Search(ResourceType.Condition)
+        .apply {
+          filter(
+            Condition.CLINICAL_STATUS,
+            {
+              value =
+                of(
+                  Coding().apply {
+                    code = "test-code"
+                    system = "http://my-code-system.org"
+                  }
+                )
+            }
+          )
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          "Condition",
+          "Condition",
+          "clinical-status",
+          "test-code",
+          "http://my-code-system.org"
+        )
+      )
+  }
+
   private companion object {
     const val mockEpochTimeStamp = 1628516301000
     const val APPROXIMATION_COEFFICIENT = 0.1

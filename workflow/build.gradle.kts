@@ -139,3 +139,5 @@ dependencies {
   testImplementation(Dependencies.truth)
   testImplementation(project(":testing"))
 }
+
+configureDokka(Releases.Workflow.artifactId, Releases.Workflow.version)

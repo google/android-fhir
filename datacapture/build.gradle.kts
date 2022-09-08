@@ -87,3 +87,5 @@ dependencies {
   testImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.Espresso.espressoCore)
 }
+
+configureDokka(Releases.DataCapture.artifactId, Releases.DataCapture.version)

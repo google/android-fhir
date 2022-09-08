@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ internal enum class ItemControlTypes(
   OPEN_CHOICE("open-choice", QuestionnaireItemViewHolderType.DIALOG_SELECT),
   RADIO_BUTTON("radio-button", QuestionnaireItemViewHolderType.RADIO_GROUP),
   SLIDER("slider", QuestionnaireItemViewHolderType.SLIDER),
-  PHONE_NUMBER("phone-number", QuestionnaireItemViewHolderType.PHONE_NUMBER)
+  PHONE_NUMBER("phone-number", QuestionnaireItemViewHolderType.PHONE_NUMBER),
 }
 
 // Please note these URLs do not point to any FHIR Resource and are broken links. They are being
@@ -59,8 +59,28 @@ internal const val EXTENSION_HIDDEN_URL =
 internal const val EXTENSION_ENTRY_FORMAT_URL =
   "http://hl7.org/fhir/StructureDefinition/entryFormat"
 
-internal const val ITEM_ENABLE_WHEN_EXPRESSION_URL: String =
+internal const val EXTENSION_ENABLE_WHEN_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression"
+
+internal const val EXTENSION_VARIABLE_URL = "http://hl7.org/fhir/StructureDefinition/variable"
+
+internal val Questionnaire.QuestionnaireItemComponent.variableExpressions: List<Expression>
+  get() =
+    this.extension.filter { it.url == EXTENSION_VARIABLE_URL }.map { it.castToExpression(it.value) }
+
+/**
+ * Finds the specific variable name [String] at the questionnaire item
+ * [Questionnaire.QuestionnaireItemComponent]
+ *
+ * @param variableName the [String] to match the variable
+ *
+ * @return an [Expression]
+ */
+internal fun Questionnaire.QuestionnaireItemComponent.findVariableExpression(
+  variableName: String
+): Expression? {
+  return variableExpressions.find { it.name == variableName }
+}
 
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
@@ -100,9 +120,10 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceO
     return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
   }
 
-/** UI controls relevant to rendering questionnaire display items. */
+/** UI controls relevant to rendering questionnaire items. */
 internal enum class DisplayItemControlType(val extensionCode: String) {
-  FLYOVER("flyover")
+  FLYOVER("flyover"),
+  PAGE("page"),
 }
 
 /** Item control to show instruction text */
@@ -224,7 +245,7 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
 // Return expression if QuestionnaireItemComponent has ENABLE WHEN EXPRESSION URL
 val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
   get() {
-    return this.extension.firstOrNull { it.url == ITEM_ENABLE_WHEN_EXPRESSION_URL }?.let {
+    return this.extension.firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }?.let {
       it.value as Expression
     }
   }

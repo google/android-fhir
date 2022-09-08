@@ -23,7 +23,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
-import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
@@ -33,9 +32,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import org.hl7.fhir.r4.model.Questionnaire
 
+/**
+ * A [Fragment] for displaying FHIR Questionnaires and getting user responses as FHIR
+ * QuestionnareResponses.
+ *
+ * For more information, see the
+ * [QuestionnaireFragment](https://github.com/google/android-fhir/wiki/SDCL%3A-Use-QuestionnaireFragment)
+ * developer guide.
+ */
 open class QuestionnaireFragment : Fragment() {
   private val viewModel: QuestionnaireViewModel by viewModels()
 
+  /** @suppress */
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -55,8 +63,12 @@ open class QuestionnaireFragment : Fragment() {
     }
   }
 
+  /** @suppress */
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
+    val questionnaireEditRecyclerView =
+      view.findViewById<RecyclerView>(R.id.questionnaire_edit_recycler_view)
+    val questionnaireReviewRecyclerView =
+      view.findViewById<RecyclerView>(R.id.questionnaire_review_recycler_view)
     val paginationPreviousButton = view.findViewById<View>(R.id.pagination_previous_button)
     paginationPreviousButton.setOnClickListener { viewModel.goToPreviousPage() }
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
@@ -64,61 +76,91 @@ open class QuestionnaireFragment : Fragment() {
     requireView().findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
       setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
     }
-    val adapter = QuestionnaireItemAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
+    val questionnaireItemEditAdapter =
+      QuestionnaireItemEditAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
+    val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
+
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
     // Reads submit button visibility value initially defined in
     // [R.attr.submitButtonStyleQuestionnaire] style.
     val submitButtonVisibilityInStyle = submitButton.visibility
+    viewModel.setShowSubmitButtonFlag(submitButtonVisibilityInStyle == View.VISIBLE)
 
-    recyclerView.adapter = adapter
-    recyclerView.layoutManager = LinearLayoutManager(view.context)
+    val reviewModeEditButton = view.findViewById<View>(R.id.review_mode_edit_button)
+    reviewModeEditButton.setOnClickListener { viewModel.setReviewMode(false) }
+
+    val reviewModeButton = view.findViewById<View>(R.id.review_mode_button)
+    reviewModeButton.setOnClickListener { viewModel.setReviewMode(true) }
+
+    questionnaireEditRecyclerView.adapter = questionnaireItemEditAdapter
+    questionnaireEditRecyclerView.layoutManager = LinearLayoutManager(view.context)
     // Animation does work well with views that could gain focus
-    recyclerView.itemAnimator = null
+    questionnaireEditRecyclerView.itemAnimator = null
+
+    questionnaireReviewRecyclerView.adapter = questionnaireItemReviewAdapter
+    questionnaireReviewRecyclerView.layoutManager = LinearLayoutManager(view.context)
 
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.questionnaireStateFlow.collect { state ->
-        adapter.submitList(state.items)
+        if (state.reviewMode) {
+          questionnaireItemReviewAdapter.submitList(state.items)
+          questionnaireReviewRecyclerView.visibility = View.VISIBLE
+          questionnaireEditRecyclerView.visibility = View.GONE
+          reviewModeEditButton.visibility = View.VISIBLE
+        } else {
+          questionnaireItemEditAdapter.submitList(state.items)
+          questionnaireEditRecyclerView.visibility = View.VISIBLE
+          questionnaireReviewRecyclerView.visibility = View.GONE
+          reviewModeEditButton.visibility = View.GONE
+        }
 
-        if (state.pagination != null) {
+        if (state.pagination.isPaginated && !state.reviewMode) {
           paginationPreviousButton.visibility = View.VISIBLE
           paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage
           paginationNextButton.visibility = View.VISIBLE
           paginationNextButton.isEnabled = state.pagination.hasNextPage
-          if (!state.pagination.hasNextPage && submitButtonVisibilityInStyle == View.VISIBLE) {
-            paginationNextButton.visibility = View.GONE
-            submitButton.visibility = View.VISIBLE
-          } else {
-            submitButton.visibility = View.GONE
-          }
         } else {
           paginationPreviousButton.visibility = View.GONE
           paginationNextButton.visibility = View.GONE
-          if (submitButtonVisibilityInStyle == View.VISIBLE) {
-            recyclerView.updatePadding(
-              bottom = resources.getDimensionPixelOffset(R.dimen.recyclerview_bottom_padding)
-            )
-          } else {
-            recyclerView.updatePadding(bottom = 0)
-          }
         }
+
+        reviewModeButton.visibility =
+          if (state.pagination.showReviewButton) View.VISIBLE else View.GONE
+
+        submitButton.visibility = if (state.pagination.showSubmitButton) View.VISIBLE else View.GONE
       }
     }
   }
 
   /**
-   * Returns a list of [QuestionnaireItemViewHolderFactoryMatcher]s that provide custom views for
-   * rendering items in the questionnaire. User-provided custom views will take precedence over
-   * canonical views provided by the library. If multiple
-   * [QuestionnaireItemViewHolderFactoryMatcher] are applicable for the same item, the behavior is
-   * undefined (any of them may be selected).
+   * Override this method to specify when custom questionnaire components should be used. It should
+   * return a [List] of [QuestionnaireItemViewHolderFactoryMatcher]s which are used to evaluate
+   * whether a custom [QuestionnaireItemViewHolderFactory] should be used to render a given
+   * questionnaire item.
+   *
+   * User-provided custom views take precedence over canonical views provided by the library. If
+   * multiple [QuestionnaireItemViewHolderFactoryMatcher] are applicable for the same item, the
+   * behavior is undefined (any of them may be selected).
+   *
+   * See the
+   * [developer guide](https://github.com/google/android-fhir/wiki/SDCL:-Customize-how-a-Questionnaire-is-displayed#custom-questionnaire-components)
+   * for more information.
    */
   open fun getCustomQuestionnaireItemViewHolderFactoryMatchers() =
     emptyList<QuestionnaireItemViewHolderFactoryMatcher>()
 
-  // Returns the current questionnaire response
+  /**
+   * Returns a [QuestionnaireResponse][org.hl7.fhir.r4.model.QuestionnaireResponse] populated with
+   * any answers that are present on the rendered [QuestionnaireFragment] when it is called.
+   */
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
+  /**
+   * Extras that can be passed to [QuestionnaireFragment] to define its behavior. When you create a
+   * QuestionnaireFragment, one of [EXTRA_QUESTIONNAIRE_JSON_URI] or
+   * [EXTRA_QUESTIONNAIRE_JSON_STRING] is required.
+   */
   companion object {
     /**
      * A JSON encoded string extra for a questionnaire. This should only be used for questionnaires
@@ -130,46 +172,64 @@ open class QuestionnaireFragment : Fragment() {
      * precedence.
      */
     const val EXTRA_QUESTIONNAIRE_JSON_STRING = "questionnaire"
+
     /**
-     * A [Uri] extra for streaming a JSON encoded questionnaire.
+     * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire.
      *
      * This is required unless [EXTRA_QUESTIONNAIRE_JSON_STRING] is provided.
      *
      * If this and [EXTRA_QUESTIONNAIRE_JSON_STRING] are provided, this extra takes precedence.
      */
     const val EXTRA_QUESTIONNAIRE_JSON_URI = "questionnaire-uri"
+
     /**
      * A JSON encoded string extra for a prefilled questionnaire response. This should only be used
      * for questionnaire response with size at most 512KB. For large questionnaire response, use
      * [EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI].
      *
-     * This is required unless [EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI] is provided.
-     *
      * If this and [EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI] are provided,
      * [EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI] takes precedence.
      */
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
+
     /**
-     * A [Uri] extra for streaming a JSON encoded questionnaire response.
-     *
-     * This is required unless [EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING] is provided.
+     * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.
      *
      * If this and [EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING] are provided, this extra takes
      * precedence.
      */
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI = "questionnaire-response-uri"
 
+    /**
+     * A [Boolean] extra to control if a review page is shown. By default it will be shown at the
+     * end of the questionnaire.
+     */
+    const val EXTRA_ENABLE_REVIEW_PAGE = "enable-review-page"
+
+    /**
+     * An [Boolean] extra to control if the review page is to be opened first. This has no effect if
+     * review page is not enabled.
+     */
+    const val EXTRA_SHOW_REVIEW_PAGE_FIRST = "show-review-page-first"
+
     const val SUBMIT_REQUEST_KEY = "submit-request-key"
   }
 
   /**
    * Data class that holds a matcher function ([matches]) which evaluates whether a given [factory]
-   * should be used in creating a
-   * [com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder] that displays the given
-   * [Questionnaire.QuestionnaireItemComponent]
+   * should be used to display a given [Questionnaire.QuestionnaireItemComponent].
+   *
+   * See the
+   * [developer guide](https://github.com/google/android-fhir/wiki/SDCL:-Customize-how-a-Questionnaire-is-displayed#custom-questionnaire-components)
+   * for more information.
    */
   data class QuestionnaireItemViewHolderFactoryMatcher(
+    /** The custom [QuestionnaireItemViewHolderFactory] to use. */
     val factory: QuestionnaireItemViewHolderFactory,
-    val matches: (Questionnaire.QuestionnaireItemComponent) -> Boolean
+    /**
+     * A predicate function which, given a [Questionnaire.QuestionnaireItemComponent], returns true
+     * if the factory should apply to that item.
+     */
+    val matches: (Questionnaire.QuestionnaireItemComponent) -> Boolean,
   )
 }
