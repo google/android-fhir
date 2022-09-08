@@ -106,7 +106,7 @@ class QuestionnaireGroupTypeHeaderViewTest {
   }
 
   @Test
-  fun shouldHideHint() {
+  fun `hides instructions`() {
     view.bind(
       Questionnaire.QuestionnaireItemComponent().apply {
         item =
