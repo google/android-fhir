@@ -160,7 +160,6 @@ open class QuestionnaireFragment : Fragment() {
 
   /** Updates the progress indicator with given progress and max values. */
   private fun updateQuestionnaireProgressIndicator(progress: Int, max: Int) {
-    println(progress)
     questionnaireProgressIndicator.apply {
       setProgress(progress)
       setMax(max)
