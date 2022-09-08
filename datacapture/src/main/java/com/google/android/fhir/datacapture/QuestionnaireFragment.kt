@@ -44,6 +44,8 @@ import org.hl7.fhir.r4.model.Questionnaire
 open class QuestionnaireFragment : Fragment() {
   private val viewModel: QuestionnaireViewModel by viewModels()
 
+  private lateinit var questionnaireProgressIndicator: LinearProgressIndicator
+
   /** @suppress */
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -77,8 +79,7 @@ open class QuestionnaireFragment : Fragment() {
     requireView().findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
       setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
     }
-    val questionnaireProgressIndicator =
-      view.findViewById<LinearProgressIndicator>(R.id.questionnaire_progress_indicator)
+    questionnaireProgressIndicator = view.findViewById(R.id.questionnaire_progress_indicator)
     val questionnaireItemEditAdapter =
       QuestionnaireItemEditAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
     val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
@@ -96,7 +97,8 @@ open class QuestionnaireFragment : Fragment() {
     reviewModeButton.setOnClickListener { viewModel.setReviewMode(true) }
 
     questionnaireEditRecyclerView.adapter = questionnaireItemEditAdapter
-    questionnaireEditRecyclerView.layoutManager = LinearLayoutManager(view.context)
+    val linearLayoutManager = LinearLayoutManager(view.context)
+    questionnaireEditRecyclerView.layoutManager = linearLayoutManager
     // Animation does work well with views that could gain focus
     questionnaireEditRecyclerView.itemAnimator = null
 
@@ -125,13 +127,27 @@ open class QuestionnaireFragment : Fragment() {
           paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage
           paginationNextButton.visibility = View.VISIBLE
           paginationNextButton.isEnabled = state.pagination.hasNextPage
-          questionnaireProgressIndicator.apply {
-            max = state.pagination.pages.size
-            progress = state.pagination.currentPageIndex + 1
-          }
+          updateQuestionnaireProgressIndicator(
+            (state.pagination.currentPageIndex +
+              1), // incremented by 1 due to initialPageIndex starts with 0.
+            state.pagination.pages.size
+          )
         } else {
           paginationPreviousButton.visibility = View.GONE
           paginationNextButton.visibility = View.GONE
+
+          questionnaireEditRecyclerView.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+              override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                updateQuestionnaireProgressIndicator(
+                  (linearLayoutManager.findLastVisibleItemPosition() +
+                    1), // incremented by 1 due to findLastVisiblePosition() starts with 0.
+                  linearLayoutManager.itemCount
+                )
+              }
+            }
+          )
         }
 
         reviewModeButton.visibility =
@@ -139,6 +155,15 @@ open class QuestionnaireFragment : Fragment() {
 
         submitButton.visibility = if (state.pagination.showSubmitButton) View.VISIBLE else View.GONE
       }
+    }
+  }
+
+  /** Updates the progress indicator with given progress and max values. */
+  private fun updateQuestionnaireProgressIndicator(progress: Int, max: Int) {
+    println(progress)
+    questionnaireProgressIndicator.apply {
+      setProgress(progress)
+      setMax(max)
     }
   }
 
