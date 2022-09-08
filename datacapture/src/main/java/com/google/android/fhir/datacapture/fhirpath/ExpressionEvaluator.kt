@@ -80,7 +80,7 @@ object ExpressionEvaluator {
    * Questionnaire.QuestionnaireItemComponent>] of child to parent
    * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] where this expression
    * is defined,
-   * @param variablesMap the [Map<String, Base>] of variables
+   * @param variablesMap the [Map<String, Base>] of variables, the default value is empty map
    *
    * @return [Base] the result of expression
    */
@@ -128,7 +128,7 @@ object ExpressionEvaluator {
    * @param expression the [Expression] Variable expression
    * @param questionnaire the [Questionnaire] respective questionnaire
    * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
-   * @param variablesMap the [Map<String, Base>] of variables
+   * @param variablesMap the [Map<String, Base>] of variables, the default value is empty map
    *
    * @return [Base] the result of expression
    */
