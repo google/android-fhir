@@ -37,6 +37,7 @@
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/questionnaire_progress_indicator"
+        style="?attr/questionnaireLinearProgressIndicatorStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
