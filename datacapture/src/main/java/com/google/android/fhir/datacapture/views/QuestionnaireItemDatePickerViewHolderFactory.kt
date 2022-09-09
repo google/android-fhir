@@ -34,6 +34,10 @@ import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.CalendarConstraints.DateValidator
+import com.google.android.material.datepicker.CompositeDateValidator
+import com.google.android.material.datepicker.DateValidatorPointBackward
+import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -158,14 +162,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           throw IllegalArgumentException("minValue cannot be greater than maxValue")
         }
 
-        val constraintsBuilder =
-          CalendarConstraints.Builder()
-            .apply {
-              min?.let { setStart(it) }
-              max?.let { setEnd(it) }
-            }
-            .build()
-        return constraintsBuilder
+        val listValidators = ArrayList<DateValidator>()
+        min?.let { listValidators.add(DateValidatorPointForward.from(it)) }
+        max?.let { listValidators.add(DateValidatorPointBackward.before(it)) }
+        val validators = CompositeDateValidator.allOf(listValidators)
+
+        return CalendarConstraints.Builder().setValidator(validators).build()
       }
 
       private fun updateAnswer(text: CharSequence?) {
