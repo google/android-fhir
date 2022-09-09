@@ -289,7 +289,7 @@ object ResourceMapper {
         currentQuestionnaireItem = questionnaireItemListIterator.next()
       }
       if (currentQuestionnaireItem.linkId == currentQuestionnaireResponseItem.linkId) {
-        extractByDefinitionFromQuestionnaireItemType(
+        extractByDefinition(
           currentQuestionnaireItem,
           currentQuestionnaireResponseItem,
           extractionContext,
@@ -308,7 +308,7 @@ object ResourceMapper {
    * Handles nested questionnaire items recursively. New extraction contexts may be defined in the
    * recursion.
    */
-  private fun extractByDefinitionFromQuestionnaireItemType(
+  private fun extractByDefinition(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     extractionContext: Base?,
@@ -428,7 +428,7 @@ object ResourceMapper {
     if (questionnaireResponseItem.answer.isEmpty()) return
 
     // Set the primitive type value if the field exists
-    val fieldName = getFieldNameByDefinition(questionnaireItem.definition) // 1111111111111
+    val fieldName = getFieldNameByDefinition(questionnaireItem.definition)
     base.javaClass.getFieldOrNull(fieldName)?.let { field ->
       if (field.nonParameterizedType.isEnum) {
         updateFieldWithEnum(base, field, questionnaireResponseItem.answer.first().value)
@@ -451,14 +451,14 @@ object ResourceMapper {
     }
 
     if (base.javaClass.getFieldOrNull(fieldName) == null) {
-      // If field not found in resource class add definition based extension
+      // If field not found in resource class, assume this is an extension
       addDefinitionBasedCustomExtension(questionnaireItem, questionnaireResponseItem, base)
     }
   }
 }
 
 /**
- * Adds definition based custom extension for Resource.
+ * Adds custom extension for Resource.
  * @param questionnaireItem QuestionnaireItemComponent with details for extension
  * @param questionnaireResponseItem QuestionnaireResponseItemComponent for response value
  * @param base
@@ -550,7 +550,7 @@ private fun updateField(
     updateFieldWithAnswer(base, field, answersOfFieldType.first())
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
-    updateListFieldWithAnswer(base, field, answersOfFieldType) // given name updated here
+    updateListFieldWithAnswer(base, field, answersOfFieldType)
   }
 }
 

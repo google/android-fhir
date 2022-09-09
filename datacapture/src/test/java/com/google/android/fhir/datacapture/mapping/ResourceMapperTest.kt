@@ -2382,30 +2382,31 @@ class ResourceMapperTest {
     Unit = runBlocking {
     @Language("JSON")
     val questionnaire =
-      """{
-      "resourceType": "Questionnaire",
-      "subjectType": [
-        "Encounter"
-      ],
-      "extension": [
+      """
         {
-        "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-          "valueExpression": {
-            "language": "application/x-fhir-query",
-            "expression": "Encounter",
-            "name": "encounter"
-          }
+          "resourceType": "Questionnaire",
+          "subjectType": [
+            "Encounter"
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Encounter",
+                "name": "encounter"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "1",
+              "definition": "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-encounter#Encounter.contactNumber",
+              "text": "ANC contact number",
+              "type": "integer"
+            }
+          ]
         }
-      ],
-      "item": [
-        {
-          "linkId": "1",
-          "definition": "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-encounter#Encounter.contactNumber",
-          "text": "ANC contact number",
-          "type": "integer"
-        }
-      ]
-    }
       """.trimIndent()
 
     @Language("JSON")
@@ -2414,14 +2415,14 @@ class ResourceMapperTest {
         {
           "resourceType": "QuestionnaireResponse",
           "item": [
-             {
-                "linkId": "1",
-                "answer": [
-                  {
-                    "valueInteger": 9
-                  }
-                ]
-              }
+            {
+              "linkId": "1",
+              "answer": [
+                {
+                  "valueInteger": 9
+                }
+              ]
+            }
           ]
         }
       """.trimIndent()
@@ -2449,182 +2450,35 @@ class ResourceMapperTest {
     Unit = runBlocking {
     @Language("JSON")
     val questionnaire =
-      """{
-  "resourceType": "Questionnaire",
-  "id": "ANCOYO",
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-      "valueExpression": {
-        "name": "patient",
-        "language": "application/x-fhir-query",
-        "expression": "Patient"
-      }
-    }
-  ],
-  "url": "Questionnaire/ANCOYO",
-  "version": "0.1.0",
-  "name": "ANCOYO",
-  "title": "Patient Registration",
-  "status": "active",
-  "experimental": false,
-  "date": "2022-03-18T18:49:37+05:30",
-  "publisher": "Intellectual Property Research and Deployment (IPRD)",
-  "description": "The registration of a patient for the purpose of maternal workflow.",
-  "useContext": [
-    {
-      "code": {
-        "system": "http://terminology.hl7.org/CodeSystem/usage-context-type",
-        "code": "task",
-        "display": "Workflow Task"
-      },
-      "valueCodeableConcept": {
-        "coding": [
-          {
-            "system": "https://www.iprdsolutions.com/Nigeria/Oyo/Clinic/CodeSystem/lab-activity-codes",
-            "code": "ANC.OYO",
-            "display": "Patient-Reg"
-          }
-        ]
-      }
-    }
-  ],
-  "item": [
-    {
-      "extension": [
+      """
         {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-          "valueCodeableConcept": {
-            "coding": [
-              {
-                "system": "http://hl7.org/fhir/questionnaire-item-control",
-                "code": "page",
-                "display": "Page"
-              }
-            ],
-            "text": "Page"
-          }
-        }
-      ],
-      "type": "group",
-      "linkId": "patient-basic-details",
-      "text": "Patient details",
-      "item": [
-        {
-          "linkId": "patient-name",
-          "type": "group",
-          "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name",
-          "item": [
-            {
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-                  "valueExpression": {
-                    "language": "text/fhirpath",
-                    "expression": "Patient.name.given[0]",
-                    "name": "patientName"
-                  }
-                }
-              ],
-              "type": "string",
-              "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.given",
-              "linkId": "first-name",
-              "required": true,
-              "text": "First name"
-            },
-            {
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-                  "valueExpression": {
-                    "language": "text/fhirpath",
-                    "expression": "Patient.name.family",
-                    "name": "patientFamilyName"
-                  }
-                }
-              ],
-              "type": "string",
-              "linkId": "last-name",
-              "required": true,
-              "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.family",
-              "text": "Last name"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-          "valueCodeableConcept": {
-            "coding": [
-              {
-                "system": "http://hl7.org/fhir/questionnaire-item-control",
-                "code": "page",
-                "display": "Page"
-              }
-            ],
-            "text": "Page"
-          }
-        }
-      ],
-      "type": "group",
-      "linkId": "patient-other-details",
-      "item": [
-        {
-          "type": "choice",
+          "resourceType": "Questionnaire",
           "extension": [
             {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-              "valueCodeableConcept": {
-                "coding": [
-                  {
-                    "system": "http://hl7.org/fhir/questionnaire-item-control",
-                    "code": "open-choice",
-                    "display": "Open Choice"
-                  }
-                ],
-                "text": "Open Choice"
-              }
-            },
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
               "valueExpression": {
-                "language": "text/fhirpath",
-                "expression": "Patient.extension.where(url=\"http://iprdgroup.org/fhir/extention/tribe\").value",
-                "name": "patientTribe"
+                "name": "patient",
+                "language": "application/x-fhir-query",
+                "expression": "Patient"
               }
             }
           ],
-          "linkId": "tribe",
-          "text": "Tribe",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension:tribe",
-          "answerOption": [
+          "item": [
             {
-              "valueCoding": {
-                "code": "hausa",
-                "display": "Hausa"
-              }
-            },
-            {
-              "valueCoding": {
-                "code": "yoruba",
-                "display": "Yoruba"
-              }
-            },
-            {
-              "valueCoding": {
-                "code": "igbo",
-                "display": "Igbo"
-              }
+              "type": "group",
+              "linkId": "patient-other-details",
+              "item": [
+                {
+                  "type": "choice",
+                  "linkId": "tribe",
+                  "text": "Tribe",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension:tribe"
+
+                }
+              ]
             }
           ]
         }
-      ]
-    }
-  ]
-}
       """.trimIndent()
 
     @Language("JSON")
@@ -2633,32 +2487,6 @@ class ResourceMapperTest {
         {
           "resourceType": "QuestionnaireResponse",
           "item": [
-            {
-              "linkId": "patient-basic-details",
-              "item": [
-                {
-                  "linkId": "patient-name",
-                  "item": [
-                    {
-                      "linkId": "first-name",
-                      "answer": [
-                        {
-                          "valueString": "Pallavi"
-                        }
-                      ]
-                    },
-                    {
-                      "linkId": "last-name",
-                      "answer": [
-                        {
-                          "valueString": "Ganorkar"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
             {
               "linkId": "patient-other-details",
               "item": [
@@ -2687,31 +2515,14 @@ class ResourceMapperTest {
     val patient = bundle.entry[0].resource as Patient
 
     assertThat(patient).isNotNull()
-    assertThat(
-        patient.getExtensionByUrl(
-            "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension:tribe"
-          )
-          .value
-      )
-      .isInstanceOf(Coding::class.java)
-    assertThat(
-        (patient.getExtensionByUrl(
-              "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension:tribe"
-            )
-            .value as
-            Coding)
-          .code
-      )
-      .isEqualTo("hausa")
-    assertThat(
-        (patient.getExtensionByUrl(
-              "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension:tribe"
-            )
-            .value as
-            Coding)
-          .display
-      )
-      .isEqualTo("Hausa")
+    val coding =
+      patient.getExtensionByUrl(
+          "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension:tribe"
+        )
+        .value as
+        Coding
+    assertThat(coding.code).isEqualTo("hausa")
+    assertThat(coding.display).isEqualTo("Hausa")
   }
 
   @Test
@@ -2719,72 +2530,42 @@ class ResourceMapperTest {
     Unit = runBlocking {
     @Language("JSON")
     val questionnaire =
-      """{
-  "resourceType": "Questionnaire",
-  "id": "ANCOYO",
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-      "valueExpression": {
-        "name": "patient",
-        "language": "application/x-fhir-query",
-        "expression": "Patient"
-      }
-    }
-  ],
-  "item": [
-    {
-      "extension": [
+      """
         {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-          "valueCodeableConcept": {
-            "coding": [
-              {
-                "system": "http://hl7.org/fhir/questionnaire-item-control",
-                "code": "page",
-                "display": "Page"
+          "resourceType": "Questionnaire",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "name": "patient",
+                "language": "application/x-fhir-query",
+                "expression": "Patient"
               }
-            ],
-            "text": "Page"
-          }
-        }
-      ],
-      "type": "group",
-      "linkId": "patient-basic-details",
-      "text": "Patient details",
-      "item": [
-        {
-          "linkId": "patient-name",
-          "type": "group",
-          "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name",
+            }
+          ],
           "item": [
             {
-              "type": "string",
-              "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.given",
-              "linkId": "first-name",
-              "required": true,
-              "text": "First name"
-            },
-             {
-              "type": "string",
-              "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.middle",
-              "linkId": "middle-name",
-              "required": true,
-              "text": "Middle name"
-            },
-            {
-              "type": "string",
-              "linkId": "last-name",
-              "required": true,
-              "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.family",
-              "text": "Last name"
+              "type": "group",
+              "linkId": "patient-basic-details",
+              "text": "Patient details",
+              "item": [
+                {
+                  "linkId": "patient-name",
+                  "type": "group",
+                  "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name",
+                  "item": [
+                    {
+                      "type": "string",
+                      "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.middle",
+                      "linkId": "middle-name",
+                      "text": "Middle name"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
-      ]
-    }
-  ]
-}
       """.trimIndent()
 
     @Language("JSON")
@@ -2800,26 +2581,10 @@ class ResourceMapperTest {
                   "linkId": "patient-name",
                   "item": [
                     {
-                      "linkId": "first-name",
-                      "answer": [
-                        {
-                          "valueString": "Pallavi"
-                        }
-                      ]
-                    },
-                    {
                       "linkId": "middle-name",
                       "answer": [
                         {
-                          "valueString": "Prabhakar"
-                        }
-                      ]
-                    },
-                    {
-                      "linkId": "last-name",
-                      "answer": [
-                        {
-                          "valueString": "Ganorkar"
+                          "valueString": "TestName"
                         }
                       ]
                     }
@@ -2839,8 +2604,6 @@ class ResourceMapperTest {
     val patient = bundle.entry[0].resource as Patient
 
     assertThat(patient).isNotNull()
-    assertThat(patient.name.first().given.first().value).isEqualTo("Pallavi")
-    assertThat(patient.name.first().family).isEqualTo("Ganorkar")
     assertThat(
         patient
           .name
@@ -2851,7 +2614,7 @@ class ResourceMapperTest {
           .valueAsPrimitive
           .valueAsString
       )
-      .isEqualTo("Prabhakar")
+      .isEqualTo("TestName")
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)
