@@ -155,6 +155,30 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  /** The map from each item in the [Questionnaire] to its parent. */
+  private var questionnaireItemParentMap:
+    Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>
+
+  init {
+    /** Adds each child-parent pair in the [Questionnaire] to the parent map. */
+    fun buildParentList(
+      item: Questionnaire.QuestionnaireItemComponent,
+      questionnaireItemToParentMap: ItemToParentMap
+    ) {
+      for (child in item.item) {
+        questionnaireItemToParentMap[child] = item
+        buildParentList(child, questionnaireItemToParentMap)
+      }
+    }
+
+    questionnaireItemParentMap =
+      buildMap {
+        for (item in questionnaire.item) {
+          buildParentList(item, this)
+        }
+      }
+  }
+
   /** The map from each item in the [QuestionnaireResponse] to its parent. */
   private val questionnaireResponseItemParentMap =
     mutableMapOf<
@@ -650,6 +674,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return null
   }
 }
+
+typealias ItemToParentMap =
+  MutableMap<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>
 
 /** Questionnaire state for the Fragment to consume. */
 internal data class QuestionnaireState(
