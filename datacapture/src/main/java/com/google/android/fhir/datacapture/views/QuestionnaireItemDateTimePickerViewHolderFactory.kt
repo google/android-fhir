@@ -61,7 +61,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       private lateinit var timeInputLayout: TextInputLayout
       private lateinit var timeInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-      private var previousQuestionnaireItemViewItem: QuestionnaireItemViewItem? = null
       private var localDate: LocalDate? = null
       private var localTime: LocalTime? = null
       private var textWatcher: TextWatcher? = null
@@ -143,10 +142,14 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         clearPreviousState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
         dateInputLayout.hint = localeDatePattern
+        dateInputEditText.removeTextChangedListener(textWatcher)
         val dateTime = questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType
         updateDateTimeInput(
           dateTime?.let {
-            LocalDateTime.of(it.year, it.month + 1, it.day, it.hour, it.minute, it.second)
+            LocalDateTime.of(it.year, it.month + 1, it.day, it.hour, it.minute, it.second)?.also {
+              localDate = it.toLocalDate()
+              localTime = it.toLocalTime()
+            }
           }
         )
         textWatcher =
@@ -197,7 +200,12 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       /** Update the date and time input fields in the UI. */
       private fun updateDateTimeInput(localDateTime: LocalDateTime?) {
         enableOrDisableTimePicker(enableIt = localDateTime != null)
-        if (dateInputEditText.text.isNullOrEmpty()) {
+        if (isTextUpdateRequired(
+            dateInputEditText.context,
+            localDateTime,
+            dateInputEditText.text.toString()
+          )
+        ) {
           dateInputEditText.setText(localDateTime?.localizedDateString ?: "")
         }
         timeInputEditText.setText(
@@ -272,23 +280,29 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       private fun clearPreviousState() {
+        localDate = null
+        localTime = null
         setReadOnlyInternal(isReadOnly = false)
-        dateInputEditText.removeTextChangedListener(textWatcher)
-        // Cleanup old state when the ViewHolder is now being used for a different questionnaireItem
-        if (previousQuestionnaireItemViewItem?.questionnaireItem !=
-            questionnaireItemViewItem.questionnaireItem
-        ) {
-          dateInputEditText.text = null
-          timeInputEditText.text = null
-          localDate = null
-          localTime = null
-        }
-        previousQuestionnaireItemViewItem = questionnaireItemViewItem
       }
 
       private fun enableOrDisableTimePicker(enableIt: Boolean) {
         timeInputLayout.isEnabled = enableIt
         timeInputLayout.isEnabled = enableIt
+      }
+
+      private fun isTextUpdateRequired(
+        context: Context,
+        answer: LocalDateTime?,
+        inputText: String?
+      ): Boolean {
+        val inputDate =
+          try {
+            generateLocalDateTime(parseDate(inputText, context), localTime)
+          } catch (e: Exception) {
+            null
+          }
+        if (answer == null || inputDate == null) return true
+        return answer.toLocalDate() != inputDate.toLocalDate()
       }
     }
 }

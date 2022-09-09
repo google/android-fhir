@@ -55,7 +55,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-      private var previousQuestionnaireItemViewItem: QuestionnaireItemViewItem? = null
       private var textWatcher: TextWatcher? = null
       // Medium and long format styles use alphabetical month names which are difficult for the user
       // to input. Use short format style which is always numerical.
@@ -103,15 +102,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = localePattern
         textInputEditText.removeTextChangedListener(textWatcher)
-        // Cleanup old state when the ViewHolder is now being used for a different questionnaireItem
-        if (previousQuestionnaireItemViewItem?.questionnaireItem !=
-            questionnaireItemViewItem.questionnaireItem
+        if (isTextUpdateRequired(
+            textInputEditText.context,
+            questionnaireItemViewItem.answers.singleOrNull()?.valueDateType,
+            textInputEditText.text.toString()
+          )
         ) {
-          textInputEditText.text = null
-        }
-        previousQuestionnaireItemViewItem = questionnaireItemViewItem
-
-        if (textInputEditText.text.isNullOrEmpty()) {
           textInputEditText.setText(
             questionnaireItemViewItem.answers.singleOrNull()
               ?.valueDateType
@@ -165,6 +161,21 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
       }
     }
+
+  private fun isTextUpdateRequired(
+    context: Context,
+    answer: DateType?,
+    inputText: String?
+  ): Boolean {
+    val inputDate =
+      try {
+        parseDate(inputText, context)
+      } catch (e: Exception) {
+        null
+      }
+    if (answer == null || inputDate == null) return true
+    return answer.localDate != inputDate
+  }
 }
 
 internal const val TAG = "date-picker"
@@ -209,7 +220,7 @@ internal fun parseDate(text: CharSequence?, context: Context): LocalDate {
     } else {
       android.text.format.DateFormat.getDateFormat(context).parse(text.toString())
     }
-  val localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+  val localDate = LocalDate.of(date.year + 1900, date.month + 1, date.date)
   // date/localDate with year more than 4 digit throws data format exception if deep copy
   // operation get performed on QuestionnaireResponse,
   // QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent in org.hl7.fhir.r4.model
