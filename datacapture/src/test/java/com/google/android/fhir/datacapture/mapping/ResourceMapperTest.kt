@@ -2434,7 +2434,7 @@ class ResourceMapperTest {
     val temperatureQuestionnaireResponse =
       iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
     val bundle = ResourceMapper.extract(questionnaireObj, temperatureQuestionnaireResponse)
-    val encounter = bundle.entry[0].resource as Encounter
+    val encounter = bundle.entry.single().resource as Encounter
 
     assertThat(encounter).isNotNull()
     assertThat(
@@ -2514,7 +2514,7 @@ class ResourceMapperTest {
     val temperatureQuestionnaireResponse =
       iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
     val bundle = ResourceMapper.extract(questionnaireObj, temperatureQuestionnaireResponse)
-    val patient = bundle.entry[0].resource as Patient
+    val patient = bundle.entry.single().resource as Patient
 
     assertThat(patient).isNotNull()
     val coding =
@@ -2603,7 +2603,7 @@ class ResourceMapperTest {
     val temperatureQuestionnaireResponse =
       iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
     val bundle = ResourceMapper.extract(questionnaireObj, temperatureQuestionnaireResponse)
-    val patient = bundle.entry[0].resource as Patient
+    val patient = bundle.entry.single().resource as Patient
 
     assertThat(patient).isNotNull()
     assertThat(

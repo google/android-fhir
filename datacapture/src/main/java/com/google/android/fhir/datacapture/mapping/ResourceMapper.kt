@@ -446,6 +446,7 @@ object ResourceMapper {
         .javaClass
         .getMethod("setValue", Type::class.java)
         .invoke(base, questionnaireResponseItem.answer.singleOrNull()?.value)
+      return
     } catch (e: NoSuchMethodException) {
       // Do nothing
     }
