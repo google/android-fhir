@@ -141,16 +141,11 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       }
 
       private fun updateAnswer(answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent) {
-        // if-else block to prevent over-writing of "items" nested within "answer"
-        if (questionnaireItemViewItem.answers.isNotEmpty()) {
-          questionnaireItemViewItem.answers.apply { this[0].value = answerOption.value }
-        } else {
-          questionnaireItemViewItem.setAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = answerOption.value
-            }
-          )
-        }
+        questionnaireItemViewItem.setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = answerOption.value
+          }
+        )
       }
     }
 }
