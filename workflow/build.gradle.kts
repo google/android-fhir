@@ -42,13 +42,8 @@ android {
   }
 
   compileOptions {
-    // Flag to enable support for the new language APIs
-    // See https://developer.android.com/studio/write/java8-support
-    isCoreLibraryDesugaringEnabled = true
-    // Sets Java compatibility to Java 8
-    // See https://developer.android.com/studio/write/java8-support
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = Java.sourceCompatibility
+    targetCompatibility = Java.targetCompatibility
   }
 
   packagingOptions {
@@ -76,29 +71,20 @@ android {
     )
   }
 
-  // See https://developer.android.com/studio/write/java8-support
-  kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
+  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
 
   configureJacocoTestOptions()
 }
 
 configurations {
   all {
-    exclude(module = "json")
     exclude(module = "xpp3")
-    exclude(module = "hamcrest-all")
-    exclude(module = "javax.activation")
+    exclude(module = "jcl-over-slf4j")
     exclude(group = "org.apache.httpcomponents")
-    exclude(module = "activation", group = "javax.activation")
-    exclude(module = "javaee-api", group = "javax")
-    exclude(module = "hamcrest-all")
-    exclude(module = "javax.activation")
-    exclude(group = "xml-apis")
-    exclude(group = "com.google.code.javaparser")
-    exclude(group = "jakarta.activation")
+    // Remove this after this issue has been fixed:
+    // https://github.com/cqframework/clinical_quality_language/issues/799
+    exclude(module = "antlr4")
   }
-
-  compileOnly { exclude(group = "org.eclipse.persistence") }
 }
 
 dependencies {

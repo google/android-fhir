@@ -29,18 +29,10 @@ android {
     }
   }
   compileOptions {
-    // Flag to enable support for the new language APIs
-    // See https://developer.android.com/studio/write/java8-support
-    isCoreLibraryDesugaringEnabled = true
-    // Sets Java compatibility to Java 8
-    // See https://developer.android.com/studio/write/java8-support
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = Java.sourceCompatibility
+    targetCompatibility = Java.targetCompatibility
   }
-  kotlinOptions {
-    // See https://developer.android.com/studio/write/java8-support
-    jvmTarget = JavaVersion.VERSION_1_8.toString()
-  }
+  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
   configureJacocoTestOptions()
 
   testOptions { animationsDisabled = true }
@@ -57,8 +49,6 @@ dependencies {
   androidTestImplementation(Dependencies.truth)
 
   api(Dependencies.HapiFhir.structuresR4)
-
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.Androidx.appCompat)
