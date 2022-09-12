@@ -146,7 +146,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         val dateTime = questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType
         updateDateTimeInput(
           dateTime?.let {
-            LocalDateTime.of(it.year, it.month + 1, it.day, it.hour, it.minute, it.second)?.also {
+            it.localDateTime.also {
               localDate = it.toLocalDate()
               localTime = it.toLocalTime()
             }
@@ -320,6 +320,17 @@ internal val DateTimeType.localDate
 internal val DateTimeType.localTime
   get() =
     LocalTime.of(
+      hour,
+      minute,
+      second,
+    )
+
+internal val DateTimeType.localDateTime
+  get() =
+    LocalDateTime.of(
+      year,
+      month + 1,
+      day,
       hour,
       minute,
       second,
