@@ -176,7 +176,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `isFlyoverCode item returns true`() {
+  fun `isFlyoverCode should return true`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         type = Questionnaire.QuestionnaireItemType.DISPLAY
@@ -506,21 +506,6 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `localizedInstructionsSpanned returns text`() {
-    val displayCategoryExtension =
-      Extension().apply {
-        url = EXTENSION_DISPLAY_CATEGORY_URL
-        setValue(
-          CodeableConcept().apply {
-            coding =
-              listOf(
-                Coding().apply {
-                  code = INSTRUCTIONS
-                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-                }
-              )
-          }
-        )
-      }
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -532,7 +517,7 @@ class MoreQuestionnaireItemComponentsTest {
               Questionnaire.QuestionnaireItemComponent().apply {
                 linkId = "nested-display-question"
                 text = "subtitle text"
-                extension = listOf(displayCategoryExtension)
+                extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
               }
             )
@@ -546,21 +531,6 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `localizedInstructionsSpanned returns text for non matching locale`() {
-    val displayCategoryExtension =
-      Extension().apply {
-        url = EXTENSION_DISPLAY_CATEGORY_URL
-        setValue(
-          CodeableConcept().apply {
-            coding =
-              listOf(
-                Coding().apply {
-                  code = INSTRUCTIONS
-                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-                }
-              )
-          }
-        )
-      }
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -580,7 +550,7 @@ class MoreQuestionnaireItemComponentsTest {
                     }
                   )
                 }
-                extension = listOf(displayCategoryExtension)
+                extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
               }
             )
@@ -594,21 +564,6 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `localizedInstructionsSpanned returns localized text for matching locale`() {
-    val displayCategoryExtension =
-      Extension().apply {
-        url = EXTENSION_DISPLAY_CATEGORY_URL
-        setValue(
-          CodeableConcept().apply {
-            coding =
-              listOf(
-                Coding().apply {
-                  code = INSTRUCTIONS
-                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-                }
-              )
-          }
-        )
-      }
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -628,7 +583,7 @@ class MoreQuestionnaireItemComponentsTest {
                     }
                   )
                 }
-                extension = listOf(displayCategoryExtension)
+                extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
               }
             )
@@ -641,21 +596,6 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `localizedInstructionsSpanned returns localized text for matching locale without country code`() {
-    val displayCategoryExtension =
-      Extension().apply {
-        url = EXTENSION_DISPLAY_CATEGORY_URL
-        setValue(
-          CodeableConcept().apply {
-            coding =
-              listOf(
-                Coding().apply {
-                  code = INSTRUCTIONS
-                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-                }
-              )
-          }
-        )
-      }
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -675,7 +615,7 @@ class MoreQuestionnaireItemComponentsTest {
                     }
                   )
                 }
-                extension = listOf(displayCategoryExtension)
+                extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
               }
             )
@@ -688,26 +628,11 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `isInstructionsCode returns true`() {
-    val displayCategoryExtension =
-      Extension().apply {
-        url = EXTENSION_DISPLAY_CATEGORY_URL
-        setValue(
-          CodeableConcept().apply {
-            coding =
-              listOf(
-                Coding().apply {
-                  code = INSTRUCTIONS
-                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-                }
-              )
-          }
-        )
-      }
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         linkId = "nested-display-question"
         text = "subtitle text"
-        extension = listOf(displayCategoryExtension)
+        extension = listOf(displayCategoryExtensionWithInstructionsCode)
         type = Questionnaire.QuestionnaireItemType.DISPLAY
       }
     assertThat(questionnaireItem.isInstructionsCode).isTrue()
@@ -715,26 +640,11 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `isInstructionsCode returns false if item type is not display`() {
-    val displayCategoryExtension =
-      Extension().apply {
-        url = EXTENSION_DISPLAY_CATEGORY_URL
-        setValue(
-          CodeableConcept().apply {
-            coding =
-              listOf(
-                Coding().apply {
-                  code = INSTRUCTIONS
-                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-                }
-              )
-          }
-        )
-      }
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         linkId = "nested-display-question"
         text = "subtitle text"
-        extension = listOf(displayCategoryExtension)
+        extension = listOf(displayCategoryExtensionWithInstructionsCode)
         type = Questionnaire.QuestionnaireItemType.STRING
       }
     assertThat(questionnaireItem.isInstructionsCode).isFalse()
@@ -1121,4 +1031,20 @@ class MoreQuestionnaireItemComponentsTest {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
     assertThat(questionnaireItem.entryFormat).isNull()
   }
+
+  private val displayCategoryExtensionWithInstructionsCode =
+    Extension().apply {
+      url = EXTENSION_DISPLAY_CATEGORY_URL
+      setValue(
+        CodeableConcept().apply {
+          coding =
+            listOf(
+              Coding().apply {
+                code = INSTRUCTIONS
+                system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+              }
+            )
+        }
+      )
+    }
 }

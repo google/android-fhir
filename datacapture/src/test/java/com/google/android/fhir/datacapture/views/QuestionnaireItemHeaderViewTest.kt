@@ -71,21 +71,6 @@ class QuestionnaireItemHeaderViewTest {
 
   @Test
   fun `shows instructions`() {
-    val displayCategoryExtension =
-      Extension().apply {
-        url = EXTENSION_DISPLAY_CATEGORY_URL
-        setValue(
-          CodeableConcept().apply {
-            coding =
-              listOf(
-                Coding().apply {
-                  code = INSTRUCTIONS
-                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-                }
-              )
-          }
-        )
-      }
     view.bind(
       Questionnaire.QuestionnaireItemComponent().apply {
         item =
@@ -93,7 +78,7 @@ class QuestionnaireItemHeaderViewTest {
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "nested-display-question"
               text = "subtitle text"
-              extension = listOf(displayCategoryExtension)
+              extension = listOf(displayCategoryExtensionWithInstructionsCode)
               type = Questionnaire.QuestionnaireItemType.DISPLAY
             }
           )
@@ -123,21 +108,6 @@ class QuestionnaireItemHeaderViewTest {
 
   @Test
   fun `shows headerItem view`() {
-    val displayCategoryExtension =
-      Extension().apply {
-        url = EXTENSION_DISPLAY_CATEGORY_URL
-        setValue(
-          CodeableConcept().apply {
-            coding =
-              listOf(
-                Coding().apply {
-                  code = INSTRUCTIONS
-                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-                }
-              )
-          }
-        )
-      }
     view.bind(
       Questionnaire.QuestionnaireItemComponent().apply {
         item =
@@ -145,7 +115,7 @@ class QuestionnaireItemHeaderViewTest {
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "nested-display-question"
               text = "subtitle text"
-              extension = listOf(displayCategoryExtension)
+              extension = listOf(displayCategoryExtensionWithInstructionsCode)
               type = Questionnaire.QuestionnaireItemType.DISPLAY
             }
           )
@@ -171,4 +141,20 @@ class QuestionnaireItemHeaderViewTest {
 
     assertThat(view.visibility).isEqualTo(View.GONE)
   }
+
+  private val displayCategoryExtensionWithInstructionsCode =
+    Extension().apply {
+      url = EXTENSION_DISPLAY_CATEGORY_URL
+      setValue(
+        CodeableConcept().apply {
+          coding =
+            listOf(
+              Coding().apply {
+                code = INSTRUCTIONS
+                system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+              }
+            )
+        }
+      )
+    }
 }

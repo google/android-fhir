@@ -28,11 +28,9 @@
                 "coding": [
                   {
                     "system": "http://hl7.org/fhir/questionnaire-display-category",
-                    "code": "instructions",
-                    "display": "Instructions"
+                    "code": "instructions"
                   }
-                ],
-                "text": "The text provides guidance on how the information will be handled from a instructions perspective."
+                ]
               }
             }
           ],
