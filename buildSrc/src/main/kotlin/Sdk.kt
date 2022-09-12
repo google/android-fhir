@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,6 @@
 
 object Sdk {
   const val compileSdk = 31
-  const val minSdk = 21
+  const val minSdk = 26 // DatastoreUtil.kt:39 requires API 26. Caffeine as well.
   const val targetSdk = 31
 }
