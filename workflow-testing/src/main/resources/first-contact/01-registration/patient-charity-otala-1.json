@@ -1,0 +1,50 @@
+{
+  "resourceType": "Patient",
+  "id": "charity-otala-1",
+  "meta": {
+    "profile": [ "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient" ]
+  },
+  "extension": [ {
+    "url": "http://fhir.org/guides/who/anc-cds/StructureDefinition/educationlevel",
+    "valueCodeableConcept": {
+      "coding": [ {
+        "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+        "code": "ANC.B6.DE4",
+        "display": "Primary school"
+      } ]
+    }
+  }, {
+    "url": "http://fhir.org/guides/who/anc-cds/StructureDefinition/occupation",
+    "valueCodeableConcept": {
+      "coding": [ {
+        "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+        "code": "ANC.B6.DE12",
+        "display": "Informal employment (other)"
+      } ]
+    }
+  } ],
+  "identifier": [ {
+    "use": "official",
+    "system": "http://example.org/identifier",
+    "value": "charity-otala-1"
+  } ],
+  "name": [ {
+    "use": "official",
+    "family": "Otala",
+    "given": [ "Charity" ],
+    "text": "Charity Otala"
+  } ],
+  "telecom": [ {
+    "system": "phone",
+    "value": "555-555-2003",
+    "use": "mobile"
+  } ],
+  "birthDate": "1994-07-01",
+  "address": [ {
+    "use": "home",
+    "text": "2222 Home Street"
+  } ],
+  "generalPractitioner": [ {
+    "reference": "PractitionerRole/anc-practitionerrole-example"
+  } ]
+}

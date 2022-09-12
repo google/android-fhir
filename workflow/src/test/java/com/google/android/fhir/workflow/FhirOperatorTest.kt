@@ -21,15 +21,12 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
+import com.google.android.fhir.workflow.testing.CqlBuilderUtils
+import com.google.android.fhir.workflow.testing.toLocalDate
 import com.google.common.truth.Truth.assertThat
 import java.util.Base64
 import java.util.Date
 import kotlinx.coroutines.runBlocking
-import org.cqframework.cql.cql2elm.CqlTranslator
-import org.cqframework.cql.cql2elm.CqlTranslatorOptions
-import org.cqframework.cql.cql2elm.LibraryManager
-import org.cqframework.cql.cql2elm.ModelManager
-import org.cqframework.cql.cql2elm.quick.FhirLibrarySourceProvider
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Library
@@ -441,18 +438,7 @@ class FhirOperatorTest {
   }
 
   private fun toJsonElm(cql: String): String {
-    val libraryManager = LibraryManager(ModelManager())
-    libraryManager.librarySourceLoader.registerProvider(FhirLibrarySourceProvider())
-
-    val translator: CqlTranslator =
-      CqlTranslator.fromText(
-        cql,
-        libraryManager.modelManager,
-        libraryManager,
-        *CqlTranslatorOptions.defaultOptions().options.toTypedArray()
-      )
-
-    return translator.toJson()
+    return CqlBuilderUtils.compile(cql).toJson()
   }
 
   private fun String.readStringToBase64Encoded(): String {
