@@ -72,7 +72,7 @@ import org.robolectric.annotation.Config
 
 /** Integration & Unit tests for {@link ResourceIndexerImpl}. */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.P])
+@Config(sdk = [Build.VERSION_CODES.O])
 class ResourceIndexerTest {
 
   /** Unit tests for resource indexer */

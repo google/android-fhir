@@ -66,7 +66,7 @@ import org.robolectric.shadows.ShadowLooper
 import org.robolectric.util.ReflectionHelpers
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
+@Config(sdk = [Build.VERSION_CODES.O], application = DataCaptureTestApplication::class)
 class QuestionnaireViewModelTest(
   private val questionnaireSource: QuestionnaireSource,
   private val questionnaireResponseSource: QuestionnaireResponseSource
