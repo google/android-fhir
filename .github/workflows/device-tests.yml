@@ -37,7 +37,7 @@ jobs:
 
     strategy:
       matrix:
-        api-level: [ 24, 27, 30 ]
+        api-level: [ 26, 27, 30 ]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
