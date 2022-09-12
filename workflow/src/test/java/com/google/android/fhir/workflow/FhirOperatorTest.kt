@@ -96,6 +96,7 @@ class FhirOperatorTest {
   }
 
   @Test
+  @Ignore("Disabled until ANCIND01-bundle is fixed/updated with CQF-Tooling 2.0")
   fun evaluatePopulationMeasure() = runBlocking {
     loadBundle(libraryBundle)
     fhirEngine.run {
@@ -161,6 +162,7 @@ class FhirOperatorTest {
   }
 
   @Test
+  @Ignore("Disabled until ANCIND01-bundle is fixed/updated with CQF-Tooling 2.0")
   fun evaluateGroupPopulationMeasure() = runBlocking {
     val resourceBundle = Bundle()
 
@@ -325,6 +327,7 @@ class FhirOperatorTest {
   }
 
   @Test
+  @Ignore("Disabled until ANCIND01-bundle is fixed/updated with CQF-Tooling 2.0")
   fun evaluateIndividualSubjectMeasure() = runBlocking {
     loadBundle(libraryBundle)
     fhirEngine.run {
