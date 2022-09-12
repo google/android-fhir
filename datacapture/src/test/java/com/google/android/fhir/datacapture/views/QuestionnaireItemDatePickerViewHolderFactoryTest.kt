@@ -65,10 +65,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
       )
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
-      )
-      .isEqualTo("")
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("")
   }
 
   @Test
@@ -86,10 +83,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _ -> },
       )
     )
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
-      )
-      .isEqualTo("11/19/20")
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/20")
   }
 
   @Test
@@ -107,10 +101,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _ -> },
       )
     )
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
-      )
-      .isEqualTo("2020/11/19")
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("2020/11/19")
   }
 
   @Test
@@ -128,10 +119,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _ -> },
       )
     )
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
-      )
-      .isEqualTo("11/19/20")
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/20")
   }
 
   @Test
@@ -146,7 +134,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
       )
 
     viewHolder.bind(item)
-    viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text = "11/19/2020"
+    viewHolder.dateInputView.text = "11/19/2020"
 
     val answer = item.answers.singleOrNull()?.value as DateType
 
@@ -166,7 +154,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(item)
-    viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text = "2020/11/19"
+    viewHolder.dateInputView.text = "2020/11/19"
     val answer = item.answers.singleOrNull()?.value as DateType
 
     assertThat(answer.day).isEqualTo(19)
@@ -190,7 +178,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
       )
     viewHolder.bind(questionnaireItem)
 
-    viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text = "11/19/"
+    viewHolder.dateInputView.text = "11/19/"
     val answer = questionnaireItem.answers.singleOrNull()?.value
     assertThat(answer).isNull()
   }
@@ -265,12 +253,59 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).isEnabled)
-      .isFalse()
+    assertThat(viewHolder.dateInputView.isEnabled).isFalse()
+  }
+
+  @Test
+  fun `bind multiple times with different QuestionnaireItemViewItem should show proper date`() {
+    setLocale(Locale.US)
+
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateType(2020, 10, 19))
+          ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/20")
+
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateType(2021, 10, 19))
+          ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/21")
+
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+    assertThat(viewHolder.dateInputView.text.toString()).isEmpty()
   }
 
   private fun setLocale(locale: Locale) {
     Locale.setDefault(locale)
     context.resources.configuration.setLocale(locale)
   }
+
+  private val QuestionnaireItemViewHolder.dateInputView: TextView
+    get() {
+      return itemView.findViewById(R.id.text_input_edit_text)
+    }
 }
