@@ -131,6 +131,7 @@ object Dependencies {
   const val material = "com.google.android.material:material:${Versions.material}"
   const val sqlcipher = "net.zetetic:android-database-sqlcipher:${Versions.sqlcipher}"
   const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
+  const val woodstox = "com.fasterxml.woodstox:woodstox-core:${Versions.woodstox}"
   const val xerces = "xerces:xercesImpl:${Versions.xerces}"
 
   // Dependencies for testing go here
@@ -152,7 +153,7 @@ object Dependencies {
   }
 
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
-  // Makes Json assertions where the order of elements is not important.
+  // Makes Json assertions where the order of elements, tabs/whitespaces are not important.
   const val jsonAssert = "org.skyscreamer:jsonassert:${Versions.jsonAssert}"
   const val junit = "junit:junit:${Versions.junit}"
   const val mockitoKotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mockitoKotlin}"
@@ -160,6 +161,8 @@ object Dependencies {
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
   const val slf4j = "org.slf4j:slf4j-android:${Versions.slf4j}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
+  // Makes XML assertions where the order of elements, tabs/whitespaces are not important.
+  const val xmlUnit = "org.xmlunit:xmlunit-core:${Versions.xmlUnit}"
 
   object Versions {
     object Androidx {
@@ -206,7 +209,9 @@ object Dependencies {
     const val sqlcipher = "4.5.0"
     const val timber = "5.0.1"
     const val truth = "1.0.1"
+    const val woodstox = "6.2.7"
     const val xerces = "2.12.2"
+    const val xmlUnit = "2.9.0"
 
     // Test dependencies
 

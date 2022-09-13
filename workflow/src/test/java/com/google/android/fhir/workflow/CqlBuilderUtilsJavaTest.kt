@@ -16,43 +16,25 @@
 
 package com.google.android.fhir.workflow
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.workflow.testing.CqlBuilderUtils
-import java.io.InputStream
-import org.hl7.fhir.instance.model.api.IBaseResource
+import com.google.android.fhir.workflow.testing.CqlBuilderTestBase
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.skyscreamer.jsonassert.JSONAssert
 
 @RunWith(RobolectricTestRunner::class)
-class CqlBuilderUtilsJavaTest {
-  private val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-
-  private fun open(asset: String): InputStream {
-    return javaClass.getResourceAsStream(asset)!!
-  }
-
-  private fun load(asset: String): String {
-    return open(asset).bufferedReader().use { bufferReader -> bufferReader.readText() }
-  }
-
-  private fun IBaseResource.toJson(): String {
-    return jsonParser.encodeResourceToString(this)
-  }
-
+class CqlBuilderUtilsJavaTest : CqlBuilderTestBase() {
   /**
    * Tests the compilation of CQL expressions into ELM by verifying if the compiled JSONs match.
    *
    * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
    */
   @Test
-  fun shouldCompileImmunityCheckCqlToElm() {
-    JSONAssert.assertEquals(
-      load("/cql-compiler/ImmunityCheck-1.0.0.elm.json"),
-      CqlBuilderUtils.compile(open("/cql-compiler/ImmunityCheck-1.0.0.cql")).toJson(),
-      false
+  fun shouldCompileAndAssembleImmunityCheck() {
+    test(
+      "/cql-compiler/ImmunityCheck-1.0.0.cql",
+      "/cql-compiler/ImmunityCheck-1.0.0.elm.json",
+      "/cql-compiler/ImmunityCheck-1.0.0.elm.xml",
+      "/cql-compiler/ImmunityCheck-1.0.0.fhir.json"
     )
   }
 
@@ -62,39 +44,12 @@ class CqlBuilderUtilsJavaTest {
    * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
    */
   @Test
-  fun shouldCompileFhirHelpersCqlToElm() {
-    JSONAssert.assertEquals(
-      load("/cql-compiler/FHIRHelpers-4.0.1.elm.json"),
-      CqlBuilderUtils.compile(open("/cql-compiler/FHIRHelpers-4.0.1.cql")).toJson(),
-      false
-    )
-  }
-
-  /**
-   * Tests the assembly of a Base64-represented ELM Library inside a FHIR Library.
-   *
-   * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
-   */
-  @Test
-  fun shouldCompileAndAssembleImmunityCheck() {
-    JSONAssert.assertEquals(
-      load("/cql-compiler/ImmunityCheck-1.0.0.fhir.json"),
-      CqlBuilderUtils.compileAndBuild(open("/cql-compiler/ImmunityCheck-1.0.0.cql")).toJson(),
-      false
-    )
-  }
-
-  /**
-   * Tests the assembly of a Base64-represented ELM Library inside a FHIR Library.
-   *
-   * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
-   */
-  @Test
   fun shouldCompileAndAssembleFhirHelpers() {
-    JSONAssert.assertEquals(
-      load("/cql-compiler/FHIRHelpers-4.0.1.fhir.json"),
-      CqlBuilderUtils.compileAndBuild(open("/cql-compiler/FHIRHelpers-4.0.1.cql")).toJson(),
-      false
+    test(
+      "/cql-compiler/FHIRHelpers-4.0.1.cql",
+      "/cql-compiler/FHIRHelpers-4.0.1.elm.json",
+      "/cql-compiler/FHIRHelpers-4.0.1.elm.xml",
+      "/cql-compiler/FHIRHelpers-4.0.1.fhir.json"
     )
   }
 }

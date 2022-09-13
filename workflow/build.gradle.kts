@@ -88,6 +88,7 @@ dependencies {
   androidTestImplementation(Dependencies.jsonAssert)
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(Dependencies.xmlUnit)
   androidTestImplementation(project(":testing"))
   androidTestImplementation(project(":workflow-testing"))
 
@@ -129,6 +130,7 @@ dependencies {
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(Dependencies.xmlUnit)
   testImplementation(project(":testing"))
   testImplementation(project(":workflow-testing"))
 }

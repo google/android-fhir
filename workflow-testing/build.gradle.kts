@@ -32,4 +32,6 @@ dependencies {
 
   compileOnly(Dependencies.junit)
   compileOnly(Dependencies.jsonAssert)
+  compileOnly(Dependencies.woodstox)
+  compileOnly(Dependencies.xmlUnit)
 }
