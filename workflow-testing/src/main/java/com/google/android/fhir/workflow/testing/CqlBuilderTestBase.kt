@@ -50,7 +50,7 @@ open class CqlBuilderTestBase {
     val translator = CqlBuilderUtils.compile(cqlText)
 
     // JSONAssert ignores property order and whitespace/tabs
-    JSONAssert.assertEquals(expectedElmJson, translator.toJson(), false)
+    JSONAssert.assertEquals(expectedElmJson, translator.toJson(), true)
 
     println(translator.toXml())
 
