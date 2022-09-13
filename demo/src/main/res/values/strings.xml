@@ -46,7 +46,7 @@
   <string name="edit_patient">Edit Patient</string>
   <string name="submit">Submit</string>
   <string name="message_syncing">Syncing\u2026</string>
-  <string name="message_input_missing">Inputs are missing.</string>
+
   <string name="message_patient_updated">Patient is updated.</string>
   <string name="inputs_missing">Inputs are missing.</string>
   <string name="resources_saved">Resources are saved.</string>
