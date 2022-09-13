@@ -65,7 +65,10 @@ dependencies {
   implementation(Dependencies.Navigation.navUiKtx)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
-  implementation(project(":engine"))
+
+  releaseImplementation(Dependencies.androidFhirEngine)
+  debugImplementation(project(":engine"))
+
   implementation(project(":datacapture"))
 
   testImplementation(Dependencies.junit)

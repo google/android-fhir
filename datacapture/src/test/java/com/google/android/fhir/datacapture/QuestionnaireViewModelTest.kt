@@ -2433,7 +2433,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun `should populate questionnaire item answer options with answer expression and choice column`() =
+  fun `resolveAnswerExpression() should return questionnaire item answer options for answer expression and choice column`() =
       runBlocking {
     val practitioner =
       Practitioner()
@@ -2475,17 +2475,9 @@ class QuestionnaireViewModelTest(
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
     val viewModel = QuestionnaireViewModel(context, state)
+    val answerOptions = viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
 
-    assertThat(
-        viewModel
-          .getQuestionnaireItemViewItemList()
-          .first()
-          .questionnaireItem
-          .answerOption
-          .first()
-          .valueReference
-          .reference
-      )
+    assertThat(answerOptions.first().valueReference.reference)
       .isEqualTo("Practitioner/${practitioner.logicalId}")
   }
 

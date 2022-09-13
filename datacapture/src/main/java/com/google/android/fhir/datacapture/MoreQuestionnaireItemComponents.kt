@@ -351,11 +351,10 @@ data class ChoiceColumn(val path: String, val label: String?, val forDisplay: Bo
  * - With reference it allows selection of fields from the resource for display and reference
  * - With other types it adds the options as is
  */
-internal fun Questionnaire.QuestionnaireItemComponent.populateAnswerOptions(dataList: List<Base>) {
-  val choiceColumns =
-    this.choiceColumn.also {
-      if (it.isNullOrEmpty() || dataList.isEmpty()) return@populateAnswerOptions
-    }!!
+internal fun Questionnaire.QuestionnaireItemComponent.extractAnswerOptions(
+  dataList: List<Base>
+): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+  if (dataList.isEmpty()) return emptyList()
 
   if (this.type != Questionnaire.QuestionnaireItemType.REFERENCE && dataList.first().isResource) {
     throw IllegalArgumentException(
@@ -363,22 +362,21 @@ internal fun Questionnaire.QuestionnaireItemComponent.populateAnswerOptions(data
     )
   }
 
-  dataList
+  return dataList
     .map { data ->
       if (data.isResource) {
         data as Resource
         Reference().apply {
           reference = "${data.resourceType}/${data.logicalId}"
-          choiceColumns
-            .filter { it.forDisplay }
-            .map { it.path }
-            .let { evaluateToDisplay(it, data) }
-            .also { display = it }
+          this@extractAnswerOptions.choiceColumn
+            ?.filter { it.forDisplay }
+            ?.map { it.path }
+            ?.let { evaluateToDisplay(it, data) }
+            ?.also { display = it }
         }
       } else data.castToType(data)
     }
     .map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
-    .also { this.answerOption.also { it.clear() }.addAll(it) }
 }
 
 /**

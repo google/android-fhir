@@ -40,7 +40,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
@@ -282,6 +281,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val answerValueSetMap =
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
 
+  private val answerExpressionMap =
+    mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
+
   /**
    * Returns current [QuestionnaireResponse] captured by the UI which includes answers of enabled
    * questions.
@@ -412,10 +414,30 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return options
   }
 
+  // TODO persist previous answers incase options are changing and new list does not have selected
+  // answer
+  @PublishedApi
+  internal suspend fun resolveAnswerExpression(
+    item: Questionnaire.QuestionnaireItemComponent
+  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+    // Check cache first for database queries
+    val answerExpression = item.answerExpression!!
+    if (answerExpression.isXFhirQuery && answerExpressionMap.contains(answerExpression.expression)
+    ) {
+      return answerExpressionMap[answerExpression.expression]!!
+    }
+
+    val options = loadAnswerExpressionOptions(item, answerExpression)
+
+    if (answerExpression.isXFhirQuery) answerExpressionMap[answerExpression.expression] = options
+
+    return options
+  }
+
   private suspend fun loadAnswerExpressionOptions(
     item: Questionnaire.QuestionnaireItemComponent,
     expression: Expression
-  ) {
+  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     val data =
       if (expression.isXFhirQuery) fhirEngine.search(expression.expression)
       else if (expression.isFhirPath)
@@ -425,7 +447,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           "${expression.language} not supported for answer-expression yet"
         )
 
-    item.populateAnswerOptions(data)
+    return item.extractAnswerOptions(data)
   }
 
   /**
@@ -513,17 +535,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return questionnaireItemList
       .asSequence()
       .flatMap { questionnaireItem ->
-        questionnaireItem.answerExpression?.let {
-          runBlocking { loadAnswerExpressionOptions(questionnaireItem, it) }
-        }
-
+        var questionnaireResponseItem = questionnaireItem.createQuestionnaireResponseItem()
         // If there is an enabled questionnaire response available then we use that. Or else we
-        // just use an empty questionnaire response item.
-        val questionnaireResponseItem =
-          questionnaireResponseItemList.find { it.linkId == questionnaireItem.linkId }?.also {
-            responseIndex += 1
-          }
-            ?: questionnaireItem.createQuestionnaireResponseItem()
+        // just use an empty questionnaireResponse Item
+        if (responseIndex < questionnaireResponseItemList.size &&
+            questionnaireItem.linkId == questionnaireResponseItem.linkId
+        ) {
+          questionnaireResponseItem = questionnaireResponseItemList[responseIndex]
+          responseIndex += 1
+        }
 
         getQuestionnaireItemViewItems(questionnaireItem, questionnaireResponseItem)
       }
@@ -572,6 +592,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           validationResult = validationResult,
           answersChangedCallback = answersChangedCallback,
           resolveAnswerValueSet = { resolveAnswerValueSet(it) },
+          resolveAnswerExpression = { resolveAnswerExpression(it) }
         )
       ) +
         getQuestionnaireItemViewItems(

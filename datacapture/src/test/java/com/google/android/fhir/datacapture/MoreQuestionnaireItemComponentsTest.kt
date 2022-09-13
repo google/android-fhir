@@ -1029,7 +1029,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `populateAnswerOptions should fill answer options for coding`() {
+  fun `extractAnswerOptions should return answer options for coding`() {
     val questionItem =
       Questionnaire()
         .addItem(
@@ -1052,21 +1052,18 @@ class MoreQuestionnaireItemComponentsTest {
           }
         )
 
-    questionItem.itemFirstRep.populateAnswerOptions(
-      listOf(Coding("a.com", "a", "A"), Coding("b.com", "b", "B"))
-    )
-
     val answers =
-      questionItem.itemFirstRep.answerOption.map {
-        "${it.valueCoding.code}|${it.valueCoding.display}"
-      }
+      questionItem.itemFirstRep.extractAnswerOptions(
+          listOf(Coding("a.com", "a", "A"), Coding("b.com", "b", "B"))
+        )
+        .map { "${it.valueCoding.code}|${it.valueCoding.display}" }
 
     assertThat(answers.first()).isEqualTo("a|A")
     assertThat(answers.last()).contains("b|B")
   }
 
   @Test
-  fun `populateAnswerOptions should fill answer options for resources`() {
+  fun `extractAnswerOptions should return answer options for resources`() {
     val questionItem =
       Questionnaire()
         .addItem(
@@ -1089,22 +1086,22 @@ class MoreQuestionnaireItemComponentsTest {
           }
         )
 
-    questionItem.itemFirstRep.populateAnswerOptions(
-      listOf(
-        Patient().apply {
-          id = "1234"
-          nameFirstRep.family = "Doe"
-          nameFirstRep.addGiven("John")
-        },
-        Patient().apply {
-          id = "5678"
-          nameFirstRep.family = "Doe"
-          nameFirstRep.addGiven("Jane")
-        }
-      )
-    )
-
-    val answers = questionItem.itemFirstRep.answerOption.map { it.valueReference }
+    val answers =
+      questionItem.itemFirstRep.extractAnswerOptions(
+          listOf(
+            Patient().apply {
+              id = "1234"
+              nameFirstRep.family = "Doe"
+              nameFirstRep.addGiven("John")
+            },
+            Patient().apply {
+              id = "5678"
+              nameFirstRep.family = "Doe"
+              nameFirstRep.addGiven("Jane")
+            }
+          )
+        )
+        .map { it.valueReference }
 
     assertThat(answers.first().display).isEqualTo("John Doe")
     assertThat(answers.first().reference).isEqualTo("Patient/1234")
@@ -1113,7 +1110,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `populateAnswerOptions should throw IllegalArgumentException when item type is not reference and data type is resource`() {
+  fun `extractAnswerOptions should throw IllegalArgumentException when item type is not reference and data type is resource`() {
     val questionItem =
       Questionnaire()
         .addItem(
@@ -1132,7 +1129,7 @@ class MoreQuestionnaireItemComponentsTest {
         )
 
     assertThrows(IllegalArgumentException::class.java) {
-      questionItem.itemFirstRep.populateAnswerOptions(listOf(Patient()))
+      questionItem.itemFirstRep.extractAnswerOptions(listOf(Patient()))
     }
       .run {
         assertThat(this.message)

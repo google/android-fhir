@@ -71,11 +71,6 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "modal-questionnaire.json",
       "modal_with_validation_questionnaire.json"
     ),
-    REFERENCE(
-      R.drawable.ic_group_1278,
-      R.string.component_name_reference,
-      "dropdown-reference-questionnaire.json"
-    ),
     OPEN_CHOICE(
       R.drawable.ic_openchoice,
       R.string.component_name_open_choice,

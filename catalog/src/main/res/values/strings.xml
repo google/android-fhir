@@ -28,7 +28,6 @@
   <string name="component_name_modal">Modal</string>
   <string name="component_name_slider">Slider</string>
   <string name="component_name_dropdown">Dropdown</string>
-  <string name="component_name_reference">Reference</string>
   <string name="component_name_image">Image</string>
   <string name="component_name_auto_complete">Auto Complete</string>
   <string name="layout_name_default_text">Default</string>

@@ -68,7 +68,10 @@ dependencies {
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.androidFhirCommon)
-  implementation(Dependencies.androidFhirEngine)
+
+  releaseImplementation(Dependencies.androidFhirEngine)
+  debugImplementation(project(":engine"))
+
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)
   implementation(Dependencies.Androidx.coreKtx)
