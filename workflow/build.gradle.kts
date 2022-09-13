@@ -93,8 +93,6 @@ dependencies {
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
-
   implementation(Dependencies.Androidx.coreKtx)
 
   // Remove this after this issue has been fixed:
