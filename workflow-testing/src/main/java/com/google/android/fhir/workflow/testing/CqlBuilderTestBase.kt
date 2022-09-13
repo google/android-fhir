@@ -49,10 +49,16 @@ open class CqlBuilderTestBase {
 
     val translator = CqlBuilderUtils.compile(cqlText)
 
+    // Manually removes the version information to make tests pass.
+    // Remove it after https://github.com/cqframework/clinical_quality_language/issues/804
+    translator.toELM().annotation.forEach {
+      if (it is org.hl7.cql_annotations.r1.CqlToElmInfo) {
+        it.translatorVersion = null
+      }
+    }
+
     // JSONAssert ignores property order and whitespace/tabs
     JSONAssert.assertEquals(expectedElmJson, translator.toJson(), true)
-
-    println(translator.toXml())
 
     // XmlAssert ignores property order and whitespace/tabs
     XMLAssert.assertEquals(expectedElmXml, translator.toXml())
