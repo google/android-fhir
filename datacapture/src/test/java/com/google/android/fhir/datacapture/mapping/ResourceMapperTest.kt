@@ -37,6 +37,7 @@ import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -875,81 +876,82 @@ class ResourceMapperTest {
       runBlocking {
     @Language("JSON")
     val questionnaireJson =
-      """{
-  "resourceType": "Questionnaire",
-  "subjectType": [
-    "Encounter"
-  ],
-  "item": [
-     {
-      "text": "Pulse Oximetry",
-      "linkId": "6.0.0",
-      "type": "group",
-      "extension": [
+      """
         {
-          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-          "valueExpression": {
-            "language": "application/x-fhir-query",
-            "expression": "Observation",
-            "name": "pulse"
-          }
-        }
-      ],
-      "item": [
-        {
-          "linkId": "6.2.0",
-          "type": "group",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
+          "resourceType": "Questionnaire",
+          "subjectType": [
+            "Encounter"
+          ],
           "item": [
             {
-              "text": "Pulse oximetry reading",
-              "type": "integer",
-              "linkId": "6.2.1",
-              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.value",
+              "text": "Pulse Oximetry",
+              "linkId": "6.0.0",
+              "type": "group",
               "extension": [
                 {
-                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
-                  "valueInteger": 60
-                },
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+                  "valueExpression": {
+                    "language": "application/x-fhir-query",
+                    "expression": "Observation",
+                    "name": "pulse"
+                  }
+                }
+              ],
+              "item": [
                 {
-                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
-                  "valueInteger": 100
+                  "linkId": "6.2.0",
+                  "type": "group",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
+                  "item": [
+                    {
+                      "text": "Pulse oximetry reading",
+                      "type": "integer",
+                      "linkId": "6.2.1",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.value",
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                          "valueInteger": 60
+                        },
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                          "valueInteger": 100
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
           ]
         }
-      ]
-    }
-  ]
-}
         """.trimIndent()
     @Language("JSON")
     val questionnaireResponseJson =
       """
         {
-  "resourceType": "QuestionnaireResponse",
-  "item": [
-     {
-      "linkId": "6.0.0",
-      "item": [
-        {
-          "linkId": "6.2.0",
+          "resourceType": "QuestionnaireResponse",
           "item": [
             {
-              "linkId": "6.2.1",
-              "answer": [
+              "linkId": "6.0.0",
+              "item": [
                 {
-                  "valueInteger": 90
+                  "linkId": "6.2.0",
+                  "item": [
+                    {
+                      "linkId": "6.2.1",
+                      "answer": [
+                        {
+                          "valueInteger": 90
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
           ]
         }
-      ]
-    }
-  ]
-}
         """.trimIndent()
 
     val iParser: IParser = FhirContext.forR4().newJsonParser()
@@ -977,189 +979,189 @@ class ResourceMapperTest {
     val questionnaireJson =
       """
         {
-  "resourceType": "Questionnaire",
-  "id": "client-registration-sample",
-  "status": "active",
-  "date": "2020-11-18T07:24:47.111Z",
-  "subjectType": [
-    "Patient"
-  ],
-  "item": [
-    {
-      "linkId": "PR",
-      "type": "group",
-      "item": [
-        {
-          "linkId": "PR-name",
-          "type": "group",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
+          "resourceType": "Questionnaire",
+          "id": "client-registration-sample",
+          "status": "active",
+          "date": "2020-11-18T07:24:47.111Z",
+          "subjectType": [
+            "Patient"
+          ],
           "item": [
             {
-              "extension": [
+              "linkId": "PR",
+              "type": "group",
+              "item": [
                 {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-                  "valueExpression": {
-                    "language": "text/fhirpath",
-                    "expression": "Patient.name.given",
-                    "name": "patientName"
-                  }
-                }
-              ],
-              "linkId": "PR-name-text",
-              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
-              "type": "string",
-              "text": "First Name"
-            },
-            {
-              "extension": [
+                  "linkId": "PR-name",
+                  "type": "group",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
+                  "item": [
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                          "valueExpression": {
+                            "language": "text/fhirpath",
+                            "expression": "Patient.name.given",
+                            "name": "patientName"
+                          }
+                        }
+                      ],
+                      "linkId": "PR-name-text",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
+                      "type": "string",
+                      "text": "First Name"
+                    },
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                          "valueExpression": {
+                            "language": "text/fhirpath",
+                            "expression": "Patient.name.family",
+                            "name": "patientFamily"
+                          }
+                        }
+                      ],
+                      "linkId": "PR-name-family",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#HumanName.family",
+                      "type": "string",
+                      "text": "Family Name"
+                    }
+                  ]
+                },
                 {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-                  "valueExpression": {
-                    "language": "text/fhirpath",
-                    "expression": "Patient.name.family",
-                    "name": "patientFamily"
-                  }
-                }
-              ],
-              "linkId": "PR-name-family",
-              "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#HumanName.family",
-              "type": "string",
-              "text": "Family Name"
-            }
-          ]
-        },
-        {
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-              "valueExpression": {
-                "language": "text/fhirpath",
-                "expression": "Patient.birthDate",
-                "name": "patientBirthDate"
-              }
-            }
-          ],
-          "linkId": "patient-0-birth-date",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate",
-          "type": "date",
-          "text": "Date of Birth"
-        },
-        {
-          "linkId": "patient-0-gender",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-              "valueExpression": {
-                "language": "text/fhirpath",
-                "expression": "Patient.gender.value",
-                "name": "patientGender"
-              }
-            }
-          ],
-          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
-          "type": "string",
-          "text": "Gender"
-        },
-        {
-          "linkId": "PR-telecom",
-          "type": "group",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom",
-          "item": [
-            {
-              "linkId": "PR-telecom-system",
-              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
-              "type": "string",
-              "text": "system",
-              "initial": [
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                      "valueExpression": {
+                        "language": "text/fhirpath",
+                        "expression": "Patient.birthDate",
+                        "name": "patientBirthDate"
+                      }
+                    }
+                  ],
+                  "linkId": "patient-0-birth-date",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate",
+                  "type": "date",
+                  "text": "Date of Birth"
+                },
                 {
-                  "valueString": "phone"
-                }
-              ],
-              "enableWhen": [
+                  "linkId": "patient-0-gender",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                      "valueExpression": {
+                        "language": "text/fhirpath",
+                        "expression": "Patient.gender.value",
+                        "name": "patientGender"
+                      }
+                    }
+                  ],
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
+                  "type": "string",
+                  "text": "Gender"
+                },
                 {
-                  "question": "patient-0-gender",
-                  "operator": "=",
-                  "answerString": "ok"
+                  "linkId": "PR-telecom",
+                  "type": "group",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom",
+                  "item": [
+                    {
+                      "linkId": "PR-telecom-system",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
+                      "type": "string",
+                      "text": "system",
+                      "initial": [
+                        {
+                          "valueString": "phone"
+                        }
+                      ],
+                      "enableWhen": [
+                        {
+                          "question": "patient-0-gender",
+                          "operator": "=",
+                          "answerString": "ok"
+                        }
+                      ]
+                    },
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                          "valueExpression": {
+                            "language": "text/fhirpath",
+                            "expression": "Patient.telecom.value",
+                            "name": "patientTelecom"
+                          }
+                        }
+                      ],
+                      "linkId": "PR-telecom-value",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.value",
+                      "type": "string",
+                      "text": "Phone Number"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-address",
+                  "type": "group",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address",
+                  "item": [
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                          "valueExpression": {
+                            "language": "text/fhirpath",
+                            "expression": "Patient.address.city",
+                            "name": "patientCity"
+                          }
+                        }
+                      ],
+                      "linkId": "PR-address-city",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address.city",
+                      "type": "string",
+                      "text": "City"
+                    },
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                          "valueExpression": {
+                            "language": "text/fhirpath",
+                            "expression": "Patient.address.country",
+                            "name": "patientCity"
+                          }
+                        }
+                      ],
+                      "linkId": "PR-address-country",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address.country",
+                      "type": "string",
+                      "text": "Country"
+                    }
+                  ]
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                      "valueExpression": {
+                        "language": "text/fhirpath",
+                        "expression": "Patient.active",
+                        "name": "patientActive"
+                      }
+                    }
+                  ],
+                  "linkId": "PR-active",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.active",
+                  "type": "boolean",
+                  "text": "Is Active?"
                 }
               ]
-            },
-            {
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-                  "valueExpression": {
-                    "language": "text/fhirpath",
-                    "expression": "Patient.telecom.value",
-                    "name": "patientTelecom"
-                  }
-                }
-              ],
-              "linkId": "PR-telecom-value",
-              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.value",
-              "type": "string",
-              "text": "Phone Number"
             }
           ]
-        },
-        {
-          "linkId": "PR-address",
-          "type": "group",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address",
-          "item": [
-            {
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-                  "valueExpression": {
-                    "language": "text/fhirpath",
-                    "expression": "Patient.address.city",
-                    "name": "patientCity"
-                  }
-                }
-              ],
-              "linkId": "PR-address-city",
-              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address.city",
-              "type": "string",
-              "text": "City"
-            },
-            {
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-                  "valueExpression": {
-                    "language": "text/fhirpath",
-                    "expression": "Patient.address.country",
-                    "name": "patientCity"
-                  }
-                }
-              ],
-              "linkId": "PR-address-country",
-              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address.country",
-              "type": "string",
-              "text": "Country"
-            }
-          ]
-        },
-        {
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-              "valueExpression": {
-                "language": "text/fhirpath",
-                "expression": "Patient.active",
-                "name": "patientActive"
-              }
-            }
-          ],
-          "linkId": "PR-active",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.active",
-          "type": "boolean",
-          "text": "Is Active?"
         }
-      ]
-    }
-  ]
-}
         """.trimIndent()
 
     val iParser: IParser = FhirContext.forR4().newJsonParser()
@@ -1873,168 +1875,169 @@ class ResourceMapperTest {
   fun extract_choiceType_updateObservationFields() = runBlocking {
     @Language("JSON")
     val questionnaire =
-      """{
-  "title": "Screener",
-  "status": "active",
-  "version": "0.0.1",
-  "publisher": "Fred Hersch (fredhersch@google.com)",
-  "resourceType": "Questionnaire",
-  "subjectType": [
-    "Encounter"
-  ],
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-      "valueExpression": {
-        "language": "application/x-fhir-query",
-        "expression": "Encounter",
-        "name": "encounter"
-      }
-    }
-  ],
-  "item": [
-    {
-      "text": "Temperature",
-      "type": "group",
-      "linkId": "5.0.0",
-      "code": [
+      """
         {
-          "code": "8310-5",
-          "display": "Temperature",
-          "system": "http://loinc.org"
-        }
-      ],
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-          "valueExpression": {
-            "language": "application/x-fhir-query",
-            "expression": "Observation",
-            "name": "temperature"
-          }
-        },
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-          "valueCodeableConcept": {
-            "coding": [
-              {
-                "system": "http://hl7.org/fhir/questionnaire-item-control",
-                "code": "page",
-                "display": "Page"
+          "title": "Screener",
+          "status": "active",
+          "version": "0.0.1",
+          "publisher": "Fred Hersch (fredhersch@google.com)",
+          "resourceType": "Questionnaire",
+          "subjectType": [
+            "Encounter"
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Encounter",
+                "name": "encounter"
               }
-            ],
-            "text": "Page"
-          }
-        }
-      ],
-      "item": [
-        {
-          "text": "Add instructions for capturing temperature",
-          "type": "display",
-          "linkId": "5.0.1"
-        },
-        {
-          "type": "group",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
+            }
+          ],
           "item": [
             {
-              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.value",
-              "text": "Record temperature",
-              "type": "decimal",
-              "linkId": "5.1.0",
-              "extension": [
+              "text": "Temperature",
+              "type": "group",
+              "linkId": "5.0.0",
+              "code": [
                 {
-                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
-                  "valueDecimal": 35.0
-                },
-                {
-                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
-                  "valueDecimal": 45.0
+                  "code": "8310-5",
+                  "display": "Temperature",
+                  "system": "http://loinc.org"
                 }
-              ]
-            },
-            {
-              "text": "Unit",
-              "type": "choice",
-              "linkId": "5.2.0",
-              "required": true,
-              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.code",
+              ],
               "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+                  "valueExpression": {
+                    "language": "application/x-fhir-query",
+                    "expression": "Observation",
+                    "name": "temperature"
+                  }
+                },
                 {
                   "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
                   "valueCodeableConcept": {
                     "coding": [
                       {
                         "system": "http://hl7.org/fhir/questionnaire-item-control",
-                        "code": "drop-down",
-                        "display": "Drop down"
+                        "code": "page",
+                        "display": "Page"
                       }
                     ],
-                    "text": "Drop down"
+                    "text": "Page"
                   }
                 }
               ],
-              "answerOption": [
+              "item": [
                 {
-                  "valueCoding": {
-                    "code": "F",
-                    "display": "F"
-                  }
+                  "text": "Add instructions for capturing temperature",
+                  "type": "display",
+                  "linkId": "5.0.1"
                 },
                 {
-                  "valueCoding": {
-                    "code": "C",
-                    "display": "C"
-                  }
+                  "type": "group",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
+                  "item": [
+                    {
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.value",
+                      "text": "Record temperature",
+                      "type": "decimal",
+                      "linkId": "5.1.0",
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                          "valueDecimal": 35.0
+                        },
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                          "valueDecimal": 45.0
+                        }
+                      ]
+                    },
+                    {
+                      "text": "Unit",
+                      "type": "choice",
+                      "linkId": "5.2.0",
+                      "required": true,
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.code",
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                          "valueCodeableConcept": {
+                            "coding": [
+                              {
+                                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                                "code": "drop-down",
+                                "display": "Drop down"
+                              }
+                            ],
+                            "text": "Drop down"
+                          }
+                        }
+                      ],
+                      "answerOption": [
+                        {
+                          "valueCoding": {
+                            "code": "F",
+                            "display": "F"
+                          }
+                        },
+                        {
+                          "valueCoding": {
+                            "code": "C",
+                            "display": "C"
+                          }
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
           ]
         }
-      ]
-    }
-  ]
-}
       """.trimIndent()
     @Language("JSON")
     val response =
       """
         {
-  "resourceType": "QuestionnaireResponse",
-  "item": [
-    {
-      "linkId": "5.0.0",
-      "item": [
-        {
-          "linkId": "5.0.1"
-        },
-        {
+          "resourceType": "QuestionnaireResponse",
           "item": [
             {
-              "linkId": "5.1.0",
-              "answer": [
+              "linkId": "5.0.0",
+              "item": [
                 {
-                  "valueDecimal": 36
-                }
-              ]
-            },
-            {
-              "linkId": "5.2.0",
-              "answer": [
+                  "linkId": "5.0.1"
+                },
                 {
-                  "valueCoding": {
-                    "code": "F",
-                    "display": "F"
-                  }
+                  "item": [
+                    {
+                      "linkId": "5.1.0",
+                      "answer": [
+                        {
+                          "valueDecimal": 36
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "5.2.0",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "code": "F",
+                            "display": "F"
+                          }
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
           ]
         }
-      ]
-    }
-  ]
-}
       """.trimIndent()
     val iParser: IParser = FhirContext.forR4().newJsonParser()
     val temperatureQuestionnaire =
@@ -2374,6 +2377,246 @@ class ResourceMapperTest {
       .isEqualTo(
         "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."
       )
+  }
+
+  @Test
+  fun `extract() should perform definition based extraction for custom extensions with valueAsPrimitive`():
+    Unit = runBlocking {
+    @Language("JSON")
+    val questionnaire =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "subjectType": [
+            "Encounter"
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Encounter",
+                "name": "encounter"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "1",
+              "definition": "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-encounter#Encounter.contactNumber",
+              "text": "ANC contact number",
+              "type": "integer"
+            }
+          ]
+        }
+      """.trimIndent()
+
+    @Language("JSON")
+    val response =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "1",
+              "answer": [
+                {
+                  "valueInteger": 9
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+    val questionnaireObj =
+      iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
+    val temperatureQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
+    val bundle = ResourceMapper.extract(questionnaireObj, temperatureQuestionnaireResponse)
+    val encounter = bundle.entry.single().resource as Encounter
+
+    assertThat(encounter).isNotNull()
+    assertThat(
+        encounter.getExtensionByUrl(
+            "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-encounter#Encounter.contactNumber"
+          )
+          .valueAsPrimitive
+          .value
+      )
+      .isEqualTo(9)
+  }
+
+  @Test
+  fun `extract() should perform definition based extraction for custom extensions with valueCodeableConcept`():
+    Unit = runBlocking {
+    @Language("JSON")
+    val questionnaire =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "name": "patient",
+                "language": "application/x-fhir-query",
+                "expression": "Patient"
+              }
+            }
+          ],
+          "item": [
+            {
+              "type": "group",
+              "linkId": "patient-other-details",
+              "item": [
+                {
+                  "type": "choice",
+                  "linkId": "tribe",
+                  "text": "Tribe",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension:tribe"
+
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    @Language("JSON")
+    val response =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "patient-other-details",
+              "item": [
+                {
+                  "linkId": "tribe",
+                  "answer": [
+                    {
+                      "valueCoding": {
+                        "code": "hausa",
+                        "display": "Hausa"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+    val questionnaireObj =
+      iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
+    val temperatureQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
+    val bundle = ResourceMapper.extract(questionnaireObj, temperatureQuestionnaireResponse)
+    val patient = bundle.entry.single().resource as Patient
+
+    assertThat(patient).isNotNull()
+    val coding =
+      patient.getExtensionByUrl(
+          "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension:tribe"
+        )
+        .value as
+        Coding
+    assertThat(coding.code).isEqualTo("hausa")
+    assertThat(coding.display).isEqualTo("Hausa")
+  }
+
+  @Test
+  fun `extract() should perform definition based extraction for Complex DataType with custom extensions`():
+    Unit = runBlocking {
+    @Language("JSON")
+    val questionnaire =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "name": "patient",
+                "language": "application/x-fhir-query",
+                "expression": "Patient"
+              }
+            }
+          ],
+          "item": [
+            {
+              "type": "group",
+              "linkId": "patient-basic-details",
+              "text": "Patient details",
+              "item": [
+                {
+                  "linkId": "patient-name",
+                  "type": "group",
+                  "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name",
+                  "item": [
+                    {
+                      "type": "string",
+                      "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.middle",
+                      "linkId": "middle-name",
+                      "text": "Middle name"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    @Language("JSON")
+    val response =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "patient-basic-details",
+              "item": [
+                {
+                  "linkId": "patient-name",
+                  "item": [
+                    {
+                      "linkId": "middle-name",
+                      "answer": [
+                        {
+                          "valueString": "TestName"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+    val questionnaireObj =
+      iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
+    val temperatureQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
+    val bundle = ResourceMapper.extract(questionnaireObj, temperatureQuestionnaireResponse)
+    val patient = bundle.entry.single().resource as Patient
+
+    assertThat(patient).isNotNull()
+    assertThat(
+        patient
+          .name
+          .first()
+          .getExtensionByUrl(
+            "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.middle"
+          )
+          .valueAsPrimitive
+          .valueAsString
+      )
+      .isEqualTo("TestName")
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)
