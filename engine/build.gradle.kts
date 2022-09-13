@@ -92,8 +92,6 @@ dependencies {
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
-
   implementation(Dependencies.Androidx.datastorePref)
   implementation(Dependencies.Androidx.sqliteKtx)
   implementation(Dependencies.Androidx.workRuntimeKtx)
