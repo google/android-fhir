@@ -32,9 +32,9 @@ class HttpLogger(val configuration: Configuration, @WorkerThread val log: (Strin
   enum class Level {
     /** Nothing will be logged. */
     NONE,
-    /** Request and response lines will logged. */
+    /** Request and response lines will be logged. */
     BASIC,
-    /** Lines along with the headers will logged for the request and response. */
+    /** Lines along with the headers will be logged for the request and response. */
     HEADERS,
     /** Lines, headers and body (if present) will be logged for the request and response. */
     BODY
