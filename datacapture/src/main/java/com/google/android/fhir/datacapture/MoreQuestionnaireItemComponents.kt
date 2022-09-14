@@ -103,7 +103,7 @@ internal fun Questionnaire.QuestionnaireItemComponent.isReferencedBy(
   item: Questionnaire.QuestionnaireItemComponent
 ) =
   item.expressionBasedExtensions.any {
-    it.castToExpression(it.value).expression.contains("'${this.linkId}'")
+    it.castToExpression(it.value).expression.replace(" ", "").contains(Regex(".*linkId='${this.linkId}'.*"))
   }
 
 // Item control code, or null
@@ -330,7 +330,7 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
  */
 fun List<Questionnaire.QuestionnaireItemComponent>.flattened():
   List<Questionnaire.QuestionnaireItemComponent> {
-  return this + this.flatMap { if (it.hasItem()) it.item.flattened() else it.item }
+  return this + this.flatMap { it.item.flattened() }
 }
 
 /**

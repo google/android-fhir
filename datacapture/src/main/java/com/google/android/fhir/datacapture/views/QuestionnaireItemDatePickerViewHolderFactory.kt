@@ -41,6 +41,7 @@ import java.time.ZoneId
 import java.time.chrono.IsoChronology
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.FormatStyle
+import java.util.Date
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.log10
@@ -103,16 +104,22 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         textInputLayout.hint = localePattern
         textInputEditText.removeTextChangedListener(textWatcher)
 
-        textInputEditText.setText(
-          questionnaireItemViewItem
-            .answers
-            .singleOrNull()
-            ?.takeIf { it.hasValue() }
-            ?.valueDateType
-            ?.localDate
-            ?.localizedString
-        )
-
+        if (isTextUpdateRequired(
+            textInputEditText.context,
+            questionnaireItemViewItem.answers.singleOrNull()?.valueDateType,
+            textInputEditText.text.toString()
+          )
+        ) {
+          textInputEditText.setText(
+            questionnaireItemViewItem
+              .answers
+              .singleOrNull()
+              ?.takeIf { it.hasValue() }
+              ?.valueDateType
+              ?.localDate
+              ?.localizedString
+          )
+        }
         textWatcher = textInputEditText.doAfterTextChanged { text -> updateAnswer(text.toString()) }
       }
 
@@ -159,6 +166,20 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
       }
     }
+
+  private fun isTextUpdateRequired(
+    context: Context,
+    answer: DateType?,
+    inputText: String?
+  ): Boolean {
+    val inputDate =
+      try {
+        parseDate(inputText, context)
+      } catch (e: Exception) {
+        null
+      }
+    return answer?.localDate != inputDate
+  }
 }
 
 internal const val TAG = "date-picker"
@@ -196,14 +217,17 @@ internal val DateType.localDate
 internal val LocalDate.dateType
   get() = DateType(year, monthValue - 1, dayOfMonth)
 
+internal val Date.localDate
+  get() = LocalDate.of(year + 1900, month + 1, date)
+
 internal fun parseDate(text: CharSequence?, context: Context): LocalDate {
-  val date =
+  val localDate =
     if (isAndroidIcuSupported()) {
-      DateFormat.getDateInstance(DateFormat.SHORT).parse(text.toString())
-    } else {
-      android.text.format.DateFormat.getDateFormat(context).parse(text.toString())
-    }
-  val localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        DateFormat.getDateInstance(DateFormat.SHORT).parse(text.toString())
+      } else {
+        android.text.format.DateFormat.getDateFormat(context).parse(text.toString())
+      }
+      .localDate
   // date/localDate with year more than 4 digit throws data format exception if deep copy
   // operation get performed on QuestionnaireResponse,
   // QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent in org.hl7.fhir.r4.model

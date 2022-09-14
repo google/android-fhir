@@ -387,16 +387,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireResponseItemPreOrderList.find { it.linkId == updatedCalculable.first.linkId }
 
         val evaluatedAnswer = updatedCalculable.second
-        val currentAnswer = updatedCalculableResponse?.answer?.map { it.value }
+        val currentAnswer = updatedCalculableResponse?.answer?.map { it.value } ?: emptyList()
 
-        // update and notify only if answer has changed to prevent any event loop
-        // if current and previous both are not empty and the answer is changed in count or
-        // content
-        if ((evaluatedAnswer + currentAnswer).isNotEmpty() &&
-            (evaluatedAnswer != currentAnswer ||
-              evaluatedAnswer
-                .filterIndexed { i, v -> currentAnswer[i].equalsDeep(v).not() }
-                .isEmpty())
+        // update and notify only if new answer has changed to prevent any event loop
+        if (evaluatedAnswer.size != currentAnswer.size ||
+            evaluatedAnswer.zip(currentAnswer).any { (v1, v2) -> v1.equalsDeep(v2).not() }
         ) {
           updatedCalculableResponse?.let {
             it.answer =

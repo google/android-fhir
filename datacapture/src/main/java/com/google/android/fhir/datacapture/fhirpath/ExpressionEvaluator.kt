@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.fhirpath
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.calculatedExpression
+import com.google.android.fhir.datacapture.expressionBasedExtensions
 import com.google.android.fhir.datacapture.findVariableExpression
 import com.google.android.fhir.datacapture.flattened
 import com.google.android.fhir.datacapture.isReferencedBy
@@ -85,6 +86,17 @@ object ExpressionEvaluator {
     }
   }
 
+  /** Detects if any item into list is referencing a dependent item in its calculated expression */
+  internal fun extractExpressionReferenceMap(
+          items: List<Questionnaire.QuestionnaireItemComponent>
+  ) {
+    items.flattened().filter { it.expressionBasedExtensions.isNotEmpty() }.run {
+      forEach { current ->
+
+      }
+    }
+  }
+
   /**
    * Returns a pair of item and the calculated and evaluated value for all items with calculated
    * expression extension, which is dependent on value of updated response
@@ -101,7 +113,10 @@ object ExpressionEvaluator {
       .item
       .flattened()
       .filter { item ->
-        // item is calculable and not modified yet and depends on the updated answer
+        // 1- item is calculable
+        // 2- item answer is not modified and touched by user;
+        // https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-calculatedExpression.html
+        // 3- item answer depends on the updated item answer
         item.calculatedExpression != null &&
           modifiedResponses.none { it.linkId == item.linkId } &&
           updatedQuestionnaireItem.isReferencedBy(item)
