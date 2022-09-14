@@ -105,7 +105,8 @@ class SyncJobImpl(private val context: Context) : SyncJob {
     fhirEngine: FhirEngine,
     downloadManager: DownloadWorkManager,
     resolver: ConflictResolver,
-    subscribeTo: MutableSharedFlow<State>?
+    subscribeTo: MutableSharedFlow<State>?,
+    uploadConfiguration: UploadConfiguration
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
       FhirSynchronizer(
@@ -114,7 +115,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
           BundleUploader(
             it,
             TransactionBundleGenerator.getDefault(),
-            Splitter.create(UploadConfiguration())
+            Splitter.create(uploadConfiguration)
           ),
           DownloaderImpl(it, downloadManager),
           resolver

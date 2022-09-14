@@ -46,6 +46,7 @@ object Sync {
     context: Context,
     fhirEngine: FhirEngine,
     downloadManager: DownloadWorkManager,
+    uploadConfiguration: UploadConfiguration = UploadConfiguration(),
     resolver: ConflictResolver
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
@@ -55,7 +56,7 @@ object Sync {
           BundleUploader(
             it,
             TransactionBundleGenerator.getDefault(),
-            Splitter.create(UploadConfiguration())
+            Splitter.create(uploadConfiguration)
           ),
           DownloaderImpl(it, downloadManager),
           resolver

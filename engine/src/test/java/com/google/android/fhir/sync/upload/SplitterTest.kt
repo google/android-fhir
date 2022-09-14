@@ -135,7 +135,6 @@ class SplitterTest {
           listOf(ResourceType.Patient, ResourceType.Encounter, ResourceType.Observation)
         )
         .split(changes)
-    changes.forEach { println(it.resourceId) }
 
     assertThat(result).hasSize(3)
     assertThat(result[0].map { it.resourceId }).containsExactly("patient-001", "patient-002")
