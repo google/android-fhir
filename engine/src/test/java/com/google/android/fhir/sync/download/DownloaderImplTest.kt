@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,6 +104,12 @@ class DownloaderImplTest {
             ResourceType.Patient to mapOf("param" to "patient-page1"),
             ResourceType.Observation to mapOf("param" to "observation-page1")
           )
+        ),
+        ResourceParamsBasedDownloadWorkManagerModified(
+          mapOf(
+            ResourceType.Patient to mapOf("param" to "patient-page1"),
+            ResourceType.Observation to mapOf("param" to "observation-page1")
+          )
         )
       )
 
@@ -160,6 +166,12 @@ class DownloaderImplTest {
           }
         },
         ResourceParamsBasedDownloadWorkManager(
+          mapOf(
+            ResourceType.Patient to mapOf("param" to "patient-page1"),
+            ResourceType.Observation to mapOf("param" to "observation-page1")
+          )
+        ),
+        ResourceParamsBasedDownloadWorkManagerModified(
           mapOf(
             ResourceType.Patient to mapOf("param" to "patient-page1"),
             ResourceType.Observation to mapOf("param" to "observation-page1")
@@ -224,6 +236,12 @@ class DownloaderImplTest {
           }
         },
         ResourceParamsBasedDownloadWorkManager(
+          mapOf(
+            ResourceType.Patient to mapOf("param" to "patient-page1"),
+            ResourceType.Observation to mapOf("param" to "observation-page1")
+          )
+        ),
+        ResourceParamsBasedDownloadWorkManagerModified(
           mapOf(
             ResourceType.Patient to mapOf("param" to "patient-page1"),
             ResourceType.Observation to mapOf("param" to "observation-page1")

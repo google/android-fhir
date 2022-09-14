@@ -42,7 +42,11 @@ class FhirSyncWorkerTest {
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
     override fun getDownloadWorkManager(): DownloadWorkManager =
-      TestingUtils.TestDownloadManagerImpl()
+      TestingUtils.TestDownloadManagerImpl(updateSyncedResourceEntity = true)
+
+    override fun getDownloadWorkManagerModified(): DownloadWorkManagerModified =
+      TestingUtils.TestDownloadManagerModifiedImpl(updateSyncedResourceEntity = true)
+
     override fun getConflictResolver() = AcceptRemoteConflictResolver
   }
 
@@ -52,7 +56,9 @@ class FhirSyncWorkerTest {
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestFailingDatasource
     override fun getDownloadWorkManager(): DownloadWorkManager =
-      TestingUtils.TestDownloadManagerImpl()
+      TestingUtils.TestDownloadManagerImpl(updateSyncedResourceEntity = true)
+    override fun getDownloadWorkManagerModified(): DownloadWorkManagerModified =
+      TestingUtils.TestDownloadManagerModifiedImpl(updateSyncedResourceEntity = true)
     override fun getConflictResolver() = AcceptRemoteConflictResolver
   }
 
@@ -62,7 +68,10 @@ class FhirSyncWorkerTest {
   ) : FhirSyncWorker(appContext, workerParams) {
 
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
-    override fun getDownloadWorkManager() = TestingUtils.TestDownloadManagerImpl()
+    override fun getDownloadWorkManager() =
+      TestingUtils.TestDownloadManagerImpl(updateSyncedResourceEntity = true)
+    override fun getDownloadWorkManagerModified(): DownloadWorkManagerModified =
+      TestingUtils.TestDownloadManagerModifiedImpl(updateSyncedResourceEntity = true)
     override fun getDataSource(): DataSource? = null
     override fun getConflictResolver() = AcceptRemoteConflictResolver
   }

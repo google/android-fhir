@@ -95,7 +95,8 @@ interface Database {
    */
   suspend fun insertSyncedResources(
     syncedResources: List<SyncedResourceEntity>,
-    resources: List<Resource>
+    resources: List<Resource>,
+    updateSyncedResourceTable: Boolean
   )
 
   /**

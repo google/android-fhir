@@ -37,7 +37,9 @@ class SyncTest {
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
     override fun getDownloadWorkManager(): DownloadWorkManager =
-      TestingUtils.TestDownloadManagerImpl()
+      TestingUtils.TestDownloadManagerImpl(updateSyncedResourceEntity = true)
+    override fun getDownloadWorkManagerModified(): DownloadWorkManagerModified =
+      TestingUtils.TestDownloadManagerModifiedImpl(updateSyncedResourceEntity = true)
     override fun getConflictResolver() = AcceptRemoteConflictResolver
   }
 

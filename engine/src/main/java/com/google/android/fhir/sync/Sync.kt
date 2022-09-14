@@ -42,10 +42,18 @@ object Sync {
     context: Context,
     fhirEngine: FhirEngine,
     downloadManager: DownloadWorkManager,
+    downloadWorkManagerModified: DownloadWorkManagerModified,
     resolver: ConflictResolver
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
-      FhirSynchronizer(context, fhirEngine, it, downloadManager, conflictResolver = resolver)
+      FhirSynchronizer(
+          context,
+          fhirEngine,
+          it,
+          downloadManager,
+          downloadWorkManagerModified,
+          conflictResolver = resolver
+        )
         .synchronize(SyncWorkType.DOWNLOAD_UPLOAD)
     }
       ?: Result.Error(

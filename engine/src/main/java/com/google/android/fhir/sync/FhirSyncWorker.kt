@@ -45,6 +45,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDownloadWorkManager(): DownloadWorkManager
+  abstract fun getDownloadWorkManagerModified(): DownloadWorkManagerModified
   private val mutex = Mutex()
   abstract fun getConflictResolver(): ConflictResolver
   private val gson =
@@ -74,6 +75,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
           getFhirEngine(),
           dataSource,
           getDownloadWorkManager(),
+          getDownloadWorkManagerModified(),
           conflictResolver = getConflictResolver()
         )
       val flow = MutableSharedFlow<State>()
@@ -82,9 +84,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         CoroutineScope(Dispatchers.IO).launch {
           flow.collect {
             // now send Progress to work manager so caller app can listen
-            kotlin.runCatching {
-              setProgress(buildWorkData(it))
-            }.onFailure (Timber::i)
+            kotlin.runCatching { setProgress(buildWorkData(it)) }.onFailure(Timber::i)
             if (it is State.Finished || it is State.Failed) {
               this@launch.cancel()
             }
@@ -106,9 +106,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       // await/join is needed to collect states completely
       kotlin.runCatching { job.join() }.onFailure(Timber::w)
 
-      kotlin.runCatching {
-        setProgress(output)
-      }.onFailure (Timber::i)
+      kotlin.runCatching { setProgress(output) }.onFailure(Timber::i)
 
       Timber.d("Received result from worker $result and sending output $output")
 

@@ -27,7 +27,9 @@ class TestSyncWorker(appContext: Context, workerParams: WorkerParameters) :
 
   override fun getFhirEngine() = TestingUtils.TestFhirEngineImpl
 
-  override fun getDownloadWorkManager() = TestingUtils.TestDownloadManagerImpl()
-
+  override fun getDownloadWorkManager() =
+    TestingUtils.TestDownloadManagerImpl(updateSyncedResourceEntity = true)
+  override fun getDownloadWorkManagerModified(): DownloadWorkManagerModified =
+    TestingUtils.TestDownloadManagerModifiedImpl(updateSyncedResourceEntity = true)
   override fun getConflictResolver() = AcceptRemoteConflictResolver
 }

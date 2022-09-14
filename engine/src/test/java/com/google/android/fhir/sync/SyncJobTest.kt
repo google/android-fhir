@@ -291,6 +291,9 @@ class SyncJobTest {
       TestingUtils.TestDownloadManagerImplWithQueue(
         listOf("Patient/bob", "Encounter/doc", "Observation/obs")
       ),
+      TestingUtils.TestDownloadManagerModifiedImplWithQueue(
+        listOf("Patient/bob", "Encounter/doc", "Observation/obs")
+      ),
       AcceptRemoteConflictResolver,
       flow
     )
@@ -363,6 +366,9 @@ class SyncJobTest {
       syncJob.run(
         fhirEngine,
         TestingUtils.TestDownloadManagerImplWithQueue(),
+        TestingUtils.TestDownloadManagerModifiedImplWithQueue(
+          listOf("Patient/bob", "Encounter/doc", "Observation/obs")
+        ),
         AcceptRemoteConflictResolver,
         flow
       )

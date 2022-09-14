@@ -17,7 +17,9 @@
 package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.SyncDownloadContext
+import com.google.android.fhir.SyncDownloadContextModified
 import com.google.android.fhir.sync.DownloadWorkManager
+import com.google.android.fhir.sync.DownloadWorkManagerModified
 import com.google.android.fhir.sync.GREATER_THAN_PREFIX
 import com.google.android.fhir.sync.ParamMap
 import com.google.android.fhir.sync.SyncDataParams
@@ -36,8 +38,10 @@ typealias ResourceSearchParams = Map<ResourceType, ParamMap>
  * implementation takes a DFS approach and downloads all available resources for a particular
  * [ResourceType] before moving on to the next [ResourceType].
  */
-class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
-  DownloadWorkManager {
+class ResourceParamsBasedDownloadWorkManager(
+  syncParams: ResourceSearchParams,
+  override val updateSyncedResourceEntity: Boolean = true
+) : DownloadWorkManager {
   private val resourcesToDownloadWithSearchParams = LinkedList(syncParams.entries)
   private val urlOfTheNextPagesToDownloadForAResource = LinkedList<String>()
 
@@ -52,6 +56,56 @@ class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
       }
       if (!params.containsKey(SyncDataParams.LAST_UPDATED_KEY)) {
         val lastUpdate = context.getLatestTimestampFor(resourceType)
+        if (!lastUpdate.isNullOrEmpty()) {
+          newParams[SyncDataParams.LAST_UPDATED_KEY] = "$GREATER_THAN_PREFIX$lastUpdate"
+        }
+      }
+
+      "${resourceType.name}?${newParams.concatParams()}"
+    }
+  }
+
+  override suspend fun processResponse(response: Resource): Collection<Resource> {
+    if (response is OperationOutcome) {
+      throw FHIRException(response.issueFirstRep.diagnostics)
+    }
+
+    return if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
+      response.link.firstOrNull { component -> component.relation == "next" }?.url?.let { next ->
+        urlOfTheNextPagesToDownloadForAResource.add(next)
+      }
+
+      response.entry.map { it.resource }
+    } else {
+      emptyList()
+    }
+  }
+}
+
+/**
+ * [DownloadWorkManager] implementation based on the provided [ResourceSearchParams] to generate
+ * [Resource] search queries and parse [Bundle.BundleType.SEARCHSET] type [Bundle]. This
+ * implementation takes a DFS approach and downloads all available resources for a particular
+ * [ResourceType] before moving on to the next [ResourceType].
+ */
+class ResourceParamsBasedDownloadWorkManagerModified(
+  syncParams: ResourceSearchParams,
+  override val updateSyncedResourceEntity: Boolean = true
+) : DownloadWorkManagerModified {
+  private val resourcesToDownloadWithSearchParams = LinkedList(syncParams.entries)
+  private val urlOfTheNextPagesToDownloadForAResource = LinkedList<String>()
+
+  override suspend fun getNextRequestUrl(context: SyncDownloadContextModified): String? {
+    if (urlOfTheNextPagesToDownloadForAResource.isNotEmpty())
+      return urlOfTheNextPagesToDownloadForAResource.poll()
+
+    return resourcesToDownloadWithSearchParams.poll()?.let { (resourceType, params) ->
+      val newParams = params.toMutableMap()
+      if (!params.containsKey(SyncDataParams.SORT_KEY)) {
+        newParams[SyncDataParams.SORT_KEY] = SyncDataParams.LAST_UPDATED_KEY
+      }
+      if (!params.containsKey(SyncDataParams.LAST_UPDATED_KEY)) {
+        val lastUpdate = context.getLatestTimestampForPatientResource("", resourceType)
         if (!lastUpdate.isNullOrEmpty()) {
           newParams[SyncDataParams.LAST_UPDATED_KEY] = "$GREATER_THAN_PREFIX$lastUpdate"
         }

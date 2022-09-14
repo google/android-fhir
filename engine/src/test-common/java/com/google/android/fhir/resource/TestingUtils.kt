@@ -21,12 +21,14 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.SyncDownloadContext
+import com.google.android.fhir.SyncDownloadContextModified
 import com.google.android.fhir.SyncStrategyTypes
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadWorkManager
+import com.google.android.fhir.sync.DownloadWorkManagerModified
 import com.google.common.truth.Truth.assertThat
 import java.time.OffsetDateTime
 import java.util.Date
@@ -101,7 +103,8 @@ class TestingUtils constructor(private val iParser: IParser) {
   }
 
   open class TestDownloadManagerImpl(
-    queries: List<String> = listOf("Patient?address-city=NAIROBI")
+    queries: List<String> = listOf("Patient?address-city=NAIROBI"),
+    override val updateSyncedResourceEntity: Boolean
   ) : DownloadWorkManager {
     private val urls = LinkedList(queries)
 
@@ -113,9 +116,28 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
   }
 
+  open class TestDownloadManagerModifiedImpl(
+    queries: List<String> = listOf("Patient?address-city=NAIROBI"),
+    override val updateSyncedResourceEntity: Boolean
+  ) : DownloadWorkManagerModified {
+    private val urls = LinkedList(queries)
+
+    override suspend fun getNextRequestUrl(context: SyncDownloadContextModified): String? =
+      urls.poll()
+
+    override suspend fun processResponse(response: Resource): Collection<Resource> {
+      val patient = Patient().setMeta(Meta().setLastUpdated(Date()))
+      return listOf(patient)
+    }
+  }
+
   class TestDownloadManagerImplWithQueue(
     queries: List<String> = listOf("Patient/bob", "Encounter/doc")
-  ) : TestDownloadManagerImpl(queries)
+  ) : TestDownloadManagerImpl(queries, true)
+
+  class TestDownloadManagerModifiedImplWithQueue(
+    queries: List<String> = listOf("Patient/bob", "Encounter/doc")
+  ) : TestDownloadManagerModifiedImpl(queries, true)
 
   object TestFhirEngineImpl : FhirEngine {
     override suspend fun create(vararg resource: Resource) = emptyList<String>()
