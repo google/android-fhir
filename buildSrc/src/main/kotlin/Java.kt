@@ -33,11 +33,7 @@ import org.gradle.api.JavaVersion
  */
 
 object Java {
-  // Sets Java compatibility to Java 8
-  // See https://developer.android.com/studio/write/java8-support
   val sourceCompatibility = JavaVersion.VERSION_11
   val targetCompatibility = JavaVersion.VERSION_11
-
-  // See https://developer.android.com/studio/write/java8-support
   val kotlinJvmTarget = JavaVersion.VERSION_11
 }
