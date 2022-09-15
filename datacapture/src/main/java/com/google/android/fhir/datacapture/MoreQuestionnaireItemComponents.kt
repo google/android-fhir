@@ -59,6 +59,11 @@ internal const val EXTENSION_HIDDEN_URL =
 internal const val EXTENSION_ENTRY_FORMAT_URL =
   "http://hl7.org/fhir/StructureDefinition/entryFormat"
 
+internal const val EXTENSION_DISPLAY_CATEGORY_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory"
+internal const val EXTENSION_DISPLAY_CATEGORY_SYSTEM =
+  "http://hl7.org/fhir/questionnaire-display-category"
+
 internal const val EXTENSION_ENABLE_WHEN_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression"
 
@@ -163,22 +168,17 @@ val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
   get() = prefixElement?.getLocalizedText()?.toSpanned()
 
 /**
- * A nested questionnaire item of type display (if present) is used as the hint of the parent
- * question.
+ * A nested questionnaire item of type display with displayCategory extension with [INSTRUCTIONS]
+ * code is used as the instructions of the parent question.
  */
-internal val Questionnaire.QuestionnaireItemComponent.localizedHintSpanned: Spanned?
+internal val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spanned?
   get() {
-    return when (type) {
-      Questionnaire.QuestionnaireItemType.GROUP -> null
-      else -> {
-        item
-          .firstOrNull { questionnaireItem ->
-            questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-              questionnaireItem.displayItemControl == null
-          }
-          ?.localizedTextSpanned
+    return item
+      .firstOrNull { questionnaireItem ->
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+          questionnaireItem.isInstructionsCode
       }
-    }
+      ?.localizedTextSpanned
   }
 
 /**
@@ -216,6 +216,44 @@ val Questionnaire.QuestionnaireItemComponent.entryFormat: String?
       return value.toString()
     }
     return null
+  }
+
+internal const val INSTRUCTIONS = "instructions"
+
+/** Returns [true] if extension is display category extension and contains 'instructions' code. */
+internal val Questionnaire.QuestionnaireItemComponent.isInstructionsCode: Boolean
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.DISPLAY -> {
+        val codeableConcept =
+          this.extension.firstOrNull { it.url == EXTENSION_DISPLAY_CATEGORY_URL }?.value as
+            CodeableConcept?
+        val code =
+          codeableConcept?.coding
+            ?.firstOrNull { it.system == EXTENSION_DISPLAY_CATEGORY_SYSTEM }
+            ?.code
+        code == INSTRUCTIONS
+      }
+      else -> {
+        false
+      }
+    }
+  }
+
+/**
+ * Returns [true] if item type is display and [displayItemControl] is
+ * [DisplayItemControlType.FLYOVER].
+ */
+internal val Questionnaire.QuestionnaireItemComponent.isFlyoverCode: Boolean
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.DISPLAY -> {
+        displayItemControl == DisplayItemControlType.FLYOVER
+      }
+      else -> {
+        false
+      }
+    }
   }
 
 /**
