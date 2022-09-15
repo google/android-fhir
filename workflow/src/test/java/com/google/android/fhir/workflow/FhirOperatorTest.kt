@@ -22,16 +22,13 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.android.fhir.workflow.testing.CqlBuilderUtils
-import com.google.android.fhir.workflow.testing.toLocalDate
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
 import java.util.Base64
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Measure
-import org.hl7.fhir.r4.model.MeasureReport
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
