@@ -27,9 +27,7 @@ import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Library
 import org.junit.Assert
-import org.junit.Assert.assertTrue
 import org.opencds.cqf.cql.engine.serializing.CqlLibraryReaderFactory
-
 
 object CqlBuilderUtils {
   private fun load(asset: InputStream): String {
@@ -59,20 +57,23 @@ object CqlBuilderUtils {
         librarySourceLoader.registerProvider(FhirLibrarySourceProvider())
       }
 
-    val translator = CqlTranslator.fromText(
-      cqlText,
-      modelManager,
-      libraryManager,
-      *CqlTranslatorOptions.defaultOptions().options.toTypedArray()
-    )
+    val translator =
+      CqlTranslator.fromText(
+        cqlText,
+        modelManager,
+        libraryManager,
+        *CqlTranslatorOptions.defaultOptions().options.toTypedArray()
+      )
 
     // Helper makes sure the test CQL compiles. Reports an error if it doesn't
     if (translator.errors.isNotEmpty()) {
-      val errors = translator.errors.map {
-        "${it.locator?.toLocator() ?: "[n/a]"}: ${it.message}"
-      }.joinToString("\n")
+      val errors =
+        translator
+          .errors
+          .map { "${it.locator?.toLocator() ?: "[n/a]"}: ${it.message}" }
+          .joinToString("\n")
 
-      Assert.fail("Could not compile CQL File. Errors:\n$errors");
+      Assert.fail("Could not compile CQL File. Errors:\n$errors")
     }
 
     return translator
