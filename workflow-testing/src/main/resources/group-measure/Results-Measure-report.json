@@ -7,7 +7,6 @@
   "status": "complete",
   "type": "summary",
   "measure": "Measure/PatientGroupsMeasure",
-  "date": "2022-09-15T15:47:21-04:00",
   "period": {
     "start": "2019-01-01T00:00:00-05:00",
     "end": "2022-12-31T23:59:59-05:00"
