@@ -2397,8 +2397,24 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun nestedDisplayItem_parentQuestionItemIsNotGroup_doesNotCreateQuestionnaireStateItem() =
+  fun `nested display item with instructions code should not be created as questionnaire state item`() =
       runBlocking {
+    val displayCategoryExtension =
+      Extension().apply {
+        url = EXTENSION_DISPLAY_CATEGORY_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = INSTRUCTIONS
+                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+                }
+              )
+          }
+        )
+      }
+
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -2413,6 +2429,54 @@ class QuestionnaireViewModelTest(
                   linkId = "nested-display-question"
                   text = "subtitle text"
                   type = Questionnaire.QuestionnaireItemType.DISPLAY
+                  extension = listOf(displayCategoryExtension)
+                }
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireItem.linkId)
+      .isEqualTo("parent-question")
+  }
+
+  @Test
+  fun `nested display item with flyover code should not be created as questionnaire state item`() =
+      runBlocking {
+    val itemControlExtensionWithFlyOverCode =
+      Extension().apply {
+        url = EXTENSION_ITEM_CONTROL_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = "flyover"
+                  system = EXTENSION_ITEM_CONTROL_SYSTEM
+                }
+              )
+          }
+        )
+      }
+
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "parent-question"
+            text = "parent question text"
+            type = Questionnaire.QuestionnaireItemType.STRING
+            item =
+              listOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "nested-display-question"
+                  text = "flyover text"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                  extension = listOf(itemControlExtensionWithFlyOverCode)
                 }
               )
           }
