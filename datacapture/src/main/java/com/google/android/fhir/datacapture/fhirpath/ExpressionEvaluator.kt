@@ -184,11 +184,20 @@ object ExpressionEvaluator {
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
     variablesMap: MutableMap<String, Base?>
   ) {
-    when {
-      // First, check the questionnaire item itself
-      questionnaireItem.findVariableExpression(variableName) != null -> {
-        questionnaireItem.findVariableExpression(variableName)?.let { expression ->
-          variablesMap[expression.name] =
+    val evaluatedValue =
+    // First, check the questionnaire item itself
+    questionnaireItem.findVariableExpression(variableName)?.let { expression ->
+        evaluateQuestionnaireItemVariableExpression(
+          expression,
+          questionnaire,
+          questionnaireResponse,
+          questionnaireItemParentMap,
+          questionnaireItem,
+          variablesMap
+        )
+      } // Secondly, check the ancestors of the questionnaire item
+        ?: findVariableInAncestors(variableName, questionnaireItemParentMap, questionnaireItem)
+          ?.let { (questionnaireItem, expression) ->
             evaluateQuestionnaireItemVariableExpression(
               expression,
               questionnaire,
@@ -197,37 +206,17 @@ object ExpressionEvaluator {
               questionnaireItem,
               variablesMap
             )
+          } // Finally, check the variables defined on the questionnaire itself
+          ?: questionnaire.findVariableExpression(variableName)?.let { expression ->
+          evaluateQuestionnaireVariableExpression(
+            expression,
+            questionnaire,
+            questionnaireResponse,
+            variablesMap
+          )
         }
-      }
-      // Secondly, check the ancestors of the questionnaire item
-      findVariableInAncestors(variableName, questionnaireItemParentMap, questionnaireItem) !=
-        null -> {
-        findVariableInAncestors(variableName, questionnaireItemParentMap, questionnaireItem)?.let {
-          (questionnaireItem, expression) ->
-          variablesMap[expression.name] =
-            evaluateQuestionnaireItemVariableExpression(
-              expression,
-              questionnaire,
-              questionnaireResponse,
-              questionnaireItemParentMap,
-              questionnaireItem,
-              variablesMap
-            )
-        }
-      }
-      // Finally, check the variables defined on the questionnaire itself
-      else -> {
-        questionnaire.findVariableExpression(variableName)?.also { expression ->
-          variablesMap[expression.name] =
-            evaluateQuestionnaireVariableExpression(
-              expression,
-              questionnaire,
-              questionnaireResponse,
-              variablesMap
-            )
-        }
-      }
-    }
+
+    evaluatedValue?.also { variablesMap[variableName] = it }
   }
 
   /**
