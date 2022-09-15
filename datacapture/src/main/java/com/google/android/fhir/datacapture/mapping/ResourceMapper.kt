@@ -38,6 +38,7 @@ import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.DomainResource
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -445,9 +446,47 @@ object ResourceMapper {
         .javaClass
         .getMethod("setValue", Type::class.java)
         .invoke(base, questionnaireResponseItem.answer.singleOrNull()?.value)
+      return
     } catch (e: NoSuchMethodException) {
       // Do nothing
     }
+
+    if (base.javaClass.getFieldOrNull(fieldName) == null) {
+      // If field not found in resource class, assume this is an extension
+      addDefinitionBasedCustomExtension(questionnaireItem, questionnaireResponseItem, base)
+    }
+  }
+}
+
+/**
+ * Adds custom extension for Resource.
+ * @param questionnaireItem QuestionnaireItemComponent with details for extension
+ * @param questionnaireResponseItem QuestionnaireResponseItemComponent for response value
+ * @param base
+ * - resource's Base class instance See
+ * https://hapifhir.io/hapi-fhir/docs/model/profiles_and_extensions.html#extensions for more on
+ * custom extensions
+ */
+private fun addDefinitionBasedCustomExtension(
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+  questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  base: Base
+) {
+  if (base is Type) {
+    // Create an extension
+    val ext = Extension()
+    ext.url = questionnaireItem.definition
+    ext.setValue(questionnaireResponseItem.answer.first().value)
+    // Add the extension to the resource
+    base.addExtension(ext)
+  }
+  if (base is DomainResource) {
+    // Create an extension
+    val ext = Extension()
+    ext.url = questionnaireItem.definition
+    ext.setValue(questionnaireResponseItem.answer.first().value)
+    // Add the extension to the resource
+    base.addExtension(ext)
   }
 }
 
