@@ -402,8 +402,4 @@ internal object ResourceIndexer {
   private const val FHIR_CURRENCY_CODE_SYSTEM = "urn:iso:std:iso:4217"
 }
 
-internal data class SearchParamDefinition(
-  val name: String,
-  val type: SearchParamType,
-  val path: String
-)
+data class SearchParamDefinition(val name: String, val type: SearchParamType, val path: String)

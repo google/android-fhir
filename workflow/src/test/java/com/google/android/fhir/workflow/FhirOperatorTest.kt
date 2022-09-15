@@ -24,6 +24,7 @@ import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.android.fhir.workflow.testing.CqlBuilderUtils
 import com.google.android.fhir.workflow.testing.toLocalDate
 import com.google.common.truth.Truth.assertThat
+import java.io.InputStream
 import java.util.Base64
 import java.util.Date
 import kotlinx.coroutines.runBlocking
@@ -39,7 +40,9 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.opencds.cqf.cql.evaluator.measure.common.MeasureEvalType
 import org.robolectric.RobolectricTestRunner
+import org.skyscreamer.jsonassert.JSONAssert
 
 @RunWith(RobolectricTestRunner::class)
 class FhirOperatorTest {
@@ -54,11 +57,11 @@ class FhirOperatorTest {
     private val jsonParser = fhirContext.newJsonParser()
     private val xmlParser = fhirContext.newXmlParser()
 
-    private fun parseJson(path: String): Bundle =
-      jsonParser.parseResource(jsonParser.javaClass.getResourceAsStream(path)) as Bundle
+    private fun open(path: String) = FhirOperatorTest.javaClass.getResourceAsStream(path)!!
 
-    private fun readResourceAsString(path: String) =
-      FhirOperatorTest::class.java.getResourceAsStream(path)!!.readBytes().decodeToString()
+    private fun parseJson(path: String): Bundle = jsonParser.parseResource(open(path)) as Bundle
+
+    private fun readResourceAsString(path: String) = open(path).readBytes().decodeToString()
 
     private fun <T> parseResource(path: String) =
       jsonParser.parseResource(readResourceAsString(path)) as T
@@ -96,7 +99,6 @@ class FhirOperatorTest {
   }
 
   @Test
-  @Ignore("Disabled until ANCIND01-bundle is fixed/updated with CQF-Tooling 2.0")
   fun evaluatePopulationMeasure() = runBlocking {
     loadBundle(libraryBundle)
     fhirEngine.run {
@@ -113,7 +115,7 @@ class FhirOperatorTest {
         end = "2021-12-31",
         reportType = "population",
         subject = null,
-        practitioner = "jane",
+        practitioner = null,
         lastReceivedOn = null
       )
     val measureReportJSON = jsonParser.encodeResourceToString(measureReport)
@@ -162,172 +164,42 @@ class FhirOperatorTest {
   }
 
   @Test
-  @Ignore("Disabled until ANCIND01-bundle is fixed/updated with CQF-Tooling 2.0")
   fun evaluateGroupPopulationMeasure() = runBlocking {
-    val resourceBundle = Bundle()
-
-    val resourceDir = "/group-measure"
-    val cqlElm = toJsonElm(readResourceAsString("$resourceDir/cql.txt"))
-
-    resourceBundle.addEntry().apply {
-      this.resource =
-        jsonParser.parseResource(
-          readResourceAsString("$resourceDir/library.json")
-            .replace("#library-elm.json", cqlElm.readStringToBase64Encoded())
-        ) as
-          Library
-    }
-
-    resourceBundle.addEntry().apply {
-      this.resource = parseResource<Library>("/lib-fhir-helper.json")
-    }
-    resourceBundle.addEntry().apply {
-      this.resource = parseResource<Measure>("$resourceDir/measure.json")
-    }
+    val resourceBundle =
+      Bundle().apply {
+        addEntry().apply {
+          resource = toFhirLibrary(open("/group-measure/PatientGroups-1.0.0.cql"))
+        }
+        addEntry().apply {
+          resource = parseResource<Measure>("/group-measure/PatientGroupsMeasure.json")
+        }
+      }
 
     loadBundle(resourceBundle)
-    loadBundle(parseJson("$resourceDir/groups-bundle.json"))
-    loadBundle(parseJson("$resourceDir/patients-bundle.json"))
+    loadBundle(parseJson("/group-measure/Data-Patients-bundle.json"))
+    loadBundle(parseJson("/group-measure/Data-Groups-bundle.json"))
 
     val measureReport =
       fhirOperator.evaluateMeasure(
-        measureUrl = "Measure/group-measure",
+        measureUrl = "Measure/PatientGroupsMeasure",
         start = "2019-01-01",
         end = "2022-12-31",
-        reportType = "population",
+        reportType = MeasureEvalType.POPULATION.toCode(),
         subject = null,
         practitioner = null,
         lastReceivedOn = null
       )
 
-    with(measureReport.group[0]) {
-      assertThat(id).isEqualTo("groups")
-      assertThat(population[0].id).isEqualTo("initial-population")
-      assertThat(population[0].count).isEqualTo(17)
-      assertThat(population[1].id).isEqualTo("denominator")
-      assertThat(population[1].count).isEqualTo(17)
-      assertThat(population[2].id).isEqualTo("numerator")
-      assertThat(population[2].count).isEqualTo(17)
-      assertThat(measureScore.value.toPlainString()).isEqualTo("1.0")
-      assertThat(stratifierFirstRep.id).isNull()
-      assertThat(stratifierFirstRep.stratum).isEmpty()
-    }
-    with(measureReport.group[1]) {
-      assertThat(id).isEqualTo("males")
-      assertThat(population[0].id).isEqualTo("initial-population")
-      assertThat(population[0].count).isEqualTo(17)
-      assertThat(population[1].id).isEqualTo("denominator")
-      assertThat(population[1].count).isEqualTo(17)
-      assertThat(population[2].id).isEqualTo("numerator")
-      assertThat(population[2].count).isEqualTo(7)
-      assertThat(measureScore.value.toPlainString()).isEqualTo("0.4117647058823529")
-      assertThat(stratifierFirstRep.id).isEqualTo("by-age")
-      with(stratifierFirstRep.stratum[0]) {
-        assertThat(value.text).isEqualTo("P0Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(1)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(1)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(1)
-      }
-      with(stratifierFirstRep.stratum[1]) {
-        assertThat(value.text).isEqualTo("P50Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(1)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(1)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(0)
-      }
-      with(stratifierFirstRep.stratum[2]) {
-        assertThat(value.text).isEqualTo("P15-49Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(2)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(2)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(1)
-      }
-      with(stratifierFirstRep.stratum[3]) {
-        assertThat(value.text).isEqualTo("P6-14Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(2)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(2)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(0)
-      }
-      with(stratifierFirstRep.stratum[4]) {
-        assertThat(value.text).isEqualTo("P1-5Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(11)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(11)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(5)
-      }
-    }
-    with(measureReport.group[2]) {
-      assertThat(id).isEqualTo("females")
-      assertThat(population[0].id).isEqualTo("initial-population")
-      assertThat(population[0].count).isEqualTo(17)
-      assertThat(population[1].id).isEqualTo("denominator")
-      assertThat(population[1].count).isEqualTo(17)
-      assertThat(population[2].id).isEqualTo("numerator")
-      assertThat(population[2].count).isEqualTo(10)
-      assertThat(measureScore.value.toPlainString()).isEqualTo("0.5882352941176471")
-      assertThat(stratifierFirstRep.id).isEqualTo("by-age")
-      with(stratifierFirstRep.stratum[0]) {
-        assertThat(value.text).isEqualTo("P0Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(1)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(1)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(0)
-      }
-      with(stratifierFirstRep.stratum[1]) {
-        assertThat(value.text).isEqualTo("P50Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(1)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(1)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(1)
-      }
-      with(stratifierFirstRep.stratum[2]) {
-        assertThat(value.text).isEqualTo("P15-49Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(2)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(2)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(1)
-      }
-      with(stratifierFirstRep.stratum[3]) {
-        assertThat(value.text).isEqualTo("P6-14Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(2)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(2)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(2)
-      }
-      with(stratifierFirstRep.stratum[4]) {
-        assertThat(value.text).isEqualTo("P1-5Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(11)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(11)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(6)
-      }
-    }
+    measureReport.date = null
+
+    JSONAssert.assertEquals(
+      readResourceAsString("/group-measure/Results-Measure-report.json"),
+      jsonParser.setPrettyPrint(true).encodeResourceToString(measureReport),
+      true
+    )
   }
 
   @Test
-  @Ignore("Disabled until ANCIND01-bundle is fixed/updated with CQF-Tooling 2.0")
   fun evaluateIndividualSubjectMeasure() = runBlocking {
     loadBundle(libraryBundle)
     fhirEngine.run {
@@ -440,8 +312,8 @@ class FhirOperatorTest {
     }
   }
 
-  private fun toJsonElm(cql: String): String {
-    return CqlBuilderUtils.compile(cql).toJson()
+  private fun toFhirLibrary(cql: InputStream): Library {
+    return CqlBuilderUtils.compileAndBuild(cql)
   }
 
   private fun String.readStringToBase64Encoded(): String {

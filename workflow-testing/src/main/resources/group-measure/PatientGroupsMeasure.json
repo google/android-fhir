@@ -1,9 +1,9 @@
 {
   "resourceType": "Measure",
-  "id": "group-measure",
-  "url": "Measure/group-measure",
-  "name": "group-measure",
-  "title": "group-measure test",
+  "id": "PatientGroupsMeasure",
+  "url": "Measure/PatientGroupsMeasure",
+  "name": "PatientGroupsMeasure",
+  "title": "PatientGroupsMeasure test",
   "status": "draft",
   "experimental": false,
   "description": "???????????",
@@ -15,7 +15,7 @@
     }
   ],
   "library": [
-    "http://fhir.org/guides/cqf/common/Library/group-measure"
+    "http://localhost/Library/PatientGroups|1.0.0"
   ],
   "scoring": {
     "coding": [

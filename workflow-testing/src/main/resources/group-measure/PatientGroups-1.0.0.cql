@@ -1,5 +1,5 @@
 //Declare name and version of lib
-library PQMedication version '1'
+library PatientGroups version '1.0.0'
 
 //FHIR as a data model and version of FHIR
 using FHIR version '4.0.1'
@@ -10,15 +10,18 @@ include "FHIRHelpers" version '4.0.1' called FHIRHelpers
 context Patient
 
 define "All Groups": [Group] G
+    with [Patient] P
+        such that P.active = true
+
 define "All Person Groups": "All Groups" G where G.type = 'person'
-define "All Group Members": flatten("All Person Groups" G return (G.member M return M.entity))
+define "All Group Members": distinct(flatten("All Person Groups" G return (G.member M return M.entity)))
 
 define "All Patients": [Patient] P
     with "All Group Members" G
-        such that P.id = Split(G.reference, '/')[1]
+        such that P.id = Split(G.reference, '/')[1] and P.active = true
 
-define "Males": "All Patients" M where M.gender='male'
-define "Females": "All Patients" F where F.gender='female'
+define "Males": "All Patients" M where M.gender='male' and M.active = true
+define "Females": "All Patients" F where F.gender='female' and F.active = true
 
 define "Age": CalculateAgeInYears(Patient.birthDate)
 
