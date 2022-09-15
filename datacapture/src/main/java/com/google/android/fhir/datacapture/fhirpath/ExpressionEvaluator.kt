@@ -251,7 +251,7 @@ object ExpressionEvaluator {
    *
    * @param expression the [Expression] the expression to evaluate
    * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
-   * @param dependentVariables the [Map] of Variable names to their values
+   * @param dependentVariables the [Map] of variable names to their values
    *
    * @return [Base] the result of expression
    */
