@@ -20,8 +20,14 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
+import com.google.android.fhir.datacapture.EXTENSION_DISPLAY_CATEGORY_SYSTEM
+import com.google.android.fhir.datacapture.EXTENSION_DISPLAY_CATEGORY_URL
+import com.google.android.fhir.datacapture.INSTRUCTIONS
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -64,7 +70,7 @@ class QuestionnaireGroupTypeHeaderViewTest {
   }
 
   @Test
-  fun shouldShowHint() {
+  fun `shows instructions`() {
     view.bind(
       Questionnaire.QuestionnaireItemComponent().apply {
         item =
@@ -72,6 +78,7 @@ class QuestionnaireGroupTypeHeaderViewTest {
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "nested-display-question"
               text = "subtitle text"
+              extension = listOf(displayCategoryExtensionWithInstructionsCode)
               type = Questionnaire.QuestionnaireItemType.DISPLAY
             }
           )
@@ -83,7 +90,7 @@ class QuestionnaireGroupTypeHeaderViewTest {
   }
 
   @Test
-  fun shouldHideHint() {
+  fun `hides instructions`() {
     view.bind(
       Questionnaire.QuestionnaireItemComponent().apply {
         item =
@@ -100,7 +107,7 @@ class QuestionnaireGroupTypeHeaderViewTest {
   }
 
   @Test
-  fun shouldShowHeaderView() {
+  fun `shows headerItem view`() {
     view.bind(
       Questionnaire.QuestionnaireItemComponent().apply {
         item =
@@ -108,6 +115,7 @@ class QuestionnaireGroupTypeHeaderViewTest {
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "nested-display-question"
               text = "subtitle text"
+              extension = listOf(displayCategoryExtensionWithInstructionsCode)
               type = Questionnaire.QuestionnaireItemType.DISPLAY
             }
           )
@@ -123,4 +131,20 @@ class QuestionnaireGroupTypeHeaderViewTest {
 
     assertThat(view.visibility).isEqualTo(View.GONE)
   }
+
+  private val displayCategoryExtensionWithInstructionsCode =
+    Extension().apply {
+      url = EXTENSION_DISPLAY_CATEGORY_URL
+      setValue(
+        CodeableConcept().apply {
+          coding =
+            listOf(
+              Coding().apply {
+                code = INSTRUCTIONS
+                system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+              }
+            )
+        }
+      )
+    }
 }
