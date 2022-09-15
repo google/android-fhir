@@ -26,6 +26,7 @@ class BehaviorListViewModel(application: Application) : AndroidViewModel(applica
   fun getBehaviorList(): List<Behavior> {
     return Behavior.values().toList()
   }
+
   enum class Behavior(
     @DrawableRes val iconId: Int,
     @StringRes val textId: Int,

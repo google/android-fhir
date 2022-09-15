@@ -37,6 +37,7 @@ class BehaviorListFragment : Fragment(R.layout.behavior_list_fragment) {
     setUpActionBar()
     (requireActivity() as MainActivity).showBottomNavigationView(View.VISIBLE)
   }
+
   private fun setUpActionBar() {
     (activity as MainActivity).setActionBar(
       getString(R.string.toolbar_text),
@@ -44,6 +45,7 @@ class BehaviorListFragment : Fragment(R.layout.behavior_list_fragment) {
     )
     setHasOptionsMenu(true)
   }
+
   private fun setUpBehaviorsRecyclerView() {
     val behaviorRecyclerView =
       requireView().findViewById<RecyclerView>(R.id.sdcBehaviorRecyclerView)
