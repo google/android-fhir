@@ -1,0 +1,543 @@
+{
+  "resourceType": "MeasureReport",
+  "extension": [ {
+    "url": "http://hl7.org/fhir/5.0/StructureDefinition/extension-MeasureReport.population.description",
+    "valueString": "???????????"
+  } ],
+  "status": "complete",
+  "type": "summary",
+  "measure": "Measure/PatientGroupsMeasure",
+  "date": "2022-09-15T15:47:21-04:00",
+  "period": {
+    "start": "2019-01-01T00:00:00-05:00",
+    "end": "2022-12-31T23:59:59-05:00"
+  },
+  "improvementNotation": {
+    "coding": [ {
+      "system": "http://terminology.hl7.org/CodeSystem/measure-improvement-notation",
+      "code": "increase"
+    } ]
+  },
+  "group": [ {
+    "id": "groups",
+    "population": [ {
+      "id": "initial-population",
+      "code": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+          "code": "initial-population"
+        } ]
+      },
+      "count": 17
+    }, {
+      "id": "denominator",
+      "code": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+          "code": "denominator"
+        } ]
+      },
+      "count": 17
+    }, {
+      "id": "numerator",
+      "code": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+          "code": "numerator"
+        } ]
+      },
+      "count": 17
+    } ],
+    "measureScore": {
+      "value": 1.0
+    }
+  }, {
+    "id": "males",
+    "population": [ {
+      "id": "initial-population",
+      "code": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+          "code": "initial-population"
+        } ]
+      },
+      "count": 17
+    }, {
+      "id": "denominator",
+      "code": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+          "code": "denominator"
+        } ]
+      },
+      "count": 17
+    }, {
+      "id": "numerator",
+      "code": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+          "code": "numerator"
+        } ]
+      },
+      "count": 7
+    } ],
+    "measureScore": {
+      "value": 0.4117647058823529
+    },
+    "stratifier": [ {
+      "id": "by-age",
+      "stratum": [ {
+        "value": {
+          "text": "P0Y"
+        },
+        "population": [ {
+          "id": "initial-population",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "initial-population"
+            } ]
+          },
+          "count": 1
+        }, {
+          "id": "denominator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "denominator"
+            } ]
+          },
+          "count": 1
+        }, {
+          "id": "numerator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "numerator"
+            } ]
+          },
+          "count": 1
+        } ],
+        "measureScore": {
+          "value": 1.0
+        }
+      }, {
+        "value": {
+          "text": "P50Y"
+        },
+        "population": [ {
+          "id": "initial-population",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "initial-population"
+            } ]
+          },
+          "count": 1
+        }, {
+          "id": "denominator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "denominator"
+            } ]
+          },
+          "count": 1
+        }, {
+          "id": "numerator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "numerator"
+            } ]
+          },
+          "count": 0
+        } ],
+        "measureScore": {
+          "value": 0.0
+        }
+      }, {
+        "value": {
+          "text": "Unspecified"
+        },
+        "population": [ {
+          "id": "initial-population",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "initial-population"
+            } ]
+          },
+          "count": 0
+        }, {
+          "id": "denominator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "denominator"
+            } ]
+          },
+          "count": 0
+        }, {
+          "id": "numerator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "numerator"
+            } ]
+          },
+          "count": 0
+        } ]
+      }, {
+        "value": {
+          "text": "P15-49Y"
+        },
+        "population": [ {
+          "id": "initial-population",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "initial-population"
+            } ]
+          },
+          "count": 2
+        }, {
+          "id": "denominator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "denominator"
+            } ]
+          },
+          "count": 2
+        }, {
+          "id": "numerator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "numerator"
+            } ]
+          },
+          "count": 1
+        } ],
+        "measureScore": {
+          "value": 0.5
+        }
+      }, {
+        "value": {
+          "text": "P1-5Y"
+        },
+        "population": [ {
+          "id": "initial-population",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "initial-population"
+            } ]
+          },
+          "count": 11
+        }, {
+          "id": "denominator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "denominator"
+            } ]
+          },
+          "count": 11
+        }, {
+          "id": "numerator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "numerator"
+            } ]
+          },
+          "count": 5
+        } ],
+        "measureScore": {
+          "value": 0.45454545454545453
+        }
+      }, {
+        "value": {
+          "text": "P6-14Y"
+        },
+        "population": [ {
+          "id": "initial-population",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "initial-population"
+            } ]
+          },
+          "count": 2
+        }, {
+          "id": "denominator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "denominator"
+            } ]
+          },
+          "count": 2
+        }, {
+          "id": "numerator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "numerator"
+            } ]
+          },
+          "count": 0
+        } ],
+        "measureScore": {
+          "value": 0.0
+        }
+      } ]
+    } ]
+  }, {
+    "id": "females",
+    "population": [ {
+      "id": "initial-population",
+      "code": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+          "code": "initial-population"
+        } ]
+      },
+      "count": 17
+    }, {
+      "id": "denominator",
+      "code": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+          "code": "denominator"
+        } ]
+      },
+      "count": 17
+    }, {
+      "id": "numerator",
+      "code": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+          "code": "numerator"
+        } ]
+      },
+      "count": 10
+    } ],
+    "measureScore": {
+      "value": 0.5882352941176471
+    },
+    "stratifier": [ {
+      "id": "by-age",
+      "stratum": [ {
+        "value": {
+          "text": "P0Y"
+        },
+        "population": [ {
+          "id": "initial-population",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "initial-population"
+            } ]
+          },
+          "count": 1
+        }, {
+          "id": "denominator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "denominator"
+            } ]
+          },
+          "count": 1
+        }, {
+          "id": "numerator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "numerator"
+            } ]
+          },
+          "count": 0
+        } ],
+        "measureScore": {
+          "value": 0.0
+        }
+      }, {
+        "value": {
+          "text": "P50Y"
+        },
+        "population": [ {
+          "id": "initial-population",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "initial-population"
+            } ]
+          },
+          "count": 1
+        }, {
+          "id": "denominator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "denominator"
+            } ]
+          },
+          "count": 1
+        }, {
+          "id": "numerator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "numerator"
+            } ]
+          },
+          "count": 1
+        } ],
+        "measureScore": {
+          "value": 1.0
+        }
+      }, {
+        "value": {
+          "text": "Unspecified"
+        },
+        "population": [ {
+          "id": "initial-population",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "initial-population"
+            } ]
+          },
+          "count": 0
+        }, {
+          "id": "denominator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "denominator"
+            } ]
+          },
+          "count": 0
+        }, {
+          "id": "numerator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "numerator"
+            } ]
+          },
+          "count": 0
+        } ]
+      }, {
+        "value": {
+          "text": "P15-49Y"
+        },
+        "population": [ {
+          "id": "initial-population",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "initial-population"
+            } ]
+          },
+          "count": 2
+        }, {
+          "id": "denominator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "denominator"
+            } ]
+          },
+          "count": 2
+        }, {
+          "id": "numerator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "numerator"
+            } ]
+          },
+          "count": 1
+        } ],
+        "measureScore": {
+          "value": 0.5
+        }
+      }, {
+        "value": {
+          "text": "P1-5Y"
+        },
+        "population": [ {
+          "id": "initial-population",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "initial-population"
+            } ]
+          },
+          "count": 11
+        }, {
+          "id": "denominator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "denominator"
+            } ]
+          },
+          "count": 11
+        }, {
+          "id": "numerator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "numerator"
+            } ]
+          },
+          "count": 6
+        } ],
+        "measureScore": {
+          "value": 0.5454545454545454
+        }
+      }, {
+        "value": {
+          "text": "P6-14Y"
+        },
+        "population": [ {
+          "id": "initial-population",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "initial-population"
+            } ]
+          },
+          "count": 2
+        }, {
+          "id": "denominator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "denominator"
+            } ]
+          },
+          "count": 2
+        }, {
+          "id": "numerator",
+          "code": {
+            "coding": [ {
+              "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+              "code": "numerator"
+            } ]
+          },
+          "count": 2
+        } ],
+        "measureScore": {
+          "value": 1.0
+        }
+      } ]
+    } ]
+  } ]
+}
