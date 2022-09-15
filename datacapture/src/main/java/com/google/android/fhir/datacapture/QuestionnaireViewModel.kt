@@ -583,7 +583,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       } else {
         NotValidated
       }
-
     val items =
       listOf(
         QuestionnaireItemViewItem(
@@ -596,17 +595,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         )
       ) +
         getQuestionnaireItemViewItems(
-          // Nested display item is subtitle text for parent questionnaire item if data type
-          // is not group.
-          // If nested display item is identified as subtitle text, then do not create
+          // If nested display item is identified as instructions or flyover, then do not create
           // questionnaire state for it.
           questionnaireItemList =
-            when (questionnaireItem.type) {
-              Questionnaire.QuestionnaireItemType.GROUP -> questionnaireItem.item
-              else ->
-                questionnaireItem.item.filterNot {
-                  it.type == Questionnaire.QuestionnaireItemType.DISPLAY
-                }
+            questionnaireItem.item.filterNot {
+              it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+                (it.isInstructionsCode || it.isFlyoverCode)
             },
           questionnaireResponseItemList =
             if (questionnaireResponseItem.answer.isEmpty()) {
