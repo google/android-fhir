@@ -26,7 +26,6 @@ import com.google.android.fhir.workflow.testing.toLocalDate
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
 import java.util.Base64
-import java.util.Date
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DateType
@@ -178,83 +177,19 @@ class FhirOperatorTest {
         measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
         start = "2020-01-01",
         end = "2020-01-31",
-        reportType = "subject",
+        reportType = MeasureEvalType.SUBJECT.toCode(),
         subject = "charity-otala-1",
         practitioner = "jane",
         lastReceivedOn = null
       )
-    val measureReportJSON = jsonParser.encodeResourceToString(measureReport)
-    assertThat(MeasureReport.MeasureReportStatus.COMPLETE).isEqualTo(measureReport.status)
-    assertThat(MeasureReport.MeasureReportType.INDIVIDUAL).isEqualTo(measureReport.type)
-    assertThat(DateType(Date()).toLocalDate).isEqualTo(DateType(measureReport.date).toLocalDate)
-    assertThat("2020-01-01").isEqualTo(DateType(measureReport.period.start).toLocalDate.toString())
-    assertThat("2020-01-31").isEqualTo(DateType(measureReport.period.end).toLocalDate.toString())
-    assertThat("Patient/charity-otala-1").isEqualTo(measureReport.subject.reference)
-    assertThat(measureReportJSON).isNotNull()
-    assertThat(measureReport).isNotNull()
 
-    assertThat(measureReport.extension[0].value.toString())
-      .isEqualTo(
-        "Percentage of pregnant women with first ANC contact in the first trimester (before 12 weeks of gestation)"
-      )
-    assertThat(measureReport.extension[0].url)
-      .isEqualTo(
-        "http://hl7.org/fhir/5.0/StructureDefinition/extension-MeasureReport.population.description"
-      )
+    measureReport.date = null
 
-    assertThat(measureReport.measure.toString())
-      .isEqualTo("http://fhir.org/guides/who/anc-cds/Measure/ANCIND01")
-    assertThat(measureReport.improvementNotation.coding[0].system)
-      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-improvement-notation")
-    assertThat(measureReport.improvementNotation.coding[0].code.toString()).isEqualTo("increase")
-
-    val evaluatedResource = measureReport.evaluatedResource
-
-    assertThat(evaluatedResource[0].reference).isEqualTo("Encounter/anc-encounter-charity-otala-1")
-    assertThat(evaluatedResource[0].extension[0].url)
-      .isEqualTo(
-        "http://hl7.org/fhir/us/davinci-deqm/StructureDefinition/extension-populationReference"
-      )
-    assertThat(evaluatedResource[0].extension[0].value.toString()).isEqualTo("denominator")
-
-    assertThat(evaluatedResource[1].reference)
-      .isEqualTo("EpisodeOfCare/charity-otala-1-pregnancy-episode")
-    assertThat(evaluatedResource[1].extension[0].url)
-      .isEqualTo(
-        "http://hl7.org/fhir/us/davinci-deqm/StructureDefinition/extension-populationReference"
-      )
-    assertThat(evaluatedResource[1].extension[0].value.toString()).isEqualTo("initial-population")
-
-    assertThat(evaluatedResource[2].reference).isEqualTo("Patient/charity-otala-1")
-    assertThat(evaluatedResource[2].extension[0].url)
-      .isEqualTo(
-        "http://hl7.org/fhir/us/davinci-deqm/StructureDefinition/extension-populationReference"
-      )
-    assertThat(evaluatedResource[2].extension[0].value.toString()).isEqualTo("initial-population")
-    assertThat(evaluatedResource[2].extension[1].url)
-      .isEqualTo(
-        "http://hl7.org/fhir/us/davinci-deqm/StructureDefinition/extension-populationReference"
-      )
-    assertThat(evaluatedResource[2].extension[1].value.toString()).isEqualTo("denominator")
-
-    val population = measureReport.group[0].population
-
-    assertThat(population[0].id).isEqualTo("initial-population")
-    assertThat(population[0].code.coding[0].code.toString()).isEqualTo("initial-population")
-    assertThat(population[0].code.coding[0].system)
-      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
-
-    assertThat(population[1].id).isEqualTo("denominator")
-    assertThat(population[1].code.coding[0].code.toString()).isEqualTo("denominator")
-    assertThat(population[1].code.coding[0].system)
-      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
-
-    assertThat(population[2].id).isEqualTo("numerator")
-    assertThat(population[2].code.coding[0].code.toString()).isEqualTo("numerator")
-    assertThat(population[2].code.coding[0].system)
-      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
-
-    assertThat(measureReport.type.display).isEqualTo("Individual")
+    JSONAssert.assertEquals(
+      readResourceAsString("/first-contact/04-results/subject-report.json"),
+      jsonParser.setPrettyPrint(true).encodeResourceToString(measureReport),
+      true
+    )
   }
 
   private suspend fun loadFile(path: String) {
