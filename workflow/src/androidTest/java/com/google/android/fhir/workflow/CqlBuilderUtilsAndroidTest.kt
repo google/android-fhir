@@ -30,12 +30,11 @@ class CqlBuilderUtilsAndroidTest {
    */
   @Test
   fun shouldCompileAndAssembleImmunityCheck() {
-    CqlBuilder.Assert
-      .that("/cql-compiler/ImmunityCheck-1.0.0.cql")
+    CqlBuilder.Assert.that("/cql-compiler/ImmunityCheck-1.0.0.cql")
       .compiles()
       .withJsonEqualsTo("/cql-compiler/ImmunityCheck-1.0.0.elm.json")
       .withXmlEqualsTo("/cql-compiler/ImmunityCheck-1.0.0.elm.xml")
-      .generatesFhirLibraryEqualsTo( "/cql-compiler/ImmunityCheck-1.0.0.fhir.json")
+      .generatesFhirLibraryEqualsTo("/cql-compiler/ImmunityCheck-1.0.0.fhir.json")
   }
 
   /**
@@ -45,8 +44,7 @@ class CqlBuilderUtilsAndroidTest {
    */
   @Test
   fun shouldCompileAndAssembleFhirHelpers() {
-    CqlBuilder.Assert
-      .that("/cql-compiler/FHIRHelpers-4.0.1.cql")
+    CqlBuilder.Assert.that("/cql-compiler/FHIRHelpers-4.0.1.cql")
       .compiles()
       .withJsonEqualsTo("/cql-compiler/FHIRHelpers-4.0.1.elm.json")
       .withXmlEqualsTo("/cql-compiler/FHIRHelpers-4.0.1.elm.xml")

@@ -32,20 +32,8 @@ import org.hl7.fhir.r4.model.Library
 import org.opencds.cqf.cql.engine.serializing.CqlLibraryReaderFactory
 import org.skyscreamer.jsonassert.JSONAssert
 
-object CqlBuilder {
+object CqlBuilder : Loadable() {
   private val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-
-  private fun open(asset: String): InputStream {
-    return javaClass.getResourceAsStream(asset)!!
-  }
-
-  fun load(asset: InputStream): String {
-    return asset.bufferedReader().use { bufferReader -> bufferReader.readText() }
-  }
-
-  fun load(asset: String): String {
-    return load(open(asset))
-  }
 
   private fun IBaseResource.toJson(): String {
     return jsonParser.encodeResourceToString(this)
@@ -206,11 +194,11 @@ object CqlBuilder {
     init {
       // Manually removes the version information to make tests pass.
       // Remove it after https://github.com/cqframework/clinical_quality_language/issues/804
-      translator.toELM().annotation
+      translator
+        .toELM()
+        .annotation
         .filterIsInstance(org.hl7.cql_annotations.r1.CqlToElmInfo::class.java)
-        .forEach {
-          it.translatorVersion = null
-        }
+        .forEach { it.translatorVersion = null }
     }
 
     fun withJsonEqualsTo(expectedElmJsonAssetName: String): CompiledCql {
