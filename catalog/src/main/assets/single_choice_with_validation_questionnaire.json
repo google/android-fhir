@@ -59,6 +59,19 @@
       ],
       "item": [
         {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
           "linkId": "1-select-one",
           "text": "Select one",
           "type": "display"

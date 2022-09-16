@@ -4,13 +4,19 @@
   <item
         android:id="@+id/componentListFragment"
         android:enabled="true"
-        android:icon="@drawable/ic_components_icon"
+        android:icon="@drawable/ic_components"
         android:title="@string/component_nav_heading"
     />
   <item
         android:id="@+id/layoutListFragment"
         android:enabled="true"
-        android:icon="@drawable/ic_layout_icon"
+        android:icon="@drawable/ic_layouts"
         android:title="@string/layout_nav_heading"
+    />
+  <item
+        android:id="@+id/behaviorListFragment"
+        android:enabled="true"
+        android:icon="@drawable/ic_behaviors"
+        android:title="@string/behavior_nav_heading"
     />
 </menu>
