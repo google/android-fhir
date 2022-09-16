@@ -18,7 +18,6 @@ package com.google.android.fhir.workflow.testing
 
 import com.ctc.wstx.shaded.msv_core.verifier.jaxp.DocumentBuilderFactoryImpl
 import com.google.common.truth.Truth.assertWithMessage
-import org.junit.Assert
 import org.xmlunit.builder.DiffBuilder
 import org.xmlunit.diff.DefaultNodeMatcher
 import org.xmlunit.diff.ElementSelectors
