@@ -91,8 +91,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             .apply {
               addOnPositiveButtonClickListener { epochMilli ->
                 with(Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()) {
-                  localDate = this
                   dateInputEditText.setText(this.formattedString(localeDatePattern))
+                  localDate = this
                   enableOrDisableTimePicker(enableIt = true)
                   generateLocalDateTime(this, localTime)?.let {
                     updateDateTimeInput(it)
