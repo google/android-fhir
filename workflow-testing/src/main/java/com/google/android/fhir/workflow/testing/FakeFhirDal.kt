@@ -16,10 +16,6 @@
 
 package com.google.android.fhir.workflow.testing
 
-import java.util.ArrayList
-import java.util.HashMap
-import java.util.function.Consumer
-import java.util.stream.Collectors
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.instance.model.api.IIdType
 import org.hl7.fhir.r4.model.Bundle
@@ -27,55 +23,34 @@ import org.hl7.fhir.r4.model.MetadataResource
 import org.opencds.cqf.cql.evaluator.fhir.dal.FhirDal
 
 class FakeFhirDal : FhirDal {
-  private val cacheById: MutableMap<String, IBaseResource> = HashMap()
-  private val cacheByURL: MutableMap<String, MutableList<IBaseResource>> = HashMap()
-  private val cacheByType: MutableMap<String, MutableList<IBaseResource>> = HashMap()
+  private val cacheById = mutableMapOf<String, IBaseResource>()
+  private val cacheByURL = mutableMapOf<String, MutableList<IBaseResource>>()
+  private val cacheByType = mutableMapOf<String, MutableList<IBaseResource>>()
 
-  private fun toKey(resource: IIdType): String {
-    return resource.resourceType + "/" + resource.idPart
-  }
-
-  private fun insertOrUpdate(
-    list: MutableMap<String, MutableList<IBaseResource>>,
-    key: String,
-    element: IBaseResource
-  ) {
-    if (list.containsKey(key)) list[key]!!.add(element) else list[key] = ArrayList(listOf(element))
-  }
+  private fun toKey(resource: IIdType) = "${resource.resourceType}/${resource.idPart}"
 
   private fun putIntoCache(resource: IBaseResource) {
     cacheById[toKey(resource.idElement)] = resource
-    insertOrUpdate(cacheByType, resource.idElement.resourceType, resource)
-    if (resource is MetadataResource) {
-      insertOrUpdate(cacheByURL, resource.url, resource)
+    cacheByType.getOrPut(resource.idElement.resourceType) { mutableListOf() }.add(resource)
+    if (resource is MetadataResource && resource.url != null) {
+      cacheByURL.getOrPut(resource.url) { mutableListOf() }.add(resource)
     }
   }
 
   fun addAll(resource: IBaseResource) {
-    if (resource is Bundle) {
-      resource.entry.forEach(
-        Consumer { entry: Bundle.BundleEntryComponent -> addAll(entry.resource) }
-      )
-    } else {
-      putIntoCache(resource)
+    when (resource) {
+      is Bundle -> resource.entry.forEach { addAll(it.resource) }
+      else -> putIntoCache(resource)
     }
   }
 
-  override fun read(id: IIdType): IBaseResource {
-    return cacheById[toKey(id)]!!
-  }
+  override fun read(id: IIdType) = cacheById[toKey(id)]
 
   override fun create(resource: IBaseResource) {}
   override fun update(resource: IBaseResource) {}
   override fun delete(id: IIdType) {}
-  override fun search(resourceType: String): Iterable<IBaseResource> {
-    return cacheByType[resourceType]!!
-  }
 
-  override fun searchByUrl(resourceType: String, url: String): Iterable<IBaseResource> {
-    return cacheByURL[url]!!
-      .stream()
-      .filter { resource: IBaseResource -> resourceType == resource.idElement.resourceType }
-      .collect(Collectors.toList())
-  }
+  override fun search(resourceType: String) = cacheByType[resourceType]
+  override fun searchByUrl(resourceType: String, url: String) =
+    cacheByURL[url]?.filter { it.idElement.resourceType == resourceType }
 }
