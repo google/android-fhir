@@ -394,7 +394,7 @@ internal fun Questionnaire.QuestionnaireItemComponent.extractAnswerOptions(
 ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
   if (dataList.isEmpty()) return emptyList()
 
-  if (this.type != Questionnaire.QuestionnaireItemType.REFERENCE && dataList.first().isResource) {
+  if (this.type != Questionnaire.QuestionnaireItemType.REFERENCE && dataList.all { it.isResource } ) {
     throw IllegalArgumentException(
       "$EXTENSION_CHOICE_COLUMN_URL not applicable for '${this.type.toCode()}'. Only type reference is allowed with resource."
     )
