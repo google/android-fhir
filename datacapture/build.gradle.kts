@@ -62,16 +62,15 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.rules)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(Dependencies.Espresso.espressoCore)
 
   api(Dependencies.HapiFhir.structuresR4)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  implementation(Dependencies.androidFhirCommon)
-
-  releaseImplementation(Dependencies.androidFhirEngine)
   debugImplementation(project(":engine"))
 
+  implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)
   implementation(Dependencies.Androidx.coreKtx)
@@ -88,6 +87,8 @@ dependencies {
   implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.timber)
 
+  releaseImplementation(Dependencies.androidFhirEngine)
+
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)
   testImplementation(Dependencies.Kotlin.kotlinTestJunit)
@@ -97,7 +98,6 @@ dependencies {
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
   testImplementation(project(":testing"))
-  androidTestImplementation(Dependencies.Espresso.espressoCore)
 }
 
 configureDokka(Releases.DataCapture.artifactId, Releases.DataCapture.version)

@@ -32,6 +32,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.utils.ToolingExtensions
 
 /** UI controls relevant to capturing question data. */
@@ -339,7 +340,7 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceColumn: List<ChoiceC
       }
     }
 
-data class ChoiceColumn(val path: String, val label: String?, val forDisplay: Boolean)
+internal data class ChoiceColumn(val path: String, val label: String?, val forDisplay: Boolean)
 
 // TODO implement full functionality of choice column
 // https://github.com/google/android-fhir/issues/1495
@@ -356,27 +357,31 @@ internal fun Questionnaire.QuestionnaireItemComponent.extractAnswerOptions(
 ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
   if (dataList.isEmpty()) return emptyList()
 
-  if (this.type != Questionnaire.QuestionnaireItemType.REFERENCE && dataList.first().isResource) {
-    throw IllegalArgumentException(
-      "$EXTENSION_CHOICE_COLUMN_URL not applicable for '${this.type.toCode()}'. Only type reference is allowed with resource."
-    )
-  }
+  val options: List<Type> =
+    dataList.map { data ->
+      when (this.type) {
+        Questionnaire.QuestionnaireItemType.REFERENCE -> {
+          require(dataList.all { it.isResource }) {
+            "$EXTENSION_CHOICE_COLUMN_URL not applicable for '${this.type.toCode()}'. Only type reference is allowed with resource."
+          }
 
-  return dataList
-    .map { data ->
-      if (data.isResource) {
-        data as Resource
-        Reference().apply {
-          reference = "${data.resourceType}/${data.logicalId}"
-          this@extractAnswerOptions.choiceColumn
-            ?.filter { it.forDisplay }
-            ?.map { it.path }
-            ?.let { evaluateToDisplay(it, data) }
-            ?.also { display = it }
+          data as Resource
+          Reference().apply {
+            reference = "${data.resourceType}/${data.logicalId}"
+            this@extractAnswerOptions.choiceColumn
+              ?.filter { it.forDisplay }
+              ?.map { it.path }
+              ?.let { evaluateToDisplay(it, data) }
+              ?.also { display = it }
+          }
         }
-      } else data.castToType(data)
+        else -> {
+          data.castToType(data)
+        }
+      }
     }
-    .map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
+
+  return options.map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
 }
 
 /**
