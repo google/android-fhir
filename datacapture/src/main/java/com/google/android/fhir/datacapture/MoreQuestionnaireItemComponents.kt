@@ -414,6 +414,10 @@ internal fun Questionnaire.QuestionnaireItemComponent.extractAnswerOptions(
           }
         }
         else -> {
+          require(dataList.all { !it.isResource }) {
+            "$EXTENSION_CHOICE_COLUMN_URL not applicable for '${this.type.toCode()}'. Only type reference is allowed with resource."
+          }
+
           data.castToType(data)
         }
       }
