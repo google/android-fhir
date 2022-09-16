@@ -252,7 +252,7 @@ object ExpressionEvaluator {
    * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
    * @param dependentVariables the [Map] of variable names to their values
    *
-   * @return [Base] the result of expression
+   * @return [Base] the result of an expression
    */
   private fun evaluateVariable(
     expression: Expression,
