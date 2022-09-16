@@ -16,14 +16,20 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.app.Application
 import android.os.Build
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import androidx.test.core.app.ApplicationProvider
+import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -32,6 +38,8 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class QuestionnaireItemViewItemTest {
+  private val context = ApplicationProvider.getApplicationContext<Application>()
+
   @Test
   fun addAnswer_questionnaireItemDoesNotRepeat_shouldThrowIllegalArgument() {
     val questionnaireItemViewItem =
@@ -43,7 +51,7 @@ class QuestionnaireItemViewItemTest {
               .setValue(BooleanType(true))
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -74,7 +82,7 @@ class QuestionnaireItemViewItemTest {
               .setValue(BooleanType(true))
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -100,7 +108,7 @@ class QuestionnaireItemViewItemTest {
               .setValue(BooleanType(true))
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -139,7 +147,7 @@ class QuestionnaireItemViewItemTest {
               .setValue(BooleanType(false))
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -172,7 +180,7 @@ class QuestionnaireItemViewItemTest {
               .setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -202,7 +210,7 @@ class QuestionnaireItemViewItemTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
 
@@ -223,14 +231,14 @@ class QuestionnaireItemViewItemTest {
         QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent(),
             questionnaireResponseItem,
-            validationResult = null,
+            validationResult = NotValidated,
             answersChangedCallback = { _, _, _ -> }
           )
           .hasTheSameItem(
             QuestionnaireItemViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               questionnaireResponseItem,
-              validationResult = null,
+              validationResult = NotValidated,
               answersChangedCallback = { _, _, _ -> }
             )
           )
@@ -246,14 +254,14 @@ class QuestionnaireItemViewItemTest {
         QuestionnaireItemViewItem(
             questionnaireItem,
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-            validationResult = null,
+            validationResult = NotValidated,
             answersChangedCallback = { _, _, _ -> }
           )
           .hasTheSameItem(
             QuestionnaireItemViewItem(
               questionnaireItem,
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-              validationResult = null,
+              validationResult = NotValidated,
               answersChangedCallback = { _, _, _ -> }
             )
           )
@@ -270,14 +278,14 @@ class QuestionnaireItemViewItemTest {
         QuestionnaireItemViewItem(
             questionnaireItem,
             questionnaireResponseItem,
-            validationResult = null,
+            validationResult = NotValidated,
             answersChangedCallback = { _, _, _ -> }
           )
           .hasTheSameItem(
             QuestionnaireItemViewItem(
               questionnaireItem,
               questionnaireResponseItem,
-              validationResult = null,
+              validationResult = NotValidated,
               answersChangedCallback = { _, _, _ -> }
             )
           )
@@ -291,7 +299,7 @@ class QuestionnaireItemViewItemTest {
         QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-            validationResult = null,
+            validationResult = NotValidated,
             answersChangedCallback = { _, _, _ -> }
           )
           .apply {
@@ -305,7 +313,7 @@ class QuestionnaireItemViewItemTest {
             QuestionnaireItemViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-              validationResult = null,
+              validationResult = NotValidated,
               answersChangedCallback = { _, _, _ -> }
             )
           )
@@ -319,14 +327,14 @@ class QuestionnaireItemViewItemTest {
         QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-            validationResult = null,
+            validationResult = NotValidated,
             answersChangedCallback = { _, _, _ -> }
           )
           .hasTheSameAnswer(
             QuestionnaireItemViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-              validationResult = null,
+              validationResult = NotValidated,
               answersChangedCallback = { _, _, _ -> }
             )
           )
@@ -340,7 +348,7 @@ class QuestionnaireItemViewItemTest {
         QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-            validationResult = null,
+            validationResult = NotValidated,
             answersChangedCallback = { _, _, _ -> }
           )
           .apply {
@@ -354,7 +362,7 @@ class QuestionnaireItemViewItemTest {
             QuestionnaireItemViewItem(
                 Questionnaire.QuestionnaireItemComponent(),
                 QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-                validationResult = null,
+                validationResult = NotValidated,
                 answersChangedCallback = { _, _, _ -> }
               )
               .apply {
@@ -375,7 +383,7 @@ class QuestionnaireItemViewItemTest {
         QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-            validationResult = null,
+            validationResult = NotValidated,
             answersChangedCallback = { _, _, _ -> }
           )
           .apply { setAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()) }
@@ -383,7 +391,7 @@ class QuestionnaireItemViewItemTest {
             QuestionnaireItemViewItem(
                 Questionnaire.QuestionnaireItemComponent(),
                 QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-                validationResult = null,
+                validationResult = NotValidated,
                 answersChangedCallback = { _, _, _ -> }
               )
               .apply {
@@ -404,7 +412,7 @@ class QuestionnaireItemViewItemTest {
         QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-            validationResult = null,
+            validationResult = NotValidated,
             answersChangedCallback = { _, _, _ -> }
           )
           .apply {
@@ -418,7 +426,7 @@ class QuestionnaireItemViewItemTest {
             QuestionnaireItemViewItem(
                 Questionnaire.QuestionnaireItemComponent(),
                 QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-                validationResult = null,
+                validationResult = NotValidated,
                 answersChangedCallback = { _, _, _ -> }
               )
               .apply { setAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()) }
@@ -433,7 +441,7 @@ class QuestionnaireItemViewItemTest {
         QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-            validationResult = null,
+            validationResult = NotValidated,
             answersChangedCallback = { _, _, _ -> }
           )
           .apply {
@@ -447,7 +455,7 @@ class QuestionnaireItemViewItemTest {
             QuestionnaireItemViewItem(
                 Questionnaire.QuestionnaireItemComponent(),
                 QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-                validationResult = null,
+                validationResult = NotValidated,
                 answersChangedCallback = { _, _, _ -> }
               )
               .apply {
@@ -468,14 +476,14 @@ class QuestionnaireItemViewItemTest {
         QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-            validationResult = null,
+            validationResult = NotValidated,
             answersChangedCallback = { _, _, _ -> }
           )
           .hasTheSameValidationResult(
             QuestionnaireItemViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-              validationResult = null,
+              validationResult = NotValidated,
               answersChangedCallback = { _, _, _ -> }
             )
           )
@@ -489,14 +497,14 @@ class QuestionnaireItemViewItemTest {
         QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-            validationResult = null,
+            validationResult = NotValidated,
             answersChangedCallback = { _, _, _ -> }
           )
           .hasTheSameValidationResult(
             QuestionnaireItemViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-              validationResult = ValidationResult(true, listOf()),
+              validationResult = Valid,
               answersChangedCallback = { _, _, _ -> }
             )
           )
@@ -510,14 +518,14 @@ class QuestionnaireItemViewItemTest {
         QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-            validationResult = ValidationResult(true, listOf()),
+            validationResult = Valid,
             answersChangedCallback = { _, _, _ -> }
           )
           .hasTheSameValidationResult(
             QuestionnaireItemViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-              validationResult = null,
+              validationResult = NotValidated,
               answersChangedCallback = { _, _, _ -> }
             )
           )
@@ -531,14 +539,14 @@ class QuestionnaireItemViewItemTest {
         QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-            validationResult = ValidationResult(true, listOf()),
+            validationResult = Valid,
             answersChangedCallback = { _, _, _ -> }
           )
           .hasTheSameValidationResult(
             QuestionnaireItemViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-              validationResult = ValidationResult(true, listOf()),
+              validationResult = Valid,
               answersChangedCallback = { _, _, _ -> }
             )
           )
@@ -552,14 +560,14 @@ class QuestionnaireItemViewItemTest {
         QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-            validationResult = ValidationResult(true, listOf()),
+            validationResult = Valid,
             answersChangedCallback = { _, _, _ -> }
           )
           .hasTheSameValidationResult(
             QuestionnaireItemViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-              validationResult = ValidationResult(false, listOf("error")),
+              validationResult = Invalid(listOf("error")),
               answersChangedCallback = { _, _, _ -> }
             )
           )
@@ -573,14 +581,14 @@ class QuestionnaireItemViewItemTest {
         QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-            validationResult = ValidationResult(false, listOf("error 1")),
+            validationResult = Invalid(listOf("error 1")),
             answersChangedCallback = { _, _, _ -> }
           )
           .hasTheSameValidationResult(
             QuestionnaireItemViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-              validationResult = ValidationResult(false, listOf("error 2")),
+              validationResult = Invalid(listOf("error 2")),
               answersChangedCallback = { _, _, _ -> }
             )
           )
@@ -594,18 +602,67 @@ class QuestionnaireItemViewItemTest {
         QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-            validationResult = ValidationResult(false, listOf("error")),
+            validationResult = Invalid(listOf("error")),
             answersChangedCallback = { _, _, _ -> }
           )
           .hasTheSameValidationResult(
             QuestionnaireItemViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-              validationResult = ValidationResult(false, listOf("error")),
+              validationResult = Invalid(listOf("error")),
               answersChangedCallback = { _, _, _ -> }
             )
           )
       )
       .isTrue()
+  }
+
+  @Test
+  fun `answerString() should return not answered with no answer`() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = Valid,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    assertThat(questionnaireItemViewItem.answerString(context))
+      .isEqualTo(context.getString(R.string.not_answered))
+  }
+
+  @Test
+  fun `answerString() should return answer value with single answer`() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(StringType("Answer"))
+          ),
+        validationResult = Valid,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    assertThat(questionnaireItemViewItem.answerString(context)).isEqualTo("Answer")
+  }
+
+  @Test
+  fun `answerString() should return comma separated answer value with multiple answers`() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(StringType("Answer1"))
+          )
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(StringType("Answer2"))
+          ),
+        validationResult = Valid,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    assertThat(questionnaireItemViewItem.answerString(context)).isEqualTo("Answer1, Answer2")
   }
 }

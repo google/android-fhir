@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ internal enum class ItemControlTypes(
   OPEN_CHOICE("open-choice", QuestionnaireItemViewHolderType.DIALOG_SELECT),
   RADIO_BUTTON("radio-button", QuestionnaireItemViewHolderType.RADIO_GROUP),
   SLIDER("slider", QuestionnaireItemViewHolderType.SLIDER),
-  PHONE_NUMBER("phone-number", QuestionnaireItemViewHolderType.PHONE_NUMBER)
+  PHONE_NUMBER("phone-number", QuestionnaireItemViewHolderType.PHONE_NUMBER),
 }
 
 // Please note these URLs do not point to any FHIR Resource and are broken links. They are being
@@ -59,8 +59,33 @@ internal const val EXTENSION_HIDDEN_URL =
 internal const val EXTENSION_ENTRY_FORMAT_URL =
   "http://hl7.org/fhir/StructureDefinition/entryFormat"
 
-internal const val ITEM_ENABLE_WHEN_EXPRESSION_URL: String =
+internal const val EXTENSION_DISPLAY_CATEGORY_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory"
+internal const val EXTENSION_DISPLAY_CATEGORY_SYSTEM =
+  "http://hl7.org/fhir/questionnaire-display-category"
+
+internal const val EXTENSION_ENABLE_WHEN_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression"
+
+internal const val EXTENSION_VARIABLE_URL = "http://hl7.org/fhir/StructureDefinition/variable"
+
+internal val Questionnaire.QuestionnaireItemComponent.variableExpressions: List<Expression>
+  get() =
+    this.extension.filter { it.url == EXTENSION_VARIABLE_URL }.map { it.castToExpression(it.value) }
+
+/**
+ * Finds the specific variable name [String] at the questionnaire item
+ * [Questionnaire.QuestionnaireItemComponent]
+ *
+ * @param variableName the [String] to match the variable
+ *
+ * @return an [Expression]
+ */
+internal fun Questionnaire.QuestionnaireItemComponent.findVariableExpression(
+  variableName: String
+): Expression? {
+  return variableExpressions.find { it.name == variableName }
+}
 
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
@@ -100,9 +125,10 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceO
     return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
   }
 
-/** UI controls relevant to rendering questionnaire display items. */
+/** UI controls relevant to rendering questionnaire items. */
 internal enum class DisplayItemControlType(val extensionCode: String) {
-  FLYOVER("flyover")
+  FLYOVER("flyover"),
+  PAGE("page"),
 }
 
 /** Item control to show instruction text */
@@ -142,22 +168,17 @@ val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
   get() = prefixElement?.getLocalizedText()?.toSpanned()
 
 /**
- * A nested questionnaire item of type display (if present) is used as the hint of the parent
- * question.
+ * A nested questionnaire item of type display with displayCategory extension with [INSTRUCTIONS]
+ * code is used as the instructions of the parent question.
  */
-internal val Questionnaire.QuestionnaireItemComponent.localizedHintSpanned: Spanned?
+internal val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spanned?
   get() {
-    return when (type) {
-      Questionnaire.QuestionnaireItemType.GROUP -> null
-      else -> {
-        item
-          .firstOrNull { questionnaireItem ->
-            questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-              questionnaireItem.displayItemControl == null
-          }
-          ?.localizedTextSpanned
+    return item
+      .firstOrNull { questionnaireItem ->
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+          questionnaireItem.isInstructionsCode
       }
-    }
+      ?.localizedTextSpanned
   }
 
 /**
@@ -197,6 +218,44 @@ val Questionnaire.QuestionnaireItemComponent.entryFormat: String?
     return null
   }
 
+internal const val INSTRUCTIONS = "instructions"
+
+/** Returns [true] if extension is display category extension and contains 'instructions' code. */
+internal val Questionnaire.QuestionnaireItemComponent.isInstructionsCode: Boolean
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.DISPLAY -> {
+        val codeableConcept =
+          this.extension.firstOrNull { it.url == EXTENSION_DISPLAY_CATEGORY_URL }?.value as
+            CodeableConcept?
+        val code =
+          codeableConcept?.coding
+            ?.firstOrNull { it.system == EXTENSION_DISPLAY_CATEGORY_SYSTEM }
+            ?.code
+        code == INSTRUCTIONS
+      }
+      else -> {
+        false
+      }
+    }
+  }
+
+/**
+ * Returns [true] if item type is display and [displayItemControl] is
+ * [DisplayItemControlType.FLYOVER].
+ */
+internal val Questionnaire.QuestionnaireItemComponent.isFlyoverCode: Boolean
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.DISPLAY -> {
+        displayItemControl == DisplayItemControlType.FLYOVER
+      }
+      else -> {
+        false
+      }
+    }
+  }
+
 /**
  * Creates a [QuestionnaireResponse.QuestionnaireResponseItemComponent] from the provided
  * [Questionnaire.QuestionnaireItemComponent].
@@ -224,7 +283,7 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
 // Return expression if QuestionnaireItemComponent has ENABLE WHEN EXPRESSION URL
 val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
   get() {
-    return this.extension.firstOrNull { it.url == ITEM_ENABLE_WHEN_EXPRESSION_URL }?.let {
+    return this.extension.firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }?.let {
       it.value as Expression
     }
   }
