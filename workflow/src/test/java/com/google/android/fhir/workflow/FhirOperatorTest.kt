@@ -26,6 +26,7 @@ import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
 import java.util.Base64
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Measure
@@ -53,13 +54,13 @@ class FhirOperatorTest {
     private val jsonParser = fhirContext.newJsonParser()
     private val xmlParser = fhirContext.newXmlParser()
 
-    private fun open(path: String) = FhirOperatorTest.javaClass.getResourceAsStream(path)!!
+    private fun open(path: String) = FhirOperatorTest::class.java.getResourceAsStream(path)!!
 
     private fun parseJson(path: String): Bundle = jsonParser.parseResource(open(path)) as Bundle
 
     private fun readResourceAsString(path: String) = open(path).readBytes().decodeToString()
 
-    private fun <T> parseResource(path: String) =
+    private fun <T : IBaseResource> parseResource(path: String) =
       jsonParser.parseResource(readResourceAsString(path)) as T
   }
 
@@ -191,10 +192,10 @@ class FhirOperatorTest {
 
   private suspend fun loadFile(path: String) {
     if (path.endsWith(suffix = ".xml")) {
-      val resource = xmlParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
+      val resource = xmlParser.parseResource(open(path)) as Resource
       fhirEngine.create(resource)
     } else if (path.endsWith(".json")) {
-      val resource = jsonParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
+      val resource = jsonParser.parseResource(open(path)) as Resource
       fhirEngine.create(resource)
     }
   }
