@@ -16,13 +16,13 @@
 
 package com.google.android.fhir.workflow
 
-import com.google.android.fhir.workflow.testing.CqlBuilderTestBase
+import com.google.android.fhir.workflow.testing.CqlBuilder
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class CqlBuilderUtilsJavaTest : CqlBuilderTestBase() {
+class CqlBuilderUtilsJavaTest {
   /**
    * Tests the compilation of CQL expressions into ELM by verifying if the compiled JSONs match.
    *
@@ -30,12 +30,12 @@ class CqlBuilderUtilsJavaTest : CqlBuilderTestBase() {
    */
   @Test
   fun shouldCompileAndAssembleImmunityCheck() {
-    test(
-      "/cql-compiler/ImmunityCheck-1.0.0.cql",
-      "/cql-compiler/ImmunityCheck-1.0.0.elm.json",
-      "/cql-compiler/ImmunityCheck-1.0.0.elm.xml",
-      "/cql-compiler/ImmunityCheck-1.0.0.fhir.json"
-    )
+    CqlBuilder.Assert
+      .that("/cql-compiler/ImmunityCheck-1.0.0.cql")
+      .compiles()
+      .withJsonEqualsTo("/cql-compiler/ImmunityCheck-1.0.0.elm.json")
+      .withXmlEqualsTo("/cql-compiler/ImmunityCheck-1.0.0.elm.xml")
+      .generatesFhirLibraryEqualsTo( "/cql-compiler/ImmunityCheck-1.0.0.fhir.json")
   }
 
   /**
@@ -45,11 +45,11 @@ class CqlBuilderUtilsJavaTest : CqlBuilderTestBase() {
    */
   @Test
   fun shouldCompileAndAssembleFhirHelpers() {
-    test(
-      "/cql-compiler/FHIRHelpers-4.0.1.cql",
-      "/cql-compiler/FHIRHelpers-4.0.1.elm.json",
-      "/cql-compiler/FHIRHelpers-4.0.1.elm.xml",
-      "/cql-compiler/FHIRHelpers-4.0.1.fhir.json"
-    )
+    CqlBuilder.Assert
+      .that("/cql-compiler/FHIRHelpers-4.0.1.cql")
+      .compiles()
+      .withJsonEqualsTo("/cql-compiler/FHIRHelpers-4.0.1.elm.json")
+      .withXmlEqualsTo("/cql-compiler/FHIRHelpers-4.0.1.elm.xml")
+      .generatesFhirLibraryEqualsTo("/cql-compiler/FHIRHelpers-4.0.1.fhir.json")
   }
 }

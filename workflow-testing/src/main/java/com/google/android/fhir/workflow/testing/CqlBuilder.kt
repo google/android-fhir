@@ -16,6 +16,8 @@
 
 package com.google.android.fhir.workflow.testing
 
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import java.io.InputStream
 import java.io.StringReader
 import org.cqframework.cql.cql2elm.CqlTranslator
@@ -23,15 +25,30 @@ import org.cqframework.cql.cql2elm.CqlTranslatorOptions
 import org.cqframework.cql.cql2elm.LibraryManager
 import org.cqframework.cql.cql2elm.ModelManager
 import org.cqframework.cql.cql2elm.fhir.r4.FhirLibrarySourceProvider
+import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Library
-import org.junit.Assert.fail
 import org.opencds.cqf.cql.engine.serializing.CqlLibraryReaderFactory
+import org.skyscreamer.jsonassert.JSONAssert
 
-object CqlBuilderUtils {
-  private fun load(asset: InputStream): String {
+object CqlBuilder {
+  private val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+
+  private fun open(asset: String): InputStream {
+    return javaClass.getResourceAsStream(asset)!!
+  }
+
+  fun load(asset: InputStream): String {
     return asset.bufferedReader().use { bufferReader -> bufferReader.readText() }
+  }
+
+  fun load(asset: String): String {
+    return load(open(asset))
+  }
+
+  private fun IBaseResource.toJson(): String {
+    return jsonParser.encodeResourceToString(this)
   }
 
   /**
@@ -73,7 +90,7 @@ object CqlBuilderUtils {
           .map { "${it.locator?.toLocator() ?: "[n/a]"}: ${it.message}" }
           .joinToString("\n")
 
-      fail("Could not compile CQL File. Errors:\n$errors")
+      org.junit.Assert.fail("Could not compile CQL File. Errors:\n$errors")
     }
 
     return translator
@@ -169,6 +186,63 @@ object CqlBuilderUtils {
         it.toELM().identifier.id,
         it.toELM().identifier.version
       )
+    }
+  }
+
+  // Test Helpers
+
+  object Assert {
+    fun that(cqlAssetName: String) = Compiler(load(cqlAssetName))
+  }
+
+  class Compiler(val cqlText: String) {
+    fun compiles() = CompiledCql(cqlText, compile(cqlText))
+  }
+
+  class CompiledCql(val cqlText: String, private val translator: CqlTranslator) {
+    private lateinit var expectedElmJsonAsset: String
+    private lateinit var expectedElmXmlAsset: String
+
+    init {
+      // Manually removes the version information to make tests pass.
+      // Remove it after https://github.com/cqframework/clinical_quality_language/issues/804
+      translator.toELM().annotation
+        .filterIsInstance(org.hl7.cql_annotations.r1.CqlToElmInfo::class.java)
+        .forEach {
+          it.translatorVersion = null
+        }
+    }
+
+    fun withJsonEqualsTo(expectedElmJsonAssetName: String): CompiledCql {
+      expectedElmJsonAsset = load(expectedElmJsonAssetName)
+
+      // JSONAssert ignores property order and whitespace/tabs
+      JSONAssert.assertEquals(expectedElmJsonAsset, translator.toJson(), true)
+      return this
+    }
+
+    fun withXmlEqualsTo(expectedElmXmlAssetName: String): CompiledCql {
+      expectedElmXmlAsset = load(expectedElmXmlAssetName)
+
+      // XmlAssert ignores property order and whitespace/tabs
+      XMLAssert.assertEquals(expectedElmXmlAsset, translator.toXml())
+      return this
+    }
+
+    fun generatesFhirLibraryEqualsTo(expectedFhirAssetName: String): CompiledCql {
+      // Given the ELM is the same, builds the lib with the expented, not the new ELM to make sure
+      // the base 64 representation of the Library matches.
+      val library =
+        assembleFhirLib(
+          cqlText,
+          expectedElmJsonAsset,
+          expectedElmXmlAsset,
+          translator.toELM().identifier.id,
+          translator.toELM().identifier.version
+        )
+
+      JSONAssert.assertEquals(load(expectedFhirAssetName), library.toJson(), false)
+      return this
     }
   }
 }

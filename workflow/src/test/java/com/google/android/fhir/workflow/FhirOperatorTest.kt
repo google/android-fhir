@@ -21,7 +21,7 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
-import com.google.android.fhir.workflow.testing.CqlBuilderUtils
+import com.google.android.fhir.workflow.testing.CqlBuilder
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
 import java.util.Base64
@@ -210,7 +210,7 @@ class FhirOperatorTest {
   }
 
   private fun toFhirLibrary(cql: InputStream): Library {
-    return CqlBuilderUtils.compileAndBuild(cql)
+    return CqlBuilder.compileAndBuild(cql)
   }
 
   private fun String.readStringToBase64Encoded(): String {
