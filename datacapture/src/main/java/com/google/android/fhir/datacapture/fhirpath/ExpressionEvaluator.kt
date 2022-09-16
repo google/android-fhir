@@ -184,30 +184,29 @@ object ExpressionEvaluator {
     variablesMap: MutableMap<String, Base?>
   ) {
     // First, check the questionnaire item itself
-    questionnaireItem.findVariableExpression(variableName)?.let { expression ->
-      evaluateQuestionnaireItemVariableExpression(
-        expression,
-        questionnaire,
-        questionnaireResponse,
-        questionnaireItemParentMap,
-        questionnaireItem,
-        variablesMap
-      )
-    } // Secondly, check the ancestors of the questionnaire item
-      ?: findVariableInAncestors(variableName, questionnaireItemParentMap, questionnaireItem)
-        ?.let { (questionnaireItem, expression) ->
-          evaluateQuestionnaireItemVariableExpression(
-            expression,
-            questionnaire,
-            questionnaireResponse,
-            questionnaireItemParentMap,
-            questionnaireItem,
-            variablesMap
-          )
-        } // Finally, check the variables defined on the questionnaire itself
-        ?: questionnaire
-        .findVariableExpression(variableName)
-        ?.let { expression ->
+    val evaluatedValue =
+      questionnaireItem.findVariableExpression(variableName)?.let { expression ->
+        evaluateQuestionnaireItemVariableExpression(
+          expression,
+          questionnaire,
+          questionnaireResponse,
+          questionnaireItemParentMap,
+          questionnaireItem,
+          variablesMap
+        )
+      } // Secondly, check the ancestors of the questionnaire item
+        ?: findVariableInAncestors(variableName, questionnaireItemParentMap, questionnaireItem)
+          ?.let { (questionnaireItem, expression) ->
+            evaluateQuestionnaireItemVariableExpression(
+              expression,
+              questionnaire,
+              questionnaireResponse,
+              questionnaireItemParentMap,
+              questionnaireItem,
+              variablesMap
+            )
+          } // Finally, check the variables defined on the questionnaire itself
+          ?: questionnaire.findVariableExpression(variableName)?.let { expression ->
           evaluateQuestionnaireVariableExpression(
             expression,
             questionnaire,
@@ -215,7 +214,8 @@ object ExpressionEvaluator {
             variablesMap
           )
         }
-        ?.also { variablesMap[variableName] = it }
+
+    evaluatedValue?.also { variablesMap[variableName] = it }
   }
 
   /**
