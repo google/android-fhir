@@ -26,7 +26,7 @@ import org.cqframework.cql.cql2elm.fhir.r4.FhirLibrarySourceProvider
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Library
-import org.junit.Assert
+import org.junit.Assert.fail
 import org.opencds.cqf.cql.engine.serializing.CqlLibraryReaderFactory
 
 object CqlBuilderUtils {
@@ -73,7 +73,7 @@ object CqlBuilderUtils {
           .map { "${it.locator?.toLocator() ?: "[n/a]"}: ${it.message}" }
           .joinToString("\n")
 
-      Assert.fail("Could not compile CQL File. Errors:\n$errors")
+      fail("Could not compile CQL File. Errors:\n$errors")
     }
 
     return translator
