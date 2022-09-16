@@ -19,6 +19,8 @@ package com.google.android.fhir.db.impl
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.android.fhir.db.impl.dao.LocalChangeDao
 import com.google.android.fhir.db.impl.dao.ResourceDao
 import com.google.android.fhir.db.impl.dao.SyncedResourceDao
@@ -53,7 +55,7 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
       SyncedResourceEntityPatientCentric::class,
       LocalChangeEntity::class,
       PositionIndexEntity::class],
-  version = 1,
+  version = 2,
   exportSchema = false
 )
 @TypeConverters(DbTypeConverters::class)
@@ -63,3 +65,15 @@ internal abstract class ResourceDatabase : RoomDatabase() {
   abstract fun syncedResourceEntityPatientCentricDao(): SyncedResourceEntityPatientCentricDao
   abstract fun localChangeDao(): LocalChangeDao
 }
+
+val MIGRATION_1_2 =
+  object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.execSQL(
+        "CREATE TABLE IF NOT EXISTS `SyncedResourceEntityPatientCentric` (`patientId` TEXT NOT NULL, `lastUpdateResource` TEXT NOT NULL, `resourceType` TEXT NOT NULL, PRIMARY KEY(`patientId`, `resourceType`))"
+      )
+      database.execSQL(
+        "CREATE INDEX IF NOT EXISTS `index_SyncedResourceEntityPatientCentric_patientId_resourceType` ON `SyncedResourceEntityPatientCentric` (`patientId`, `resourceType`)"
+      )
+    }
+  }

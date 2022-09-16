@@ -87,10 +87,13 @@ internal class DatabaseImpl(
       when {
           databaseConfig.inMemory ->
             Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
+              .addMigrations(MIGRATION_1_2)
           enableEncryption ->
             Room.databaseBuilder(context, ResourceDatabase::class.java, ENCRYPTED_DATABASE_NAME)
+              .addMigrations(MIGRATION_1_2)
           else ->
             Room.databaseBuilder(context, ResourceDatabase::class.java, UNENCRYPTED_DATABASE_NAME)
+              .addMigrations(MIGRATION_1_2)
         }
         .apply {
           // Provide the SupportSQLiteOpenHelper which enables the encryption.
