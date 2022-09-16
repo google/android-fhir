@@ -17,6 +17,7 @@
 package com.google.android.fhir.workflow.testing
 
 import com.ctc.wstx.shaded.msv_core.verifier.jaxp.DocumentBuilderFactoryImpl
+import com.google.common.truth.Truth.assertWithMessage
 import org.junit.Assert
 import org.xmlunit.builder.DiffBuilder
 import org.xmlunit.diff.DefaultNodeMatcher
@@ -29,11 +30,11 @@ object XMLAssert {
         .withTest(actual)
         .withNodeMatcher(DefaultNodeMatcher(ElementSelectors.byName))
         .withDocumentBuilderFactory(
-          DocumentBuilderFactoryImpl()
-        ) // Overrides an incomplete implementation
+          DocumentBuilderFactoryImpl() // Overrides the incomplete default DocumentBuilderFactory
+        )
         .checkForSimilar()
         .build()
 
-    Assert.assertFalse(diff.fullDescription(), diff.hasDifferences())
+    assertWithMessage(diff.fullDescription()).that(diff.hasDifferences()).isFalse()
   }
 }
