@@ -22,7 +22,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class CqlBuilderUtilsJavaTest {
+class CqlBuilderJavaTest {
   /**
    * Tests the compilation of CQL expressions into ELM by verifying if the compiled JSONs match.
    *

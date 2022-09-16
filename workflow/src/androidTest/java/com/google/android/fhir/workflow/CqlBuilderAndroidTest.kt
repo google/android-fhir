@@ -22,7 +22,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class CqlBuilderUtilsAndroidTest {
+class CqlBuilderAndroidTest {
   /**
    * Tests the compilation of CQL expressions into ELM by verifying if the compiled JSONs match.
    *
