@@ -107,7 +107,7 @@ function device_tests() {
       --app demo/build/outputs/apk/androidTest/debug/demo-debug-androidTest.apk \
       --test $lib_name/build/outputs/apk/androidTest/debug/$lib_name-debug-androidTest.apk \
       --timeout 30m \
-      --device model=Nexus6P,version=24,locale=en_US \
+      --device model=Nexus6P,version=26,locale=en_US \
       --device model=Nexus6P,version=27,locale=en_US \
       --device model=Pixel2,version=30,locale=en_US \
       --environment-variables coverage=true,coverageFile="/sdcard/Download/coverage.ec" \
