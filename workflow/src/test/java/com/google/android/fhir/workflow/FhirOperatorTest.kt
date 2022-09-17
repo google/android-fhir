@@ -24,6 +24,7 @@ import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.android.fhir.workflow.testing.CqlBuilder
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
+import java.util.TimeZone
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
@@ -67,6 +68,7 @@ class FhirOperatorTest {
   fun setUp() = runBlocking {
     fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
     fhirOperator = FhirOperator(fhirContext, fhirEngine)
+    TimeZone.setDefault(TimeZone.getTimeZone("GMT"))
   }
 
   @Test
