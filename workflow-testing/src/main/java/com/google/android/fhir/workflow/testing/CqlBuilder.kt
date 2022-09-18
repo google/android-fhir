@@ -29,6 +29,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Library
+import org.junit.Assert.fail
 import org.opencds.cqf.cql.engine.serializing.CqlLibraryReaderFactory
 import org.skyscreamer.jsonassert.JSONAssert
 
@@ -78,7 +79,7 @@ object CqlBuilder : Loadable() {
           .map { "${it.locator?.toLocator() ?: "[n/a]"}: ${it.message}" }
           .joinToString("\n")
 
-      org.junit.Assert.fail("Could not compile CQL File. Errors:\n$errors")
+      fail("Could not compile CQL File. Errors:\n$errors")
     }
 
     return translator
