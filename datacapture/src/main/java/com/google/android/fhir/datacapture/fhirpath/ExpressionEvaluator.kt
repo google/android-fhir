@@ -246,7 +246,7 @@ object ExpressionEvaluator {
   }
 
   /**
-   * Evaluates the value of variable expression and returns the evaluated value
+   * Evaluates the value of variable expression and returns its evaluated value
    *
    * @param expression the [Expression] the expression to evaluate
    * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
