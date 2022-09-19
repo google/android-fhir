@@ -31,9 +31,13 @@ class BehaviorListViewModel(application: Application) : AndroidViewModel(applica
     @DrawableRes val iconId: Int,
     @StringRes val textId: Int,
     val questionnaireFileName: String,
-    val workFlow: WorkflowType = WorkflowType.DEFAULT
+    val workFlow: WorkflowType = WorkflowType.COMPONENT
   ) {
     CALCULATIONS(R.drawable.ic_calculations_behavior, R.string.behavior_name_calculation, ""),
-    SKIP_LOGIC(R.drawable.ic_skiplogic_behavior, R.string.behavior_name_skip_logic, "")
+    SKIP_LOGIC(
+      R.drawable.ic_skiplogic_behavior,
+      R.string.behavior_name_skip_logic,
+      "skip_logic_behavior_questionnaire.json"
+    )
   }
 }
