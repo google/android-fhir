@@ -80,7 +80,7 @@ object Dependencies {
     const val kotlinTestJunit = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.Kotlin.stdlib}"
     const val kotlinCoroutinesTest =
       "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.kotlinCoroutinesCore}"
-    const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.Kotlin.stdlib}"
+    const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.Kotlin.stdlib}"
   }
 
   object Lifecycle {
@@ -120,7 +120,6 @@ object Dependencies {
   const val androidFhirCommon = "com.google.android.fhir:common:${Versions.androidFhirCommon}"
   const val lifecycleExtensions =
     "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
-  const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
   const val guava = "com.google.guava:guava:${Versions.guava}"
   const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.http}"
@@ -194,7 +193,6 @@ object Dependencies {
 
     const val androidFhirCommon = "0.1.0-alpha03"
     const val caffeine = "2.9.1"
-    const val desugarJdkLibs = "1.1.5"
     const val fhirUcum = "1.0.3"
     const val guava = "28.2-android"
     const val hapiFhir = "6.0.1"
