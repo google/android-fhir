@@ -23,9 +23,6 @@ import org.hl7.fhir.r4.model.Type
 
 object QuestionnaireResponseValidator {
 
-  /** Maps linkId to [ValidationResult]. */
-  private val linkIdToValidationResultMap = mutableMapOf<String, MutableList<ValidationResult>>()
-
   /**
    * Validates [QuestionnaireResponse] using the constraints defined in the [Questionnaire].
    * - Each item in the [QuestionnaireResponse] must have a corresponding item in the
@@ -59,6 +56,7 @@ object QuestionnaireResponseValidator {
     questionnaireResponse: QuestionnaireResponse,
     context: Context
   ): Map<String, List<ValidationResult>> {
+    val linkIdToValidationResultMap = mutableMapOf<String, MutableList<ValidationResult>>()
 
     require(
       questionnaireResponse.questionnaire == null ||
@@ -66,7 +64,12 @@ object QuestionnaireResponseValidator {
     ) {
       "Mismatching Questionnaire ${questionnaire.url} and QuestionnaireResponse (for Questionnaire ${questionnaireResponse.questionnaire})"
     }
-    validateQuestionnaireResponseItems(questionnaire.item, questionnaireResponse.item, context)
+    validateQuestionnaireResponseItems(
+      questionnaire.item,
+      questionnaireResponse.item,
+      context,
+      linkIdToValidationResultMap
+    )
 
     return linkIdToValidationResultMap
   }
@@ -74,9 +77,9 @@ object QuestionnaireResponseValidator {
   private fun validateQuestionnaireResponseItems(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
-    context: Context
+    context: Context,
+    linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>
   ): Map<String, List<ValidationResult>> {
-
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
 
@@ -90,7 +93,12 @@ object QuestionnaireResponseValidator {
         questionnaireItem = questionnaireItemListIterator.next()
       } while (questionnaireItem!!.linkId != questionnaireResponseItem.linkId)
 
-      validateQuestionnaireResponseItem(questionnaireItem, questionnaireResponseItem, context)
+      validateQuestionnaireResponseItem(
+        questionnaireItem,
+        questionnaireResponseItem,
+        context,
+        linkIdToValidationResultMap
+      )
     }
     return linkIdToValidationResultMap
   }
@@ -98,7 +106,8 @@ object QuestionnaireResponseValidator {
   private fun validateQuestionnaireResponseItem(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-    context: Context
+    context: Context,
+    linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>
   ): Map<String, List<ValidationResult>> {
 
     when (checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }) {
@@ -109,7 +118,8 @@ object QuestionnaireResponseValidator {
         validateQuestionnaireResponseItems(
           questionnaireItem.item,
           questionnaireResponseItem.item,
-          context
+          context,
+          linkIdToValidationResultMap
         )
       else -> {
         require(questionnaireItem.repeats || questionnaireResponseItem.answer.size <= 1) {
@@ -117,7 +127,12 @@ object QuestionnaireResponseValidator {
         }
 
         questionnaireResponseItem.answer.forEach {
-          validateQuestionnaireResponseItems(questionnaireItem.item, it.item, context)
+          validateQuestionnaireResponseItems(
+            questionnaireItem.item,
+            it.item,
+            context,
+            linkIdToValidationResultMap
+          )
         }
 
         linkIdToValidationResultMap[questionnaireItem.linkId] = mutableListOf()

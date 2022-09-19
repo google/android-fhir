@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
+import com.google.android.fhir.datacapture.isHidden
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -39,7 +40,12 @@ internal object QuestionnaireResponseItemValidator {
     answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
     context: Context
   ): ValidationResult {
-    val validationResults = validators.map { it.validate(questionnaireItem, answers, context) }
+    val validationResults =
+      validators.map {
+        if (questionnaireItem.isHidden)
+          ConstraintValidator.ConstraintValidationResult(true, "Field is hidden")
+        else it.validate(questionnaireItem, answers, context)
+      }
 
     return if (validationResults.all { it.isValid }) {
       Valid
