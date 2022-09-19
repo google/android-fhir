@@ -466,6 +466,51 @@ class QuestionnaireResponseValidatorTest {
   }
 
   @Test
+  fun `validation fails for required questionnaire item with hidden extension set to false when no value specified`() {
+    val questionnaire =
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+              StringType("valid-hidden-item"),
+              Enumeration(
+                Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                Questionnaire.QuestionnaireItemType.INTEGER
+              )
+            )
+            .apply {
+              this.required = true
+              addExtension().apply {
+                url = EXTENSION_HIDDEN_URL
+                setValue(BooleanType(false))
+              }
+            }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        this.questionnaire = "questionnaire-1"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("valid-hidden-item"))
+        )
+      }
+
+    val result =
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context
+        )
+        .entries
+        .first()
+
+    assertThat(result.key).isEqualTo("valid-hidden-item")
+    assertThat(result.value.first()).isInstanceOf(Invalid::class.java)
+    assertThat((result.value.first() as Invalid).getSingleStringValidationMessage())
+      .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
   fun `validate recursively for questionnaire item type GROUP`() {
     assertException_validateQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
