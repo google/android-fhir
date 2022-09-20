@@ -27,22 +27,22 @@ object Sdk {
    * # Issues that cannot be resolved with Desugaring but can be fixed by minSDK 26
    *
    * CQLEngine 2.0, HAPI-fhir-base 5 and some versions (2.13.2) of Jackson require
-   * java.lang.reflect.Method.getParameterCount() which is not available before 26.
-   * We have overridden those Jackson versions with corrected versions, but it might come back.
-   * The use of HAPI's PropertyModifyingHelper will crash the app on runtime.
-   * Make sure to heavily test different JSONs and XMLs to cover rare need for getParameterCount()
+   * java.lang.reflect.Method.getParameterCount() which is not available before 26. We have
+   * overridden those Jackson versions with corrected versions, but it might come back. The use of
+   * HAPI's PropertyModifyingHelper will crash the app on runtime. Make sure to heavily test
+   * different JSONs and XMLs to cover rare need for getParameterCount()
    * - Discussion: https://github.com/FasterXML/jackson-databind/issues/3412
    *
    * java.nio.file, which is now frequently used by HAPI, is not available before 26. This doesn't
-   * break our test cases yet, but with NPM Package Manager being based on filesystem, we can
-   * expect heavy use of this new API in the near future.
+   * break our test cases yet, but with NPM Package Manager being based on filesystem, we can expect
+   * heavy use of this new API in the near future.
    * - Keep an eye on: https://github.com/hapifhir/hapi-fhir/search?q=java.nio.file
    *
    * # Issues that cannot be resolved by us.
    *
-   * Caffeine 3.0 is not compatible with Android anymore due to the use of System.getLogger
-   * which is not provided by either desuraring nor newer versions of the SDK. For now, we have to
-   * force Caffeine ~2.9
+   * Caffeine 3.0 is not compatible with Android anymore due to the use of System.getLogger which is
+   * not provided by either desuraring nor newer versions of the SDK. For now, we have to force
+   * Caffeine ~2.9
    * - Discussion here: https://github.com/ben-manes/caffeine/issues/763
    * - The solution is to use Guava in the future: https://github.com/hapifhir/hapi-fhir/pull/3977
    *
