@@ -15,7 +15,11 @@
         "expression": "Encounter",
         "name": "encounter"
       }
-    }
+    },
+      {
+        "url" : "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-entryMode",
+        "valueCode" : "prior-edit"
+      }
   ],
   "item": [
     {
@@ -292,7 +296,6 @@
         {
           "linkId": "2.1.0",
           "type": "group",
-          "required": true,
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -381,7 +384,6 @@
         {
           "linkId": "2.2.0",
           "type": "group",
-          "required": true,
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -461,7 +463,6 @@
         {
           "linkId": "2.3.0",
           "type": "group",
-          "required": true,
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
