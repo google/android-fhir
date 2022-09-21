@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
 >
@@ -27,15 +28,74 @@
         app:layout_constraintTop_toTopOf="parent"
     />
 
-  <TextView
-        android:id="@+id/hint"
-        style="?attr/questionnaireSubtitleTextStyle"
-        android:text="group type"
-        android:layout_width="match_parent"
+  <LinearLayout
+        android:id="@+id/helpContainer"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/question"
-    />
+        app:layout_constraintStart_toStartOf="parent"
+    >
+
+    <TextView
+            android:id="@+id/hint"
+            style="?attr/questionnaireSubtitleTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight=".7"
+            android:layout_gravity="center_vertical"
+            tools:text="Select one Select Select one Select Select one Select Select one Select Select one Select "
+        />
+    <Button
+            android:id="@+id/helpButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight=".3"
+            android:layout_marginStart="4dp"
+            app:icon="@drawable/ic_help_48px"
+            style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+        />
+  </LinearLayout>
+
+  <com.google.android.material.card.MaterialCardView
+        android:id="@+id/helpCardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/helpContainer"
+        app:layout_constraintStart_toStartOf="parent"
+    >
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="?attr/colorSurfaceVariant"
+        >
+      <TextView
+                style="?attr/textAppearanceTitleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp"
+                android:text="Help"
+                tools:text="Help"
+            />
+      <TextView
+                android:id="@+id/helpDescription"
+                style="?attr/questionnaireSubtitleTextStyle"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Only one answer can be selected. If none apply, skip the question."
+                tools:text="Only one answer can be selected. If none apply, skip the question."
+            />
+    </LinearLayout>
+  </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

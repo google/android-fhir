@@ -24,6 +24,10 @@
     <attr name="questionnaireQuestionTextStyle" format="reference" />
     <!--   Style for subtitle text. -->
     <attr name="questionnaireSubtitleTextStyle" format="reference" />
+    <!--   Style for help text. -->
+    <attr name="questionnaireHelpTextStyle" format="reference" />
+    <!--   Style for help description text. -->
+    <attr name="questionnaireHelpDescriptionTextStyle" format="reference" />
     <!--   Style for answer text. -->
     <attr name="questionnaireAnswerTextStyle" format="reference" />
 

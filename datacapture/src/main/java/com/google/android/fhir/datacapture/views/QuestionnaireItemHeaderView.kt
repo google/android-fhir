@@ -20,14 +20,19 @@ import android.content.Context
 import android.text.Spanned
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.hasHelpButton
+import com.google.android.fhir.datacapture.localizedHelpSpanned
 import com.google.android.fhir.datacapture.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.material.card.MaterialCardView
 import org.hl7.fhir.r4.model.Questionnaire
 
 /** View for the prefix, question, and hint of a questionnaire item. */
@@ -46,6 +51,7 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
     question.updateTextAndVisibility(questionnaireItem.localizedTextSpanned)
     hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
+    initHelpButton(this, questionnaireItem)
     //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
     visibility = getViewGroupVisibility(prefix, question, hint)
@@ -68,4 +74,32 @@ internal fun getViewGroupVisibility(vararg view: TextView): Int {
     return VISIBLE
   }
   return GONE
+}
+
+internal fun initHelpButton(
+  view: View,
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent
+) {
+  val helpButton = view.findViewById<Button>(R.id.helpButton)
+  helpButton.visibility =
+    if (questionnaireItem.hasHelpButton) {
+      VISIBLE
+    } else {
+      GONE
+    }
+  val helpCardView = view.findViewById<MaterialCardView>(R.id.helpCardView)
+  var isHelpCardViewVisible = true
+  helpButton.setOnClickListener {
+    helpCardView.visibility =
+      if (isHelpCardViewVisible) {
+        isHelpCardViewVisible = false
+        VISIBLE
+      } else {
+        isHelpCardViewVisible = true
+        GONE
+      }
+  }
+  view
+    .findViewById<TextView>(R.id.helpDescription)
+    .updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
 }
