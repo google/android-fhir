@@ -17,35 +17,29 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
+import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.views.localeDatePattern
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object QuestionnaireResponseItemValidator {
-
-  private val validators =
-    mutableListOf(
-      RequiredConstraintValidator,
-      MaxValueConstraintValidator,
-      MinValueConstraintValidator,
-      PrimitiveTypeAnswerMaxLengthValidator,
-      PrimitiveTypeAnswerMinLengthValidator,
-      RegexValidator,
-      DecimalTypeMaxDecimalValidator,
-      DateFormatValidator
-    )
-
-  /** Validates [answers] contains valid answer(s) to [questionnaireItem]. */
-  fun validate(
+internal object DateFormatValidator : ConstraintValidator {
+  override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
     context: Context
-  ): ValidationResult {
-    val validationResults = validators.map { it.validate(questionnaireItem, answers, context) }
-
-    return if (validationResults.all { it.isValid }) {
-      Valid
-    } else {
-      Invalid(validationResults.mapNotNull { it.message })
+  ): ConstraintValidator.ConstraintValidationResult {
+    if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATE ||
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATETIME
+    ) {
+      if (answers.any { it.hasValue() }) {
+        return ConstraintValidator.ConstraintValidationResult(true, null)
+      } else {
+        return ConstraintValidator.ConstraintValidationResult(
+          false,
+          context.getString(R.string.date_format_validation_error_msg, localeDatePattern)
+        )
+      }
     }
+    return ConstraintValidator.ConstraintValidationResult(true, null)
   }
 }

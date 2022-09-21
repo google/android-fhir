@@ -57,15 +57,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private var textWatcher: TextWatcher? = null
-      // Medium and long format styles use alphabetical month names which are difficult for the user
-      // to input. Use short format style which is always numerical.
-      private val localePattern =
-        DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-          FormatStyle.SHORT,
-          null,
-          IsoChronology.INSTANCE,
-          Locale.getDefault()
-        )
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
@@ -101,7 +92,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
-        textInputLayout.hint = localePattern
+        textInputLayout.hint = localeDatePattern
         textInputEditText.removeTextChangedListener(textWatcher)
         if (isTextUpdateRequired(
             textInputEditText.context,
@@ -158,7 +149,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             }
           )
         } catch (e: ParseException) {
-          questionnaireItemViewItem.clearAnswer()
+          questionnaireItemViewItem.notifyAnswersChanged()
+          if (!questionnaireItemViewItem.answers.isEmpty()) {
+            questionnaireItemViewItem.clearAnswer()
+          }
         }
       }
     }
@@ -181,6 +175,15 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 internal const val TAG = "date-picker"
 internal val ZONE_ID_UTC = ZoneId.of("UTC")
 
+// Medium and long format styles use alphabetical month names which are difficult for the user
+// to input. Use short format style which is always numerical.
+internal val localeDatePattern =
+  DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+    FormatStyle.SHORT,
+    null,
+    IsoChronology.INSTANCE,
+    Locale.getDefault()
+  )
 /**
  * Returns the [AppCompatActivity] if there exists one wrapped inside [ContextThemeWrapper] s, or
  * `null` otherwise.

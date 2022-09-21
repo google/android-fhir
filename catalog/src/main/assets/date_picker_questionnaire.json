@@ -5,12 +5,6 @@
       "linkId": "1",
       "text": "When was your last menstrual period? (LMP)",
       "type": "date",
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
-          "valueString": "yyyy-mm-dd"
-        }
-      ],
       "item": [
         {
           "extension": [

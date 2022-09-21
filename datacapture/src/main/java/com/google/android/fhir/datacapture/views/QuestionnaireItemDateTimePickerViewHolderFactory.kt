@@ -43,11 +43,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.chrono.IsoChronology
-import java.time.format.DateTimeFormatterBuilder
-import java.time.format.FormatStyle
 import java.util.Date
-import java.util.Locale
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -64,13 +60,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       private var localDate: LocalDate? = null
       private var localTime: LocalTime? = null
       private var textWatcher: TextWatcher? = null
-      private val localeDatePattern =
-        DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-          FormatStyle.SHORT,
-          null,
-          IsoChronology.INSTANCE,
-          Locale.getDefault()
-        )
+      private var dateParsingExceptionOccured = false
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
@@ -156,13 +146,18 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           dateInputEditText.doAfterTextChanged { text ->
             try {
               localDate = parseDate(text.toString(), dateInputEditText.context.applicationContext)
+              dateParsingExceptionOccured = false
               enableOrDisableTimePicker(enableIt = true)
               generateLocalDateTime(localDate, localTime)?.run {
                 updateDateTimeInput(this)
                 updateDateTimeAnswer(this)
               }
             } catch (e: ParseException) {
-              this.questionnaireItemViewItem.clearAnswer()
+              dateParsingExceptionOccured = true
+              questionnaireItemViewItem.notifyAnswersChanged()
+              if (!questionnaireItemViewItem.answers.isEmpty()) {
+                questionnaireItemViewItem.clearAnswer()
+              }
               localDate = null
               enableOrDisableTimePicker(enableIt = false)
             }
@@ -170,16 +165,24 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        dateInputLayout.error =
-          when (validationResult) {
-            is NotValidated, Valid -> null
-            is Invalid -> validationResult.getSingleStringValidationMessage()
-          }
-        timeInputLayout.error =
-          when (validationResult) {
-            is NotValidated, Valid -> null
-            is Invalid -> validationResult.getSingleStringValidationMessage()
-          }
+        if (dateParsingExceptionOccured) {
+          dateInputLayout.error =
+            when (validationResult) {
+              is NotValidated, Valid -> null
+              is Invalid -> validationResult.getSingleStringValidationMessage()
+            }
+        } else {
+          dateInputLayout.error =
+            when (validationResult) {
+              is NotValidated, Valid -> null
+              is Invalid -> validationResult.getSingleStringValidationMessage()
+            }
+          timeInputLayout.error =
+            when (validationResult) {
+              is NotValidated, Valid -> null
+              is Invalid -> validationResult.getSingleStringValidationMessage()
+            }
+        }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

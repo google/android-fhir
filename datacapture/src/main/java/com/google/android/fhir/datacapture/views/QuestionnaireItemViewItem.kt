@@ -131,6 +131,10 @@ data class QuestionnaireItemViewItem(
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
   }
 
+  internal fun notifyAnswersChanged() {
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
+  }
+
   fun isAnswerOptionSelected(
     answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent
   ): Boolean {
