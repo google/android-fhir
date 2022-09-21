@@ -25,7 +25,7 @@ import android.view.View.VISIBLE
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedHintSpanned
+import com.google.android.fhir.datacapture.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
 import org.hl7.fhir.r4.model.Questionnaire
@@ -45,7 +45,7 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
     question.updateTextAndVisibility(questionnaireItem.localizedTextSpanned)
-    hint.updateTextAndVisibility(questionnaireItem.localizedHintSpanned)
+    hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
     //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
     visibility = getViewGroupVisibility(prefix, question, hint)
