@@ -195,6 +195,68 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun `isFlyoverCode should return true`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DISPLAY
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(DisplayItemControlType.FLYOVER.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
+            )
+        )
+      }
+
+    assertThat(questionnaireItem.isFlyoverCode).isTrue()
+  }
+
+  @Test
+  fun `isFlyoverCode item returns false if type is not display`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.STRING
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(DisplayItemControlType.FLYOVER.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
+            )
+        )
+      }
+
+    assertThat(questionnaireItem.isFlyoverCode).isFalse()
+  }
+
+  @Test
+  fun `isFlyoverCode item returns false if code is not flyover`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.STRING
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(Coding().setCode("random-code").setSystem(EXTENSION_ITEM_CONTROL_SYSTEM))
+            )
+        )
+      }
+
+    assertThat(questionnaireItem.isFlyoverCode).isFalse()
+  }
+
+  @Test
   fun `displayItemControl should return page type`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
@@ -441,38 +503,28 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedHintSpanned_noNestedDisplayItem_shouldReturnNull() {
+  fun `nested display item without instructions code returns null`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
           linkId = "parent-question"
           text = "parent question text"
           type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "text"
+              }
+            )
         }
       )
 
-    assertThat(questionItemList.first().localizedHintSpanned).isNull()
+    assertThat(questionItemList.first().localizedInstructionsSpanned).isNull()
   }
 
   @Test
-  fun localizedHintSpanned_groupType_shouldReturnNull() {
-    val questionnaireItemComponent =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        type = Questionnaire.QuestionnaireItemType.GROUP
-        item =
-          listOf(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "nested-display-question"
-              text = "text"
-            }
-          )
-      }
-
-    assertThat(questionnaireItemComponent.localizedHintSpanned).isNull()
-  }
-
-  @Test
-  fun localizedHintSpanned_shouldReturnText() {
+  fun `localizedInstructionsSpanned returns text`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -484,6 +536,7 @@ class MoreQuestionnaireItemComponentsTest {
               Questionnaire.QuestionnaireItemComponent().apply {
                 linkId = "nested-display-question"
                 text = "subtitle text"
+                extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
               }
             )
@@ -491,11 +544,12 @@ class MoreQuestionnaireItemComponentsTest {
       )
     Locale.setDefault(Locale.US)
 
-    assertThat(questionItemList.first().localizedHintSpanned.toString()).isEqualTo("subtitle text")
+    assertThat(questionItemList.first().localizedInstructionsSpanned.toString())
+      .isEqualTo("subtitle text")
   }
 
   @Test
-  fun localizedHintSpanned_nonMatchingLocale_shouldReturnText() {
+  fun `localizedInstructionsSpanned returns text for non matching locale`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -515,6 +569,7 @@ class MoreQuestionnaireItemComponentsTest {
                     }
                   )
                 }
+                extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
               }
             )
@@ -522,11 +577,12 @@ class MoreQuestionnaireItemComponentsTest {
       )
     Locale.setDefault(Locale.US)
 
-    assertThat(questionItemList.first().localizedHintSpanned.toString()).isEqualTo("subtitle text")
+    assertThat(questionItemList.first().localizedInstructionsSpanned.toString())
+      .isEqualTo("subtitle text")
   }
 
   @Test
-  fun localizedHintSpanned_matchingLocale_shouldReturnLocalizedText() {
+  fun `localizedInstructionsSpanned returns localized text for matching locale`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -546,6 +602,7 @@ class MoreQuestionnaireItemComponentsTest {
                     }
                   )
                 }
+                extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
               }
             )
@@ -553,11 +610,11 @@ class MoreQuestionnaireItemComponentsTest {
       )
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
-    assertThat(questionItemList.first().localizedHintSpanned.toString()).isEqualTo("phụ đề")
+    assertThat(questionItemList.first().localizedInstructionsSpanned.toString()).isEqualTo("phụ đề")
   }
 
   @Test
-  fun localizedHintSpanned_matchingLocaleWithoutCountryCode_shouldReturnLocalizedText() {
+  fun `localizedInstructionsSpanned returns localized text for matching locale without country code`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -577,6 +634,7 @@ class MoreQuestionnaireItemComponentsTest {
                     }
                   )
                 }
+                extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
               }
             )
@@ -584,7 +642,58 @@ class MoreQuestionnaireItemComponentsTest {
       )
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
-    assertThat(questionItemList.first().localizedHintSpanned.toString()).isEqualTo("phụ đề")
+    assertThat(questionItemList.first().localizedInstructionsSpanned.toString()).isEqualTo("phụ đề")
+  }
+
+  @Test
+  fun `isInstructionsCode returns true`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "nested-display-question"
+        text = "subtitle text"
+        extension = listOf(displayCategoryExtensionWithInstructionsCode)
+        type = Questionnaire.QuestionnaireItemType.DISPLAY
+      }
+    assertThat(questionnaireItem.isInstructionsCode).isTrue()
+  }
+
+  @Test
+  fun `isInstructionsCode returns false if item type is not display`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "nested-display-question"
+        text = "subtitle text"
+        extension = listOf(displayCategoryExtensionWithInstructionsCode)
+        type = Questionnaire.QuestionnaireItemType.STRING
+      }
+    assertThat(questionnaireItem.isInstructionsCode).isFalse()
+  }
+
+  @Test
+  fun `isInstructionsCode returns false if instructions code is not present`() {
+    val displayCategoryExtension =
+      Extension().apply {
+        url = EXTENSION_DISPLAY_CATEGORY_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = "some random code"
+                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+                }
+              )
+          }
+        )
+      }
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "nested-display-question"
+        text = "subtitle text"
+        extension = listOf(displayCategoryExtension)
+        type = Questionnaire.QuestionnaireItemType.STRING
+      }
+    assertThat(questionnaireItem.isInstructionsCode).isFalse()
   }
 
   @Test
@@ -1101,4 +1210,20 @@ class MoreQuestionnaireItemComponentsTest {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
     assertThat(questionnaireItem.entryFormat).isNull()
   }
+
+  private val displayCategoryExtensionWithInstructionsCode =
+    Extension().apply {
+      url = EXTENSION_DISPLAY_CATEGORY_URL
+      setValue(
+        CodeableConcept().apply {
+          coding =
+            listOf(
+              Coding().apply {
+                code = INSTRUCTIONS
+                system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+              }
+            )
+        }
+      )
+    }
 }
