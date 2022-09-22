@@ -135,8 +135,8 @@
       "type" : "Library$Contexts",
       "def" : [ {
         "type" : "ContextDef",
-        "locator" : "7:1-7:20",
-        "name" : "Immunization"
+        "locator" : "7:1-7:15",
+        "name" : "Patient"
       } ]
     },
     "statements" : {
@@ -147,14 +147,14 @@
           "type" : "SingletonFrom",
           "operand" : {
             "type" : "Retrieve",
-            "locator" : "7:1-7:20",
-            "dataType" : "{http://hl7.org/fhir}Immunization",
-            "templateId" : "http://hl7.org/fhir/StructureDefinition/Immunization"
+            "locator" : "7:1-7:15",
+            "dataType" : "{http://hl7.org/fhir}Patient",
+            "templateId" : "http://hl7.org/fhir/StructureDefinition/Patient"
           }
         },
-        "locator" : "7:1-7:20",
-        "name" : "Immunization",
-        "context" : "Immunization"
+        "locator" : "7:1-7:15",
+        "name" : "Patient",
+        "context" : "Patient"
       }, {
         "type" : "ExpressionDef",
         "expression" : {
@@ -926,7 +926,7 @@
         "localId" : "19",
         "locator" : "12:1-15:82",
         "name" : "GetFinalDose",
-        "context" : "Immunization",
+        "context" : "Patient",
         "accessLevel" : "Public"
       }, {
         "type" : "ExpressionDef",
@@ -1839,7 +1839,7 @@
         "localId" : "41",
         "locator" : "17:1-21:57",
         "name" : "GetSingleDose",
-        "context" : "Immunization",
+        "context" : "Patient",
         "accessLevel" : "Public"
       }, {
         "type" : "ExpressionDef",
@@ -2056,7 +2056,7 @@
         "localId" : "45",
         "locator" : "9:1-10:47",
         "name" : "CompletedImmunization",
-        "context" : "Immunization",
+        "context" : "Patient",
         "accessLevel" : "Public"
       } ]
     },

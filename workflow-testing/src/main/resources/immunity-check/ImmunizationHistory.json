@@ -20,7 +20,7 @@
         "id": "8aa553e8-8847-482a-8bcf-2eca4e9598ef",
         "status": "completed",
         "patient": {
-          "reference": "#1"
+          "reference": "Patient/d4d35004-24f8-40e4-8084-1ad75924514f"
         },
         "occurrenceDateTime": "2021-05-27",
         "protocolApplied": [
