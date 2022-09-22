@@ -162,7 +162,9 @@ class SequentialSyncStrategy() : SyncStrategy() {
         contextWorkSpace.idsDone.add(localChange.key)
         runBlocking { collectAndEmit(localChange.key, contextWorkSpace) }
       } else {
-        if (localChange.value.resourceType == "Encounter") {
+        if (localChange.value.resourceType == "Encounter" &&
+            localChange.value.type == LocalChange.Type.INSERT
+        ) {
           val encounter =
             FhirContext.forCached(FhirVersionEnum.R4)
               .newJsonParser()
