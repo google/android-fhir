@@ -43,7 +43,7 @@ internal object QuestionnaireResponseItemValidator {
     val validationResults =
       validators.map {
         if (questionnaireItem.isHidden)
-          ConstraintValidator.ConstraintValidationResult(true, "Field is hidden")
+          ConstraintValidator.ConstraintValidationResult(true, null)
         else it.validate(questionnaireItem, answers, context)
       }
 
