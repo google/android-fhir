@@ -46,6 +46,7 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.rules)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
+  androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
 
   api(Dependencies.HapiFhir.structuresR4)
