@@ -43,6 +43,7 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Device
+import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Identifier
@@ -557,6 +558,26 @@ class ResourceIndexerTest {
   }
 
   @Test
+  fun index_token_Coding() {
+    val codeString = "1427AAAAA"
+    val systemString = "http://openmrs.org/concepts"
+    val encounter =
+      Encounter().apply {
+        id = "non-null-ID"
+        class_ =
+          Coding().apply {
+            system = systemString
+            code = codeString
+            display = "Display"
+          }
+      }
+    val resourceIndices = ResourceIndexer.index(encounter)
+
+    assertThat(resourceIndices.tokenIndices)
+      .contains(TokenIndex("class", "Encounter.class", systemString, codeString))
+  }
+
+  @Test
   fun index_token_null() {
     val observation =
       Observation().apply {
@@ -1043,7 +1064,13 @@ class ResourceIndexerTest {
           "http://hl7.org/fhir/publication-status",
           "draft"
         ),
-        TokenIndex("_id", "Questionnaire.id", null, "3141")
+        TokenIndex("_id", "Questionnaire.id", null, "3141"),
+        TokenIndex(
+          "code",
+          "Questionnaire.item.code",
+          "http://example.org/system/code/sections",
+          "HISTOPATHOLOGY"
+        )
       )
 
     assertThat(resourceIndices.dateTimeIndices)

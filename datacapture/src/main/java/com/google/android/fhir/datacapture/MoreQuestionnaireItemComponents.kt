@@ -87,6 +87,9 @@ internal fun Questionnaire.QuestionnaireItemComponent.findVariableExpression(
   return variableExpressions.find { it.name == variableName }
 }
 
+internal const val CQF_CALCULATED_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue"
+
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
   get() {
