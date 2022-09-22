@@ -109,7 +109,9 @@ class FhirEngineTerminologyProvider(
           fhirEngine,
           ResourceType.ValueSet,
           id.removePrefix(URN_OID).removePrefix(URN_UUID)
-        ) as? ValueSet)
+        ) as?
+          ValueSet
+      )
     }
   }
 
