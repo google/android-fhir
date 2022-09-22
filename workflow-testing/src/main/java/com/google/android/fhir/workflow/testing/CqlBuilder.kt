@@ -25,6 +25,7 @@ import org.cqframework.cql.cql2elm.CqlTranslatorOptions
 import org.cqframework.cql.cql2elm.LibraryManager
 import org.cqframework.cql.cql2elm.ModelManager
 import org.cqframework.cql.cql2elm.fhir.r4.FhirLibrarySourceProvider
+import org.fhir.ucum.UcumEssenceService
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Enumerations
@@ -68,6 +69,7 @@ object CqlBuilder : Loadable() {
         cqlText,
         modelManager,
         libraryManager,
+        UcumEssenceService(this::class.java.getResourceAsStream("/ucum-essence.xml")),
         *CqlTranslatorOptions.defaultOptions().options.toTypedArray()
       )
 
