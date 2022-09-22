@@ -38,6 +38,7 @@ import com.google.android.fhir.search.SearchQuery
 import java.lang.IllegalStateException
 import java.time.Instant
 import java.util.UUID
+import org.hl7.fhir.r4.model.Appointment
 import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Immunization
@@ -221,6 +222,12 @@ internal class DatabaseImpl(
             ResourceType.Immunization ->
               SyncedResourceEntityPatientCentric(
                 (it as Immunization).patient.reference,
+                it.meta.lastUpdatedElement.valueAsString,
+                it.resourceType
+              )
+            ResourceType.Appointment ->
+              SyncedResourceEntityPatientCentric(
+                (it as Appointment).participant[0].actor.reference,
                 it.meta.lastUpdatedElement.valueAsString,
                 it.resourceType
               )
