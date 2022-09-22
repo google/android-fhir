@@ -124,7 +124,10 @@ class FhirEngineTerminologyProvider(
   }
 
   fun resolveValueSet(valueSet: ValueSetInfo): ValueSet {
-    if (valueSet.codeSystems != null && valueSet.codeSystems.isNotEmpty()) {
+    if (valueSet.version != null ||
+        (valueSet.codeSystems != null && valueSet.codeSystems.isNotEmpty())
+    ) {
+      // Cannot do both at the same time yet.
       throw UnsupportedOperationException(
         "Could not expand value set ${valueSet.id}; version and code system bindings are not supported at this time."
       )
@@ -139,9 +142,9 @@ class FhirEngineTerminologyProvider(
     }
 
     return if (searchResults.isEmpty()) {
-      throw IllegalArgumentException(String.format("Could not resolve value set %s.", valueSet.id))
+      throw IllegalArgumentException("Could not resolve value set ${valueSet.id}.")
     } else if (searchResults.size > 1) {
-      throw IllegalArgumentException("Found more than 1 ValueSet with url: " + valueSet.id)
+      throw IllegalArgumentException("Found more than 1 ValueSet with url: ${valueSet.id}")
     } else {
       searchResults.first()
     }
