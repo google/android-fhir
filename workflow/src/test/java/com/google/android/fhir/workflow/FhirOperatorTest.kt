@@ -33,7 +33,6 @@ import org.hl7.fhir.r4.model.Measure
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -72,7 +71,6 @@ class FhirOperatorTest {
   }
 
   @Test
-  @Ignore("Refactor the API to accommodate local end points")
   fun generateCarePlan() = runBlocking {
     loadBundle(libraryBundle)
     fhirEngine.run {
