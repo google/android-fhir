@@ -36,9 +36,6 @@ import timber.log.Timber
  * [ExpressionEvaluator] supports evaluation of
  * [variable expression](http://hl7.org/fhir/R4/extension-variable.html) defined at either
  * questionnaire level or questionnaire item level.
- *
- * TODO(https://github.com/google/android-fhir/issues/1575): Add a global map to apply variable
- * values if already evaluated to avoid re-calculation
  */
 object ExpressionEvaluator {
 
@@ -83,6 +80,7 @@ object ExpressionEvaluator {
    * Questionnaire.QuestionnaireItemComponent>] of child to parent
    * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] where this expression
    * is defined,
+   * @param variablesMap the [Map<String, Base>] of variables, the default value is empty map
    *
    * @return [Base] the result of expression
    */
@@ -92,7 +90,8 @@ object ExpressionEvaluator {
     questionnaireResponse: QuestionnaireResponse,
     questionnaireItemParentMap:
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    variablesMap: MutableMap<String, Base?> = mutableMapOf()
   ): Base? {
     require(
       questionnaireItem.variableExpressions.any {
@@ -100,19 +99,20 @@ object ExpressionEvaluator {
       }
     ) { "The expression should come from the same questionnaire item" }
 
-    val dependentVariablesMap = buildMap {
-      findDependentVariables(expression).forEach { variableName ->
+    findDependentVariables(expression).forEach { variableName ->
+      if (variablesMap[variableName] == null) {
         findAndEvaluateVariable(
           variableName,
           questionnaireItem,
           questionnaire,
           questionnaireResponse,
           questionnaireItemParentMap,
-          this
+          variablesMap
         )
       }
     }
-    return evaluateVariable(expression, questionnaireResponse, dependentVariablesMap)
+
+    return evaluateVariable(expression, questionnaireResponse, variablesMap)
   }
 
   /**
@@ -128,30 +128,31 @@ object ExpressionEvaluator {
    * @param expression the [Expression] Variable expression
    * @param questionnaire the [Questionnaire] respective questionnaire
    * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
+   * @param variablesMap the [Map<String, Base>] of variables, the default value is empty map
    *
    * @return [Base] the result of expression
    */
   internal fun evaluateQuestionnaireVariableExpression(
     expression: Expression,
     questionnaire: Questionnaire,
-    questionnaireResponse: QuestionnaireResponse
+    questionnaireResponse: QuestionnaireResponse,
+    variablesMap: MutableMap<String, Base?> = mutableMapOf()
   ): Base? {
-    val variableMap =
-      buildMap<String, Base?> {
-        findDependentVariables(expression).forEach { variableName ->
-          questionnaire.findVariableExpression(variableName)?.let { expression ->
-            put(
-              expression.name,
-              evaluateQuestionnaireVariableExpression(
-                expression,
-                questionnaire,
-                questionnaireResponse
-              )
+    findDependentVariables(expression).forEach { variableName ->
+      questionnaire.findVariableExpression(variableName)?.let { expression ->
+        if (variablesMap[expression.name] == null) {
+          variablesMap[expression.name] =
+            evaluateQuestionnaireVariableExpression(
+              expression,
+              questionnaire,
+              questionnaireResponse,
+              variablesMap
             )
-          }
         }
       }
-    return evaluateVariable(expression, questionnaireResponse, variableMap)
+    }
+
+    return evaluateVariable(expression, questionnaireResponse, variablesMap)
   }
 
   private fun findDependentVariables(expression: Expression) =
@@ -171,7 +172,7 @@ object ExpressionEvaluator {
    * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
    * @param questionnaireItemParentMap the [Map<Questionnaire.QuestionnaireItemComponent,
    * Questionnaire.QuestionnaireItemComponent>] of child to parent
-   * @param dependentVariablesMap the [Map<String, Base>] of dependent variables
+   * @param variablesMap the [Map<String, Base>] of variables
    */
   private fun findAndEvaluateVariable(
     variableName: String,
@@ -180,49 +181,41 @@ object ExpressionEvaluator {
     questionnaireResponse: QuestionnaireResponse,
     questionnaireItemParentMap:
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
-    dependentVariablesMap: MutableMap<String, Base?>
+    variablesMap: MutableMap<String, Base?>
   ) {
-    when {
-      // First, check the questionnaire item itself
-      questionnaireItem.findVariableExpression(variableName) != null -> {
-        questionnaireItem.findVariableExpression(variableName)?.let { expression ->
-          dependentVariablesMap[expression.name] =
+    // First, check the questionnaire item itself
+    val evaluatedValue =
+      questionnaireItem.findVariableExpression(variableName)?.let { expression ->
+        evaluateQuestionnaireItemVariableExpression(
+          expression,
+          questionnaire,
+          questionnaireResponse,
+          questionnaireItemParentMap,
+          questionnaireItem,
+          variablesMap
+        )
+      } // Secondly, check the ancestors of the questionnaire item
+        ?: findVariableInAncestors(variableName, questionnaireItemParentMap, questionnaireItem)
+          ?.let { (questionnaireItem, expression) ->
             evaluateQuestionnaireItemVariableExpression(
               expression,
               questionnaire,
               questionnaireResponse,
               questionnaireItemParentMap,
-              questionnaireItem
+              questionnaireItem,
+              variablesMap
             )
+          } // Finally, check the variables defined on the questionnaire itself
+          ?: questionnaire.findVariableExpression(variableName)?.let { expression ->
+          evaluateQuestionnaireVariableExpression(
+            expression,
+            questionnaire,
+            questionnaireResponse,
+            variablesMap
+          )
         }
-      }
-      // Secondly, check the ancestors of the questionnaire item
-      findVariableInAncestors(variableName, questionnaireItemParentMap, questionnaireItem) !=
-        null -> {
-        findVariableInAncestors(variableName, questionnaireItemParentMap, questionnaireItem)?.let {
-          (questionnaireItem, expression) ->
-          dependentVariablesMap[expression.name] =
-            evaluateQuestionnaireItemVariableExpression(
-              expression,
-              questionnaire,
-              questionnaireResponse,
-              questionnaireItemParentMap,
-              questionnaireItem
-            )
-        }
-      }
-      // Finally, check the variables defined on the questionnaire itself
-      else -> {
-        questionnaire.findVariableExpression(variableName)?.also { expression ->
-          dependentVariablesMap[expression.name] =
-            evaluateQuestionnaireVariableExpression(
-              expression,
-              questionnaire,
-              questionnaireResponse
-            )
-        }
-      }
-    }
+
+    evaluatedValue?.also { variablesMap[variableName] = it }
   }
 
   /**
@@ -234,7 +227,7 @@ object ExpressionEvaluator {
    * visit
    * @param questionnaireItemParentMap the [Map<Questionnaire.QuestionnaireItemComponent,
    * Questionnaire.QuestionnaireItemComponent>] of child to parent
-   * @return [Pair] containing [Questionnaire.QuestionnaireItemComponent] and [Expression]
+   * @return [Pair] containing [Questionnaire.QuestionnaireItemComponent] and an [Expression]
    */
   private fun findVariableInAncestors(
     variableName: String,
@@ -253,13 +246,13 @@ object ExpressionEvaluator {
   }
 
   /**
-   * Evaluates the value of variable expression and return the evaluated value
+   * Evaluates the value of variable expression and returns its evaluated value
    *
    * @param expression the [Expression] the expression to evaluate
    * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
-   * @param dependentVariables the [Map] of Variable names to their values
+   * @param dependentVariables the [Map] of variable names to their values
    *
-   * @return [Base] the result of expression
+   * @return [Base] the result of an expression
    */
   private fun evaluateVariable(
     expression: Expression,
