@@ -76,9 +76,9 @@ class FhirOperatorTest {
   fun generateCarePlan() = runBlocking {
     loadBundle(libraryBundle)
     fhirEngine.run {
-      loadBundle(parseJson("/RuleFilters-1.0.0-bundle.json"))
-      loadBundle(parseJson("/tests-Reportable-bundle.json"))
-      loadBundle(parseJson("/tests-NotReportable-bundle.json"))
+      loadBundle(parseJson("/plan-definition/rule-filters/RuleFilters-1.0.0-bundle.json"))
+      loadBundle(parseJson("/plan-definition/rule-filters/tests-Reportable-bundle.json"))
+      loadBundle(parseJson("/plan-definition/rule-filters/tests-NotReportable-bundle.json"))
 
       loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
       loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
