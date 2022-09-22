@@ -20,7 +20,6 @@ import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
-import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Class that holds what type of resources we need to synchronise and what are the parameters of
@@ -110,20 +109,13 @@ data class BackoffCriteria(
 )
 
 /**
- * Configuration for max size number of resources and order of resources in a Bundle to be uploaded.
- * The default size is [DEFAULT_BUNDLE_SIZE] and default order is the resource insertion order in
- * the changes table.
+ * Configuration for max number of resources to be uploaded in a Bundle.The default size is
+ * [DEFAULT_BUNDLE_SIZE].
  */
 data class UploadConfiguration(
   /**
    * Number of [Resource]s to be added in a singe [Bundle] for upload and default is
    * [DEFAULT_BUNDLE_SIZE]
    */
-  val uploadBundleSize: Int = DEFAULT_BUNDLE_SIZE,
-  /**
-   * Optional order in which resources should be added in the [Bundle]s during upload. This should
-   * be used if a group of resources need to be uploaded before others for the purpose of
-   * referential integrity.
-   */
-  val resourceTypes: List<ResourceType>? = null
+  val uploadBundleSize: Int = DEFAULT_BUNDLE_SIZE
 )

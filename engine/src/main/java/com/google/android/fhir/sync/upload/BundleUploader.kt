@@ -34,13 +34,14 @@ import org.hl7.fhir.r4.model.ResourceType
 internal class BundleUploader(
   private val dataSource: DataSource,
   private val bundleGenerator: TransactionBundleGenerator,
-  private val splitter: Splitter
+  private val localChangesPaginator: LocalChangesPaginator
 ) : Uploader {
 
   override suspend fun upload(
     localChanges: List<LocalChange>,
   ): Flow<UploadResult> = flow {
-    bundleGenerator.generate(splitter.split(localChanges)).forEach { (bundle, localChangeTokens) ->
+    bundleGenerator.generate(localChangesPaginator.page(localChanges)).forEach {
+      (bundle, localChangeTokens) ->
       try {
         val response = dataSource.upload(bundle)
         emit(getUploadResult(response, localChangeTokens))

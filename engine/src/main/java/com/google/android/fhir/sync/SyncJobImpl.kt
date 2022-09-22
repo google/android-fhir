@@ -28,7 +28,7 @@ import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.download.DownloaderImpl
 import com.google.android.fhir.sync.upload.BundleUploader
-import com.google.android.fhir.sync.upload.Splitter
+import com.google.android.fhir.sync.upload.LocalChangesPaginator
 import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import com.google.gson.GsonBuilder
 import java.time.OffsetDateTime
@@ -115,7 +115,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
           BundleUploader(
             it,
             TransactionBundleGenerator.getDefault(),
-            Splitter.create(uploadConfiguration)
+            LocalChangesPaginator.create(uploadConfiguration)
           ),
           DownloaderImpl(it, downloadManager),
           resolver

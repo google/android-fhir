@@ -28,7 +28,7 @@ import com.google.android.fhir.sync.Result.Error
 import com.google.android.fhir.sync.Result.Success
 import com.google.android.fhir.sync.download.DownloaderImpl
 import com.google.android.fhir.sync.upload.BundleUploader
-import com.google.android.fhir.sync.upload.Splitter
+import com.google.android.fhir.sync.upload.LocalChangesPaginator
 import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
@@ -97,7 +97,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
           BundleUploader(
             dataSource,
             TransactionBundleGenerator.getDefault(),
-            Splitter.create(getUploadConfiguration())
+            LocalChangesPaginator.create(getUploadConfiguration())
           ),
           DownloaderImpl(dataSource, getDownloadWorkManager()),
           getConflictResolver()

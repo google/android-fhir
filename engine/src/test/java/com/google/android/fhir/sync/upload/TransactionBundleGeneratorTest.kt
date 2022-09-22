@@ -215,10 +215,9 @@ class TransactionBundleGeneratorTest {
     // Exactly 3 Bundles are generated
     assertThat(result).hasSize(3)
     // Each Bundle is of type transaction
-    assertThat(result.map { it.first.type }.filter { it == Bundle.BundleType.TRANSACTION }.size)
-      .isEqualTo(3)
+    assertThat(result.all { it.first.type == Bundle.BundleType.TRANSACTION }).isTrue()
     // Each Bundle has exactly 1 entry
-    assertThat(result.map { it.first.entry.size }.filter { it == 1 }.size).isEqualTo(3)
+    assertThat(result.all { it.first.entry.size == 1 }).isTrue()
     assertThat(result.map { it.first.entry.first().request.method })
       .containsExactly(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, Bundle.HTTPVerb.DELETE)
       .inOrder()

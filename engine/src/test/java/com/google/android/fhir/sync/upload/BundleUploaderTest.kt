@@ -47,7 +47,7 @@ class BundleUploaderTest {
             Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
           },
           TransactionBundleGenerator.getDefault(),
-          Splitter.DEFAULT
+          LocalChangesPaginator.DEFAULT
         )
         .upload(localChanges)
         .toList()
@@ -71,7 +71,7 @@ class BundleUploaderTest {
             }
           },
           TransactionBundleGenerator.getDefault(),
-          Splitter.DEFAULT
+          LocalChangesPaginator.DEFAULT
         )
         .upload(localChanges)
         .toList()
@@ -86,7 +86,7 @@ class BundleUploaderTest {
       BundleUploader(
           TestingUtils.BundleDataSource { throw ConnectException("Failed to connect to server.") },
           TransactionBundleGenerator.getDefault(),
-          Splitter.DEFAULT
+          LocalChangesPaginator.DEFAULT
         )
         .upload(localChanges)
         .toList()
