@@ -63,7 +63,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   private val fhirTypeConverter = FhirTypeConverterFactory().create(FhirVersionEnum.R4)
   private val fhirEngineRetrieveProvider =
     FhirEngineRetrieveProvider(fhirEngine).apply {
-      terminologyProvider = terminologyProvider
+      terminologyProvider = fhirEngineTerminologyProvider
       isExpandValueSets = true
     }
   private val dataProvider =
