@@ -59,7 +59,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
   }
 
   /**
-   * Evaluates a compiled CQL that was exported to Jxson and included inside a FHIRLibrary Json. The
+   * Evaluates a compiled CQL that was exported to Json and included inside a FHIRLibrary Json. The
    * compiled CQL file is encoded in Base64 and placed inside the JSON Library. The expression
    * `CompletedImmunization` simply checks if a vaccination protocol has been finished as below.
    *
