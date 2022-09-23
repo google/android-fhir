@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync.remote
 
 import androidx.annotation.WorkerThread
-import timber.log.Timber
 
 /** Logger for the network communication between the engine and the remote server */
 class HttpLogger(val configuration: Configuration, @WorkerThread val log: (String) -> Unit) {
@@ -43,8 +42,5 @@ class HttpLogger(val configuration: Configuration, @WorkerThread val log: (Strin
   companion object {
     /** The logger will not log any data. */
     val NONE = HttpLogger(Configuration(Level.NONE)) {}
-
-    /** The logger will only log [Level.BASIC] data onto the system logger. */
-    val DEFAULT = HttpLogger(Configuration(Level.BASIC)) { Timber.tag("FHIR-Http-Logger").d(it) }
   }
 }

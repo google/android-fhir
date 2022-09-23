@@ -133,7 +133,7 @@ data class ServerConfiguration(
   val baseUrl: String,
   val networkConfiguration: NetworkConfiguration = NetworkConfiguration(),
   val authenticator: Authenticator? = null,
-  val httpLogger: HttpLogger = HttpLogger.DEFAULT
+  val httpLogger: HttpLogger = HttpLogger.NONE
 )
 
 /** A configuration to provide the network connection parameters. */

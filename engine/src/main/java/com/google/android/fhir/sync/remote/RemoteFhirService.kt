@@ -46,33 +46,21 @@ internal interface RemoteFhirService : DataSource {
     private var authenticator: Authenticator? = null
     private var httpLoggingInterceptor: HttpLoggingInterceptor? = null
 
-    fun setAuthenticator(authenticator: Authenticator?) {
+    fun setAuthenticator(authenticator: Authenticator?) = apply {
       this.authenticator = authenticator
     }
 
-    fun setHttpLogger(httpLogger: HttpLogger) {
-      httpLoggingInterceptor =
-        HttpLoggingInterceptor { httpLogger.log(it) }.apply {
-          level = httpLogger.configuration.level.toOkhttpLogLevel()
-          httpLogger.configuration.headersToIgnore?.forEach { this.redactHeader(it) }
-        }
+    fun setHttpLogger(httpLogger: HttpLogger) = apply {
+      httpLoggingInterceptor = httpLogger.toOkHttpLoggingInterceptor()
     }
-
-    private fun HttpLogger.Level.toOkhttpLogLevel() =
-      when (this) {
-        HttpLogger.Level.NONE -> HttpLoggingInterceptor.Level.NONE
-        HttpLogger.Level.HEADERS -> HttpLoggingInterceptor.Level.HEADERS
-        HttpLogger.Level.BASIC -> HttpLoggingInterceptor.Level.BASIC
-        HttpLogger.Level.BODY -> HttpLoggingInterceptor.Level.BODY
-      }
 
     fun build(): RemoteFhirService {
       val client =
         OkHttpClient.Builder()
+          .connectTimeout(networkConfiguration.connectionTimeOut, TimeUnit.SECONDS)
+          .readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
+          .writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
           .apply {
-            connectTimeout(networkConfiguration.connectionTimeOut, TimeUnit.SECONDS)
-            readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
-            writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
             httpLoggingInterceptor?.let { addInterceptor(it) }
             authenticator?.let {
               addInterceptor(
