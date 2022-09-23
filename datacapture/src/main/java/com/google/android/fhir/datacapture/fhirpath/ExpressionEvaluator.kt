@@ -88,12 +88,10 @@ object ExpressionEvaluator {
 
   /** Detects if any item into list is referencing a dependent item in its calculated expression */
   internal fun extractExpressionReferenceMap(
-          items: List<Questionnaire.QuestionnaireItemComponent>
+    items: List<Questionnaire.QuestionnaireItemComponent>
   ) {
     items.flattened().filter { it.expressionBasedExtensions.isNotEmpty() }.run {
-      forEach { current ->
-
-      }
+      forEach { current -> }
     }
   }
 

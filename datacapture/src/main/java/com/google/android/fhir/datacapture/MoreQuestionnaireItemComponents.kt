@@ -108,7 +108,10 @@ internal fun Questionnaire.QuestionnaireItemComponent.isReferencedBy(
   item: Questionnaire.QuestionnaireItemComponent
 ) =
   item.expressionBasedExtensions.any {
-    it.castToExpression(it.value).expression.replace(" ", "").contains(Regex(".*linkId='${this.linkId}'.*"))
+    it.castToExpression(it.value)
+      .expression
+      .replace(" ", "")
+      .contains(Regex(".*linkId='${this.linkId}'.*"))
   }
 
 // Item control code, or null
