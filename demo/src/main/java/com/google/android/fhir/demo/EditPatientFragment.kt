@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
     }
     viewModel.isPatientSaved.observe(viewLifecycleOwner) {
       if (!it) {
-        Toast.makeText(requireContext(), R.string.message_input_missing, Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), R.string.inputs_missing, Toast.LENGTH_SHORT).show()
         return@observe
       }
       Toast.makeText(requireContext(), R.string.message_patient_updated, Toast.LENGTH_SHORT).show()

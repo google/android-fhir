@@ -28,9 +28,16 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.utilities.isAndroidIcuSupported
 import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.MaxValueConstraintValidator.getMaxValue
+import com.google.android.fhir.datacapture.validation.MinValueConstraintValidator.getMinValue
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.CalendarConstraints.DateValidator
+import com.google.android.material.datepicker.CompositeDateValidator
+import com.google.android.material.datepicker.DateValidatorPointBackward
+import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -41,6 +48,7 @@ import java.time.ZoneId
 import java.time.chrono.IsoChronology
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.FormatStyle
+import java.util.Date
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.log10
@@ -102,8 +110,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = localePattern
         textInputEditText.removeTextChangedListener(textWatcher)
-
-        if (textInputEditText.text.isNullOrEmpty()) {
+        if (isTextUpdateRequired(
+            textInputEditText.context,
+            questionnaireItemViewItem.answers.singleOrNull()?.valueDateType,
+            textInputEditText.text.toString()
+          )
+        ) {
           textInputEditText.setText(
             questionnaireItemViewItem.answers.singleOrNull()
               ?.valueDateType
@@ -141,7 +153,26 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         return MaterialDatePicker.Builder.datePicker()
           .setTitleText(R.string.select_date)
           .setSelection(selectedDate)
+          .setCalendarConstraints(getCalenderConstraint())
           .build()
+      }
+
+      private fun getCalenderConstraint(): CalendarConstraints {
+        val min =
+          (getMinValue(questionnaireItemViewItem.questionnaireItem) as? DateType)?.value?.time
+        val max =
+          (getMaxValue(questionnaireItemViewItem.questionnaireItem) as? DateType)?.value?.time
+
+        if (min != null && max != null && min > max) {
+          throw IllegalArgumentException("minValue cannot be greater than maxValue")
+        }
+
+        val listValidators = ArrayList<DateValidator>()
+        min?.let { listValidators.add(DateValidatorPointForward.from(it)) }
+        max?.let { listValidators.add(DateValidatorPointBackward.before(it)) }
+        val validators = CompositeDateValidator.allOf(listValidators)
+
+        return CalendarConstraints.Builder().setValidator(validators).build()
       }
 
       private fun updateAnswer(text: CharSequence?) {
@@ -157,6 +188,20 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
       }
     }
+
+  private fun isTextUpdateRequired(
+    context: Context,
+    answer: DateType?,
+    inputText: String?
+  ): Boolean {
+    val inputDate =
+      try {
+        parseDate(inputText, context)
+      } catch (e: Exception) {
+        null
+      }
+    return answer?.localDate != inputDate
+  }
 }
 
 internal const val TAG = "date-picker"
@@ -194,14 +239,17 @@ internal val DateType.localDate
 internal val LocalDate.dateType
   get() = DateType(year, monthValue - 1, dayOfMonth)
 
+internal val Date.localDate
+  get() = LocalDate.of(year + 1900, month + 1, date)
+
 internal fun parseDate(text: CharSequence?, context: Context): LocalDate {
-  val date =
+  val localDate =
     if (isAndroidIcuSupported()) {
-      DateFormat.getDateInstance(DateFormat.SHORT).parse(text.toString())
-    } else {
-      android.text.format.DateFormat.getDateFormat(context).parse(text.toString())
-    }
-  val localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        DateFormat.getDateInstance(DateFormat.SHORT).parse(text.toString())
+      } else {
+        android.text.format.DateFormat.getDateFormat(context).parse(text.toString())
+      }
+      .localDate
   // date/localDate with year more than 4 digit throws data format exception if deep copy
   // operation get performed on QuestionnaireResponse,
   // QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent in org.hl7.fhir.r4.model
