@@ -72,6 +72,9 @@ internal const val EXTENSION_ENABLE_WHEN_EXPRESSION_URL: String =
 
 internal const val EXTENSION_VARIABLE_URL = "http://hl7.org/fhir/StructureDefinition/variable"
 
+internal const val EXTENSION_CQF_CALCULATED_VALUE_URL: String =
+  "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue"
+
 internal val Questionnaire.QuestionnaireItemComponent.variableExpressions: List<Expression>
   get() =
     this.extension.filter { it.url == EXTENSION_VARIABLE_URL }.map { it.castToExpression(it.value) }
