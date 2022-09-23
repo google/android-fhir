@@ -43,11 +43,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.chrono.IsoChronology
-import java.time.format.DateTimeFormatterBuilder
-import java.time.format.FormatStyle
 import java.util.Date
-import java.util.Locale
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -64,13 +60,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       private var localDate: LocalDate? = null
       private var localTime: LocalTime? = null
       private var textWatcher: TextWatcher? = null
-      private val localeDatePattern =
-        DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-          FormatStyle.SHORT,
-          null,
-          IsoChronology.INSTANCE,
-          Locale.getDefault()
-        )
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
@@ -125,6 +114,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 with(LocalTime.of(this.hour, this.minute, 0)) {
                   localTime = this
                   timeInputEditText.setText(this.toLocalizedString(context))
+                  displayTimeValidationError(Valid)
                   generateLocalDateTime(localDate, this)?.let {
                     updateDateTimeInput(it)
                     updateDateTimeAnswer(it)
@@ -161,26 +151,74 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 updateDateTimeInput(this)
                 updateDateTimeAnswer(this)
               }
+              displayDateValidationError(Valid)
+              if (localTime == null && questionnaireItemViewItem.questionnaireItem.required) {
+                displayTimeValidationError(
+                  Invalid(
+                    listOf(
+                      dateInputEditText.context.getString(
+                        R.string.required_constraint_validation_error_msg
+                      )
+                    )
+                  )
+                )
+              }
             } catch (e: ParseException) {
-              this.questionnaireItemViewItem.clearAnswer()
+              if (text.isNullOrEmpty()) {
+                if (questionnaireItemViewItem.questionnaireItem.required) {
+                  displayDateValidationError(
+                    Invalid(
+                      listOf(
+                        dateInputEditText.context.getString(
+                          R.string.required_constraint_validation_error_msg
+                        )
+                      )
+                    )
+                  )
+                } else {
+                  displayDateValidationError(Valid)
+                }
+              } else {
+                displayDateValidationError(
+                  Invalid(
+                    listOf(
+                      dateInputEditText.context.getString(
+                        R.string.date_format_validation_error_msg,
+                        localeDatePattern
+                      )
+                    )
+                  )
+                )
+                if (localTime == null) {
+                  displayTimeValidationError(Valid)
+                }
+              }
+              if (questionnaireItemViewItem.answers.isNotEmpty()) {
+                questionnaireItemViewItem.clearAnswer()
+              }
               localDate = null
               enableOrDisableTimePicker(enableIt = false)
             }
           }
       }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {
+      fun displayDateValidationError(validationResult: ValidationResult) {
         dateInputLayout.error =
           when (validationResult) {
             is NotValidated, Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
+      }
+
+      fun displayTimeValidationError(validationResult: ValidationResult) {
         timeInputLayout.error =
           when (validationResult) {
             is NotValidated, Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
       }
+
+      override fun displayValidationResult(validationResult: ValidationResult) {}
 
       override fun setReadOnly(isReadOnly: Boolean) {
         // The system outside this delegate should only be able to mark it read only. Otherwise, it
