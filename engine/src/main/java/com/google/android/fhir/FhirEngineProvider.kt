@@ -124,15 +124,18 @@ enum class DatabaseErrorStrategy {
   RECREATE_AT_OPEN
 }
 
-/**
- * A configuration to provide the remote FHIR server url, an [Authenticator] for supplying any auth
- * token that may be necessary to communicate with the server and a [HttpLogger] to log the
- * communication between the engine and the remote server.
- */
+/** A configuration to provide necessary params for network connection. */
 data class ServerConfiguration(
+  /** Url of the remote FHIR server. */
   val baseUrl: String,
+  /** A configuration to provide the network connection parameters. */
   val networkConfiguration: NetworkConfiguration = NetworkConfiguration(),
+  /**
+   * An [Authenticator] for supplying any auth token that may be necessary to communicate with the
+   * server
+   */
   val authenticator: Authenticator? = null,
+  /** Logs the communication between the engine and the remote server. */
   val httpLogger: HttpLogger = HttpLogger.NONE
 )
 
