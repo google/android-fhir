@@ -15,6 +15,7 @@
           "status": "generated",
           "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody/></table></div>"
         },
+        "birthDate": "2011-01-01",
         "telecom": [
           {
             "system": "phone",
