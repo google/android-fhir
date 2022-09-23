@@ -105,7 +105,7 @@ object ExpressionEvaluator {
         item.calculatedExpression != null &&
           modifiedResponses.none { it.linkId == item.linkId } &&
           (updatedQuestionnaireItem.isReferencedBy(item) ||
-                  findDependentVariables(item.calculatedExpression!!).isNotEmpty())
+            findDependentVariables(item.calculatedExpression!!).isNotEmpty())
       }
       .map { calculable ->
         val appContext =
