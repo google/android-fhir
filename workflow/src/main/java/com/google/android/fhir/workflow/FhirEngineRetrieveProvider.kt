@@ -89,14 +89,4 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
       }
     }
   }
-
-  private fun hasField(dataType: String?, field: String): Boolean {
-    if (dataType == null) return false
-    return try {
-      Class.forName("org.hl7.fhir.r4.model.$dataType").getDeclaredField(field)
-      true
-    } catch (e: NoSuchFieldException) {
-      false
-    }
-  }
 }
