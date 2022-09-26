@@ -29,7 +29,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.M, Build.VERSION_CODES.N])
+@Config(sdk = [Build.VERSION_CODES.N])
 class MoreLocalDateTimesTest {
   @Test
   fun localizedString_US() {
