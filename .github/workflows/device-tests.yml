@@ -37,7 +37,7 @@ jobs:
 
     strategy:
       matrix:
-        api-level: [ 26, 27, 30 ]
+        api-level: [ 24, 27, 30 ]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -76,7 +76,8 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
-      - name: Run instrumentation tests
+
+      - name: Run instrumentation tests (Engine and SDC)
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
@@ -87,6 +88,17 @@ jobs:
           script: |
             ./gradlew :datacapture:connectedCheck --stacktrace --scan
             ./gradlew :engine:connectedCheck  --stacktrace --scan
+
+      - name: Run instrumentation tests (Workflow)
+        if: matrix.api-level >= 26 # workflow doesn't work on 24.
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: default
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: |
             ./gradlew :workflow:connectedCheck --stacktrace --scan
 
       - name: Generate Jacoco test coverage reports
