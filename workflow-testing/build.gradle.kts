@@ -7,7 +7,7 @@ android {
   compileSdk = Sdk.compileSdk
 
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.minSdkWorkflow
     targetSdk = Sdk.targetSdk
   }
   compileOptions {
