@@ -31,7 +31,7 @@ android {
     // Flag to enable support for the new language APIs
     // See https://developer.android.com/studio/write/java8-support
     isCoreLibraryDesugaringEnabled = true
-    
+
     sourceCompatibility = Java.sourceCompatibility
     targetCompatibility = Java.targetCompatibility
   }
