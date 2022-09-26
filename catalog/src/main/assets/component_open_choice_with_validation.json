@@ -11,11 +11,9 @@
             "coding": [
               {
                 "system": "http://hl7.org/fhir/questionnaire-item-control",
-                "code": "open-choice",
-                "display": "Open choice"
+                "code": "open-choice"
               }
-            ],
-            "text": "Open choice"
+            ]
           }
         }
       ],
