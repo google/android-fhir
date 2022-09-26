@@ -26,6 +26,10 @@ import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.Result.Error
 import com.google.android.fhir.sync.Result.Success
+import com.google.android.fhir.sync.download.DownloaderImpl
+import com.google.android.fhir.sync.upload.BundleUploader
+import com.google.android.fhir.sync.upload.LocalChangesPaginator
+import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
@@ -44,6 +48,12 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDownloadWorkManager(): DownloadWorkManager
   abstract fun getConflictResolver(): ConflictResolver
+
+  /**
+   * Configuration defining the max upload Bundle size (in terms to number of resources in a Bundle)
+   * and optionally defining the order of Resources.
+   */
+  open fun getUploadConfiguration(): UploadConfiguration = UploadConfiguration()
 
   private val gson =
     GsonBuilder()
@@ -65,14 +75,6 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
           )
         )
 
-    val fhirSynchronizer =
-      FhirSynchronizer(
-        applicationContext,
-        getFhirEngine(),
-        dataSource,
-        getDownloadWorkManager(),
-        conflictResolver = getConflictResolver()
-      )
     val flow = MutableSharedFlow<State>()
 
     val job =
@@ -87,11 +89,21 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         }
       }
 
-    fhirSynchronizer.subscribe(flow)
-
     Timber.v("Subscribed to flow for progress")
-
-    val result = fhirSynchronizer.synchronize()
+    val result =
+      FhirSynchronizer(
+          applicationContext,
+          getFhirEngine(),
+          BundleUploader(
+            dataSource,
+            TransactionBundleGenerator.getDefault(),
+            LocalChangesPaginator.create(getUploadConfiguration())
+          ),
+          DownloaderImpl(dataSource, getDownloadWorkManager()),
+          getConflictResolver()
+        )
+        .apply { subscribe(flow) }
+        .synchronize()
     val output = buildOutput(result)
 
     // await/join is needed to collect states completely
