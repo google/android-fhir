@@ -40,6 +40,7 @@ data class StringParamFilterCriterion(
           when (modifier) {
             StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
             StringFilterModifier.MATCHES_EXACTLY -> "= ?"
+            StringFilterModifier.MATCHES -> "MATCH ?"
             StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
           },
         value!!
@@ -51,4 +52,4 @@ internal data class StringParamFilterCriteria(
   val parameter: StringClientParam,
   override val filters: List<StringParamFilterCriterion>,
   override val operation: Operation,
-) : FilterCriteria(filters, operation, parameter, "StringIndexEntity")
+) : FilterCriteria(filters, operation, parameter, "StringIndexEntity", "StringIndexEntityFts")

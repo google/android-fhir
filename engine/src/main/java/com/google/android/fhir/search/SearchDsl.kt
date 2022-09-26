@@ -152,6 +152,7 @@ enum class Order {
 enum class StringFilterModifier {
   STARTS_WITH,
   MATCHES_EXACTLY,
+  MATCHES,
   CONTAINS
 }
 
