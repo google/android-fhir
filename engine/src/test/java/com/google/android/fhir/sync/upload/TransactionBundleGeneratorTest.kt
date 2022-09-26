@@ -131,4 +131,95 @@ class TransactionBundleGeneratorTest {
       .containsExactly(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, Bundle.HTTPVerb.DELETE)
       .inOrder()
   }
+
+  @Test
+  fun `generate() should return 3 Transaction Bundle with single entry each`() = runBlocking {
+    val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+    val changes =
+      listOf(
+        LocalChangeEntity(
+            id = 1,
+            resourceType = ResourceType.Patient.name,
+            resourceId = "Patient-001",
+            type = Type.INSERT,
+            payload =
+              jsonParser.encodeResourceToString(
+                Patient().apply {
+                  id = "Patient-001"
+                  addName(
+                    HumanName().apply {
+                      addGiven("John")
+                      family = "Doe"
+                    }
+                  )
+                }
+              )
+          )
+          .toLocalChange()
+          .apply { token = LocalChangeToken(listOf(1)) },
+        LocalChangeEntity(
+            id = 2,
+            resourceType = ResourceType.Patient.name,
+            resourceId = "Patient-002",
+            type = Type.UPDATE,
+            payload =
+              LocalChangeUtils.diff(
+                  jsonParser,
+                  Patient().apply {
+                    id = "Patient-002"
+                    addName(
+                      HumanName().apply {
+                        addGiven("Jane")
+                        family = "Doe"
+                      }
+                    )
+                  },
+                  Patient().apply {
+                    id = "Patient-002"
+                    addName(
+                      HumanName().apply {
+                        addGiven("Janet")
+                        family = "Doe"
+                      }
+                    )
+                  }
+                )
+                .toString()
+          )
+          .toLocalChange()
+          .apply { LocalChangeToken(listOf(2)) },
+        LocalChangeEntity(
+            id = 3,
+            resourceType = ResourceType.Patient.name,
+            resourceId = "Patient-003",
+            type = Type.DELETE,
+            payload =
+              jsonParser.encodeResourceToString(
+                Patient().apply {
+                  id = "Patient-003"
+                  addName(
+                    HumanName().apply {
+                      addGiven("John")
+                      family = "Roe"
+                    }
+                  )
+                }
+              )
+          )
+          .toLocalChange()
+          .apply { LocalChangeToken(listOf(3)) }
+      )
+    val generator = TransactionBundleGenerator.Factory.getDefault()
+    val result = generator.generate(changes.chunked(1))
+
+    // Exactly 3 Bundles are generated
+    assertThat(result).hasSize(3)
+    // Each Bundle is of type transaction
+    assertThat(result.all { it.first.type == Bundle.BundleType.TRANSACTION }).isTrue()
+    // Each Bundle has exactly 1 entry
+    assertThat(result.all { it.first.entry.size == 1 }).isTrue()
+    assertThat(result.map { it.first.entry.first().request.method })
+      .containsExactly(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, Bundle.HTTPVerb.DELETE)
+      .inOrder()
+  }
 }
