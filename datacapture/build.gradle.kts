@@ -61,6 +61,7 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.rules)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
+  androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.Espresso.espressoCore)
 

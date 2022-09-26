@@ -180,7 +180,7 @@ object Dependencies {
     const val desugarJdkLibs = "1.1.5"
     const val fhirUcum = "1.0.3"
     const val guava = "28.2-android"
-    const val hapiFhir = "5.4.0"
+    const val hapiFhir = "6.0.1"
     const val http = "4.9.1"
     // TODO: The next release of HAPI FHIR will hopefully have
     // https://github.com/hapifhir/hapi-fhir/pull/3043 merged in. If it does, when we update, we
@@ -210,7 +210,7 @@ object Dependencies {
 
     const val espresso = "3.4.0"
     const val jacoco = "0.8.7"
-    const val junit = "4.12"
+    const val junit = "4.13.2"
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
     const val robolectric = "4.7.3"
