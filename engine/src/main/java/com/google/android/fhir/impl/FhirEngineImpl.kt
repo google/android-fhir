@@ -92,6 +92,10 @@ internal class FhirEngineImpl(
     database.purge(type, id, forcePurge)
   }
 
+  override suspend fun getSquashedLocalChangeCount(): Int {
+    return database.getAllLocalChanges().size
+  }
+
   suspend fun syncDownloadModified(
     conflictResolver: ConflictResolver,
     updateSyncedResourceTable: Boolean = true,
