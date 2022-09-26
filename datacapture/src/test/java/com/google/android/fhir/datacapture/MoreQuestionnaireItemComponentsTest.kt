@@ -885,7 +885,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `localizedHelpSpanned should returns null if no help code`() {
+  fun `localizedHelpSpanned should return null if no help code`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -899,7 +899,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `localizedHelpSpanned should returns help`() {
+  fun `localizedHelpSpanned should return help`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -930,7 +930,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `localizedHelpSpanned does not match locale should returns help`() {
+  fun `localizedHelpSpanned not matching locale should return help`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -970,7 +970,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `localizedHelpSpanned returns localized text for matching locale`() {
+  fun `localizedHelpSpanned matching locale should return localized text`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {

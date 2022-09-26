@@ -142,16 +142,13 @@ internal val Questionnaire.QuestionnaireItemComponent.displayItemControl: Displa
     return DisplayItemControlType.values().firstOrNull { it.extensionCode == code }
   }
 
-/** Returns true if any one of the nested display item has [DisplayItemControlType.HELP] control. */
+/** Whether any one of the nested display item has [DisplayItemControlType.HELP] control. */
 internal val Questionnaire.QuestionnaireItemComponent.hasHelpButton: Boolean
   get() {
     return item.any { it.isHelpCode }
   }
 
-/**
- * Returns [true] if item type is display and [displayItemControl] is
- * [DisplayItemControlType.FLYOVER].
- */
+/** Whether item type is display and [displayItemControl] is [DisplayItemControlType.HELP]. */
 internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
   get() {
     return when (type) {

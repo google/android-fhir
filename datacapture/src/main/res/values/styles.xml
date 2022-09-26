@@ -47,11 +47,14 @@
             name="questionnaireSubtitleTextStyle"
         >@style/TextAppearance.Material3.BodyMedium</item>
       <item
-            name="questionnaireHelpTextStyle"
+            name="questionnaireHelpHeaderStyle"
         >@style/TextAppearance.Material3.TitleSmall</item>
       <item
-            name="questionnaireHelpDescriptionTextStyle"
+            name="questionnaireHelpTextStyle"
         >@style/TextAppearance.Material3.BodyMedium</item>
+      <item
+            name="questionnaireHelpButtonStyle"
+        >@style/Widget.MaterialComponents.Button.TextButton.Icon</item>
         <item
             name="questionnaireAnswerTextStyle"
         >@style/Questionnaire.AnswerStyle</item>

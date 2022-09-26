@@ -32,7 +32,7 @@
         android:id="@+id/helpContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="@dimen/instructions_top_margin"
         android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/question"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,17 +45,17 @@
             android:layout_height="wrap_content"
             android:layout_weight=".7"
             android:layout_gravity="center_vertical"
-            tools:text="Select one Select Select one Select Select one Select Select one Select Select one Select "
+            tools:text="Sample helper text"
         />
     <Button
+            style="?attr/questionnaireHelpButtonStyle"
             android:id="@+id/helpButton"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="@dimen/help_button_width"
+            android:layout_height="@dimen/help_button_height"
             android:layout_gravity="center_vertical"
             android:layout_weight=".3"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="@dimen/help_button_margin_start"
             app:icon="@drawable/ic_help_48px"
-            style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
         />
   </LinearLayout>
 
@@ -63,7 +63,7 @@
         android:id="@+id/helpCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/help_card_view_margin_top"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/helpContainer"
@@ -76,24 +76,22 @@
             android:background="?attr/colorSurfaceVariant"
         >
       <TextView
-                style="?attr/textAppearanceTitleSmall"
+                style="?attr/questionnaireHelpHeaderStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="4dp"
-                android:text="Help"
-                tools:text="Help"
+                android:layout_marginHorizontal="@dimen/help_header_horizontal_margin"
+                android:layout_marginTop="@dimen/help_card_view_margin_top"
+                android:layout_marginBottom="@dimen/help_header_margin_bottom"
+                android:text="@string/help"
             />
       <TextView
-                android:id="@+id/helpDescription"
-                style="?attr/questionnaireSubtitleTextStyle"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginBottom="16dp"
+                android:id="@+id/helpText"
+                style="?attr/questionnaireHelpTextStyle"
+                android:layout_marginHorizontal="@dimen/help_header_horizontal_margin"
+                android:layout_marginBottom="@dimen/help_margin_bottom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Only one answer can be selected. If none apply, skip the question."
-                tools:text="Only one answer can be selected. If none apply, skip the question."
+                tools:text="Sample helper text"
             />
     </LinearLayout>
   </com.google.android.material.card.MaterialCardView>

@@ -88,18 +88,18 @@ internal fun initHelpButton(
       GONE
     }
   val helpCardView = view.findViewById<MaterialCardView>(R.id.helpCardView)
-  var isHelpCardViewVisible = true
+  var isHelpCardViewVisible = false
   helpButton.setOnClickListener {
-    helpCardView.visibility =
-      if (isHelpCardViewVisible) {
-        isHelpCardViewVisible = false
-        VISIBLE
-      } else {
-        isHelpCardViewVisible = true
-        GONE
-      }
+    if (isHelpCardViewVisible) {
+      isHelpCardViewVisible = false
+      helpCardView.visibility = GONE
+    } else {
+      isHelpCardViewVisible = true
+      helpCardView.visibility = VISIBLE
+    }
   }
+
   view
-    .findViewById<TextView>(R.id.helpDescription)
+    .findViewById<TextView>(R.id.helpText)
     .updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
 }

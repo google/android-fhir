@@ -206,8 +206,7 @@ class QuestionnaireGroupTypeHeaderViewTest {
       }
     )
 
-    assertThat(view.findViewById<TextView>(R.id.helpDescription).text.toString())
-      .isEqualTo("help text")
+    assertThat(view.findViewById<TextView>(R.id.helpText).text.toString()).isEqualTo("help text")
   }
 
   @Test
