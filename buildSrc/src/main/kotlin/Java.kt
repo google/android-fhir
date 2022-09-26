@@ -33,7 +33,7 @@ import org.gradle.api.JavaVersion
  */
 
 object Java {
-  val sourceCompatibility = JavaVersion.VERSION_11
-  val targetCompatibility = JavaVersion.VERSION_11
-  val kotlinJvmTarget = JavaVersion.VERSION_11
+  val sourceCompatibility = JavaVersion.VERSION_1_8
+  val targetCompatibility = JavaVersion.VERSION_1_8
+  val kotlinJvmTarget = JavaVersion.VERSION_1_8
 }
