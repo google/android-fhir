@@ -9,7 +9,7 @@ mobile applications.
 
 ## Requirements
 
-The SDK supports Android 21 (lollipop) and above. Android Studio 4.0 or above is required for
+The SDK supports Android 7.0 (API level 24) and above. Android Studio 4.0 or above is required for
 [Java 8 library desugaring](https://developer.android.com/studio/preview/features#j8-desugar).
 
 ## Libraries
