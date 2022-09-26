@@ -57,6 +57,9 @@ android {
   }
 
   compileOptions {
+    // Flag to enable support for the new language APIs
+    // See https = //developer.android.com/studio/write/java8-support
+    isCoreLibraryDesugaringEnabled = true
     sourceCompatibility = Java.sourceCompatibility
     targetCompatibility = Java.targetCompatibility
   }
@@ -91,6 +94,8 @@ dependencies {
   androidTestImplementation(Dependencies.truth)
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.Androidx.datastorePref)
   implementation(Dependencies.Androidx.sqliteKtx)
