@@ -22,6 +22,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Calendar
 import java.util.Date
 import org.hl7.fhir.r4.model.DateTimeType
@@ -36,7 +37,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.time.LocalDate
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
@@ -215,7 +215,10 @@ class MinValueConstraintValidatorTest {
           )
         }
       )
-    assertThat((MinValueConstraintValidator.getMinValue(questionItem.first()) as? DateType)?.valueAsString).isEqualTo(today)
+    assertThat(
+        (MinValueConstraintValidator.getMinValue(questionItem.first()) as? DateType)?.valueAsString
+      )
+      .isEqualTo(today)
   }
 
   @Test
@@ -233,7 +236,7 @@ class MinValueConstraintValidatorTest {
         }
       )
 
-    assertThat((MinValueConstraintValidator.getMinValue(questionItem.first()) as? DateType)?.value).isEqualTo(dateType.value)
+    assertThat((MinValueConstraintValidator.getMinValue(questionItem.first()) as? DateType)?.value)
+      .isEqualTo(dateType.value)
   }
-
 }

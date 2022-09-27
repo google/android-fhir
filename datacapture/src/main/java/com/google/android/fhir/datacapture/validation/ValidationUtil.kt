@@ -33,4 +33,3 @@ fun Type.valueOrCalculateValue(): Type? {
     this
   }
 }
-

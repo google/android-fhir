@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.datacapture.validation.CQF_CALCULATED_EXPRESSION_URL
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
