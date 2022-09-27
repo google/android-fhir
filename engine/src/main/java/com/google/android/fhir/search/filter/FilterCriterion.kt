@@ -45,8 +45,7 @@ internal sealed class FilterCriteria(
   open val filters: List<FilterCriterion>,
   open val operation: Operation,
   val param: IParam,
-  private val entityTableName: String,
-  private val ftsEntityTableName: String = ""
+  private val entityTableName: String
 ) {
 
   /**
@@ -58,8 +57,8 @@ internal sealed class FilterCriteria(
     val conditionParams = filters.flatMap { it.getConditionalParams() }
     return SearchQuery(
         """
-      SELECT resourceUuid FROM $entityTableName INNER JOIN $ftsEntityTableName ON $entityTableName.index_name = $ftsEntityTableName.index_name
-      WHERE resourceType = ? AND $ftsEntityTableName.index_name = ? AND $ftsEntityTableName.${conditionParams.toQueryString(operation)} 
+      SELECT resourceUuid FROM $entityTableName
+      WHERE resourceType = ? AND index_name = ? AND ${conditionParams.toQueryString(operation)} 
       """,
         listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }
       )

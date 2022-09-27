@@ -77,7 +77,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
         filter(
           Patient.NAME,
           {
-            modifier = StringFilterModifier.CONTAINS
+            modifier = StringFilterModifier.MATCHES
             value = nameQuery
           }
         )
@@ -90,6 +90,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val patients: MutableList<PatientItem> = mutableListOf()
     fhirEngine
       .search<Patient> {
+        filter(Patient.ACTIVE, {value= of(true)})
         if (nameQuery.isNotEmpty()) {
           filter(
             Patient.NAME,

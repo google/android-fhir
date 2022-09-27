@@ -20,7 +20,9 @@ import ca.uhn.fhir.rest.gclient.StringClientParam
 import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
+import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.search.StringFilterModifier
+import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Represents a criterion for filtering [StringClientParam]. e.g. filter(Patient.FAMILY, { value =
@@ -40,7 +42,7 @@ data class StringParamFilterCriterion(
           when (modifier) {
             StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
             StringFilterModifier.MATCHES_EXACTLY -> "= ?"
-            StringFilterModifier.MATCHES -> "MATCH ?"
+            StringFilterModifier.MATCHES -> "MATCH '*' || ? || '*'"
             StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
           },
         value!!
@@ -52,4 +54,51 @@ internal data class StringParamFilterCriteria(
   val parameter: StringClientParam,
   override val filters: List<StringParamFilterCriterion>,
   override val operation: Operation,
-) : FilterCriteria(filters, operation, parameter, "StringIndexEntity", "StringIndexEntityFts")
+) : FilterCriteria(filters, operation, parameter, "StringIndexEntity") {
+
+  override fun query(type: ResourceType): SearchQuery {
+    val conditionParams = filters.flatMap { it.getConditionalParams() }
+    return SearchQuery(
+      """
+      SELECT resourceUuid FROM StringIndexEntity c JOIN StringIndexEntityFts d ON c.id = d.docid
+      WHERE resourceType = ? AND d.index_name = ? AND d.${conditionParams.toQueryString(operation)} 
+      """,
+      listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }
+    )
+  }
+
+
+  /**
+   * Joins [ConditionParam]s to generate condition string for the SearchQuery.
+   *
+   * A simple query:
+   *
+   * SELECT * FROM StringIndexEntity WHERE resourceType = 'Patient' AND index_name = 'name' AND
+   * index_value = "X" OR index_value = "Y"
+   *
+   * behaves like :
+   *
+   * SELECT * FROM StringIndexEntity WHERE resourceType = 'Patient' AND (index_name = 'name' AND
+   * index_value = "X") OR index_value = "Y"
+   *
+   * instead of the intended:
+   *
+   * SELECT * FROM StringIndexEntity WHERE resourceType = 'Patient' AND index_name = 'name' AND
+   * (index_value = "X" OR index_value = "Y").
+   *
+   * This function takes care of wrapping the conditions in brackets so that they are evaluated as
+   * intended.
+   */
+  private fun List<ConditionParam<*>>.toQueryString(operation: Operation) =
+    this.joinToString(
+      separator = " ${operation.logicalOperator} ",
+      prefix = if (size > 1) "(" else "",
+      postfix = if (size > 1) ")" else ""
+    ) {
+      if (it.params.size > 1) {
+        "(${it.condition})"
+      } else {
+        it.condition
+      }
+    }
+}
