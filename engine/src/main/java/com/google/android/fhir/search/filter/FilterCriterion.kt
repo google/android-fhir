@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,12 +56,12 @@ internal sealed class FilterCriteria(
   open fun query(type: ResourceType): SearchQuery {
     val conditionParams = filters.flatMap { it.getConditionalParams() }
     return SearchQuery(
-        """
+      """
       SELECT resourceUuid FROM $entityTableName
       WHERE resourceType = ? AND index_name = ? AND ${conditionParams.toQueryString(operation)} 
       """,
-        listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }
-      )
+      listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }
+    )
   }
 
   /**
