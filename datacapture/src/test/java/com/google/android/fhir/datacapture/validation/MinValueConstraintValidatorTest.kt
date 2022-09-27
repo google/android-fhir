@@ -20,7 +20,6 @@ import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.fhir.datacapture.CQF_CALCULATED_EXPRESSION_URL
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -37,6 +36,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.time.LocalDate
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
@@ -50,7 +50,7 @@ class MinValueConstraintValidatorTest {
   }
 
   @Test
-  fun shouldReturnInvalidResult() {
+  fun `should return invalid result`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -75,7 +75,7 @@ class MinValueConstraintValidatorTest {
   }
 
   @Test
-  fun shouldReturnValidResult() {
+  fun `should return valid result`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -100,7 +100,7 @@ class MinValueConstraintValidatorTest {
   }
 
   @Test
-  fun shouldReturnInvalidResultWhenUsingExpressionForMinValue() {
+  fun `should show validation error when answer date is before yesterday's date`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -150,7 +150,7 @@ class MinValueConstraintValidatorTest {
   }
 
   @Test
-  fun shouldReturnValidResultWhenUsingExpressionForMinValue() {
+  fun `getMinValue should return yesterday's date from calculated expression`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -187,4 +187,53 @@ class MinValueConstraintValidatorTest {
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.message.isNullOrBlank()).isTrue()
   }
+
+  @Test
+  fun `getMinValue should return today's date from calculated expression`() {
+    val today = LocalDate.now().toString()
+    val questionItem =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(
+            Extension().apply {
+              url = MIN_VALUE_EXTENSION_URL
+              this.setValue(
+                DateType().apply {
+                  extension =
+                    listOf(
+                      Extension(
+                        CQF_CALCULATED_EXPRESSION_URL,
+                        Expression().apply {
+                          language = "text/fhirpath"
+                          expression = "today()"
+                        }
+                      )
+                    )
+                }
+              )
+            }
+          )
+        }
+      )
+    assertThat((MinValueConstraintValidator.getMinValue(questionItem.first()) as? DateType)?.valueAsString).isEqualTo(today)
+  }
+
+  @Test
+  fun `getMinValue should return min value date`() {
+    val dateType = DateType(SimpleDateFormat("yyyy-MM-dd").parse("2021-06-01"))
+    val questionItem =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(
+            Extension().apply {
+              url = MIN_VALUE_EXTENSION_URL
+              this.setValue(dateType)
+            }
+          )
+        }
+      )
+
+    assertThat((MinValueConstraintValidator.getMinValue(questionItem.first()) as? DateType)?.value).isEqualTo(dateType.value)
+  }
+
 }
