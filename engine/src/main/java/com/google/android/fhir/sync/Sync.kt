@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,10 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.sync.download.DownloaderImpl
+import com.google.android.fhir.sync.upload.BundleUploader
+import com.google.android.fhir.sync.upload.LocalChangesPaginator
+import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import org.hl7.fhir.r4.model.ResourceType
 
 object Sync {
@@ -41,10 +45,23 @@ object Sync {
   suspend fun oneTimeSync(
     context: Context,
     fhirEngine: FhirEngine,
-    downloadManager: DownloadWorkManager
+    downloadManager: DownloadWorkManager,
+    uploadConfiguration: UploadConfiguration = UploadConfiguration(),
+    resolver: ConflictResolver
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
-      FhirSynchronizer(context, fhirEngine, it, downloadManager).synchronize()
+      FhirSynchronizer(
+          context,
+          fhirEngine,
+          BundleUploader(
+            it,
+            TransactionBundleGenerator.getDefault(),
+            LocalChangesPaginator.create(uploadConfiguration)
+          ),
+          DownloaderImpl(it, downloadManager),
+          resolver
+        )
+        .synchronize()
     }
       ?: Result.Error(
         listOf(

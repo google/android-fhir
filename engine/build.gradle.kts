@@ -1,3 +1,5 @@
+import codegen.GenerateSourcesTask
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -9,6 +11,21 @@ plugins {
 publishArtifact(Releases.Engine)
 
 createJacocoTestReportTask()
+
+val generateSourcesTask =
+  project.tasks.register("generateSearchParamsTask", GenerateSourcesTask::class) {
+    srcOutputDir.set(project.layout.buildDirectory.dir("gen/main"))
+    testOutputDir.set(project.layout.buildDirectory.dir("gen/test"))
+  }
+
+kotlin {
+  sourceSets {
+    val main by getting
+    val test by getting
+    main.kotlin.srcDirs(generateSourcesTask.map { it.srcOutputDir })
+    test.kotlin.srcDirs(generateSourcesTask.map { it.testOutputDir })
+  }
+}
 
 android {
   compileSdk = Sdk.compileSdk
@@ -119,5 +136,4 @@ dependencies {
   testImplementation(Dependencies.truth)
 }
 
-// Generate SearchParameterRepositoryGenerated.kt.
-tasks.getByName("build") { dependsOn(":codegen:runCodeGenerator") }
+configureDokka(Releases.Engine.artifactId, Releases.Engine.version)

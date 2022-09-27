@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package com.google.android.fhir.sync.upload
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.sync.UploadResult
@@ -46,7 +46,8 @@ class BundleUploaderTest {
           TestingUtils.BundleDataSource {
             Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
           },
-          TransactionBundleGenerator.getDefault()
+          TransactionBundleGenerator.getDefault(),
+          LocalChangesPaginator.DEFAULT
         )
         .upload(localChanges)
         .toList()
@@ -69,7 +70,8 @@ class BundleUploaderTest {
               )
             }
           },
-          TransactionBundleGenerator.getDefault()
+          TransactionBundleGenerator.getDefault(),
+          LocalChangesPaginator.DEFAULT
         )
         .upload(localChanges)
         .toList()
@@ -83,7 +85,8 @@ class BundleUploaderTest {
     val result =
       BundleUploader(
           TestingUtils.BundleDataSource { throw ConnectException("Failed to connect to server.") },
-          TransactionBundleGenerator.getDefault()
+          TransactionBundleGenerator.getDefault(),
+          LocalChangesPaginator.DEFAULT
         )
         .upload(localChanges)
         .toList()
@@ -95,9 +98,7 @@ class BundleUploaderTest {
   companion object {
     val localChanges =
       listOf(
-        SquashedLocalChange(
-          LocalChangeToken(listOf(1)),
-          LocalChangeEntity(
+        LocalChangeEntity(
             id = 1,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
@@ -117,7 +118,8 @@ class BundleUploaderTest {
                   }
                 )
           )
-        )
+          .toLocalChange()
+          .apply { LocalChangeToken(listOf(1)) }
       )
   }
 }

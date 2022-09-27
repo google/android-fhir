@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
+import java.lang.IllegalStateException
 import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -218,8 +219,60 @@ internal class DatabaseImpl(
     }
   }
 
+  override suspend fun withTransaction(block: suspend () -> Unit) {
+    db.withTransaction(block)
+  }
+
+  override suspend fun deleteUpdates(resources: List<Resource>) {
+    localChangeDao.discardLocalChanges(resources)
+  }
+
   override fun close() {
     db.close()
+  }
+
+  override suspend fun clearDatabase() {
+    db.clearAllTables()
+  }
+
+  override suspend fun getLocalChange(type: ResourceType, id: String): SquashedLocalChange? {
+    return db.withTransaction {
+      val localChangeEntityList =
+        localChangeDao.getLocalChanges(resourceType = type, resourceId = id)
+      if (localChangeEntityList.isEmpty()) {
+        return@withTransaction null
+      }
+      SquashedLocalChange(
+        LocalChangeToken(localChangeEntityList.map { it.id }),
+        LocalChangeUtils.squash(localChangeEntityList)
+      )
+    }
+  }
+
+  override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
+    db.withTransaction {
+      // To check resource is present in DB else throw ResourceNotFoundException()
+      selectEntity(type, id)
+      val localChangeEntityList = localChangeDao.getLocalChanges(type, id)
+      // If local change is not available simply delete resource
+      if (localChangeEntityList.isEmpty()) {
+        resourceDao.deleteResource(resourceId = id, resourceType = type)
+      } else {
+        // local change is available with FORCE_PURGE the delete resource and discard changes from
+        // localChangeEntity table
+        if (forcePurge) {
+          resourceDao.deleteResource(resourceId = id, resourceType = type)
+          localChangeDao.discardLocalChanges(
+            token = LocalChangeToken(localChangeEntityList.map { it.id })
+          )
+        } else {
+          // local change is available but FORCE_PURGE = false then throw exception
+          throw IllegalStateException(
+            "Resource with type $type and id $id has local changes, either sync with server or FORCE_PURGE required"
+          )
+        }
+      }
+    }
   }
 
   companion object {

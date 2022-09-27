@@ -18,6 +18,7 @@
   <string name="submit_button_text">Submit</string>
   <string name="component_nav_heading">Components</string>
   <string name="layout_nav_heading">Layouts</string>
+  <string name="behavior_nav_heading">Behaviors</string>
   <string name="component_name_multiple_choice">Multiple choice</string>
   <string name="component_name_single_choice">Single choice</string>
   <string name="component_name_boolean_choice">Boolean choice</string>
@@ -29,10 +30,13 @@
   <string name="component_name_slider">Slider</string>
   <string name="component_name_dropdown">Dropdown</string>
   <string name="component_name_image">Image</string>
+  <string name="component_name_auto_complete">Auto Complete</string>
   <string name="layout_name_default_text">Default</string>
   <string name="layout_name_paginated">Paginated</string>
   <string name="layout_name_review">Review</string>
   <string name="layout_name_read_only">Read only</string>
+  <string name="behavior_name_calculation">Calculation</string>
+  <string name="behavior_name_skip_logic">Skip logic</string>
   <string name="toolbar_text">Structured data capture \n Catalog</string>
   <string
         name="questionnaire_response_title"

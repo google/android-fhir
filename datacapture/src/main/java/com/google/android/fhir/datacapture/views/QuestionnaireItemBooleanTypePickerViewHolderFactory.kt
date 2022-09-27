@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,10 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -48,11 +50,11 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
-        val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
+        val questionnaireItem = questionnaireItemViewItem.questionnaireItem
 
         header.bind(questionnaireItem)
 
-        when (questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value) {
+        when (questionnaireItemViewItem.answers.singleOrNull()?.valueBooleanType?.value) {
           true -> {
             yesRadioButton.isChecked = true
             noRadioButton.isChecked = false
@@ -68,44 +70,44 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
         }
 
         yesRadioButton.setOnClickListener {
-          if (questionnaireResponseItem.answer.singleOrNull()?.valueBooleanType?.booleanValue() ==
+          if (questionnaireItemViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() ==
               true
           ) {
-            questionnaireResponseItem.answer.clear()
+            questionnaireItemViewItem.clearAnswer()
             radioGroup.clearCheck()
           } else {
-            questionnaireResponseItem.answer.clear()
-            questionnaireResponseItem.answer.add(
+            questionnaireItemViewItem.setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(true)
               }
             )
           }
-          onAnswerChanged(radioGroup.context)
         }
 
         noRadioButton.setOnClickListener {
-          if (questionnaireResponseItem.answer.singleOrNull()?.valueBooleanType?.booleanValue() ==
+          if (questionnaireItemViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() ==
               false
           ) {
-            questionnaireResponseItem.answer.clear()
+            questionnaireItemViewItem.clearAnswer()
             radioGroup.clearCheck()
           } else {
-            questionnaireResponseItem.answer.clear()
-            questionnaireResponseItem.answer.add(
+            questionnaireItemViewItem.setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(false)
               }
             )
           }
-          onAnswerChanged(radioGroup.context)
         }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        error.text =
-          if (validationResult.getSingleStringValidationMessage() == "") null
-          else validationResult.getSingleStringValidationMessage()
+        when (validationResult) {
+          is NotValidated, Valid -> error.visibility = View.GONE
+          is Invalid -> {
+            error.text = validationResult.getSingleStringValidationMessage()
+            error.visibility = View.VISIBLE
+          }
+        }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

@@ -11,7 +11,6 @@ createJacocoTestReportTask()
 
 android {
   compileSdk = Sdk.compileSdk
-  buildToolsVersion = Plugins.Versions.buildTools
 
   defaultConfig {
     minSdk = Sdk.minSdk
@@ -55,6 +54,7 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.rules)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
+  androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
 
   api(Dependencies.HapiFhir.structuresR4)
@@ -71,10 +71,10 @@ dependencies {
     exclude(module = "httpclient")
     exclude(group = "net.sf.saxon", module = "Saxon-HE")
   }
+  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
-  implementation(Dependencies.flexBox)
   implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.timber)
 
@@ -88,3 +88,5 @@ dependencies {
   testImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.Espresso.espressoCore)
 }
+
+configureDokka(Releases.DataCapture.artifactId, Releases.DataCapture.version)

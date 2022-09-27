@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,25 +23,27 @@ import android.view.View
 import android.view.View.FOCUS_DOWN
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.LayoutRes
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal abstract class QuestionnaireItemEditTextViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_edit_text_view) {
+internal abstract class QuestionnaireItemEditTextViewHolderFactory(
+  @LayoutRes override val resId: Int
+) : QuestionnaireItemViewHolderFactory(resId) {
   abstract override fun getQuestionnaireItemViewHolderDelegate():
     QuestionnaireItemEditTextViewHolderDelegate
 }
 
-abstract class QuestionnaireItemEditTextViewHolderDelegate(
-  private val rawInputType: Int,
-  private val isSingleLine: Boolean
-) : QuestionnaireItemViewHolderDelegate {
+abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputType: Int) :
+  QuestionnaireItemViewHolderDelegate {
   private lateinit var header: QuestionnaireItemHeaderView
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
@@ -53,21 +55,6 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
     textInputEditText.setRawInputType(rawInputType)
-    textInputEditText.isSingleLine = isSingleLine
-  }
-
-  override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-    header.bind(questionnaireItemViewItem.questionnaireItem)
-    textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
-    textInputEditText.removeTextChangedListener(textWatcher)
-    textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
-    textInputEditText.setOnFocusChangeListener { view, focused ->
-      if (!focused) {
-        (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
-            InputMethodManager)
-          .hideSoftInputFromWindow(view.windowToken, 0)
-      }
-    }
     // Override `setOnEditorActionListener` to avoid crash with `IllegalStateException` if it's not
     // possible to move focus forward.
     // See
@@ -78,17 +65,50 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
       }
       view.focusSearch(FOCUS_DOWN)?.requestFocus(FOCUS_DOWN) ?: false
     }
-    textWatcher =
-      textInputEditText.doAfterTextChanged { editable: Editable? ->
-        questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
-        onAnswerChanged(textInputEditText.context)
+    textInputEditText.setOnFocusChangeListener { view, focused ->
+      if (!focused) {
+        (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
+            InputMethodManager)
+          .hideSoftInputFromWindow(view.windowToken, 0)
+
+        // Update answer even if the text box loses focus without any change. This will mark the
+        // questionnaire response item as being modified in the view model and trigger validation.
+        updateAnswer(textInputEditText.editableText)
       }
+    }
   }
+
+  override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+    header.bind(questionnaireItemViewItem.questionnaireItem)
+    textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
+
+    textInputEditText.removeTextChangedListener(textWatcher)
+    val text = getText(questionnaireItemViewItem.answers.singleOrNull())
+    if (isTextUpdatesRequired(text, textInputEditText.text.toString())) {
+      textInputEditText.setText(getText(questionnaireItemViewItem.answers.singleOrNull()))
+    }
+
+    textWatcher =
+      textInputEditText.doAfterTextChanged { editable: Editable? -> updateAnswer(editable) }
+  }
+
+  private fun updateAnswer(editable: Editable?) {
+    val input = getValue(editable.toString())
+    if (input != null) {
+      questionnaireItemViewItem.setAnswer(input)
+    } else {
+      questionnaireItemViewItem.clearAnswer()
+    }
+  }
+
+  open fun isTextUpdatesRequired(answerText: String, inputText: String) = (answerText != inputText)
 
   override fun displayValidationResult(validationResult: ValidationResult) {
     textInputLayout.error =
-      if (validationResult.getSingleStringValidationMessage() == "") null
-      else validationResult.getSingleStringValidationMessage()
+      when (validationResult) {
+        is NotValidated, Valid -> null
+        is Invalid -> validationResult.getSingleStringValidationMessage()
+      }
   }
 
   override fun setReadOnly(isReadOnly: Boolean) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,6 @@ package com.google.android.fhir.sync
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.sync.download.DownloaderImpl
-import com.google.android.fhir.sync.upload.BundleUploader
-import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
@@ -51,11 +48,9 @@ data class ResourceSyncException(val resourceType: ResourceType, val exception: 
 internal class FhirSynchronizer(
   context: Context,
   private val fhirEngine: FhirEngine,
-  private val dataSource: DataSource,
-  private val downloadManager: DownloadWorkManager,
-  private val uploader: Uploader =
-    BundleUploader(dataSource, TransactionBundleGenerator.getDefault()),
-  private val downloader: Downloader = DownloaderImpl(dataSource, downloadManager)
+  private val uploader: Uploader,
+  private val downloader: Downloader,
+  private val conflictResolver: ConflictResolver
 ) {
   private var syncState: MutableSharedFlow<State>? = null
   private val datastoreUtil = DatastoreUtil(context)
@@ -90,7 +85,7 @@ internal class FhirSynchronizer(
   suspend fun synchronize(): Result {
     setSyncState(State.Started)
 
-    return listOf(upload(), download())
+    return listOf(download(), upload())
       .filterIsInstance<Result.Error>()
       .flatMap { it.exceptions }
       .let {
@@ -104,13 +99,19 @@ internal class FhirSynchronizer(
 
   private suspend fun download(): Result {
     val exceptions = mutableListOf<ResourceSyncException>()
-    fhirEngine.syncDownload {
+    fhirEngine.syncDownload(conflictResolver) {
       flow {
         downloader.download(it).collect {
           when (it) {
-            is DownloadState.Started -> setSyncState(State.InProgress(it.type))
-            is DownloadState.Success -> emit(it.resources)
-            is DownloadState.Failure -> exceptions.add(it.syncError)
+            is DownloadState.Started -> {
+              setSyncState(State.InProgress(it.type))
+            }
+            is DownloadState.Success -> {
+              emit(it.resources)
+            }
+            is DownloadState.Failure -> {
+              exceptions.add(it.syncError)
+            }
           }
         }
       }

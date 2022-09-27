@@ -12,7 +12,7 @@
  limitations under the License.
 -->
 <Button
-    style="?attr/buttonStyleQuestionnaire"
+    style="?attr/questionnaireAddAnotherAnswerButtonStyle"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/add_another"
     android:layout_width="wrap_content"

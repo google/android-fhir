@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,7 +137,6 @@ object Dependencies {
   }
 
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
-  const val flexBox = "com.google.android.flexbox:flexbox:${Versions.flexBox}"
   const val junit = "junit:junit:${Versions.junit}"
   const val mockitoKotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mockitoKotlin}"
   const val mockitoInline = "org.mockito:mockito-inline:${Versions.mockitoInline}"
@@ -170,16 +169,15 @@ object Dependencies {
     }
 
     object Kotlin {
-      const val kotlinCoroutinesCore = "1.4.2"
+      const val kotlinCoroutinesCore = "1.6.2"
       const val stdlib = "1.6.10"
     }
 
     const val androidFhirCommon = "0.1.0-alpha03"
     const val desugarJdkLibs = "1.1.5"
     const val fhirUcum = "1.0.3"
-    const val flexBox = "3.0.0"
     const val guava = "28.2-android"
-    const val hapiFhir = "5.4.0"
+    const val hapiFhir = "6.0.1"
     const val http = "4.9.1"
     // TODO: The next release of HAPI FHIR will hopefully have
     // https://github.com/hapifhir/hapi-fhir/pull/3043 merged in. If it does, when we update, we
@@ -209,7 +207,7 @@ object Dependencies {
 
     const val espresso = "3.4.0"
     const val jacoco = "0.8.7"
-    const val junit = "4.12"
+    const val junit = "4.13.2"
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
     const val robolectric = "4.7.3"

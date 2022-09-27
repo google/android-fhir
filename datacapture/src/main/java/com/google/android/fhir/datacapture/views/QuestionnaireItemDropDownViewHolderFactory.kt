@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,10 @@ import android.widget.AutoCompleteTextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -47,6 +49,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        cleanupOldState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
         val answerOptionString =
@@ -55,30 +58,36 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         val adapter =
           ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
         autoCompleteTextView.setText(
-          questionnaireItemViewItem.singleAnswerOrNull?.valueCoding?.display ?: ""
+          questionnaireItemViewItem.answers.singleOrNull()?.displayString ?: ""
         )
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.onItemClickListener =
           AdapterView.OnItemClickListener { _, _, position, _ ->
             if (position == 0) {
-              questionnaireItemViewItem.singleAnswerOrNull = null
+              questionnaireItemViewItem.clearAnswer()
             } else {
-              questionnaireItemViewItem.singleAnswerOrNull =
+              questionnaireItemViewItem.setAnswer(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(questionnaireItemViewItem.answerOption[position - 1].valueCoding)
+                  .setValue(questionnaireItemViewItem.answerOption[position - 1].value)
+              )
             }
-            onAnswerChanged(autoCompleteTextView.context)
           }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         textInputLayout.error =
-          if (validationResult.getSingleStringValidationMessage() == "") null
-          else validationResult.getSingleStringValidationMessage()
+          when (validationResult) {
+            is NotValidated, Valid -> null
+            is Invalid -> validationResult.getSingleStringValidationMessage()
+          }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
         textInputLayout.isEnabled = !isReadOnly
+      }
+
+      private fun cleanupOldState() {
+        autoCompleteTextView.setAdapter(null)
       }
     }
 }
