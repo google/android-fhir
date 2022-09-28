@@ -42,7 +42,7 @@ data class StringParamFilterCriterion(
           when (modifier) {
             StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
             StringFilterModifier.MATCHES_EXACTLY -> "= ?"
-            StringFilterModifier.MATCHES -> "MATCH '*' || ? || '*'"
+            StringFilterModifier.MATCHES_FTS -> "MATCH '*' || ? || '*'"
             StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
           },
         value!!
@@ -59,7 +59,7 @@ internal data class StringParamFilterCriteria(
   override fun query(type: ResourceType): SearchQuery {
     val conditionParams = filters.flatMap { it.getConditionalParams() }
 
-    return if (filters.first().modifier == StringFilterModifier.MATCHES)
+    return if (filters.first().modifier == StringFilterModifier.MATCHES_FTS)
       SearchQuery(
         """
       SELECT resourceUuid FROM StringIndexEntity c JOIN StringIndexEntityFts d ON c.id = d.docid
