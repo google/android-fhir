@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.datacapture.validation
 
-import com.google.android.fhir.datacapture.enablement.fhirPathEngine
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.fhirPathEngine
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Type
 

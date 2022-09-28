@@ -54,7 +54,7 @@ object ExpressionEvaluator {
    */
   private val variableRegex = Regex("[%]([A-Za-z0-9\\-]{1,64})")
 
-  private val fhirPathEngine: FHIRPathEngine =
+  internal val fhirPathEngine: FHIRPathEngine =
     with(FhirContext.forCached(FhirVersionEnum.R4)) {
       FHIRPathEngine(HapiWorkerContext(this, this.validationSupport)).apply {
         hostServices = FHIRPathEngineHostServices
