@@ -22,7 +22,6 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
-import kotlin.test.assertTrue
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -109,11 +108,8 @@ class MaxValueConstraintValidatorTest {
         }
       )
 
-    assertTrue(
-      (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)?.value?.equals(
-        dateType.value
-      ) == true
-    )
+    assertThat((MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)?.value)
+      .isEqualTo(dateType.value)
   }
 
   @Test
@@ -144,10 +140,10 @@ class MaxValueConstraintValidatorTest {
         }
       )
 
-    assertTrue(
-      (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)?.valueAsString
-        ?.equals(today) == true
-    )
+    assertThat(
+        (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)?.valueAsString
+      )
+      .isEqualTo(today)
   }
 
   @Test
@@ -178,9 +174,9 @@ class MaxValueConstraintValidatorTest {
         }
       )
 
-    assertTrue(
-      (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)?.valueAsString
-        ?.equals(fiveDaysAhead) == true
-    )
+    assertThat(
+        (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)?.valueAsString
+      )
+      .isEqualTo(fiveDaysAhead)
   }
 }
