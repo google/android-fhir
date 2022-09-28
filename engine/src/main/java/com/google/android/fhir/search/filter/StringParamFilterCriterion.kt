@@ -58,13 +58,23 @@ internal data class StringParamFilterCriteria(
 
   override fun query(type: ResourceType): SearchQuery {
     val conditionParams = filters.flatMap { it.getConditionalParams() }
-    return SearchQuery(
-      """
+
+    return if (filters.first().modifier == StringFilterModifier.MATCHES)
+      SearchQuery(
+        """
       SELECT resourceUuid FROM StringIndexEntity c JOIN StringIndexEntityFts d ON c.id = d.docid
       WHERE resourceType = ? AND d.index_name = ? AND d.${conditionParams.toQueryString(operation)} 
       """,
-      listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }
-    )
+        listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }
+      )
+    else
+      SearchQuery(
+        """
+      SELECT resourceUuid FROM StringIndexEntity
+      WHERE resourceType = ? AND index_name = ? AND ${conditionParams.toQueryString(operation)} 
+      """,
+        listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }
+      )
   }
 
   /**
