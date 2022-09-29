@@ -31,4 +31,5 @@
     <dimen name="dialog_button_text_size_default">14sp</dimen>
     <dimen name="auto_complete_chip_group_margin">10dp</dimen>
     <dimen name="auto_complete_chip_group_bottom_margin">50dp</dimen>
+    <dimen name="icon_inset">16dp</dimen>
 </resources>

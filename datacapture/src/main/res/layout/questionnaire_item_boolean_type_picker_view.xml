@@ -43,7 +43,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/yes"
-            android:button="@drawable/radio_button"
         />
         <RadioButton
             style="?attr/questionnaireRadioButtonStyle"
@@ -52,7 +51,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_default"
             android:text="@string/no"
-            android:button="@drawable/radio_button"
         />
     </RadioGroup>
 

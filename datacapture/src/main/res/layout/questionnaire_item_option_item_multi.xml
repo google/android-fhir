@@ -18,6 +18,5 @@
     style="?attr/questionnaireCheckBoxStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:button="@drawable/checkbox"
     tools:text="Option"
 />
