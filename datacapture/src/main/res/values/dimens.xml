@@ -39,4 +39,5 @@
     <dimen name="help_header_horizontal_margin">16dp</dimen>
     <dimen name="help_header_margin_bottom">4dp</dimen>
     <dimen name="help_margin_bottom">16dp</dimen>
+    <dimen name="icon_inset">16dp</dimen>
 </resources>

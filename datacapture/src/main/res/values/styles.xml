@@ -209,6 +209,7 @@
         name="Questionnaire.CheckBoxStyle"
         parent="Widget.Material3.CompoundButton.CheckBox"
     >
+        <item name="android:button">@drawable/checkbox_inset</item>
         <item name="android:textColor">@color/checked_text_color</item>
         <item name="android:buttonTint">@color/checked_text_color</item>
         <item
@@ -221,6 +222,7 @@
         name="Questionnaire.RadioButtonStyle"
         parent="Widget.Material3.CompoundButton.RadioButton"
     >
+        <item name="android:button">@drawable/radio_button_inset</item>
         <item name="android:textColor">@color/checked_text_color</item>
         <item name="android:buttonTint">@color/checked_text_color</item>
         <item
