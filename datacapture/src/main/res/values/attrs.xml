@@ -28,7 +28,7 @@
     <attr name="questionnaireHelpHeaderStyle" format="reference" />
     <!--   Style for help text. -->
     <attr name="questionnaireHelpTextStyle" format="reference" />
-    <!--   Style for help button. -->
+    <!--   Style for help button -->
     <attr name="questionnaireHelpButtonStyle" format="reference" />
     <!--   Style for answer text. -->
     <attr name="questionnaireAnswerTextStyle" format="reference" />
