@@ -42,7 +42,7 @@ class ValidationUtilTest {
   }
 
   @Test
-  fun `should return calculated value`() {
+  fun `should return calculated value for cqf expression`() {
     val today = LocalDate.now().toString()
     val type =
       DateType().apply {
@@ -61,7 +61,7 @@ class ValidationUtilTest {
   }
 
   @Test
-  fun `should return value`() {
+  fun `should return entered value when no cqf expression is defined`() {
     val type = IntegerType().apply { value = 500 }
     assertThat((type.valueOrCalculateValue() as? IntegerType)?.value).isEqualTo(500)
   }

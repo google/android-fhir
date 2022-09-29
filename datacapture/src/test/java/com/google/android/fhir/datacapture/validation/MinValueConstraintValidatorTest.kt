@@ -50,7 +50,7 @@ class MinValueConstraintValidatorTest {
   }
 
   @Test
-  fun `should return invalid result`() {
+  fun `should return invalid result and show error message when entered value is less than minValue`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -75,7 +75,7 @@ class MinValueConstraintValidatorTest {
   }
 
   @Test
-  fun `should return valid result`() {
+  fun `should return valid result when entered value is greater than minValue`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -189,7 +189,7 @@ class MinValueConstraintValidatorTest {
   }
 
   @Test
-  fun `getMinValue should return today's date from calculated expression`() {
+  fun `getMinValue should return today's date when expression evaluates to today`() {
     val today = LocalDate.now().toString()
     val questionItem =
       listOf(
