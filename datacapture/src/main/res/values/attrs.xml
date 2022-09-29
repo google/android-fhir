@@ -66,6 +66,7 @@
     <attr name="questionnaireSubmitButtonStyle" format="reference" />
     <!--   Style for edit button. -->
     <attr name="questionnaireEditButtonStyle" format="reference" />
+
     <!--   Style for Linear Progress Indicator. -->
     <attr name="questionnaireLinearProgressIndicatorStyle" format="reference" />
 
