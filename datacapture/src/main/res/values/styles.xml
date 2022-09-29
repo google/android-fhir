@@ -46,6 +46,15 @@
         <item
             name="questionnaireSubtitleTextStyle"
         >@style/TextAppearance.Material3.BodyMedium</item>
+      <item
+            name="questionnaireHelpHeaderStyle"
+        >@style/TextAppearance.Material3.TitleSmall</item>
+      <item
+            name="questionnaireHelpTextStyle"
+        >@style/TextAppearance.Material3.BodyMedium</item>
+      <item
+            name="questionnaireHelpButtonStyle"
+        >@style/Widget.MaterialComponents.Button.TextButton.Icon</item>
         <item
             name="questionnaireAnswerTextStyle"
         >@style/Questionnaire.AnswerStyle</item>
@@ -100,6 +109,20 @@
             name="questionnaireAddAnotherAnswerButtonStyle"
         >@style/Widget.Material3.Button
         </item>
+    </style>
+
+    <style
+        name="Questionnaire.HelpStyle"
+        parent="TextAppearance.Material3.TitleSmall"
+    >
+      <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style
+        name="Questionnaire.HelpDescriptionStyle"
+        parent="TextAppearance.Material3.BodyMedium"
+    >
+      <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
 
     <style
