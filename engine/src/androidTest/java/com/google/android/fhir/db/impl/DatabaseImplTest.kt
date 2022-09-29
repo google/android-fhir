@@ -735,7 +735,7 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun search_string_match_fts() = runBlocking {
+  fun search_string_fts_match() = runBlocking {
     val patient =
       Patient().apply {
         id = "test_1"
@@ -758,6 +758,32 @@ class DatabaseImplTest {
       )
 
     assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
+  }
+
+  @Test
+  fun search_string_fts_no_match() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "test_1"
+        addName(HumanName().addGiven("Evening"))
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(
+              Patient.GIVEN,
+              {
+                value = "Abc"
+                modifier = StringFilterModifier.MATCHES_FTS
+              }
+            )
+          }
+          .getQuery()
+      )
+
+    assertThat(result).isEmpty()
   }
 
   @Test
