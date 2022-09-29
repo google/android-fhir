@@ -927,7 +927,7 @@ class SearchTest {
   }
 
   @Test
-  fun search_filter_string_matches_fts() {
+  fun `search filter string with matches fts modifier`() {
     val query =
       Search(ResourceType.Patient)
         .apply {
