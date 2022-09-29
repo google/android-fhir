@@ -44,7 +44,7 @@ import org.robolectric.RuntimeEnvironment
 class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
   private val viewHolder = QuestionnaireItemCheckBoxGroupViewHolderFactory.create(parent)
 

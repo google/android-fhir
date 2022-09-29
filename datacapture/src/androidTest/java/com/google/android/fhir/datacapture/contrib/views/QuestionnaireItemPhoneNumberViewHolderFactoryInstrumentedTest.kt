@@ -53,7 +53,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
     context =
       ContextThemeWrapper(
         InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_MaterialComponents
+        R.style.Theme_Material3_DayNight
       )
     parent = FrameLayout(context)
     viewHolder = QuestionnaireItemPhoneNumberViewHolderFactory.create(parent)
