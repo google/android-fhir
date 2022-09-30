@@ -214,11 +214,19 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         timeInputLayout.error =
           when (validationResult) {
             is NotValidated, Valid -> null
-            is Invalid -> validationResult.getSingleStringValidationMessage()
+            is Invalid ->
+              if (timeInputLayout.isEnabled) {
+                validationResult.getSingleStringValidationMessage()
+              } else {
+                null
+              }
           }
       }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {}
+      override fun displayValidationResult(validationResult: ValidationResult) {
+        displayDateValidationError(validationResult)
+        displayTimeValidationError(validationResult)
+      }
 
       override fun setReadOnly(isReadOnly: Boolean) {
         // The system outside this delegate should only be able to mark it read only. Otherwise, it
@@ -326,7 +334,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       private fun enableOrDisableTimePicker(enableIt: Boolean) {
-        timeInputLayout.isEnabled = enableIt
         timeInputLayout.isEnabled = enableIt
       }
 
