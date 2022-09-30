@@ -17,11 +17,18 @@
 package com.google.android.fhir.sync.remote
 
 import com.google.common.truth.Truth.assertThat
+import java.util.concurrent.TimeUnit
+import okhttp3.Call
+import okhttp3.Connection
+import okhttp3.Interceptor
+import okhttp3.Protocol
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.ResponseBody.Companion.toResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.util.ReflectionHelpers
 
 @RunWith(RobolectricTestRunner::class)
 class MoreHttpLoggerKtTest {
@@ -39,26 +46,84 @@ class MoreHttpLoggerKtTest {
   }
 
   @Test
-  fun `toOkHttpLoggingInterceptor headersToRedact should be empty when headersToIgnore is not provided`() {
-    assertThat(
-        httpLogger(HttpLogger.Level.BODY, emptyList()).toOkHttpLoggingInterceptor().redactHeaders
+  fun `toOkHttpLoggingInterceptor all headers should be logged when headersToIgnore is not provided`() {
+
+    val logMessages = mutableListOf<String>()
+    HttpLogger(HttpLogger.Configuration(HttpLogger.Level.BODY, emptyList())) { logMessages.add(it) }
+      .toOkHttpLoggingInterceptor()
+      .intercept(testInterceptorChain)
+    assertThat(logMessages)
+      .containsAtLeast(
+        "Restricted: request-restricted-value",
+        "Restricted: response-restricted-value",
+        "Unrestricted: request-unrestricted-value",
+        "Unrestricted: response-unrestricted-value"
       )
-      .isEmpty()
   }
 
   @Test
-  fun `toOkHttpLoggingInterceptor headersToIgnore should populate headersToRedact`() {
-    assertThat(
-        httpLogger(HttpLogger.Level.BODY, listOf("Authorization", "content-type"))
-          .toOkHttpLoggingInterceptor()
-          .redactHeaders
+  fun `toOkHttpLoggingInterceptor provided headersToIgnore should not be logged`() {
+
+    val logMessages = mutableListOf<String>()
+    HttpLogger(HttpLogger.Configuration(HttpLogger.Level.BODY, listOf("Restricted"))) {
+        logMessages.add(it)
+      }
+      .toOkHttpLoggingInterceptor()
+      .intercept(testInterceptorChain)
+
+    assertThat(logMessages)
+      .containsAtLeast(
+        "Unrestricted: request-unrestricted-value",
+        "Unrestricted: response-unrestricted-value"
       )
-      .containsExactly("Authorization", "content-type")
+    assertThat(logMessages)
+      .containsNoneOf(
+        "Restricted: request-restricted-value",
+        "Restricted: response-restricted-value"
+      )
   }
 
   private fun httpLogger(level: HttpLogger.Level, headersToIgnore: List<String>? = null) =
     HttpLogger(HttpLogger.Configuration(level, headersToIgnore)) {}
 
-  private val HttpLoggingInterceptor.redactHeaders: Collection<String>
-    get() = ReflectionHelpers.getField(this, "headersToRedact")
+  private val testInterceptorChain =
+    object : Interceptor.Chain {
+
+      override fun connection(): Connection? = null
+
+      override fun proceed(request: Request) =
+        Response.Builder()
+          .code(200)
+          .header("Restricted", "response-restricted-value")
+          .header("Unrestricted", "response-unrestricted-value")
+          .request(request())
+          .protocol(Protocol.HTTP_2)
+          .message("OK")
+          .body("Sample-Response".toResponseBody())
+          .build()
+
+      override fun request() =
+        Request.Builder()
+          .url("http://server.test.url")
+          .header("Restricted", "request-restricted-value")
+          .header("Unrestricted", "request-unrestricted-value")
+          .get()
+          .build()
+
+      override fun connectTimeoutMillis() = 1000
+
+      override fun readTimeoutMillis() = 1000
+
+      override fun withConnectTimeout(timeout: Int, unit: TimeUnit) = apply {}
+
+      override fun withReadTimeout(timeout: Int, unit: TimeUnit) = apply {}
+
+      override fun withWriteTimeout(timeout: Int, unit: TimeUnit) = apply {}
+
+      override fun writeTimeoutMillis() = 1000
+
+      override fun call(): Call {
+        TODO("Not yet implemented")
+      }
+    }
 }
