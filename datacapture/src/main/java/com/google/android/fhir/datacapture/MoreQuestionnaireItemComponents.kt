@@ -146,6 +146,7 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceO
 internal enum class DisplayItemControlType(val extensionCode: String) {
   FLYOVER("flyover"),
   PAGE("page"),
+  HELP("help")
 }
 
 /** Item control to show instruction text */
@@ -156,6 +157,25 @@ internal val Questionnaire.QuestionnaireItemComponent.displayItemControl: Displa
     val code =
       codeableConcept?.coding?.firstOrNull { it.system == EXTENSION_ITEM_CONTROL_SYSTEM }?.code
     return DisplayItemControlType.values().firstOrNull { it.extensionCode == code }
+  }
+
+/** Whether any one of the nested display item has [DisplayItemControlType.HELP] control. */
+internal val Questionnaire.QuestionnaireItemComponent.hasHelpButton: Boolean
+  get() {
+    return item.any { it.isHelpCode }
+  }
+
+/** Whether item type is display and [displayItemControl] is [DisplayItemControlType.HELP]. */
+internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.DISPLAY -> {
+        displayItemControl == DisplayItemControlType.HELP
+      }
+      else -> {
+        false
+      }
+    }
   }
 
 /**
@@ -210,6 +230,17 @@ internal val Questionnaire.QuestionnaireItemComponent.localizedFlyoverSpanned: S
           questionnaireItem.displayItemControl == DisplayItemControlType.FLYOVER
       }
       ?.localizedTextSpanned
+
+/**
+ * A nested questionnaire item of type display with displayCategory extension with [INSTRUCTIONS]
+ * code is used as the instructions of the parent question.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.localizedHelpSpanned: Spanned?
+  get() {
+    return item
+      .firstOrNull { questionnaireItem -> questionnaireItem.isHelpCode }
+      ?.localizedTextSpanned
+  }
 
 /**
  * Whether the QuestionnaireItem should be hidden according to the hidden extension or lack thereof.

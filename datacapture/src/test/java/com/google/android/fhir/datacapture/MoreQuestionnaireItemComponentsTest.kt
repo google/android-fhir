@@ -262,6 +262,126 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun `displayItemControl should return help`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.STRING
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(DisplayItemControlType.HELP.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
+            )
+        )
+      }
+
+    assertThat(questionnaireItem.displayItemControl).isEqualTo(DisplayItemControlType.HELP)
+  }
+
+  @Test
+  fun `help button is visible if questionnaireItem has helpCode`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+              addExtension(
+                Extension()
+                  .setUrl(EXTENSION_ITEM_CONTROL_URL)
+                  .setValue(
+                    CodeableConcept()
+                      .addCoding(
+                        Coding()
+                          .setCode(DisplayItemControlType.HELP.extensionCode)
+                          .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                      )
+                  )
+              )
+            }
+          )
+      }
+
+    assertThat(questionnaireItem.hasHelpButton).isTrue()
+  }
+
+  @Test
+  fun `help button is hidden if questionnaireItem does not have helpCode`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+              addExtension(
+                Extension()
+                  .setUrl(EXTENSION_ITEM_CONTROL_URL)
+                  .setValue(
+                    CodeableConcept()
+                      .addCoding(
+                        Coding()
+                          .setCode(DisplayItemControlType.FLYOVER.extensionCode)
+                          .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                      )
+                  )
+              )
+            }
+          )
+      }
+
+    assertThat(questionnaireItem.hasHelpButton).isFalse()
+  }
+
+  @Test
+  fun `isHelpCode returns true if displayItemControl is help`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DISPLAY
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(DisplayItemControlType.HELP.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
+            )
+        )
+      }
+
+    assertThat(questionnaireItem.isHelpCode).isTrue()
+  }
+
+  @Test
+  fun `isHelpCode returns false if displayItemControl is not help`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DISPLAY
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(DisplayItemControlType.PAGE.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
+            )
+        )
+      }
+
+    assertThat(questionnaireItem.isHelpCode).isFalse()
+  }
+
+  @Test
   fun `displayItemControl should return null if the extension url is missing`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
@@ -764,6 +884,131 @@ class MoreQuestionnaireItemComponentsTest {
 
     assertThat(questionItemList.first().localizedFlyoverSpanned.toString())
       .isEqualTo("flyover text")
+  }
+
+  @Test
+  fun `localizedHelpSpanned should return null if no help code`() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+        }
+      )
+
+    assertThat(questionItemList.first().localizedHelpSpanned).isNull()
+  }
+
+  @Test
+  fun `localizedHelpSpanned should return help`() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "help text"
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+                addExtension(
+                  EXTENSION_ITEM_CONTROL_URL,
+                  CodeableConcept().apply {
+                    addCoding().apply {
+                      system = EXTENSION_ITEM_CONTROL_SYSTEM
+                      code = DisplayItemControlType.HELP.extensionCode
+                    }
+                  }
+                )
+              }
+            )
+        }
+      )
+
+    assertThat(questionItemList.first().localizedHelpSpanned.toString()).isEqualTo("help text")
+  }
+
+  @Test
+  fun `localizedHelpSpanned not matching locale should return help`() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "help text"
+                textElement.apply {
+                  addExtension(
+                    Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                      addExtension(Extension("lang", StringType("vi-VN")))
+                      addExtension(Extension("content", StringType("gợi ý")))
+                    }
+                  )
+                }
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+                addExtension(
+                  EXTENSION_ITEM_CONTROL_URL,
+                  CodeableConcept().apply {
+                    addCoding().apply {
+                      system = EXTENSION_ITEM_CONTROL_SYSTEM
+                      code = DisplayItemControlType.HELP.extensionCode
+                    }
+                  }
+                )
+              }
+            )
+        }
+      )
+    Locale.setDefault(Locale.US)
+
+    assertThat(questionItemList.first().localizedHelpSpanned.toString()).isEqualTo("help text")
+  }
+
+  @Test
+  fun `localizedHelpSpanned matching locale should return localized text`() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "help text"
+                textElement.apply {
+                  addExtension(
+                    Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                      addExtension(Extension("lang", StringType("vi-VN")))
+                      addExtension(Extension("content", StringType("phụ đề")))
+                    }
+                  )
+                }
+                addExtension(
+                  EXTENSION_ITEM_CONTROL_URL,
+                  CodeableConcept().apply {
+                    addCoding().apply {
+                      system = EXTENSION_ITEM_CONTROL_SYSTEM
+                      code = DisplayItemControlType.HELP.extensionCode
+                    }
+                  }
+                )
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+              }
+            )
+        }
+      )
+    Locale.setDefault(Locale.forLanguageTag("vi-VN"))
+
+    assertThat(questionItemList.first().localizedHelpSpanned.toString()).isEqualTo("phụ đề")
   }
 
   @Test
