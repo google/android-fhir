@@ -184,7 +184,7 @@ object Dependencies {
       const val antlr = "4.10.1"
       const val engine = "2.0.0"
       const val evaluator = "2.0.0"
-      const val translator = "2.1.0"
+      const val translator = "2.2.0"
     }
 
     object Kotlin {
