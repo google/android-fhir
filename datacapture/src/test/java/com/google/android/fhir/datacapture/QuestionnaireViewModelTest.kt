@@ -39,7 +39,6 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -449,17 +448,77 @@ class QuestionnaireViewModelTest(
     assertThat(questionnaireItemViewItem.items.first().questionnaireItem.linkId)
       .isEqualTo(questionnaireResponseWithMissingItem.item.first().linkId)
     assertThat(
-        questionnaireItemViewItem.items.first().answers.first().valueBooleanType.booleanValue()
+        questionnaireItemViewItem.items.single().answers.single().valueBooleanType.booleanValue()
       )
-      .isEqualTo(
-        questionnaireResponseWithMissingItem
-          .item
-          .first()
-          .answer
-          .first()
-          .valueBooleanType
-          .booleanValue()
-      )
+      .isTrue()
+  }
+
+  @Test
+  fun stateHasQuestionnaireResponse_lessItemsInQuestionnaireResponse_shouldCopyAnswer() =
+      runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "q1"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(false)))
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "q2"
+            text = "Another basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(false)))
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "q3"
+            text = "Another basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(false)))
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "q2"
+            answer =
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(true)
+                }
+              )
+          }
+        )
+      }
+
+    val questionnaireViewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+    val questionnaireItemViewItemList = questionnaireViewModel.questionnaireStateFlow.first().items
+
+    // Answer to first question should be created from questionnaire
+    val questionnaireItemViewItem1 = questionnaireItemViewItemList[0]
+    assertThat(questionnaireItemViewItem1.questionnaireItem.linkId).isEqualTo("q1")
+    assertThat(questionnaireItemViewItem1.answers.single().valueBooleanType.booleanValue())
+      .isFalse()
+
+    // Answer to second question should be copied from questionnaire response
+    val questionnaireItemViewItem2 = questionnaireItemViewItemList[1]
+    assertThat(questionnaireItemViewItem2.questionnaireItem.linkId).isEqualTo("q2")
+    assertThat(questionnaireItemViewItem2.answers.single().valueBooleanType.booleanValue()).isTrue()
+
+    // Answer to third quesiton should be created from questionnaire
+    val questionnaireItemViewItem3 = questionnaireItemViewItemList[2]
+    assertThat(questionnaireItemViewItem3.questionnaireItem.linkId).isEqualTo("q3")
+    assertThat(questionnaireItemViewItem3.answers.single().valueBooleanType.booleanValue())
+      .isFalse()
   }
 
   @Test
@@ -2470,6 +2529,53 @@ class QuestionnaireViewModelTest(
                   text = "flyover text"
                   type = Questionnaire.QuestionnaireItemType.DISPLAY
                   extension = listOf(itemControlExtensionWithFlyOverCode)
+                }
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireItem.linkId)
+      .isEqualTo("parent-question")
+  }
+
+  @Test
+  fun `nested display item with help code should not be created as questionnaire state item`() =
+      runBlocking {
+    val itemControlExtensionWithHelpCode =
+      Extension().apply {
+        url = EXTENSION_ITEM_CONTROL_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = DisplayItemControlType.HELP.extensionCode
+                  system = EXTENSION_ITEM_CONTROL_SYSTEM
+                }
+              )
+          }
+        )
+      }
+
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "parent-question"
+            text = "parent question text"
+            type = Questionnaire.QuestionnaireItemType.STRING
+            item =
+              listOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "nested-display-question"
+                  text = "help description"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                  extension = listOf(itemControlExtensionWithHelpCode)
                 }
               )
           }

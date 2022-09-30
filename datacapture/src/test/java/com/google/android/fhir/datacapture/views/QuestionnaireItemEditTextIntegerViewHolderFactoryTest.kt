@@ -37,7 +37,7 @@ import org.robolectric.RuntimeEnvironment
 class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
   private val viewHolder = QuestionnaireItemEditTextIntegerViewHolderFactory.create(parent)
 
