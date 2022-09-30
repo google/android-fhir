@@ -32,11 +32,9 @@
                 "coding": [
                   {
                     "system": "http://hl7.org/fhir/questionnaire-item-control",
-                    "code": "flyover",
-                    "display": "Fly-over"
+                    "code": "flyover"
                   }
-                ],
-                "text": "Flyover"
+                ]
               }
             }
           ]
