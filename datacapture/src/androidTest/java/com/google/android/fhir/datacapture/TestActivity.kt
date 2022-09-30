@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,13 @@
 
 package com.google.android.fhir.datacapture
 
+import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
 /** Only exists so we can use an AppCompatActivity in ActivityScenario tests. */
-class TestActivity : AppCompatActivity()
+class TestActivity : AppCompatActivity() {
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setTheme(R.style.Theme_Material3_DayNight)
+  }
+}
