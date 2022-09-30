@@ -113,6 +113,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               ?.localDate
               ?.localizedString
           )
+          displayValidationError(Valid)
         }
         textWatcher = textInputEditText.doAfterTextChanged { text -> updateAnswer(text.toString()) }
       }
@@ -222,6 +223,9 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       } catch (e: Exception) {
         null
       }
+    if (inputDate == null || answer == null) {
+      return true
+    }
     return answer?.localDate != inputDate
   }
 }

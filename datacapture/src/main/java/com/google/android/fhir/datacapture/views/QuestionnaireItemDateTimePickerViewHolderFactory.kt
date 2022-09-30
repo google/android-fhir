@@ -245,10 +245,12 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           )
         ) {
           dateInputEditText.setText(localDateTime?.localizedDateString ?: "")
+          displayDateValidationError(Valid)
         }
         timeInputEditText.setText(
           localDateTime?.toLocalizedTimeString(timeInputEditText.context) ?: ""
         )
+        displayTimeValidationError(Valid)
       }
 
       /** Updates the recorded answer. */
