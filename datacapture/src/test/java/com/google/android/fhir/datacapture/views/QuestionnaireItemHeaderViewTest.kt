@@ -70,7 +70,7 @@ class QuestionnaireItemHeaderViewTest {
   }
 
   @Test
-  fun `shows question text with *`() {
+  fun `shows * at the end of question text`() {
     view.bind(
       Questionnaire.QuestionnaireItemComponent().apply {
         text = "Question?"
