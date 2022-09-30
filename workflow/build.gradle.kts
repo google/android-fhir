@@ -71,6 +71,9 @@ android {
 configurations {
   all {
     exclude(module = "xpp3")
+    exclude(module = "xpp3_min")
+    exclude(module = "xmlpull")
+    exclude(module = "javax.json")
     exclude(module = "jcl-over-slf4j")
     exclude(group = "org.apache.httpcomponents")
     // Remove this after this issue has been fixed:
