@@ -411,6 +411,27 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun `localizedTextSpannedWithAsterisk returns localizedTextSpanned appended by *`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        text = "Patient Information"
+        required = true
+      }
+    Locale.setDefault(Locale.US)
+    assertThat(questionnaireItem.localizedTextSpannedWithAsterisk.toString())
+      .isEqualTo("Patient Information*")
+  }
+
+  @Test
+  fun `localizedTextSpannedWithAsterisk returns localizedTextSpanned`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply { text = "Patient Information" }
+    Locale.setDefault(Locale.US)
+    assertThat(questionnaireItem.localizedTextSpannedWithAsterisk.toString())
+      .isEqualTo("Patient Information")
+  }
+
+  @Test
   fun localizedPrefixSpanned_noPrefix_shouldReturnNull() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
 

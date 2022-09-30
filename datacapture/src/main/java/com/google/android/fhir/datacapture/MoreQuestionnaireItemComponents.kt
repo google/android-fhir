@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
+import androidx.core.text.toSpanned
 import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
@@ -162,6 +163,19 @@ private fun String.toSpanned(): Spanned {
  */
 val Questionnaire.QuestionnaireItemComponent.localizedTextSpanned: Spanned?
   get() = textElement?.getLocalizedText()?.toSpanned()
+
+/**
+ * `*` value is appended to [Questionnaire.QuestionnaireItemComponent.localizedTextSpanned] if
+ * [Questionnaire.QuestionnaireItemComponent.required] is true.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.localizedTextSpannedWithAsterisk: Spanned?
+  get() {
+    return if (required) {
+      localizedTextSpanned?.toString()?.plus("*")?.toSpanned()
+    } else {
+      localizedTextSpanned
+    }
+  }
 
 /**
  * Localized and spanned value of [Questionnaire.QuestionnaireItemComponent.prefix] if translation

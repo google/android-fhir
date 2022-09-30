@@ -24,7 +24,7 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.localizedTextSpannedWithAsterisk
 import org.hl7.fhir.r4.model.Questionnaire
 
 internal class QuestionnaireGroupTypeHeaderView(context: Context, attrs: AttributeSet?) :
@@ -39,7 +39,7 @@ internal class QuestionnaireGroupTypeHeaderView(context: Context, attrs: Attribu
     val question = findViewById<TextView>(R.id.question)
     val hint = findViewById<TextView>(R.id.hint)
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
-    question.updateTextAndVisibility(questionnaireItem.localizedTextSpanned)
+    question.updateTextAndVisibility(questionnaireItem.localizedTextSpannedWithAsterisk)
     hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
     visibility = getViewGroupVisibility(prefix, question, hint)
   }

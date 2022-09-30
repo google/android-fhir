@@ -27,7 +27,7 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.localizedTextSpannedWithAsterisk
 import org.hl7.fhir.r4.model.Questionnaire
 
 /** View for the prefix, question, and hint of a questionnaire item. */
@@ -44,7 +44,7 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
 
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
-    question.updateTextAndVisibility(questionnaireItem.localizedTextSpanned)
+    question.updateTextAndVisibility(questionnaireItem.localizedTextSpannedWithAsterisk)
     hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
     //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.

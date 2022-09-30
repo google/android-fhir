@@ -70,6 +70,18 @@ class QuestionnaireGroupTypeHeaderViewTest {
   }
 
   @Test
+  fun `shows question text with *`() {
+    view.bind(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        text = "Question?"
+        required = true
+      }
+    )
+
+    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question?*")
+  }
+
+  @Test
   fun `shows instructions`() {
     view.bind(
       Questionnaire.QuestionnaireItemComponent().apply {
