@@ -376,3 +376,16 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
  */
 private inline fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
   item.map { it.createQuestionnaireResponseItem() }
+
+/**
+ * `*` value is appended to [Questionnaire.QuestionnaireItemComponent.localizedTextSpanned] if
+ * [Questionnaire.QuestionnaireItemComponent.required] is true.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.localizedTextSpannedWithAsterisk: Spanned?
+  get() {
+    return if (required) {
+      localizedTextSpanned?.toString()?.plus("*")?.toSpanned()
+    } else {
+      localizedTextSpanned
+    }
+  }

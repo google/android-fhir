@@ -235,6 +235,18 @@ class QuestionnaireGroupTypeHeaderViewTest {
     assertThat(view.visibility).isEqualTo(View.GONE)
   }
 
+  @Test
+  fun `shows * at the end of question text`() {
+    view.bind(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        text = "Question?"
+        required = true
+      }
+    )
+
+    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question?*")
+  }
+
   private val displayCategoryExtensionWithInstructionsCode =
     Extension().apply {
       url = EXTENSION_DISPLAY_CATEGORY_URL
