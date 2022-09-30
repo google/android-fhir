@@ -114,7 +114,6 @@ dependencies {
   implementation(Dependencies.Cql.translatorElmJackson) // Necessary to import XML/JSON CQL Libs
   implementation(Dependencies.Cql.translatorModel) // Overrides HAPI's old versions
   implementation(Dependencies.Cql.translatorModelJackson) // Necessary to import XML/JSON ModelInfos
-  implementation(Dependencies.Cql.translatorQDM) // Overrides HAPI's old versions
 
   // Runtime dependency that is required to run FhirPath (also requires minSDK of 26).
   // Version 3.0 uses java.lang.System.Logger, which is not available on Android

@@ -45,11 +45,9 @@ object Dependencies {
     const val evaluatorBuilder = "$openCdsGroup:evaluator.builder:${Versions.Cql.evaluator}"
     const val evaluatorDagger = "$openCdsGroup:evaluator.dagger:${Versions.Cql.evaluator}"
     const val evaluatorPlanDef = "$openCdsGroup:evaluator.plandefinition:${Versions.Cql.evaluator}"
-
     const val translatorCqlToElm = "$translatorGroup:cql-to-elm:${Versions.Cql.translator}"
     const val translatorElm = "$translatorGroup:elm:${Versions.Cql.translator}"
     const val translatorModel = "$translatorGroup:model:${Versions.Cql.translator}"
-    const val translatorQDM = "$translatorGroup:qdm:${Versions.Cql.translator}"
 
     const val translatorElmJackson = "$translatorGroup:elm-jackson:${Versions.Cql.translator}"
     const val translatorModelJackson = "$translatorGroup:model-jackson:${Versions.Cql.translator}"

@@ -27,7 +27,6 @@ dependencies {
   compileOnly(Dependencies.Cql.translatorCqlToElm)
   compileOnly(Dependencies.Cql.translatorElm)
   compileOnly(Dependencies.Cql.translatorModel)
-  compileOnly(Dependencies.Cql.translatorQDM)
 
   compileOnly(Dependencies.junit)
   compileOnly(Dependencies.jsonAssert)
