@@ -40,12 +40,9 @@ internal object QuestionnaireResponseItemValidator {
     answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
     context: Context
   ): ValidationResult {
-    val validationResults =
-      validators.map {
-        if (questionnaireItem.isHidden)
-          ConstraintValidator.ConstraintValidationResult(true, "Field is hidden")
-        else it.validate(questionnaireItem, answers, context)
-      }
+    if (questionnaireItem.isHidden) return NotValidated
+
+    val validationResults = validators.map { it.validate(questionnaireItem, answers, context) }
 
     return if (validationResults.all { it.isValid }) {
       Valid

@@ -414,55 +414,7 @@ class QuestionnaireResponseValidatorTest {
       )
 
     assertThat(result.entries.first().key).isEqualTo("valid-hidden-item")
-    assertThat(result.entries.first().value.first()).isEqualTo(Valid)
-  }
-
-  @Test
-  fun `validation passes for required questionnaire item with hidden extension when value specified`() {
-    val questionnaire =
-      Questionnaire().apply {
-        url = "questionnaire-1"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent(
-              StringType("valid-hidden-item"),
-              Enumeration(
-                Questionnaire.QuestionnaireItemTypeEnumFactory(),
-                Questionnaire.QuestionnaireItemType.INTEGER
-              )
-            )
-            .apply {
-              required = true
-              addExtension().apply {
-                url = EXTENSION_HIDDEN_URL
-                setValue(BooleanType(true))
-              }
-            }
-        )
-      }
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        this.questionnaire = "questionnaire-1"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("valid-hidden-item"))
-            .apply {
-              addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = IntegerType(12)
-                }
-              )
-            }
-        )
-      }
-
-    val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        questionnaireResponse,
-        context
-      )
-
-    assertThat(result.entries.first().key).isEqualTo("valid-hidden-item")
-    assertThat(result.entries.first().value.first()).isEqualTo(Valid)
+    assertThat(result.entries.first().value.first()).isEqualTo(NotValidated)
   }
 
   @Test
