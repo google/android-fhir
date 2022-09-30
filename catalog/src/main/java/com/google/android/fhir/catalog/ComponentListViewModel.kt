@@ -41,73 +41,73 @@ class ComponentListViewModel(application: Application, private val state: SavedS
     val questionnaireFileWithValidation: String = "",
     val workflow: WorkflowType = WorkflowType.COMPONENT
   ) {
-    SINGLE_CHOICE(
-      R.drawable.ic_singlechoice,
-      R.string.component_name_single_choice,
-      "single_choice_questionnaire.json",
-      "single_choice_with_validation_questionnaire.json"
-    ),
     BOOLEAN_CHOICE(
       R.drawable.ic_booleanchoice,
       R.string.component_name_boolean_choice,
-      "boolean_choice_questionnaire.json",
-      "boolean_choice_with_validation_questionnaire.json"
+      "component_boolean_choice.json",
+      "component_boolean_choice_with_validation.json"
+    ),
+    SINGLE_CHOICE(
+      R.drawable.ic_singlechoice,
+      R.string.component_name_single_choice,
+      "component_single_choice.json",
+      "component_single_choice_with_validation.json"
     ),
     MULTIPLE_CHOICE(
       R.drawable.ic_multiplechoice,
       R.string.component_name_multiple_choice,
-      "multi_select_choice_questionnaire.json",
-      "multi_select_choice_with_validation_questionnaire.json"
+      "component_multi_select_choice.json",
+      "component_multi_select_choice_with_validation.json"
     ),
     DROPDOWN(
       R.drawable.ic_group_1278,
       R.string.component_name_dropdown,
-      "dropdown-questionnaire.json",
-      "dropdown_with_validation_questionnaire.json"
+      "component_dropdown.json",
+      "component_dropdown_with_validation.json"
     ),
     MODAL(
       R.drawable.ic_modal,
       R.string.component_name_modal,
-      "modal-questionnaire.json",
-      "modal_with_validation_questionnaire.json"
+      "component_modal.json",
+      "component_modal_with_validation.json"
     ),
     OPEN_CHOICE(
       R.drawable.ic_openchoice,
       R.string.component_name_open_choice,
-      "open-choice-questionnaire.json",
-      "open_choice_with_validation_questionnaire.json"
+      "component_open_choice.json",
+      "component_open_choice_with_validation.json"
     ),
     TEXT_FIELD(
       R.drawable.ic_textfield,
       R.string.component_name_text_field,
-      "text_fields_questionnaire.json",
-      "text_fields_with_validation_questionnaire.json"
+      "component_text_fields.json",
+      "component_text_fields_with_validation.json"
     ),
     DATE_PICKER(
       R.drawable.ic_datepicker,
       R.string.component_name_date_picker,
-      "date_picker_questionnaire.json",
-      "date_picker_with_validation_questionnaire.json"
+      "component_date_picker.json",
+      "component_date_picker_with_validation.json"
     ),
     DATE_TIME_PICKER(
       R.drawable.ic_timepicker,
       R.string.component_name_date_time_picker,
-      "date_time_questionnaire.json",
-      "date_time_with_validation_questionnaire.json"
+      "component_date_time_picker.json",
+      "component_date_time_picker_with_validation.json"
     ),
     // TODO https://github.com/google/android-fhir/issues/1260
     //    SLIDER(
     //      R.drawable.ic_slider,
     //      R.string.component_name_slider,
-    //      "slider_questionnaire.json",
-    //      "slider_with_validation_questionnaire.json"
+    //      "component_slider.json",
+    //      "component_slider_with_validation.json"
     //    ),
     IMAGE(R.drawable.ic_image, R.string.component_name_image, "", ""),
     AUTO_COMPLETE(
       R.drawable.ic_autocomplete,
       R.string.component_name_auto_complete,
-      "auto_complete_questionnaire.json",
-      "auto_complete_with_validation_questionnaire.json"
+      "component_auto_complete.json",
+      "component_auto_complete_with_validation.json"
     ),
   }
 }
