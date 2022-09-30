@@ -232,8 +232,11 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
 internal const val TAG = "date-picker"
 internal val ZONE_ID_UTC = ZoneId.of("UTC")
-// Medium and long format styles use alphabetical month names which are difficult for the user
-// to input. Use short format style which is always numerical.
+
+/**
+ * Medium and long format styles use alphabetical month names which are difficult for the user to
+ * input. Use short format style which is always numerical.
+ */
 internal val localeDatePattern =
   DateTimeFormatterBuilder.getLocalizedDateTimePattern(
     FormatStyle.SHORT,
@@ -241,6 +244,7 @@ internal val localeDatePattern =
     IsoChronology.INSTANCE,
     Locale.getDefault()
   )
+
 /**
  * Returns the [AppCompatActivity] if there exists one wrapped inside [ContextThemeWrapper] s, or
  * `null` otherwise.
