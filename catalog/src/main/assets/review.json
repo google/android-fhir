@@ -1,0 +1,893 @@
+{
+  "status": "draft",
+  "publisher": "Roshnee team",
+  "name": "covid-19-screening",
+  "title": "COVID-19 Screening",
+  "resourceType": "Questionnaire",
+  "subjectType": ["Encounter"],
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire|2.7"
+    ],
+    "tag": [
+      {
+        "code": "lformsVersion: 29.2.1"
+      }
+    ]
+  },
+  "item": [
+    {
+      "type": "group",
+      "code": [
+        {
+          "code": "67795-5",
+          "display": "Vital signs, weight, height, head circumference and oximetry panel HITSP",
+          "system": "http://loinc.org"
+        }
+      ],
+      "required": false,
+      "linkId": "/67795-5",
+      "text": "Vital signs, weight, height, head circumference and oximetry panel HITSP",
+      "item": [
+        {
+          "type": "decimal",
+          "code": [
+            {
+              "code": "59408-5",
+              "display": "SaO2 % BldA PulseOx",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
+              "valueCoding": {
+                "display": "%"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/59408-5",
+          "text": "SaO2 % BldA PulseOx"
+        },
+        {
+          "type": "quantity",
+          "code": [
+            {
+              "code": "3141-9",
+              "display": "Weight Measured",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "display": "[lb_av]"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "display": "kg"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/3141-9",
+          "text": "Weight Measured"
+        },
+        {
+          "type": "decimal",
+          "code": [
+            {
+              "code": "8287-5",
+              "display": "Head Circumf OFC by Tape measure",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
+              "valueCoding": {
+                "display": "cm"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/8287-5",
+          "text": "Head Circumf OFC by Tape measure"
+        },
+        {
+          "type": "quantity",
+          "code": [
+            {
+              "code": "8302-2",
+              "display": "Body height",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "display": "centimeters"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "display": "feet"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "display": "inches"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "display": "meters"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/8302-2",
+          "text": "Body height"
+        },
+        {
+          "type": "quantity",
+          "code": [
+            {
+              "code": "8306-3",
+              "display": "Body height lying",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "display": "[in_us]"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "display": "cm"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "display": "m"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/8306-3",
+          "text": "Body height lying"
+        },
+        {
+          "type": "decimal",
+          "code": [
+            {
+              "code": "8310-5",
+              "display": "Body temperature",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
+              "valueCoding": {
+                "display": "Cel"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/8310-5",
+          "text": "Body temperature"
+        },
+        {
+          "type": "decimal",
+          "code": [
+            {
+              "code": "8462-4",
+              "display": "BP dias",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
+              "valueCoding": {
+                "display": "mm[Hg]"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/8462-4",
+          "text": "BP dias"
+        },
+        {
+          "type": "decimal",
+          "code": [
+            {
+              "code": "8480-6",
+              "display": "BP sys",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
+              "valueCoding": {
+                "display": "mm[Hg]"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/8480-6",
+          "text": "BP sys"
+        },
+        {
+          "type": "quantity",
+          "code": [
+            {
+              "code": "8867-4",
+              "display": "Heart rate",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "display": "{beats}/min"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "display": "{counts/min}"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/8867-4",
+          "text": "Heart rate"
+        },
+        {
+          "type": "quantity",
+          "code": [
+            {
+              "code": "9279-1",
+              "display": "Resp rate",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "display": "{breaths}/min"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "display": "{counts/min}"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/9279-1",
+          "text": "Resp rate"
+        },
+        {
+          "text": "This panel was created to collect the set of vital sign observations that was originally defined by HITSP and called the \"Vital Sign Result Value Set\" in the C80 Clinical Document and Message Terminology Component (Value Set OID: 2.16.840.1.113883.3.88.12.80.62), but it is not limited for use in that context. This collection includes the standard vital sign measurements (heart and respiratory rate, blood pressure and body temperature) along with measurements for height, weight, head circumference (OFC), and oximetry.",
+          "type": "display",
+          "linkId": "/67795-5-help",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "text": "Help-Button",
+                "coding": [
+                  {
+                    "code": "help",
+                    "display": "Help-Button",
+                    "system": "http://hl7.org/fhir/questionnaire-item-control"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "code": [
+        {
+          "code": "88786-9",
+          "display": "Symptoms",
+          "system": "http://loinc.org"
+        }
+      ],
+      "required": false,
+      "linkId": "/88786-9",
+      "text": "Symptoms",
+      "item": [
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "88755-4",
+              "display": "Do you feel grinding, hear clicking or any other type of noise from your hip?",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/88755-4",
+          "text": "Do you feel grinding, hear clicking or any other type of noise from your hip?",
+          "answerOption": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                  "valueString": "0"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                  "valueDecimal": 0
+                }
+              ],
+              "valueCoding": {
+                "code": "LA6270-8",
+                "display": "Never"
+              }
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                  "valueString": "1"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                  "valueDecimal": 1
+                }
+              ],
+              "valueCoding": {
+                "code": "LA10066-1",
+                "display": "Rarely"
+              }
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                  "valueString": "2"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                  "valueDecimal": 2
+                }
+              ],
+              "valueCoding": {
+                "code": "LA10082-8",
+                "display": "Sometimes"
+              }
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                  "valueString": "3"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                  "valueDecimal": 3
+                }
+              ],
+              "valueCoding": {
+                "code": "LA10044-8",
+                "display": "Often"
+              }
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                  "valueString": "4"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                  "valueDecimal": 4
+                }
+              ],
+              "valueCoding": {
+                "code": "LA9933-8",
+                "display": "Always"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "88754-7",
+              "display": "Difficulties spreading legs wide apart",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/88754-7",
+          "text": "Difficulties spreading legs wide apart",
+          "answerOption": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                  "valueString": "0"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                  "valueDecimal": 0
+                }
+              ],
+              "valueCoding": {
+                "code": "LA137-2",
+                "display": "None"
+              }
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                  "valueString": "1"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                  "valueDecimal": 1
+                }
+              ],
+              "valueCoding": {
+                "code": "LA6752-5",
+                "display": "Mild"
+              }
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                  "valueString": "2"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                  "valueDecimal": 2
+                }
+              ],
+              "valueCoding": {
+                "code": "LA6751-7",
+                "display": "Moderate"
+              }
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                  "valueString": "3"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                  "valueDecimal": 3
+                }
+              ],
+              "valueCoding": {
+                "code": "LA6750-9",
+                "display": "Severe"
+              }
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                  "valueString": "4"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                  "valueDecimal": 4
+                }
+              ],
+              "valueCoding": {
+                "code": "LA11912-5",
+                "display": "Extreme"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "88753-9",
+              "display": "Difficulties to stride out when walking",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/88753-9",
+          "text": "Difficulties to stride out when walking",
+          "answerOption": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                  "valueString": "0"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                  "valueDecimal": 0
+                }
+              ],
+              "valueCoding": {
+                "code": "LA137-2",
+                "display": "None"
+              }
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                  "valueString": "1"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                  "valueDecimal": 1
+                }
+              ],
+              "valueCoding": {
+                "code": "LA6752-5",
+                "display": "Mild"
+              }
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                  "valueString": "2"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                  "valueDecimal": 2
+                }
+              ],
+              "valueCoding": {
+                "code": "LA6751-7",
+                "display": "Moderate"
+              }
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                  "valueString": "3"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                  "valueDecimal": 3
+                }
+              ],
+              "valueCoding": {
+                "code": "LA6750-9",
+                "display": "Severe"
+              }
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                  "valueString": "4"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                  "valueDecimal": 4
+                }
+              ],
+              "valueCoding": {
+                "code": "LA11912-5",
+                "display": "Extreme"
+              }
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "code": [
+            {
+              "code": "88785-1",
+              "display": "Stiffness",
+              "system": "http://loinc.org"
+            }
+          ],
+          "required": false,
+          "linkId": "/88785-1",
+          "text": "Stiffness",
+          "item": [
+            {
+              "type": "choice",
+              "code": [
+                {
+                  "code": "88752-1",
+                  "display": "How severe is your hip joint stiffness after first wakening in the morning?",
+                  "system": "http://loinc.org"
+                }
+              ],
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "drop-down",
+                        "display": "Drop down"
+                      }
+                    ],
+                    "text": "Drop down"
+                  }
+                }
+              ],
+              "required": false,
+              "linkId": "/88785-1/88752-1",
+              "text": "How severe is your hip joint stiffness after first wakening in the morning?",
+              "answerOption": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                      "valueString": "0"
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                      "valueDecimal": 0
+                    }
+                  ],
+                  "valueCoding": {
+                    "code": "LA137-2",
+                    "display": "None"
+                  }
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                      "valueString": "1"
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                      "valueDecimal": 1
+                    }
+                  ],
+                  "valueCoding": {
+                    "code": "LA6752-5",
+                    "display": "Mild"
+                  }
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                      "valueString": "2"
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                      "valueDecimal": 2
+                    }
+                  ],
+                  "valueCoding": {
+                    "code": "LA6751-7",
+                    "display": "Moderate"
+                  }
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                      "valueString": "3"
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                      "valueDecimal": 3
+                    }
+                  ],
+                  "valueCoding": {
+                    "code": "LA6750-9",
+                    "display": "Severe"
+                  }
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                      "valueString": "4"
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                      "valueDecimal": 4
+                    }
+                  ],
+                  "valueCoding": {
+                    "code": "LA11912-5",
+                    "display": "Extreme"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "choice",
+              "code": [
+                {
+                  "code": "88751-3",
+                  "display": "How severe is your hip stiffness after sitting, lying or resting later in the day?",
+                  "system": "http://loinc.org"
+                }
+              ],
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "drop-down",
+                        "display": "Drop down"
+                      }
+                    ],
+                    "text": "Drop down"
+                  }
+                }
+              ],
+              "required": false,
+              "linkId": "/88785-1/88751-3",
+              "text": "How severe is your hip stiffness after sitting, lying or resting later in the day?",
+              "answerOption": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                      "valueString": "0"
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                      "valueDecimal": 0
+                    }
+                  ],
+                  "valueCoding": {
+                    "code": "LA137-2",
+                    "display": "None"
+                  }
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                      "valueString": "1"
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                      "valueDecimal": 1
+                    }
+                  ],
+                  "valueCoding": {
+                    "code": "LA6752-5",
+                    "display": "Mild"
+                  }
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                      "valueString": "2"
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                      "valueDecimal": 2
+                    }
+                  ],
+                  "valueCoding": {
+                    "code": "LA6751-7",
+                    "display": "Moderate"
+                  }
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                      "valueString": "3"
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                      "valueDecimal": 3
+                    }
+                  ],
+                  "valueCoding": {
+                    "code": "LA6750-9",
+                    "display": "Severe"
+                  }
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+                      "valueString": "4"
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/ordinalValue",
+                      "valueDecimal": 4
+                    }
+                  ],
+                  "valueCoding": {
+                    "code": "LA11912-5",
+                    "display": "Extreme"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
