@@ -46,7 +46,7 @@ class MaxValueConstraintValidatorTest {
   }
 
   @Test
-  fun `should return invalid result and show error message when entered value is greater than maxValue`() {
+  fun `should return invalid result when entered value is greater than maxValue`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -94,7 +94,7 @@ class MaxValueConstraintValidatorTest {
   }
 
   @Test
-  fun `getMaxValue should return max value date`() {
+  fun `should return maxValue date`() {
     val dateType = DateType(SimpleDateFormat("yyyy-MM-dd").parse("2023-06-01"))
     val questionItem =
       listOf(
@@ -113,7 +113,7 @@ class MaxValueConstraintValidatorTest {
   }
 
   @Test
-  fun `getMaxValue should return today's date when expression evaluates to today`() {
+  fun `should return today's date when expression evaluates to today`() {
     val today = LocalDate.now().toString()
     val questionItem =
       listOf(
@@ -147,7 +147,7 @@ class MaxValueConstraintValidatorTest {
   }
 
   @Test
-  fun `getMaxValue should return date five days ahead from today`() {
+  fun `should return future's date when expression evaluates`() {
     val fiveDaysAhead = LocalDate.now().plusDays(5).toString()
     val questionItem =
       listOf(
