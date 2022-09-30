@@ -109,7 +109,6 @@ dependencies {
   implementation(Dependencies.Cql.translatorCqlToElm) // Overrides HAPI's old versions
   implementation(Dependencies.Cql.translatorElm) // Overrides HAPI's old versions
   implementation(Dependencies.Cql.translatorElmJackson) // Necessary to import XML/JSON CQL Libs
-  implementation(Dependencies.Cql.translatorFhirR4) // Overrides HAPI's old versions
   implementation(Dependencies.Cql.translatorModel) // Overrides HAPI's old versions
   implementation(Dependencies.Cql.translatorModelJackson) // Necessary to import XML/JSON ModelInfos
   implementation(Dependencies.Cql.translatorQDM) // Overrides HAPI's old versions

@@ -48,7 +48,6 @@ object Dependencies {
 
     const val translatorCqlToElm = "$translatorGroup:cql-to-elm:${Versions.Cql.translator}"
     const val translatorElm = "$translatorGroup:elm:${Versions.Cql.translator}"
-    const val translatorFhirR4 = "$translatorGroup:fhir-r4:${Versions.Cql.translator}"
     const val translatorModel = "$translatorGroup:model:${Versions.Cql.translator}"
     const val translatorQDM = "$translatorGroup:qdm:${Versions.Cql.translator}"
 

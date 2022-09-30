@@ -26,7 +26,6 @@ dependencies {
   compileOnly(Dependencies.Cql.evaluatorPlanDef)
   compileOnly(Dependencies.Cql.translatorCqlToElm)
   compileOnly(Dependencies.Cql.translatorElm)
-  compileOnly(Dependencies.Cql.translatorFhirR4)
   compileOnly(Dependencies.Cql.translatorModel)
   compileOnly(Dependencies.Cql.translatorQDM)
 
