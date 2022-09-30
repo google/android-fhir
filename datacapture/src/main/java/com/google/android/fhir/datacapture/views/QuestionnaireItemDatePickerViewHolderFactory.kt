@@ -113,14 +113,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               ?.localDate
               ?.localizedString
           )
-          displayValidationError(Valid)
+          displayValidationResult(Valid)
         }
         textWatcher = textInputEditText.doAfterTextChanged { text -> updateAnswer(text.toString()) }
       }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {}
-
-      fun displayValidationError(validationResult: ValidationResult) {
+      override fun displayValidationResult(validationResult: ValidationResult) {
         textInputLayout.error =
           when (validationResult) {
             is NotValidated, Valid -> null
@@ -177,11 +175,11 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               value = localDate.dateType
             }
           )
-          displayValidationError(Valid)
+          displayValidationResult(Valid)
         } catch (e: ParseException) {
           if (text.isNullOrEmpty()) {
             if (questionnaireItemViewItem.questionnaireItem.required) {
-              displayValidationError(
+              displayValidationResult(
                 Invalid(
                   listOf(
                     textInputEditText.context.getString(
@@ -191,10 +189,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                 )
               )
             } else {
-              displayValidationError(Valid)
+              displayValidationResult(Valid)
             }
           } else {
-            displayValidationError(
+            displayValidationResult(
               Invalid(
                 listOf(
                   textInputEditText.context.getString(
