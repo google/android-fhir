@@ -95,12 +95,13 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "date_time_questionnaire.json",
       "date_time_with_validation_questionnaire.json"
     ),
-    SLIDER(
-      R.drawable.ic_slider,
-      R.string.component_name_slider,
-      "slider_questionnaire.json",
-      "slider_with_validation_questionnaire.json"
-    ),
+    // TODO https://github.com/google/android-fhir/issues/1260
+    //    SLIDER(
+    //      R.drawable.ic_slider,
+    //      R.string.component_name_slider,
+    //      "slider_questionnaire.json",
+    //      "slider_with_validation_questionnaire.json"
+    //    ),
     IMAGE(R.drawable.ic_image, R.string.component_name_image, "", ""),
     AUTO_COMPLETE(
       R.drawable.ic_autocomplete,
