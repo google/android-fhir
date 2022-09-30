@@ -145,8 +145,6 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
         }
       )
     }
-
-    println(search.getQuery(false))
   }
 
   private fun convertDate(obj: Any): Date {
