@@ -26,7 +26,6 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.filter.TokenParamFilterCriterion
-import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.query.XFhirQueryTranslator.applyFilterParam
 import java.math.BigDecimal
 import java.util.Date
