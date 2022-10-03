@@ -1407,9 +1407,8 @@ class MoreQuestionnaireItemComponentsTest {
         )
 
     val answers =
-      questionItem.itemFirstRep.extractAnswerOptions(
-          listOf(Coding("a.com", "a", "A"), Coding("b.com", "b", "B"))
-        )
+      questionItem.itemFirstRep
+        .extractAnswerOptions(listOf(Coding("a.com", "a", "A"), Coding("b.com", "b", "B")))
         .map { "${it.valueCoding.code}|${it.valueCoding.display}" }
 
     assertThat(answers.first()).isEqualTo("a|A")
@@ -1441,7 +1440,8 @@ class MoreQuestionnaireItemComponentsTest {
         )
 
     val answers =
-      questionItem.itemFirstRep.extractAnswerOptions(
+      questionItem.itemFirstRep
+        .extractAnswerOptions(
           listOf(
             Patient().apply {
               id = "1234"
@@ -1483,8 +1483,8 @@ class MoreQuestionnaireItemComponentsTest {
         )
 
     assertThrows(IllegalArgumentException::class.java) {
-      questionItem.itemFirstRep.extractAnswerOptions(listOf(Patient()))
-    }
+        questionItem.itemFirstRep.extractAnswerOptions(listOf(Patient()))
+      }
       .run {
         assertThat(this.message)
           .isEqualTo(

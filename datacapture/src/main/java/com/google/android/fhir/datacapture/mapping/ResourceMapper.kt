@@ -160,8 +160,7 @@ object ResourceMapper {
     val structureMapProvider = structureMapExtractionContext.structureMapProvider
     val simpleWorkerContext =
       DataCapture.getConfiguration(structureMapExtractionContext.context)
-        .simpleWorkerContext
-        .apply { setExpansionProfile(Parameters()) }
+        .simpleWorkerContext.apply { setExpansionProfile(Parameters()) }
     val structureMap = structureMapProvider(questionnaire.targetStructureMap!!, simpleWorkerContext)
 
     return Bundle().apply {
@@ -244,9 +243,9 @@ object ResourceMapper {
 
   private val Questionnaire.QuestionnaireItemComponent.initialExpression: Expression?
     get() {
-      return this.extension.firstOrNull { it.url == ITEM_INITIAL_EXPRESSION_URL }?.let {
-        it.value as Expression
-      }
+      return this.extension
+        .firstOrNull { it.url == ITEM_INITIAL_EXPRESSION_URL }
+        ?.let { it.value as Expression }
     }
 
   /**
@@ -432,8 +431,7 @@ object ResourceMapper {
     // answer, e.g., `Observation#setValue`. We set the answer component of the questionnaire
     // response item directly as the value (e.g `StringType`).
     try {
-      base
-        .javaClass
+      base.javaClass
         .getMethod("setValue", Type::class.java)
         .invoke(base, questionnaireResponseItem.answer.singleOrNull()?.value)
       return
@@ -523,8 +521,7 @@ private fun updateFieldWithEnum(base: Base, field: Field, value: Base) {
 
   val stringValue = if (value is Coding) value.code else value.toString()
 
-  base
-    .javaClass
+  base.javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.nonParameterizedType)
     .invoke(base, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
@@ -546,15 +543,13 @@ private fun updateField(
 }
 
 private fun updateFieldWithAnswer(base: Base, field: Field, answerValue: Base) {
-  base
-    .javaClass
+  base.javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}Element", field.type)
     .invoke(base, answerValue)
 }
 
 private fun updateListFieldWithAnswer(base: Base, field: Field, answerValue: List<Base>) {
-  base
-    .javaClass
+  base.javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.type)
     .invoke(base, if (field.isParameterized && field.isList) answerValue else answerValue.first())
 }
@@ -675,10 +670,11 @@ private val Questionnaire.QuestionnaireItemComponent.itemExtractionContextNameTo
  */
 private val List<Extension>.itemExtractionContextExtensionNameToExpressionPair
   get() =
-    this.singleOrNull { it.url == ITEM_CONTEXT_EXTENSION_URL }?.let {
-      val expression = it.value as Expression
-      expression.name to expression.expression
-    }
+    this.singleOrNull { it.url == ITEM_CONTEXT_EXTENSION_URL }
+      ?.let {
+        val expression = it.value as Expression
+        expression.name to expression.expression
+      }
 
 /**
  * URL for the

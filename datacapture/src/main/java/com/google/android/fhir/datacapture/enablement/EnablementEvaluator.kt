@@ -70,7 +70,8 @@ internal object EnablementEvaluator {
     questionnaireResponseItemRetriever:
       (
         item: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-        linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
+        linkId: String
+      ) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhen
     val enableWhenExpression = questionnaireItem.enableWhenExpression
@@ -125,7 +126,8 @@ private fun evaluateEnableWhen(
   questionnaireResponseItemRetriever:
     (
       item: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-      linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
+      linkId: String
+    ) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
 ): Boolean {
   val questionnaireResponseItem =
     questionnaireResponseItemRetriever(questionnaireResponseItem, enableWhen.question)

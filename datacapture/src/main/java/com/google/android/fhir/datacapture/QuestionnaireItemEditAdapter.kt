@@ -57,9 +57,8 @@ internal class QuestionnaireItemEditAdapter(
 
     // Map custom widget viewTypes to their corresponding widget factories
     if (viewType >= numOfCanonicalWidgets)
-      return questionnaireItemViewHolderMatchers[viewType - numOfCanonicalWidgets].factory.create(
-        parent
-      )
+      return questionnaireItemViewHolderMatchers[viewType - numOfCanonicalWidgets]
+        .factory.create(parent)
 
     val viewHolderFactory =
       when (QuestionnaireItemViewHolderType.fromInt(viewType)) {

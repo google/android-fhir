@@ -2564,45 +2564,52 @@ class QuestionnaireViewModelTest(
 
   @Test
   fun `resolveAnswerExpression() should return questionnaire item answer options for answer expression and choice column`() =
-      runBlocking {
-    val practitioner =
-      Practitioner()
-        .apply {
-          id = UUID.randomUUID().toString()
-          active = true
-          addName(HumanName().apply { this.family = "John" })
+    runBlocking {
+      val practitioner =
+        Practitioner()
+          .apply {
+            id = UUID.randomUUID().toString()
+            active = true
+            addName(HumanName().apply { this.family = "John" })
+          }
+          .also { fhirEngine.create(it) }
+
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              text = "answer expression question text"
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              extension =
+                listOf(
+                  Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                    Expression().apply {
+                      this.expression = "Practitioner?active=true"
+                      this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                    }
+                  ),
+                  Extension(
+                      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
+                    )
+                    .apply {
+                      this.addExtension(Extension("path", StringType("id")))
+                      this.addExtension(Extension("label", StringType("name")))
+                      this.addExtension(Extension("forDisplay", BooleanType(true)))
+                    }
+                )
+            }
+          )
         }
-        .also { fhirEngine.create(it) }
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
-    val questionnaire =
-      Questionnaire().apply {
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a"
-            text = "answer expression question text"
-            type = Questionnaire.QuestionnaireItemType.REFERENCE
-            extension =
-              listOf(
-                Extension(
-                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
-                  Expression().apply {
-                    this.expression = "Practitioner?active=true"
-                    this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
-                  }
-                ),
-                Extension(
-                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
-                  )
-                  .apply {
-                    this.addExtension(Extension("path", StringType("id")))
-                    this.addExtension(Extension("label", StringType("name")))
-                    this.addExtension(Extension("forDisplay", BooleanType(true)))
-                  }
-    val answerOptions = viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
+      val viewModel = QuestionnaireViewModel(context, state)
+      val answerOptions = viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
 
-    assertThat(answerOptions.first().valueReference.reference)
-      .isEqualTo("Practitioner/${practitioner.logicalId}")
-  }  
+      assertThat(answerOptions.first().valueReference.reference)
+        .isEqualTo("Practitioner/${practitioner.logicalId}")
+    }
 
   @Test
   fun `nested display item with help code should not be created as questionnaire state item`() =

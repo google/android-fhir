@@ -37,7 +37,9 @@ internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
 internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
   get() {
     return when (value) {
-      is IntegerType, is DateType, is TimeType -> value.primitiveValue()
+      is IntegerType,
+      is DateType,
+      is TimeType -> value.primitiveValue()
       is StringType -> (value as StringType).getLocalizedText() ?: value.toString()
       is Reference -> valueReference.display ?: valueReference.reference
       is Coding -> {
@@ -60,7 +62,9 @@ internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString:
 internal val QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.displayString: String
   get() {
     return when (value) {
-      is IntegerType, is DateType, is TimeType -> value.primitiveValue()
+      is IntegerType,
+      is DateType,
+      is TimeType -> value.primitiveValue()
       is StringType -> (value as StringType).getLocalizedText() ?: value.toString()
       is Coding -> {
         val display = valueCoding.displayElement.getLocalizedText() ?: valueCoding.display
