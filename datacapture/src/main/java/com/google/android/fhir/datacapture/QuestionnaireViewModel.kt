@@ -100,8 +100,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
         val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI]!!
         questionnaireResponse =
-          parser.parseResource(application.contentResolver.openInputStream(uri)) as
-            QuestionnaireResponse
+          parser.parseResource(application.contentResolver.openInputStream(uri))
+            as QuestionnaireResponse
         checkQuestionnaireResponse(questionnaire, questionnaireResponse)
       }
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING) -> {
@@ -171,19 +171,19 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
     }
 
-    questionnaireItemParentMap =
-      buildMap {
-        for (item in questionnaire.item) {
-          buildParentList(item, this)
-        }
+    questionnaireItemParentMap = buildMap {
+      for (item in questionnaire.item) {
+        buildParentList(item, this)
       }
+    }
   }
 
   /** The map from each item in the [QuestionnaireResponse] to its parent. */
   private val questionnaireResponseItemParentMap =
     mutableMapOf<
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
-      QuestionnaireResponse.QuestionnaireResponseItemComponent>()
+      QuestionnaireResponse.QuestionnaireResponseItemComponent
+    >()
 
   init {
     /** Adds each child-parent pair in the [QuestionnaireResponse] to the parent map. */
@@ -261,17 +261,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     (
       Questionnaire.QuestionnaireItemComponent,
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
-      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>) -> Unit =
-      { questionnaireItem, questionnaireResponseItem, answers ->
-    // TODO(jingtang10): update the questionnaire response item pre-order list and the parent map
-    questionnaireResponseItem.answer = answers.toList()
-    if (questionnaireItem.hasNestedItemsWithinAnswers) {
-      questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
-    }
+      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
+    ) -> Unit =
+    { questionnaireItem, questionnaireResponseItem, answers ->
+      // TODO(jingtang10): update the questionnaire response item pre-order list and the parent map
+      questionnaireResponseItem.answer = answers.toList()
+      if (questionnaireItem.hasNestedItemsWithinAnswers) {
+        questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
+      }
 
-    modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
-    modificationCount.update { it + 1 }
-  }
+      modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
+      modificationCount.update { it + 1 }
+    }
 
   private val answerValueSetMap =
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
@@ -288,7 +289,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   internal fun goToPreviousPage() {
     when (entryMode) {
-      EntryMode.PRIOR_EDIT, EntryMode.RANDOM -> {
+      EntryMode.PRIOR_EDIT,
+      EntryMode.RANDOM -> {
         val previousPageIndex =
           pages!!.indexOfLast { it.index < currentPageIndexFlow.value!! && it.enabled }
         check(previousPageIndex != -1) {
@@ -304,7 +306,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   internal fun goToNextPage() {
     when (entryMode) {
-      EntryMode.PRIOR_EDIT, EntryMode.SEQUENTIAL -> {
+      EntryMode.PRIOR_EDIT,
+      EntryMode.SEQUENTIAL -> {
         if (!isPaginationButtonPressed) {
           // Force update validation results for all questions on the current page. This is needed
           // when the user has not answered any questions so no validation has been done.
@@ -387,11 +390,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           }
           ?.let { resource ->
             val valueSet = resource as ValueSet
-            valueSet.expansion.contains.filterNot { it.abstract || it.inactive }.map { component ->
-              Questionnaire.QuestionnaireItemAnswerOptionComponent(
-                Coding(component.system, component.code, component.display)
-              )
-            }
+            valueSet.expansion.contains
+              .filterNot { it.abstract || it.inactive }
+              .map { component ->
+                Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                  Coding(component.system, component.code, component.display)
+                )
+              }
           }
       } else {
         // Ask the client to provide the answers from an external expanded Valueset.
@@ -495,7 +500,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         // If there is an enabled questionnaire response available then we use that. Or else we
         // just use an empty questionnaireResponse Item
         if (responseIndex < questionnaireResponseItemList.size &&
-            questionnaireItem.linkId == questionnaireResponseItem.linkId
+            questionnaireItem.linkId == questionnaireResponseItemList[responseIndex].linkId
         ) {
           questionnaireResponseItem = questionnaireResponseItemList[responseIndex]
           responseIndex += 1
@@ -555,7 +560,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireItemList =
             questionnaireItem.item.filterNot {
               it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-                (it.isInstructionsCode || it.isFlyoverCode)
+                (it.isInstructionsCode || it.isFlyoverCode || it.isHelpCode)
             },
           questionnaireResponseItemList =
             if (questionnaireResponseItem.answer.isEmpty()) {

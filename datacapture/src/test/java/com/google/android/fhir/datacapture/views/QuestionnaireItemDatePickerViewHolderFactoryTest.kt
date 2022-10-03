@@ -35,7 +35,7 @@ import org.robolectric.RuntimeEnvironment
 @RunWith(RobolectricTestRunner::class)
 class QuestionnaireItemDatePickerViewHolderFactoryTest {
   private val context =
-    RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+    RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
   private val parent = FrameLayout(context)
   private val viewHolder = QuestionnaireItemDatePickerViewHolderFactory.create(parent)
 

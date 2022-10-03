@@ -48,7 +48,8 @@ class BundleUploaderTest {
           TestingUtils.BundleDataSource {
             Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
           },
-          TransactionBundleGenerator.getDefault()
+          TransactionBundleGenerator.getDefault(),
+          LocalChangesPaginator.DEFAULT
         )
         .upload(localChanges, null)
         .toList()
@@ -119,7 +120,8 @@ class BundleUploaderTest {
               )
             }
           },
-          TransactionBundleGenerator.getDefault()
+          TransactionBundleGenerator.getDefault(),
+          LocalChangesPaginator.DEFAULT
         )
         .upload(localChanges, null)
         .toList()
@@ -133,7 +135,8 @@ class BundleUploaderTest {
     val result =
       BundleUploader(
           TestingUtils.BundleDataSource { throw ConnectException("Failed to connect to server.") },
-          TransactionBundleGenerator.getDefault()
+          TransactionBundleGenerator.getDefault(),
+          LocalChangesPaginator.DEFAULT
         )
         .upload(localChanges, null)
         .toList()

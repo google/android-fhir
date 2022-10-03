@@ -87,6 +87,9 @@ internal fun Questionnaire.QuestionnaireItemComponent.findVariableExpression(
   return variableExpressions.find { it.name == variableName }
 }
 
+internal const val CQF_CALCULATED_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue"
+
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
   get() {
@@ -95,10 +98,10 @@ internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTy
         .firstOrNull {
           it.url == EXTENSION_ITEM_CONTROL_URL || it.url == EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR
         }
-        ?.value as
-        CodeableConcept?
+        ?.value as CodeableConcept?
     val code =
-      codeableConcept?.coding
+      codeableConcept
+        ?.coding
         ?.firstOrNull {
           it.system == EXTENSION_ITEM_CONTROL_SYSTEM ||
             it.system == EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR
@@ -119,8 +122,8 @@ internal const val EXTENSION_CHOICE_ORIENTATION_URL =
 internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceOrientationTypes?
   get() {
     val code =
-      (this.extension.firstOrNull { it.url == EXTENSION_CHOICE_ORIENTATION_URL }?.value as
-          CodeType?)
+      (this.extension.firstOrNull { it.url == EXTENSION_CHOICE_ORIENTATION_URL }?.value
+          as CodeType?)
         ?.valueAsString
     return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
   }
@@ -129,6 +132,7 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceO
 internal enum class DisplayItemControlType(val extensionCode: String) {
   FLYOVER("flyover"),
   PAGE("page"),
+  HELP("help")
 }
 
 /** Item control to show instruction text */
@@ -139,6 +143,25 @@ internal val Questionnaire.QuestionnaireItemComponent.displayItemControl: Displa
     val code =
       codeableConcept?.coding?.firstOrNull { it.system == EXTENSION_ITEM_CONTROL_SYSTEM }?.code
     return DisplayItemControlType.values().firstOrNull { it.extensionCode == code }
+  }
+
+/** Whether any one of the nested display item has [DisplayItemControlType.HELP] control. */
+internal val Questionnaire.QuestionnaireItemComponent.hasHelpButton: Boolean
+  get() {
+    return item.any { it.isHelpCode }
+  }
+
+/** Whether item type is display and [displayItemControl] is [DisplayItemControlType.HELP]. */
+internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.DISPLAY -> {
+        displayItemControl == DisplayItemControlType.HELP
+      }
+      else -> {
+        false
+      }
+    }
   }
 
 /**
@@ -195,6 +218,17 @@ internal val Questionnaire.QuestionnaireItemComponent.localizedFlyoverSpanned: S
       ?.localizedTextSpanned
 
 /**
+ * A nested questionnaire item of type display with displayCategory extension with [INSTRUCTIONS]
+ * code is used as the instructions of the parent question.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.localizedHelpSpanned: Spanned?
+  get() {
+    return item
+      .firstOrNull { questionnaireItem -> questionnaireItem.isHelpCode }
+      ?.localizedTextSpanned
+  }
+
+/**
  * Whether the QuestionnaireItem should be hidden according to the hidden extension or lack thereof.
  */
 internal val Questionnaire.QuestionnaireItemComponent.isHidden: Boolean
@@ -226,10 +260,11 @@ internal val Questionnaire.QuestionnaireItemComponent.isInstructionsCode: Boolea
     return when (type) {
       Questionnaire.QuestionnaireItemType.DISPLAY -> {
         val codeableConcept =
-          this.extension.firstOrNull { it.url == EXTENSION_DISPLAY_CATEGORY_URL }?.value as
-            CodeableConcept?
+          this.extension.firstOrNull { it.url == EXTENSION_DISPLAY_CATEGORY_URL }?.value
+            as CodeableConcept?
         val code =
-          codeableConcept?.coding
+          codeableConcept
+            ?.coding
             ?.firstOrNull { it.system == EXTENSION_DISPLAY_CATEGORY_SYSTEM }
             ?.code
         code == INSTRUCTIONS
@@ -283,9 +318,9 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
 // Return expression if QuestionnaireItemComponent has ENABLE WHEN EXPRESSION URL
 val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
   get() {
-    return this.extension.firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }?.let {
-      it.value as Expression
-    }
+    return this.extension
+      .firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }
+      ?.let { it.value as Expression }
   }
 
 /**

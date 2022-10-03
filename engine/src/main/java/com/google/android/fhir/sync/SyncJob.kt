@@ -35,7 +35,8 @@ interface SyncJob {
     fhirEngine: FhirEngine,
     downloadManager: DownloadWorkManager,
     resolver: ConflictResolver,
-    subscribeTo: MutableSharedFlow<State>?
+    subscribeTo: MutableSharedFlow<State>?,
+    uploadConfiguration: UploadConfiguration = UploadConfiguration()
   ): Result
 
   suspend fun stateFlow(scope: CoroutineScope): Flow<State>

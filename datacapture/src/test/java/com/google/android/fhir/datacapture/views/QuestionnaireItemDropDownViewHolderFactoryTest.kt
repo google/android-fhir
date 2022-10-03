@@ -37,7 +37,7 @@ import org.robolectric.RuntimeEnvironment
 class QuestionnaireItemDropDownViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
   private val viewHolder = QuestionnaireItemDropDownViewHolderFactory.create(parent)
 
@@ -72,8 +72,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<AutoCompleteTextView>(R.id.auto_complete)
           .adapter
           .getItem(1)
@@ -98,8 +97,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<AutoCompleteTextView>(R.id.auto_complete)
           .adapter
           .getItem(1)

@@ -41,7 +41,7 @@ import org.robolectric.RuntimeEnvironment
 class QuestionnaireItemRadioGroupViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
   private val viewHolder = QuestionnaireItemRadioGroupViewHolderFactory.create(parent)
 
@@ -150,8 +150,8 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
     )
 
     val radioButton =
-      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
-        RadioButton
+      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1)
+        as RadioButton
     assertThat(radioButton.isChecked).isFalse()
   }
 
@@ -184,14 +184,14 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
     )
 
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
-            RadioButton)
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1)
+            as RadioButton)
           .isChecked
       )
       .isTrue()
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2) as
-            RadioButton)
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2)
+            as RadioButton)
           .isChecked
       )
       .isFalse()
@@ -213,8 +213,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder
-      .itemView
+    viewHolder.itemView
       .findViewById<ConstraintLayout>(R.id.radio_group)
       .getChildAt(1)
       .performClick()
@@ -248,21 +247,20 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder
-      .itemView
+    viewHolder.itemView
       .findViewById<ConstraintLayout>(R.id.radio_group)
       .getChildAt(1)
       .performClick()
 
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
-            RadioButton)
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1)
+            as RadioButton)
           .isChecked
       )
       .isTrue()
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2) as
-            RadioButton)
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2)
+            as RadioButton)
           .isChecked
       )
       .isFalse()
@@ -297,21 +295,20 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
     )
 
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
-            RadioButton)
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1)
+            as RadioButton)
           .isChecked
       )
       .isTrue()
 
-    viewHolder
-      .itemView
+    viewHolder.itemView
       .findViewById<ConstraintLayout>(R.id.radio_group)
       .getChildAt(2)
       .performClick()
 
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2) as
-            RadioButton)
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2)
+            as RadioButton)
           .isChecked
       )
       .isTrue()
@@ -335,8 +332,8 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
 
     viewHolder.bind(questionnaireItemViewItem)
     val singleChoiceOption =
-      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
-        RadioButton
+      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1)
+        as RadioButton
     singleChoiceOption.performClick()
     assertThat(singleChoiceOption.isChecked).isTrue()
     singleChoiceOption.performClick()
@@ -362,8 +359,8 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
 
     viewHolder.bind(questionnaireItemViewItem)
     val singleChoiceOption =
-      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
-        RadioButton
+      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1)
+        as RadioButton
     singleChoiceOption.performClick()
     singleChoiceOption.performClick()
 
@@ -430,8 +427,8 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
       )
     )
     val radioButton =
-      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
-        RadioButton
+      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1)
+        as RadioButton
 
     assertThat(radioButton.isEnabled).isFalse()
   }

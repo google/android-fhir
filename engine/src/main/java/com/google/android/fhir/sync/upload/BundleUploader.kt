@@ -34,7 +34,8 @@ import org.hl7.fhir.r4.model.ResourceType
 /** [Uploader] implementation to work with Fhir [Bundle]. */
 internal class BundleUploader(
   private val dataSource: DataSource,
-  private val bundleGenerator: TransactionBundleGenerator
+  private val bundleGenerator: TransactionBundleGenerator,
+  private val localChangesPaginator: LocalChangesPaginator
 ) : Uploader {
 
   override suspend fun upload(

@@ -71,11 +71,8 @@ data class ResourceSyncException(val resourceType: ResourceType, val exception: 
 internal class FhirSynchronizer(
   context: Context,
   private val fhirEngine: FhirEngine,
-  private val dataSource: DataSource,
-  private val downloadManager: DownloadWorkManager,
-  private val uploader: Uploader =
-    BundleUploader(dataSource, TransactionBundleGenerator.getDefault()),
-  private val downloader: Downloader = DownloaderImpl(dataSource, downloadManager),
+  private val uploader: Uploader,
+  private val downloader: Downloader,
   private val conflictResolver: ConflictResolver
 ) {
   private var syncState: MutableSharedFlow<State>? = null
