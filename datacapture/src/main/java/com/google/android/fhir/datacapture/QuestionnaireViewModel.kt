@@ -495,7 +495,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         // If there is an enabled questionnaire response available then we use that. Or else we
         // just use an empty questionnaireResponse Item
         if (responseIndex < questionnaireResponseItemList.size &&
-            questionnaireItem.linkId == questionnaireResponseItem.linkId
+            questionnaireItem.linkId == questionnaireResponseItemList[responseIndex].linkId
         ) {
           questionnaireResponseItem = questionnaireResponseItemList[responseIndex]
           responseIndex += 1
@@ -555,7 +555,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireItemList =
             questionnaireItem.item.filterNot {
               it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-                (it.isInstructionsCode || it.isFlyoverCode)
+                (it.isInstructionsCode || it.isFlyoverCode || it.isHelpCode)
             },
           questionnaireResponseItemList =
             if (questionnaireResponseItem.answer.isEmpty()) {
