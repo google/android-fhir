@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.DomainResource
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -62,10 +63,12 @@ import org.hl7.fhir.r4.utils.StructureMapUtilities
  * [population](http://build.fhir.org/ig/HL7/sdc/populate.html).
  *
  * This class supports
- * [Definition-based extraction](http://build.fhir.org/ig/HL7/sdc/extraction.html#definition-based-extraction),
- * [StructureMap-based extraction](http://hl7.org/fhir/uv/sdc/extraction.html#structuremap-based-extraction),
- * and
- * [expression-based population](http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population).
+ * [Definition-based extraction](http://build.fhir.org/ig/HL7/sdc/extraction.html#definition-based-extraction)
+ * ,
+ * [StructureMap-based extraction](http://hl7.org/fhir/uv/sdc/extraction.html#structuremap-based-extraction)
+ * , and
+ * [expression-based population](http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population)
+ * .
  *
  * See the [developer guide](https://github.com/google/android-fhir/wiki/SDCL%3A-Use-ResourceMapper)
  * for more information.
@@ -87,7 +90,8 @@ object ResourceMapper {
    * [Bundle] is returned if [structureMapExtractionContext] is not provided.
    *
    * Otherwise, this method will perform
-   * [Definition-based extraction](http://hl7.org/fhir/uv/sdc/extraction.html#definition-based-extraction).
+   * [Definition-based extraction](http://hl7.org/fhir/uv/sdc/extraction.html#definition-based-extraction)
+   * .
    *
    * @param questionnaire A [Questionnaire] with data extraction extensions.
    * @param questionnaireResponse A [QuestionnaireResponse] with answers for [questionnaire].
@@ -442,9 +446,47 @@ object ResourceMapper {
         .javaClass
         .getMethod("setValue", Type::class.java)
         .invoke(base, questionnaireResponseItem.answer.singleOrNull()?.value)
+      return
     } catch (e: NoSuchMethodException) {
       // Do nothing
     }
+
+    if (base.javaClass.getFieldOrNull(fieldName) == null) {
+      // If field not found in resource class, assume this is an extension
+      addDefinitionBasedCustomExtension(questionnaireItem, questionnaireResponseItem, base)
+    }
+  }
+}
+
+/**
+ * Adds custom extension for Resource.
+ * @param questionnaireItem QuestionnaireItemComponent with details for extension
+ * @param questionnaireResponseItem QuestionnaireResponseItemComponent for response value
+ * @param base
+ * - resource's Base class instance See
+ * https://hapifhir.io/hapi-fhir/docs/model/profiles_and_extensions.html#extensions for more on
+ * custom extensions
+ */
+private fun addDefinitionBasedCustomExtension(
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+  questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  base: Base
+) {
+  if (base is Type) {
+    // Create an extension
+    val ext = Extension()
+    ext.url = questionnaireItem.definition
+    ext.setValue(questionnaireResponseItem.answer.first().value)
+    // Add the extension to the resource
+    base.addExtension(ext)
+  }
+  if (base is DomainResource) {
+    // Create an extension
+    val ext = Extension()
+    ext.url = questionnaireItem.definition
+    ext.setValue(questionnaireResponseItem.answer.first().value)
+    // Add the extension to the resource
+    base.addExtension(ext)
   }
 }
 

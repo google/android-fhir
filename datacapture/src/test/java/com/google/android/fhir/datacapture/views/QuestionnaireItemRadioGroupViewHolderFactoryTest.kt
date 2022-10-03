@@ -25,7 +25,8 @@ import androidx.core.view.children
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
@@ -40,7 +41,7 @@ import org.robolectric.RuntimeEnvironment
 class QuestionnaireItemRadioGroupViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
   private val viewHolder = QuestionnaireItemRadioGroupViewHolderFactory.create(parent)
 
@@ -50,7 +51,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -82,7 +83,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         questionnaire,
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -118,7 +119,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         questionnaire,
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -143,7 +144,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -177,7 +178,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -208,7 +209,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -243,7 +244,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
             emptyList()
           }
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
@@ -290,7 +291,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -317,12 +318,65 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
   }
 
   @Test
+  fun `unselect radio button if selected radio button is clicked`() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    viewHolder.bind(questionnaireItemViewItem)
+    val singleChoiceOption =
+      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
+        RadioButton
+    singleChoiceOption.performClick()
+    assertThat(singleChoiceOption.isChecked).isTrue()
+    singleChoiceOption.performClick()
+
+    assertThat(singleChoiceOption.isChecked).isFalse()
+  }
+
+  @Test
+  fun `clear the answer if selected radio button is clicked`() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    viewHolder.bind(questionnaireItemViewItem)
+    val singleChoiceOption =
+      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
+        RadioButton
+    singleChoiceOption.performClick()
+    singleChoiceOption.performClick()
+
+    assertThat(questionnaireItemViewItem.answers.isEmpty()).isTrue()
+  }
+
+  @Test
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
+        validationResult = Invalid(listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -350,7 +404,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -371,7 +425,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
       )
     )

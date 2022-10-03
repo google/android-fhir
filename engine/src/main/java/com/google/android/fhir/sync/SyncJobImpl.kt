@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,10 @@ import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
+import com.google.android.fhir.sync.download.DownloaderImpl
+import com.google.android.fhir.sync.upload.BundleUploader
+import com.google.android.fhir.sync.upload.LocalChangesPaginator
+import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import com.google.gson.GsonBuilder
 import java.time.OffsetDateTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -100,10 +104,22 @@ class SyncJobImpl(private val context: Context) : SyncJob {
   override suspend fun run(
     fhirEngine: FhirEngine,
     downloadManager: DownloadWorkManager,
-    subscribeTo: MutableSharedFlow<State>?
+    resolver: ConflictResolver,
+    subscribeTo: MutableSharedFlow<State>?,
+    uploadConfiguration: UploadConfiguration
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
-      FhirSynchronizer(context, fhirEngine, it, downloadManager)
+      FhirSynchronizer(
+          context,
+          fhirEngine,
+          BundleUploader(
+            it,
+            TransactionBundleGenerator.getDefault(),
+            LocalChangesPaginator.create(uploadConfiguration)
+          ),
+          DownloaderImpl(it, downloadManager),
+          resolver
+        )
         .apply { if (subscribeTo != null) subscribe(subscribeTo) }
         .synchronize()
     }

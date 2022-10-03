@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import android.net.Uri
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -25,9 +26,10 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +37,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -50,6 +51,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
+  private lateinit var currentPageItems: List<QuestionnaireItemViewItem>
 
   init {
     questionnaire =
@@ -76,9 +78,17 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
   }
 
+  @VisibleForTesting
+  val entryMode: EntryMode by lazy { questionnaire.entryMode ?: EntryMode.RANDOM }
+
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
 
+  /**
+   * True if the user has tapped the next/previous pagination buttons on the current page. This is
+   * needed to avoid spewing validation errors before any questions are answered.
+   */
+  private var isPaginationButtonPressed = false
   init {
     when {
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI) -> {
@@ -145,6 +155,30 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  /** The map from each item in the [Questionnaire] to its parent. */
+  private var questionnaireItemParentMap:
+    Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>
+
+  init {
+    /** Adds each child-parent pair in the [Questionnaire] to the parent map. */
+    fun buildParentList(
+      item: Questionnaire.QuestionnaireItemComponent,
+      questionnaireItemToParentMap: ItemToParentMap
+    ) {
+      for (child in item.item) {
+        questionnaireItemToParentMap[child] = item
+        buildParentList(child, questionnaireItemToParentMap)
+      }
+    }
+
+    questionnaireItemParentMap =
+      buildMap {
+        for (item in questionnaire.item) {
+          buildParentList(item, this)
+        }
+      }
+  }
+
   /** The map from each item in the [QuestionnaireResponse] to its parent. */
   private val questionnaireResponseItemParentMap =
     mutableMapOf<
@@ -165,8 +199,38 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  /** The pages of the questionnaire, or null if the questionnaire is not paginated. */
+  @VisibleForTesting var pages: List<QuestionnairePage>? = questionnaire.getInitialPages()
+
+  /**
+   * The flow representing the index of the current page, or null if the questionnaire is not
+   * paginated.
+   */
+  @VisibleForTesting val currentPageIndexFlow = MutableStateFlow(getInitialPageIndex())
+
+  /** Flag to support fragment for review-feature */
+  private val enableReviewPage: Boolean
+
+  init {
+    enableReviewPage = state[QuestionnaireFragment.EXTRA_ENABLE_REVIEW_PAGE] ?: false
+  }
+
+  /** Flag to open fragment first in data-collection or review-mode */
+  private val showReviewPageFirst: Boolean
+
+  init {
+    showReviewPageFirst =
+      enableReviewPage && state[QuestionnaireFragment.EXTRA_SHOW_REVIEW_PAGE_FIRST] ?: false
+  }
+
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
+
+  /** Toggles review mode. */
+  private val reviewFlow = MutableStateFlow(showReviewPageFirst)
+
+  /** Flag to show/hide submit button. */
+  private var showSubmitButtonFlag = false
 
   /**
    * Contains [QuestionnaireResponse.QuestionnaireResponseItemComponent]s that have been modified by
@@ -209,8 +273,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     modificationCount.update { it + 1 }
   }
 
-  private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
-
   private val answerValueSetMap =
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
 
@@ -225,23 +287,74 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   internal fun goToPreviousPage() {
-    pageFlow.value = pageFlow.value!!.previousPage()
+    when (entryMode) {
+      EntryMode.PRIOR_EDIT, EntryMode.RANDOM -> {
+        val previousPageIndex =
+          pages!!.indexOfLast { it.index < currentPageIndexFlow.value!! && it.enabled }
+        check(previousPageIndex != -1) {
+          "Can't call goToPreviousPage() if no preceding page is enabled"
+        }
+        currentPageIndexFlow.value = previousPageIndex
+      }
+      else -> {
+        Timber.w("Previous questions and submitted answers cannot be viewed or edited.")
+      }
+    }
   }
 
   internal fun goToNextPage() {
-    pageFlow.value = pageFlow.value!!.nextPage()
+    when (entryMode) {
+      EntryMode.PRIOR_EDIT, EntryMode.SEQUENTIAL -> {
+        if (!isPaginationButtonPressed) {
+          // Force update validation results for all questions on the current page. This is needed
+          // when the user has not answered any questions so no validation has been done.
+          isPaginationButtonPressed = true
+          modificationCount.update { it + 1 }
+        }
+
+        if (currentPageItems.all { it.validationResult is Valid }) {
+          isPaginationButtonPressed = false
+          val nextPageIndex =
+            pages!!.indexOfFirst { it.index > currentPageIndexFlow.value!! && it.enabled }
+          check(nextPageIndex != -1) { "Can't call goToNextPage() if no following page is enabled" }
+          currentPageIndexFlow.value = nextPageIndex
+        }
+      }
+      EntryMode.RANDOM -> {
+        val nextPageIndex =
+          pages!!.indexOfFirst { it.index > currentPageIndexFlow.value!! && it.enabled }
+        check(nextPageIndex != -1) { "Can't call goToNextPage() if no following page is enabled" }
+        currentPageIndexFlow.value = nextPageIndex
+      }
+    }
+  }
+
+  internal fun setReviewMode(reviewModeFlag: Boolean) {
+    reviewFlow.value = reviewModeFlag
+  }
+
+  internal fun setShowSubmitButtonFlag(showSubmitButton: Boolean) {
+    showSubmitButtonFlag = showSubmitButton
   }
 
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: Flow<QuestionnaireState> =
-    modificationCount
-      .combine(pageFlow) { _, pagination ->
-        getQuestionnaireState(
-          questionnaireItemList = questionnaire.item,
-          questionnaireResponseItemList = questionnaireResponse.item,
-          pagination = pagination,
-          modificationCount = modificationCount.value
-        )
+    combine(modificationCount, currentPageIndexFlow, reviewFlow) { _, pagination, reviewFlow ->
+        if (reviewFlow) {
+          getQuestionnaireState(
+            questionnaireItemList = questionnaire.item,
+            questionnaireResponseItemList = questionnaireResponse.item,
+            currentPageIndex = null,
+            reviewMode = reviewFlow
+          )
+        } else {
+          getQuestionnaireState(
+            questionnaireItemList = questionnaire.item,
+            questionnaireResponseItemList = questionnaireResponse.item,
+            currentPageIndex = pagination,
+            reviewMode = reviewFlow
+          )
+        }
       }
       .stateIn(
         viewModelScope,
@@ -250,8 +363,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           getQuestionnaireState(
             questionnaireItemList = questionnaire.item,
             questionnaireResponseItemList = questionnaireResponse.item,
-            pagination = questionnaire.getInitialPagination(),
-            modificationCount = 0
+            currentPageIndex = getInitialPageIndex(),
+            reviewMode = enableReviewPage
           )
       )
 
@@ -299,100 +412,160 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * [questionnaireStateFlow] with matching pairs of questionnaire item and questionnaire response
    * item.
    *
-   * The traverse is carried out in the two lists in tandem. The two lists should be structurally
-   * identical.
+   * The traverse is carried out in the two lists in tandem.
    */
   private fun getQuestionnaireState(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
-    pagination: QuestionnairePagination?,
-    modificationCount: Int,
+    currentPageIndex: Int?,
+    reviewMode: Boolean
   ): QuestionnaireState {
-    var responseIndex = 0
-    val items: List<QuestionnaireItemViewItem> =
-      questionnaireItemList
-        .asSequence()
-        .flatMapIndexed { index, questionnaireItem ->
-          var questionnaireResponseItem = questionnaireItem.createQuestionnaireResponseItem()
 
-          // If there is an enabled questionnaire response available then we use that. Or else we
-          // just use an empty questionnaireResponse Item
-          if (responseIndex < questionnaireResponseItemList.size &&
-              questionnaireItem.linkId == questionnaireResponseItem.linkId
-          ) {
-            questionnaireResponseItem = questionnaireResponseItemList[responseIndex]
-            responseIndex += 1
+    val showReviewButton =
+      enableReviewPage &&
+        !reviewFlow.value &&
+        (currentPageIndex == null ||
+          !QuestionnairePagination(pages = pages!!, currentPageIndex = currentPageIndex)
+            .hasNextPage)
+
+    val showSubmitButton =
+      showSubmitButtonFlag &&
+        !showReviewButton &&
+        (currentPageIndex == null ||
+          !QuestionnairePagination(pages = pages!!, currentPageIndex = currentPageIndex)
+            .hasNextPage)
+
+    if (currentPageIndex == null) {
+      // Single-page questionnaire
+      return QuestionnaireState(
+        items = getQuestionnaireItemViewItems(questionnaireItemList, questionnaireResponseItemList),
+        pagination =
+          QuestionnairePagination(false, emptyList(), -1, showSubmitButton, showReviewButton),
+        reviewMode = reviewMode
+      )
+    }
+
+    // Paginated questionnaire
+    pages =
+      questionnaireItemList.zip(questionnaireResponseItemList).mapIndexed {
+        index,
+        (questionnaireItem, questionnaireResponseItem) ->
+        QuestionnairePage(
+          index,
+          EnablementEvaluator.evaluate(
+            questionnaireItem,
+            questionnaireResponseItem,
+            questionnaireResponse
+          ) { questionnaireResponseItem, linkId ->
+            findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, linkId)
           }
-          // if the questionnaire is paginated and we're currently working through the paginated
-          // groups, make sure that only the current page gets set
-          if (pagination != null && pagination.currentPageIndex != index) {
-            return@flatMapIndexed emptyList()
-          }
-
-          val enabled =
-            EnablementEvaluator.evaluate(
-              questionnaireItem,
-              questionnaireResponseItem,
-              questionnaireResponse
-            ) { questionnaireResponseItem, linkId ->
-              findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, linkId)
-            }
-
-          if (!enabled || questionnaireItem.isHidden) {
-            return@flatMapIndexed emptyList()
-          }
-
-          val validationResult =
-            if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem)) {
-              QuestionnaireResponseItemValidator.validate(
-                questionnaireItem,
-                questionnaireResponseItem.answer,
-                this@QuestionnaireViewModel.getApplication()
-              )
-            } else {
-              ValidationResult(true, listOf())
-            }
-
-          listOf(
-            QuestionnaireItemViewItem(
-              questionnaireItem,
-              questionnaireResponseItem,
-              validationResult = validationResult,
-              answersChangedCallback = answersChangedCallback,
-              resolveAnswerValueSet = { resolveAnswerValueSet(it) },
-            )
-          ) +
-            getQuestionnaireState(
-                // Nested display item is subtitle text for parent questionnaire item if data type
-                // is not group.
-                // If nested display item is identified as subtitle text, then do not create
-                // questionnaire state for it.
-                questionnaireItemList =
-                  when (questionnaireItem.type) {
-                    Questionnaire.QuestionnaireItemType.GROUP -> questionnaireItem.item
-                    else ->
-                      questionnaireItem.item.filterNot {
-                        it.type == Questionnaire.QuestionnaireItemType.DISPLAY
-                      }
-                  },
-                questionnaireResponseItemList =
-                  if (questionnaireResponseItem.answer.isEmpty()) {
-                    questionnaireResponseItem.item
-                  } else {
-                    questionnaireResponseItem.answer.first().item
-                  },
-                // we're now dealing with nested items, so pagination is no longer a concern
-                pagination = null,
-                modificationCount = modificationCount,
-              )
-              .items
-        }
-        .toList()
+        )
+      }
     return QuestionnaireState(
-      items = items,
-      pagination = pagination,
-      modificationCount = modificationCount
+      items =
+        getQuestionnaireItemViewItems(
+          questionnaireItemList[currentPageIndex],
+          questionnaireResponseItemList[currentPageIndex]
+        ),
+      pagination =
+        QuestionnairePagination(
+          true,
+          pages!!,
+          currentPageIndex,
+          showSubmitButton,
+          showReviewButton
+        ),
+      reviewMode = reviewMode
     )
+  }
+
+  /**
+   * Returns the list of [QuestionnaireItemViewItem]s generated for the questionnaire items and
+   * questionnaire response items.
+   */
+  private fun getQuestionnaireItemViewItems(
+    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+  ): List<QuestionnaireItemViewItem> {
+    var responseIndex = 0
+    return questionnaireItemList
+      .asSequence()
+      .flatMap { questionnaireItem ->
+        var questionnaireResponseItem = questionnaireItem.createQuestionnaireResponseItem()
+        // If there is an enabled questionnaire response available then we use that. Or else we
+        // just use an empty questionnaireResponse Item
+        if (responseIndex < questionnaireResponseItemList.size &&
+            questionnaireItem.linkId == questionnaireResponseItemList[responseIndex].linkId
+        ) {
+          questionnaireResponseItem = questionnaireResponseItemList[responseIndex]
+          responseIndex += 1
+        }
+
+        getQuestionnaireItemViewItems(questionnaireItem, questionnaireResponseItem)
+      }
+      .toList()
+  }
+
+  /**
+   * Returns the list of [QuestionnaireItemViewItem]s generated for the questionnaire item and
+   * questionnaire response item.
+   */
+  private fun getQuestionnaireItemViewItems(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+  ): List<QuestionnaireItemViewItem> {
+    val enabled =
+      EnablementEvaluator.evaluate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        questionnaireResponse
+      ) { questionnaireResponseItem, linkId ->
+        findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, linkId)
+      }
+
+    if (!enabled || questionnaireItem.isHidden) {
+      return emptyList()
+    }
+
+    val validationResult =
+      if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
+          isPaginationButtonPressed
+      ) {
+        QuestionnaireResponseItemValidator.validate(
+          questionnaireItem,
+          questionnaireResponseItem.answer,
+          this@QuestionnaireViewModel.getApplication()
+        )
+      } else {
+        NotValidated
+      }
+    val items =
+      listOf(
+        QuestionnaireItemViewItem(
+          questionnaireItem,
+          questionnaireResponseItem,
+          validationResult = validationResult,
+          answersChangedCallback = answersChangedCallback,
+          resolveAnswerValueSet = { resolveAnswerValueSet(it) },
+        )
+      ) +
+        getQuestionnaireItemViewItems(
+          // If nested display item is identified as instructions or flyover, then do not create
+          // questionnaire state for it.
+          questionnaireItemList =
+            questionnaireItem.item.filterNot {
+              it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+                (it.isInstructionsCode || it.isFlyoverCode || it.isHelpCode)
+            },
+          questionnaireResponseItemList =
+            if (questionnaireResponseItem.answer.isEmpty()) {
+              questionnaireResponseItem.item
+            } else {
+              questionnaireResponseItem.answer.first().item
+            },
+        )
+    currentPageItems = items
+    return items
   }
 
   private fun getEnabledResponseItems(
@@ -413,6 +586,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
       .map { (questionnaireItem, questionnaireResponseItem) ->
+        questionnaireResponseItem.text = questionnaireItem.localizedTextSpanned?.toString()
         // Nested group items
         questionnaireResponseItem.item =
           getEnabledResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
@@ -434,23 +608,20 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * If this questionnaire uses pagination, returns the [QuestionnairePagination] that you would see
    * when first opening this questionnaire. Otherwise, returns `null`.
    */
-  private fun Questionnaire.getInitialPagination(): QuestionnairePagination? {
-    val usesPagination =
-      item.any { item ->
-        item.extension.any { extension ->
-          (extension.value as? CodeableConcept)?.coding?.any { coding -> coding.code == "page" } ==
-            true
-        }
-      }
-    return if (usesPagination) {
-      QuestionnairePagination(
-        currentPageIndex = 0,
-        lastPageIndex = item.size - 1,
-      )
+  private fun getInitialPageIndex(): Int? =
+    if (questionnaire.isPaginated) {
+      0 // Always begin with the first page
     } else {
       null
     }
-  }
+
+  private fun Questionnaire.getInitialPages() =
+    if (questionnaire.isPaginated) {
+      // Assume all pages are enabled to begin with
+      item.indices.map { QuestionnairePage(it, true) }
+    } else {
+      null
+    }
 
   /**
    * Find a questionnaire response item in [QuestionnaireResponse] with the given `linkId` starting
@@ -498,32 +669,39 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 }
 
+typealias ItemToParentMap =
+  MutableMap<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>
+
 /** Questionnaire state for the Fragment to consume. */
 internal data class QuestionnaireState(
   /** The items that should be currently-rendered into the Fragment. */
   val items: List<QuestionnaireItemViewItem>,
-  /** The pagination state of the questionnaire. If `null`, the questionnaire is not paginated. */
-  val pagination: QuestionnairePagination?,
-  /** Tracks modifications in order to update the UI. */
-  val modificationCount: Int,
+  /** The pagination state of the questionnaire. */
+  val pagination: QuestionnairePagination,
+  /** Tracks reviewMode in order to update the UI. */
+  val reviewMode: Boolean,
 )
 
+/**
+ * Pagination information of the questionnaire. This is used for the UI to render pagination
+ * controls. Includes information for each page and the current page index.
+ */
 internal data class QuestionnairePagination(
+  val isPaginated: Boolean = false,
+  val pages: List<QuestionnairePage>,
   val currentPageIndex: Int,
-  val lastPageIndex: Int,
+  val showSubmitButton: Boolean = false,
+  val showReviewButton: Boolean = false
+)
+
+/** A single page in the questionnaire. This is used for the UI to render pagination controls. */
+internal data class QuestionnairePage(
+  val index: Int,
+  val enabled: Boolean,
 )
 
 internal val QuestionnairePagination.hasPreviousPage: Boolean
-  get() = currentPageIndex > 0
+  get() = pages.any { it.index < currentPageIndex && it.enabled }
+
 internal val QuestionnairePagination.hasNextPage: Boolean
-  get() = currentPageIndex < lastPageIndex
-
-internal fun QuestionnairePagination.previousPage(): QuestionnairePagination {
-  check(hasPreviousPage) { "Can't call previousPage() if hasPreviousPage is false ($this)" }
-  return copy(currentPageIndex = currentPageIndex - 1)
-}
-
-internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
-  check(hasNextPage) { "Can't call nextPage() if hasNextPage is false ($this)" }
-  return copy(currentPageIndex = currentPageIndex + 1)
-}
+  get() = pages.any { it.index > currentPageIndex && it.enabled }

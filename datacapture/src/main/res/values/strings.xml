@@ -16,6 +16,9 @@
     <string name="submit_button_text">Submit</string>
     <string name="button_pagination_next">Next</string>
     <string name="button_pagination_previous">Previous</string>
+    <string name="back_button_text">Back</string>
+    <string name="edit_button_text">Edit</string>
+    <string name="review_answers_text">Review answers</string>
 
     <string name="open_choice_other">Other</string>
     <string name="open_choice_other_hint">Enter custom option</string>
@@ -31,4 +34,8 @@
     <string name="select_time">Select time</string>
     <string name="hyphen">-</string>
     <string name="cancel">Cancel</string>
+    <string name="button_review">Review</string>
+    <string name="not_answered">"Not Answered"</string>
+    <string name="help">Help</string>
+
 </resources>
