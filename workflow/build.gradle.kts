@@ -13,7 +13,7 @@ android {
   compileSdk = Sdk.compileSdk
 
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.minSdkWorkflow
     targetSdk = Sdk.targetSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
