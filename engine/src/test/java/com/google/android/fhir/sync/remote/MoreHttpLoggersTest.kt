@@ -47,8 +47,21 @@ class MoreHttpLoggersTest {
 
   @Test
   fun `toOkHttpLoggingInterceptor all headers should be logged when headersToIgnore is not provided`() {
-
-    val logMessages = intercept(HttpLogger.Level.BODY, emptyList(), testInterceptorChain)
+    val logMessages =
+      intercept(
+        level = HttpLogger.Level.BODY,
+        headersToIgnore = emptyList(),
+        requestHeaders =
+          listOf(
+            "Restricted" to "request-restricted-value",
+            "Unrestricted" to "request-unrestricted-value"
+          ),
+        responseHeaders =
+          listOf(
+            "Restricted" to "response-restricted-value",
+            "Unrestricted" to "response-unrestricted-value"
+          )
+      )
     assertThat(logMessages)
       .containsAtLeast(
         "Restricted: request-restricted-value",
@@ -60,8 +73,21 @@ class MoreHttpLoggersTest {
 
   @Test
   fun `toOkHttpLoggingInterceptor provided headersToIgnore should not be logged`() {
-
-    val logMessages = intercept(HttpLogger.Level.BODY, listOf("Restricted"), testInterceptorChain)
+    val logMessages =
+      intercept(
+        level = HttpLogger.Level.BODY,
+        headersToIgnore = listOf("Restricted"),
+        requestHeaders =
+          listOf(
+            "Restricted" to "request-restricted-value",
+            "Unrestricted" to "request-unrestricted-value"
+          ),
+        responseHeaders =
+          listOf(
+            "Restricted" to "response-restricted-value",
+            "Unrestricted" to "response-unrestricted-value"
+          )
+      )
 
     assertThat(logMessages)
       .containsAtLeast(
@@ -81,53 +107,54 @@ class MoreHttpLoggersTest {
   private fun intercept(
     level: HttpLogger.Level,
     headersToIgnore: List<String>? = null,
-    chain: Interceptor.Chain
+    requestHeaders: List<Pair<String, String>>,
+    responseHeaders: List<Pair<String, String>>
   ): List<String> {
     val logMessages = mutableListOf<String>()
     HttpLogger(HttpLogger.Configuration(level, headersToIgnore)) { logMessages.add(it) }
       .toOkHttpLoggingInterceptor()
-      .intercept(chain)
+      .intercept(TestInterceptorChain(requestHeaders, responseHeaders))
     return logMessages
   }
 
-  private val testInterceptorChain =
-    object : Interceptor.Chain {
+  class TestInterceptorChain(
+    private val requestHeaders: List<Pair<String, String>>,
+    private val responseHeaders: List<Pair<String, String>>
+  ) : Interceptor.Chain {
 
-      override fun connection(): Connection? = null
+    override fun connection(): Connection? = null
 
-      override fun proceed(request: Request) =
-        Response.Builder()
-          .code(200)
-          .header("Restricted", "response-restricted-value")
-          .header("Unrestricted", "response-unrestricted-value")
-          .request(request())
-          .protocol(Protocol.HTTP_2)
-          .message("OK")
-          .body("Sample-Response".toResponseBody())
-          .build()
+    override fun proceed(request: Request) =
+      Response.Builder()
+        .code(200)
+        .request(request())
+        .protocol(Protocol.HTTP_2)
+        .message("OK")
+        .body("Sample-Response".toResponseBody())
+        .apply { responseHeaders.forEach { header(it.first, it.second) } }
+        .build()
 
-      override fun request() =
-        Request.Builder()
-          .url("http://server.test.url")
-          .header("Restricted", "request-restricted-value")
-          .header("Unrestricted", "request-unrestricted-value")
-          .get()
-          .build()
+    override fun request() =
+      Request.Builder()
+        .url("http://server.test.url")
+        .get()
+        .apply { requestHeaders.forEach { header(it.first, it.second) } }
+        .build()
 
-      override fun connectTimeoutMillis() = 1000
+    override fun connectTimeoutMillis() = 1000
 
-      override fun readTimeoutMillis() = 1000
+    override fun readTimeoutMillis() = 1000
 
-      override fun withConnectTimeout(timeout: Int, unit: TimeUnit) = apply {}
+    override fun withConnectTimeout(timeout: Int, unit: TimeUnit) = apply {}
 
-      override fun withReadTimeout(timeout: Int, unit: TimeUnit) = apply {}
+    override fun withReadTimeout(timeout: Int, unit: TimeUnit) = apply {}
 
-      override fun withWriteTimeout(timeout: Int, unit: TimeUnit) = apply {}
+    override fun withWriteTimeout(timeout: Int, unit: TimeUnit) = apply {}
 
-      override fun writeTimeoutMillis() = 1000
+    override fun writeTimeoutMillis() = 1000
 
-      override fun call(): Call {
-        TODO("Not yet implemented")
-      }
+    override fun call(): Call {
+      TODO("Not yet implemented")
     }
+  }
 }
