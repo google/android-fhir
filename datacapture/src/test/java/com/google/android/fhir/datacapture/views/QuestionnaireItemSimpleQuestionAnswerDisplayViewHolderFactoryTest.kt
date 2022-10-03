@@ -41,7 +41,7 @@ import org.robolectric.RuntimeEnvironment
 class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
   private val viewHolder =
     QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory.create(parent)

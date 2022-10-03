@@ -2543,6 +2543,53 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
+  fun `nested display item with help code should not be created as questionnaire state item`() =
+      runBlocking {
+    val itemControlExtensionWithHelpCode =
+      Extension().apply {
+        url = EXTENSION_ITEM_CONTROL_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = DisplayItemControlType.HELP.extensionCode
+                  system = EXTENSION_ITEM_CONTROL_SYSTEM
+                }
+              )
+          }
+        )
+      }
+
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "parent-question"
+            text = "parent question text"
+            type = Questionnaire.QuestionnaireItemType.STRING
+            item =
+              listOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "nested-display-question"
+                  text = "help description"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                  extension = listOf(itemControlExtensionWithHelpCode)
+                }
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireItem.linkId)
+      .isEqualTo("parent-question")
+  }
+
+  @Test
   fun `setShowSubmitButtonFlag() to false should not show submit button`() {
     runBlocking {
       val questionnaire =
