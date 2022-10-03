@@ -31,7 +31,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class MoreHttpLoggerKtTest {
+class MoreHttpLoggersTest {
 
   @Test
   fun `toOkHttpLoggingInterceptor HttpLoggingInterceptor Level should match provided HttpLogger Level`() {
@@ -48,10 +48,7 @@ class MoreHttpLoggerKtTest {
   @Test
   fun `toOkHttpLoggingInterceptor all headers should be logged when headersToIgnore is not provided`() {
 
-    val logMessages = mutableListOf<String>()
-    HttpLogger(HttpLogger.Configuration(HttpLogger.Level.BODY, emptyList())) { logMessages.add(it) }
-      .toOkHttpLoggingInterceptor()
-      .intercept(testInterceptorChain)
+    val logMessages = intercept(HttpLogger.Level.BODY, emptyList(), testInterceptorChain)
     assertThat(logMessages)
       .containsAtLeast(
         "Restricted: request-restricted-value",
@@ -64,12 +61,7 @@ class MoreHttpLoggerKtTest {
   @Test
   fun `toOkHttpLoggingInterceptor provided headersToIgnore should not be logged`() {
 
-    val logMessages = mutableListOf<String>()
-    HttpLogger(HttpLogger.Configuration(HttpLogger.Level.BODY, listOf("Restricted"))) {
-        logMessages.add(it)
-      }
-      .toOkHttpLoggingInterceptor()
-      .intercept(testInterceptorChain)
+    val logMessages = intercept(HttpLogger.Level.BODY, listOf("Restricted"), testInterceptorChain)
 
     assertThat(logMessages)
       .containsAtLeast(
@@ -85,6 +77,18 @@ class MoreHttpLoggerKtTest {
 
   private fun httpLogger(level: HttpLogger.Level, headersToIgnore: List<String>? = null) =
     HttpLogger(HttpLogger.Configuration(level, headersToIgnore)) {}
+
+  private fun intercept(
+    level: HttpLogger.Level,
+    headersToIgnore: List<String>? = null,
+    chain: Interceptor.Chain
+  ): List<String> {
+    val logMessages = mutableListOf<String>()
+    HttpLogger(HttpLogger.Configuration(level, headersToIgnore)) { logMessages.add(it) }
+      .toOkHttpLoggingInterceptor()
+      .intercept(chain)
+    return logMessages
+  }
 
   private val testInterceptorChain =
     object : Interceptor.Chain {
