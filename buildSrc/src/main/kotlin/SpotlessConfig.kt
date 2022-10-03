@@ -18,19 +18,11 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 
-fun Project.configureSpotlessRoot() {
-  apply(plugin = Plugins.BuildPlugins.spotless)
-  configure<com.diffplug.gradle.spotless.SpotlessExtension> {
-    // See https://github.com/diffplug/spotless/issues/1213 and https://github.com/diffplug/spotless/tree/main/plugin-gradle#dependency-resolution-modes for why pre-declare is used.
-    kotlin { ktfmt("0.28") }
-    predeclareDepsFromBuildscript()
-  }
-}
-fun Project.configureSpotlessModule() {
-  apply(plugin = Plugins.BuildPlugins.spotless)
+fun Project.configureSpotless() {
   val ktlintVersion = "0.41.0"
   val ktlintOptions = mapOf("indent_size" to "2", "continuation_indent_size" to "2")
-  configure<com.diffplug.gradle.spotless.SpotlessExtensionPredeclare> {
+  apply(plugin = Plugins.BuildPlugins.spotless)
+  configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     ratchetFrom = "origin/master" // only format files which have changed since origin/master
     kotlin {
       target("**/*.kt")

@@ -39,8 +39,7 @@ fun equals(a: Type, b: Type): Boolean {
 
   // Codes with the same system and code values are considered equal even if they have different
   // display values.
-  if (a is
-      Coding && b is Coding) return a.system == b.system && a.code == b.code
+  if (a is Coding && b is Coding) return a.system == b.system && a.code == b.code
 
   throw NotImplementedError("Comparison for type ${a::class.java} not supported.")
 }
