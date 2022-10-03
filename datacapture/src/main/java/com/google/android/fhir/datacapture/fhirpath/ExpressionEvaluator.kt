@@ -98,24 +98,24 @@ object ExpressionEvaluator {
       .item
       .flattened()
       .filter { item ->
-        // 1- item is calculable
-        // 2- item answer is not modified and touched by user;
+        // Condition 1. item is calculable
+        // Condition 2. item answer is not modified and touched by user;
         // https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-calculatedExpression.html
-        // 3- item answer depends on the updated item answer OR has a variable dependency
+        // Condition 3. item answer depends on the updated item answer OR has a variable dependency
         item.calculatedExpression != null &&
           modifiedResponses.none { it.linkId == item.linkId } &&
           (updatedQuestionnaireItem.isReferencedBy(item) ||
             findDependentVariables(item.calculatedExpression!!).isNotEmpty())
       }
-      .map { calculable ->
+      .map { questionnaireItem ->
         val appContext =
           mutableMapOf<String, Base?>().apply {
             extractDependentVariables(
-              calculable.calculatedExpression!!,
+                    questionnaireItem.calculatedExpression!!,
               questionnaire,
               questionnaireResponse,
               questionnaireItemParentMap,
-              calculable,
+                    questionnaireItem,
               this
             )
           }
@@ -126,10 +126,10 @@ object ExpressionEvaluator {
               questionnaireResponse,
               null,
               null,
-              calculable.calculatedExpression!!.expression
+                  questionnaireItem.calculatedExpression!!.expression
             )
             .map { it.castToType(it) }
-        calculable to updatedAnswer
+          questionnaireItem to updatedAnswer
       }
   }
 
