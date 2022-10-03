@@ -140,7 +140,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     override suspend fun syncUpload(
       upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
     ) {
-      upload(listOf())
+      upload(listOf(getLocalChange(ResourceType.Patient, "123")))
     }
 
     override suspend fun syncDownload(
@@ -148,12 +148,13 @@ class TestingUtils constructor(private val iParser: IParser) {
       download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
     ) {
       download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType): String {
-            return "123456788"
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType): String {
+              return "123456788"
+            }
           }
-        }
-      )
+        )
+        .collect {}
     }
     override suspend fun count(search: Search): Long {
       return 0
@@ -165,8 +166,14 @@ class TestingUtils constructor(private val iParser: IParser) {
 
     override suspend fun clearDatabase() {}
 
-    override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange? {
-      TODO("Not yet implemented")
+    override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange {
+      return LocalChange(
+        resourceType = type.name,
+        resourceId = id,
+        payload = "{}",
+        token = LocalChangeToken(listOf()),
+        type = LocalChange.Type.INSERT
+      )
     }
 
     override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {}

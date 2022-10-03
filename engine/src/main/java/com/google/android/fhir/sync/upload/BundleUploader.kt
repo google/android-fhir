@@ -45,7 +45,7 @@ internal class BundleUploader(
     progressCallback?.onStart(localChanges.count())
 
     bundleGenerator
-      .generate(listOf(localChanges))
+      .generate(localChangesPaginator.page(localChanges))
       .also { progressCallback?.onProgress(0.0) }
       .forEach { (bundle, localChangeTokens) ->
         try {

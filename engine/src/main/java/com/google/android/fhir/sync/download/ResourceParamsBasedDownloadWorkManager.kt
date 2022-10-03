@@ -99,9 +99,9 @@ class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
     }
 
     return if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
-      response.link.firstOrNull { component -> component.relation == "next" }?.url?.let { next ->
-        urlOfTheNextPagesToDownloadForAResource.add(next)
-      }
+      response.link
+        .firstOrNull { component -> component.relation == "next" }
+        ?.url?.let { next -> urlOfTheNextPagesToDownloadForAResource.add(next) }
 
       response.entry.map { it.resource }
     } else {

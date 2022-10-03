@@ -113,7 +113,8 @@ class DownloaderImplTest {
       )
 
     val result = mutableListOf<DownloadState>()
-    downloader.download(
+    downloader
+      .download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
         },
@@ -130,130 +131,132 @@ class DownloaderImplTest {
 
   @Test
   fun `downloader with patient and observations should return failure in case of server or network error`() =
-      runBlocking {
-    val downloader =
-      DownloaderImpl(
-        object : DataSource {
-          override suspend fun download(path: String): Resource {
-            return when {
-              path.contains("patient-page1") ->
-                searchPageParamToSearchResponseBundleMap["patient-page1"]!!
-              path.contains("patient-page2") ->
-                OperationOutcome().apply {
-                  addIssue(
-                    OperationOutcome.OperationOutcomeIssueComponent().apply {
-                      diagnostics = "Server couldn't fulfil the request."
-                    }
+    runBlocking {
+      val downloader =
+        DownloaderImpl(
+          object : DataSource {
+            override suspend fun download(path: String): Resource {
+              return when {
+                path.contains("patient-page1") ->
+                  searchPageParamToSearchResponseBundleMap["patient-page1"]!!
+                path.contains("patient-page2") ->
+                  OperationOutcome().apply {
+                    addIssue(
+                      OperationOutcome.OperationOutcomeIssueComponent().apply {
+                        diagnostics = "Server couldn't fulfil the request."
+                      }
+                    )
+                  }
+                path.contains("observation-page1") ->
+                  searchPageParamToSearchResponseBundleMap["observation-page1"]!!
+                path.contains("observation-page2") ->
+                  throw UnknownHostException(
+                    "Url host can't be found. Check if device is connected to internet."
                   )
-                }
-              path.contains("observation-page1") ->
-                searchPageParamToSearchResponseBundleMap["observation-page1"]!!
-              path.contains("observation-page2") ->
-                throw UnknownHostException(
-                  "Url host can't be found. Check if device is connected to internet."
-                )
-              else -> OperationOutcome()
+                else -> OperationOutcome()
+              }
             }
-          }
 
-          override suspend fun upload(
-            bundle: Bundle,
-            progressCallback: ProgressCallback?
-          ): Resource {
-            TODO("Upload not tested in this path")
-          }
-        },
-        ResourceParamsBasedDownloadWorkManager(
-          mapOf(
-            ResourceType.Patient to mapOf("param" to "patient-page1"),
-            ResourceType.Observation to mapOf("param" to "observation-page1")
+            override suspend fun upload(
+              bundle: Bundle,
+              progressCallback: ProgressCallback?
+            ): Resource {
+              TODO("Upload not tested in this path")
+            }
+          },
+          ResourceParamsBasedDownloadWorkManager(
+            mapOf(
+              ResourceType.Patient to mapOf("param" to "patient-page1"),
+              ResourceType.Observation to mapOf("param" to "observation-page1")
+            )
           )
         )
-      )
 
-    val result = mutableListOf<DownloadState>()
-    downloader.download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = null
-        },
-        null
-      )
-      .collectIndexed { index, value -> result.add(value) }
+      val result = mutableListOf<DownloadState>()
+      downloader
+        .download(
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType) = null
+          },
+          null
+        )
+        .collectIndexed { index, value -> result.add(value) }
 
-    assertThat(result.filterIsInstance<DownloadState.Failure>()).hasSize(2)
+      assertThat(result.filterIsInstance<DownloadState.Failure>()).hasSize(2)
 
-    assertThat(result.filterIsInstance<DownloadState.Failure>().map { it.syncError.resourceType })
-      .containsExactly(ResourceType.Patient, ResourceType.Observation)
-      .inOrder()
-    assertThat(
-        result.filterIsInstance<DownloadState.Failure>().map { it.syncError.exception.message }
-      )
-      .containsExactly(
-        "Server couldn't fulfil the request.",
-        "Url host can't be found. Check if device is connected to internet."
-      )
-      .inOrder()
-  }
+      assertThat(result.filterIsInstance<DownloadState.Failure>().map { it.syncError.resourceType })
+        .containsExactly(ResourceType.Patient, ResourceType.Observation)
+        .inOrder()
+      assertThat(
+          result.filterIsInstance<DownloadState.Failure>().map { it.syncError.exception.message }
+        )
+        .containsExactly(
+          "Server couldn't fulfil the request.",
+          "Url host can't be found. Check if device is connected to internet."
+        )
+        .inOrder()
+    }
 
   @Test
   fun `downloader with patient and observations should continue to download observations if patient download fail`() =
-      runBlocking {
-    val downloader =
-      DownloaderImpl(
-        object : DataSource {
-          override suspend fun download(path: String): Resource {
-            return when {
-              path.contains("patient-page1") || path.contains("patient-page2") ->
-                OperationOutcome().apply {
-                  addIssue(
-                    OperationOutcome.OperationOutcomeIssueComponent().apply {
-                      diagnostics = "Server couldn't fulfil the request."
-                    }
-                  )
-                }
-              path.contains("observation-page1") ->
-                searchPageParamToSearchResponseBundleMap["observation-page1"]!!
-              path.contains("observation-page2") ->
-                searchPageParamToSearchResponseBundleMap["observation-page2"]!!
-              else -> OperationOutcome()
+    runBlocking {
+      val downloader =
+        DownloaderImpl(
+          object : DataSource {
+            override suspend fun download(path: String): Resource {
+              return when {
+                path.contains("patient-page1") || path.contains("patient-page2") ->
+                  OperationOutcome().apply {
+                    addIssue(
+                      OperationOutcome.OperationOutcomeIssueComponent().apply {
+                        diagnostics = "Server couldn't fulfil the request."
+                      }
+                    )
+                  }
+                path.contains("observation-page1") ->
+                  searchPageParamToSearchResponseBundleMap["observation-page1"]!!
+                path.contains("observation-page2") ->
+                  searchPageParamToSearchResponseBundleMap["observation-page2"]!!
+                else -> OperationOutcome()
+              }
             }
-          }
 
-          override suspend fun upload(
-            bundle: Bundle,
-            progressCallback: ProgressCallback?
-          ): Resource {
-            TODO("Not yet implemented")
-          }
-        },
-        ResourceParamsBasedDownloadWorkManager(
-          mapOf(
-            ResourceType.Patient to mapOf("param" to "patient-page1"),
-            ResourceType.Observation to mapOf("param" to "observation-page1")
+            override suspend fun upload(
+              bundle: Bundle,
+              progressCallback: ProgressCallback?
+            ): Resource {
+              TODO("Not yet implemented")
+            }
+          },
+          ResourceParamsBasedDownloadWorkManager(
+            mapOf(
+              ResourceType.Patient to mapOf("param" to "patient-page1"),
+              ResourceType.Observation to mapOf("param" to "observation-page1")
+            )
           )
         )
-      )
 
-    val result = mutableListOf<DownloadState>()
-    downloader.download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = null
-        },
-        null
-      )
-      .collectIndexed { index, value -> result.add(value) }
+      val result = mutableListOf<DownloadState>()
+      downloader
+        .download(
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType) = null
+          },
+          null
+        )
+        .collectIndexed { index, value -> result.add(value) }
 
-    assertThat(result.filterIsInstance<DownloadState.Failure>().map { it.syncError.resourceType })
-      .containsExactly(ResourceType.Patient)
+      assertThat(result.filterIsInstance<DownloadState.Failure>().map { it.syncError.resourceType })
+        .containsExactly(ResourceType.Patient)
 
-    assertThat(
-        result
-          .filterIsInstance<DownloadState.Success>()
-          .flatMap { it.resources }
-          .filterIsInstance<Observation>()
-      )
-      .hasSize(2)
-  }
+      assertThat(
+          result
+            .filterIsInstance<DownloadState.Success>()
+            .flatMap { it.resources }
+            .filterIsInstance<Observation>()
+        )
+        .hasSize(2)
+    }
 
   @Test
   fun `downloader should call progress on-start`() = runBlocking {
@@ -291,7 +294,8 @@ class DownloaderImplTest {
       }
 
     val result = mutableListOf<DownloadState>()
-    downloader.download(
+    downloader
+      .download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
         },
@@ -341,7 +345,8 @@ class DownloaderImplTest {
       }
 
     val result = mutableListOf<DownloadState>()
-    downloader.download(
+    downloader
+      .download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
         },

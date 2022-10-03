@@ -128,8 +128,7 @@ class SyncJobTest {
         ExistingPeriodicWorkPolicy.REPLACE,
         worker
       )
-      .result
-      .get()
+      .result.get()
 
     Thread.sleep(5000)
 
@@ -249,8 +248,7 @@ class SyncJobTest {
         ExistingPeriodicWorkPolicy.REPLACE,
         worker1
       )
-      .result
-      .get()
+      .result.get()
     Thread.sleep(5000)
     val firstSyncResult = (stateList1[stateList1.size - 1] as State.Finished).result
     assertThat(firstSyncResult.timestamp).isGreaterThan(currentTimeStamp)
@@ -268,8 +266,7 @@ class SyncJobTest {
         ExistingPeriodicWorkPolicy.REPLACE,
         worker2
       )
-      .result
-      .get()
+      .result.get()
     Thread.sleep(5000)
     val secondSyncResult = (stateList2[stateList2.size - 1] as State.Finished).result
     assertThat(secondSyncResult.timestamp).isGreaterThan(firstSyncResult.timestamp)
@@ -328,38 +325,38 @@ class SyncJobTest {
 
   @Test
   fun `number of resources loaded equals number of resources in TestDownloaderImpl`() =
-      runBlockingTest {
-    whenever(database.getAllLocalChanges()).thenReturn(listOf())
-    whenever(dataSource.download(any())).thenReturn(Bundle().apply { total = 1 })
+    runBlockingTest {
+      whenever(database.getAllLocalChanges()).thenReturn(listOf())
+      whenever(dataSource.download(any())).thenReturn(Bundle().apply { total = 1 })
 
-    val res = mutableListOf<State>()
+      val res = mutableListOf<State>()
 
-    val flow = MutableSharedFlow<State>()
+      val flow = MutableSharedFlow<State>()
 
-    val job = launch { flow.collect { res.add(it) } }
+      val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(
-      fhirEngine,
-      TestingUtils.TestDownloadManagerImplWithQueue(
-        listOf("Patient/bob", "Encounter/doc", "Observation/obs")
-      ),
-      AcceptRemoteConflictResolver,
-      flow
-    )
-
-    assertThat(res.map { it::class.java })
-      .containsExactly(
-        State.Started::class.java,
-        State.Spawned::class.java,
-        State.InProgress::class.java,
-        State.Finished::class.java
+      syncJob.run(
+        fhirEngine,
+        TestingUtils.TestDownloadManagerImplWithQueue(
+          listOf("Patient/bob", "Encounter/doc", "Observation/obs")
+        ),
+        AcceptRemoteConflictResolver,
+        flow
       )
-      .inOrder()
-    job.cancel()
 
-    // one for counts of each and one for data download
-    verify(dataSource, times(3 * 2)).download(any())
-  }
+      assertThat(res.map { it::class.java })
+        .containsExactly(
+          State.Started::class.java,
+          State.Spawned::class.java,
+          State.InProgress::class.java,
+          State.Finished::class.java
+        )
+        .inOrder()
+      job.cancel()
+
+      // one for counts of each and one for data download
+      verify(dataSource, times(3 * 2)).download(any())
+    }
 
   @Test
   fun `should fail when there data source is null`() = runBlockingTest {

@@ -103,12 +103,16 @@ internal class DownloaderImpl(
 
     val totalRecords = progressSummary.sumOf { it.total }
 
-    resources.groupBy { it.resourceType }.forEach { (type, list) ->
-      progressSummary.find { it.type == type.name }?.let {
-        it.completed = it.completed + list.count()
+    resources
+      .groupBy { it.resourceType }
+      .forEach { (type, list) ->
+        progressSummary
+          .find { it.type == type.name }
+          ?.let {
+            it.completed = it.completed + list.count()
 
-        progressCallback?.onProgress(percentOf(it.completed, totalRecords), it)
+            progressCallback?.onProgress(percentOf(it.completed, totalRecords), it)
+          }
       }
-    }
   }
 }

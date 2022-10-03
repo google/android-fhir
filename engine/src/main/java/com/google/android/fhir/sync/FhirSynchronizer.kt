@@ -19,11 +19,8 @@ package com.google.android.fhir.sync
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.sync.download.DownloaderImpl
 import com.google.android.fhir.sync.progress.Progress
 import com.google.android.fhir.sync.progress.ProgressCallback
-import com.google.android.fhir.sync.upload.BundleUploader
-import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect

@@ -72,7 +72,8 @@ class BundleUploaderTest {
 
     BundleUploader(
         TestingUtils.BundleDataSource { Bundle() },
-        TransactionBundleGenerator.getDefault()
+        TransactionBundleGenerator.getDefault(),
+        LocalChangesPaginator.DEFAULT
       )
       .upload(localChanges, progressCallback)
       .toList()
@@ -97,7 +98,8 @@ class BundleUploaderTest {
 
     BundleUploader(
         TestingUtils.BundleDataSource { Bundle() },
-        TransactionBundleGenerator.getDefault()
+        TransactionBundleGenerator.getDefault(),
+        LocalChangesPaginator.DEFAULT
       )
       .upload(localChanges, progressCallback)
       .toList()
