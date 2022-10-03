@@ -98,7 +98,7 @@ class DemoQuestionnaireFragment : Fragment() {
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
-    inflater.inflate(getMenu(), menu)
+    getMenu()?.let { inflater.inflate(it, menu) }
   }
 
   private fun setUpActionBar() {
@@ -176,10 +176,10 @@ class DemoQuestionnaireFragment : Fragment() {
     }
   }
 
-  private fun getMenu(): Int {
+  private fun getMenu(): Int? {
     return when (args.workflow) {
-      WorkflowType.DEFAULT, WorkflowType.PAGINATED -> R.menu.layout_menu
       WorkflowType.COMPONENT -> R.menu.component_menu
+      else -> null
     }
   }
 
