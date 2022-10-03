@@ -20,9 +20,8 @@ allprojects {
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
     gradlePluginPortal()
   }
+  configureSpotless()
 }
-
-configureSpotless()
 
 subprojects {
   // We have some empty folders like the :contrib root folder, which Gradle recognizes as projects.
