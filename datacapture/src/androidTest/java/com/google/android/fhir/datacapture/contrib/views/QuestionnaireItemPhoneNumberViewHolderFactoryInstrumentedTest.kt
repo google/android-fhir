@@ -102,11 +102,9 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString()
+          .text.toString()
       )
       .isEqualTo("+12345678910")
   }
@@ -137,11 +135,9 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString()
+          .text.toString()
       )
       .isEqualTo("")
   }
@@ -158,8 +154,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder
-      .itemView
+    viewHolder.itemView
       .findViewById<TextInputEditText>(R.id.text_input_edit_text)
       .setText("+12345678910")
     assertThat(questionnaireItemViewItem.answers.single().valueStringType.value)
