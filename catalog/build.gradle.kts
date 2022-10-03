@@ -47,9 +47,6 @@ android {
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.Espresso.espressoCore)
-  androidTestImplementation(Dependencies.Espresso.espressoContrib)
-  androidTestImplementation(Dependencies.junit)
-  androidTestImplementation(Dependencies.truth)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 

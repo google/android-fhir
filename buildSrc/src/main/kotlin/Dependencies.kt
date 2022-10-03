@@ -134,7 +134,6 @@ object Dependencies {
 
   object Espresso {
     const val espressoCore = "androidx.test.espresso:espresso-core:${Versions.espresso}"
-    const val espressoContrib = "androidx.test.espresso:espresso-contrib:${Versions.espresso}"
   }
 
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
