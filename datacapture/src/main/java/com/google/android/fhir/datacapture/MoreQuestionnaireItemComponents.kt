@@ -112,10 +112,10 @@ internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTy
         .firstOrNull {
           it.url == EXTENSION_ITEM_CONTROL_URL || it.url == EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR
         }
-        ?.value as
-        CodeableConcept?
+        ?.value as CodeableConcept?
     val code =
-      codeableConcept?.coding
+      codeableConcept
+        ?.coding
         ?.firstOrNull {
           it.system == EXTENSION_ITEM_CONTROL_SYSTEM ||
             it.system == EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR
@@ -136,8 +136,8 @@ internal const val EXTENSION_CHOICE_ORIENTATION_URL =
 internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceOrientationTypes?
   get() {
     val code =
-      (this.extension.firstOrNull { it.url == EXTENSION_CHOICE_ORIENTATION_URL }?.value as
-          CodeType?)
+      (this.extension.firstOrNull { it.url == EXTENSION_CHOICE_ORIENTATION_URL }?.value
+          as CodeType?)
         ?.valueAsString
     return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
   }
@@ -274,10 +274,11 @@ internal val Questionnaire.QuestionnaireItemComponent.isInstructionsCode: Boolea
     return when (type) {
       Questionnaire.QuestionnaireItemType.DISPLAY -> {
         val codeableConcept =
-          this.extension.firstOrNull { it.url == EXTENSION_DISPLAY_CATEGORY_URL }?.value as
-            CodeableConcept?
+          this.extension.firstOrNull { it.url == EXTENSION_DISPLAY_CATEGORY_URL }?.value
+            as CodeableConcept?
         val code =
-          codeableConcept?.coding
+          codeableConcept
+            ?.coding
             ?.firstOrNull { it.system == EXTENSION_DISPLAY_CATEGORY_SYSTEM }
             ?.code
         code == INSTRUCTIONS
@@ -331,9 +332,9 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
 // Return expression if QuestionnaireItemComponent has ENABLE WHEN EXPRESSION URL
 val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
   get() {
-    return this.extension.firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }?.let {
-      it.value as Expression
-    }
+    return this.extension
+      .firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }
+      ?.let { it.value as Expression }
   }
 
 /**
