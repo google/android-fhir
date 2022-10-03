@@ -28,11 +28,8 @@ import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.progress.ProgressCallback
 import com.google.common.truth.Truth.assertThat
-import java.time.OffsetDateTime
-import java.util.Date
-import java.util.LinkedList
-import java.util.stream.Collectors
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
@@ -40,6 +37,10 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.json.JSONArray
 import org.json.JSONObject
+import java.time.OffsetDateTime
+import java.util.Date
+import java.util.LinkedList
+import java.util.stream.Collectors
 
 /** Utilities for testing. */
 class TestingUtils constructor(private val iParser: IParser) {
