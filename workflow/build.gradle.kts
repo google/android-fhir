@@ -42,9 +42,6 @@ android {
   }
 
   compileOptions {
-    // Flag to enable support for the new language APIs
-    // See https://developer.android.com/studio/write/java8-support
-    isCoreLibraryDesugaringEnabled = true
     // Sets Java compatibility to Java 8
     // See https://developer.android.com/studio/write/java8-support
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -112,8 +109,6 @@ dependencies {
   androidTestImplementation(project(":testing"))
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
-
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Cql.evaluator)
