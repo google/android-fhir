@@ -111,7 +111,8 @@ object QuestionnaireResponseValidator {
   ): Map<String, List<ValidationResult>> {
 
     when (checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }) {
-      Questionnaire.QuestionnaireItemType.DISPLAY, Questionnaire.QuestionnaireItemType.NULL -> Unit
+      Questionnaire.QuestionnaireItemType.DISPLAY,
+      Questionnaire.QuestionnaireItemType.NULL -> Unit
       Questionnaire.QuestionnaireItemType.GROUP ->
         // Nested items under group
         // http://www.hl7.org/fhir/questionnaireresponse-definitions.html#QuestionnaireResponse.item.item
@@ -215,7 +216,8 @@ object QuestionnaireResponseValidator {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   ) {
     when (checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }) {
-      Questionnaire.QuestionnaireItemType.DISPLAY, Questionnaire.QuestionnaireItemType.NULL -> Unit
+      Questionnaire.QuestionnaireItemType.DISPLAY,
+      Questionnaire.QuestionnaireItemType.NULL -> Unit
       Questionnaire.QuestionnaireItemType.GROUP ->
         // Nested items under group
         // http://www.hl7.org/fhir/questionnaireresponse-definitions.html#QuestionnaireResponse.item.item
@@ -290,7 +292,8 @@ object QuestionnaireResponseValidator {
         require(answerType == "url") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
-      Questionnaire.QuestionnaireItemType.CHOICE, Questionnaire.QuestionnaireItemType.OPENCHOICE ->
+      Questionnaire.QuestionnaireItemType.CHOICE,
+      Questionnaire.QuestionnaireItemType.OPENCHOICE ->
         require(answerType == "Coding" || answerType == "string") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }

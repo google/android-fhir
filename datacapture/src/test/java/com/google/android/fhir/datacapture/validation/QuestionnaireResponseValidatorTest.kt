@@ -453,8 +453,7 @@ class QuestionnaireResponseValidatorTest {
           questionnaireResponse,
           context
         )
-        .entries
-        .first()
+        .entries.first()
 
     assertThat(result.key).isEqualTo("valid-hidden-item")
     assertThat(result.value.first()).isInstanceOf(Invalid::class.java)
