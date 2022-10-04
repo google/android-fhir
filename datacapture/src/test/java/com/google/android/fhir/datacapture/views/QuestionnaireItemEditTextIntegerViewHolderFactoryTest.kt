@@ -74,11 +74,9 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString()
+          .text.toString()
       )
       .isEqualTo("5")
   }
@@ -109,11 +107,9 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString()
+          .text.toString()
       )
       .isEqualTo("")
   }

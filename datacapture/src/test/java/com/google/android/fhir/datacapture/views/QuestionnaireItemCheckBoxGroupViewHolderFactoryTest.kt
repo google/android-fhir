@@ -418,8 +418,8 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
     )
 
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group).getChildAt(1) as
-            CheckBox)
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group).getChildAt(1)
+            as CheckBox)
           .isEnabled
       )
       .isFalse()
