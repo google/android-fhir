@@ -108,6 +108,7 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
             error.visibility = View.VISIBLE
           }
         }
+        updateQuestionText(header, questionnaireItemViewItem.questionnaireItem, validationResult)
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

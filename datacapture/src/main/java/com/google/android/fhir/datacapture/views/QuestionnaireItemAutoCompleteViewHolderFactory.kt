@@ -103,6 +103,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
             textInputLayout.error = " " // non empty text
           }
         }
+        updateQuestionText(header, questionnaireItemViewItem.questionnaireItem, validationResult)
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

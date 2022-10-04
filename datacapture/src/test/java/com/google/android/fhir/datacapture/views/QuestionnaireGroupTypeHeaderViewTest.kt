@@ -244,7 +244,22 @@ class QuestionnaireGroupTypeHeaderViewTest {
       }
     )
 
-    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question?*")
+    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question? *")
+  }
+
+  @Test
+  fun `Does not show * at the end of question text`() {
+    view.bind(Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" })
+
+    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question?")
+  }
+
+  @Test
+  fun `Does not show * if question text is missing`() {
+    view.bind(Questionnaire.QuestionnaireItemComponent().apply { required = true })
+
+    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEmpty()
+    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEmpty()
   }
 
   private val displayCategoryExtensionWithInstructionsCode =

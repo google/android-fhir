@@ -85,6 +85,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
             error.visibility = View.VISIBLE
           }
         }
+        updateQuestionText(header, questionnaireItemViewItem.questionnaireItem, validationResult)
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

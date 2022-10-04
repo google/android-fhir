@@ -111,6 +111,11 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
             is NotValidated, Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
+        updateQuestionText(
+          holder.header,
+          questionnaireItemViewItem.questionnaireItem,
+          validationResult
+        )
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

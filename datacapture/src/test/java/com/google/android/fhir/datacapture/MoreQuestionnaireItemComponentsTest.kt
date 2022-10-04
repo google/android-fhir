@@ -1277,27 +1277,6 @@ class MoreQuestionnaireItemComponentsTest {
     assertThat(questionnaireItem.entryFormat).isNull()
   }
 
-  @Test
-  fun `localizedTextSpannedWithAsterisk returns localizedTextSpanned appended by *`() {
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        text = "Patient Information"
-        required = true
-      }
-    Locale.setDefault(Locale.US)
-    assertThat(questionnaireItem.localizedTextSpannedWithAsterisk.toString())
-      .isEqualTo("Patient Information*")
-  }
-
-  @Test
-  fun `localizedTextSpannedWithAsterisk returns localizedTextSpanned`() {
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply { text = "Patient Information" }
-    Locale.setDefault(Locale.US)
-    assertThat(questionnaireItem.localizedTextSpannedWithAsterisk.toString())
-      .isEqualTo("Patient Information")
-  }
-
   private val displayCategoryExtensionWithInstructionsCode =
     Extension().apply {
       url = EXTENSION_DISPLAY_CATEGORY_URL

@@ -17,8 +17,12 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -26,12 +30,18 @@ import android.view.View.VISIBLE
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.hasHelpButton
 import com.google.android.fhir.datacapture.localizedHelpSpanned
 import com.google.android.fhir.datacapture.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpannedWithAsterisk
+import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.card.MaterialCardView
 import org.hl7.fhir.r4.model.Questionnaire
 
@@ -49,7 +59,7 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
 
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
-    question.updateTextAndVisibility(questionnaireItem.localizedTextSpannedWithAsterisk)
+    updateQuestionText(this, questionnaireItem)
     hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
     initHelpButton(this, questionnaireItem)
     //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
@@ -58,7 +68,7 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
   }
 }
 
-internal fun TextView.updateTextAndVisibility(localizedText: Spanned?) {
+internal fun TextView.updateTextAndVisibility(localizedText: Spanned? = null) {
   text = localizedText
   visibility =
     if (localizedText.isNullOrEmpty()) {
@@ -102,4 +112,52 @@ internal fun initHelpButton(
   view
     .findViewById<TextView>(R.id.helpText)
     .updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
+}
+
+/**
+ * Updates textview [R.id.question] with
+ * [Questionnaire.QuestionnaireItemComponent.localizedTextSpanned] text and `*` if
+ * [Questionnaire.QuestionnaireItemComponent.required] is true. And applies [R.attr.colorError] to
+ * `*` in error state.
+ */
+internal fun updateQuestionText(
+  view: View,
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+  validationResult: ValidationResult = NotValidated
+) {
+  if (questionnaireItem.localizedTextSpanned == null) {
+    view.findViewById<TextView>(R.id.question).updateTextAndVisibility()
+    return
+  }
+  val builder = SpannableStringBuilder()
+  builder.append(questionnaireItem.localizedTextSpanned)
+  if (questionnaireItem.required) {
+    when (validationResult) {
+      is NotValidated, Valid -> {
+        builder.append(view.context.applicationContext.getString(R.string.space_asterisk))
+      }
+      is Invalid -> {
+        val start = builder.length
+        builder.append(view.context.applicationContext.getString(R.string.space_asterisk))
+        val end = builder.length
+        builder.setSpan(
+          ForegroundColorSpan(view.context.getColorFromAttr(R.attr.colorError)),
+          start,
+          end,
+          Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+      }
+    }
+  }
+  view.findViewById<TextView>(R.id.question).updateTextAndVisibility(builder)
+}
+
+@ColorInt
+private fun Context.getColorFromAttr(
+  @AttrRes attrColor: Int,
+  typedValue: TypedValue = TypedValue(),
+  resolveRefs: Boolean = true
+): Int {
+  theme.resolveAttribute(attrColor, typedValue, resolveRefs)
+  return typedValue.data
 }
