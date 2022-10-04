@@ -111,6 +111,9 @@ interface FhirEngine {
    * delete resource entry from LocalChangeEntity table.
    */
   suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
+
+  /** Returns the total count of squashed local changes. */
+  suspend fun getSquashedLocalChangeCount(): Int
 }
 
 /**
