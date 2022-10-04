@@ -117,17 +117,14 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<QuestionnaireGroupTypeHeaderView>(R.id.header)
           .findViewById<TextView>(R.id.hint)
-          .text
-          .isNullOrEmpty()
+          .text.isNullOrEmpty()
       )
       .isTrue()
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<QuestionnaireGroupTypeHeaderView>(R.id.header)
           .findViewById<TextView>(R.id.hint)
           .visibility
