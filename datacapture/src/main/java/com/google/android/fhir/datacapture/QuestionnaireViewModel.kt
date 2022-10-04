@@ -383,24 +383,20 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       questionnaireItemParentMap
     )
       .forEach { (questionnaireItem, calculatedAnswers) ->
-        val updatedCalculableResponse =
-          questionnaireResponseItemPreOrderList.find { it.linkId == questionnaireItem.linkId }
-
-        val currentAnswer = updatedCalculableResponse?.answer?.map { it.value } ?: emptyList()
-
-        // update and notify only if new answer has changed to prevent any event loop
-        if (calculatedAnswers.size != currentAnswer.size ||
-            calculatedAnswers.zip(currentAnswer).any { (v1, v2) -> v1.equalsDeep(v2).not() }
-        ) {
-          updatedCalculableResponse?.let {
-            it.answer =
-              calculatedAnswers.map {
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = it
+        // update all response item with updated values
+        questionnaireResponseItemPreOrderList
+          .filter { it.linkId == questionnaireItem.linkId }
+          .forEach { questionnaireResponseItem ->
+            // update and notify only if new answer has changed to prevent any event loop
+            if (questionnaireResponseItem.answer.hasDifferentAnswerSet(calculatedAnswers)) {
+              questionnaireResponseItem.answer =
+                calculatedAnswers.map {
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = it
+                  }
                 }
-              }
+            }
           }
-        }
       }
   }
 

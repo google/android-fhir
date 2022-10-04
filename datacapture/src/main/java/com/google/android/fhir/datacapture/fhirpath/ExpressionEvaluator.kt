@@ -93,7 +93,7 @@ object ExpressionEvaluator {
     modifiedResponses: Set<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     questionnaireItemParentMap:
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>
-  ): List<Pair<Questionnaire.QuestionnaireItemComponent, List<Type>>> {
+  ): List<ItemToAnswersPair> {
     return questionnaire
       .item
       .flattened()
@@ -378,3 +378,6 @@ object ExpressionEvaluator {
       null
     }
 }
+
+/** Pair of a [Questionnaire.QuestionnaireItemComponent] with its evaluated answers */
+internal typealias ItemToAnswersPair = Pair<Questionnaire.QuestionnaireItemComponent, List<Type>>
