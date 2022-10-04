@@ -400,8 +400,8 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
 }
 
 /**
- * Flatten a nested list of [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]
- * recursively and returns a flat list of all items into list embedded at any level
+ * Flatten a nested list of [Questionnaire.QuestionnaireItemComponent] recursively and returns a
+ * flat list of all items into list embedded at any level
  */
 fun List<Questionnaire.QuestionnaireItemComponent>.flattened():
   List<Questionnaire.QuestionnaireItemComponent> {

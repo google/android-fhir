@@ -83,8 +83,8 @@ object ExpressionEvaluator {
   }
 
   /**
-   * Returns a pair of item and the calculated and evaluated value for all items with calculated
-   * expression extension, which is dependent on value of updated response
+   * Returns a list of pair of item and the calculated and evaluated value for all items with
+   * calculated expression extension, which is dependent on value of updated response
    */
   fun evaluateCalculatedExpressions(
     updatedQuestionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -111,11 +111,11 @@ object ExpressionEvaluator {
         val appContext =
           mutableMapOf<String, Base?>().apply {
             extractDependentVariables(
-                    questionnaireItem.calculatedExpression!!,
+              questionnaireItem.calculatedExpression!!,
               questionnaire,
               questionnaireResponse,
               questionnaireItemParentMap,
-                    questionnaireItem,
+              questionnaireItem,
               this
             )
           }
@@ -126,10 +126,10 @@ object ExpressionEvaluator {
               questionnaireResponse,
               null,
               null,
-                  questionnaireItem.calculatedExpression!!.expression
+              questionnaireItem.calculatedExpression!!.expression
             )
             .map { it.castToType(it) }
-          questionnaireItem to updatedAnswer
+        questionnaireItem to updatedAnswer
       }
   }
 

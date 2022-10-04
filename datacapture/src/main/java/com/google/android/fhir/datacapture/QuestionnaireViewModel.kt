@@ -390,11 +390,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
         // update and notify only if new answer has changed to prevent any event loop
         if (calculatedAnswers.size != currentAnswer.size ||
-                calculatedAnswers.zip(currentAnswer).any { (v1, v2) -> v1.equalsDeep(v2).not() }
+            calculatedAnswers.zip(currentAnswer).any { (v1, v2) -> v1.equalsDeep(v2).not() }
         ) {
           updatedCalculableResponse?.let {
             it.answer =
-               calculatedAnswers.map {
+              calculatedAnswers.map {
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                   value = it
                 }
