@@ -48,13 +48,15 @@ object Sync {
   inline fun <reified W : FhirSyncWorker> oneTimeSync(
     context: Context,
     retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
-  ) {
+  ): Flow<State> {
+    val flow = getStateFlow<W>(context)
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
-        SyncWorkType.DOWNLOAD.workerName,
+        W::class.java.name,
         ExistingWorkPolicy.KEEP,
         createOneTimeWorkRequest(retryConfiguration, W::class.java)
       )
+    return flow
   }
 
   /**
@@ -67,30 +69,30 @@ object Sync {
     context: Context,
     periodicSyncConfiguration: PeriodicSyncConfiguration
   ): Flow<State> {
-    val flow =
-      WorkManager.getInstance(context)
-        .getWorkInfosForUniqueWorkLiveData(SyncWorkType.DOWNLOAD.workerName)
-        .asFlow()
-        .flatMapConcat { it.asFlow() }
-        .mapNotNull { workInfo ->
-          workInfo.progress
-            .takeIf { it.keyValueMap.isNotEmpty() && it.hasKeyWithValueOfType<String>("StateType") }
-            ?.let {
-              val state = it.getString("StateType")!!
-              val stateData = it.getString("State")
-              gson.fromJson(stateData, Class.forName(state)) as State
-            }
-        }
-
+    val flow = getStateFlow<W>(context)
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
-        SyncWorkType.DOWNLOAD.workerName,
+        W::class.java.name,
         ExistingPeriodicWorkPolicy.REPLACE,
         createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java)
       )
-
     return flow
   }
+
+  inline fun <reified W : FhirSyncWorker> getStateFlow(context: Context) =
+    WorkManager.getInstance(context)
+      .getWorkInfosForUniqueWorkLiveData(W::class.java.name)
+      .asFlow()
+      .flatMapConcat { it.asFlow() }
+      .mapNotNull { workInfo ->
+        workInfo.progress
+          .takeIf { it.keyValueMap.isNotEmpty() && it.hasKeyWithValueOfType<String>("StateType") }
+          ?.let {
+            val state = it.getString("StateType")!!
+            val stateData = it.getString("State")
+            gson.fromJson(stateData, Class.forName(state)) as State
+          }
+      }
 
   @PublishedApi
   internal inline fun <W : FhirSyncWorker> createOneTimeWorkRequest(
