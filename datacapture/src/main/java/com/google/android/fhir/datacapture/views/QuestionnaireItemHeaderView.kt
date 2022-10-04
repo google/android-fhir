@@ -133,7 +133,8 @@ internal fun updateQuestionText(
   builder.append(questionnaireItem.localizedTextSpanned)
   if (questionnaireItem.required) {
     when (validationResult) {
-      is NotValidated, Valid -> {
+      is NotValidated,
+      Valid -> {
         builder.append(view.context.applicationContext.getString(R.string.space_asterisk))
       }
       is Invalid -> {

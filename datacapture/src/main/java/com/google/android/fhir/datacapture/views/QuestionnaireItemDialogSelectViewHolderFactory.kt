@@ -108,7 +108,8 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         holder.summaryHolder.error =
           when (validationResult) {
-            is NotValidated, Valid -> null
+            is NotValidated,
+            Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
         updateQuestionText(
@@ -128,17 +129,19 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
       private fun updateAnswers(selectedOptions: SelectedOptions) {
         questionnaireItemViewItem.clearAnswer()
-        selectedOptions.options.filter { it.selected }.map { option ->
-          val answer =
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = option.item.value
+        selectedOptions.options
+          .filter { it.selected }
+          .map { option ->
+            val answer =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = option.item.value
+              }
+            if (questionnaireItemViewItem.questionnaireItem.repeats) {
+              questionnaireItemViewItem.addAnswer(answer)
+            } else {
+              questionnaireItemViewItem.setAnswer(answer)
             }
-          if (questionnaireItemViewItem.questionnaireItem.repeats) {
-            questionnaireItemViewItem.addAnswer(answer)
-          } else {
-            questionnaireItemViewItem.setAnswer(answer)
           }
-        }
         selectedOptions.otherOptions.map { otherOption ->
           val otherAnswer =
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {

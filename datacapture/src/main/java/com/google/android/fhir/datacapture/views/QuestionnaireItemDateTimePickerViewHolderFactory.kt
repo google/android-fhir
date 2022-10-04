@@ -172,12 +172,14 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         dateInputLayout.error =
           when (validationResult) {
-            is NotValidated, Valid -> null
+            is NotValidated,
+            Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
         timeInputLayout.error =
           when (validationResult) {
-            is NotValidated, Valid -> null
+            is NotValidated,
+            Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
         updateQuestionText(header, questionnaireItemViewItem.questionnaireItem, validationResult)

@@ -77,7 +77,8 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         textInputLayout.error =
           when (validationResult) {
-            is NotValidated, Valid -> null
+            is NotValidated,
+            Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
         updateQuestionText(header, questionnaireItemViewItem.questionnaireItem, validationResult)

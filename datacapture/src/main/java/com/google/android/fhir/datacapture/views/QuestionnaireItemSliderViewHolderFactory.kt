@@ -64,7 +64,8 @@ internal object QuestionnaireItemSliderViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         error.text =
           when (validationResult) {
-            is NotValidated, Valid -> null
+            is NotValidated,
+            Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
         updateQuestionText(header, questionnaireItemViewItem.questionnaireItem, validationResult)
