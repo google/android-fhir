@@ -72,8 +72,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<AutoCompleteTextView>(R.id.auto_complete)
           .adapter
           .getItem(1)
@@ -98,8 +97,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<AutoCompleteTextView>(R.id.auto_complete)
           .adapter
           .getItem(1)
