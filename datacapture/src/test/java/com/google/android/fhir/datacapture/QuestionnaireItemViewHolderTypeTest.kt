@@ -24,7 +24,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O])
+@Config(sdk = [Build.VERSION_CODES.P])
 class QuestionnaireItemViewHolderTypeTest {
   @Test
   fun size_shouldReturnNumberOfQuestionnaireViewHolderTypes() {

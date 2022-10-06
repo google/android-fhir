@@ -31,7 +31,7 @@ import org.robolectric.annotation.Config
 
 /** Unit tests for when [NumberParamFilterCriterion] used in [MoreSearch]. */
 @RunWith(ParameterizedRobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O])
+@Config(sdk = [Build.VERSION_CODES.P])
 class NumberSearchParameterizedTest(
   private val num: BigDecimal,
   private val lowerBound: BigDecimal,

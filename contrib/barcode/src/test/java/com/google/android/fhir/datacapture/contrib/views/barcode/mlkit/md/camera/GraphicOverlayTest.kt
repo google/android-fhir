@@ -43,7 +43,7 @@ import org.robolectric.util.ReflectionHelpers.getField
 import org.robolectric.util.ReflectionHelpers.setField
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O])
+@Config(sdk = [Build.VERSION_CODES.P])
 class GraphicOverlayTest {
 
   private val context: Application by lazy {

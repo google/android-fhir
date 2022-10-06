@@ -50,7 +50,7 @@ import org.robolectric.annotation.Config
 
 /** Unit tests for [MoreSearch]. */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O])
+@Config(sdk = [Build.VERSION_CODES.P])
 class SearchTest {
 
   @Test

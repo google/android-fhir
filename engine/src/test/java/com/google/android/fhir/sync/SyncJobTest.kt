@@ -64,7 +64,7 @@ import org.robolectric.annotation.LooperMode
 
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O])
+@Config(sdk = [Build.VERSION_CODES.P])
 @LooperMode(LooperMode.Mode.PAUSED)
 class SyncJobTest {
   private val context: Context = ApplicationProvider.getApplicationContext()
