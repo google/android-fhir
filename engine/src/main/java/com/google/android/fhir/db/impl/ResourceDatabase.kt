@@ -51,7 +51,8 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
       NumberIndexEntity::class,
       SyncedResourceEntity::class,
       LocalChangeEntity::class,
-      PositionIndexEntity::class],
+      PositionIndexEntity::class
+    ],
   version = 1,
   exportSchema = false
 )

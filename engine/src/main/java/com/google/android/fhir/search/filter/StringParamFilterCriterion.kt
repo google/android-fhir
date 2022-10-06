@@ -22,6 +22,7 @@ import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.search.StringFilterModifier
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 
 /**
@@ -50,6 +51,19 @@ data class StringParamFilterCriterion(
     )
 }
 
+/**
+ * Contains a set of filter criteria sharing the same search parameter. e.g A
+ * [StringParamFilterCriteria] may contain a list of [StringParamFilterCriterion] each with
+ * different [StringParamFilterCriterion.value] and [StringParamFilterCriterion.modifier] to filter
+ * results for a particular [StringClientParam] like [Patient.GIVEN].
+ *
+ * An api call like filter(Patient.GIVEN,{value = "John"},{value = "Jane"}) will create a
+ * [StringParamFilterCriteria] with two [StringParamFilterCriterion] one with
+ * [StringParamFilterCriterion.value] as "John" and other as "Jane."
+ *
+ * For MATCH_FTS [StringFilterModifier], it returns a query doing JOIN with StringIndexEntityFts
+ * Table
+ */
 internal data class StringParamFilterCriteria(
   val parameter: StringClientParam,
   override val filters: List<StringParamFilterCriterion>,
