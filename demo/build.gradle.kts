@@ -46,6 +46,8 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
+  debugImplementation(project(":engine"))
+
   implementation(Dependencies.Androidx.activity)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)
@@ -62,8 +64,9 @@ dependencies {
   implementation(Dependencies.Navigation.navUiKtx)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
-  implementation(project(":engine"))
   implementation(project(":datacapture"))
+
+  releaseImplementation(Dependencies.androidFhirEngine)
 
   testImplementation(Dependencies.junit)
 }
