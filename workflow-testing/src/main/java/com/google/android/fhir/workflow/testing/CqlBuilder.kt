@@ -76,8 +76,7 @@ object CqlBuilder : Loadable() {
     // Helper makes sure the test CQL compiles. Reports an error if it doesn't
     if (translator.errors.isNotEmpty()) {
       val errors =
-        translator
-          .errors
+        translator.errors
           .map { "${it.locator?.toLocator() ?: "[n/a]"}: ${it.message}" }
           .joinToString("\n")
 

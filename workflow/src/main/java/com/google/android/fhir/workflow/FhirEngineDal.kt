@@ -57,13 +57,13 @@ class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
   }
 
   override fun searchByUrl(resourceType: String, url: String): Iterable<IBaseResource> =
-      runBlocking {
-    when (resourceType) {
-      "Measure" -> fhirEngine.search<Measure> { filter(Measure.URL, { value = url }) }
-      "Library" -> listOf(libs[url] as Library)
-      else -> listOf()
-    }.toMutableList()
-  }
+    runBlocking {
+      when (resourceType) {
+        "Measure" -> fhirEngine.search<Measure> { filter(Measure.URL, { value = url }) }
+        "Library" -> listOf(libs[url] as Library)
+        else -> listOf()
+      }.toMutableList()
+    }
 
   @Suppress("UNCHECKED_CAST")
   private fun IIdType.getResourceClass(): Class<Resource> {

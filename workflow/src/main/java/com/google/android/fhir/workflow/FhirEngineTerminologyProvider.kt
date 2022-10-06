@@ -105,12 +105,8 @@ class FhirEngineTerminologyProvider(
   private fun searchById(id: String): List<ValueSet> {
     return runBlocking {
       listOfNotNull(
-        safeGet(
-          fhirEngine,
-          ResourceType.ValueSet,
-          id.removePrefix(URN_OID).removePrefix(URN_UUID)
-        ) as?
-          ValueSet
+        safeGet(fhirEngine, ResourceType.ValueSet, id.removePrefix(URN_OID).removePrefix(URN_UUID))
+          as? ValueSet
       )
     }
   }

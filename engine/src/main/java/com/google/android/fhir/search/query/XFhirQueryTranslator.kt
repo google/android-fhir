@@ -66,9 +66,10 @@ object XFhirQueryTranslator {
     val queryParams =
       queryStringPairs?.mapNotNull {
         // skip missing values like active=[missing]
-        it.split("=").takeIf { it.size > 1 && it[1].isNotBlank() }?.let {
-          it.first() to it.elementAt(1)
-        }
+        it
+          .split("=")
+          .takeIf { it.size > 1 && it[1].isNotBlank() }
+          ?.let { it.first() to it.elementAt(1) }
       }
 
     val sort =

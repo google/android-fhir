@@ -167,8 +167,8 @@ class EnablementEvaluatorTest {
     questionnaire.item.forEach { item -> if (item.linkId == "2") questionnaireItemComponent = item }
 
     val questionnaireResponse =
-      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
-        QuestionnaireResponse
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+        as QuestionnaireResponse
 
     assertThat(
         EnablementEvaluator.evaluate(
@@ -248,8 +248,8 @@ class EnablementEvaluatorTest {
       Questionnaire.QuestionnaireItemComponent()
     questionnaire.item.forEach { item -> if (item.linkId == "2") questionnaireItemComponent = item }
     val questionnaireResponse =
-      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
-        QuestionnaireResponse
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+        as QuestionnaireResponse
 
     assertThat(
         EnablementEvaluator.evaluate(

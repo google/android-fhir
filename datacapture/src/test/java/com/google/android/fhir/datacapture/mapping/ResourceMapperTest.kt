@@ -474,13 +474,12 @@ class ResourceMapperTest {
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
     val uriTestQuestionnaireResponse =
-      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
-        QuestionnaireResponse
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+        as QuestionnaireResponse
 
     val patient =
-      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
-        .resource as
-        Patient
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0].resource
+        as Patient
 
     assertThat(patient.birthDate).isEqualTo("2021-01-01".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isTrue()
@@ -586,55 +585,54 @@ class ResourceMapperTest {
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
     val uriTestQuestionnaireResponse =
-      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
-        QuestionnaireResponse
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+        as QuestionnaireResponse
 
     val observation =
       ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse)
         .entry
         .single()
-        .resource as
-        Observation
+        .resource as Observation
 
     assertThat(observation.valueStringType.value).isEqualTo("world")
   }
 
   @Test
   fun `populate() should correctly populate current date from fhirpath expression in QuestionnaireResponse`() =
-      runBlocking {
-    val questionnaire =
-      Questionnaire()
-        .addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "patient-dob"
-            type = Questionnaire.QuestionnaireItemType.TEXT
-            extension =
-              listOf(
-                Extension(
-                  ITEM_INITIAL_EXPRESSION_URL,
-                  Expression().apply {
-                    language = "text/fhirpath"
-                    expression = "today()"
-                  }
+    runBlocking {
+      val questionnaire =
+        Questionnaire()
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "patient-dob"
+              type = Questionnaire.QuestionnaireItemType.TEXT
+              extension =
+                listOf(
+                  Extension(
+                    ITEM_INITIAL_EXPRESSION_URL,
+                    Expression().apply {
+                      language = "text/fhirpath"
+                      expression = "today()"
+                    }
+                  )
                 )
-              )
-          }
-        )
+            }
+          )
 
-    val patientId = UUID.randomUUID().toString()
-    val patient = Patient().apply { id = "Patient/$patientId/_history/2" }
-    val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+      val patientId = UUID.randomUUID().toString()
+      val patient = Patient().apply { id = "Patient/$patientId/_history/2" }
+      val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
 
-    assertThat((questionnaireResponse.item[0].answer[0].value as DateType).localDate)
-      .isEqualTo((DateType(Date())).localDate)
-  }
+      assertThat((questionnaireResponse.item[0].answer[0].value as DateType).localDate)
+        .isEqualTo((DateType(Date())).localDate)
+    }
 
   @Test
   fun `extract() should perform definition-based extraction with unanswered questions`() =
-      runBlocking {
-    @Language("JSON")
-    val questionnaireJson =
-      """
+    runBlocking {
+      @Language("JSON")
+      val questionnaireJson =
+        """
         {
           "resourceType": "Questionnaire",
           "id": "client-registration-sample",
@@ -757,9 +755,9 @@ class ResourceMapperTest {
         }
         """.trimIndent()
 
-    @Language("JSON")
-    val questionnaireResponseJson =
-      """
+      @Language("JSON")
+      val questionnaireResponseJson =
+        """
         {
           "resourceType": "QuestionnaireResponse",
           "questionnaire": "Questionnaire/client-registration-sample",
@@ -850,33 +848,32 @@ class ResourceMapperTest {
         }
         """.trimIndent()
 
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
+      val iParser: IParser = FhirContext.forR4().newJsonParser()
 
-    val uriTestQuestionnaire =
-      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+      val uriTestQuestionnaire =
+        iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
-    val uriTestQuestionnaireResponse =
-      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
-        QuestionnaireResponse
+      val uriTestQuestionnaireResponse =
+        iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+          as QuestionnaireResponse
 
-    val patient =
-      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
-        .resource as
-        Patient
+      val patient =
+        ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0].resource
+          as Patient
 
-    assertThat(patient.birthDate).isEqualTo("2016-02-11".toDateFromFormatYyyyMmDd())
-    assertThat(patient.active).isFalse()
-    assertThat(patient.telecom.get(0).value).isNull()
-    assertThat(patient.name.first().given.first().toString()).isEqualTo("Simon")
-    assertThat(patient.name.first().family).isEqualTo("Crawford")
-  }
+      assertThat(patient.birthDate).isEqualTo("2016-02-11".toDateFromFormatYyyyMmDd())
+      assertThat(patient.active).isFalse()
+      assertThat(patient.telecom.get(0).value).isNull()
+      assertThat(patient.name.first().given.first().toString()).isEqualTo("Simon")
+      assertThat(patient.name.first().family).isEqualTo("Crawford")
+    }
 
   @Test
   fun `extract_updateIntegerObservationForDecimalDefination_shouldUpdateAsDecimal() `() =
-      runBlocking {
-    @Language("JSON")
-    val questionnaireJson =
-      """
+    runBlocking {
+      @Language("JSON")
+      val questionnaireJson =
+        """
         {
           "resourceType": "Questionnaire",
           "subjectType": [
@@ -926,9 +923,9 @@ class ResourceMapperTest {
           ]
         }
         """.trimIndent()
-    @Language("JSON")
-    val questionnaireResponseJson =
-      """
+      @Language("JSON")
+      val questionnaireResponseJson =
+        """
         {
           "resourceType": "QuestionnaireResponse",
           "item": [
@@ -954,30 +951,29 @@ class ResourceMapperTest {
         }
         """.trimIndent()
 
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
+      val iParser: IParser = FhirContext.forR4().newJsonParser()
 
-    val pulseOximetryQuestionnaire =
-      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+      val pulseOximetryQuestionnaire =
+        iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
-    val pulseOximetryQuestionnaireResponse =
-      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
-        QuestionnaireResponse
+      val pulseOximetryQuestionnaireResponse =
+        iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+          as QuestionnaireResponse
 
-    val observation =
-      ResourceMapper.extract(pulseOximetryQuestionnaire, pulseOximetryQuestionnaireResponse).entry[
-          0]
-        .resource as
-        Observation
+      val observation =
+        ResourceMapper.extract(pulseOximetryQuestionnaire, pulseOximetryQuestionnaireResponse)
+          .entry[0]
+          .resource as Observation
 
-    assertThat(observation.valueQuantity.value).isEqualTo(BigDecimal(90))
-  }
+      assertThat(observation.valueQuantity.value).isEqualTo(BigDecimal(90))
+    }
 
   @Test
   fun `populate() should fill QuestionnaireResponse with values when given a single Resource`() =
-      runBlocking {
-    @Language("JSON")
-    val questionnaireJson =
-      """
+    runBlocking {
+      @Language("JSON")
+      val questionnaireJson =
+        """
         {
           "resourceType": "Questionnaire",
           "id": "client-registration-sample",
@@ -1164,144 +1160,144 @@ class ResourceMapperTest {
         }
         """.trimIndent()
 
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
+      val iParser: IParser = FhirContext.forR4().newJsonParser()
 
-    val uriTestQuestionnaire =
-      iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
-        Questionnaire
+      val uriTestQuestionnaire =
+        iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson)
+          as Questionnaire
 
-    val patient = createPatientResource()
-    val response = ResourceMapper.populate(uriTestQuestionnaire, patient)
+      val patient = createPatientResource()
+      val response = ResourceMapper.populate(uriTestQuestionnaire, patient)
 
-    val responseItem = response.item[0]
-    assertThat(((responseItem.item[0].item[0].answer[0]).value as StringType).valueAsString)
-      .isEqualTo("Salman")
-    assertThat(((responseItem.item[0].item[1].answer[0]).value as StringType).valueAsString)
-      .isEqualTo("Ali")
-    assertThat(((responseItem.item[1].answer[0]).value as DateType).valueAsString)
-      .isEqualTo("3896-09-17")
-    assertThat(((responseItem.item[2].answer[0]).value as StringType).valueAsString)
-      .isEqualTo("male")
-    assertThat(((responseItem.item[3].item[1].answer[0]).value as StringType).valueAsString)
-      .isEqualTo("12345")
-    assertThat(((responseItem.item[4].item[0].answer[0]).value as StringType).valueAsString)
-      .isEqualTo("Lahore")
-    assertThat(((responseItem.item[4].item[1].answer[0]).value as StringType).valueAsString)
-      .isEqualTo("Pakistan")
-    assertThat(((responseItem.item[5].answer[0]).value as BooleanType).booleanValue())
-      .isEqualTo(true)
-  }
+      val responseItem = response.item[0]
+      assertThat(((responseItem.item[0].item[0].answer[0]).value as StringType).valueAsString)
+        .isEqualTo("Salman")
+      assertThat(((responseItem.item[0].item[1].answer[0]).value as StringType).valueAsString)
+        .isEqualTo("Ali")
+      assertThat(((responseItem.item[1].answer[0]).value as DateType).valueAsString)
+        .isEqualTo("3896-09-17")
+      assertThat(((responseItem.item[2].answer[0]).value as StringType).valueAsString)
+        .isEqualTo("male")
+      assertThat(((responseItem.item[3].item[1].answer[0]).value as StringType).valueAsString)
+        .isEqualTo("12345")
+      assertThat(((responseItem.item[4].item[0].answer[0]).value as StringType).valueAsString)
+        .isEqualTo("Lahore")
+      assertThat(((responseItem.item[4].item[1].answer[0]).value as StringType).valueAsString)
+        .isEqualTo("Pakistan")
+      assertThat(((responseItem.item[5].answer[0]).value as BooleanType).booleanValue())
+        .isEqualTo(true)
+    }
 
   @Test
   fun `populate() should fill QuestionnaireResponse with values when given multiple Resources`() =
-      runBlocking {
-    val relatedPerson =
-      RelatedPerson().apply {
-        name =
-          listOf(
-            HumanName().apply {
-              given = listOf(StringType("John"))
-              family = "Doe"
+    runBlocking {
+      val relatedPerson =
+        RelatedPerson().apply {
+          name =
+            listOf(
+              HumanName().apply {
+                given = listOf(StringType("John"))
+                family = "Doe"
+              }
+            )
+          birthDate = "1990-05-20".toDateFromFormatYyyyMmDd()
+        }
+
+      val observation =
+        Observation().apply {
+          value = StringType("Allergic to dairy products and proteins")
+          note = listOf(Annotation(MarkdownType("Patient Registration Comments")))
+        }
+
+      val questionnaire =
+        Questionnaire()
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "first-name"
+              type = Questionnaire.QuestionnaireItemType.TEXT
+              extension =
+                listOf(
+                  Extension(
+                    ITEM_INITIAL_EXPRESSION_URL,
+                    Expression().apply {
+                      language = "text/fhirpath"
+                      expression = "Patient.name.given"
+                    }
+                  )
+                )
             }
           )
-        birthDate = "1990-05-20".toDateFromFormatYyyyMmDd()
-      }
-
-    val observation =
-      Observation().apply {
-        value = StringType("Allergic to dairy products and proteins")
-        note = listOf(Annotation(MarkdownType("Patient Registration Comments")))
-      }
-
-    val questionnaire =
-      Questionnaire()
-        .addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "first-name"
-            type = Questionnaire.QuestionnaireItemType.TEXT
-            extension =
-              listOf(
-                Extension(
-                  ITEM_INITIAL_EXPRESSION_URL,
-                  Expression().apply {
-                    language = "text/fhirpath"
-                    expression = "Patient.name.given"
-                  }
-                )
-              )
-          }
-        )
-        .addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "related-person-details"
-            type = Questionnaire.QuestionnaireItemType.GROUP
-            item =
-              listOf(
-                Questionnaire.QuestionnaireItemComponent().apply {
-                  linkId = "rp-family-name"
-                  type = Questionnaire.QuestionnaireItemType.TEXT
-                  extension =
-                    listOf(
-                      Extension(
-                        ITEM_INITIAL_EXPRESSION_URL,
-                        Expression().apply {
-                          language = "text/fhirpath"
-                          expression = "RelatedPerson.name.family"
-                        }
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "related-person-details"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              item =
+                listOf(
+                  Questionnaire.QuestionnaireItemComponent().apply {
+                    linkId = "rp-family-name"
+                    type = Questionnaire.QuestionnaireItemType.TEXT
+                    extension =
+                      listOf(
+                        Extension(
+                          ITEM_INITIAL_EXPRESSION_URL,
+                          Expression().apply {
+                            language = "text/fhirpath"
+                            expression = "RelatedPerson.name.family"
+                          }
+                        )
                       )
-                    )
-                }
-              )
-          }
-        )
-        .addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "related-person-dob"
-            type = Questionnaire.QuestionnaireItemType.DATE
-            extension =
-              listOf(
-                Extension(
-                  ITEM_INITIAL_EXPRESSION_URL,
-                  Expression().apply {
-                    language = "text/fhirpath"
-                    expression = "RelatedPerson.birthDate"
                   }
                 )
-              )
-          }
-        )
-        .addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "comments"
-            type = Questionnaire.QuestionnaireItemType.TEXT
-            extension =
-              listOf(
-                Extension(
-                  ITEM_INITIAL_EXPRESSION_URL,
-                  Expression().apply {
-                    language = "text/fhirpath"
-                    expression = "Observation.value"
-                  }
+            }
+          )
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "related-person-dob"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              extension =
+                listOf(
+                  Extension(
+                    ITEM_INITIAL_EXPRESSION_URL,
+                    Expression().apply {
+                      language = "text/fhirpath"
+                      expression = "RelatedPerson.birthDate"
+                    }
+                  )
                 )
-              )
-          }
+            }
+          )
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "comments"
+              type = Questionnaire.QuestionnaireItemType.TEXT
+              extension =
+                listOf(
+                  Extension(
+                    ITEM_INITIAL_EXPRESSION_URL,
+                    Expression().apply {
+                      language = "text/fhirpath"
+                      expression = "Observation.value"
+                    }
+                  )
+                )
+            }
+          )
+
+      val patient = createPatientResource()
+      val questionnaireResponse =
+        ResourceMapper.populate(questionnaire, patient, relatedPerson, observation)
+
+      assertThat((questionnaireResponse.item[0].answer[0].value as StringType).valueAsString)
+        .isEqualTo("Salman")
+      assertThat(
+          ((questionnaireResponse.item[1].item[0].answer[0]).value as StringType).valueAsString
         )
-
-    val patient = createPatientResource()
-    val questionnaireResponse =
-      ResourceMapper.populate(questionnaire, patient, relatedPerson, observation)
-
-    assertThat((questionnaireResponse.item[0].answer[0].value as StringType).valueAsString)
-      .isEqualTo("Salman")
-    assertThat(
-        ((questionnaireResponse.item[1].item[0].answer[0]).value as StringType).valueAsString
-      )
-      .isEqualTo("Doe")
-    assertThat(((questionnaireResponse.item[2].answer[0]).value as DateType).valueAsString)
-      .isEqualTo("1990-05-20")
-    assertThat(((questionnaireResponse.item[3].answer[0]).value as StringType).valueAsString)
-      .isEqualTo("Allergic to dairy products and proteins")
-  }
+        .isEqualTo("Doe")
+      assertThat(((questionnaireResponse.item[2].answer[0]).value as DateType).valueAsString)
+        .isEqualTo("1990-05-20")
+      assertThat(((questionnaireResponse.item[3].answer[0]).value as StringType).valueAsString)
+        .isEqualTo("Allergic to dairy products and proteins")
+    }
 
   @Test
   fun `populate() should correctly populate IdType value in QuestionnaireResponse`() = runBlocking {
@@ -1334,78 +1330,78 @@ class ResourceMapperTest {
 
   @Test
   fun `populate() should correctly populate IdType value with history in QuestionnaireResponse`() =
-      runBlocking {
-    val questionnaire =
-      Questionnaire()
-        .addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "patient-id"
-            type = Questionnaire.QuestionnaireItemType.TEXT
-            extension =
-              listOf(
-                Extension(
-                  ITEM_INITIAL_EXPRESSION_URL,
-                  Expression().apply {
-                    language = "text/fhirpath"
-                    expression = "Patient.id"
-                  }
+    runBlocking {
+      val questionnaire =
+        Questionnaire()
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "patient-id"
+              type = Questionnaire.QuestionnaireItemType.TEXT
+              extension =
+                listOf(
+                  Extension(
+                    ITEM_INITIAL_EXPRESSION_URL,
+                    Expression().apply {
+                      language = "text/fhirpath"
+                      expression = "Patient.id"
+                    }
+                  )
                 )
-              )
-          }
-        )
+            }
+          )
 
-    val patientId = UUID.randomUUID().toString()
-    val patient = Patient().apply { id = "Patient/$patientId/_history/2" }
-    val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+      val patientId = UUID.randomUUID().toString()
+      val patient = Patient().apply { id = "Patient/$patientId/_history/2" }
+      val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
 
-    assertThat((questionnaireResponse.item[0].answer[0].value as StringType).value)
-      .isEqualTo(patientId)
-  }
+      assertThat((questionnaireResponse.item[0].answer[0].value as StringType).value)
+        .isEqualTo(patientId)
+    }
 
   @Test
   fun `populate() should correctly populate Enumeration value in QuestionnaireResponse`() =
-      runBlocking {
-    val questionnaire =
-      Questionnaire()
-        .addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "patient-gender"
-            type = Questionnaire.QuestionnaireItemType.CHOICE
-            extension =
-              listOf(
-                Extension(
-                  ITEM_INITIAL_EXPRESSION_URL,
-                  Expression().apply {
-                    language = "text/fhirpath"
-                    expression = "Patient.gender"
-                  }
+    runBlocking {
+      val questionnaire =
+        Questionnaire()
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "patient-gender"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              extension =
+                listOf(
+                  Extension(
+                    ITEM_INITIAL_EXPRESSION_URL,
+                    Expression().apply {
+                      language = "text/fhirpath"
+                      expression = "Patient.gender"
+                    }
+                  )
                 )
-              )
-            answerOption =
-              listOf(
-                Questionnaire.QuestionnaireItemAnswerOptionComponent(
-                  Coding().apply {
-                    code = AdministrativeGender.MALE.toCode()
-                    display = AdministrativeGender.MALE.display
-                  }
-                ),
-                Questionnaire.QuestionnaireItemAnswerOptionComponent(
-                  Coding().apply {
-                    code = AdministrativeGender.FEMALE.toCode()
-                    display = AdministrativeGender.FEMALE.display
-                  }
+              answerOption =
+                listOf(
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                    Coding().apply {
+                      code = AdministrativeGender.MALE.toCode()
+                      display = AdministrativeGender.MALE.display
+                    }
+                  ),
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                    Coding().apply {
+                      code = AdministrativeGender.FEMALE.toCode()
+                      display = AdministrativeGender.FEMALE.display
+                    }
+                  )
                 )
-              )
-          }
-        )
+            }
+          )
 
-    val patient = Patient().apply { gender = Enumerations.AdministrativeGender.FEMALE }
-    val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+      val patient = Patient().apply { gender = Enumerations.AdministrativeGender.FEMALE }
+      val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
 
-    assertThat((questionnaireResponse.item[0].answer[0].value as Coding).code).isEqualTo("female")
-    assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
-      .isEqualTo("Female")
-  }
+      assertThat((questionnaireResponse.item[0].answer[0].value as Coding).code).isEqualTo("female")
+      assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
+        .isEqualTo("Female")
+    }
 
   @Test
   fun `populate() should populate nested non-group questions`() = runBlocking {
@@ -1763,8 +1759,8 @@ class ResourceMapperTest {
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
     val uriTestQuestionnaireResponse =
-      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
-        QuestionnaireResponse
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+        as QuestionnaireResponse
 
     val bundle =
       ResourceMapper.extract(
@@ -1784,10 +1780,10 @@ class ResourceMapperTest {
 
   @Test
   fun `extract() should use custom TransformSupportServices to generate unsupported nested resource types`() =
-      runBlocking {
-    @Language("JSON")
-    val questionnaireJson =
-      """
+    runBlocking {
+      @Language("JSON")
+      val questionnaireJson =
+        """
         {
           "resourceType": "Questionnaire",
           "id": "immunization-sample",
@@ -1810,9 +1806,9 @@ class ResourceMapperTest {
         }
         """.trimIndent()
 
-    @Language("JSON")
-    val questionnaireResponseJson =
-      """
+      @Language("JSON")
+      val questionnaireResponseJson =
+        """
         {
           "resourceType": "QuestionnaireResponse",
           "questionnaire": "client-registration-sample",
@@ -1829,8 +1825,8 @@ class ResourceMapperTest {
         }
         """.trimIndent()
 
-    val mapping =
-      """map "http://hl7.org/fhir/StructureMap/ImmunizationReg" = 'ImmunizationReg'
+      val mapping =
+        """map "http://hl7.org/fhir/StructureMap/ImmunizationReg" = 'ImmunizationReg'
 
         uses "http://hl7.org/fhir/StructureDefinition/QuestionnaireReponse" as source
         uses "http://hl7.org/fhir/StructureDefinition/Bundle" as target
@@ -1846,30 +1842,30 @@ class ResourceMapperTest {
              src -> tgt.reaction = create('Immunization_Reaction') "rule_z1";
         }"""
 
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
+      val iParser: IParser = FhirContext.forR4().newJsonParser()
 
-    val uriTestQuestionnaire =
-      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+      val uriTestQuestionnaire =
+        iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
-    val uriTestQuestionnaireResponse =
-      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
-        QuestionnaireResponse
+      val uriTestQuestionnaireResponse =
+        iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+          as QuestionnaireResponse
 
-    val transformSupportServices = TransformSupportServices(mutableListOf())
+      val transformSupportServices = TransformSupportServices(mutableListOf())
 
-    val bundle =
-      ResourceMapper.extract(
-        uriTestQuestionnaire,
-        uriTestQuestionnaireResponse,
-        StructureMapExtractionContext(context, transformSupportServices) { _, worker ->
-          StructureMapUtilities(worker).parse(mapping, "")
-        }
-      )
+      val bundle =
+        ResourceMapper.extract(
+          uriTestQuestionnaire,
+          uriTestQuestionnaireResponse,
+          StructureMapExtractionContext(context, transformSupportServices) { _, worker ->
+            StructureMapUtilities(worker).parse(mapping, "")
+          }
+        )
 
-    assertThat(bundle.entry.get(0).resource).isInstanceOf(Immunization::class.java)
-    assertThat((bundle.entry.get(0).resource as Immunization).reaction[0])
-      .isInstanceOf(Immunization.ImmunizationReactionComponent::class.java)
-  }
+      assertThat(bundle.entry.get(0).resource).isInstanceOf(Immunization::class.java)
+      assertThat((bundle.entry.get(0).resource as Immunization).reaction[0])
+        .isInstanceOf(Immunization.ImmunizationReactionComponent::class.java)
+    }
 
   @Test
   fun extract_choiceType_updateObservationFields() = runBlocking {
@@ -2141,8 +2137,8 @@ class ResourceMapperTest {
     val questionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
     val response =
-      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
-        QuestionnaireResponse
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+        as QuestionnaireResponse
     val patient = ResourceMapper.extract(questionnaire, response).entry[0].resource as Patient
 
     assertThat(patient.name.first().given).isEmpty() // disabled questionnaire item
@@ -2322,8 +2318,8 @@ class ResourceMapperTest {
     val questionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
     val response =
-      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
-        QuestionnaireResponse
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+        as QuestionnaireResponse
     val patient: Patient
     runBlocking {
       patient = ResourceMapper.extract(questionnaire, response).entry[0].resource as Patient
@@ -2438,11 +2434,11 @@ class ResourceMapperTest {
 
     assertThat(encounter).isNotNull()
     assertThat(
-        encounter.getExtensionByUrl(
+        encounter
+          .getExtensionByUrl(
             "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-encounter#Encounter.contactNumber"
           )
-          .valueAsPrimitive
-          .value
+          .valueAsPrimitive.value
       )
       .isEqualTo(9)
   }
@@ -2518,11 +2514,11 @@ class ResourceMapperTest {
 
     assertThat(patient).isNotNull()
     val coding =
-      patient.getExtensionByUrl(
+      patient
+        .getExtensionByUrl(
           "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension:tribe"
         )
-        .value as
-        Coding
+        .value as Coding
     assertThat(coding.code).isEqualTo("hausa")
     assertThat(coding.display).isEqualTo("Hausa")
   }
@@ -2607,14 +2603,12 @@ class ResourceMapperTest {
 
     assertThat(patient).isNotNull()
     assertThat(
-        patient
-          .name
+        patient.name
           .first()
           .getExtensionByUrl(
             "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.middle"
           )
-          .valueAsPrimitive
-          .valueAsString
+          .valueAsPrimitive.valueAsString
       )
       .isEqualTo("TestName")
   }
