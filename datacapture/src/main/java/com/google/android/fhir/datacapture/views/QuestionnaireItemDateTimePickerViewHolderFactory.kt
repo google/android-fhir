@@ -205,7 +205,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       fun displayDateValidationError(validationResult: ValidationResult) {
         dateInputLayout.error =
           when (validationResult) {
-            is NotValidated, Valid -> null
+            is NotValidated,
+            Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
       }
@@ -213,7 +214,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       fun displayTimeValidationError(validationResult: ValidationResult) {
         timeInputLayout.error =
           when (validationResult) {
-            is NotValidated, Valid -> null
+            is NotValidated,
+            Valid -> null
             is Invalid ->
               if (timeInputLayout.isEnabled) {
                 validationResult.getSingleStringValidationMessage()
