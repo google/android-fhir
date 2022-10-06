@@ -100,7 +100,7 @@ function build_only() {
 # for documentation on the gsutil command used in this function
 function device_tests() {
   ./gradlew packageDebugAndroidTest --scan --stacktrace
-  local lib_names=("datacapture" "engine" "workflow")
+  local lib_names=("datacapture" "engine")
   firebase_pids=()
   for lib_name in "${lib_names[@]}"; do
    gcloud firebase test android run --type instrumentation \
@@ -118,6 +118,24 @@ function device_tests() {
       --no-use-orchestrator &
       firebase_pids+=("$!")
   done
+
+    local lib_names_min_sdk_26=("workflow")
+    for lib_name in "${lib_names_min_sdk_26[@]}"; do
+     gcloud firebase test android run --type instrumentation \
+        --app demo/build/outputs/apk/androidTest/debug/demo-debug-androidTest.apk \
+        --test $lib_name/build/outputs/apk/androidTest/debug/$lib_name-debug-androidTest.apk \
+        --timeout 30m \
+        --device model=Nexus6P,version=26,locale=en_US \
+        --device model=Nexus6P,version=27,locale=en_US \
+        --device model=Pixel2,version=30,locale=en_US \
+        --environment-variables coverage=true,coverageFile="/sdcard/Download/coverage.ec" \
+        --directories-to-pull /sdcard/Download  \
+        --results-bucket=$GCS_BUCKET \
+        --results-dir=$KOKORO_BUILD_ARTIFACTS_SUBDIR/firebase/$lib_name \
+        --project=android-fhir-instrumeted-tests \
+        --no-use-orchestrator &
+        firebase_pids+=("$!")
+    done
 
   for firebase_pid in ${firebase_pids[*]}; do
     wait $firebase_pid
