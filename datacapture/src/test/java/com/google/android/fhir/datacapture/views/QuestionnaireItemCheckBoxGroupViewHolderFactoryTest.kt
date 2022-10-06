@@ -44,7 +44,7 @@ import org.robolectric.RuntimeEnvironment
 class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
   private val viewHolder = QuestionnaireItemCheckBoxGroupViewHolderFactory.create(parent)
 
@@ -418,8 +418,8 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
     )
 
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group).getChildAt(1) as
-            CheckBox)
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group).getChildAt(1)
+            as CheckBox)
           .isEnabled
       )
       .isFalse()
