@@ -31,7 +31,7 @@ internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
 
 /**
  * Text value for answer option [Questionnaire.QuestionnaireItemAnswerOptionComponent] if answer
- * option is [IntegerType] or [StringType] or [Coding] or [Reference] type.
+ * option is [IntegerType], [StringType], [Coding], or [Reference] type.
  */
 internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
   get() {

@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    compileSdk = 31
+    compileSdk = Sdk.compileSdk
 
     defaultConfig {
         applicationId = "com.google.android.fhir.codelabs.datacapture"
-        minSdk = 21
-        targetSdk = 31
+        minSdk = Sdk.minSdk
+        targetSdk = Sdk.targetSdk
         versionCode = 1
         versionName = "1.0"
 
