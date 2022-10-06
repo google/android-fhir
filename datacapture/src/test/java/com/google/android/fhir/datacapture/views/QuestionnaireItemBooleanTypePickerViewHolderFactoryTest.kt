@@ -347,8 +347,8 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
     )
 
     assertThat(
-        (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0) as
-            RadioButton)
+        (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0)
+            as RadioButton)
           .isEnabled
       )
       .isFalse()
