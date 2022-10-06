@@ -11,4 +11,44 @@
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
     />
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/infoCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/info_card_view_margin"
+        android:layout_marginStart="@dimen/info_card_view_margin"
+        android:layout_marginEnd="@dimen/info_card_view_margin"
+        android:layout_marginBottom="@dimen/info_card_view_margin_bottom"
+        android:visibility="visible"
+        app:strokeWidth="0dp"
+        app:layout_constraintBottom_toBottomOf="@id/container"
+    >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorSurfaceVariant"
+            android:orientation="vertical"
+        >
+            <TextView
+                android:drawableStart="@drawable/ic_info_24"
+                android:drawablePadding="@dimen/info_card_icon_padding"
+                android:id="@+id/infoCardHeader"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginHorizontal="@dimen/info_card_header_margin"
+                android:layout_marginTop="@dimen/info_card_header_margin"
+                android:layout_marginBottom="@dimen/info_header_margin_bottom"
+            />
+            <TextView
+                android:id="@+id/infoCardText"
+                android:layout_marginHorizontal="@dimen/info_card_header_margin"
+                android:layout_marginBottom="@dimen/info_card_view_margin"
+                android:layout_width="wrap_content"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:layout_height="wrap_content"
+            />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

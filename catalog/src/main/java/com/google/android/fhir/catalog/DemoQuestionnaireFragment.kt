@@ -24,6 +24,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -40,12 +41,16 @@ import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.BUNDLE
 import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.REQUEST_ERROR_KEY
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.SUBMIT_REQUEST_KEY
+import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
 
 class DemoQuestionnaireFragment : Fragment() {
   private val viewModel: DemoQuestionnaireViewModel by viewModels()
   private val args: DemoQuestionnaireFragmentArgs by navArgs()
   private var isErrorState = false
+  private lateinit var infoCard: MaterialCardView
+  private lateinit var infoCardHeader: TextView
+  private lateinit var infoCardText: TextView
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -58,6 +63,17 @@ class DemoQuestionnaireFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    infoCard = view.findViewById(R.id.infoCard)
+    when (args.questionnaireTitleKey) {
+      getString(R.string.behavior_name_skip_logic) -> {
+        infoCard.visibility = View.VISIBLE
+        infoCardHeader = view.findViewById(R.id.infoCardHeader)
+        infoCardHeader.text = args.questionnaireTitleKey
+        infoCardText = view.findViewById(R.id.infoCardText)
+        infoCardText.text = getString(R.string.behavior_name_skip_logic_info)
+      }
+      else -> infoCard.visibility = View.GONE
+    }
     setFragmentResultListener(REQUEST_ERROR_KEY) { _, bundle ->
       isErrorState = bundle.getBoolean(BUNDLE_ERROR_KEY)
       replaceQuestionnaireFragmentWithQuestionnaireJson()

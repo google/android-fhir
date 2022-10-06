@@ -8,4 +8,9 @@
   <dimen name="bottom_navigation_view_height">80dp</dimen>
   <dimen name="component_horizontal_margin">4dp</dimen>
   <dimen name="component_vertical_margin">4dp</dimen>
+  <dimen name="info_card_view_margin">16dp</dimen>
+  <dimen name="info_card_icon_padding">8dp</dimen>
+  <dimen name="info_card_view_margin_bottom">32dp</dimen>
+  <dimen name="info_header_margin_bottom">8dp</dimen>
+  <dimen name="info_card_header_margin">16dp</dimen>
 </resources>
