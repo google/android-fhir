@@ -35,6 +35,10 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.UriType
 
+/**
+ * Text value for response item answer option
+ * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] depending on the type
+ */
 internal fun QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.displayString(
   context: Context
 ): String {
@@ -66,6 +70,6 @@ internal fun QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.disp
         ?: valueStringType.valueAsString ?: context.getString(R.string.not_answered)
     is TimeType -> valueTimeType.valueAsString ?: context.getString(R.string.not_answered)
     is UriType -> valueUriType.valueAsString ?: context.getString(R.string.not_answered)
-    else -> context.getString(R.string.not_answered)
+    else -> throw IllegalArgumentException("$value is not supported.")
   }
 }
