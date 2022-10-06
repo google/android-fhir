@@ -100,7 +100,7 @@ function build_only() {
 # for documentation on the gsutil command used in this function
 function device_tests() {
   ./gradlew packageDebugAndroidTest --scan --stacktrace
-  local lib_names=("datacapture" "engine" "workflow")
+  local lib_names=("datacapture" "engine")
   firebase_pids=()
   for lib_name in "${lib_names[@]}"; do
    gcloud firebase test android run --type instrumentation \

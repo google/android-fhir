@@ -17,8 +17,6 @@ android {
     versionName = Releases.Catalog.versionName
 
     testInstrumentationRunner = Dependencies.androidJunitRunner
-    // Required when setting minSdkVersion to 20 or lower
-    multiDexEnabled = true
   }
 
   buildFeatures { viewBinding = true }

@@ -16,9 +16,6 @@ android {
     versionCode = Releases.Demo.versionCode
     versionName = Releases.Demo.versionName
     testInstrumentationRunner = Dependencies.androidJunitRunner
-    // Required when setting minSdkVersion to 20 or lower
-    // See https://developer.android.com/studio/write/java8-support
-    multiDexEnabled = true
   }
   buildTypes {
     getByName("release") {
