@@ -33,6 +33,8 @@ include(":common")
 
 include(":contrib:barcode")
 
+include(":contrib:libspellfix")
+
 include(":datacapture")
 
 include(":demo")
