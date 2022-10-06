@@ -46,7 +46,6 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-
   implementation(Dependencies.Androidx.activity)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)
@@ -65,6 +64,6 @@ dependencies {
   implementation(Dependencies.timber)
   implementation(project(":engine"))
   implementation(project(":datacapture"))
-  
+
   testImplementation(Dependencies.junit)
 }
