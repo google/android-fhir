@@ -442,7 +442,7 @@ internal fun Questionnaire.QuestionnaireItemComponent.extractAnswerOptions(
       when (this.type) {
         Questionnaire.QuestionnaireItemType.REFERENCE -> {
           require(dataList.all { it.isResource }) {
-            "$EXTENSION_CHOICE_COLUMN_URL not applicable for '${this.type.toCode()}'. Only type reference is allowed with resource."
+            "'${this.type.toCode()}' cannot be used to populate $EXTENSION_CHOICE_COLUMN_URL. Only Resources can be used to populate the choice columns."
           }
 
           data as Resource
