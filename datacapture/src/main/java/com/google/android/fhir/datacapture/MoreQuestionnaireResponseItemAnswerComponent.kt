@@ -70,6 +70,6 @@ internal fun QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.disp
         ?: valueStringType.valueAsString ?: context.getString(R.string.not_answered)
     is TimeType -> valueTimeType.valueAsString ?: context.getString(R.string.not_answered)
     is UriType -> valueUriType.valueAsString ?: context.getString(R.string.not_answered)
-    else -> throw IllegalArgumentException("$value is not supported.")
+    else -> context.getString(R.string.not_answered)
   }
 }

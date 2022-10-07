@@ -1353,9 +1353,10 @@ class MoreQuestionnaireItemComponentsTest {
         )
 
     assertThat(questionItem.itemFirstRep.choiceColumn!!)
-      .contains(ChoiceColumn("code", "CODE", false))
-    assertThat(questionItem.itemFirstRep.choiceColumn!!)
-      .contains(ChoiceColumn("display", "DESCRIPTION", true))
+      .containsExactly(
+        ChoiceColumn("code", "CODE", false),
+        ChoiceColumn("display", "DESCRIPTION", true)
+      )
   }
 
   @Test
@@ -1457,6 +1458,7 @@ class MoreQuestionnaireItemComponentsTest {
         )
         .map { it.valueReference }
 
+    assertThat(answers.size).isEqualTo(2)
     assertThat(answers.first().display).isEqualTo("John Doe")
     assertThat(answers.first().reference).isEqualTo("Patient/1234")
     assertThat(answers.last().display).isEqualTo("Jane Doe")

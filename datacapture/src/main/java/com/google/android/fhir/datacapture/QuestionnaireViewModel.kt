@@ -282,6 +282,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val answerValueSetMap =
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
 
+  /**
+   * The answer expression referencing an x-fhir-query has its evaluated data cached to avoid
+   * reloading resources unnecessarily. The value is updated each time an item with answer
+   * expression is evaluating the latest answer options.
+   */
   private val answerExpressionMap =
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
 
@@ -420,13 +425,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   // TODO persist previous answers incase options are changing and new list does not have selected
-  // answer
+  // answer and fhirpath in x-fhir-query
+  // https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
   @PublishedApi
   internal suspend fun resolveAnswerExpression(
     item: Questionnaire.QuestionnaireItemComponent
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     // Check cache first for database queries
-    val answerExpression = item.answerExpression!!
+    val answerExpression = item.answerExpression ?: return emptyList()
     if (answerExpression.isXFhirQuery && answerExpressionMap.contains(answerExpression.expression)
     ) {
       return answerExpressionMap[answerExpression.expression]!!

@@ -52,7 +52,8 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * @param answersChangedCallback the callback to notify the view model that the answers have been
  * changed for the [QuestionnaireResponse.QuestionnaireResponseItemComponent]
  * @param resolveAnswerValueSet the callback to resolve the answer value set and return the answer
- * options
+ * @param resolveAnswerExpression the callback to resolve answer options when answer-expression
+ * extension exists options
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -146,12 +147,14 @@ data class QuestionnaireItemViewItem(
   }
 
   /**
-   * In a `choice` or `open-choice` type question, the answer options are defined in one of the two
-   * elements in the questionnaire:
+   * In a `choice` or `open-choice` type question, the answer options are defined in one of the
+   * three elements in the questionnaire:
    *
    * - `Questionnaire.item.answerOption`: a list of permitted answers to the question
    * - `Questionnaire.item.answerValueSet`: a reference to a value set containing a list of
    * permitted answers to the question
+   * - `Extension answer-expression`: an expression based extension which defines the x-fhir-query
+   * or fhirpath to evaluate permitted answer options
    *
    * This property returns the answer options defined in one of the sources above. If the answer
    * options are defined in `Questionnaire.item.answerValueSet`, the answer value set will be

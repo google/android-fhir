@@ -32,7 +32,6 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
-import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.utils.ToolingExtensions
 
 /** UI controls relevant to capturing question data. */
@@ -413,6 +412,12 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceColumn: List<ChoiceC
       }
     }
 
+/**
+ * A choice column extracted from choice column extension contains following properties
+ * - path -> the path or expression in evaluated answerOption or resources to extract value
+ * - label -> the label of given column of table or answerOption
+ * - forDisplay -> if the column should be shown on UI
+ */
 internal data class ChoiceColumn(val path: String, val label: String?, val forDisplay: Boolean)
 
 // TODO implement full functionality of choice column
@@ -424,14 +429,16 @@ internal data class ChoiceColumn(val path: String, val label: String?, val forDi
  * Control the information displayed in list.
  * - With reference it allows selection of fields from the resource for display and reference
  * - With other types it adds the options as is
+ *
+ * @param dataList the source data to extract the answer option values. The data could be list of
+ * resources [Resource], identifiers [Identifier] or codes [Coding]
+ * @return list of answer options [Questionnaire.QuestionnaireItemAnswerOptionComponent]
  */
 internal fun Questionnaire.QuestionnaireItemComponent.extractAnswerOptions(
   dataList: List<Base>
 ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-  if (dataList.isEmpty()) return emptyList()
-
-  val options: List<Type> =
-    dataList.map { data ->
+  return dataList
+    .map { data ->
       when (this.type) {
         Questionnaire.QuestionnaireItemType.REFERENCE -> {
           require(dataList.all { it.isResource }) {
@@ -457,8 +464,7 @@ internal fun Questionnaire.QuestionnaireItemComponent.extractAnswerOptions(
         }
       }
     }
-
-  return options.map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
+    .map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
 }
 
 /**
