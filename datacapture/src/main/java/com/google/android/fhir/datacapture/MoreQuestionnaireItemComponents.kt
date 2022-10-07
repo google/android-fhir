@@ -437,34 +437,32 @@ internal data class ChoiceColumn(val path: String, val label: String?, val forDi
 internal fun Questionnaire.QuestionnaireItemComponent.extractAnswerOptions(
   dataList: List<Base>
 ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-  return dataList
-    .map { data ->
-      when (this.type) {
-        Questionnaire.QuestionnaireItemType.REFERENCE -> {
-          require(dataList.all { it.isResource }) {
-            "'${this.type.toCode()}' cannot be used to populate $EXTENSION_CHOICE_COLUMN_URL. Only Resources can be used to populate the choice columns."
-          }
+  return when (this.type) {
+    Questionnaire.QuestionnaireItemType.REFERENCE -> {
+      require(dataList.all { it.isResource }) {
+        "'${this.type.toCode()}' cannot be used to populate $EXTENSION_CHOICE_COLUMN_URL. Only Resources can be used to populate the choice columns."
+      }
 
-          data as Resource
-          Reference().apply {
-            reference = "${data.resourceType}/${data.logicalId}"
-            this@extractAnswerOptions.choiceColumn
-              ?.filter { it.forDisplay }
-              ?.map { it.path }
-              ?.let { evaluateToDisplay(it, data) }
-              ?.also { display = it }
-          }
-        }
-        else -> {
-          require(dataList.all { !it.isResource }) {
-            "$EXTENSION_CHOICE_COLUMN_URL not applicable for '${this.type.toCode()}'. Only type reference is allowed with resource."
-          }
-
-          data.castToType(data)
+      dataList.map { data ->
+        data as Resource
+        Reference().apply {
+          reference = "${data.resourceType}/${data.logicalId}"
+          this@extractAnswerOptions.choiceColumn
+            ?.filter { it.forDisplay }
+            ?.map { it.path }
+            ?.let { evaluateToDisplay(it, data) }
+            ?.also { display = it }
         }
       }
     }
-    .map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
+    else -> {
+      require(dataList.all { !it.isResource }) {
+        "$EXTENSION_CHOICE_COLUMN_URL not applicable for '${this.type.toCode()}'. Only type reference is allowed with resource."
+      }
+
+      dataList.map { it.castToType(it) }
+    }
+  }.map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
 }
 
 /**

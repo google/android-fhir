@@ -27,5 +27,8 @@ internal val fhirPathEngine: FHIRPathEngine =
     FHIRPathEngine(HapiWorkerContext(this, this.validationSupport))
   }
 
+/**
+ * Evaluates the expressions over list of resources [Resource] and joins to space separated string
+ */
 internal fun evaluateToDisplay(expressions: List<String>, data: Resource) =
   expressions.joinToString(" ") { fhirPathEngine.evaluateToString(data, it) }
