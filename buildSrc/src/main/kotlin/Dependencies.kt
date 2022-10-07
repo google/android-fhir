@@ -101,8 +101,11 @@ object Dependencies {
       "com.google.mlkit:object-detection-custom:${Versions.Mlkit.objectDetectionCustom}"
   }
 
-  const val androidFhirCommon = "com.google.android.fhir:common:${Versions.androidFhirCommon}"
-  const val androidFhirEngine = "com.google.android.fhir:engine:${Versions.androidFhirEngine}"
+  const val androidFhirGroup = "com.google.android.fhir"
+  const val androidFhirCommon = "$androidFhirGroup:common:${Versions.androidFhirCommon}"
+  const val androidFhirEngineModule = "engine"
+  const val androidFhirEngine =
+    "$androidFhirGroup:$androidFhirEngineModule:${Versions.androidFhirEngine}"
 
   const val lifecycleExtensions =
     "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
