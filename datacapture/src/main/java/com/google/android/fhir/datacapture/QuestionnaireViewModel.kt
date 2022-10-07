@@ -419,7 +419,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return options
   }
 
-  // TODO persist previous answers incase options are changing and new list does not have selected
+  // TODO: persist previous answers incase options are changing and new list does not have selected.
   // answer
   @PublishedApi
   internal suspend fun resolveAnswerExpression(
