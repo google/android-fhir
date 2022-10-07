@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,16 +30,17 @@ import org.hl7.fhir.r4.model.ResourceType
 class DownloadWorkManagerImpl : DownloadWorkManager {
   private val resourceTypeList = ResourceType.values().map { it.name }
   private val urls = LinkedList(listOf("Patient?address-city=NAIROBI"))
+  override var nextRequestUrl: String? = null
 
   override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? {
-    var url = urls.poll() ?: return null
+    nextRequestUrl = urls.poll() ?: return null
 
     val resourceTypeToDownload =
-      ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
+      ResourceType.fromCode(nextRequestUrl?.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
     context.getLatestTimestampFor(resourceTypeToDownload)?.let {
-      url = affixLastUpdatedTimestamp(url!!, it)
+      nextRequestUrl = affixLastUpdatedTimestamp(nextRequestUrl!!, it)
     }
-    return url
+    return nextRequestUrl
   }
 
   override suspend fun processResponse(response: Resource): Collection<Resource> {

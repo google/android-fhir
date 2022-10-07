@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,9 @@ import org.hl7.fhir.r4.model.Resource
  * manager be created or should there be an API to restart a new download job.
  */
 interface DownloadWorkManager {
+
+  var nextRequestUrl: String?
+
   /**
    * Returns the URL for the next download request, or `null` if there is no more download request
    * to be issued.

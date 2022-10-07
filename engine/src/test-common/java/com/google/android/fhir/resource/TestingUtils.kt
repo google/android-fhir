@@ -31,7 +31,6 @@ import java.time.OffsetDateTime
 import java.util.Date
 import java.util.LinkedList
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
@@ -104,7 +103,12 @@ class TestingUtils constructor(private val iParser: IParser) {
   ) : DownloadWorkManager {
     private val urls = LinkedList(queries)
 
-    override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? = urls.poll()
+    override var nextRequestUrl: String? = null
+
+    override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? {
+      nextRequestUrl = urls.poll()
+      return nextRequestUrl
+    }
 
     override suspend fun processResponse(response: Resource): Collection<Resource> {
       val patient = Patient().setMeta(Meta().setLastUpdated(Date()))
@@ -142,12 +146,12 @@ class TestingUtils constructor(private val iParser: IParser) {
       download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
     ) {
       download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType): String {
-            return "123456788"
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType): String {
+              return "123456788"
+            }
           }
-        }
-      )
+        )
         .collect {}
     }
     override suspend fun count(search: Search): Long {

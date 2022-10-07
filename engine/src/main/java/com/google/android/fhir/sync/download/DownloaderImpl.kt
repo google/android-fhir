@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.Downloader
 import com.google.android.fhir.sync.ResourceSyncException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -38,25 +39,29 @@ internal class DownloaderImpl(
 ) : Downloader {
   private val resourceTypeList = ResourceType.values().map { it.name }
 
-  override suspend fun download(context: SyncDownloadContext): Flow<DownloadState> = flow {
-    var resourceTypeToDownload: ResourceType = ResourceType.Bundle
-    emit(DownloadState.Started(resourceTypeToDownload))
-    var url = downloadWorkManager.getNextRequestUrl(context)
-    while (url != null) {
-      try {
-        resourceTypeToDownload =
-          ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
-
-        emit(
-          DownloadState.Success(
-            downloadWorkManager.processResponse(dataSource.download(url!!)).toList()
+  override suspend fun download(context: SyncDownloadContext): Flow<DownloadState> =
+    flow {
+        val resourceTypeToDownload: ResourceType = ResourceType.Bundle
+        emit(DownloadState.Started(resourceTypeToDownload))
+        var url = downloadWorkManager.getNextRequestUrl(context)
+        while (url != null) {
+          emit(
+            DownloadState.Success(
+              downloadWorkManager.processResponse(dataSource.download(url)).toList()
+            )
           )
-        )
-      } catch (exception: Exception) {
-        emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
+          url = downloadWorkManager.getNextRequestUrl(context)
+        }
       }
-
-      url = downloadWorkManager.getNextRequestUrl(context)
-    }
-  }
+      .catch { throwable: Throwable ->
+        val resourceTypeToDownload =
+          ResourceType.fromCode(
+            downloadWorkManager.nextRequestUrl
+              ?.findAnyOf(resourceTypeList, ignoreCase = true)
+              ?.second
+          )
+        emit(
+          DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, Exception(throwable)))
+        )
+      }
 }
