@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync.remote
 
-import com.google.android.fhir.BuildConfig
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
@@ -45,23 +44,24 @@ internal interface RemoteFhirService : DataSource {
     private val networkConfiguration: NetworkConfiguration
   ) {
     private var authenticator: Authenticator? = null
+    private var httpLoggingInterceptor: HttpLoggingInterceptor? = null
 
-    fun setAuthenticator(authenticator: Authenticator?) {
+    fun setAuthenticator(authenticator: Authenticator?) = apply {
       this.authenticator = authenticator
     }
 
+    fun setHttpLogger(httpLogger: HttpLogger) = apply {
+      httpLoggingInterceptor = httpLogger.toOkHttpLoggingInterceptor()
+    }
+
     fun build(): RemoteFhirService {
-      val logger = HttpLoggingInterceptor()
-      logger.level =
-        if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
-        else HttpLoggingInterceptor.Level.BASIC
       val client =
         OkHttpClient.Builder()
+          .connectTimeout(networkConfiguration.connectionTimeOut, TimeUnit.SECONDS)
+          .readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
+          .writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
           .apply {
-            connectTimeout(networkConfiguration.connectionTimeOut, TimeUnit.SECONDS)
-            readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
-            writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
-            addInterceptor(logger)
+            httpLoggingInterceptor?.let { addInterceptor(it) }
             authenticator?.let {
               addInterceptor(
                 Interceptor { chain: Interceptor.Chain ->

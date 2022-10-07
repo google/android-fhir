@@ -13,14 +13,11 @@ android {
   compileSdk = Sdk.compileSdk
 
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.minSdkWorkflow
     targetSdk = Sdk.targetSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.workflow"
-    // Required when setting minSdkVersion to 20 or lower
-    // See https://developer.android.com/studio/write/java8-support
-    multiDexEnabled = true
   }
 
   sourceSets {
@@ -42,9 +39,6 @@ android {
   }
 
   compileOptions {
-    // Flag to enable support for the new language APIs
-    // See https://developer.android.com/studio/write/java8-support
-    isCoreLibraryDesugaringEnabled = true
     // Sets Java compatibility to Java 8
     // See https://developer.android.com/studio/write/java8-support
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -112,8 +106,6 @@ dependencies {
   androidTestImplementation(project(":testing"))
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
-
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Cql.evaluator)
