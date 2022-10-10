@@ -25,12 +25,15 @@ import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.utilities.fhirPathEngine
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.search.search
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -38,6 +41,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.ResourceType
@@ -48,6 +52,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   AndroidViewModel(application) {
 
   private val parser: IParser by lazy { FhirContext.forCached(FhirVersionEnum.R4).newJsonParser() }
+  private val fhirEngine by lazy { FhirEngineProvider.getInstance(application) }
 
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
@@ -278,6 +283,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
 
   /**
+   * The answer expression referencing an x-fhir-query has its evaluated data cached to avoid
+   * reloading resources unnecessarily. The value is updated each time an item with answer
+   * expression is evaluating the latest answer options.
+   */
+  private val answerExpressionMap =
+    mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
+
+  /**
    * Returns current [QuestionnaireResponse] captured by the UI which includes answers of enabled
    * questions.
    */
@@ -409,6 +422,43 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     // save it so that we avoid have cache misses.
     answerValueSetMap[uri] = options
     return options
+  }
+
+  // TODO persist previous answers incase options are changing and new list does not have selected
+  // answer and fhirpath in x-fhir-query
+  // https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
+  @PublishedApi
+  internal suspend fun resolveAnswerExpression(
+    item: Questionnaire.QuestionnaireItemComponent
+  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+    // Check cache first for database queries
+    val answerExpression = item.answerExpression ?: return emptyList()
+    if (answerExpression.isXFhirQuery && answerExpressionMap.contains(answerExpression.expression)
+    ) {
+      return answerExpressionMap[answerExpression.expression]!!
+    }
+
+    val options = loadAnswerExpressionOptions(item, answerExpression)
+
+    if (answerExpression.isXFhirQuery) answerExpressionMap[answerExpression.expression] = options
+
+    return options
+  }
+
+  private suspend fun loadAnswerExpressionOptions(
+    item: Questionnaire.QuestionnaireItemComponent,
+    expression: Expression
+  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+    val data =
+      if (expression.isXFhirQuery) fhirEngine.search(expression.expression)
+      else if (expression.isFhirPath)
+        fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
+      else
+        throw UnsupportedOperationException(
+          "${expression.language} not supported for answer-expression yet"
+        )
+
+    return item.extractAnswerOptions(data)
   }
 
   /**
@@ -552,6 +602,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           validationResult = validationResult,
           answersChangedCallback = answersChangedCallback,
           resolveAnswerValueSet = { resolveAnswerValueSet(it) },
+          resolveAnswerExpression = { resolveAnswerExpression(it) }
         )
       ) +
         getQuestionnaireItemViewItems(
