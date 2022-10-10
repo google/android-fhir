@@ -87,6 +87,7 @@ dependencies {
   androidTestImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
 
+  androidTestImplementation(Dependencies.Cql.engineJackson)
   androidTestImplementation(Dependencies.Cql.evaluator)
   androidTestImplementation(Dependencies.Cql.evaluatorBuilder)
 

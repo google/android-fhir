@@ -23,7 +23,8 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.opencds.cqf.cql.engine.execution.JsonCqlLibraryReader
+import org.opencds.cqf.cql.engine.serializing.jackson.JsonCqlLibraryReader
+import org.opencds.cqf.cql.engine.serializing.jackson.JsonCqlMapper
 
 @RunWith(AndroidJUnit4::class)
 class A_JacksonMapperBenchmark {
@@ -36,6 +37,6 @@ class A_JacksonMapperBenchmark {
    */
   @Test
   fun loadJsonMapper() {
-    benchmarkRule.measureRepeated { assertThat(JsonCqlLibraryReader.mapper()).isNotNull() }
+    benchmarkRule.measureRepeated { assertThat(JsonCqlMapper.getMapper()).isNotNull() }
   }
 }

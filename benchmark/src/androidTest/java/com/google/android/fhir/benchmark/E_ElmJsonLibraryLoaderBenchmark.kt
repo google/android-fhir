@@ -29,7 +29,7 @@ import org.hl7.fhir.r4.model.Library
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.opencds.cqf.cql.engine.execution.JsonCqlLibraryReader
+import org.opencds.cqf.cql.engine.serializing.jackson.JsonCqlLibraryReader
 
 @RunWith(AndroidJUnit4::class)
 class E_ElmJsonLibraryLoaderBenchmark {
@@ -49,11 +49,13 @@ class E_ElmJsonLibraryLoaderBenchmark {
         jsonParser.parseResource(open("/immunity-check/ImmunityCheck.json")) as Bundle
       }
 
-      val immunicyCheckLibrary = libraryBundle.entry[0].resource as Library
-      val immunicyCheckCqlLibrary =
-        JsonCqlLibraryReader.read(StringReader(String(immunicyCheckLibrary.content[0].data)))
+      val immunityCheckLibrary = libraryBundle.entry[0].resource as Library
+      val jsonLib = immunityCheckLibrary.content.first { it.contentType == "application/elm+json" }
 
-      assertThat(immunicyCheckCqlLibrary.identifier.id).isEqualTo("ImmunityCheck")
+      val immunityCheckCqlLibrary =
+        JsonCqlLibraryReader().read(StringReader(String(jsonLib.data)))
+
+      assertThat(immunityCheckCqlLibrary.identifier.id).isEqualTo("ImmunityCheck")
     }
   }
 
@@ -67,8 +69,10 @@ class E_ElmJsonLibraryLoaderBenchmark {
       }
 
       val fhirHelpersLibrary = libraryBundle.entry[1].resource as Library
+      val jsonLib = fhirHelpersLibrary.content.first { it.contentType == "application/elm+json" }
+
       val fhirHelpersCqlLibrary =
-        JsonCqlLibraryReader.read(StringReader(String(fhirHelpersLibrary.content[0].data)))
+        JsonCqlLibraryReader().read(StringReader(String(jsonLib.data)))
 
       assertThat(fhirHelpersCqlLibrary.identifier.id).isEqualTo("FHIRHelpers")
     }
