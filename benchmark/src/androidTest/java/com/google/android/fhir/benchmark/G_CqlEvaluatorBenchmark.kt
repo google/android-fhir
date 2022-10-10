@@ -76,8 +76,7 @@ class G_CqlEvaluatorBenchmark {
           "http://localhost/Library/ImmunityCheck|1.0.0",
           "d4d35004-24f8-40e4-8084-1ad75924514f",
           setOf("CompletedImmunization")
-        ) as
-          Parameters
+        ) as Parameters
 
       assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
     }
