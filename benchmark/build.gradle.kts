@@ -25,7 +25,6 @@ android {
     testInstrumentationRunnerArguments["androidx.benchmark.dryRunMode.enable"] = "true"
     // Includes Startup time
     testInstrumentationRunnerArguments["androidx.benchmark.startupMode.enable"] = "true"
-    multiDexEnabled = true
   }
 
   sourceSets {
