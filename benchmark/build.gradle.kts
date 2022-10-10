@@ -17,7 +17,7 @@ android {
   kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
 
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.minSdkWorkflow
     targetSdk = Sdk.targetSdk
 
     testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
