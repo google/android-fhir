@@ -27,11 +27,6 @@ android {
     testInstrumentationRunnerArguments["androidx.benchmark.startupMode.enable"] = "true"
   }
 
-  sourceSets {
-    getByName("test").apply { resources.setSrcDirs(listOf("testdata")) }
-    getByName("androidTest").apply { resources.setSrcDirs(listOf("testdata")) }
-  }
-
   testBuildType = "release"
   buildTypes {
     debug {
@@ -70,6 +65,20 @@ android {
   }
 }
 
+configurations {
+  all {
+    exclude(module = "xpp3")
+    exclude(module = "xpp3_min")
+    exclude(module = "xmlpull")
+    exclude(module = "javax.json")
+    exclude(module = "jcl-over-slf4j")
+    exclude(group = "org.apache.httpcomponents")
+    // Remove this after this issue has been fixed:
+    // https://github.com/cqframework/clinical_quality_language/issues/799
+    exclude(module = "antlr4")
+  }
+}
+
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
@@ -80,6 +89,8 @@ dependencies {
 
   androidTestImplementation(Dependencies.Cql.evaluator)
   androidTestImplementation(Dependencies.Cql.evaluatorBuilder)
+
   androidTestImplementation(project(":engine"))
   androidTestImplementation(project(":workflow"))
+  androidTestImplementation(project(":workflow-testing"))
 }
