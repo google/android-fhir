@@ -28,8 +28,8 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
-import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions

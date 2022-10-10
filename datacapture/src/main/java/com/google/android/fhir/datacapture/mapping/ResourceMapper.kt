@@ -31,6 +31,7 @@ import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.util.Locale
 import org.hl7.fhir.r4.context.IWorkerContext
+import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeType
@@ -50,6 +51,7 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
+import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 
 /**

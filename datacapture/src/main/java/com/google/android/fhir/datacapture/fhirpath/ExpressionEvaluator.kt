@@ -69,17 +69,20 @@ object ExpressionEvaluator {
   internal fun detectExpressionCyclicDependency(
     items: List<Questionnaire.QuestionnaireItemComponent>
   ) {
-    items.flattened().filter { it.calculatedExpression != null }.run {
-      forEach { current ->
-        // no calculable item depending on current item should be used as dependency into current
-        // item
-        this.forEach { dependent ->
-          check(!(current.isReferencedBy(dependent) && dependent.isReferencedBy(current))) {
-            "${current.linkId} and ${dependent.linkId} have cyclic dependency in expression based extension"
+    items
+      .flattened()
+      .filter { it.calculatedExpression != null }
+      .run {
+        forEach { current ->
+          // no calculable item depending on current item should be used as dependency into current
+          // item
+          this.forEach { dependent ->
+            check(!(current.isReferencedBy(dependent) && dependent.isReferencedBy(current))) {
+              "${current.linkId} and ${dependent.linkId} have cyclic dependency in expression based extension"
+            }
           }
         }
       }
-    }
   }
 
   /**
@@ -90,20 +93,15 @@ object ExpressionEvaluator {
     updatedQuestionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    modifiedResponses: Set<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     questionnaireItemParentMap:
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>
   ): List<ItemToAnswersPair> {
-    return questionnaire
-      .item
+    return questionnaire.item
       .flattened()
       .filter { item ->
         // Condition 1. item is calculable
-        // Condition 2. item answer is not modified and touched by user;
-        // https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-calculatedExpression.html
-        // Condition 3. item answer depends on the updated item answer OR has a variable dependency
+        // Condition 2. item answer depends on the updated item answer OR has a variable dependency
         item.calculatedExpression != null &&
-          modifiedResponses.none { it.linkId == item.linkId } &&
           (updatedQuestionnaireItem.isReferencedBy(item) ||
             findDependentVariables(item.calculatedExpression!!).isNotEmpty())
       }
@@ -121,7 +119,8 @@ object ExpressionEvaluator {
           }
 
         val updatedAnswer =
-          fhirPathEngine.evaluate(
+          fhirPathEngine
+            .evaluate(
               appContext,
               questionnaireResponse,
               null,
@@ -258,10 +257,11 @@ object ExpressionEvaluator {
   }
 
   private fun findDependentVariables(expression: Expression) =
-    variableRegex.findAll(expression.expression).map { it.groupValues[1] }.toList().filterNot {
-      variable ->
-      reservedVariables.contains(variable)
-    }
+    variableRegex
+      .findAll(expression.expression)
+      .map { it.groupValues[1] }
+      .toList()
+      .filterNot { variable -> reservedVariables.contains(variable) }
 
   /**
    * Finds the dependent variables at questionnaire item level first, then in ancestors and then at

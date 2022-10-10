@@ -268,19 +268,20 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     (
       Questionnaire.QuestionnaireItemComponent,
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
-      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>) -> Unit =
-      { questionnaireItem, questionnaireResponseItem, answers ->
-    // TODO(jingtang10): update the questionnaire response item pre-order list and the parent map
-    questionnaireResponseItem.answer = answers.toList()
-    if (questionnaireItem.hasNestedItemsWithinAnswers) {
-      questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
+      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
+    ) -> Unit =
+    { questionnaireItem, questionnaireResponseItem, answers ->
+      // TODO(jingtang10): update the questionnaire response item pre-order list and the parent map
+      questionnaireResponseItem.answer = answers.toList()
+      if (questionnaireItem.hasNestedItemsWithinAnswers) {
+        questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
+      }
+      modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
+
+      updateDependentQuestionnaireResponseItems(questionnaireItem)
+
+      modificationCount.update { it + 1 }
     }
-    modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
-
-    runCalculations(questionnaireItem)
-
-    modificationCount.update { it + 1 }
-  }
 
   private val answerValueSetMap =
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
@@ -380,27 +381,37 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         SharingStarted.Lazily,
         initialValue =
           getQuestionnaireState(
-            questionnaireItemList = questionnaire.item,
-            questionnaireResponseItemList = questionnaireResponse.item,
-            currentPageIndex = getInitialPageIndex(),
-            reviewMode = enableReviewPage
-          )
+              questionnaireItemList = questionnaire.item,
+              questionnaireResponseItemList = questionnaireResponse.item,
+              currentPageIndex = getInitialPageIndex(),
+              reviewMode = enableReviewPage
+            )
             .also { detectExpressionCyclicDependency(questionnaire.item) }
-            .also { questionnaire.item.flattened().forEach { runCalculations(it) } }
+            .also {
+              questionnaire.item.flattened().forEach {
+                updateDependentQuestionnaireResponseItems(it)
+              }
+            }
       )
 
-  fun runCalculations(updatedQuestionnaireItem: Questionnaire.QuestionnaireItemComponent) {
+  fun updateDependentQuestionnaireResponseItems(
+    updatedQuestionnaireItem: Questionnaire.QuestionnaireItemComponent
+  ) {
     evaluateCalculatedExpressions(
-      updatedQuestionnaireItem,
-      questionnaire,
-      questionnaireResponse,
-      modifiedQuestionnaireResponseItemSet,
-      questionnaireItemParentMap
-    )
+        updatedQuestionnaireItem,
+        questionnaire,
+        questionnaireResponse,
+        questionnaireItemParentMap
+      )
       .forEach { (questionnaireItem, calculatedAnswers) ->
         // update all response item with updated values
         questionnaireResponseItemPreOrderList
-          .filter { it.linkId == questionnaireItem.linkId }
+          // Item answer should not be modified and touched by user;
+          // https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-calculatedExpression.html
+          .filter {
+            it.linkId == questionnaireItem.linkId &&
+              !modifiedQuestionnaireResponseItemSet.contains(it)
+          }
           .forEach { questionnaireResponseItem ->
             // update and notify only if new answer has changed to prevent any event loop
             if (questionnaireResponseItem.answer.hasDifferentAnswerSet(calculatedAnswers)) {

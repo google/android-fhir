@@ -27,10 +27,12 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
 
 fun Type.valueOrCalculateValue(): Type? {
   return if (this.hasExtension()) {
-    this.extension.firstOrNull { it.url == EXTENSION_CQF_CALCULATED_VALUE_URL }?.let {
-      val expression = (it.value as Expression).expression
-      fhirPathEngine.evaluate(this, expression).firstOrNull()?.let { it as Type }
-    }
+    this.extension
+      .firstOrNull { it.url == EXTENSION_CQF_CALCULATED_VALUE_URL }
+      ?.let {
+        val expression = (it.value as Expression).expression
+        fhirPathEngine.evaluate(this, expression).firstOrNull()?.let { it as Type }
+      }
   } else {
     this
   }

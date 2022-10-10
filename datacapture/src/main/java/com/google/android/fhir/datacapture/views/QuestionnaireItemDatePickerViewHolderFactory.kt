@@ -118,8 +118,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           )
         ) {
           textInputEditText.setText(
-            questionnaireItemViewItem
-              .answers
+            questionnaireItemViewItem.answers
               .singleOrNull()
               ?.takeIf { it.hasValue() }
               ?.valueDateType
@@ -133,7 +132,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         textInputLayout.error =
           when (validationResult) {
-            is NotValidated, Valid -> null
+            is NotValidated,
+            Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
       }
@@ -145,8 +145,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
       private fun createMaterialDatePicker(): MaterialDatePicker<Long> {
         val selectedDate =
-          questionnaireItemViewItem
-            .answers
+          questionnaireItemViewItem.answers
             .singleOrNull()
             ?.valueDateType
             ?.localDate

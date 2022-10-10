@@ -75,9 +75,7 @@ internal fun QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.disp
   }
 }
 
-internal fun List<
-  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>.hasDifferentAnswerSet(
-  answers: List<Type>
-) =
+internal fun List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
+  .hasDifferentAnswerSet(answers: List<Type>) =
   this.size != answers.size ||
     this.map { it.value }.zip(answers).any { (v1, v2) -> v1.equalsDeep(v2).not() }
