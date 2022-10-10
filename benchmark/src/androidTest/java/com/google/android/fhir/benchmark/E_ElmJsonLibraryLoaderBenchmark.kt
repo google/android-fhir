@@ -52,8 +52,7 @@ class E_ElmJsonLibraryLoaderBenchmark {
       val immunityCheckLibrary = libraryBundle.entry[0].resource as Library
       val jsonLib = immunityCheckLibrary.content.first { it.contentType == "application/elm+json" }
 
-      val immunityCheckCqlLibrary =
-        JsonCqlLibraryReader().read(StringReader(String(jsonLib.data)))
+      val immunityCheckCqlLibrary = JsonCqlLibraryReader().read(StringReader(String(jsonLib.data)))
 
       assertThat(immunityCheckCqlLibrary.identifier.id).isEqualTo("ImmunityCheck")
     }
@@ -71,8 +70,7 @@ class E_ElmJsonLibraryLoaderBenchmark {
       val fhirHelpersLibrary = libraryBundle.entry[1].resource as Library
       val jsonLib = fhirHelpersLibrary.content.first { it.contentType == "application/elm+json" }
 
-      val fhirHelpersCqlLibrary =
-        JsonCqlLibraryReader().read(StringReader(String(jsonLib.data)))
+      val fhirHelpersCqlLibrary = JsonCqlLibraryReader().read(StringReader(String(jsonLib.data)))
 
       assertThat(fhirHelpersCqlLibrary.identifier.id).isEqualTo("FHIRHelpers")
     }
