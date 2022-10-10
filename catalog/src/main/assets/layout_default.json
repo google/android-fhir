@@ -1,0 +1,765 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "type": "display",
+      "text": "Personal information",
+      "prefix":"1."
+    },
+    {
+      "linkId": "2",
+      "type": "string",
+      "item": [
+        {
+          "linkId": "2.1",
+          "text": "First Name",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "3",
+      "type": "string",
+      "item": [
+        {
+          "linkId": "3.1",
+          "text": "Family Name",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "4",
+      "type": "integer",
+      "item": [
+        {
+          "linkId": "4.1",
+          "text": "ID number",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "5",
+      "type": "integer",
+      "item": [
+        {
+          "linkId": "5.1",
+          "text": "Mobile number",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "6",
+      "type": "choice",
+      "repeats": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "check-box",
+                "display": "Checkbox"
+              }
+            ],
+            "text": "Checkbox"
+          }
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "code",
+            "display": "Receive SMS reminders"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "7",
+      "type": "date",
+      "text": "Date of birth",
+      "prefix":"2.",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "7.1",
+          "text": "If the real DOB is unknown, provide an estimated year.",
+          "type": "display"
+        }
+      ]
+    },
+    {
+      "linkId": "8",
+      "type": "choice",
+      "repeats": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "check-box",
+                "display": "Checkbox"
+              }
+            ],
+            "text": "Checkbox"
+          }
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "code1",
+            "display": "Unknown birthday"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "9",
+      "type": "display",
+      "text": "Address",
+      "prefix":"3."
+    },
+    {
+      "linkId": "10",
+      "type": "string",
+      "item": [
+        {
+          "linkId": "10.1",
+          "text": "House number and street",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "11",
+      "type": "string",
+      "item": [
+        {
+          "linkId": "11.1",
+          "text": "Apartment, unit",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "12",
+      "type": "string",
+      "item": [
+        {
+          "linkId": "12.1",
+          "text": "City, town or village",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "13",
+      "type": "string",
+      "item": [
+        {
+          "linkId": "13.1",
+          "text": "County",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "14",
+      "type": "string",
+      "item": [
+        {
+          "linkId": "14.1",
+          "text": "Postal Code",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "15",
+      "type": "display",
+      "text": "Alternative contact person",
+      "prefix":"4.",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "15.1",
+          "text": "The alternative contact would be used in the case of an emergency situation and could be next of kin (e.g. partner, mother, sibling.)",
+          "type": "display"
+        }
+      ]
+    },
+    {
+      "linkId": "16",
+      "type": "string",
+      "item": [
+        {
+          "linkId": "16.1",
+          "text": "Name",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "17",
+      "type": "choice",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "drop-down",
+                "display": "Drop down"
+              }
+            ],
+            "text": "Drop down"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "17.1",
+          "text": "Relationship",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "child",
+            "display": "Child"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "father",
+            "display": "Father"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "mother",
+            "display": "Mother"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "sibling",
+            "display": "Sibling"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "other",
+            "display": "Other"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "18",
+      "type": "string",
+      "item": [
+        {
+          "linkId": "18.1",
+          "text": "Phone number",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "19",
+      "type": "choice",
+      "text": "What is the highest level of education achieved?",
+      "prefix":"5.",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "radio-button",
+                "display": "Radio Button"
+              }
+            ],
+            "text": "Radio button"
+          }
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "19.1",
+          "text": "Select one",
+          "type": "display"
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "education",
+            "display": "Does not know level of education"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "primary-school",
+            "display": "Primary school"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "secondary-school",
+            "display": "Secondary school"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "higher-education",
+            "display": "Higher education"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "20",
+      "type": "choice",
+      "repeats": true,
+      "text": "Who does the client live with?",
+      "prefix":"6.",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "check-box",
+                "display": "Checkbox"
+              }
+            ],
+            "text": "Checkbox"
+          }
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "20.1",
+          "text": "Check all that apply",
+          "type": "display"
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "Parents",
+            "display": "Parents"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "siblings",
+            "display": "Siblings"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "extended-family",
+            "display": "Extended family"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "partner",
+            "display": "Partner"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "friends",
+            "display": "Friend(s)"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "no-one",
+            "display": "No one"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "21",
+      "type": "choice",
+      "text": "Has the client received this year’s seasonal flu vaccine?",
+      "prefix":"7.",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "radio-button",
+                "display": "Radio Button"
+              }
+            ],
+            "text": "Radio button"
+          }
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "21.1",
+          "text": "Select one",
+          "type": "display"
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "yes",
+            "display": "Yes"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "no",
+            "display": "No"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "unknown",
+            "display": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "22",
+      "type": "date",
+      "text": "When was their last menstrual period? (LMP)",
+      "prefix": "8.",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "22.1",
+          "text":"First day of the most recent period",
+          "type": "display"
+        }
+      ]
+    },
+    {
+      "linkId": "23",
+      "type": "integer",
+      "text": "How many times have they been pregnant?",
+      "prefix": "9.",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "slider",
+                "display": "Slider"
+              }
+            ],
+            "text": "Slider"
+          }
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "23.1",
+          "text":"Including this pregnancy. Also referred to as gravida.",
+          "type": "display"
+        }
+      ]
+    },
+    {
+      "linkId": "24",
+      "type": "dateTime",
+      "text": "What was the date and time of the ultrasound?",
+      "prefix": "10."
+    }
+  ]
+}

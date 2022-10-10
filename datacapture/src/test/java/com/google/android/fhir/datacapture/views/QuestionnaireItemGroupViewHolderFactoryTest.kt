@@ -35,7 +35,7 @@ import org.robolectric.RuntimeEnvironment
 class QuestionnaireItemGroupViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
   private val viewHolder = QuestionnaireItemGroupViewHolderFactory.create(parent)
 
@@ -117,17 +117,14 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<QuestionnaireGroupTypeHeaderView>(R.id.header)
           .findViewById<TextView>(R.id.hint)
-          .text
-          .isNullOrEmpty()
+          .text.isNullOrEmpty()
       )
       .isTrue()
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<QuestionnaireGroupTypeHeaderView>(R.id.header)
           .findViewById<TextView>(R.id.hint)
           .visibility

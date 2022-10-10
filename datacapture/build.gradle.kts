@@ -32,15 +32,18 @@ android {
     // Flag to enable support for the new language APIs
     // See https://developer.android.com/studio/write/java8-support
     isCoreLibraryDesugaringEnabled = true
-    // Sets Java compatibility to Java 8
-    // See https://developer.android.com/studio/write/java8-support
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+
+    sourceCompatibility = Java.sourceCompatibility
+    targetCompatibility = Java.targetCompatibility
   }
-  kotlinOptions {
-    // See https://developer.android.com/studio/write/java8-support
-    jvmTarget = JavaVersion.VERSION_1_8.toString()
+
+  packagingOptions {
+    resources.excludes.addAll(
+      listOf("META-INF/ASL2.0", "META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")
+    )
   }
+
+  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
   configureJacocoTestOptions()
 
   testOptions { animationsDisabled = true }
@@ -54,11 +57,15 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.rules)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
+  androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(Dependencies.Espresso.espressoCore)
 
   api(Dependencies.HapiFhir.structuresR4)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+
+  debugImplementation(project(":engine"))
 
   implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.Androidx.appCompat)
@@ -77,6 +84,8 @@ dependencies {
   implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.timber)
 
+  releaseImplementation(Dependencies.androidFhirEngine)
+
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)
   testImplementation(Dependencies.Kotlin.kotlinTestJunit)
@@ -85,7 +94,7 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
-  androidTestImplementation(Dependencies.Espresso.espressoCore)
+  testImplementation(project(":testing"))
 }
 
 configureDokka(Releases.DataCapture.artifactId, Releases.DataCapture.version)

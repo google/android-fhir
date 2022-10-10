@@ -18,14 +18,21 @@ package com.google.android.fhir.datacapture
 
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
+import com.google.android.fhir.datacapture.common.datatype.asStringValue
+import com.google.android.fhir.datacapture.utilities.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
+import com.google.android.fhir.logicalId
+import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.utils.ToolingExtensions
 
 /** UI controls relevant to capturing question data. */
 internal enum class ItemControlTypes(
@@ -59,8 +66,19 @@ internal const val EXTENSION_HIDDEN_URL =
 internal const val EXTENSION_ENTRY_FORMAT_URL =
   "http://hl7.org/fhir/StructureDefinition/entryFormat"
 
+internal const val EXTENSION_DISPLAY_CATEGORY_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory"
+internal const val EXTENSION_DISPLAY_CATEGORY_SYSTEM =
+  "http://hl7.org/fhir/questionnaire-display-category"
+
 internal const val EXTENSION_ENABLE_WHEN_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression"
+
+internal const val EXTENSION_ANSWER_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression"
+
+internal const val EXTENSION_CHOICE_COLUMN_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
 
 internal const val EXTENSION_VARIABLE_URL = "http://hl7.org/fhir/StructureDefinition/variable"
 
@@ -82,6 +100,9 @@ internal fun Questionnaire.QuestionnaireItemComponent.findVariableExpression(
   return variableExpressions.find { it.name == variableName }
 }
 
+internal const val CQF_CALCULATED_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue"
+
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
   get() {
@@ -90,10 +111,10 @@ internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTy
         .firstOrNull {
           it.url == EXTENSION_ITEM_CONTROL_URL || it.url == EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR
         }
-        ?.value as
-        CodeableConcept?
+        ?.value as CodeableConcept?
     val code =
-      codeableConcept?.coding
+      codeableConcept
+        ?.coding
         ?.firstOrNull {
           it.system == EXTENSION_ITEM_CONTROL_SYSTEM ||
             it.system == EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR
@@ -114,8 +135,8 @@ internal const val EXTENSION_CHOICE_ORIENTATION_URL =
 internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceOrientationTypes?
   get() {
     val code =
-      (this.extension.firstOrNull { it.url == EXTENSION_CHOICE_ORIENTATION_URL }?.value as
-          CodeType?)
+      (this.extension.firstOrNull { it.url == EXTENSION_CHOICE_ORIENTATION_URL }?.value
+          as CodeType?)
         ?.valueAsString
     return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
   }
@@ -124,6 +145,7 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceO
 internal enum class DisplayItemControlType(val extensionCode: String) {
   FLYOVER("flyover"),
   PAGE("page"),
+  HELP("help")
 }
 
 /** Item control to show instruction text */
@@ -134,6 +156,25 @@ internal val Questionnaire.QuestionnaireItemComponent.displayItemControl: Displa
     val code =
       codeableConcept?.coding?.firstOrNull { it.system == EXTENSION_ITEM_CONTROL_SYSTEM }?.code
     return DisplayItemControlType.values().firstOrNull { it.extensionCode == code }
+  }
+
+/** Whether any one of the nested display item has [DisplayItemControlType.HELP] control. */
+internal val Questionnaire.QuestionnaireItemComponent.hasHelpButton: Boolean
+  get() {
+    return item.any { it.isHelpCode }
+  }
+
+/** Whether item type is display and [displayItemControl] is [DisplayItemControlType.HELP]. */
+internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.DISPLAY -> {
+        displayItemControl == DisplayItemControlType.HELP
+      }
+      else -> {
+        false
+      }
+    }
   }
 
 /**
@@ -163,22 +204,17 @@ val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
   get() = prefixElement?.getLocalizedText()?.toSpanned()
 
 /**
- * A nested questionnaire item of type display (if present) is used as the hint of the parent
- * question.
+ * A nested questionnaire item of type display with displayCategory extension with [INSTRUCTIONS]
+ * code is used as the instructions of the parent question.
  */
-internal val Questionnaire.QuestionnaireItemComponent.localizedHintSpanned: Spanned?
+internal val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spanned?
   get() {
-    return when (type) {
-      Questionnaire.QuestionnaireItemType.GROUP -> null
-      else -> {
-        item
-          .firstOrNull { questionnaireItem ->
-            questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-              questionnaireItem.displayItemControl == null
-          }
-          ?.localizedTextSpanned
+    return item
+      .firstOrNull { questionnaireItem ->
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+          questionnaireItem.isInstructionsCode
       }
-    }
+      ?.localizedTextSpanned
   }
 
 /**
@@ -193,6 +229,17 @@ internal val Questionnaire.QuestionnaireItemComponent.localizedFlyoverSpanned: S
           questionnaireItem.displayItemControl == DisplayItemControlType.FLYOVER
       }
       ?.localizedTextSpanned
+
+/**
+ * A nested questionnaire item of type display with displayCategory extension with [INSTRUCTIONS]
+ * code is used as the instructions of the parent question.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.localizedHelpSpanned: Spanned?
+  get() {
+    return item
+      .firstOrNull { questionnaireItem -> questionnaireItem.isHelpCode }
+      ?.localizedTextSpanned
+  }
 
 /**
  * Whether the QuestionnaireItem should be hidden according to the hidden extension or lack thereof.
@@ -216,6 +263,45 @@ val Questionnaire.QuestionnaireItemComponent.entryFormat: String?
       return value.toString()
     }
     return null
+  }
+
+internal const val INSTRUCTIONS = "instructions"
+
+/** Returns [true] if extension is display category extension and contains 'instructions' code. */
+internal val Questionnaire.QuestionnaireItemComponent.isInstructionsCode: Boolean
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.DISPLAY -> {
+        val codeableConcept =
+          this.extension.firstOrNull { it.url == EXTENSION_DISPLAY_CATEGORY_URL }?.value
+            as CodeableConcept?
+        val code =
+          codeableConcept
+            ?.coding
+            ?.firstOrNull { it.system == EXTENSION_DISPLAY_CATEGORY_SYSTEM }
+            ?.code
+        code == INSTRUCTIONS
+      }
+      else -> {
+        false
+      }
+    }
+  }
+
+/**
+ * Returns [true] if item type is display and [displayItemControl] is
+ * [DisplayItemControlType.FLYOVER].
+ */
+internal val Questionnaire.QuestionnaireItemComponent.isFlyoverCode: Boolean
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.DISPLAY -> {
+        displayItemControl == DisplayItemControlType.FLYOVER
+      }
+      else -> {
+        false
+      }
+    }
   }
 
 /**
@@ -245,9 +331,9 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
 // Return expression if QuestionnaireItemComponent has ENABLE WHEN EXPRESSION URL
 val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
   get() {
-    return this.extension.firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }?.let {
-      it.value as Expression
-    }
+    return this.extension
+      .firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }
+      ?.let { it.value as Expression }
   }
 
 /**
@@ -293,6 +379,90 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
   if (answer.isNotEmpty()) {
     answer.first().item = questionnaireItemComponent.getNestedQuestionnaireResponseItems()
   }
+}
+
+internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expression?
+  get() =
+    ToolingExtensions.getExtension(this, EXTENSION_ANSWER_EXPRESSION_URL)?.value?.let {
+      it.castToExpression(it)
+    }
+
+// TODO implement full functionality of choice column
+// https://github.com/google/android-fhir/issues/1495
+/**
+ * Choice column extension https://build.fhir.org/ig/HL7/sdc/examples.html#choiceColumn
+ *
+ * The extension choice-column defines its internal elements as nested extension with table
+ * properties
+ * - path -> the field in answerOption
+ * - width -> the width of given column if widget generates a table; TBD in #1495
+ * - label -> the label of given column of table or answerOption
+ * - forDisplay -> if the column should be shown on UI
+ */
+internal val Questionnaire.QuestionnaireItemComponent.choiceColumn: List<ChoiceColumn>?
+  get() =
+    ToolingExtensions.getExtensions(this, EXTENSION_CHOICE_COLUMN_URL)?.map {
+      it.extension.let {
+        ChoiceColumn(
+          path = it.find { it.url == "path" }!!.value.asStringValue(),
+          label = it.find { it.url == "label" }?.value?.asStringValue(),
+          forDisplay =
+            it.any { it.url == "forDisplay" && it.castToBoolean(it.value).booleanValue() }
+        )
+      }
+    }
+
+/**
+ * A choice column extracted from choice column extension contains following properties
+ * - path -> the path or expression in evaluated answerOption or resources to extract value
+ * - label -> the label of given column of table or answerOption
+ * - forDisplay -> if the column should be shown on UI
+ */
+internal data class ChoiceColumn(val path: String, val label: String?, val forDisplay: Boolean)
+
+// TODO implement full functionality of choice column
+// https://github.com/google/android-fhir/issues/1495
+/**
+ * Apply and add each choice-column mapping to answer options
+ * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-choiceColumn.html
+ *
+ * Control the information displayed in list.
+ * - With reference it allows selection of fields from the resource for display and reference
+ * - With other types it adds the options as is
+ *
+ * @param dataList the source data to extract the answer option values. The data could be list of
+ * resources [Resource], identifiers [Identifier] or codes [Coding]
+ * @return list of answer options [Questionnaire.QuestionnaireItemAnswerOptionComponent]
+ */
+internal fun Questionnaire.QuestionnaireItemComponent.extractAnswerOptions(
+  dataList: List<Base>
+): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+  return when (this.type) {
+    Questionnaire.QuestionnaireItemType.REFERENCE -> {
+      require(dataList.all { it.isResource }) {
+        "'${this.type.toCode()}' cannot be used to populate $EXTENSION_CHOICE_COLUMN_URL. Only Resources can be used to populate the choice columns."
+      }
+
+      dataList.map { data ->
+        data as Resource
+        Reference().apply {
+          reference = "${data.resourceType}/${data.logicalId}"
+          this@extractAnswerOptions.choiceColumn
+            ?.filter { it.forDisplay }
+            ?.map { it.path }
+            ?.let { evaluateToDisplay(it, data) }
+            ?.also { display = it }
+        }
+      }
+    }
+    else -> {
+      require(dataList.all { !it.isResource }) {
+        "$EXTENSION_CHOICE_COLUMN_URL not applicable for '${this.type.toCode()}'. Only type reference is allowed with resource."
+      }
+
+      dataList.map { it.castToType(it) }
+    }
+  }.map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
 }
 
 /**

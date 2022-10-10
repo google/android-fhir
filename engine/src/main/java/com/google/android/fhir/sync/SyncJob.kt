@@ -34,7 +34,8 @@ interface SyncJob {
     fhirEngine: FhirEngine,
     downloadManager: DownloadWorkManager,
     resolver: ConflictResolver,
-    subscribeTo: MutableSharedFlow<State>?
+    subscribeTo: MutableSharedFlow<State>?,
+    uploadConfiguration: UploadConfiguration = UploadConfiguration()
   ): Result
 
   fun workInfoFlow(): Flow<WorkInfo>

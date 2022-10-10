@@ -44,7 +44,7 @@ import org.hl7.fhir.r4.model.ResourceType
  * http://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements and
  * http://hl7.org/fhir/R4/search.html
  */
-internal object XFhirQueryTranslator {
+object XFhirQueryTranslator {
   private const val XFHIR_QUERY_SORT_PARAM = "_sort"
   private const val XFHIR_QUERY_COUNT_PARAM = "_count"
 
@@ -66,9 +66,10 @@ internal object XFhirQueryTranslator {
     val queryParams =
       queryStringPairs?.mapNotNull {
         // skip missing values like active=[missing]
-        it.split("=").takeIf { it.size > 1 && it[1].isNotBlank() }?.let {
-          it.first() to it.elementAt(1)
-        }
+        it
+          .split("=")
+          .takeIf { it.size > 1 && it[1].isNotBlank() }
+          ?.let { it.first() to it.elementAt(1) }
       }
 
     val sort =
@@ -110,7 +111,7 @@ internal object XFhirQueryTranslator {
     }
   }
 
-  internal fun Search.applyFilterParam(param: SearchParamDefinition, filterValue: String) =
+  fun Search.applyFilterParam(param: SearchParamDefinition, filterValue: String) =
     when (param.type) {
       Enumerations.SearchParamType.NUMBER -> {
         this.filter(NumberClientParam(param.name), { value = filterValue.toBigDecimal() })

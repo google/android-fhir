@@ -43,4 +43,6 @@ include(":engine")
 
 include(":workflow")
 
+include(":workflow-testing")
+
 include(":testing")

@@ -35,6 +35,10 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.UriType
 
+/**
+ * Text value for response item answer option
+ * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] depending on the type
+ */
 internal fun QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.displayString(
   context: Context
 ): String {
