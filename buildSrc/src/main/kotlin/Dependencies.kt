@@ -114,7 +114,12 @@ object Dependencies {
       "com.google.mlkit:object-detection-custom:${Versions.Mlkit.objectDetectionCustom}"
   }
 
-  const val androidFhirCommon = "com.google.android.fhir:common:${Versions.androidFhirCommon}"
+  const val androidFhirGroup = "com.google.android.fhir"
+  const val androidFhirCommon = "$androidFhirGroup:common:${Versions.androidFhirCommon}"
+  const val androidFhirEngineModule = "engine"
+  const val androidFhirEngine =
+    "$androidFhirGroup:$androidFhirEngineModule:${Versions.androidFhirEngine}"
+
   const val lifecycleExtensions =
     "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
@@ -190,6 +195,7 @@ object Dependencies {
     }
 
     const val androidFhirCommon = "0.1.0-alpha03"
+    const val androidFhirEngine = "0.1.0-beta02"
     const val desugarJdkLibs = "1.1.5"
     const val caffeine = "2.9.1"
     const val fhirUcum = "1.0.3"

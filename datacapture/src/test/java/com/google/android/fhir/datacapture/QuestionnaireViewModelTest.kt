@@ -23,6 +23,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
@@ -33,8 +35,11 @@ import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.logicalId
+import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.io.File
+import java.util.UUID
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
@@ -46,8 +51,11 @@ import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
@@ -55,6 +63,7 @@ import org.hl7.fhir.r4.model.ValueSet
 import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Before
 import org.junit.Ignore
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
@@ -70,11 +79,15 @@ class QuestionnaireViewModelTest(
   private val questionnaireSource: QuestionnaireSource,
   private val questionnaireResponseSource: QuestionnaireResponseSource
 ) {
+  @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
+
+  private lateinit var fhirEngine: FhirEngine
   private lateinit var state: SavedStateHandle
   private val context = ApplicationProvider.getApplicationContext<Application>()
 
   @Before
   fun setUp() {
+    fhirEngine = FhirEngineProvider.getInstance(context)
     state = SavedStateHandle()
     check(
       ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
@@ -2547,6 +2560,55 @@ class QuestionnaireViewModelTest(
 
       assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireItem.linkId)
         .isEqualTo("parent-question")
+    }
+
+  @Test
+  fun `resolveAnswerExpression() should return questionnaire item answer options for answer expression and choice column`() =
+    runBlocking {
+      val practitioner =
+        Practitioner()
+          .apply {
+            id = UUID.randomUUID().toString()
+            active = true
+            addName(HumanName().apply { this.family = "John" })
+          }
+          .also { fhirEngine.create(it) }
+
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              text = "answer expression question text"
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              extension =
+                listOf(
+                  Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                    Expression().apply {
+                      this.expression = "Practitioner?active=true"
+                      this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                    }
+                  ),
+                  Extension(
+                      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
+                    )
+                    .apply {
+                      this.addExtension(Extension("path", StringType("id")))
+                      this.addExtension(Extension("label", StringType("name")))
+                      this.addExtension(Extension("forDisplay", BooleanType(true)))
+                    }
+                )
+            }
+          )
+        }
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+      val viewModel = QuestionnaireViewModel(context, state)
+      val answerOptions = viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
+
+      assertThat(answerOptions.first().valueReference.reference)
+        .isEqualTo("Practitioner/${practitioner.logicalId}")
     }
 
   @Test

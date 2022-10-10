@@ -60,8 +60,10 @@ dependencies {
   implementation(Dependencies.Navigation.navUiKtx)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
+  implementation(project(":datacapture")) {
+    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
+  }
   implementation(project(":engine"))
-  implementation(project(":datacapture"))
 
   testImplementation(Dependencies.junit)
 }

@@ -14,27 +14,31 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture
+package com.google.android.fhir.datacapture.utilities
 
-import android.os.Build
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.Patient
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.P])
-class QuestionnaireItemViewHolderTypeTest {
-  @Test
-  fun size_shouldReturnNumberOfQuestionnaireViewHolderTypes() {
-    assertThat(QuestionnaireItemViewHolderType.values().size).isEqualTo(17)
-  }
+class FhirPathUtilTest {
 
   @Test
-  fun fromInt_shouldReturnQuestionnaireViewHolderType() {
-    QuestionnaireItemViewHolderType.values().forEach {
-      assertThat(QuestionnaireItemViewHolderType.fromInt(it.value)).isEqualTo(it)
-    }
+  fun `evaluateToDisplay should return concatenated string for expressions evaluation on given resource`() {
+    val expressions = listOf("name.given", "name.family")
+    val resource =
+      Patient().apply {
+        addName(
+          HumanName().apply {
+            this.family = "Doe"
+            this.addGiven("John")
+          }
+        )
+      }
+
+    assertThat(evaluateToDisplay(expressions, resource)).isEqualTo("John Doe")
   }
 }
