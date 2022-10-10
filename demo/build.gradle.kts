@@ -28,16 +28,14 @@ android {
     // Flag to enable support for the new language APIs
     // See https://developer.android.com/studio/write/java8-support
     isCoreLibraryDesugaringEnabled = true
-    // Sets Java compatibility to Java 8
-    // See https://developer.android.com/studio/write/java8-support
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+
+    sourceCompatibility = Java.sourceCompatibility
+    targetCompatibility = Java.targetCompatibility
   }
+  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
   packagingOptions {
     resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
   }
-  // See https://developer.android.com/studio/write/java8-support
-  kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
 }
 
 dependencies {

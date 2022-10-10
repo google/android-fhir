@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,13 +57,13 @@ class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
   }
 
   override fun searchByUrl(resourceType: String, url: String): Iterable<IBaseResource> =
-      runBlocking {
-    when (resourceType) {
-      "Measure" -> fhirEngine.search<Measure> { filter(Measure.URL, { value = url }) }
-      "Library" -> listOf(libs[url] as Library)
-      else -> listOf()
-    }.toMutableList()
-  }
+    runBlocking {
+      when (resourceType) {
+        "Measure" -> fhirEngine.search<Measure> { filter(Measure.URL, { value = url }) }
+        "Library" -> listOf(libs[url] as Library)
+        else -> listOf()
+      }.toMutableList()
+    }
 
   @Suppress("UNCHECKED_CAST")
   private fun IIdType.getResourceClass(): Class<Resource> {
