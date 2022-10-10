@@ -1,0 +1,216 @@
+{
+  "resourceType": "Measure",
+  "id": "PatientGroupsMeasure",
+  "url": "Measure/PatientGroupsMeasure",
+  "name": "PatientGroupsMeasure",
+  "title": "PatientGroupsMeasure test",
+  "status": "draft",
+  "experimental": false,
+  "description": "???????????",
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "label": "FHIRHelpers|4.0.1",
+      "resource": "Library/1753"
+    }
+  ],
+  "library": [
+    "http://localhost/Library/PatientGroups|1.0.0"
+  ],
+  "scoring": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/measure-scoring",
+        "code": "proportion"
+      }
+    ]
+  },
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/measure-type",
+          "code": "process"
+        }
+      ]
+    }
+  ],
+  "improvementNotation": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/measure-improvement-notation",
+        "code": "increase"
+      }
+    ]
+  },
+  "group": [
+    {
+      "id": "groups",
+      "population": [
+        {
+          "id": "initial-population",
+          "code": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+                "code": "initial-population"
+              }
+            ]
+          },
+          "criteria": {
+            "language": "text/cql-identifier",
+            "expression": "All Groups"
+          }
+        },
+        {
+          "id": "denominator",
+          "code": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+                "code": "denominator"
+              }
+            ]
+          },
+          "criteria": {
+            "language": "text/cql-identifier",
+            "expression": "All Person Groups"
+          }
+        },
+        {
+          "id": "numerator",
+          "code": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+                "code": "numerator"
+              }
+            ]
+          },
+          "criteria": {
+            "language": "text/cql-identifier",
+            "expression": "All Person Groups"
+          }
+        }
+      ]
+    },
+    {
+      "id": "males",
+      "population": [
+        {
+          "id": "initial-population",
+          "code": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+                "code": "initial-population"
+              }
+            ]
+          },
+          "criteria": {
+            "language": "text/cql-identifier",
+            "expression": "All Patients"
+          }
+        },
+        {
+          "id": "denominator",
+          "code": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+                "code": "denominator"
+              }
+            ]
+          },
+          "criteria": {
+            "language": "text/cql-identifier",
+            "expression": "All Patients"
+          }
+        },
+        {
+          "id": "numerator",
+          "code": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+                "code": "numerator"
+              }
+            ]
+          },
+          "criteria": {
+            "language": "text/cql-identifier",
+            "expression": "Males"
+          }
+        }
+      ],
+      "stratifier": [
+        {
+          "id": "by-age",
+          "criteria": {
+            "language": "text/cql-identifier",
+            "expression": "Age Stratifier"
+          }
+        }
+      ]
+    },
+    {
+      "id": "females",
+      "population": [
+        {
+          "id": "initial-population",
+          "code": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+                "code": "initial-population"
+              }
+            ]
+          },
+          "criteria": {
+            "language": "text/cql-identifier",
+            "expression": "All Patients"
+          }
+        },
+        {
+          "id": "denominator",
+          "code": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+                "code": "denominator"
+              }
+            ]
+          },
+          "criteria": {
+            "language": "text/cql-identifier",
+            "expression": "All Patients"
+          }
+        },
+        {
+          "id": "numerator",
+          "code": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+                "code": "numerator"
+              }
+            ]
+          },
+          "criteria": {
+            "language": "text/cql-identifier",
+            "expression": "Females"
+          }
+        }
+      ],
+      "stratifier": [
+        {
+          "id": "by-age",
+          "criteria": {
+            "language": "text/cql-identifier",
+            "expression": "Age Stratifier"
+          }
+        }
+      ]
+    }
+  ]
+}
