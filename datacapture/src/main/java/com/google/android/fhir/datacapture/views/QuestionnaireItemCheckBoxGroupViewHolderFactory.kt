@@ -87,7 +87,6 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
             error.visibility = View.VISIBLE
           }
         }
-        updateQuestionText(header, questionnaireItemViewItem.questionnaireItem, validationResult)
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

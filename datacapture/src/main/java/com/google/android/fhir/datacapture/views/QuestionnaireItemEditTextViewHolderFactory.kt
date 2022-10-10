@@ -110,7 +110,6 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
         Valid -> null
         is Invalid -> validationResult.getSingleStringValidationMessage()
       }
-    updateQuestionText(header, questionnaireItemViewItem.questionnaireItem, validationResult)
   }
 
   override fun setReadOnly(isReadOnly: Boolean) {

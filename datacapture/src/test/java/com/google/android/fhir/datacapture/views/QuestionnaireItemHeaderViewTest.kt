@@ -258,17 +258,18 @@ class QuestionnaireItemHeaderViewTest {
   }
 
   @Test
-  fun `Does not show * at the end of question text`() {
+  fun `does not show * at the end of question text`() {
     view.bind(Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" })
 
     assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question?")
   }
 
   @Test
-  fun `Does not show * if question text is missing`() {
+  fun `shows * though question text is missing`() {
     view.bind(Questionnaire.QuestionnaireItemComponent().apply { required = true })
 
-    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEmpty()
+    assertThat(view.findViewById<TextView>(R.id.question).text.toString())
+      .isEqualTo(view.context.applicationContext.resources.getString(R.string.space_asterisk))
   }
 
   private val displayCategoryExtensionWithInstructionsCode =

@@ -38,10 +38,6 @@ import com.google.android.fhir.datacapture.localizedHelpSpanned
 import com.google.android.fhir.datacapture.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
-import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
-import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.card.MaterialCardView
 import org.hl7.fhir.r4.model.Questionnaire
 
@@ -118,39 +114,28 @@ internal fun initHelpButton(
  * Updates textview [R.id.question] with
  * [Questionnaire.QuestionnaireItemComponent.localizedTextSpanned] text and `*` if
  * [Questionnaire.QuestionnaireItemComponent.required] is true. And applies [R.attr.colorError] to
- * `*` in error state.
+ * `*`.
  */
 internal fun updateQuestionText(
   view: View,
   questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-  validationResult: ValidationResult = NotValidated
 ) {
-  if (questionnaireItem.localizedTextSpanned == null) {
-    view.findViewById<TextView>(R.id.question).updateTextAndVisibility()
-    return
-  }
   val builder = SpannableStringBuilder()
-  builder.append(questionnaireItem.localizedTextSpanned)
+  questionnaireItem.localizedTextSpanned?.let { builder.append(it) }
   if (questionnaireItem.required) {
-    when (validationResult) {
-      is NotValidated,
-      Valid -> {
-        builder.append(view.context.applicationContext.getString(R.string.space_asterisk))
-      }
-      is Invalid -> {
-        val start = builder.length
-        builder.append(view.context.applicationContext.getString(R.string.space_asterisk))
-        val end = builder.length
-        builder.setSpan(
-          ForegroundColorSpan(view.context.getColorFromAttr(R.attr.colorError)),
-          start,
-          end,
-          Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-      }
-    }
+    builder.appendWithSpan(
+      view.context.applicationContext.getString(R.string.space_asterisk),
+      view.context.getColorFromAttr(R.attr.colorError)
+    )
   }
   view.findViewById<TextView>(R.id.question).updateTextAndVisibility(builder)
+}
+
+private fun SpannableStringBuilder.appendWithSpan(value: String, @ColorInt color: Int) {
+  val start = length
+  append(value)
+  val end = length
+  setSpan(ForegroundColorSpan(color), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 }
 
 @ColorInt

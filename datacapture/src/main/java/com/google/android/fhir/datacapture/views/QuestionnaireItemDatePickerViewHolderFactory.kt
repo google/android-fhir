@@ -134,7 +134,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
-        updateQuestionText(header, questionnaireItemViewItem.questionnaireItem, validationResult)
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
