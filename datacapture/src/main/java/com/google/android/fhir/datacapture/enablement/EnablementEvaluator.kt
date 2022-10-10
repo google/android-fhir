@@ -16,16 +16,12 @@
 
 package com.google.android.fhir.datacapture.enablement
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
-import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.compareTo
 import com.google.android.fhir.datacapture.enableWhenExpression
+import com.google.android.fhir.datacapture.utilities.fhirPathEngine
 import com.google.android.fhir.equals
-import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.utils.FHIRPathEngine
 
 /**
  * Evaluator for the enablement status of a [Questionnaire.QuestionnaireItemComponent]. Uses the
@@ -74,7 +70,8 @@ internal object EnablementEvaluator {
     questionnaireResponseItemRetriever:
       (
         item: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-        linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
+        linkId: String
+      ) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhen
     val enableWhenExpression = questionnaireItem.enableWhenExpression
@@ -129,7 +126,8 @@ private fun evaluateEnableWhen(
   questionnaireResponseItemRetriever:
     (
       item: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-      linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
+      linkId: String
+    ) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
 ): Boolean {
   val questionnaireResponseItem =
     questionnaireResponseItemRetriever(questionnaireResponseItem, enableWhen.question)
@@ -172,10 +170,4 @@ private val Questionnaire.QuestionnaireItemEnableWhenComponent.predicate:
       }
       else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
     }
-  }
-
-// Create fhirPathEngine instance
-val fhirPathEngine: FHIRPathEngine =
-  with(FhirContext.forCached(FhirVersionEnum.R4)) {
-    FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this)))
   }

@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-object Sdk {
-  const val compileSdk = 31
-  const val targetSdk = 31
+package com.google.android.fhir.datacapture
 
-  // Engine and SDC must support API 24.
-  // Remove desugaring when upgrading it to 26.
-  const val minSdk = 24
+import org.hl7.fhir.r4.model.Expression
 
-  // Workflow requires minSDK 26
-  const val minSdkWorkflow = 26
-}
+internal val Expression.isXFhirQuery: Boolean
+  get() = this.language == Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+
+internal val Expression.isFhirPath: Boolean
+  get() = this.language == Expression.ExpressionLanguage.TEXT_FHIRPATH.toCode()

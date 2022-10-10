@@ -16,9 +16,6 @@ android {
     versionCode = Releases.Demo.versionCode
     versionName = Releases.Demo.versionName
     testInstrumentationRunner = Dependencies.androidJunitRunner
-    // Required when setting minSdkVersion to 20 or lower
-    // See https://developer.android.com/studio/write/java8-support
-    multiDexEnabled = true
   }
   buildTypes {
     getByName("release") {
@@ -65,8 +62,10 @@ dependencies {
   implementation(Dependencies.Navigation.navUiKtx)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
+  implementation(project(":datacapture")) {
+    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
+  }
   implementation(project(":engine"))
-  implementation(project(":datacapture"))
 
   testImplementation(Dependencies.junit)
 }

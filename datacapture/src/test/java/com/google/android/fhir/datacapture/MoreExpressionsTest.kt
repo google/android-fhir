@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.Expression
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -25,16 +26,33 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class QuestionnaireItemViewHolderTypeTest {
+class MoreExpressionsTest {
+
   @Test
-  fun size_shouldReturnNumberOfQuestionnaireViewHolderTypes() {
-    assertThat(QuestionnaireItemViewHolderType.values().size).isEqualTo(17)
+  fun `isXFhirQuery should return true`() {
+    val expression = Expression().apply { this.language = "application/x-fhir-query" }
+
+    assertThat(expression.isXFhirQuery).isTrue()
   }
 
   @Test
-  fun fromInt_shouldReturnQuestionnaireViewHolderType() {
-    QuestionnaireItemViewHolderType.values().forEach {
-      assertThat(QuestionnaireItemViewHolderType.fromInt(it.value)).isEqualTo(it)
-    }
+  fun `isXFhirQuery should return false`() {
+    val expression = Expression().apply { this.language = "text/cql" }
+
+    assertThat(expression.isXFhirQuery).isFalse()
+  }
+
+  @Test
+  fun `isFhirPath should return true`() {
+    val expression = Expression().apply { this.language = "text/fhirpath" }
+
+    assertThat(expression.isFhirPath).isTrue()
+  }
+
+  @Test
+  fun `isFhirPath should return false`() {
+    val expression = Expression().apply { this.language = "application/x-fhir-query" }
+
+    assertThat(expression.isFhirPath).isFalse()
   }
 }
