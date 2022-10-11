@@ -27,6 +27,7 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions
@@ -1275,6 +1276,25 @@ class MoreQuestionnaireItemComponentsTest {
   fun entryFormat_formatExtensionMissing_shouldReturnNull() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
     assertThat(questionnaireItem.entryFormat).isNull()
+  }
+
+  @Test
+  fun `sliderStepValue is integer value if slider-step-value extension is present`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "slider-step-value"
+        addExtension(EXTENSION_SLIDER_STEP_VALUE_URL, IntegerType(1))
+      }
+
+    assertThat(questionnaireItem.sliderStepValue).isEqualTo(1)
+  }
+
+  @Test
+  fun `sliderStepValue is null if slider-step-value extension is not present`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply { linkId = "slider-step-value" }
+
+    assertThat(questionnaireItem.sliderStepValue).isNull()
   }
 
   private val displayCategoryExtensionWithInstructionsCode =

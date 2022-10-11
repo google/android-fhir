@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views
 
 import android.widget.FrameLayout
 import android.widget.TextView
+import com.google.android.fhir.datacapture.EXTENSION_SLIDER_STEP_VALUE_URL
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -72,6 +73,37 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(10)
+  }
+
+  @Test
+  fun `slider-step-value extension updates slider step size `() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "slider-step-value"
+          addExtension(EXTENSION_SLIDER_STEP_VALUE_URL, IntegerType(1))
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).stepSize).isEqualTo(1)
+  }
+
+  @Test
+  fun `if slider-step-value extension is not present then default value is assigned as step size`() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "slider-step-value" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).stepSize).isEqualTo(10)
   }
 
   @Test
