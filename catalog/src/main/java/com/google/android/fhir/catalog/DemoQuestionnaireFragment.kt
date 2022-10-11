@@ -66,11 +66,11 @@ class DemoQuestionnaireFragment : Fragment() {
     infoCard = view.findViewById(R.id.infoCard)
     when (args.questionnaireTitleKey) {
       getString(R.string.behavior_name_skip_logic) -> {
-        infoCard.visibility = View.VISIBLE
         infoCardHeader = view.findViewById(R.id.infoCardHeader)
         infoCardHeader.text = args.questionnaireTitleKey
         infoCardText = view.findViewById(R.id.infoCardText)
         infoCardText.text = getString(R.string.behavior_name_skip_logic_info)
+        infoCard.visibility = View.VISIBLE
       }
       else -> infoCard.visibility = View.GONE
     }
@@ -187,7 +187,8 @@ class DemoQuestionnaireFragment : Fragment() {
   private fun getThemeId(): Int {
     return when (args.workflow) {
       WorkflowType.DEFAULT -> R.style.Theme_Androidfhir_DefaultLayout
-      WorkflowType.COMPONENT -> R.style.Theme_Androidfhir_Component
+      WorkflowType.COMPONENT,
+      WorkflowType.BEHAVIOR -> R.style.Theme_Androidfhir_Component
       WorkflowType.PAGINATED -> R.style.Theme_Androidfhir_PaginatedLayout
     }
   }
@@ -235,5 +236,6 @@ class DemoQuestionnaireFragment : Fragment() {
 enum class WorkflowType {
   COMPONENT,
   DEFAULT,
-  PAGINATED
+  PAGINATED,
+  BEHAVIOR
 }
