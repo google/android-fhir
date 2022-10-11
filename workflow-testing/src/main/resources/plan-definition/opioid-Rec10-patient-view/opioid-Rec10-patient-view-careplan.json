@@ -1,0 +1,42 @@
+{
+  "resourceType": "CarePlan",
+  "contained": [ {
+    "resourceType": "RequestGroup",
+    "id": "1",
+    "status": "draft",
+    "intent": "proposal",
+    "action": [ {
+      "resource": {
+        "reference": "#2"
+      }
+    } ]
+  }, {
+    "resourceType": "ServiceRequest",
+    "id": "2",
+    "status": "draft",
+    "intent": "order",
+    "code": {
+      "coding": [ {
+        "system": "http://snomed.info/sct",
+        "code": "310627008",
+        "display": "Urine drug screening (procedure)"
+      } ]
+    },
+    "subject": {
+      "reference": "example-rec-10-patient-view-POS-Cocaine-drugs"
+    }
+  } ],
+  "instantiatesCanonical": [ "opioidcds-10-patient-view" ],
+  "status": "draft",
+  "subject": {
+    "reference": "example-rec-10-patient-view-POS-Cocaine-drugs"
+  },
+  "encounter": {
+    "reference": "example-rec-10-patient-view-POS-Cocaine-drugs-prefetch"
+  },
+  "activity": [ {
+    "reference": {
+      "reference": "#1"
+    }
+  } ]
+}

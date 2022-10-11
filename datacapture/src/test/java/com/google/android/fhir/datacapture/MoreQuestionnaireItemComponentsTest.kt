@@ -27,9 +27,11 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -1275,6 +1277,222 @@ class MoreQuestionnaireItemComponentsTest {
   fun entryFormat_formatExtensionMissing_shouldReturnNull() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
     assertThat(questionnaireItem.entryFormat).isNull()
+  }
+
+  @Test
+  fun `answerExpression should return expression`() {
+    val questionItem =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  EXTENSION_ANSWER_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "%resource.item.where(linkId='diseases').value"
+                  }
+                )
+              )
+          }
+        )
+
+    assertThat(questionItem.itemFirstRep.answerExpression!!.expression)
+      .isEqualTo("%resource.item.where(linkId='diseases').value")
+  }
+
+  @Test
+  fun `answerExpression should return null for missing extension`() {
+    val questionItem =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "today()"
+                  }
+                )
+              )
+          }
+        )
+
+    assertThat(questionItem.itemFirstRep.answerExpression).isNull()
+  }
+
+  @Test
+  fun `choiceColumn should return choice columns list`() {
+    val questionItem =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(EXTENSION_CHOICE_COLUMN_URL).apply {
+                  addExtension(Extension("path", StringType("code")))
+                  addExtension(Extension("label", StringType("CODE")))
+                  addExtension(Extension("forDisplay", BooleanType(false)))
+                },
+                Extension(EXTENSION_CHOICE_COLUMN_URL).apply {
+                  addExtension(Extension("path", StringType("display")))
+                  addExtension(Extension("label", StringType("DESCRIPTION")))
+                  addExtension(Extension("forDisplay", BooleanType(true)))
+                }
+              )
+          }
+        )
+
+    assertThat(questionItem.itemFirstRep.choiceColumn!!)
+      .containsExactly(
+        ChoiceColumn("code", "CODE", false),
+        ChoiceColumn("display", "DESCRIPTION", true)
+      )
+  }
+
+  @Test
+  fun `choiceColumn should return null for missing extension`() {
+    val questionItem =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "today()"
+                  }
+                )
+              )
+          }
+        )
+
+    assertThat(questionItem.itemFirstRep.choiceColumn).isEmpty()
+  }
+
+  @Test
+  fun `extractAnswerOptions should return answer options for coding`() {
+    val questionItem =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(EXTENSION_CHOICE_COLUMN_URL).apply {
+                  addExtension(Extension("path", StringType("code")))
+                  addExtension(Extension("label", StringType("CODE")))
+                  addExtension(Extension("forDisplay", BooleanType(false)))
+                },
+                Extension(EXTENSION_CHOICE_COLUMN_URL).apply {
+                  addExtension(Extension("path", StringType("display")))
+                  addExtension(Extension("label", StringType("DESCRIPTION")))
+                  addExtension(Extension("forDisplay", BooleanType(true)))
+                }
+              )
+          }
+        )
+
+    val answers =
+      questionItem.itemFirstRep
+        .extractAnswerOptions(listOf(Coding("a.com", "a", "A"), Coding("b.com", "b", "B")))
+        .map { "${it.valueCoding.code}|${it.valueCoding.display}" }
+
+    assertThat(answers.first()).isEqualTo("a|A")
+    assertThat(answers.last()).contains("b|B")
+  }
+
+  @Test
+  fun `extractAnswerOptions should return answer options for resources`() {
+    val questionItem =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "full-name"
+            type = Questionnaire.QuestionnaireItemType.REFERENCE
+            extension =
+              listOf(
+                Extension(EXTENSION_CHOICE_COLUMN_URL).apply {
+                  addExtension(Extension("path", StringType("name.given")))
+                  addExtension(Extension("label", StringType("GIVEN")))
+                  addExtension(Extension("forDisplay", BooleanType(true)))
+                },
+                Extension(EXTENSION_CHOICE_COLUMN_URL).apply {
+                  addExtension(Extension("path", StringType("name.family")))
+                  addExtension(Extension("label", StringType("FAMILY")))
+                  addExtension(Extension("forDisplay", BooleanType(true)))
+                }
+              )
+          }
+        )
+
+    val answers =
+      questionItem.itemFirstRep
+        .extractAnswerOptions(
+          listOf(
+            Patient().apply {
+              id = "1234"
+              nameFirstRep.family = "Doe"
+              nameFirstRep.addGiven("John")
+            },
+            Patient().apply {
+              id = "5678"
+              nameFirstRep.family = "Doe"
+              nameFirstRep.addGiven("Jane")
+            }
+          )
+        )
+        .map { it.valueReference }
+
+    assertThat(answers.size).isEqualTo(2)
+    assertThat(answers.first().display).isEqualTo("John Doe")
+    assertThat(answers.first().reference).isEqualTo("Patient/1234")
+    assertThat(answers.last().display).isEqualTo("Jane Doe")
+    assertThat(answers.last().reference).isEqualTo("Patient/5678")
+  }
+
+  @Test
+  fun `extractAnswerOptions should throw IllegalArgumentException when item type is not reference and data type is resource`() {
+    val questionItem =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "full-name"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(EXTENSION_CHOICE_COLUMN_URL).apply {
+                  addExtension(Extension("path", StringType("name.given")))
+                  addExtension(Extension("label", StringType("GIVEN")))
+                  addExtension(Extension("forDisplay", BooleanType(true)))
+                }
+              )
+          }
+        )
+
+    assertThrows(IllegalArgumentException::class.java) {
+        questionItem.itemFirstRep.extractAnswerOptions(listOf(Patient()))
+      }
+      .run {
+        assertThat(this.message)
+          .isEqualTo(
+            "$EXTENSION_CHOICE_COLUMN_URL not applicable for 'choice'. Only type reference is allowed with resource."
+          )
+      }
   }
 
   private val displayCategoryExtensionWithInstructionsCode =
