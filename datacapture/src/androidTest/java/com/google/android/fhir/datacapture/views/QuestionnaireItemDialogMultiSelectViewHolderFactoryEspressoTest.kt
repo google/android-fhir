@@ -217,11 +217,9 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
-          .hint
-          .toString()
+          .hint.toString()
       )
       .isEqualTo("Select code")
   }
