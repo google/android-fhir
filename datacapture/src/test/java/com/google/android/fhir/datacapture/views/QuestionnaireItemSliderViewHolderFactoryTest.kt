@@ -76,12 +76,12 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
   }
 
   @Test
-  fun `slider-step-value extension updates slider step size `() {
+  fun `step size should come from the sliderStepValue extension`() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           linkId = "slider-step-value"
-          addExtension(EXTENSION_SLIDER_STEP_VALUE_URL, IntegerType(1))
+          addExtension(EXTENSION_SLIDER_STEP_VALUE_URL, IntegerType(10))
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
@@ -89,11 +89,11 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).stepSize).isEqualTo(1)
+    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).stepSize).isEqualTo(10)
   }
 
   @Test
-  fun `if slider-step-value extension is not present then default value is assigned as step size`() {
+  fun `step size should be 1 if the sliderStepValue extension is not present`() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { linkId = "slider-step-value" },
@@ -103,7 +103,7 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).stepSize).isEqualTo(10)
+    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).stepSize).isEqualTo(1)
   }
 
   @Test

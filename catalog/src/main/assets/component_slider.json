@@ -17,7 +17,7 @@
         },
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue",
-          "valueInteger": 1
+          "valueInteger": 10
         }
       ],
       "linkId": "1",

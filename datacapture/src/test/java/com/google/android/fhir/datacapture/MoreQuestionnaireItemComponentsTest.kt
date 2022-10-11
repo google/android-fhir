@@ -1497,18 +1497,18 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `sliderStepValue is integer value if slider-step-value extension is present`() {
+  fun `sliderStepValue should return the integer value in the sliderStepValue extension`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         linkId = "slider-step-value"
-        addExtension(EXTENSION_SLIDER_STEP_VALUE_URL, IntegerType(1))
+        addExtension(EXTENSION_SLIDER_STEP_VALUE_URL, IntegerType(10))
       }
 
-    assertThat(questionnaireItem.sliderStepValue).isEqualTo(1)
+    assertThat(questionnaireItem.sliderStepValue).isEqualTo(10)
   }
 
   @Test
-  fun `sliderStepValue is null if slider-step-value extension is not present`() {
+  fun `sliderStepValue should return null if sliderStepValue extension is not present`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply { linkId = "slider-step-value" }
 

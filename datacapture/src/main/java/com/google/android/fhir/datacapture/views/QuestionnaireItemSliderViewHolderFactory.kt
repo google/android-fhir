@@ -79,4 +79,4 @@ internal object QuestionnaireItemSliderViewHolderFactory :
     }
 }
 
-private const val SLIDER_DEFAULT_STEP_SIZE = 10
+private const val SLIDER_DEFAULT_STEP_SIZE = 1
