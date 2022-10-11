@@ -50,7 +50,8 @@ internal object QuestionnaireItemSliderViewHolderFactory :
         slider.valueFrom = 0.0F
         slider.valueTo = 100.0F
         slider.stepSize =
-          (questionnaireItemViewItem.questionnaireItem?.sliderStepValue ?: 10).toFloat()
+          (questionnaireItemViewItem.questionnaireItem?.sliderStepValue ?: SLIDER_DEFAULT_STEP_SIZE)
+            .toFloat()
         val sliderValue = answer?.valueIntegerType?.value?.toString() ?: "0.0"
         slider.value = sliderValue.toFloat()
 
@@ -77,3 +78,5 @@ internal object QuestionnaireItemSliderViewHolderFactory :
       }
     }
 }
+
+private const val SLIDER_DEFAULT_STEP_SIZE = 10
