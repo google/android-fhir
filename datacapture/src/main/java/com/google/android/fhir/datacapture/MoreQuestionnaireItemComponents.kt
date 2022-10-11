@@ -308,7 +308,7 @@ internal val Questionnaire.QuestionnaireItemComponent.isFlyoverCode: Boolean
     }
   }
 
-/** Slider step value if present in extension [EXTENSION_SLIDER_STEP_VALUE_URL] otherwise null. */
+/** Slider step extension value. */
 internal val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
   get() {
     val extension =
