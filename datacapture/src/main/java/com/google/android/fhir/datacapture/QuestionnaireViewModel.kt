@@ -149,8 +149,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         buildPreOrderList(child)
       }
       for (answer in item.answer) {
-        for (item in answer.item) {
-          buildPreOrderList(item)
+        for (answerItem in answer.item) {
+          buildPreOrderList(answerItem)
         }
       }
     }
@@ -425,10 +425,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   // TODO persist previous answers incase options are changing and new list does not have selected
-  // answer and fhirpath in x-fhir-query
+  // answer and FHIRPath in x-fhir-query
   // https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
   @PublishedApi
-  internal suspend fun resolveAnswerExpression(
+  internal fun resolveAnswerExpression(
     item: Questionnaire.QuestionnaireItemComponent
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     // Check cache first for database queries
@@ -445,7 +445,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return options
   }
 
-  private suspend fun loadAnswerExpressionOptions(
+  private fun loadAnswerExpressionOptions(
     item: Questionnaire.QuestionnaireItemComponent,
     expression: Expression
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
@@ -511,9 +511,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             questionnaireItem,
             questionnaireResponseItem,
             questionnaireResponse
-          ) { questionnaireResponseItem, linkId ->
-            findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, linkId)
-          }
+          ) { item, linkId -> findEnableWhenQuestionnaireResponseItem(item, linkId) }
         )
       }
     return QuestionnaireState(
@@ -574,9 +572,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaireItem,
         questionnaireResponseItem,
         questionnaireResponse
-      ) { questionnaireResponseItem, linkId ->
-        findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, linkId)
-      }
+      ) { item, linkId -> findEnableWhenQuestionnaireResponseItem(item, linkId) }
 
     if (!enabled || questionnaireItem.isHidden) {
       return emptyList()
@@ -628,17 +624,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
   ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+    val responseItemKeys = questionnaireResponseItemList.map { it.linkId }
     return questionnaireItemList
       .asSequence()
+      .filter { responseItemKeys.contains(it.linkId) }
       .zip(questionnaireResponseItemList.asSequence())
       .filter { (questionnaireItem, questionnaireResponseItem) ->
         EnablementEvaluator.evaluate(
           questionnaireItem,
           questionnaireResponseItem,
           questionnaireResponse
-        ) { questionnaireResponseItem, linkId ->
-          findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, linkId)
-            ?: return@evaluate null
+        ) { item, linkId ->
+          findEnableWhenQuestionnaireResponseItem(item, linkId) ?: return@evaluate null
         }
       }
       .map { (questionnaireItem, questionnaireResponseItem) ->
