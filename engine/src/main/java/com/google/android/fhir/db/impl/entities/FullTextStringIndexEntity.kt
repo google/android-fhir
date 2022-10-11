@@ -23,4 +23,4 @@ import com.google.android.fhir.index.entities.StringIndex
 
 @Fts4(contentEntity = StringIndexEntity::class)
 @Entity
-internal data class StringIndexEntityFts(@Embedded(prefix = "index_") val index: StringIndex)
+internal data class FullTextStringIndexEntity(@Embedded(prefix = "index_") val index: StringIndex)
