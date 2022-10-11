@@ -139,28 +139,32 @@ internal object ResourceIndexer {
     }
 
     if (resource.meta.hasProfile()) {
-      resource.meta.profile.filter { it.value != null && it.value.isNotEmpty() }.forEach {
-        indexBuilder.addReferenceIndex(
-          ReferenceIndex(
-            "_profile",
-            arrayOf(resource.fhirType(), "meta", "profile").joinToString(separator = "."),
-            it.value
+      resource.meta.profile
+        .filter { it.value != null && it.value.isNotEmpty() }
+        .forEach {
+          indexBuilder.addReferenceIndex(
+            ReferenceIndex(
+              "_profile",
+              arrayOf(resource.fhirType(), "meta", "profile").joinToString(separator = "."),
+              it.value
+            )
           )
-        )
-      }
+        }
     }
 
     if (resource.meta.hasTag()) {
-      resource.meta.tag.filter { it.code != null && it.code!!.isNotEmpty() }.forEach {
-        indexBuilder.addTokenIndex(
-          TokenIndex(
-            "_tag",
-            arrayOf(resource.fhirType(), "meta", "tag").joinToString(separator = "."),
-            it.system ?: "",
-            it.code
+      resource.meta.tag
+        .filter { it.code != null && it.code!!.isNotEmpty() }
+        .forEach {
+          indexBuilder.addTokenIndex(
+            TokenIndex(
+              "_tag",
+              arrayOf(resource.fhirType(), "meta", "tag").joinToString(separator = "."),
+              it.system ?: "",
+              it.code
+            )
           )
-        )
-      }
+        }
     }
   }
 
@@ -305,11 +309,12 @@ internal object ResourceIndexer {
       }
       "CodeableConcept" -> {
         val codeableConcept = value as CodeableConcept
-        codeableConcept.coding.filter { it.code != null && it.code!!.isNotEmpty() }.map {
-          TokenIndex(searchParam.name, searchParam.path, it.system ?: "", it.code)
-        }
+        codeableConcept.coding
+          .filter { it.code != null && it.code!!.isNotEmpty() }
+          .map { TokenIndex(searchParam.name, searchParam.path, it.system ?: "", it.code) }
       }
-      "code", "Coding" -> {
+      "code",
+      "Coding" -> {
         val coding = value as ICoding
         listOf(TokenIndex(searchParam.name, searchParam.path, coding.system ?: "", coding.code))
       }
@@ -402,8 +407,4 @@ internal object ResourceIndexer {
   private const val FHIR_CURRENCY_CODE_SYSTEM = "urn:iso:std:iso:4217"
 }
 
-internal data class SearchParamDefinition(
-  val name: String,
-  val type: SearchParamType,
-  val path: String
-)
+data class SearchParamDefinition(val name: String, val type: SearchParamType, val path: String)
