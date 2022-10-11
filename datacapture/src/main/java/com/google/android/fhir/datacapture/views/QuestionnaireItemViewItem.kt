@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.answerExpression
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -51,7 +52,8 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * @param answersChangedCallback the callback to notify the view model that the answers have been
  * changed for the [QuestionnaireResponse.QuestionnaireResponseItemComponent]
  * @param resolveAnswerValueSet the callback to resolve the answer value set and return the answer
- * options
+ * @param resolveAnswerExpression the callback to resolve answer options when answer-expression
+ * extension exists options
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -61,12 +63,19 @@ data class QuestionnaireItemViewItem(
     (
       Questionnaire.QuestionnaireItemComponent,
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
-      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>) -> Unit,
+      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
+    ) -> Unit,
   private val resolveAnswerValueSet:
     suspend (String) -> List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
-      {
-    emptyList()
-  },
+    {
+      emptyList()
+    },
+  private val resolveAnswerExpression:
+    suspend (Questionnaire.QuestionnaireItemComponent) -> List<
+        Questionnaire.QuestionnaireItemAnswerOptionComponent> =
+    {
+      emptyList()
+    }
 ) {
 
   /**
@@ -138,12 +147,14 @@ data class QuestionnaireItemViewItem(
   }
 
   /**
-   * In a `choice` or `open-choice` type question, the answer options are defined in one of the two
-   * elements in the questionnaire:
+   * In a `choice` or `open-choice` type question, the answer options are defined in one of the
+   * three elements in the questionnaire:
    *
    * - `Questionnaire.item.answerOption`: a list of permitted answers to the question
    * - `Questionnaire.item.answerValueSet`: a reference to a value set containing a list of
    * permitted answers to the question
+   * - `Extension answer-expression`: an expression based extension which defines the x-fhir-query
+   * or fhirpath to evaluate permitted answer options
    *
    * This property returns the answer options defined in one of the sources above. If the answer
    * options are defined in `Questionnaire.item.answerValueSet`, the answer value set will be
@@ -156,6 +167,7 @@ data class QuestionnaireItemViewItem(
           questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
           !questionnaireItem.answerValueSet.isNullOrEmpty() ->
             resolveAnswerValueSet(questionnaireItem.answerValueSet)
+          questionnaireItem.answerExpression != null -> resolveAnswerExpression(questionnaireItem)
           else -> emptyList()
         }
       }
