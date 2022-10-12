@@ -428,7 +428,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   // answer and FHIRPath in x-fhir-query
   // https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
   @PublishedApi
-  internal fun resolveAnswerExpression(
+  internal suspend fun resolveAnswerExpression(
     item: Questionnaire.QuestionnaireItemComponent
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     // Check cache first for database queries
@@ -445,7 +445,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return options
   }
 
-  private fun loadAnswerExpressionOptions(
+  private suspend fun loadAnswerExpressionOptions(
     item: Questionnaire.QuestionnaireItemComponent,
     expression: Expression
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
