@@ -27,6 +27,8 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
 import com.google.android.fhir.datacapture.utilities.fhirPathEngine
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
@@ -274,8 +276,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       if (questionnaireItem.hasNestedItemsWithinAnswers) {
         questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
       }
-
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
+
+      updateDependentQuestionnaireResponseItems(questionnaireItem)
+
       modificationCount.update { it + 1 }
     }
 
@@ -377,12 +381,50 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         SharingStarted.Lazily,
         initialValue =
           getQuestionnaireState(
-            questionnaireItemList = questionnaire.item,
-            questionnaireResponseItemList = questionnaireResponse.item,
-            currentPageIndex = getInitialPageIndex(),
-            reviewMode = enableReviewPage
-          )
+              questionnaireItemList = questionnaire.item,
+              questionnaireResponseItemList = questionnaireResponse.item,
+              currentPageIndex = getInitialPageIndex(),
+              reviewMode = enableReviewPage
+            )
+            .also { detectExpressionCyclicDependency(questionnaire.item) }
+            .also {
+              questionnaire.item.flattened().forEach {
+                updateDependentQuestionnaireResponseItems(it)
+              }
+            }
       )
+
+  fun updateDependentQuestionnaireResponseItems(
+    updatedQuestionnaireItem: Questionnaire.QuestionnaireItemComponent
+  ) {
+    evaluateCalculatedExpressions(
+        updatedQuestionnaireItem,
+        questionnaire,
+        questionnaireResponse,
+        questionnaireItemParentMap
+      )
+      .forEach { (questionnaireItem, calculatedAnswers) ->
+        // update all response item with updated values
+        questionnaireResponseItemPreOrderList
+          // Item answer should not be modified and touched by user;
+          // https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-calculatedExpression.html
+          .filter {
+            it.linkId == questionnaireItem.linkId &&
+              !modifiedQuestionnaireResponseItemSet.contains(it)
+          }
+          .forEach { questionnaireResponseItem ->
+            // update and notify only if new answer has changed to prevent any event loop
+            if (questionnaireResponseItem.answer.hasDifferentAnswerSet(calculatedAnswers)) {
+              questionnaireResponseItem.answer =
+                calculatedAnswers.map {
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = it
+                  }
+                }
+            }
+          }
+      }
+  }
 
   @PublishedApi
   internal suspend fun resolveAnswerValueSet(

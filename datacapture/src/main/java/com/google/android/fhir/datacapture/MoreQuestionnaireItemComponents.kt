@@ -64,6 +64,9 @@ internal const val EXTENSION_ITEM_CONTROL_SYSTEM = "http://hl7.org/fhir/question
 internal const val EXTENSION_HIDDEN_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
 
+internal const val EXTENSION_CALCULATED_EXPRESSION_URL =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression"
+
 internal const val EXTENSION_ENTRY_FORMAT_URL =
   "http://hl7.org/fhir/StructureDefinition/entryFormat"
 
@@ -82,6 +85,9 @@ internal const val EXTENSION_CHOICE_COLUMN_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
 
 internal const val EXTENSION_VARIABLE_URL = "http://hl7.org/fhir/StructureDefinition/variable"
+
+internal const val EXTENSION_CQF_CALCULATED_VALUE_URL: String =
+  "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue"
 
 internal const val EXTENSION_SLIDER_STEP_VALUE_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue"
@@ -104,8 +110,32 @@ internal fun Questionnaire.QuestionnaireItemComponent.findVariableExpression(
   return variableExpressions.find { it.name == variableName }
 }
 
-internal const val CQF_CALCULATED_EXPRESSION_URL: String =
-  "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue"
+/** Returns Calculated expression, or null */
+internal val Questionnaire.QuestionnaireItemComponent.calculatedExpression: Expression?
+  get() =
+    this.getExtensionByUrl(EXTENSION_CALCULATED_EXPRESSION_URL)?.let {
+      it.castToExpression(it.value)
+    }
+
+/** Returns list of extensions whose value is of type [Expression] */
+internal val Questionnaire.QuestionnaireItemComponent.expressionBasedExtensions
+  get() = this.extension.filter { it.value is Expression }
+
+/**
+ * Whether [item] has any expression directly referencing the current questionnaire item by link ID
+ * (e.g. if [item] has an expression `%resource.item.where(linkId='this-question')` where
+ * `this-question` is the link ID of the current questionnaire item).
+ */
+internal fun Questionnaire.QuestionnaireItemComponent.isReferencedBy(
+  item: Questionnaire.QuestionnaireItemComponent
+) =
+  item.expressionBasedExtensions.any {
+    it
+      .castToExpression(it.value)
+      .expression
+      .replace(" ", "")
+      .contains(Regex(".*linkId='${this.linkId}'.*"))
+  }
 
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
@@ -358,7 +388,12 @@ val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
  */
 private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
   MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? {
-  if (initial.isEmpty()) {
+  // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
+  // quantity given as initial without value is for unit reference purpose only. Answer conversion
+  // not needed
+  if (initial.isEmpty() ||
+      (initialFirstRep.hasValueQuantity() && initialFirstRep.valueQuantity.value == null)
+  ) {
     return null
   }
 
@@ -479,6 +514,15 @@ internal fun Questionnaire.QuestionnaireItemComponent.extractAnswerOptions(
       dataList.map { it.castToType(it) }
     }
   }.map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
+}
+
+/**
+ * Flatten a nested list of [Questionnaire.QuestionnaireItemComponent] recursively and returns a
+ * flat list of all items into list embedded at any level
+ */
+fun List<Questionnaire.QuestionnaireItemComponent>.flattened():
+  List<Questionnaire.QuestionnaireItemComponent> {
+  return this + this.flatMap { it.item.flattened() }
 }
 
 /**
