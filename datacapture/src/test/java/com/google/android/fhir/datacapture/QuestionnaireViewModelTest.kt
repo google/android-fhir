@@ -1056,7 +1056,6 @@ class QuestionnaireViewModelTest(
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "question-1"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addInitial().apply { value = BooleanType(true) }
           }
         )
         addItem(
