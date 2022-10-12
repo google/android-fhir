@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,30 @@
 
 package com.google.android.fhir.workflow
 
+import ca.uhn.fhir.rest.gclient.DateClientParam
+import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
+import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
+import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.get
+import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.search.Search
-import com.google.android.fhir.search.search
+import com.google.android.fhir.search.filter.TokenParamFilterCriterion
+import com.google.android.fhir.search.query.XFhirQueryTranslator.applyFilterParam
+import java.math.BigDecimal
+import java.util.Date
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.Group
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.opencds.cqf.cql.engine.retrieve.TerminologyAwareRetrieveProvider
 import org.opencds.cqf.cql.engine.runtime.Code
+import org.opencds.cqf.cql.engine.runtime.DateTime
 import org.opencds.cqf.cql.engine.runtime.Interval
+import org.opencds.cqf.cql.engine.terminology.ValueSetInfo
 
 class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
   TerminologyAwareRetrieveProvider() {
@@ -46,33 +58,201 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
     dateRange: Interval?
   ): Iterable<Any> {
     return runBlocking {
-      if (contextPath == "id" && contextValue is String) {
-        listOf(fhirEngine.get(ResourceType.fromCode(dataType), contextValue))
+      if (dataType == null) {
+        emptyList()
+      } else if (contextPath == "id" && contextValue == null) {
+        emptyList()
+      } else if (contextPath == "id" && contextValue != null) {
+        listOfNotNull(
+          safeGet(fhirEngine, ResourceType.fromCode(dataType), "$contextValue"),
+          safeGet(fhirEngine, ResourceType.fromCode(dataType), "urn:uuid:$contextValue"),
+          safeGet(fhirEngine, ResourceType.fromCode(dataType), "urn:oid:$contextValue")
+        )
+      } else if (codePath == "id" && codes != null) {
+        codes.mapNotNull { safeGet(fhirEngine, ResourceType.fromCode(dataType), it.code) }
       } else {
         val search = Search(ResourceType.fromCode(dataType))
-        if (search.type != ResourceType.Group && // added special treatment for Group type
-          contextPath is String && context is String && contextValue is String
-        ) {
-          search.filter(ReferenceClientParam(contextPath), { value = "$context/$contextValue" })
-        } else {
-          if (search.type == ResourceType.Patient && // filtering active patients
-            hasField(dataType, "active")
-          ) {
-            search.filter(TokenClientParam("active"), { value = of(true) })
-          }
-        }
+
+        // filter by context
+        filterByContext(context, contextPath, contextValue, dataType, search)
+
+        // filter by code in codes
+        filterByCode(codePath, codes, search)
+
+        // filter by code into valueSet
+        filterByValueSet(codePath, valueSet, search)
+
+        // filter by date in range
+        filterByDateRange(datePath, dateLowPath, dateHighPath, dateRange, search)
+
         fhirEngine.search(search)
       }
     }
   }
 
-  private fun hasField(dataType: String?, field: String): Boolean {
-    if (dataType == null) return false
-    return try {
-      Class.forName("org.hl7.fhir.r4.model.$dataType").getDeclaredField(field)
-      true
-    } catch (e: NoSuchFieldException) {
-      false
+  private fun filterByDateRange(
+    datePath: String?,
+    dateLowPath: String?,
+    dateHighPath: String?,
+    dateRange: Interval?,
+    search: Search
+  ) {
+    if (datePath != null && dateRange?.low != null) {
+      search.filter(
+        DateClientParam(datePath),
+        {
+          prefix =
+            if (dateRange.lowClosed) ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+            else ParamPrefixEnum.GREATERTHAN
+          value = of(DateTimeType(convertDate(dateRange.low)))
+        }
+      )
     }
+
+    if (datePath != null && dateRange?.high != null) {
+      search.filter(
+        DateClientParam(datePath),
+        {
+          prefix =
+            if (dateRange.highClosed) ParamPrefixEnum.LESSTHAN_OR_EQUALS
+            else ParamPrefixEnum.LESSTHAN
+          value = of(DateTimeType(convertDate(dateRange.high)))
+        }
+      )
+    }
+
+    if (dateLowPath != null && dateRange?.low != null) {
+      search.filter(
+        DateClientParam(dateLowPath),
+        {
+          prefix =
+            if (dateRange.lowClosed) ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+            else ParamPrefixEnum.GREATERTHAN
+          value = of(DateTimeType(convertDate(dateRange.low)))
+        }
+      )
+    }
+
+    if (dateHighPath != null && dateRange?.high != null) {
+      search.filter(
+        DateClientParam(dateHighPath),
+        {
+          prefix =
+            if (dateRange.highClosed) ParamPrefixEnum.LESSTHAN_OR_EQUALS
+            else ParamPrefixEnum.LESSTHAN
+          value = of(DateTimeType(convertDate(dateRange.high)))
+        }
+      )
+    }
+  }
+
+  private fun convertDate(obj: Any): Date {
+    return when (obj) {
+      is Date -> obj
+      is DateTime -> obj.toJavaDate()
+      else ->
+        throw UnsupportedOperationException(
+          "FhirEngineRetrieveProvider doesn't know " +
+            "how to convert (${obj.javaClass.name}) into a java.util.Date"
+        )
+    }
+  }
+
+  private fun filterByCode(codePath: String?, codes: Iterable<Code>?, search: Search) {
+    if (codes == null || codePath == null) return
+
+    val inCodes =
+      codes.map {
+        val apply: TokenParamFilterCriterion.() -> Unit = {
+          this.value = of(Coding(it.system, it.code, it.display))
+        }
+        apply
+      }
+
+    if (inCodes.isNotEmpty()) search.filter(TokenClientParam(codePath), *inCodes.toTypedArray())
+  }
+
+  private fun filterByValueSet(codePath: String?, valueSetUrl: String?, search: Search) {
+    if (valueSetUrl == null || codePath == null) return
+
+    val valueSet = terminologyProvider.expand(ValueSetInfo().withId(valueSetUrl))
+
+    val inCodes =
+      valueSet.map {
+        val apply: TokenParamFilterCriterion.() -> Unit = {
+          this.value = of(Coding(it.system, it.code, it.display))
+        }
+        apply
+      }
+
+    if (inCodes.isNotEmpty()) search.filter(TokenClientParam(codePath), *inCodes.toTypedArray())
+  }
+
+  private fun filterByContext(
+    context: String?,
+    contextPath: String?,
+    contextValue: Any?,
+    dataType: String,
+    search: Search,
+  ) {
+    if (context == null || contextPath == null || contextValue == null) return
+    // Finds the SearchParamDefinition annotation that matches the incoming contextPath
+    val ann = findSearchParamDefinition(dataType, contextPath)
+
+    if (ann != null) {
+      // If found, uses the applyFilterParam
+      if (ann.type == Enumerations.SearchParamType.REFERENCE) {
+        search.filter(
+          ReferenceClientParam(ann.name),
+          { value = "$context/$contextValue" },
+          { value = "urn:uuid:$contextValue" },
+          { value = "urn:oid:$contextValue" }
+        )
+      } else {
+        search.applyFilterParam(ann, "$contextValue")
+      }
+    } else {
+      // Tries to identify the right param class by type
+      when (contextValue) {
+        is String -> search.filter(StringClientParam(contextPath), { value = contextValue })
+        is DateTimeType -> search.filter(DateClientParam(contextPath), { value = of(contextValue) })
+        is BigDecimal -> search.filter(NumberClientParam(contextPath), { value = contextValue })
+        else ->
+          throw UnsupportedOperationException(
+            "FhirEngineRetrieveProvider doesn't know " +
+              "how to search for $dataType.$contextPath = $contextValue" +
+              "(${contextValue.javaClass.name}) and get $context"
+          )
+      }
+    }
+  }
+
+  private suspend fun safeGet(fhirEngine: FhirEngine, type: ResourceType, id: String): Resource? {
+    return try {
+      fhirEngine.get(type, id)
+    } catch (e: ResourceNotFoundException) {
+      null
+    }
+  }
+
+  private fun findSearchParamDefinition(dataType: String, path: String) =
+    getClass(dataType)
+      .fields
+      .asSequence()
+      .mapNotNull {
+        it.getAnnotation(ca.uhn.fhir.model.api.annotation.SearchParamDefinition::class.java)
+      }
+      .filter { it.path == "$dataType.$path" }
+      .map {
+        com.google.android.fhir.index.SearchParamDefinition(
+          it.name,
+          Enumerations.SearchParamType.fromCode(it.type),
+          it.path
+        )
+      }
+      .firstOrNull()
+
+  private fun getClass(dataType: String): Class<*> {
+    return Class.forName("org.hl7.fhir.r4.model.$dataType")
   }
 }

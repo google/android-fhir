@@ -123,8 +123,8 @@ class MaxValueConstraintValidatorTest {
         }
       )
     assertTrue(
-      (MinValueConstraintValidator.getMinValue(questionItem.first()) as? DateType)?.valueAsString
-        .equals(today) == true
+      (MinValueConstraintValidator.getMinValue(questionItem.first()) as? DateType)
+        ?.valueAsString.equals(today) == true
     )
   }
 
@@ -144,9 +144,8 @@ class MaxValueConstraintValidatorTest {
       )
 
     assertTrue(
-      (MinValueConstraintValidator.getMinValue(questionItem.first()) as? DateType)?.value?.equals(
-        dateType.value
-      ) == true
+      (MinValueConstraintValidator.getMinValue(questionItem.first()) as? DateType)
+        ?.value?.equals(dateType.value) == true
     )
   }
 
@@ -166,9 +165,8 @@ class MaxValueConstraintValidatorTest {
       )
 
     assertTrue(
-      (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)?.value?.equals(
-        dateType.value
-      ) == true
+      (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)
+        ?.value?.equals(dateType.value) == true
     )
   }
 
@@ -201,8 +199,8 @@ class MaxValueConstraintValidatorTest {
       )
 
     assertTrue(
-      (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)?.valueAsString
-        ?.equals(today) == true
+      (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)
+        ?.valueAsString?.equals(today) == true
     )
   }
 
@@ -235,8 +233,8 @@ class MaxValueConstraintValidatorTest {
       )
 
     assertTrue(
-      (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)?.valueAsString
-        ?.equals(fiveDaysAhead) == true
+      (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)
+        ?.valueAsString?.equals(fiveDaysAhead) == true
     )
   }
 }
