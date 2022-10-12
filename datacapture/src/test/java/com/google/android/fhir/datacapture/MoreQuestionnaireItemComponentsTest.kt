@@ -28,6 +28,7 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
@@ -1660,6 +1661,25 @@ class MoreQuestionnaireItemComponentsTest {
             "$EXTENSION_CHOICE_COLUMN_URL not applicable for 'choice'. Only type reference is allowed with resource."
           )
       }
+  }
+
+  @Test
+  fun `sliderStepValue should return the integer value in the sliderStepValue extension`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "slider-step-value"
+        addExtension(EXTENSION_SLIDER_STEP_VALUE_URL, IntegerType(10))
+      }
+
+    assertThat(questionnaireItem.sliderStepValue).isEqualTo(10)
+  }
+
+  @Test
+  fun `sliderStepValue should return null if sliderStepValue extension is not present`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply { linkId = "slider-step-value" }
+
+    assertThat(questionnaireItem.sliderStepValue).isNull()
   }
 
   private val displayCategoryExtensionWithInstructionsCode =

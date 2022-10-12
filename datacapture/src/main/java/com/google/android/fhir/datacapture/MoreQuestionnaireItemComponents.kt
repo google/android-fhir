@@ -27,6 +27,7 @@ import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
@@ -87,6 +88,9 @@ internal const val EXTENSION_VARIABLE_URL = "http://hl7.org/fhir/StructureDefini
 
 internal const val EXTENSION_CQF_CALCULATED_VALUE_URL: String =
   "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue"
+
+internal const val EXTENSION_SLIDER_STEP_VALUE_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue"
 
 internal val Questionnaire.QuestionnaireItemComponent.variableExpressions: List<Expression>
   get() =
@@ -332,6 +336,18 @@ internal val Questionnaire.QuestionnaireItemComponent.isFlyoverCode: Boolean
         false
       }
     }
+  }
+
+/** Slider step extension value. */
+internal val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
+  get() {
+    val extension =
+      this.extension.singleOrNull { it.url == EXTENSION_SLIDER_STEP_VALUE_URL } ?: return null
+    val value = extension.value
+    if (value is IntegerType) {
+      return value.value
+    }
+    return null
   }
 
 /**
