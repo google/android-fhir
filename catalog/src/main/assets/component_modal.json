@@ -6,6 +6,26 @@
       "type": "choice",
       "repeats": true,
       "text": "Specific health concern for today’s visit",
+      "item": [
+        {
+          "linkId": "1.2",
+          "text": "Health concern",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
       "answerOption": [
         {
           "valueCoding": {
