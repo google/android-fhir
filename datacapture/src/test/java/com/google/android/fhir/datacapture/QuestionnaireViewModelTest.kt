@@ -31,6 +31,7 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
+import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -39,6 +40,8 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.io.File
+import java.util.Calendar
+import java.util.Date
 import java.util.UUID
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
@@ -51,16 +54,19 @@ import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Practitioner
+import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.ValueSet
 import org.hl7.fhir.r4.utils.ToolingExtensions
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
@@ -3032,6 +3038,315 @@ class QuestionnaireViewModelTest(
     }
   }
 
+  @Test
+  fun `should calculate value on start for questionnaire item with calculated expression extension`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-birthdate"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              addExtension().apply {
+                url = EXTENSION_CALCULATED_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression =
+                      "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+                  }
+                )
+              }
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-age-years"
+              type = Questionnaire.QuestionnaireItemType.QUANTITY
+              addInitial(
+                Questionnaire.QuestionnaireItemInitialComponent(Quantity.fromUcum("1", "year"))
+              )
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+
+      assertThat(
+          viewModel
+            .getQuestionnaireResponse()
+            .item
+            .single { it.linkId == "a-birthdate" }
+            .answerFirstRep.value.asStringValue()
+        )
+        .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -1) }.asStringValue())
+
+      assertThat(
+          viewModel
+            .getQuestionnaireResponse()
+            .item
+            .single { it.linkId == "a-age-years" }
+            .answerFirstRep.valueQuantity.value.toString()
+        )
+        .isEqualTo("1")
+    }
+
+  @Test
+  fun `should calculate value on change for questionnaire item with calculated expression extension`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-birthdate"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              addExtension().apply {
+                url = EXTENSION_CALCULATED_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression =
+                      "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+                  }
+                )
+              }
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-age-years"
+              type = Questionnaire.QuestionnaireItemType.INTEGER
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+
+      val birthdateItem =
+        viewModel.getQuestionnaireItemViewItemList().first {
+          it.questionnaireItem.linkId == "a-birthdate"
+        }
+
+      assertThat(birthdateItem.getQuestionnaireResponseItem().answer).isEmpty()
+
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .first { it.questionnaireItem.linkId == "a-age-years" }
+        .apply {
+          this.answersChangedCallback(
+            this.questionnaireItem,
+            this.getQuestionnaireResponseItem(),
+            listOf(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                this.value = Quantity.fromUcum("2", "years")
+              }
+            )
+          )
+        }
+
+      assertThat(
+          birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
+        )
+        .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -2) }.valueAsString)
+    }
+
+  @Test
+  fun `should not change value for modified questionnaire items with calculated expression extension`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-birthdate"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              addExtension().apply {
+                url = EXTENSION_CALCULATED_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression =
+                      "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+                  }
+                )
+              }
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-age-years"
+              type = Questionnaire.QuestionnaireItemType.INTEGER
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      val birthdateItem =
+        viewModel.getQuestionnaireItemViewItemList().first {
+          it.questionnaireItem.linkId == "a-birthdate"
+        }
+      val birthdateValue = DateType(Date())
+      birthdateItem.apply {
+        this.answersChangedCallback(
+          this.questionnaireItem,
+          this.getQuestionnaireResponseItem(),
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              this.value = birthdateValue
+            }
+          )
+        )
+      }
+
+      assertThat(
+          birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
+        )
+        .isEqualTo(birthdateValue.valueAsString)
+
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .first { it.questionnaireItem.linkId == "a-age-years" }
+        .apply {
+          this.answersChangedCallback(
+            this.questionnaireItem,
+            this.getQuestionnaireResponseItem(),
+            listOf(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                this.value = Quantity.fromUcum("2", "years")
+              }
+            )
+          )
+        }
+
+      assertThat(
+          birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
+        )
+        .isEqualTo(birthdateValue.valueAsString)
+    }
+
+  @Test
+  fun `should detect cyclic dependency for questionnaire item with calculated expression extension in flat list`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-birthdate"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              addInitial(
+                Questionnaire.QuestionnaireItemInitialComponent(
+                  DateType(Date()).apply { add(Calendar.YEAR, -2) }
+                )
+              )
+              addExtension().apply {
+                url = EXTENSION_CALCULATED_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression =
+                      "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+                  }
+                )
+              }
+            }
+          )
+
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-age-years"
+              type = Questionnaire.QuestionnaireItemType.INTEGER
+              addExtension().apply {
+                url = EXTENSION_CALCULATED_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression =
+                      "today().toString().substring(0, 4).toInteger() - %resource.repeat(item).where(linkId='a-birthdate').answer.value.toString().substring(0, 4).toInteger()"
+                  }
+                )
+              }
+            }
+          )
+        }
+
+      val exception =
+        Assert.assertThrows(null, IllegalStateException::class.java) {
+          createQuestionnaireViewModel(questionnaire)
+        }
+      assertThat(exception.message)
+        .isEqualTo(
+          "a-birthdate and a-age-years have cyclic dependency in expression based extension"
+        )
+    }
+
+  @Test
+  fun `should detect cyclic dependency for questionnaire item with calculated expression extension in nested list`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "a-birthdate"
+                type = Questionnaire.QuestionnaireItemType.DATE
+                addInitial(
+                  Questionnaire.QuestionnaireItemInitialComponent(
+                    DateType(Date()).apply { add(Calendar.YEAR, -2) }
+                  )
+                )
+                addExtension().apply {
+                  url = EXTENSION_CALCULATED_EXPRESSION_URL
+                  setValue(
+                    Expression().apply {
+                      this.language = "text/fhirpath"
+                      this.expression =
+                        "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+                    }
+                  )
+                }
+              }
+            )
+            .addItem()
+            .apply {
+              linkId = "a.1"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+            }
+            .addItem()
+            .apply {
+              linkId = "a.1.1"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+            }
+            .addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "a-age-years"
+                type = Questionnaire.QuestionnaireItemType.INTEGER
+                addExtension().apply {
+                  url = EXTENSION_CALCULATED_EXPRESSION_URL
+                  setValue(
+                    Expression().apply {
+                      this.language = "text/fhirpath"
+                      this.expression =
+                        "today().toString().substring(0, 4).toInteger() - %resource.repeat(item).where(linkId='a-birthdate').answer.value.toString().substring(0, 4).toInteger()"
+                    }
+                  )
+                }
+              }
+            )
+        }
+
+      val exception =
+        Assert.assertThrows(null, IllegalStateException::class.java) {
+          createQuestionnaireViewModel(questionnaire)
+        }
+      assertThat(exception.message)
+        .isEqualTo(
+          "a-birthdate and a-age-years have cyclic dependency in expression based extension"
+        )
+    }
+
   private fun createQuestionnaireViewModel(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse? = null,
@@ -3075,6 +3390,12 @@ class QuestionnaireViewModelTest(
 
   private suspend fun QuestionnaireViewModel.getQuestionnaireItemViewItemList() =
     questionnaireStateFlow.first().items
+
+  private fun QuestionnaireItemViewItem.getQuestionnaireResponseItem() =
+    ReflectionHelpers.getField<QuestionnaireResponse.QuestionnaireResponseItemComponent>(
+      this,
+      "questionnaireResponseItem"
+    )
 
   private companion object {
     const val CODE_SYSTEM_YES_NO = "http://terminology.hl7.org/CodeSystem/v2-0136"

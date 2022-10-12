@@ -134,7 +134,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
 
     val answer = questionnaireItemViewItem.answers
     assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueQuantity!!.value!!.toString()).isEqualTo("10.0")
+    assertThat(answer[0].valueQuantity!!.value!!.toString()).isEqualTo("10")
   }
 
   @Test
