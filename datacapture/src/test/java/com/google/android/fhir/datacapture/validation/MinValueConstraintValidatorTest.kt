@@ -20,7 +20,7 @@ import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.fhir.datacapture.CQF_CALCULATED_EXPRESSION_URL
+import com.google.android.fhir.datacapture.EXTENSION_CQF_CALCULATED_VALUE_URL
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -111,7 +111,7 @@ class MinValueConstraintValidatorTest {
                 extension =
                   listOf(
                     Extension(
-                      CQF_CALCULATED_EXPRESSION_URL,
+                      EXTENSION_CQF_CALCULATED_VALUE_URL,
                       Expression().apply {
                         language = "text/fhirpath"
                         expression = "today() - 1 'days'"
@@ -161,7 +161,7 @@ class MinValueConstraintValidatorTest {
                 extension =
                   listOf(
                     Extension(
-                      CQF_CALCULATED_EXPRESSION_URL,
+                      EXTENSION_CQF_CALCULATED_VALUE_URL,
                       Expression().apply {
                         language = "text/fhirpath"
                         expression = "today() - 1 'days'"
