@@ -39,7 +39,7 @@ internal class QuestionnaireGroupTypeHeaderView(context: Context, attrs: Attribu
     val hint = findViewById<TextView>(R.id.hint)
     initHelpButton(this, questionnaireItem)
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
-    updateQuestionText(this, questionnaireItem)
+    updateQuestionText(question, questionnaireItem)
     hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
     visibility = getViewGroupVisibility(prefix, question, hint)
   }

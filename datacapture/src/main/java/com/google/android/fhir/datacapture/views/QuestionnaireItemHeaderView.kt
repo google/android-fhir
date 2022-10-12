@@ -55,7 +55,7 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
 
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
-    updateQuestionText(this, questionnaireItem)
+    updateQuestionText(question, questionnaireItem)
     hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
     initHelpButton(this, questionnaireItem)
     //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
@@ -117,18 +117,18 @@ internal fun initHelpButton(
  * `*`.
  */
 internal fun updateQuestionText(
-  view: View,
+  questionTextView: TextView,
   questionnaireItem: Questionnaire.QuestionnaireItemComponent,
 ) {
   val builder = SpannableStringBuilder()
   questionnaireItem.localizedTextSpanned?.let { builder.append(it) }
   if (questionnaireItem.required) {
     builder.appendWithSpan(
-      view.context.applicationContext.getString(R.string.space_asterisk),
-      view.context.getColorFromAttr(R.attr.colorError)
+      questionTextView.context.applicationContext.getString(R.string.space_asterisk),
+      questionTextView.context.getColorFromAttr(R.attr.colorError)
     )
   }
-  view.findViewById<TextView>(R.id.question).updateTextAndVisibility(builder)
+  questionTextView.updateTextAndVisibility(builder)
 }
 
 private fun SpannableStringBuilder.appendWithSpan(value: String, @ColorInt color: Int) {
@@ -139,11 +139,8 @@ private fun SpannableStringBuilder.appendWithSpan(value: String, @ColorInt color
 }
 
 @ColorInt
-private fun Context.getColorFromAttr(
-  @AttrRes attrColor: Int,
-  typedValue: TypedValue = TypedValue(),
-  resolveRefs: Boolean = true
-): Int {
-  theme.resolveAttribute(attrColor, typedValue, resolveRefs)
+private fun Context.getColorFromAttr(@AttrRes attrColor: Int): Int {
+  val typedValue = TypedValue()
+  theme.resolveAttribute(attrColor, typedValue, true)
   return typedValue.data
 }

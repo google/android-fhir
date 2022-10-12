@@ -255,7 +255,7 @@ class QuestionnaireGroupTypeHeaderViewTest {
   }
 
   @Test
-  fun `shows * though question text is missing`() {
+  fun `shows * even if question text is missing`() {
     view.bind(Questionnaire.QuestionnaireItemComponent().apply { required = true })
 
     assertThat(view.findViewById<TextView>(R.id.question).text.toString())
