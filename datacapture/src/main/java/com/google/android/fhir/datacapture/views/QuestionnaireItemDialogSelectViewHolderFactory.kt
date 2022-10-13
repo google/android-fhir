@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.itemControl
+import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -57,6 +58,8 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         cleanupOldState()
+        holder.summaryHolder.hint =
+          questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
         val activity =
           requireNotNull(holder.header.context.tryUnwrapContext()) {
             "Can only use dialog select in an AppCompatActivity context"

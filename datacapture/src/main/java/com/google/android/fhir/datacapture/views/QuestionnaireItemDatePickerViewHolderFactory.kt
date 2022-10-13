@@ -110,6 +110,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = localePattern
         textInputEditText.removeTextChangedListener(textWatcher)
+
         if (isTextUpdateRequired(
             textInputEditText.context,
             questionnaireItemViewItem.answers.singleOrNull()?.valueDateType,
@@ -119,6 +120,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           textInputEditText.setText(
             questionnaireItemViewItem.answers
               .singleOrNull()
+              ?.takeIf { it.hasValue() }
               ?.valueDateType
               ?.localDate
               ?.localizedString
@@ -231,11 +233,13 @@ fun Context.tryUnwrapContext(): AppCompatActivity? {
 
 internal val DateType.localDate
   get() =
-    LocalDate.of(
-      year,
-      month + 1,
-      day,
-    )
+    if (!this.hasValue()) null
+    else
+      LocalDate.of(
+        year,
+        month + 1,
+        day,
+      )
 
 internal val LocalDate.dateType
   get() = DateType(year, monthValue - 1, dayOfMonth)
