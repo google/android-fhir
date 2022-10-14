@@ -245,6 +245,33 @@ class QuestionnaireItemHeaderViewTest {
     assertThat(view.visibility).isEqualTo(View.GONE)
   }
 
+  @Test
+  fun `shows * at the end of question text`() {
+    view.bind(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        text = "Question?"
+        required = true
+      }
+    )
+
+    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question? *")
+  }
+
+  @Test
+  fun `does not show * at the end of question text`() {
+    view.bind(Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" })
+
+    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question?")
+  }
+
+  @Test
+  fun `shows * though question text is missing`() {
+    view.bind(Questionnaire.QuestionnaireItemComponent().apply { required = true })
+
+    assertThat(view.findViewById<TextView>(R.id.question).text.toString())
+      .isEqualTo(view.context.applicationContext.resources.getString(R.string.space_asterisk))
+  }
+
   private val displayCategoryExtensionWithInstructionsCode =
     Extension().apply {
       url = EXTENSION_DISPLAY_CATEGORY_URL
