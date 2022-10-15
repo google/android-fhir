@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.datacapture.CQF_CALCULATED_EXPRESSION_URL
+import com.google.android.fhir.datacapture.EXTENSION_CQF_CALCULATED_VALUE_URL
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -109,7 +109,7 @@ class MaxValueConstraintValidatorTest {
                   extension =
                     listOf(
                       Extension(
-                        CQF_CALCULATED_EXPRESSION_URL,
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
                         Expression().apply {
                           language = "text/fhirpath"
                           expression = "today()"
@@ -184,7 +184,7 @@ class MaxValueConstraintValidatorTest {
                   extension =
                     listOf(
                       Extension(
-                        CQF_CALCULATED_EXPRESSION_URL,
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
                         Expression().apply {
                           language = "text/fhirpath"
                           expression = "today()"
@@ -218,7 +218,7 @@ class MaxValueConstraintValidatorTest {
                   extension =
                     listOf(
                       Extension(
-                        CQF_CALCULATED_EXPRESSION_URL,
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
                         Expression().apply {
                           language = "text/fhirpath"
                           expression = "today() + 5 'days' "
