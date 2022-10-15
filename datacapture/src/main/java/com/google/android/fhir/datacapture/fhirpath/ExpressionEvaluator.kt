@@ -18,7 +18,10 @@ package com.google.android.fhir.datacapture.fhirpath
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.datacapture.calculatedExpression
 import com.google.android.fhir.datacapture.findVariableExpression
+import com.google.android.fhir.datacapture.flattened
+import com.google.android.fhir.datacapture.isReferencedBy
 import com.google.android.fhir.datacapture.variableExpressions
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
@@ -26,6 +29,7 @@ import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 import timber.log.Timber
 
@@ -60,6 +64,73 @@ object ExpressionEvaluator {
         hostServices = FHIRPathEngineHostServices
       }
     }
+
+  /** Detects if any item into list is referencing a dependent item in its calculated expression */
+  internal fun detectExpressionCyclicDependency(
+    items: List<Questionnaire.QuestionnaireItemComponent>
+  ) {
+    items
+      .flattened()
+      .filter { it.calculatedExpression != null }
+      .run {
+        forEach { current ->
+          // no calculable item depending on current item should be used as dependency into current
+          // item
+          this.forEach { dependent ->
+            check(!(current.isReferencedBy(dependent) && dependent.isReferencedBy(current))) {
+              "${current.linkId} and ${dependent.linkId} have cyclic dependency in expression based extension"
+            }
+          }
+        }
+      }
+  }
+
+  /**
+   * Returns a list of pair of item and the calculated and evaluated value for all items with
+   * calculated expression extension, which is dependent on value of updated response
+   */
+  fun evaluateCalculatedExpressions(
+    updatedQuestionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse,
+    questionnaireItemParentMap:
+      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>
+  ): List<ItemToAnswersPair> {
+    return questionnaire.item
+      .flattened()
+      .filter { item ->
+        // Condition 1. item is calculable
+        // Condition 2. item answer depends on the updated item answer OR has a variable dependency
+        item.calculatedExpression != null &&
+          (updatedQuestionnaireItem.isReferencedBy(item) ||
+            findDependentVariables(item.calculatedExpression!!).isNotEmpty())
+      }
+      .map { questionnaireItem ->
+        val appContext =
+          mutableMapOf<String, Base?>().apply {
+            extractDependentVariables(
+              questionnaireItem.calculatedExpression!!,
+              questionnaire,
+              questionnaireResponse,
+              questionnaireItemParentMap,
+              questionnaireItem,
+              this
+            )
+          }
+
+        val updatedAnswer =
+          fhirPathEngine
+            .evaluate(
+              appContext,
+              questionnaireResponse,
+              null,
+              null,
+              questionnaireItem.calculatedExpression!!.expression
+            )
+            .map { it.castToType(it) }
+        questionnaireItem to updatedAnswer
+      }
+  }
 
   /**
    * Evaluates variable expression defined at questionnaire item level and returns the evaluated
@@ -98,7 +169,40 @@ object ExpressionEvaluator {
         it.name == expression.name && it.expression == expression.expression
       }
     ) { "The expression should come from the same questionnaire item" }
+    extractDependentVariables(
+      expression,
+      questionnaire,
+      questionnaireResponse,
+      questionnaireItemParentMap,
+      questionnaireItem,
+      variablesMap
+    )
 
+    return evaluateVariable(expression, questionnaireResponse, variablesMap)
+  }
+
+  /**
+   * Parses the expression using regex [Regex] for variable and build a map of variables and its
+   * values respecting the scope and hierarchy level
+   *
+   * @param expression the [Expression] expression to find variables applicable
+   * @param questionnaire the [Questionnaire] respective questionnaire
+   * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
+   * @param questionnaireItemParentMap the [Map<Questionnaire.QuestionnaireItemComponent,
+   * Questionnaire.QuestionnaireItemComponent>] of child to parent
+   * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] where this expression
+   * @param variablesMap the [Map<String, Base>] of variables, the default value is empty map is
+   * defined
+   */
+  internal fun extractDependentVariables(
+    expression: Expression,
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse,
+    questionnaireItemParentMap:
+      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    variablesMap: MutableMap<String, Base?> = mutableMapOf()
+  ) =
     findDependentVariables(expression).forEach { variableName ->
       if (variablesMap[variableName] == null) {
         findAndEvaluateVariable(
@@ -111,9 +215,6 @@ object ExpressionEvaluator {
         )
       }
     }
-
-    return evaluateVariable(expression, questionnaireResponse, variablesMap)
-  }
 
   /**
    * Evaluates variable expression defined at questionnaire level and returns the evaluated result.
@@ -156,10 +257,11 @@ object ExpressionEvaluator {
   }
 
   private fun findDependentVariables(expression: Expression) =
-    variableRegex.findAll(expression.expression).map { it.groupValues[1] }.toList().filterNot {
-      variable ->
-      reservedVariables.contains(variable)
-    }
+    variableRegex
+      .findAll(expression.expression)
+      .map { it.groupValues[1] }
+      .toList()
+      .filterNot { variable -> reservedVariables.contains(variable) }
 
   /**
    * Finds the dependent variables at questionnaire item level first, then in ancestors and then at
@@ -276,3 +378,6 @@ object ExpressionEvaluator {
       null
     }
 }
+
+/** Pair of a [Questionnaire.QuestionnaireItemComponent] with its evaluated answers */
+internal typealias ItemToAnswersPair = Pair<Questionnaire.QuestionnaireItemComponent, List<Type>>

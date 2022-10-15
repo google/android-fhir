@@ -42,5 +42,6 @@
     <string name="button_review">Review</string>
     <string name="not_answered">"Not Answered"</string>
     <string name="help">Help</string>
+    <string name="space_asterisk">\u0020\u002a</string>
 
 </resources>
