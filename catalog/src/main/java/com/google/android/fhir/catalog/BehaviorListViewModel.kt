@@ -33,7 +33,7 @@ class BehaviorListViewModel(application: Application) : AndroidViewModel(applica
     val questionnaireFileName: String,
     val workFlow: WorkflowType = WorkflowType.BEHAVIOR
   ) {
-   CALCULATED_EXPRESSION(
+    CALCULATED_EXPRESSION(
       R.drawable.ic_calculations_behavior,
       R.string.behavior_name_calculated_expression,
       "calculated_expression_questionnaire.json"
