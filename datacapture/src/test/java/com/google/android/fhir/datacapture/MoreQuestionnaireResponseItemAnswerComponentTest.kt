@@ -221,4 +221,56 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
 
     assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.not_answered))
   }
+
+  @Test
+  fun `hasDifferentAnswerSet() should return false when both list values are exactly same`() {
+    val list1 =
+      listOf(
+        createCodingQuestionnaireResponseItemAnswerComponent("http://abc.org", "code1", "Code 1"),
+        createCodingQuestionnaireResponseItemAnswerComponent("http://abc.org", "code2", "Code 2")
+      )
+    val list2 =
+      listOf(
+        Coding("http://abc.org", "code1", "Code 1"),
+        Coding("http://abc.org", "code2", "Code 2")
+      )
+    assertThat(list1.hasDifferentAnswerSet(list2)).isFalse()
+  }
+
+  @Test
+  fun `hasDifferentAnswerSet() should return true when both list sizes are different`() {
+    val list1 =
+      listOf(
+        createCodingQuestionnaireResponseItemAnswerComponent("http://abc.org", "code1", "Code 1"),
+      )
+    val list2 =
+      listOf(
+        Coding("http://abc.org", "code1", "Code 1"),
+        Coding("http://abc.org", "code2", "Code 2")
+      )
+    assertThat(list1.hasDifferentAnswerSet(list2)).isTrue()
+  }
+
+  @Test
+  fun `hasDifferentAnswerSet() should return true when both list sizes are same with different items`() {
+    val list1 =
+      listOf(
+        createCodingQuestionnaireResponseItemAnswerComponent("http://abc.org", "code1", "Code 1"),
+        createCodingQuestionnaireResponseItemAnswerComponent("http://abc.org", "code2", "Code 2"),
+      )
+    val list2 =
+      listOf(
+        Coding("http://abc.org", "code1", "Code 1"),
+        Coding("http://abc.org", "code4", "Code 4")
+      )
+    assertThat(list1.hasDifferentAnswerSet(list2)).isTrue()
+  }
+
+  private fun createCodingQuestionnaireResponseItemAnswerComponent(
+    url: String,
+    code: String,
+    display: String
+  ) =
+    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+      .setValue(Coding(url, code, display))
 }

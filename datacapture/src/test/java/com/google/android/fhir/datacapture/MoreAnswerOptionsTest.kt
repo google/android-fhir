@@ -27,6 +27,7 @@ import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.utils.ToolingExtensions
@@ -61,6 +62,24 @@ class MoreAnswerOptionsTest {
     val answerOption = Questionnaire.QuestionnaireItemAnswerOptionComponent()
 
     assertFailsWith<IllegalArgumentException> { answerOption.displayString }
+  }
+
+  @Test
+  fun `getDisplayString should return answer option with reference display value for reference item type`() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent()
+        .setValue(Reference().setReference("Patient/123").setDisplay("John Doe"))
+
+    assertThat(answerOption.displayString).isEqualTo("John Doe")
+  }
+
+  @Test
+  fun `getDisplayString should return answer option with reference type and id for reference item type for missing display`() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent()
+        .setValue(Reference().setReference("Patient/123"))
+
+    assertThat(answerOption.displayString).isEqualTo("Patient/123")
   }
 
   @Test
