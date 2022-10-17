@@ -94,13 +94,17 @@ data class QuestionnaireItemViewItem(
     questionnaireResponseItem.answer.map { it.copy() }
 
   fun setAnswer(
-    questionnaireResponseItemAnswerComponent:
+    vararg questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
   ) {
-    check(!questionnaireItem.repeats) {
-      "Questionnaire item with linkId ${questionnaireItem.linkId} has repeated answers. Use addAnswer instead."
+    check(questionnaireItem.repeats || questionnaireResponseItemAnswerComponent.size <= 1) {
+      "Questionnaire item with linkId ${questionnaireItem.linkId} has repeated answers."
     }
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(questionnaireResponseItemAnswerComponent))
+    answersChangedCallback(
+      questionnaireItem,
+      questionnaireResponseItem,
+      questionnaireResponseItemAnswerComponent.toList()
+    )
   }
 
   internal fun answerString(context: Context): String {
@@ -115,7 +119,11 @@ data class QuestionnaireItemViewItem(
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers + questionnaireResponseItemAnswerComponent)
+    answersChangedCallback(
+      questionnaireItem,
+      questionnaireResponseItem,
+      answers + questionnaireResponseItemAnswerComponent
+    )
   }
 
   internal fun removeAnswer(
@@ -125,9 +133,13 @@ data class QuestionnaireItemViewItem(
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers.toMutableList().apply {
-      removeIf { it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value) }
-    })
+    answersChangedCallback(
+      questionnaireItem,
+      questionnaireResponseItem,
+      answers.toMutableList().apply {
+        removeIf { it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value) }
+      }
+    )
   }
 
   fun clearAnswer() {
