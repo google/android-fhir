@@ -170,18 +170,18 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       }
 
       private fun updateAnswer(text: CharSequence?) {
-         if(text == null || text.isNullOrEmpty()){
-           displayValidationResult(
-             Invalid(
-               listOf(
-                 textInputEditText.context.getString(
-                   R.string.required_constraint_validation_error_msg
-                 )
-               )
-             )
-           )
-           return
-         }
+        if (text == null || text.isNullOrEmpty()) {
+          displayValidationResult(
+            Invalid(
+              listOf(
+                textInputEditText.context.getString(
+                  R.string.required_constraint_validation_error_msg
+                )
+              )
+            )
+          )
+          return
+        }
         try {
           val localDate = parseDate(text, textInputEditText.context.applicationContext)
           questionnaireItemViewItem.setAnswer(
@@ -281,10 +281,10 @@ internal val Date.localDate
 internal fun parseDate(text: CharSequence?, context: Context): LocalDate {
   val localDate =
     if (isAndroidIcuSupported()) {
-      DateFormat.getDateInstance(DateFormat.SHORT).parse(text.toString())
-    } else {
-      android.text.format.DateFormat.getDateFormat(context).parse(text.toString())
-    }
+        DateFormat.getDateInstance(DateFormat.SHORT).parse(text.toString())
+      } else {
+        android.text.format.DateFormat.getDateFormat(context).parse(text.toString())
+      }
       .localDate
   // date/localDate with year more than 4 digit throws data format exception if deep copy
   // operation get performed on QuestionnaireResponse,
