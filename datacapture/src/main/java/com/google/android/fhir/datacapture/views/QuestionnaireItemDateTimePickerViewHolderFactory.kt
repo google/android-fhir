@@ -144,6 +144,18 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         )
         textWatcher =
           dateInputEditText.doAfterTextChanged { text ->
+            if (text == null || text.isNullOrEmpty()) {
+              displayDateValidationError(
+                Invalid(
+                  listOf(
+                    dateInputEditText.context.getString(
+                      R.string.required_constraint_validation_error_msg
+                    )
+                  )
+                )
+              )
+              return@doAfterTextChanged
+            }
             try {
               localDate = parseDate(text.toString(), dateInputEditText.context.applicationContext)
               enableOrDisableTimePicker(enableIt = true)
@@ -164,34 +176,18 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 )
               }
             } catch (e: ParseException) {
-              if (text.isNullOrEmpty()) {
-                if (questionnaireItemViewItem.questionnaireItem.required) {
-                  displayDateValidationError(
-                    Invalid(
-                      listOf(
-                        dateInputEditText.context.getString(
-                          R.string.required_constraint_validation_error_msg
-                        )
-                      )
-                    )
-                  )
-                } else {
-                  displayDateValidationError(Valid)
-                }
-              } else {
-                displayDateValidationError(
-                  Invalid(
-                    listOf(
-                      dateInputEditText.context.getString(
-                        R.string.date_format_validation_error_msg,
-                        localeDatePattern
-                      )
+              displayDateValidationError(
+                Invalid(
+                  listOf(
+                    dateInputEditText.context.getString(
+                      R.string.date_format_validation_error_msg,
+                      localeDatePattern
                     )
                   )
                 )
-                if (localTime == null) {
-                  displayTimeValidationError(Valid)
-                }
+              )
+              if (!timeInputLayout.isEnabled) {
+                displayTimeValidationError(Valid)
               }
               if (questionnaireItemViewItem.answers.isNotEmpty()) {
                 questionnaireItemViewItem.clearAnswer()
@@ -255,12 +251,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           )
         ) {
           dateInputEditText.setText(localDateTime?.localizedDateString ?: "")
-          displayDateValidationError(Valid)
         }
         timeInputEditText.setText(
           localDateTime?.toLocalizedTimeString(timeInputEditText.context) ?: ""
         )
-        displayTimeValidationError(Valid)
       }
 
       /** Updates the recorded answer. */
