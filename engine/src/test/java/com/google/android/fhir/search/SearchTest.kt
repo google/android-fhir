@@ -948,7 +948,7 @@ class SearchTest {
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
-        SELECT resourceUuid FROM StringIndexEntity c JOIN StringIndexEntityFts d ON c.id = d.docid
+        SELECT resourceUuid FROM StringIndexEntity c JOIN FullTextStringIndexEntity d ON c.id = d.docid
         WHERE resourceType = ? AND d.index_name = ? AND d.index_value MATCH '*' || ? || '*'
         )
         """.trimIndent()
