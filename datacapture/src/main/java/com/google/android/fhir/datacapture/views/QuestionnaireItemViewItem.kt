@@ -90,9 +90,8 @@ data class QuestionnaireItemViewItem(
    * [QuestionnaireResponse.QuestionnaireResponseItemComponent] so that proper comparisons can be
    * carried out for the [RecyclerView.Adapter] to decide which items need to be updated.
    */
-  var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
+  val answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
     questionnaireResponseItem.answer.map { it.copy() }
-    private set
 
   fun setAnswer(
     questionnaireResponseItemAnswerComponent:
@@ -101,8 +100,7 @@ data class QuestionnaireItemViewItem(
     check(!questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} has repeated answers. Use addAnswer instead."
     }
-    answers = listOf(questionnaireResponseItemAnswerComponent)
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(questionnaireResponseItemAnswerComponent))
   }
 
   internal fun answerString(context: Context): String {
@@ -117,8 +115,7 @@ data class QuestionnaireItemViewItem(
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
-    answers += questionnaireResponseItemAnswerComponent
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers + questionnaireResponseItemAnswerComponent)
   }
 
   internal fun removeAnswer(
@@ -128,16 +125,13 @@ data class QuestionnaireItemViewItem(
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
-    answers =
-      answers.toMutableList().apply {
-        removeIf { it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value) }
-      }
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers.toMutableList().apply {
+      removeIf { it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value) }
+    })
   }
 
   fun clearAnswer() {
-    answers = listOf()
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf())
   }
 
   fun isAnswerOptionSelected(
