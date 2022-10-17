@@ -16,7 +16,13 @@
 
 object Sdk {
   const val compileSdk = 31
-  const val minSdk = 24
   const val targetSdk = 31
   const val ndkVersion = "20.1.5948944"
+
+  // Engine and SDC must support API 24.
+  // Remove desugaring when upgrading it to 26.
+  const val minSdk = 24
+
+  // Workflow requires minSDK 26
+  const val minSdkWorkflow = 26
 }

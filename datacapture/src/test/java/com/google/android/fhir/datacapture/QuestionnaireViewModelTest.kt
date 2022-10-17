@@ -23,18 +23,26 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
+import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.logicalId
+import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.io.File
+import java.util.Calendar
+import java.util.Date
+import java.util.UUID
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
@@ -46,15 +54,22 @@ import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Practitioner
+import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.ValueSet
 import org.hl7.fhir.r4.utils.ToolingExtensions
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Ignore
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
@@ -70,11 +85,15 @@ class QuestionnaireViewModelTest(
   private val questionnaireSource: QuestionnaireSource,
   private val questionnaireResponseSource: QuestionnaireResponseSource
 ) {
+  @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
+
+  private lateinit var fhirEngine: FhirEngine
   private lateinit var state: SavedStateHandle
   private val context = ApplicationProvider.getApplicationContext<Application>()
 
   @Before
   fun setUp() {
+    fhirEngine = FhirEngineProvider.getInstance(context)
     state = SavedStateHandle()
     check(
       ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
@@ -83,8 +102,10 @@ class QuestionnaireViewModelTest(
     ReflectionHelpers.setStaticField(DataCapture::class.java, "configuration", null)
   }
 
+  // Test cases for initialization
+
   @Test
-  fun stateHasNoQuestionnaire_shouldThrow() {
+  fun `init should throw an exception if no questionnaire is provided`() {
     val errorMessage =
       assertFailsWith<IllegalStateException> { QuestionnaireViewModel(context, state) }
         .localizedMessage
@@ -96,11 +117,12 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun stateHasNoQuestionnaireResponse_shouldCopyQuestionnaireUrl() {
+  fun `should copy questionnaire URL if no response is provided`() {
     val questionnaire =
       Questionnaire().apply {
         url = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
       }
+
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     assertResourceEquals(
@@ -112,7 +134,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun stateHasNoQuestionnaireResponse_shouldCopyQuestion() {
+  fun `should copy questions if no response is provided`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -124,6 +146,7 @@ class QuestionnaireViewModelTest(
           }
         )
       }
+
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     assertResourceEquals(
@@ -140,7 +163,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun stateHasNoQuestionnaireResponse_shouldCopyQuestionnaireStructure() {
+  fun `should copy nested questions if no response is provided`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -159,6 +182,7 @@ class QuestionnaireViewModelTest(
           }
         )
       }
+
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     assertResourceEquals(
@@ -181,7 +205,406 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun stateHasQuestionnaireResponse_nestedItemsWithinGroupItems_shouldNotThrowException() {
+  fun `should throw an exception for questions without type`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+          }
+        )
+      }
+
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "a-link-id" }
+        )
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
+        .localizedMessage
+
+    assertThat(errorMessage).isEqualTo("Questionnaire item must have type")
+  }
+
+  @Test
+  fun `should set initial value`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            initial =
+              mutableListOf(
+                Questionnaire.QuestionnaireItemInitialComponent().apply {
+                  value = BooleanType(false)
+                }
+              )
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun `should throw an exception for group items with an initial value`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            initial =
+              mutableListOf(
+                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true))
+              )
+          }
+        )
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> { createQuestionnaireViewModel(questionnaire) }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "Questionnaire item a-link-id has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+      )
+  }
+
+  @Test
+  fun `should throw an exception for display items with an initial value`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.DISPLAY
+            initial =
+              mutableListOf(
+                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true))
+              )
+          }
+        )
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> { createQuestionnaireViewModel(questionnaire) }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "Questionnaire item a-link-id has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+      )
+  }
+
+  @Test
+  fun `should set the first of multiple initial values`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            repeats = true
+            initial =
+              mutableListOf(
+                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true)),
+                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true))
+              )
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun `should throw an exception for multiple initial values for a non-repeating item`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            repeats = false
+            initial =
+              mutableListOf(
+                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true)),
+                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true))
+              )
+          }
+        )
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> { createQuestionnaireViewModel(questionnaire) }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "Questionnaire item a-link-id can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+      )
+  }
+
+  @Test
+  fun `should not throw exception for matching URL`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        url = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        this.questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+  }
+
+  @Test
+  fun `should throw exception for non-matching URLs`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        url = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        this.questionnaire = "Questionnaire/a-questionnaire"
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> {
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "Mismatching Questionnaire http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1 and QuestionnaireResponse (for Questionnaire Questionnaire/a-questionnaire)"
+      )
+  }
+
+  @Test
+  fun `should throw exception for non-matching question linkIds`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-different-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> {
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo("Missing questionnaire item for questionnaire response item a-different-link-id")
+  }
+
+  @Test
+  fun `should throw exception for non-matching question types`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = StringType("true")
+              }
+            )
+          }
+        )
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> {
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo("Mismatching question type BOOLEAN and answer type string for a-link-id")
+  }
+
+  @Test
+  fun `should not throw exception with repeated questions with multiple answers`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question which allows multiple answers"
+            type = Questionnaire.QuestionnaireItemType.STRING
+            repeats = true
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question which allows multiple answers"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = StringType("string 1")
+              }
+            )
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = StringType("string 2")
+              }
+            )
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+
+    assertResourceEquals(questionnaireResponse, viewModel.getQuestionnaireResponse())
+  }
+
+  @Test
+  fun `should throw an exception with non-repeated questions with multiple answers`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            repeats = false
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> {
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo("Multiple answers for non-repeat questionnaire item a-link-id")
+  }
+
+  @Test
+  fun `should not throw exception for questions nested under group`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -195,13 +618,6 @@ class QuestionnaireViewModelTest(
                 linkId = "another-link-id"
                 text = "Is this true?"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
-                addItem(
-                  Questionnaire.QuestionnaireItemComponent().apply {
-                    linkId = "yet-another-link-id"
-                    text = "Name?"
-                    type = Questionnaire.QuestionnaireItemType.STRING
-                  }
-                )
               }
             )
           }
@@ -221,17 +637,6 @@ class QuestionnaireViewModelTest(
                 addAnswer(
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                     value = BooleanType(true)
-                    addItem(
-                      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                        linkId = "yet-another-link-id"
-                        text = "Name?"
-                        addAnswer(
-                          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                            value = StringType("a-name")
-                          }
-                        )
-                      }
-                    )
                   }
                 )
               }
@@ -240,11 +645,13 @@ class QuestionnaireViewModelTest(
         )
       }
 
-    createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+    val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
   }
 
   @Test
-  fun stateHasQuestionnaireResponse_nestedItemsWithinNonGroupItems_shouldNotThrowException() {
+  fun `should not throw exception for questions nested under question`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -290,11 +697,13 @@ class QuestionnaireViewModelTest(
         )
       }
 
-    createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+    val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
   }
 
   @Test
-  fun stateHasQuestionnaireResponse_nonPrimitiveType_shouldNotThrowError() {
+  fun `should not throw exception for non primitive type`() {
     val testOption1 = Coding("test", "option", "1")
     val testOption2 = Coding("test", "option", "2")
 
@@ -320,6 +729,7 @@ class QuestionnaireViewModelTest(
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
+            text = "Basic question"
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = testOption1
@@ -329,52 +739,47 @@ class QuestionnaireViewModelTest(
         )
       }
 
-    createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+    val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
   }
 
   @Test
-  fun stateHasQuestionnaireResponse_questionnaireUrlMatches_shouldNotThrowError() {
+  fun `should override initial value with empty answer`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
-        url = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            initial =
+              mutableListOf(
+                Questionnaire.QuestionnaireItemInitialComponent().apply { value = valueCoding }
+              )
+          }
+        )
       }
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         id = "a-questionnaire-response"
-        this.questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = StringType("")
+              }
+            )
+          }
+        )
       }
-
     createQuestionnaireViewModel(questionnaire, questionnaireResponse)
   }
 
   @Test
-  fun stateHasQuestionnaireResponse_questionnaireUrlDoesNotMatch_shouldThrowError() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        url = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
-      }
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        id = "a-questionnaire-response"
-        this.questionnaire = "Questionnaire/a-questionnaire"
-      }
-
-    val errorMessage =
-      assertFailsWith<IllegalArgumentException> {
-          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-        }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo(
-        "Mismatching Questionnaire http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1 and QuestionnaireResponse (for Questionnaire Questionnaire/a-questionnaire)"
-      )
-  }
-
-  @Test
-  fun stateHasQuestionnaireResponse_wrongLinkId_shouldThrowError() {
+  fun stateHasQuestionnaireResponse_moreItemsInQuestionnaireResponse_shouldThrowError() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -389,6 +794,16 @@ class QuestionnaireViewModelTest(
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-different-link-id"
@@ -410,6 +825,305 @@ class QuestionnaireViewModelTest(
     assertThat(errorMessage)
       .isEqualTo("Missing questionnaire item for questionnaire response item a-different-link-id")
   }
+
+  // Test cases for getQuestionnaireResponse function
+
+  @Test
+  fun `getQuestionnaireResponse() should copy question text`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addInitial(
+              Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(false) }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun `getQuestionnaireResponse() should copy translated question text`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            textElement.apply {
+              addExtension(
+                Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                  addExtension(Extension("lang", StringType("en-US")))
+                  addExtension(Extension("content", StringType("Basic Question")))
+                }
+              )
+            }
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addInitial(
+              Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(false) }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic Question"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun `getQuestionnaireResponse() should copy question text for nested questions`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "a.1-link-id"
+                text = "Basic Nested question"
+                type = Questionnaire.QuestionnaireItemType.STRING
+                initial =
+                  mutableListOf(
+                    Questionnaire.QuestionnaireItemInitialComponent().apply {
+                      value = StringType("Test Value")
+                    }
+                  )
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "a.1-link-id"
+                text = "Basic Nested question"
+                answer =
+                  listOf(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = StringType("Test Value")
+                    }
+                  )
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun `should return questionnaire response without disabled questions`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addInitial().apply { value = BooleanType(false) }
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addEnableWhen().apply {
+              answer = BooleanType(true)
+              question = "question-1"
+              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+            }
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-1"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun `should return questionnaire response with enabled questions`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addInitial().apply { value = BooleanType(true) }
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addEnableWhen().apply {
+              answer = BooleanType(true)
+              question = "question-1"
+              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+            }
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-1"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "question-2" }
+        )
+      }
+    )
+  }
+
+  @Test // https://github.com/google/android-fhir/issues/1664
+  fun `should skip disabled questions`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addEnableWhen().apply {
+              answer = BooleanType(true)
+              question = "question-1"
+              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+            }
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-3"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addEnableWhen().apply {
+              answer = BooleanType(false)
+              question = "question-1"
+              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+            }
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-1"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-3"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+      }
+    state.set(
+      EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
+      printer.encodeResourceToString(questionnaireResponse)
+    )
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+  }
+
+  // Test cases for state flow
 
   @Test
   fun stateHasQuestionnaireResponse_lessItemsInQuestionnaireResponse_shouldAddTheMissingItem() =
@@ -445,6 +1159,7 @@ class QuestionnaireViewModelTest(
 
       val questionnaireViewModel =
         createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+
       val questionnaireItemViewItem = questionnaireViewModel.questionnaireStateFlow.first()
       assertThat(questionnaireItemViewItem.items.first().questionnaireItem.linkId)
         .isEqualTo(questionnaireResponseWithMissingItem.item.first().linkId)
@@ -524,536 +1239,6 @@ class QuestionnaireViewModelTest(
       assertThat(questionnaireItemViewItem3.answers.single().valueBooleanType.booleanValue())
         .isFalse()
     }
-
-  @Test
-  fun stateHasQuestionnaireResponse_wrongType_shouldThrowError() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
-        )
-      }
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        id = "a-questionnaire-response"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = StringType("true")
-              }
-            )
-          }
-        )
-      }
-
-    val errorMessage =
-      assertFailsWith<IllegalArgumentException> {
-          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-        }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo("Mismatching question type BOOLEAN and answer type string for a-link-id")
-  }
-
-  @Test
-  fun stateHasQuestionnaireResponse_repeatsTrueWithMultipleAnswers_shouldNotThrowError() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question which allows multiple answers"
-            type = Questionnaire.QuestionnaireItemType.STRING
-            repeats = true
-          }
-        )
-      }
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        id = "a-questionnaire-response"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question which allows multiple answers"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = StringType("string 1")
-              }
-            )
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = StringType("string 2")
-              }
-            )
-          }
-        )
-      }
-
-    val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-
-    assertResourceEquals(questionnaireResponse, viewModel.getQuestionnaireResponse())
-  }
-
-  @Test
-  fun stateHasQuestionnaireResponse_repeatsFalseWithMultipleAnswers_shouldThrowError() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            repeats = false
-          }
-        )
-      }
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        id = "a-questionnaire-response"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(false)
-              }
-            )
-          }
-        )
-      }
-
-    val errorMessage =
-      assertFailsWith<IllegalArgumentException> {
-          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-        }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo("Multiple answers for non-repeat questionnaire item a-link-id")
-  }
-
-  @Test
-  fun questionnaireHasInitialValue_shouldSetAnswerValueInQuestionnaireResponse() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            initial =
-              mutableListOf(
-                Questionnaire.QuestionnaireItemInitialComponent().apply {
-                  value = BooleanType(false)
-                }
-              )
-          }
-        )
-      }
-    val viewModel = createQuestionnaireViewModel(questionnaire)
-
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(false)
-              }
-            )
-          }
-        )
-      }
-    )
-  }
-
-  @Test
-  fun questionnaireHasMultipleInitialValuesForRepeatingCase_shouldSetFirstAnswerValueInQuestionnaireResponse() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            repeats = true
-            initial =
-              mutableListOf(
-                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true)),
-                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true))
-              )
-          }
-        )
-      }
-    val viewModel = createQuestionnaireViewModel(questionnaire)
-
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
-          }
-        )
-      }
-    )
-  }
-
-  @Test
-  fun questionnaireHasInitialValueButQuestionnaireResponseAsEmpty_shouldSetEmptyAnswer() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.GROUP
-            initial =
-              mutableListOf(
-                Questionnaire.QuestionnaireItemInitialComponent().apply { value = valueCoding }
-              )
-          }
-        )
-      }
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        id = "a-questionnaire-response"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = StringType("")
-              }
-            )
-          }
-        )
-      }
-    createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-  }
-
-  @Test
-  fun `getQuestionnaireResponse() should have text in questionnaire response item`() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addInitial(
-              Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(false) }
-            )
-          }
-        )
-      }
-    val viewModel = createQuestionnaireViewModel(questionnaire)
-
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(false)
-              }
-            )
-          }
-        )
-      }
-    )
-  }
-
-  @Test
-  fun `getQuestionnaireResponse() should have translated text in questionnaire response item`() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            textElement.apply {
-              addExtension(
-                Extension(ToolingExtensions.EXT_TRANSLATION).apply {
-                  addExtension(Extension("lang", StringType("en-US")))
-                  addExtension(Extension("content", StringType("Basic Question")))
-                }
-              )
-            }
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addInitial(
-              Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(false) }
-            )
-          }
-        )
-      }
-    val viewModel = createQuestionnaireViewModel(questionnaire)
-
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic Question"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(false)
-              }
-            )
-          }
-        )
-      }
-    )
-  }
-
-  @Test
-  fun `getQuestionnaireResponse() should have text in questionnaire response item for nested items`() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.GROUP
-            addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "a.1-link-id"
-                text = "Basic Nested question"
-                type = Questionnaire.QuestionnaireItemType.STRING
-                initial =
-                  mutableListOf(
-                    Questionnaire.QuestionnaireItemInitialComponent().apply {
-                      value = StringType("Test Value")
-                    }
-                  )
-              }
-            )
-          }
-        )
-      }
-    val viewModel = createQuestionnaireViewModel(questionnaire)
-
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "a.1-link-id"
-                text = "Basic Nested question"
-                answer =
-                  listOf(
-                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                      value = StringType("Test Value")
-                    }
-                  )
-              }
-            )
-          }
-        )
-      }
-    )
-  }
-
-  @Test
-  fun `createQuestionnaireViewModel() should throw IllegalArgumentException for multiple initial values with non repeating item`() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            repeats = false
-            initial =
-              mutableListOf(
-                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true)),
-                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true))
-              )
-          }
-        )
-      }
-
-    val errorMessage =
-      assertFailsWith<IllegalArgumentException> { createQuestionnaireViewModel(questionnaire) }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo(
-        "Questionnaire item a-link-id can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
-      )
-  }
-
-  @Test
-  fun questionnaireItemMissingType_shouldThrowError() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-          }
-        )
-      }
-
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        id = "a-questionnaire-response"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "a-link-id" }
-        )
-      }
-
-    val errorMessage =
-      assertFailsWith<IllegalStateException> {
-          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-        }
-        .localizedMessage
-
-    assertThat(errorMessage).isEqualTo("Questionnaire item must have type")
-  }
-
-  @Test
-  fun questionnaireHasInitialValueAndGroupType_shouldThrowError() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.GROUP
-            initial =
-              mutableListOf(
-                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true))
-              )
-          }
-        )
-      }
-
-    val errorMessage =
-      assertFailsWith<IllegalArgumentException> { createQuestionnaireViewModel(questionnaire) }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo(
-        "Questionnaire item a-link-id has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
-      )
-  }
-
-  @Test
-  fun questionnaireHasInitialValueAndDisplayType_shouldThrowError() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.DISPLAY
-            initial =
-              mutableListOf(
-                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true))
-              )
-          }
-        )
-      }
-
-    val errorMessage =
-      assertFailsWith<IllegalArgumentException> { createQuestionnaireViewModel(questionnaire) }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo(
-        "Questionnaire item a-link-id has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
-      )
-  }
-
-  @Test
-  fun stateHasQuestionnaireResponse_moreItemsInQuestionnaireResponse_shouldThrowError() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
-        )
-      }
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        id = "a-questionnaire-response"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
-          }
-        )
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-different-link-id"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
-          }
-        )
-      }
-
-    val errorMessage =
-      assertFailsWith<IllegalArgumentException> {
-          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-        }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo("Missing questionnaire item for questionnaire response item a-different-link-id")
-  }
 
   @Test
   fun `should emit questionnaire state flow`() = runBlocking {
@@ -1211,6 +1396,87 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
+  fun `should emit questionnaire state flow without hidden questions`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-boolean-item-1"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addExtension().apply {
+              url = EXTENSION_HIDDEN_URL
+              setValue(BooleanType(true))
+            }
+          }
+        )
+      }
+
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList()).isEmpty()
+  }
+
+  @Test
+  fun `should emit questionnaire state flow with non-hidden questions`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-boolean-item-1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addExtension().apply {
+              url = EXTENSION_HIDDEN_URL
+              setValue(BooleanType(false))
+            }
+            addInitial().apply { value = BooleanType(true) }
+          }
+        )
+      }
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
+      .isEqualTo("a-boolean-item-1")
+  }
+
+  @Test
+  fun `should emit questionnaire state flow with hidden extension without valid value`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-boolean-item-1"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              addExtension().apply {
+                url = EXTENSION_HIDDEN_URL
+                setValue(IntegerType(1))
+              }
+              addInitial().apply { value = BooleanType(true) }
+            }
+          )
+        }
+      val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
+
+      val viewModel = QuestionnaireViewModel(context, state)
+
+      assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
+        .isEqualTo("a-boolean-item-1")
+    }
+
+  // Test cases for user interaction
+
+  @Test
   fun questionnaireHasNestedItem_ofTypeGroup_shouldNestItemWithinItem() = runBlocking {
     val questionnaire =
       Questionnaire().apply {
@@ -1307,6 +1573,7 @@ class QuestionnaireViewModelTest(
           }
         )
       }
+
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     viewModel
@@ -1324,6 +1591,8 @@ class QuestionnaireViewModelTest(
 
     assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
   }
+
+  // Test cases for pagination and navigation
 
   @Test
   fun `should show questionnaire items in the active page in a paginated questionnaire`() =
@@ -1923,7 +2192,7 @@ class QuestionnaireViewModelTest(
     viewModel.goToNextPage()
 
     assertThat(viewModel.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.pages?.last()?.index)
+    assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.last()?.index)
   }
 
   @Test
@@ -1965,7 +2234,7 @@ class QuestionnaireViewModelTest(
     viewModel.goToPreviousPage()
 
     assertThat(viewModel.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.pages?.first()?.index)
+    assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.first()?.index)
   }
 
   @Test
@@ -2167,6 +2436,8 @@ class QuestionnaireViewModelTest(
     }
   }
 
+  // Test cases for answer value set
+
   @Test
   fun questionnaire_resolveContainedAnswerValueSet() = runBlocking {
     val valueSetId = "yesnodontknow"
@@ -2254,177 +2525,7 @@ class QuestionnaireViewModelTest(
       .inOrder()
   }
 
-  @Test
-  fun questionnaireItem_hiddenExtensionTrue_doNotCreateQuestionnaireItemView() = runBlocking {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-boolean-item-1"
-            text = "a question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addExtension().apply {
-              url = EXTENSION_HIDDEN_URL
-              setValue(BooleanType(true))
-            }
-          }
-        )
-      }
-
-    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
-
-    val viewModel = QuestionnaireViewModel(context, state)
-
-    assertThat(viewModel.getQuestionnaireItemViewItemList()).isEmpty()
-  }
-
-  @Test
-  fun questionnaireItem_hiddenExtensionFalse_shouldCreateQuestionnaireItemView() = runBlocking {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-boolean-item-1"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addExtension().apply {
-              url = EXTENSION_HIDDEN_URL
-              setValue(BooleanType(false))
-            }
-            addInitial().apply { value = BooleanType(true) }
-          }
-        )
-      }
-    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
-
-    val viewModel = QuestionnaireViewModel(context, state)
-
-    assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
-      .isEqualTo("a-boolean-item-1")
-  }
-
-  @Test
-  fun questionnaireItem_hiddenExtensionValueIsNotBoolean_shouldCreateQuestionnaireItemView() =
-    runBlocking {
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "a-boolean-item-1"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              addExtension().apply {
-                url = EXTENSION_HIDDEN_URL
-                setValue(IntegerType(1))
-              }
-              addInitial().apply { value = BooleanType(true) }
-            }
-          )
-        }
-      val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
-
-      val viewModel = QuestionnaireViewModel(context, state)
-
-      assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
-        .isEqualTo("a-boolean-item-1")
-    }
-
-  @Test
-  fun `should return questionnaire response without disabled questions`() = runBlocking {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "question-1"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addInitial().apply { value = BooleanType(false) }
-          }
-        )
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "question-2"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addEnableWhen().apply {
-              answer = BooleanType(true)
-              question = "question-1"
-              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
-            }
-          }
-        )
-      }
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-
-    val viewModel = QuestionnaireViewModel(context, state)
-
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "question-1"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(false)
-              }
-            )
-          }
-        )
-      }
-    )
-  }
-
-  @Test
-  fun `should return questionnaire response with enabled questions`() = runBlocking {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "question-1"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addInitial().apply { value = BooleanType(true) }
-          }
-        )
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "question-2"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addEnableWhen().apply {
-              answer = BooleanType(true)
-              question = "question-1"
-              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
-            }
-          }
-        )
-      }
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-
-    val viewModel = QuestionnaireViewModel(context, state)
-
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "question-1"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
-          }
-        )
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "question-2" }
-        )
-      }
-    )
-  }
+  // Test cases for nested display items
 
   @Test
   fun nestedDisplayItem_parentQuestionItemIsGroup_createQuestionnaireStateItem() = runBlocking {
@@ -2596,6 +2697,59 @@ class QuestionnaireViewModelTest(
         .isEqualTo("parent-question")
     }
 
+  // Test cases for expressions
+
+  @Test
+  fun `resolveAnswerExpression() should return questionnaire item answer options for answer expression and choice column`() =
+    runBlocking {
+      val practitioner =
+        Practitioner()
+          .apply {
+            id = UUID.randomUUID().toString()
+            active = true
+            addName(HumanName().apply { this.family = "John" })
+          }
+          .also { fhirEngine.create(it) }
+
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              text = "answer expression question text"
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              extension =
+                listOf(
+                  Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                    Expression().apply {
+                      this.expression = "Practitioner?active=true"
+                      this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                    }
+                  ),
+                  Extension(
+                      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
+                    )
+                    .apply {
+                      this.addExtension(Extension("path", StringType("id")))
+                      this.addExtension(Extension("label", StringType("name")))
+                      this.addExtension(Extension("forDisplay", BooleanType(true)))
+                    }
+                )
+            }
+          )
+        }
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+      val viewModel = QuestionnaireViewModel(context, state)
+      val answerOptions = viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
+
+      assertThat(answerOptions.first().valueReference.reference)
+        .isEqualTo("Practitioner/${practitioner.logicalId}")
+    }
+
+  // Test cases for submit button
+
   @Test
   fun `setShowSubmitButtonFlag() to false should not show submit button`() {
     runBlocking {
@@ -2633,6 +2787,8 @@ class QuestionnaireViewModelTest(
       assertThat(viewModel.questionnaireStateFlow.first().pagination.showSubmitButton).isTrue()
     }
   }
+
+  // Test cases for review mode
 
   @Test
   fun `state has review feature and submit button to true should show submit button when moved to review page`() {
@@ -2882,6 +3038,315 @@ class QuestionnaireViewModelTest(
     }
   }
 
+  @Test
+  fun `should calculate value on start for questionnaire item with calculated expression extension`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-birthdate"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              addExtension().apply {
+                url = EXTENSION_CALCULATED_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression =
+                      "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+                  }
+                )
+              }
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-age-years"
+              type = Questionnaire.QuestionnaireItemType.QUANTITY
+              addInitial(
+                Questionnaire.QuestionnaireItemInitialComponent(Quantity.fromUcum("1", "year"))
+              )
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+
+      assertThat(
+          viewModel
+            .getQuestionnaireResponse()
+            .item
+            .single { it.linkId == "a-birthdate" }
+            .answerFirstRep.value.asStringValue()
+        )
+        .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -1) }.asStringValue())
+
+      assertThat(
+          viewModel
+            .getQuestionnaireResponse()
+            .item
+            .single { it.linkId == "a-age-years" }
+            .answerFirstRep.valueQuantity.value.toString()
+        )
+        .isEqualTo("1")
+    }
+
+  @Test
+  fun `should calculate value on change for questionnaire item with calculated expression extension`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-birthdate"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              addExtension().apply {
+                url = EXTENSION_CALCULATED_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression =
+                      "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+                  }
+                )
+              }
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-age-years"
+              type = Questionnaire.QuestionnaireItemType.INTEGER
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+
+      val birthdateItem =
+        viewModel.getQuestionnaireItemViewItemList().first {
+          it.questionnaireItem.linkId == "a-birthdate"
+        }
+
+      assertThat(birthdateItem.getQuestionnaireResponseItem().answer).isEmpty()
+
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .first { it.questionnaireItem.linkId == "a-age-years" }
+        .apply {
+          this.answersChangedCallback(
+            this.questionnaireItem,
+            this.getQuestionnaireResponseItem(),
+            listOf(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                this.value = Quantity.fromUcum("2", "years")
+              }
+            )
+          )
+        }
+
+      assertThat(
+          birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
+        )
+        .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -2) }.valueAsString)
+    }
+
+  @Test
+  fun `should not change value for modified questionnaire items with calculated expression extension`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-birthdate"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              addExtension().apply {
+                url = EXTENSION_CALCULATED_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression =
+                      "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+                  }
+                )
+              }
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-age-years"
+              type = Questionnaire.QuestionnaireItemType.INTEGER
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      val birthdateItem =
+        viewModel.getQuestionnaireItemViewItemList().first {
+          it.questionnaireItem.linkId == "a-birthdate"
+        }
+      val birthdateValue = DateType(Date())
+      birthdateItem.apply {
+        this.answersChangedCallback(
+          this.questionnaireItem,
+          this.getQuestionnaireResponseItem(),
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              this.value = birthdateValue
+            }
+          )
+        )
+      }
+
+      assertThat(
+          birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
+        )
+        .isEqualTo(birthdateValue.valueAsString)
+
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .first { it.questionnaireItem.linkId == "a-age-years" }
+        .apply {
+          this.answersChangedCallback(
+            this.questionnaireItem,
+            this.getQuestionnaireResponseItem(),
+            listOf(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                this.value = Quantity.fromUcum("2", "years")
+              }
+            )
+          )
+        }
+
+      assertThat(
+          birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
+        )
+        .isEqualTo(birthdateValue.valueAsString)
+    }
+
+  @Test
+  fun `should detect cyclic dependency for questionnaire item with calculated expression extension in flat list`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-birthdate"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              addInitial(
+                Questionnaire.QuestionnaireItemInitialComponent(
+                  DateType(Date()).apply { add(Calendar.YEAR, -2) }
+                )
+              )
+              addExtension().apply {
+                url = EXTENSION_CALCULATED_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression =
+                      "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+                  }
+                )
+              }
+            }
+          )
+
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-age-years"
+              type = Questionnaire.QuestionnaireItemType.INTEGER
+              addExtension().apply {
+                url = EXTENSION_CALCULATED_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression =
+                      "today().toString().substring(0, 4).toInteger() - %resource.repeat(item).where(linkId='a-birthdate').answer.value.toString().substring(0, 4).toInteger()"
+                  }
+                )
+              }
+            }
+          )
+        }
+
+      val exception =
+        Assert.assertThrows(null, IllegalStateException::class.java) {
+          createQuestionnaireViewModel(questionnaire)
+        }
+      assertThat(exception.message)
+        .isEqualTo(
+          "a-birthdate and a-age-years have cyclic dependency in expression based extension"
+        )
+    }
+
+  @Test
+  fun `should detect cyclic dependency for questionnaire item with calculated expression extension in nested list`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "a-birthdate"
+                type = Questionnaire.QuestionnaireItemType.DATE
+                addInitial(
+                  Questionnaire.QuestionnaireItemInitialComponent(
+                    DateType(Date()).apply { add(Calendar.YEAR, -2) }
+                  )
+                )
+                addExtension().apply {
+                  url = EXTENSION_CALCULATED_EXPRESSION_URL
+                  setValue(
+                    Expression().apply {
+                      this.language = "text/fhirpath"
+                      this.expression =
+                        "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+                    }
+                  )
+                }
+              }
+            )
+            .addItem()
+            .apply {
+              linkId = "a.1"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+            }
+            .addItem()
+            .apply {
+              linkId = "a.1.1"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+            }
+            .addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "a-age-years"
+                type = Questionnaire.QuestionnaireItemType.INTEGER
+                addExtension().apply {
+                  url = EXTENSION_CALCULATED_EXPRESSION_URL
+                  setValue(
+                    Expression().apply {
+                      this.language = "text/fhirpath"
+                      this.expression =
+                        "today().toString().substring(0, 4).toInteger() - %resource.repeat(item).where(linkId='a-birthdate').answer.value.toString().substring(0, 4).toInteger()"
+                    }
+                  )
+                }
+              }
+            )
+        }
+
+      val exception =
+        Assert.assertThrows(null, IllegalStateException::class.java) {
+          createQuestionnaireViewModel(questionnaire)
+        }
+      assertThat(exception.message)
+        .isEqualTo(
+          "a-birthdate and a-age-years have cyclic dependency in expression based extension"
+        )
+    }
+
   private fun createQuestionnaireViewModel(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse? = null,
@@ -2925,6 +3390,12 @@ class QuestionnaireViewModelTest(
 
   private suspend fun QuestionnaireViewModel.getQuestionnaireItemViewItemList() =
     questionnaireStateFlow.first().items
+
+  private fun QuestionnaireItemViewItem.getQuestionnaireResponseItem() =
+    ReflectionHelpers.getField<QuestionnaireResponse.QuestionnaireResponseItemComponent>(
+      this,
+      "questionnaireResponseItem"
+    )
 
   private companion object {
     const val CODE_SYSTEM_YES_NO = "http://terminology.hl7.org/CodeSystem/v2-0136"

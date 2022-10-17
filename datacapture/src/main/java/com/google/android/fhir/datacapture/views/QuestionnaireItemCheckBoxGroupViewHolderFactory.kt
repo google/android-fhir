@@ -71,8 +71,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
             flow.setWrapMode(Flow.WRAP_NONE)
           }
         }
-        questionnaireItemViewItem
-          .answerOption
+        questionnaireItemViewItem.answerOption
           .map { answerOption -> View.generateViewId() to answerOption }
           .onEach { populateViewWithAnswerOption(it.first, it.second, choiceOrientation) }
           .map { it.first }
@@ -81,7 +80,8 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
-          is NotValidated, Valid -> error.visibility = View.GONE
+          is NotValidated,
+          Valid -> error.visibility = View.GONE
           is Invalid -> {
             error.text = validationResult.getSingleStringValidationMessage()
             error.visibility = View.VISIBLE
