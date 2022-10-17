@@ -30,10 +30,13 @@ import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
 import com.google.android.fhir.datacapture.utilities.fhirPathEngine
+import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.validation.Valid
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.flow.Flow
@@ -96,6 +99,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * needed to avoid spewing validation errors before any questions are answered.
    */
   private var isPaginationButtonPressed = false
+
+  /** Forces response validation each time [getQuestionnaireItemViewItems] is called. */
+  private var forceValidate = false
+
   init {
     when {
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI) -> {
@@ -303,6 +310,23 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       item = getEnabledResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
     }
   }
+
+  /**
+   * Validates questionnaire and return the validation results. As a side effect, it triggers the UI
+   * update to show errors in case there are any validation errors.
+   */
+  internal fun validateQuestionnaireAndUpdateUI(): Map<String, List<ValidationResult>> =
+    QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        questionnaireResponse,
+        getApplication()
+      )
+      .also {
+        if (it.values.flatten().filterIsInstance<Invalid>().isNotEmpty()) {
+          forceValidate = true
+          modificationCount.update { count -> count + 1 }
+        }
+      }
 
   internal fun goToPreviousPage() {
     when (entryMode) {
@@ -622,7 +646,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
     val validationResult =
       if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
-          isPaginationButtonPressed
+          isPaginationButtonPressed ||
+          forceValidate
       ) {
         QuestionnaireResponseItemValidator.validate(
           questionnaireItem,

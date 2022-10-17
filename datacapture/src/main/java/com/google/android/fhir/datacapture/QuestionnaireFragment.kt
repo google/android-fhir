@@ -24,17 +24,19 @@ import android.widget.Button
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import org.hl7.fhir.r4.model.Questionnaire
 
 /**
  * A [Fragment] for displaying FHIR Questionnaires and getting user responses as FHIR
- * QuestionnareResponses.
+ * QuestionnaireResponses.
  *
  * For more information, see the
  * [QuestionnaireFragment](https://github.com/google/android-fhir/wiki/SDCL%3A-Use-QuestionnaireFragment)
@@ -73,8 +75,23 @@ open class QuestionnaireFragment : Fragment() {
     paginationPreviousButton.setOnClickListener { viewModel.goToPreviousPage() }
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
-    requireView().findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
-      setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
+    view.findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
+      viewModel.validateQuestionnaireAndUpdateUI().let { validationMap ->
+        if (validationMap
+            .filter { (_, validations) -> validations.filterIsInstance<Invalid>().isNotEmpty() }
+            .isEmpty()
+        ) {
+          setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
+        } else {
+          val errorViewModel: QuestionnaireValidationErrorViewModel by activityViewModels()
+          errorViewModel.setQuestionnaireAndValidation(viewModel.questionnaire, validationMap)
+          QuestionnaireValidationErrorMessageDialogFragment()
+            .show(
+              requireActivity().supportFragmentManager,
+              "QuestionnaireValidationErrorMessageDialogFragment"
+            )
+        }
+      }
     }
     val questionnaireItemEditAdapter =
       QuestionnaireItemEditAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
