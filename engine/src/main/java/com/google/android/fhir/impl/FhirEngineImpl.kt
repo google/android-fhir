@@ -89,10 +89,11 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   ) {
     try {
       download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
-        }
-      )
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType) =
+              database.lastUpdate(type)
+          }
+        )
         .collect { resources ->
           database.withTransaction {
             val resolved =
@@ -105,7 +106,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
             saveResolvedResourcesToDatabase(resolved)
           }
         }
-    } catch (exception: Exception){
+    } catch (exception: Exception) {
       Timber.e(exception, "Sync download failed")
     }
   }
@@ -119,9 +120,11 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   private suspend fun saveRemoteResourcesToDatabase(resources: List<Resource>) {
     val timeStamps =
-      resources.groupBy { it.resourceType }.entries.map {
-        SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
-      }
+      resources
+        .groupBy { it.resourceType }
+        .entries.map {
+          SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+        }
     database.insertSyncedResources(timeStamps, resources)
   }
 
@@ -211,7 +214,8 @@ internal class FhirEngineImpl(private val database: Database, private val contex
    */
   private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
     get() =
-      location?.split("/")?.takeIf { it.size > 3 }?.let {
-        it[it.size - 3] to ResourceType.fromCode(it[it.size - 4])
-      }
+      location
+        ?.split("/")
+        ?.takeIf { it.size > 3 }
+        ?.let { it[it.size - 3] to ResourceType.fromCode(it[it.size - 4]) }
 }
