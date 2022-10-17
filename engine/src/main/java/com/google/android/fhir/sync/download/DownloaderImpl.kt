@@ -21,10 +21,10 @@ import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.Downloader
+import com.google.android.fhir.sync.ResourceSyncException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.ResourceType
-import timber.log.Timber
 
 /**
  * Implementation of the [Downloader]. It orchestrates the pre & post processing of resources via
@@ -53,7 +53,7 @@ internal class DownloaderImpl(
           )
         )
       } catch (exception: Exception) {
-        Timber.e(exception, "Resource type $resourceTypeToDownload failed to sync")
+        emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
       }
 
       url = downloadWorkManager.getNextRequestUrl(context)
