@@ -19,8 +19,10 @@ package com.google.android.fhir.db.impl
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
+import androidx.sqlite.db.SupportSQLiteDatabase
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.DatabaseErrorStrategy
 import com.google.android.fhir.db.ResourceNotFoundException
@@ -79,8 +81,32 @@ internal class DatabaseImpl(
             Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
           enableEncryption ->
             Room.databaseBuilder(context, ResourceDatabase::class.java, ENCRYPTED_DATABASE_NAME)
-          else ->
+          else -> {
+            val dbCallBack =
+              object : RoomDatabase.Callback() {
+                override fun onCreate(db: SupportSQLiteDatabase) {
+                  super.onCreate(db)
+                  db.execSQL(
+                    """
+                    create table "Test" (
+                      "rowId" integer primary key autoincrement not null,
+                      "id" text unique not null,
+                      "text1" text not null,
+                      "searchText" text not null
+                    )
+                  """.trimIndent()
+                  )
+
+                  db.execSQL(
+                    """
+                        create virtual table "Demo" using spellfix1
+                  """.trimIndent()
+                  )
+                }
+              }
             Room.databaseBuilder(context, ResourceDatabase::class.java, UNENCRYPTED_DATABASE_NAME)
+              .addCallback(dbCallBack)
+          }
         }
         .apply {
           // Provide the SupportSQLiteOpenHelper which enables the encryption.
@@ -145,8 +171,7 @@ internal class DatabaseImpl(
         iParser.parseResource(it)
       }
         ?: throw ResourceNotFoundException(type.name, id)
-    } as
-      Resource
+    } as Resource
   }
 
   override suspend fun lastUpdate(resourceType: ResourceType): String? {
@@ -202,9 +227,12 @@ internal class DatabaseImpl(
    */
   override suspend fun getAllLocalChanges(): List<SquashedLocalChange> {
     return db.withTransaction {
-      localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
-        SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
-      }
+      localChangeDao
+        .getAllLocalChanges()
+        .groupBy { it.resourceId to it.resourceType }
+        .values.map {
+          SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
+        }
     }
   }
 
