@@ -87,14 +87,13 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     conflictResolver: ConflictResolver,
     download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
   ) {
-    try {
-      download(
-          object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) =
-              database.lastUpdate(type)
-          }
-        )
-        .collect { resources ->
+    download(
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
+        }
+      )
+      .collect { resources ->
+        try {
           database.withTransaction {
             val resolved =
               resolveConflictingResources(
@@ -105,10 +104,10 @@ internal class FhirEngineImpl(private val database: Database, private val contex
             saveRemoteResourcesToDatabase(resources)
             saveResolvedResourcesToDatabase(resolved)
           }
+        } catch (exception: Exception) {
+          Timber.e(exception, "Save remote and resolved conflicting resources to database failed")
         }
-    } catch (exception: Exception) {
-      Timber.e(exception, "Sync download failed")
-    }
+      }
   }
 
   private suspend fun saveResolvedResourcesToDatabase(resolved: List<Resource>?) {
