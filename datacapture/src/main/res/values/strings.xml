@@ -13,6 +13,9 @@
     <string
         name="max_value_validation_error_msg"
     >Maximum value allowed is:<xliff:g id="max_value">%1$s</xliff:g> </string>
+    <string
+        name="number_format_validation_error_msg"
+    >Only use (.) between two numbers. Other special characters are not supported.</string>
     <string name="submit_button_text">Submit</string>
     <string name="button_pagination_next">Next</string>
     <string name="button_pagination_previous">Previous</string>
