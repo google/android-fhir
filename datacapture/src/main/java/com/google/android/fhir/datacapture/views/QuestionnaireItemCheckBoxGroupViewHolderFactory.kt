@@ -121,11 +121,12 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
             setOnClickListener {
               when (isChecked) {
                 true -> {
-                  questionnaireItemViewItem.addAnswer(
+                  val newAnswers = questionnaireItemViewItem.answers.toMutableList()
+                  newAnswers +=
                     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                       value = answerOption.value
                     }
-                  )
+
                   if (answerOption.optionExclusive) {
                     // if this answer option has optionExclusive extension, then deselect other
                     // answer options.
@@ -135,11 +136,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
                         continue
                       }
                       (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
-                      questionnaireItemViewItem.removeAnswer(
-                        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                          value = questionnaireItemViewItem.answerOption[i].value
-                        }
-                      )
+                      newAnswers.removeIf { it.value.equalsDeep(questionnaireItemViewItem.answerOption[i].value) }
                     }
                   } else {
                     // deselect optionExclusive answer option.
@@ -148,13 +145,10 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
                         continue
                       }
                       (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
-                      questionnaireItemViewItem.removeAnswer(
-                        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                          value = questionnaireItemViewItem.answerOption[i].value
-                        }
-                      )
+                      newAnswers.removeIf { it.value.equalsDeep(questionnaireItemViewItem.answerOption[i].value) }
                     }
                   }
+                  questionnaireItemViewItem.setAnswer(*newAnswers.toTypedArray())
                 }
                 false -> {
                   questionnaireItemViewItem.removeAnswer(

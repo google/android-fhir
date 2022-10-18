@@ -202,6 +202,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
 
   @Test
   fun click_shouldAddQuestionnaireResponseItemAnswer() {
+    var answerHolder : List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -218,18 +219,19 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
     checkBox.performClick()
 
-    assertThat(questionnaireItemViewItem.answers.single().valueCoding.display).isEqualTo("Coding 1")
+    assertThat(answerHolder!!.single().valueCoding.display).isEqualTo("Coding 1")
   }
 
   @Test
   fun optionExclusiveAnswerOption_click_deselectsOtherAnswerOptions() {
+    var answerHolder : List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -256,19 +258,19 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     (checkBoxGroup.getChildAt(2) as CheckBox).performClick()
     (checkBoxGroup.getChildAt(1) as CheckBox).performClick()
 
-    assertThat(questionnaireItemViewItem.answers.single().valueCoding.display)
-      .isEqualTo("display-1")
+    assertThat(answerHolder!!.single().valueCoding.display).isEqualTo("display-1")
   }
 
   @Test
   fun answerOption_click_deselectsOptionExclusiveAnswerOption() {
+    var answerHolder : List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -295,7 +297,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
 
     viewHolder.bind(questionnaireItemViewItem)
@@ -303,12 +305,12 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
     (checkBoxGroup.getChildAt(1) as CheckBox).performClick()
     (checkBoxGroup.getChildAt(2) as CheckBox).performClick()
 
-    assertThat(questionnaireItemViewItem.answers.single().valueCoding.display)
-      .isEqualTo("display-2")
+    assertThat(answerHolder!!.single().valueCoding.display).isEqualTo("display-2")
   }
 
   @Test
   fun click_shouldRemoveQuestionnaireResponseItemAnswer() {
+    var answerHolder : List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -342,14 +344,14 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           }
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
     checkBox.performClick()
 
-    assertThat(questionnaireItemViewItem.answers).isEmpty()
+    assertThat(answerHolder).isEmpty()
   }
 
   @Test
