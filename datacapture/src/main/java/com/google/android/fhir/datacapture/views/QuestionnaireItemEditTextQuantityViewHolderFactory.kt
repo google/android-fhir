@@ -55,7 +55,7 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
                       this.system = initial.system
                     }
                   }
-                else Quantity().apply { this.value = BigDecimal(text) }
+                else Quantity().apply { this.value = value }
               }
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(quantity)
           } catch (exception: NumberFormatException) {
