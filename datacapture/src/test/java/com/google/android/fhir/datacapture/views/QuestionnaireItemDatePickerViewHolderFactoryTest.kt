@@ -145,7 +145,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
   @Test
   fun `parse date text input in US locale`() {
     setLocale(Locale.US)
-    var answers : List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val item =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -167,7 +167,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
   @Test
   fun `parse date text input in Japan locale`() {
     setLocale(Locale.JAPAN)
-    var answers : List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val item =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -187,7 +187,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
   @Test
   fun `clear the answer if date input is invalid`() {
     setLocale(Locale.US)
-    var answers : List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),

@@ -173,7 +173,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
 
   @Test
   fun click_shouldSetAnswerTrue() {
-    var answerHolder : List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -189,7 +189,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
 
   @Test
   fun click_shouldSetAnswerFalse() {
-    var answerHolder : List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -205,7 +205,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
 
   @Test
   fun yesSelected_clickYes_shouldClearAnswer() {
-    var answerHolder : List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -251,7 +251,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
 
   @Test
   fun noSelected_clickNo_shouldClearAnswer() {
-    var answerHolder : List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },

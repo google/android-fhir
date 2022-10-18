@@ -199,7 +199,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
 
   @Test
   fun click_shouldSetQuestionnaireResponseItemAnswer() {
-    var answerHolder : List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {

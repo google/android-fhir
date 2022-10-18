@@ -202,7 +202,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
 
   @Test
   fun click_shouldAddQuestionnaireResponseItemAnswer() {
-    var answerHolder : List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -231,7 +231,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
 
   @Test
   fun optionExclusiveAnswerOption_click_deselectsOtherAnswerOptions() {
-    var answerHolder : List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -270,7 +270,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
 
   @Test
   fun answerOption_click_deselectsOptionExclusiveAnswerOption() {
-    var answerHolder : List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -310,7 +310,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
 
   @Test
   fun click_shouldRemoveQuestionnaireResponseItemAnswer() {
-    var answerHolder : List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {

@@ -71,8 +71,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
             flow.setWrapMode(Flow.WRAP_NONE)
           }
         }
-        questionnaireItemViewItem
-          .answerOption
+        questionnaireItemViewItem.answerOption
           .map { answerOption -> View.generateViewId() to answerOption }
           .onEach { populateViewWithAnswerOption(it.first, it.second, choiceOrientation) }
           .map { it.first }
@@ -81,7 +80,8 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
-          is NotValidated, Valid -> error.visibility = View.GONE
+          is NotValidated,
+          Valid -> error.visibility = View.GONE
           is Invalid -> {
             error.text = validationResult.getSingleStringValidationMessage()
             error.visibility = View.VISIBLE
@@ -136,7 +136,9 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
                         continue
                       }
                       (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
-                      newAnswers.removeIf { it.value.equalsDeep(questionnaireItemViewItem.answerOption[i].value) }
+                      newAnswers.removeIf {
+                        it.value.equalsDeep(questionnaireItemViewItem.answerOption[i].value)
+                      }
                     }
                   } else {
                     // deselect optionExclusive answer option.
@@ -145,7 +147,9 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
                         continue
                       }
                       (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
-                      newAnswers.removeIf { it.value.equalsDeep(questionnaireItemViewItem.answerOption[i].value) }
+                      newAnswers.removeIf {
+                        it.value.equalsDeep(questionnaireItemViewItem.answerOption[i].value)
+                      }
                     }
                   }
                   questionnaireItemViewItem.setAnswer(*newAnswers.toTypedArray())
