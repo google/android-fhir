@@ -43,7 +43,6 @@ import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.StringSubject
 import com.google.common.truth.Truth.assertThat
-import org.hamcrest.Matchers.not
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
@@ -254,7 +253,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun addAnotherAnswer_selectOther_shouldShowAddAnotherAnswer() {
+  fun selectOther_shouldScrollDownToShowAddAnotherAnswer() {
     val questionnaireItem =
       answerOptions(
         true,
@@ -286,7 +285,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun addAnotherAnswer_unselectOther_shouldNotShowAddAnotherAnswer() {
+  fun unselectOther_shouldHideAddAnotherAnswer() {
     val questionnaireItem =
       answerOptions(
         true,
@@ -319,7 +318,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun addAnotherAnswer_performClick_addAnotherAnswerShouldBeVisible() {
+  fun clickAddAnotherAnswer_shouldScrollDownToShowAddAnotherAnswer() {
     val questionnaireItem =
       answerOptions(
         true,
@@ -368,21 +367,9 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     )
 
   private val openChoiceType =
-    Extension()
-      .apply {
-        url = EXTENSION_ITEM_CONTROL_URL
-        setValue(
-          CodeableConcept()
-            .addCoding(
-              Coding()
-                .setCode(ItemControlTypes.OPEN_CHOICE.extensionCode)
-                .setDisplay("Open Choice")
-                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-            )
-        )
-      }
-      .setUrl(EXTENSION_ITEM_CONTROL_URL)
-      .setValue(
+    Extension().apply {
+      url = EXTENSION_ITEM_CONTROL_URL
+      setValue(
         CodeableConcept()
           .addCoding(
             Coding()
@@ -391,6 +378,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
               .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
           )
       )
+    }
 
   internal companion object {
     private fun answerOptions(multiSelect: Boolean, vararg options: String) =
