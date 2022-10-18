@@ -29,7 +29,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.utilities.calculatePercent
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import org.hl7.fhir.r4.model.Questionnaire
@@ -128,7 +127,7 @@ open class QuestionnaireFragment : Fragment() {
           paginationNextButton.visibility = View.VISIBLE
           paginationNextButton.isEnabled = state.pagination.hasNextPage
           questionnaireProgressIndicator.updateProgressIndicator(
-            calculatePercent(
+            calculateProgressPercentage(
               count =
                 (state.pagination.currentPageIndex +
                   1), // incremented by 1 due to initialPageIndex starts with 0.
@@ -144,7 +143,7 @@ open class QuestionnaireFragment : Fragment() {
               override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 questionnaireProgressIndicator.updateProgressIndicator(
-                  calculatePercent(
+                  calculateProgressPercentage(
                     count =
                       (linearLayoutManager.findLastVisibleItemPosition() +
                         1), // incremented by 1 due to findLastVisiblePosition() starts with 0.
@@ -162,6 +161,11 @@ open class QuestionnaireFragment : Fragment() {
         submitButton.visibility = if (state.pagination.showSubmitButton) View.VISIBLE else View.GONE
       }
     }
+  }
+
+  /** Calculates the progress percentage from given [count] and [totalCount] values. */
+  internal fun calculateProgressPercentage(count: Int, totalCount: Int): Int {
+    return if (totalCount == 0) 0 else (count * 100 / totalCount)
   }
 
   /**
