@@ -268,6 +268,7 @@ open class QuestionnaireFragment : Fragment() {
     val matches: (Questionnaire.QuestionnaireItemComponent) -> Boolean,
   )
 }
+
 /**
  * Updates the [LinearProgressIndicator] progress with given value.
  *
