@@ -19,10 +19,14 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.DisplayItemControlType
@@ -251,7 +255,18 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
   @Test
   fun addAnotherAnswer_selectOther_shouldShowAddAnotherAnswer() {
-    val questionnaireItem = answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4")
+    val questionnaireItem =
+      answerOptions(
+        true,
+        "Coding 1",
+        "Coding 2",
+        "Coding 3",
+        "Coding 4",
+        "Coding 5",
+        "Coding 6",
+        "Coding 7",
+        "Coding 8"
+      )
     questionnaireItem.addExtension(openChoiceType)
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -264,14 +279,26 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
     endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
+    onView(withId(R.id.recycler_view))
+      .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(8))
     clickOnTextInDialog("Other")
-    onView(ViewMatchers.withId(R.id.add_another))
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+    onView(withId(R.id.add_another)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
   }
 
   @Test
   fun addAnotherAnswer_unselectOther_shouldNotShowAddAnotherAnswer() {
-    val questionnaireItem = answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4")
+    val questionnaireItem =
+      answerOptions(
+        true,
+        "Coding 1",
+        "Coding 2",
+        "Coding 3",
+        "Coding 4",
+        "Coding 5",
+        "Coding 6",
+        "Coding 7",
+        "Coding 8"
+      )
     questionnaireItem.addExtension(openChoiceType)
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -284,9 +311,44 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
     endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
+    onView(withId(R.id.recycler_view))
+      .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(8))
     clickOnTextInDialog("Other")
     clickOnTextInDialog("Other")
     onView(ViewMatchers.withId(R.id.add_another)).check(doesNotExist())
+  }
+
+  @Test
+  fun addAnotherAnswer_performClick_addAnotherAnswerShouldBeVisible() {
+    val questionnaireItem =
+      answerOptions(
+        true,
+        "Coding 1",
+        "Coding 2",
+        "Coding 3",
+        "Coding 4",
+        "Coding 5",
+        "Coding 6",
+        "Coding 7",
+        "Coding 8"
+      )
+    questionnaireItem.addExtension(openChoiceType)
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        questionnaireItem,
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
+    onView(withId(R.id.recycler_view))
+      .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(8))
+    clickOnTextInDialog("Other")
+    onView(withId(R.id.add_another)).perform(click())
+    onView(withId(R.id.add_another)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
   }
 
   /** Method to run code snippet on UI/main thread */
