@@ -117,6 +117,9 @@
         </item>
         <item name="questionnaireValidationDialogButtonStyle">
             @style/Widget.Material3.Button.TextButton.Dialog
+        <item
+            name="questionnaireLinearProgressIndicatorStyle"
+        >@style/Widget.Material3.LinearProgressIndicator
         </item>
     </style>
 

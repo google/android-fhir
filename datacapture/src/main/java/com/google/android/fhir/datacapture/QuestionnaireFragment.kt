@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import org.hl7.fhir.r4.model.Questionnaire
 
 /**
@@ -93,6 +94,8 @@ open class QuestionnaireFragment : Fragment() {
         }
       }
     }
+    val questionnaireProgressIndicator: LinearProgressIndicator =
+      view.findViewById(R.id.questionnaire_progress_indicator)
     val questionnaireItemEditAdapter =
       QuestionnaireItemEditAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
     val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
@@ -110,7 +113,8 @@ open class QuestionnaireFragment : Fragment() {
     reviewModeButton.setOnClickListener { viewModel.setReviewMode(true) }
 
     questionnaireEditRecyclerView.adapter = questionnaireItemEditAdapter
-    questionnaireEditRecyclerView.layoutManager = LinearLayoutManager(view.context)
+    val linearLayoutManager = LinearLayoutManager(view.context)
+    questionnaireEditRecyclerView.layoutManager = linearLayoutManager
     // Animation does work well with views that could gain focus
     questionnaireEditRecyclerView.itemAnimator = null
 
@@ -125,11 +129,13 @@ open class QuestionnaireFragment : Fragment() {
           questionnaireReviewRecyclerView.visibility = View.VISIBLE
           questionnaireEditRecyclerView.visibility = View.GONE
           reviewModeEditButton.visibility = View.VISIBLE
+          questionnaireProgressIndicator.visibility = View.GONE
         } else {
           questionnaireItemEditAdapter.submitList(state.items)
           questionnaireEditRecyclerView.visibility = View.VISIBLE
           questionnaireReviewRecyclerView.visibility = View.GONE
           reviewModeEditButton.visibility = View.GONE
+          questionnaireProgressIndicator.visibility = View.VISIBLE
         }
 
         if (state.pagination.isPaginated && !state.reviewMode) {
@@ -137,9 +143,33 @@ open class QuestionnaireFragment : Fragment() {
           paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage
           paginationNextButton.visibility = View.VISIBLE
           paginationNextButton.isEnabled = state.pagination.hasNextPage
+          questionnaireProgressIndicator.updateProgressIndicator(
+            calculateProgressPercentage(
+              count =
+                (state.pagination.currentPageIndex +
+                  1), // incremented by 1 due to initialPageIndex starts with 0.
+              totalCount = state.pagination.pages.size
+            )
+          )
         } else {
           paginationPreviousButton.visibility = View.GONE
           paginationNextButton.visibility = View.GONE
+
+          questionnaireEditRecyclerView.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+              override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                questionnaireProgressIndicator.updateProgressIndicator(
+                  calculateProgressPercentage(
+                    count =
+                      (linearLayoutManager.findLastVisibleItemPosition() +
+                        1), // incremented by 1 due to findLastVisiblePosition() starts with 0.
+                    totalCount = linearLayoutManager.itemCount
+                  )
+                )
+              }
+            }
+          )
         }
 
         reviewModeButton.visibility =
@@ -148,6 +178,11 @@ open class QuestionnaireFragment : Fragment() {
         submitButton.visibility = if (state.pagination.showSubmitButton) View.VISIBLE else View.GONE
       }
     }
+  }
+
+  /** Calculates the progress percentage from given [count] and [totalCount] values. */
+  internal fun calculateProgressPercentage(count: Int, totalCount: Int): Int {
+    return if (totalCount == 0) 0 else (count * 100 / totalCount)
   }
 
   /**
@@ -249,4 +284,16 @@ open class QuestionnaireFragment : Fragment() {
      */
     val matches: (Questionnaire.QuestionnaireItemComponent) -> Boolean,
   )
+}
+
+/**
+ * Updates the [LinearProgressIndicator] progress with given value.
+ *
+ * This method will also set max value of [LinearProgressIndicator] to 100.
+ *
+ * @param progress The new progress [Integer] value between 0 to 100.
+ */
+internal fun LinearProgressIndicator.updateProgressIndicator(progress: Int) {
+  setProgress(progress)
+  max = 100
 }
