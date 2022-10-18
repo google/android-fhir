@@ -171,15 +171,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
       private fun updateAnswer(text: CharSequence?) {
         if (text == null || text.isNullOrEmpty()) {
-          displayValidationResult(
-            Invalid(
-              listOf(
-                textInputEditText.context.getString(
-                  R.string.required_constraint_validation_error_msg
-                )
-              )
-            )
-          )
+          questionnaireItemViewItem.clearAnswer()
           return
         }
         try {

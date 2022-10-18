@@ -145,15 +145,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         textWatcher =
           dateInputEditText.doAfterTextChanged { text ->
             if (text == null || text.isNullOrEmpty()) {
-              displayDateValidationError(
-                Invalid(
-                  listOf(
-                    dateInputEditText.context.getString(
-                      R.string.required_constraint_validation_error_msg
-                    )
-                  )
-                )
-              )
+              questionnaireItemViewItem.clearAnswer()
               return@doAfterTextChanged
             }
             try {
@@ -162,18 +154,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               generateLocalDateTime(localDate, localTime)?.run {
                 updateDateTimeInput(this)
                 updateDateTimeAnswer(this)
-              }
-              displayDateValidationError(Valid)
-              if (localTime == null && questionnaireItemViewItem.questionnaireItem.required) {
-                displayTimeValidationError(
-                  Invalid(
-                    listOf(
-                      dateInputEditText.context.getString(
-                        R.string.required_constraint_validation_error_msg
-                      )
-                    )
-                  )
-                )
               }
             } catch (e: ParseException) {
               displayDateValidationError(
