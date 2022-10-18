@@ -23,9 +23,7 @@ import android.widget.TextView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.RootMatchers.isDialog
-import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -88,19 +86,18 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
     }
 
     onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
-    onView(allOf(withText("Nov 19, 2020")))
-      .inRoot(RootMatchers.isDialog())
-      .check(matches(ViewMatchers.isDisplayed()))
+    onView(allOf(withText("Nov 19, 2020"))).inRoot(isDialog()).check(matches(isDisplayed()))
   }
 
   @Test
   fun shouldSetDateInput() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemView =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -113,12 +110,12 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
 
     val today = DateTimeType.today().valueAsString
 
-    assertThat(questionnaireItemView.answers.singleOrNull()?.valueDateType?.valueAsString)
-      .isEqualTo(today)
+    assertThat(answerHolder!!.single().valueDateType?.valueAsString).isEqualTo(today)
   }
 
   @Test
   fun shouldSetDateInput_withinRange() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemView =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -135,7 +132,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -154,13 +151,13 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         viewHolder.itemView.context
       )
 
-    assertThat(questionnaireItemView.answers.singleOrNull()?.valueDateType?.valueAsString)
-      .isEqualTo(today)
+    assertThat(answerHolder!!.single().valueDateType?.valueAsString).isEqualTo(today)
     assertThat(validationResult).isEqualTo(Valid)
   }
 
   @Test
   fun shouldNotSetDateInput_outsideMaxRange() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val maxDate = DateType(Date()).apply { add(Calendar.YEAR, -2) }
     val questionnaireItemView =
       QuestionnaireItemViewItem(
@@ -177,7 +174,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -192,7 +189,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
     val validationResult =
       QuestionnaireResponseItemValidator.validate(
         questionnaireItemView.questionnaireItem,
-        questionnaireItemView.answers,
+        answerHolder!!,
         viewHolder.itemView.context
       )
 
@@ -202,6 +199,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
 
   @Test
   fun shouldNotSetDateInput_outsideMinRange() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val minDate = DateType(Date()).apply { add(Calendar.YEAR, 1) }
     val questionnaireItemView =
       QuestionnaireItemViewItem(
@@ -218,7 +216,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -233,7 +231,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
     val validationResult =
       QuestionnaireResponseItemValidator.validate(
         questionnaireItemView.questionnaireItem,
-        questionnaireItemView.answers,
+        answerHolder!!,
         viewHolder.itemView.context
       )
 
