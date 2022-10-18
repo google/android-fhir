@@ -114,7 +114,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 with(LocalTime.of(this.hour, this.minute, 0)) {
                   localTime = this
                   timeInputEditText.setText(this.toLocalizedString(context))
-                  displayTimeValidationError(Valid)
                   generateLocalDateTime(localDate, this)?.let {
                     updateDateTimeInput(it)
                     updateDateTimeAnswer(it)
