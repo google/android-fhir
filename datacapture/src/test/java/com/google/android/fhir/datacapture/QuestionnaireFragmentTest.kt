@@ -22,6 +22,7 @@ import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.fragment.app.testing.withFragment
 import androidx.lifecycle.Lifecycle
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
@@ -33,6 +34,8 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class QuestionnaireFragmentTest {
+
+  private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
   @Test
   fun `fragment should have valid questionnaire response`() {
@@ -46,8 +49,7 @@ class QuestionnaireFragmentTest {
           }
         )
       }
-    val questionnaireJson =
-      FhirContext.forR4().newJsonParser().encodeResourceToString(questionnaire)
+    val questionnaireJson = parser.encodeResourceToString(questionnaire)
     val scenario =
       launchFragmentInContainer<QuestionnaireFragment>(
         bundleOf(EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson)
@@ -56,6 +58,34 @@ class QuestionnaireFragmentTest {
     scenario.withFragment {
       assertThat(this.getQuestionnaireResponse()).isNotNull()
       assertThat(this.getQuestionnaireResponse().item.any { it.linkId == "a-link-id" }).isTrue()
+    }
+  }
+
+  @Test
+  fun `calculateProgressPercentage should return zero for totalCount value zero`() {
+    val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
+    val questionnaireJson = parser.encodeResourceToString(questionnaire)
+    val scenario =
+      launchFragmentInContainer<QuestionnaireFragment>(
+        bundleOf(EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson)
+      )
+    scenario.moveToState(Lifecycle.State.RESUMED)
+    scenario.withFragment {
+      assertThat(calculateProgressPercentage(count = 10, totalCount = 0)).isEqualTo(0)
+    }
+  }
+
+  @Test
+  fun `calculateProgressPercentage should return valid percentage result`() {
+    val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
+    val questionnaireJson = parser.encodeResourceToString(questionnaire)
+    val scenario =
+      launchFragmentInContainer<QuestionnaireFragment>(
+        bundleOf(EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson)
+      )
+    scenario.moveToState(Lifecycle.State.RESUMED)
+    scenario.withFragment {
+      assertThat(calculateProgressPercentage(count = 10, totalCount = 50)).isEqualTo(20)
     }
   }
 }
