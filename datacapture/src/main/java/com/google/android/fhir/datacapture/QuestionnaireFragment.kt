@@ -29,6 +29,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.utilities.calculatePercent
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import org.hl7.fhir.r4.model.Questionnaire
@@ -43,8 +44,6 @@ import org.hl7.fhir.r4.model.Questionnaire
  */
 open class QuestionnaireFragment : Fragment() {
   private val viewModel: QuestionnaireViewModel by viewModels()
-
-  private lateinit var questionnaireProgressIndicator: LinearProgressIndicator
 
   /** @suppress */
   override fun onCreateView(
@@ -79,7 +78,8 @@ open class QuestionnaireFragment : Fragment() {
     requireView().findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
       setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
     }
-    questionnaireProgressIndicator = view.findViewById(R.id.questionnaire_progress_indicator)
+    val questionnaireProgressIndicator: LinearProgressIndicator =
+      view.findViewById(R.id.questionnaire_progress_indicator)
     val questionnaireItemEditAdapter =
       QuestionnaireItemEditAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
     val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
@@ -127,10 +127,13 @@ open class QuestionnaireFragment : Fragment() {
           paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage
           paginationNextButton.visibility = View.VISIBLE
           paginationNextButton.isEnabled = state.pagination.hasNextPage
-          updateQuestionnaireProgressIndicator(
-            (state.pagination.currentPageIndex +
-              1), // incremented by 1 due to initialPageIndex starts with 0.
-            state.pagination.pages.size
+          questionnaireProgressIndicator.updateProgressIndicator(
+            calculatePercent(
+              count =
+                (state.pagination.currentPageIndex +
+                  1), // incremented by 1 due to initialPageIndex starts with 0.
+              totalCount = state.pagination.pages.size
+            )
           )
         } else {
           paginationPreviousButton.visibility = View.GONE
@@ -140,10 +143,13 @@ open class QuestionnaireFragment : Fragment() {
             object : RecyclerView.OnScrollListener() {
               override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                updateQuestionnaireProgressIndicator(
-                  (linearLayoutManager.findLastVisibleItemPosition() +
-                    1), // incremented by 1 due to findLastVisiblePosition() starts with 0.
-                  linearLayoutManager.itemCount
+                questionnaireProgressIndicator.updateProgressIndicator(
+                  calculatePercent(
+                    count =
+                      (linearLayoutManager.findLastVisibleItemPosition() +
+                        1), // incremented by 1 due to findLastVisiblePosition() starts with 0.
+                    totalCount = linearLayoutManager.itemCount
+                  )
                 )
               }
             }
@@ -155,14 +161,6 @@ open class QuestionnaireFragment : Fragment() {
 
         submitButton.visibility = if (state.pagination.showSubmitButton) View.VISIBLE else View.GONE
       }
-    }
-  }
-
-  /** Updates the progress indicator with given progress and max values. */
-  private fun updateQuestionnaireProgressIndicator(progress: Int, max: Int) {
-    questionnaireProgressIndicator.apply {
-      setProgress(progress)
-      setMax(max)
     }
   }
 
@@ -265,4 +263,15 @@ open class QuestionnaireFragment : Fragment() {
      */
     val matches: (Questionnaire.QuestionnaireItemComponent) -> Boolean,
   )
+}
+/**
+ * Updates the [LinearProgressIndicator] progress with given value.
+ *
+ * This method will also set max value of [LinearProgressIndicator] to 100.
+ *
+ * @param progress The new progress [Integer] value between 0 to 100.
+ */
+internal fun LinearProgressIndicator.updateProgressIndicator(progress: Int) {
+  setProgress(progress)
+  max = 100
 }
