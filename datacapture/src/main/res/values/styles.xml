@@ -76,7 +76,7 @@
         >@style/TextAppearance.Material3.BodyLarge</item>
         <item
             name="questionnaireChipStyle"
-        >@style/Widget.MaterialComponents.Chip.Entry</item>
+        >@style/Widget.Material3.Chip.Input</item>
         <item name="questionnaireButtonStyle">@style/Widget.Material3.Button
         </item>
         <item name="questionnaireErrorTextStyle">
@@ -108,6 +108,10 @@
         <item
             name="questionnaireAddAnotherAnswerButtonStyle"
         >@style/Widget.Material3.Button
+        </item>
+        <item
+            name="questionnaireLinearProgressIndicatorStyle"
+        >@style/Widget.Material3.LinearProgressIndicator
         </item>
     </style>
 
