@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture
 import android.os.Build
 import com.google.android.fhir.datacapture.mapping.ITEM_INITIAL_EXPRESSION_URL
 import com.google.common.truth.Truth.assertThat
+import java.math.BigDecimal
 import java.util.Locale
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
@@ -27,7 +28,9 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions
@@ -1062,6 +1065,115 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun `calculatedExpression should return expression for valid extension url`() {
+    val item =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          EXTENSION_CALCULATED_EXPRESSION_URL,
+          Expression().apply {
+            this.expression = "today()"
+            this.language = "text/fhirpath"
+          }
+        )
+      }
+    assertThat(item.calculatedExpression).isNotNull()
+    assertThat(item.calculatedExpression!!.expression).isEqualTo("today()")
+  }
+
+  @Test
+  fun `calculatedExpression should return null for other extension url`() {
+    val item =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          ITEM_INITIAL_EXPRESSION_URL,
+          Expression().apply {
+            this.expression = "today()"
+            this.language = "text/fhirpath"
+          }
+        )
+      }
+    assertThat(item.calculatedExpression).isNull()
+  }
+
+  @Test
+  fun `expressionBasedExtensions should return all extension of type expression`() {
+    val item =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_HIDDEN_URL, BooleanType(true))
+        addExtension(
+          EXTENSION_CALCULATED_EXPRESSION_URL,
+          Expression().apply {
+            this.expression = "today()"
+            this.language = "text/fhirpath"
+          }
+        )
+        addExtension(
+          EXTENSION_ENABLE_WHEN_EXPRESSION_URL,
+          Expression().apply {
+            this.expression = "%resource.status == 'draft'"
+            this.language = "text/fhirpath"
+          }
+        )
+      }
+
+    val result = item.expressionBasedExtensions
+
+    assertThat(result.count()).isEqualTo(2)
+    assertThat(result.first().url).isEqualTo(EXTENSION_CALCULATED_EXPRESSION_URL)
+    assertThat(result.last().url).isEqualTo(EXTENSION_ENABLE_WHEN_EXPRESSION_URL)
+  }
+
+  @Test
+  fun `isReferencedBy should return true`() {
+    val item1 =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "A"
+        addExtension(
+          EXTENSION_CALCULATED_EXPRESSION_URL,
+          Expression().apply {
+            this.expression = "%resource.item.where(linkId='B')"
+            this.language = "text/fhirpath"
+          }
+        )
+      }
+    val item2 = Questionnaire.QuestionnaireItemComponent().apply { linkId = "B" }
+    assertThat(item2.isReferencedBy(item1)).isTrue()
+  }
+
+  @Test
+  fun `isReferencedBy should return false`() {
+    val item1 =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "A"
+        addExtension(
+          EXTENSION_CALCULATED_EXPRESSION_URL,
+          Expression().apply {
+            this.expression = "%resource.item.where(answer.value.empty())"
+            this.language = "text/fhirpath"
+          }
+        )
+      }
+    val item2 = Questionnaire.QuestionnaireItemComponent().apply { linkId = "B" }
+    assertThat(item2.isReferencedBy(item1)).isFalse()
+  }
+
+  @Test
+  fun `flattened should return linear list`() {
+    val items =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "A" },
+        Questionnaire.QuestionnaireItemComponent()
+          .apply { linkId = "B" }
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent()
+              .apply { linkId = "C" }
+              .addItem(Questionnaire.QuestionnaireItemComponent().apply { linkId = "D" })
+          )
+      )
+    assertThat(items.flattened().map { it.linkId }).containsExactly("A", "B", "C", "D")
+  }
+
+  @Test
   fun localizedFlyoverSpanned_matchingLocale_shouldReturnFlyover() {
     val questionItemList =
       listOf(
@@ -1253,6 +1365,62 @@ class MoreQuestionnaireItemComponentsTest {
         (questionResponse.item[0].answer[0].item[0].answer[0].value as BooleanType).booleanValue()
       )
       .isEqualTo(true)
+  }
+
+  @Test
+  fun `createQuestionResponse should not set answer for quantity type with missing value`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent(
+          StringType("age"),
+          Enumeration(
+            Questionnaire.QuestionnaireItemTypeEnumFactory(),
+            Questionnaire.QuestionnaireItemType.QUANTITY
+          )
+        )
+        .apply {
+          initial =
+            listOf(
+              Questionnaire.QuestionnaireItemInitialComponent(
+                Quantity().apply {
+                  code = "months"
+                  system = "http://unitofmeausre.org"
+                }
+              )
+            )
+        }
+
+    val questionResponse = question.createQuestionnaireResponseItem()
+
+    assertThat(questionResponse.answer).isEmpty()
+  }
+
+  @Test
+  fun `createQuestionResponse should set answer with quantity type`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent(
+          StringType("age"),
+          Enumeration(
+            Questionnaire.QuestionnaireItemTypeEnumFactory(),
+            Questionnaire.QuestionnaireItemType.QUANTITY
+          )
+        )
+        .apply {
+          initial =
+            listOf(
+              Questionnaire.QuestionnaireItemInitialComponent(
+                Quantity().apply {
+                  code = "months"
+                  system = "http://unitofmeausre.org"
+                  value = BigDecimal("1")
+                }
+              )
+            )
+        }
+
+    val questionResponse = question.createQuestionnaireResponseItem()
+    val answer = questionResponse.answerFirstRep.value as Quantity
+    assertThat(answer.value).isEqualTo(BigDecimal(1))
+    assertThat(answer.code).isEqualTo("months")
   }
 
   @Test
@@ -1493,6 +1661,25 @@ class MoreQuestionnaireItemComponentsTest {
             "$EXTENSION_CHOICE_COLUMN_URL not applicable for 'choice'. Only type reference is allowed with resource."
           )
       }
+  }
+
+  @Test
+  fun `sliderStepValue should return the integer value in the sliderStepValue extension`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "slider-step-value"
+        addExtension(EXTENSION_SLIDER_STEP_VALUE_URL, IntegerType(10))
+      }
+
+    assertThat(questionnaireItem.sliderStepValue).isEqualTo(10)
+  }
+
+  @Test
+  fun `sliderStepValue should return null if sliderStepValue extension is not present`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply { linkId = "slider-step-value" }
+
+    assertThat(questionnaireItem.sliderStepValue).isNull()
   }
 
   private val displayCategoryExtensionWithInstructionsCode =

@@ -69,6 +69,26 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
   }
 
   @Test
+  fun `should set text field empty when date field is initialized but answer date value is null`() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(DateType())
+          ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
+      )
+      .isEqualTo("")
+  }
+
+  @Test
   fun shouldSetDateInput_localeUs() {
     setLocale(Locale.US)
     viewHolder.bind(
