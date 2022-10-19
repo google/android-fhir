@@ -1,0 +1,28 @@
+{
+  "resourceType": "CarePlan",
+  "contained": [
+    {
+      "resourceType": "RequestGroup",
+      "id": "1",
+      "status": "draft",
+      "intent": "proposal"
+    }
+  ],
+  "instantiatesCanonical": [
+    "hello-world-patient-view"
+  ],
+  "status": "draft",
+  "subject": {
+    "reference": "helloworld-patient-1"
+  },
+  "encounter": {
+    "reference": "helloworld-patient-1-encounter-1"
+  },
+  "activity": [
+    {
+      "reference": {
+        "reference": "#1"
+      }
+    }
+  ]
+}

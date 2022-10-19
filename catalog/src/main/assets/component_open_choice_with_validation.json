@@ -11,17 +11,35 @@
             "coding": [
               {
                 "system": "http://hl7.org/fhir/questionnaire-item-control",
-                "code": "open-choice",
-                "display": "Open choice"
+                "code": "open-choice"
               }
-            ],
-            "text": "Open choice"
+            ]
           }
         }
       ],
       "linkId": "1",
       "text": "Do you have any pre-existing health conditions?",
       "required": true,
+      "item": [
+        {
+          "linkId": "1.1",
+          "text": "Health conditions",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
       "answerOption": [
         {
           "valueCoding": {
