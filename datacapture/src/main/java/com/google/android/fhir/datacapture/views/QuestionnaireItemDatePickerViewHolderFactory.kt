@@ -64,15 +64,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private var textWatcher: TextWatcher? = null
-      // Medium and long format styles use alphabetical month names which are difficult for the user
-      // to input. Use short format style which is always numerical.
-      private val localePattern =
-        DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-          FormatStyle.SHORT,
-          null,
-          IsoChronology.INSTANCE,
-          Locale.getDefault()
-        )
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
@@ -108,8 +99,9 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
-        textInputLayout.hint = localePattern
+        textInputLayout.hint = localeDatePattern
         textInputEditText.removeTextChangedListener(textWatcher)
+
         if (isTextUpdateRequired(
             textInputEditText.context,
             questionnaireItemViewItem.answers.singleOrNull()?.valueDateType,
@@ -117,7 +109,9 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           )
         ) {
           textInputEditText.setText(
-            questionnaireItemViewItem.answers.singleOrNull()
+            questionnaireItemViewItem.answers
+              .singleOrNull()
+              ?.takeIf { it.hasValue() }
               ?.valueDateType
               ?.localDate
               ?.localizedString
@@ -129,7 +123,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         textInputLayout.error =
           when (validationResult) {
-            is NotValidated, Valid -> null
+            is NotValidated,
+            Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
       }
@@ -141,8 +136,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
       private fun createMaterialDatePicker(): MaterialDatePicker<Long> {
         val selectedDate =
-          questionnaireItemViewItem
-            .answers
+          questionnaireItemViewItem.answers
             .singleOrNull()
             ?.valueDateType
             ?.localDate
@@ -176,6 +170,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       }
 
       private fun updateAnswer(text: CharSequence?) {
+        if (text == null || text.isNullOrEmpty()) {
+          questionnaireItemViewItem.clearAnswer()
+          return
+        }
         try {
           val localDate = parseDate(text, textInputEditText.context.applicationContext)
           questionnaireItemViewItem.setAnswer(
@@ -184,7 +182,20 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             }
           )
         } catch (e: ParseException) {
-          questionnaireItemViewItem.clearAnswer()
+          displayValidationResult(
+            Invalid(
+              listOf(
+                textInputEditText.context.getString(
+                  R.string.date_format_validation_error_msg,
+                  localeDatePattern
+                )
+              )
+            )
+          )
+
+          if (questionnaireItemViewItem.answers.isNotEmpty()) {
+            questionnaireItemViewItem.clearAnswer()
+          }
         }
       }
     }
@@ -200,12 +211,27 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       } catch (e: Exception) {
         null
       }
+    if (inputDate == null || answer == null) {
+      return true
+    }
     return answer?.localDate != inputDate
   }
 }
 
 internal const val TAG = "date-picker"
 internal val ZONE_ID_UTC = ZoneId.of("UTC")
+
+/**
+ * Medium and long format styles use alphabetical month names which are difficult for the user to
+ * input. Use short format style which is always numerical.
+ */
+internal val localeDatePattern =
+  DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+    FormatStyle.SHORT,
+    null,
+    IsoChronology.INSTANCE,
+    Locale.getDefault()
+  )
 
 /**
  * Returns the [AppCompatActivity] if there exists one wrapped inside [ContextThemeWrapper] s, or
@@ -230,11 +256,13 @@ fun Context.tryUnwrapContext(): AppCompatActivity? {
 
 internal val DateType.localDate
   get() =
-    LocalDate.of(
-      year,
-      month + 1,
-      day,
-    )
+    if (!this.hasValue()) null
+    else
+      LocalDate.of(
+        year,
+        month + 1,
+        day,
+      )
 
 internal val LocalDate.dateType
   get() = DateType(year, monthValue - 1, dayOfMonth)
