@@ -36,10 +36,10 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * render the data item in the UI. The view SHOULD NOT mutate the data using these properties.
  *
  * The view should use the following answer APIs to update the answer(s):
- * - [setAnswer] (for single answer only)
+ * - [setAnswer] (for single and repeated answers)
+ * - [clearAnswer] (for single and repeated answers)
  * - [addAnswer] (for repeated answers only)
  * - [removeAnswer] (for repeated answers only)
- * - [clearAnswer] (for both single and repated answers)
  *
  * Updates to the answers using these APIs will invoke [answersChangedCallback] to notify the view
  * model that the answer(s) have been changed. This will trigger a re-render of the [RecyclerView]
@@ -108,6 +108,11 @@ data class QuestionnaireItemViewItem(
     )
   }
 
+  /** Clears existing answers. */
+  fun clearAnswer() {
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf())
+  }
+
   /** Adds an answer to the existing answers. */
   internal fun addAnswer(
     questionnaireResponseItemAnswerComponent:
@@ -138,11 +143,6 @@ data class QuestionnaireItemViewItem(
         removeIf { it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value) }
       }
     )
-  }
-
-  /** Clears existing answers. */
-  fun clearAnswer() {
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf())
   }
 
   internal fun answerString(context: Context): String {
