@@ -458,6 +458,31 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun mimeTypes_shouldReturnMimeTypes() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MIME_TYPE, CodeType("image/jpg"))
+        addExtension(EXTENSION_MIME_TYPE, CodeType("application/pdf"))
+      }
+    assertThat(questionnaire.mimeTypes).isEqualTo(listOf("image/jpg", "application/pdf"))
+  }
+
+  @Test
+  fun mimeTypes_missingMimeType_shouldReturnEmpty() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MIME_TYPE, CodeType(""))
+      }
+    assertThat(questionnaire.mimeTypes).isEmpty()
+  }
+
+  @Test
+  fun mimeTypes_missingExtension_shouldReturnNull() {
+    val questionnaire = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaire.mimeTypes).isEmpty()
+  }
+
+  @Test
   fun localizedTextSpanned_noText_shouldReturnNull() {
     assertThat(Questionnaire.QuestionnaireItemComponent().localizedTextSpanned).isNull()
   }
