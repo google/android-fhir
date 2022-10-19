@@ -16,10 +16,9 @@
     <string
         name="number_format_validation_error_msg"
     >Only use (.) between two numbers. Other special characters are not supported.</string>
+    <string
         name="date_format_validation_error_msg"
-    >Date format needs to be <xliff:g
-            id="locale_format"
-        >%1$s</xliff:g> </string>
+    >Date format needs to be <xliff:g id="locale_format">%1$s</xliff:g></string>
     <string name="submit_button_text">Submit</string>
     <string name="button_pagination_next">Next</string>
     <string name="button_pagination_previous">Previous</string>
