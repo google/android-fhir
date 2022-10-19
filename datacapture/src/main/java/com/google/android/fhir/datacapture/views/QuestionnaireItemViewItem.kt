@@ -93,6 +93,7 @@ data class QuestionnaireItemViewItem(
   val answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
     questionnaireResponseItem.answer.map { it.copy() }
 
+  /** Updates the answers. This will override any existing answers. */
   fun setAnswer(
     vararg questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
@@ -107,11 +108,7 @@ data class QuestionnaireItemViewItem(
     )
   }
 
-  internal fun answerString(context: Context): String {
-    if (!questionnaireResponseItem.hasAnswer()) return context.getString(R.string.not_answered)
-    return questionnaireResponseItem.answer.joinToString { it.displayString(context) }
-  }
-
+  /** Adds an answer to the existing answers. */
   internal fun addAnswer(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
@@ -126,6 +123,7 @@ data class QuestionnaireItemViewItem(
     )
   }
 
+  /** Removes an answer from the existing answers. */
   internal fun removeAnswer(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
@@ -142,8 +140,14 @@ data class QuestionnaireItemViewItem(
     )
   }
 
+  /** Clears existing answers. */
   fun clearAnswer() {
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf())
+  }
+
+  internal fun answerString(context: Context): String {
+    if (!questionnaireResponseItem.hasAnswer()) return context.getString(R.string.not_answered)
+    return questionnaireResponseItem.answer.joinToString { it.displayString(context) }
   }
 
   fun isAnswerOptionSelected(
