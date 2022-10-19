@@ -109,6 +109,10 @@
             name="questionnaireAddAnotherAnswerButtonStyle"
         >@style/Widget.Material3.Button
         </item>
+        <item
+            name="questionnaireLinearProgressIndicatorStyle"
+        >@style/Widget.Material3.LinearProgressIndicator
+        </item>
     </style>
 
     <style
