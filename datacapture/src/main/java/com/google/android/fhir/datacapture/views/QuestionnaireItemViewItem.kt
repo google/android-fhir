@@ -36,10 +36,10 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * render the data item in the UI. The view SHOULD NOT mutate the data using these properties.
  *
  * The view should use the following answer APIs to update the answer(s):
- * - [setAnswer] (for single answer only)
+ * - [setAnswer] (for single and repeated answers)
+ * - [clearAnswer] (for single and repeated answers)
  * - [addAnswer] (for repeated answers only)
  * - [removeAnswer] (for repeated answers only)
- * - [clearAnswer] (for both single and repated answers)
  *
  * Updates to the answers using these APIs will invoke [answersChangedCallback] to notify the view
  * model that the answer(s) have been changed. This will trigger a re-render of the [RecyclerView]
@@ -90,26 +90,30 @@ data class QuestionnaireItemViewItem(
    * [QuestionnaireResponse.QuestionnaireResponseItemComponent] so that proper comparisons can be
    * carried out for the [RecyclerView.Adapter] to decide which items need to be updated.
    */
-  var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
+  val answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
     questionnaireResponseItem.answer.map { it.copy() }
-    private set
 
+  /** Updates the answers. This will override any existing answers. */
   fun setAnswer(
-    questionnaireResponseItemAnswerComponent:
+    vararg questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
   ) {
-    check(!questionnaireItem.repeats) {
-      "Questionnaire item with linkId ${questionnaireItem.linkId} has repeated answers. Use addAnswer instead."
+    check(questionnaireItem.repeats || questionnaireResponseItemAnswerComponent.size <= 1) {
+      "Questionnaire item with linkId ${questionnaireItem.linkId} has repeated answers."
     }
-    answers = listOf(questionnaireResponseItemAnswerComponent)
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
+    answersChangedCallback(
+      questionnaireItem,
+      questionnaireResponseItem,
+      questionnaireResponseItemAnswerComponent.toList()
+    )
   }
 
-  internal fun answerString(context: Context): String {
-    if (!questionnaireResponseItem.hasAnswer()) return context.getString(R.string.not_answered)
-    return questionnaireResponseItem.answer.joinToString { it.displayString(context) }
+  /** Clears existing answers. */
+  fun clearAnswer() {
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf())
   }
 
+  /** Adds an answer to the existing answers. */
   internal fun addAnswer(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
@@ -117,10 +121,14 @@ data class QuestionnaireItemViewItem(
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
-    answers += questionnaireResponseItemAnswerComponent
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
+    answersChangedCallback(
+      questionnaireItem,
+      questionnaireResponseItem,
+      answers + questionnaireResponseItemAnswerComponent
+    )
   }
 
+  /** Removes an answer from the existing answers. */
   internal fun removeAnswer(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
@@ -128,16 +136,18 @@ data class QuestionnaireItemViewItem(
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
-    answers =
+    answersChangedCallback(
+      questionnaireItem,
+      questionnaireResponseItem,
       answers.toMutableList().apply {
         removeIf { it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value) }
       }
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
+    )
   }
 
-  fun clearAnswer() {
-    answers = listOf()
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
+  internal fun answerString(context: Context): String {
+    if (!questionnaireResponseItem.hasAnswer()) return context.getString(R.string.not_answered)
+    return questionnaireResponseItem.answer.joinToString { it.displayString(context) }
   }
 
   fun isAnswerOptionSelected(
