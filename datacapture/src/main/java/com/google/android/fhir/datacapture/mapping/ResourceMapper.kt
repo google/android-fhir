@@ -21,11 +21,11 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
-import com.google.android.fhir.datacapture.utilities.fhirPathEngine
 import com.google.android.fhir.datacapture.utilities.toCodeType
 import com.google.android.fhir.datacapture.utilities.toCoding
 import com.google.android.fhir.datacapture.utilities.toIdType
 import com.google.android.fhir.datacapture.utilities.toUriType
+import java.lang.IllegalArgumentException
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -34,6 +34,7 @@ import org.hl7.fhir.r4.context.IWorkerContext
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -49,10 +50,12 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.StructureDefinition
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
+import timber.log.Timber
 
 /**
  * Maps a [QuestionnaireResponse] to FHIR resources and vice versa.
@@ -100,15 +103,36 @@ object ResourceMapper {
    *
    * @return [Bundle] containing the extracted [Resource]s or empty Bundle if the extraction fails.
    * An exception might also be thrown in a few cases
+   *
+   * @throws IllegalArgumentException when Resource getting extracted does conform different profile
+   * than standard FHIR profile and argument loadProfile callback Implementation is not provided to
+   * load different profile
    */
   suspend fun extract(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    structureMapExtractionContext: StructureMapExtractionContext? = null
+    structureMapExtractionContext: StructureMapExtractionContext? = null,
+    loadProfile: LoadProfileCallback? = null,
   ): Bundle {
+    val structureDefinitionMap: MutableMap<String, StructureDefinition> = hashMapOf()
+    val profiles: List<CanonicalType> = questionnaire.meta.profile
+    if (!profiles.isNullOrEmpty()) {
+      profiles.forEach {
+        if (FHIR_PROFILE_CANONICAL_URL_LIST.contains(it.toString())) {
+          Timber.d("resource conform to FHIR standard profile $it")
+        } else if (loadProfile == null) {
+          throw IllegalArgumentException(
+            "LoadProfileCallback implementation required to load StructureDefinition that this resource claims to conform to"
+          )
+        } else {
+          val structureDefinition = loadProfile.loadProfile(it)
+          structureDefinitionMap.put(structureDefinition.type, structureDefinition)
+        }
+      }
+    }
     return when {
       questionnaire.targetStructureMap == null ->
-        extractByDefinition(questionnaire, questionnaireResponse)
+        extractByDefinition(questionnaire, questionnaireResponse, structureDefinitionMap)
       structureMapExtractionContext != null -> {
         extractByStructureMap(questionnaire, questionnaireResponse, structureMapExtractionContext)
       }
@@ -127,7 +151,8 @@ object ResourceMapper {
    */
   private fun extractByDefinition(
     questionnaire: Questionnaire,
-    questionnaireResponse: QuestionnaireResponse
+    questionnaireResponse: QuestionnaireResponse,
+    structureDefinitionMap: MutableMap<String, StructureDefinition>? = null
   ): Bundle {
     val rootResource: Resource? = questionnaire.createResource()
     val extractedResources = mutableListOf<Resource>()
@@ -136,7 +161,8 @@ object ResourceMapper {
       questionnaire.item,
       questionnaireResponse.item,
       rootResource,
-      extractedResources
+      extractedResources,
+      structureDefinitionMap
     )
 
     if (rootResource != null) {
@@ -272,7 +298,8 @@ object ResourceMapper {
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     extractionContext: Base?,
-    extractionResult: MutableList<Resource>
+    extractionResult: MutableList<Resource>,
+    structureDefinitionMap: MutableMap<String, StructureDefinition>? = null
   ) {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
@@ -292,7 +319,8 @@ object ResourceMapper {
           currentQuestionnaireItem,
           currentQuestionnaireResponseItem,
           extractionContext,
-          extractionResult
+          extractionResult,
+          structureDefinitionMap
         )
       }
     }
@@ -311,7 +339,8 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     extractionContext: Base?,
-    extractionResult: MutableList<Resource>
+    extractionResult: MutableList<Resource>,
+    structureDefinitionMap: MutableMap<String, StructureDefinition>? = null
   ) {
     when (questionnaireItem.type) {
       Questionnaire.QuestionnaireItemType.GROUP ->
@@ -328,7 +357,8 @@ object ResourceMapper {
             extractResourceByDefinition(
               questionnaireItem,
               questionnaireResponseItem,
-              extractionResult
+              extractionResult,
+              structureDefinitionMap
             )
           questionnaireItem.definition != null -> {
             // Extract a new element (which is not a resource) e.g. HumanName, Quantity, etc
@@ -339,7 +369,8 @@ object ResourceMapper {
               questionnaireItem,
               questionnaireResponseItem,
               extractionContext,
-              extractionResult
+              extractionResult,
+              structureDefinitionMap
             )
           }
           else ->
@@ -348,7 +379,8 @@ object ResourceMapper {
               questionnaireItem.item,
               questionnaireResponseItem.item,
               extractionContext,
-              extractionResult
+              extractionResult,
+              structureDefinitionMap
             )
         }
       else ->
@@ -360,7 +392,8 @@ object ResourceMapper {
           extractPrimitiveTypeValueByDefinition(
             questionnaireItem,
             questionnaireResponseItem,
-            extractionContext
+            extractionContext,
+            structureDefinitionMap?.get(extractionContext.fhirType())
           )
         }
     }
@@ -374,14 +407,16 @@ object ResourceMapper {
   private fun extractResourceByDefinition(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-    extractionResult: MutableList<Resource>
+    extractionResult: MutableList<Resource>,
+    structureDefinitionMap: MutableMap<String, StructureDefinition>? = null
   ) {
     val resource = questionnaireItem.createResource() as Resource
     extractByDefinition(
       questionnaireItem.item,
       questionnaireResponseItem.item,
       resource,
-      extractionResult
+      extractionResult,
+      structureDefinitionMap
     )
     extractionResult += resource
   }
@@ -395,7 +430,8 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     base: Base,
-    extractionResult: MutableList<Resource>
+    extractionResult: MutableList<Resource>,
+    structureDefinitionMap: MutableMap<String, StructureDefinition>? = null
   ) {
     val fieldName = getFieldNameByDefinition(questionnaireItem.definition)
     val value =
@@ -411,7 +447,8 @@ object ResourceMapper {
       questionnaireItem.item,
       questionnaireResponseItem.item,
       value,
-      extractionResult
+      extractionResult,
+      structureDefinitionMap
     )
   }
 
@@ -422,7 +459,8 @@ object ResourceMapper {
   private fun extractPrimitiveTypeValueByDefinition(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-    base: Base
+    base: Base,
+    structureDefinition: StructureDefinition?
   ) {
     if (questionnaireResponseItem.answer.isEmpty()) return
 
@@ -449,9 +487,51 @@ object ResourceMapper {
       // Do nothing
     }
 
+    /* Examples considered here is element having id and path as below
+     "id" : "Patient.extension:birthPlace",
+      "path" : "Patient.extension",
+      "definition": "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.birthPlace"
+      OR
+     "id": "Patient.address.extension:address-preferred",
+     "path": "Patient.address.extension",
+     "definition": "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.address.address-preferred"
+    */
     if (base.javaClass.getFieldOrNull(fieldName) == null) {
-      // If field not found in resource class, assume this is an extension
-      addDefinitionBasedCustomExtension(questionnaireItem, questionnaireResponseItem, base)
+      // Variable to check whether extension defined in profile
+      var isExtensionSupported = false
+      if (structureDefinition == null) {
+        Timber.w(
+          "StructureDefinition for ${base.fhirType()} is not available to which resource " +
+            "claims to conform to. So, field ''$fieldName'' is not added as extension to resource"
+        )
+        return
+      }
+
+      /* eg for "definition": "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.address.address-preferred"
+      extensionForType is "Patient.address" */
+      val extensionForType =
+        questionnaireItem.definition.substring(
+          questionnaireItem.definition.lastIndexOf("#") + 1,
+          questionnaireItem.definition.lastIndexOf(".")
+        )
+      val listOfElementDefinition =
+        structureDefinition.snapshot.element.filter {
+          it.path.equals(extensionForType + ".extension") // eg "path": "Patient.address.extension",
+        } // it.id.contains(extensionForType+".extension:")
+      listOfElementDefinition.forEach {
+        if (it.id.substringAfterLast(":").equals(fieldName)) {
+          // If field not found in resource class, assume this is an extension
+          isExtensionSupported = true
+          addDefinitionBasedCustomExtension(questionnaireItem, questionnaireResponseItem, base)
+        }
+        if (!isExtensionSupported) {
+          Timber.w(
+            "Extension for field '$fieldName' is not defined in StructureDefinition of ${base.fhirType()}, so field is ignored"
+          )
+        }
+      }
+      /* // If field not found in resource class, assume this is an extension
+      addDefinitionBasedCustomExtension(questionnaireItem, questionnaireResponseItem, base)*/
     }
   }
 }

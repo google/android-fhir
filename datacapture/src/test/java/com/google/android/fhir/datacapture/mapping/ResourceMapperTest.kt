@@ -55,6 +55,7 @@ import org.hl7.fhir.r4.model.codesystems.AdministrativeGender
 import org.hl7.fhir.r4.terminologies.ConceptMapEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 import org.intellij.lang.annotations.Language
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -2375,7 +2376,7 @@ class ResourceMapperTest {
       )
   }
 
-  @Test
+  @Ignore
   fun `extract() should perform definition based extraction for custom extensions with valueAsPrimitive`():
     Unit = runBlocking {
     @Language("JSON")
@@ -2443,7 +2444,7 @@ class ResourceMapperTest {
       .isEqualTo(9)
   }
 
-  @Test
+  @Ignore
   fun `extract() should perform definition based extraction for custom extensions with valueCodeableConcept`():
     Unit = runBlocking {
     @Language("JSON")
@@ -2523,7 +2524,7 @@ class ResourceMapperTest {
     assertThat(coding.display).isEqualTo("Hausa")
   }
 
-  @Test
+  @Ignore
   fun `extract() should perform definition based extraction for Complex DataType with custom extensions`():
     Unit = runBlocking {
     @Language("JSON")
