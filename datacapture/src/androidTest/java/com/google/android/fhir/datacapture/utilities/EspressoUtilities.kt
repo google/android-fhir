@@ -23,9 +23,9 @@ import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 fun clickOnText(text: String) {
   onView(withText(text)).perform(click())
@@ -40,11 +40,10 @@ fun endIconClickInTextInputLayout(id: Int) {
 }
 
 fun assertQuestionnaireResponseAtIndex(
-  questionnaireItemViewItem: QuestionnaireItemViewItem,
+  answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
   vararg expectedStrings: String
 ) {
   for ((index, expectedString) in expectedStrings.withIndex()) {
-    assertThat((questionnaireItemViewItem.answers[index].value as Coding).display)
-      .isEqualTo(expectedString)
+    assertThat((answers[index].value as Coding).display).isEqualTo(expectedString)
   }
 }
