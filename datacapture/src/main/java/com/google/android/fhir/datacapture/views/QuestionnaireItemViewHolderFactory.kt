@@ -60,9 +60,7 @@ open class QuestionnaireItemViewHolder(
     delegate.questionnaireItemViewItem = questionnaireItemViewItem
     delegate.bind(questionnaireItemViewItem)
     delegate.setReadOnly(questionnaireItemViewItem.questionnaireItem.readOnly)
-    delegate.questionnaireItemViewItem.validationResult?.let {
-      delegate.displayValidationResult(it)
-    }
+    delegate.displayValidationResult(questionnaireItemViewItem.validationResult)
   }
 }
 
