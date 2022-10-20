@@ -36,49 +36,51 @@ import timber.log.Timber
 /** [Uploader] implementation to work with Fhir [Bundle]. */
 internal class BundleUploader(
   private val dataSource: DataSource,
-  private val bundleGenerator: TransactionBundleGenerator
+  private val bundleGenerator: TransactionBundleGenerator,
+  private val localChangesPaginator: LocalChangesPaginator
 ) : Uploader {
 
   override suspend fun upload(
     localChanges: List<LocalChange>,
-  ): Flow<UploadResult> =
-    flow {
-      bundleGenerator.generate(listOf(localChanges)).forEach { (bundle, localChangeTokens) ->
+  ): Flow<UploadResult> = flow {
+    bundleGenerator.generate(localChangesPaginator.page(localChanges))
+      .forEach { (bundle, localChangeTokens) ->
         val response = dataSource.upload(bundle)
         emit(getUploadResult(response, localChangeTokens))
       }
+  }
+    .catch { exception ->
+      Timber.i("exception stacktrace ${exception.stackTraceToString()}")
+      Timber.i("exception localised message ${exception.localizedMessage}")
+      if (exception.cause is HttpException) {
+        Timber.i("exception cause ${(exception as HttpException).response()}")
+      }
+      emit(
+        UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, exception as Exception))
+      )
     }
-      .catch { exception ->
-        Timber.i("exception stacktrace ${exception.stackTraceToString()}")
-        Timber.i("exception localised message ${exception.localizedMessage}")
-        if (exception.cause is HttpException) {
-          Timber.i("exception cause ${(exception as HttpException).response()}")
-        }
-        emit(
-          UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, exception as Exception))
+
+
+  private fun getUploadResult(response: Resource, localChangeTokens: List<LocalChangeToken>) =
+    when {
+      response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
+        UploadResult.Success(LocalChangeToken(localChangeTokens.flatMap { it.ids }), response)
+      }
+      response is OperationOutcome && response.issue.isNotEmpty() -> {
+        UploadResult.Failure(
+          ResourceSyncException(
+            ResourceType.Bundle,
+            FHIRException(response.issueFirstRep.diagnostics)
+          )
         )
       }
+      else -> {
+        UploadResult.Failure(
+          ResourceSyncException(
+            ResourceType.Bundle,
+            FHIRException("Unknown response for ${response.resourceType}")
+          )
+        )
+      }
+    }
 }
-
-private fun getUploadResult(response: Resource, localChangeTokens: List<LocalChangeToken>) =
-  when {
-    response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
-      UploadResult.Success(LocalChangeToken(localChangeTokens.flatMap { it.ids }), response)
-    }
-    response is OperationOutcome && response.issue.isNotEmpty() -> {
-      UploadResult.Failure(
-        ResourceSyncException(
-          ResourceType.Bundle,
-          FHIRException(response.issueFirstRep.diagnostics)
-        )
-      )
-    }
-    else -> {
-      UploadResult.Failure(
-        ResourceSyncException(
-          ResourceType.Bundle,
-          FHIRException("Unknown response for ${response.resourceType}")
-        )
-      )
-    }
-  }

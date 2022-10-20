@@ -16,16 +16,9 @@
 
 package com.google.android.fhir.sync.remote
 
-import android.content.Context
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.remote.RemoteServiceLoggingHelper.SYNC_FOLDER
-import com.google.android.fhir.sync.remote.RemoteServiceLoggingHelper.getSyncLogsDirectory
-import java.io.File
-import java.io.FileNotFoundException
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -38,7 +31,6 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Url
-import timber.log.Timber
 
 /** Interface to make http requests to the FHIR server. */
 internal interface RemoteFhirService : DataSource {
@@ -48,42 +40,28 @@ internal interface RemoteFhirService : DataSource {
   @POST(".") override suspend fun upload(@Body bundle: Bundle): Resource
 
   class Builder(
-    private val context: Context,
     private val baseUrl: String,
     private val networkConfiguration: NetworkConfiguration
   ) {
     private var authenticator: Authenticator? = null
-    private var logFileNamePostFix: String = ""
+    private var httpLoggingInterceptor: HttpLoggingInterceptor? = null
 
-    fun setLogFilePostFix(logFileNamePostFix: String) {
-      this.logFileNamePostFix = logFileNamePostFix
-    }
-
-    fun setAuthenticator(authenticator: Authenticator?) {
+    fun setAuthenticator(authenticator: Authenticator?) = apply {
       this.authenticator = authenticator
     }
 
-    fun build(): RemoteFhirService {
-      val dateString = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now())
-      val fullFileName = dateString + "_" + logFileNamePostFix
-      val customLogger =
-        HttpLoggingInterceptor.Logger {
-          try {
-            writeToFile(fullFileName, it)
-          } catch (exception: FileNotFoundException) {
-            Timber.i("File not found")
-          }
-        }
-      val logger = HttpLoggingInterceptor(customLogger)
-      logger.level = HttpLoggingInterceptor.Level.HEADERS
+    fun setHttpLogger(httpLogger: HttpLogger) = apply {
+      httpLoggingInterceptor = httpLogger.toOkHttpLoggingInterceptor()
+    }
 
+    fun build(): RemoteFhirService {
       val client =
         OkHttpClient.Builder()
+          .connectTimeout(networkConfiguration.connectionTimeOut, TimeUnit.SECONDS)
+          .readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
+          .writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
           .apply {
-            connectTimeout(networkConfiguration.connectionTimeOut, TimeUnit.SECONDS)
-            readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
-            writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
-            addInterceptor(logger)
+            httpLoggingInterceptor?.let { addInterceptor(it) }
             authenticator?.let {
               addInterceptor(
                 Interceptor { chain: Interceptor.Chain ->
@@ -108,14 +86,10 @@ internal interface RemoteFhirService : DataSource {
         .build()
         .create(RemoteFhirService::class.java)
     }
-
-    private fun writeToFile(fileName: String, content: String) {
-      File(getSyncLogsDirectory(context, SYNC_FOLDER), fileName).appendText(content + "\n")
-    }
   }
 
   companion object {
-    fun builder(context: Context, baseUrl: String, networkConfiguration: NetworkConfiguration) =
-      Builder(context, baseUrl, networkConfiguration)
+    fun builder(baseUrl: String, networkConfiguration: NetworkConfiguration) =
+      Builder(baseUrl, networkConfiguration)
   }
 }

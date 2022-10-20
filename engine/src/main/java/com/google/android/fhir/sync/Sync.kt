@@ -25,6 +25,10 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.sync.download.DownloaderImpl
+import com.google.android.fhir.sync.upload.BundleUploader
+import com.google.android.fhir.sync.upload.LocalChangesPaginator
+import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import org.hl7.fhir.r4.model.ResourceType
 
 object Sync {
@@ -43,6 +47,7 @@ object Sync {
     fhirEngine: FhirEngine,
     downloadManager: DownloadWorkManager,
     downloadWorkManagerModified: DownloadWorkManagerModified,
+    uploadConfiguration: UploadConfiguration = UploadConfiguration(),
     resolver: ConflictResolver
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {

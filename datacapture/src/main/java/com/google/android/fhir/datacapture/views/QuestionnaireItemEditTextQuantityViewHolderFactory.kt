@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views
 
 import android.text.InputType
 import com.google.android.fhir.datacapture.R
+import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -34,9 +35,26 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
       override fun getValue(
         text: String
       ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
-        return text.toDoubleOrNull()?.let {
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(Quantity(it))
-        }
+        // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
+        // read default unit from initial, as ideally quantity must specify a unit
+        return text
+          .takeIf { it.isNotBlank() }
+          ?.let {
+            val value = BigDecimal(text)
+            val quantity =
+              with(questionnaireItemViewItem.questionnaireItem) {
+                if (this.hasInitial() && this.initialFirstRep.valueQuantity.hasCode())
+                  this.initialFirstRep.valueQuantity.let { initial ->
+                    Quantity().apply {
+                      this.value = value
+                      this.code = initial.code
+                      this.system = initial.system
+                    }
+                  }
+                else Quantity().apply { this.value = value }
+              }
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(quantity)
+          }
       }
 
       override fun getText(

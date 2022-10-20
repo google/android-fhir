@@ -26,6 +26,10 @@ import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
+import com.google.android.fhir.sync.download.DownloaderImpl
+import com.google.android.fhir.sync.upload.BundleUploader
+import com.google.android.fhir.sync.upload.LocalChangesPaginator
+import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import com.google.gson.GsonBuilder
 import java.time.OffsetDateTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -102,7 +106,8 @@ class SyncJobImpl(private val context: Context) : SyncJob {
     downloadManager: DownloadWorkManager,
     downloadWorkManagerModified: DownloadWorkManagerModified,
     resolver: ConflictResolver,
-    subscribeTo: MutableSharedFlow<State>?
+    subscribeTo: MutableSharedFlow<State>?,
+    uploadConfiguration: UploadConfiguration
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
       FhirSynchronizer(

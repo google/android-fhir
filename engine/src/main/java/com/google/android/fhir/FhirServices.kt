@@ -51,11 +51,11 @@ internal data class FhirServices(
       enableEncryption = true
     }
 
-    internal fun setDatabaseErrorStrategy(databaseErrorStrategy: DatabaseErrorStrategy) {
+    internal fun setDatabaseErrorStrategy(databaseErrorStrategy: DatabaseErrorStrategy) = apply {
       this.databaseErrorStrategy = databaseErrorStrategy
     }
 
-    internal fun setServerConfiguration(serverConfiguration: ServerConfiguration) {
+    internal fun setServerConfiguration(serverConfiguration: ServerConfiguration) = apply {
       this.serverConfiguration = serverConfiguration
     }
 
@@ -69,11 +69,9 @@ internal data class FhirServices(
         )
       val remoteDataSource =
         serverConfiguration?.let {
-          RemoteFhirService.builder(context, it.baseUrl, it.networkConfiguration)
-            .apply {
-              setAuthenticator(it.authenticator)
-              setLogFilePostFix(it.logFileNamePostFix)
-            }
+          RemoteFhirService.builder(it.baseUrl, it.networkConfiguration)
+            .setAuthenticator(it.authenticator)
+            .setHttpLogger(it.httpLogger)
             .build()
         }
       val engine = FhirEngineImpl(database = db, context = context, remoteDataSource)

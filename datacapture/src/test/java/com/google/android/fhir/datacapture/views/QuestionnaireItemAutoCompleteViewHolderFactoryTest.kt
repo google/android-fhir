@@ -37,7 +37,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
-class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
+class QuestionnaireItemAutoCompleteViewHolderFactoryTest {
   private val parent =
     FrameLayout(
       RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
@@ -61,30 +61,34 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
 
   @Test
   fun shouldHaveSingleAnswerChip() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = false
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent()
+            .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code"))
+        )
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent()
+            .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
+        )
+      }
     viewHolder.bind(
       QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            repeats = false
-            addAnswerOption(
-              Questionnaire.QuestionnaireItemAnswerOptionComponent()
-                .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code"))
-            )
-            addAnswerOption(
-              Questionnaire.QuestionnaireItemAnswerOptionComponent()
-                .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
-            )
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
-        )
-        .apply {
-          setAnswer(
+        questionnaireItem,
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
+              value =
+                questionnaireItem.answerOption
+                  .first { it.displayString == "Test1 Code" }
+                  .valueCoding
             }
           )
-        }
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
@@ -93,41 +97,44 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
 
   @Test
   fun shouldHaveTwoAnswerChipWithExternalValueSet() {
+    val answers =
+      listOf(
+        Questionnaire.QuestionnaireItemAnswerOptionComponent()
+          .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code")),
+        Questionnaire.QuestionnaireItemAnswerOptionComponent()
+          .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
+      )
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = true
+        answerValueSet = "http://answwer-value-set-url"
+      }
     viewHolder.bind(
       QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            repeats = true
-            answerValueSet = "http://answwer-value-set-url"
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          resolveAnswerValueSet = {
-            if (it == "http://answwer-value-set-url") {
-              listOf(
-                Questionnaire.QuestionnaireItemAnswerOptionComponent()
-                  .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code")),
-                Questionnaire.QuestionnaireItemAnswerOptionComponent()
-                  .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
-              )
-            } else {
-              emptyList()
-            }
-          },
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
-        )
-        .apply {
+        questionnaireItem,
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
+              value = answers.first { it.displayString == "Test1 Code" }.valueCoding
             }
           )
 
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = answerOption.first { it.displayString == "Test2 Code" }.valueCoding
+              value = answers.first { it.displayString == "Test2 Code" }.valueCoding
             }
           )
-        }
+        },
+        resolveAnswerValueSet = {
+          if (it == "http://answwer-value-set-url") {
+            answers
+          } else {
+            emptyList()
+          }
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
@@ -136,35 +143,36 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
 
   @Test
   fun shouldHaveSingleAnswerChipWithContainedAnswerValueSet() {
+    val answers =
+      listOf(
+        Questionnaire.QuestionnaireItemAnswerOptionComponent()
+          .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code")),
+        Questionnaire.QuestionnaireItemAnswerOptionComponent()
+          .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
+      )
     viewHolder.bind(
       QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            repeats = false
-            answerValueSet = "#ContainedValueSet"
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          resolveAnswerValueSet = {
-            if (it == "#ContainedValueSet") {
-              listOf(
-                Questionnaire.QuestionnaireItemAnswerOptionComponent()
-                  .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code")),
-                Questionnaire.QuestionnaireItemAnswerOptionComponent()
-                  .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
-              )
-            } else {
-              emptyList()
-            }
-          },
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
-        )
-        .apply {
-          setAnswer(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = false
+          answerValueSet = "#ContainedValueSet"
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
+              value = answers.first { it.displayString == "Test1 Code" }.valueCoding
             }
           )
-        }
+        },
+        resolveAnswerValueSet = {
+          if (it == "#ContainedValueSet") {
+            answers
+          } else {
+            emptyList()
+          }
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
@@ -222,27 +230,29 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
 
   @Test
   fun bind_readOnly_shouldDisableView() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        readOnly = true
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "readOnly" }
+          }
+        )
+      }
     viewHolder.bind(
       QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            readOnly = true
-            addAnswerOption(
-              Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-                value = Coding().apply { display = "readOnly" }
-              }
-            )
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
-        )
-        .apply {
-          setAnswer(
+        questionnaireItem,
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = answerOption.first { it.displayString == "readOnly" }.valueCoding
+              value =
+                questionnaireItem.answerOption.first { it.displayString == "readOnly" }.valueCoding
             }
           )
-        }
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer)[0].isEnabled)

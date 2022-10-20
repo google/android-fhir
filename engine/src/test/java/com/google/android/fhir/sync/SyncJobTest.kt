@@ -24,6 +24,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.Configuration
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
@@ -104,124 +105,122 @@ class SyncJobTest {
     mock.close()
   }
 
-  //  @Test
-  //  fun `should poll accurately with given delay`() = runBlockingTest {
-  //    val worker = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
-  //
-  //    // Get flows return by work manager wrapper
-  //    val workInfoFlow = syncJob.workInfoFlow()
-  //    val stateFlow = syncJob.stateFlow()
-  //
-  //    val workInfoList = mutableListOf<WorkInfo>()
-  //    val stateList = mutableListOf<State>()
-  //
-  //    // Convert flows to list to assert later
-  //    val job1 = launch { workInfoFlow.toList(workInfoList) }
-  //    val job2 = launch { stateFlow.toList(stateList) }
-  //
-  //    workManager
-  //      .enqueueUniquePeriodicWork(
-  //        SyncWorkType.DOWNLOAD_UPLOAD.workerName,
-  //        ExistingPeriodicWorkPolicy.REPLACE,
-  //        worker
-  //      )
-  //      .result
-  //      .get()
-  //
-  //    Thread.sleep(5000)
-  //
-  //    assertThat(workInfoList.map { it.state })
-  //      .containsAtLeast(
-  //        WorkInfo.State.ENQUEUED, // Waiting for turn
-  //        WorkInfo.State.RUNNING, // Worker launched
-  //        WorkInfo.State.RUNNING, // Progresses emitted Started, InProgress..State.Success
-  //        WorkInfo.State.ENQUEUED // Waiting again for next turn
-  //      )
-  //      .inOrder()
-  //
-  //    // States are Started, InProgress .... , Finished (Success)
-  //    assertThat(stateList.map { it::class.java }).contains(State.Finished::class.java)
-  //
-  //    val success = (stateList[stateList.size - 1] as State.Finished).result
-  //    assertThat(success.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
-  //
-  //    job1.cancel()
-  //    job2.cancel()
-  //  }
+  @Test
+  fun `should poll accurately with given delay`() = runBlockingTest {
+    val worker = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
 
-  //  @Test
-  //  fun `should run synchronizer and emit states accurately in sequence`() = runBlockingTest {
-  //    whenever(database.getAllLocalChanges()).thenReturn(listOf())
-  //    whenever(dataSource.download(any()))
-  //      .thenReturn(Bundle().apply { type = Bundle.BundleType.SEARCHSET })
-  //
-  //    val res = mutableListOf<State>()
-  //
-  //    val flow = MutableSharedFlow<State>()
-  //    val job = launch { flow.collect { res.add(it) } }
-  //
-  //    syncJob.run(
-  //      fhirEngine,
-  //      TestingUtils.TestDownloadManagerImpl(),
-  //      AcceptRemoteConflictResolver,
-  //      flow
-  //    )
-  //
-  //    // State transition for successful job as below
-  //    // Started, InProgress, Finished (Success)
-  //    assertThat(res.map { it::class.java })
-  //      .containsExactly(
-  //        State.Started::class.java,
-  //        State.InProgress::class.java,
-  //        State.Finished::class.java
-  //      )
-  //      .inOrder()
-  //
-  //    val success = (res[2] as State.Finished).result
-  //
-  //    assertThat(success.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
-  //
-  //    job.cancel()
-  //  }
+    // Get flows return by work manager wrapper
+    val workInfoFlow = syncJob.workInfoFlow()
+    val stateFlow = syncJob.stateFlow()
 
-  //  @Test
-  //  fun `should run synchronizer and emit  with error accurately in sequence`() = runBlockingTest
-  // {
-  //    whenever(database.getAllLocalChanges()).thenReturn(listOf())
-  //    whenever(dataSource.download(any())).thenThrow(IllegalStateException::class.java)
-  //
-  //    val res = mutableListOf<State>()
-  //
-  //    val flow = MutableSharedFlow<State>()
-  //
-  //    val job = launch { flow.collect { res.add(it) } }
-  //
-  //    syncJob.run(
-  //      fhirEngine,
-  //      TestingUtils.TestDownloadManagerImpl(),
-  //      AcceptRemoteConflictResolver,
-  //      flow
-  //    )
-  //    // State transition for failed job as below
-  //    // Started, InProgress, Glitch, Failed (Error)
-  //    assertThat(res.map { it::class.java })
-  //      .containsExactly(
-  //        State.Started::class.java,
-  //        State.InProgress::class.java,
-  //        State.Glitch::class.java,
-  //        State.Failed::class.java
-  //      )
-  //      .inOrder()
-  //
-  //    val error = (res[3] as State.Failed).result
-  //
-  //    assertThat(error.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
-  //
-  //    assertThat(error.exceptions[0].exception)
-  //      .isInstanceOf(java.lang.IllegalStateException::class.java)
-  //
-  //    job.cancel()
-  //  }
+    val workInfoList = mutableListOf<WorkInfo>()
+    val stateList = mutableListOf<State>()
+
+    // Convert flows to list to assert later
+    val job1 = launch { workInfoFlow.toList(workInfoList) }
+    val job2 = launch { stateFlow.toList(stateList) }
+
+    workManager
+      .enqueueUniquePeriodicWork(
+        SyncWorkType.DOWNLOAD_UPLOAD.workerName,
+        ExistingPeriodicWorkPolicy.REPLACE,
+        worker
+      )
+      .result.get()
+
+    Thread.sleep(5000)
+
+    assertThat(workInfoList.map { it.state })
+      .containsAtLeast(
+        WorkInfo.State.ENQUEUED, // Waiting for turn
+        WorkInfo.State.RUNNING, // Worker launched
+        WorkInfo.State.RUNNING, // Progresses emitted Started, InProgress..State.Success
+        WorkInfo.State.ENQUEUED // Waiting again for next turn
+      )
+      .inOrder()
+
+    // States are Started, InProgress .... , Finished (Success)
+    assertThat(stateList.map { it::class.java }).contains(State.Finished::class.java)
+
+    val success = (stateList[stateList.size - 1] as State.Finished).result
+    assertThat(success.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
+
+    job1.cancel()
+    job2.cancel()
+  }
+
+  @Test
+  fun `should run synchronizer and emit states accurately in sequence`() = runBlockingTest {
+    whenever(database.getAllLocalChanges()).thenReturn(listOf())
+    whenever(dataSource.download(any()))
+      .thenReturn(Bundle().apply { type = Bundle.BundleType.SEARCHSET })
+
+    val res = mutableListOf<State>()
+
+    val flow = MutableSharedFlow<State>()
+    val job = launch { flow.collect { res.add(it) } }
+
+    syncJob.run(
+      fhirEngine,
+      TestingUtils.TestDownloadManagerImpl(),
+      AcceptRemoteConflictResolver,
+      flow
+    )
+
+    // State transition for successful job as below
+    // Started, InProgress, Finished (Success)
+    assertThat(res.map { it::class.java })
+      .containsExactly(
+        State.Started::class.java,
+        State.InProgress::class.java,
+        State.Finished::class.java
+      )
+      .inOrder()
+
+    val success = (res[2] as State.Finished).result
+
+    assertThat(success.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
+
+    job.cancel()
+  }
+
+  @Test
+  fun `should run synchronizer and emit  with error accurately in sequence`() = runBlockingTest {
+    whenever(database.getAllLocalChanges()).thenReturn(listOf())
+    whenever(dataSource.download(any())).thenThrow(IllegalStateException::class.java)
+
+    val res = mutableListOf<State>()
+
+    val flow = MutableSharedFlow<State>()
+
+    val job = launch { flow.collect { res.add(it) } }
+
+    syncJob.run(
+      fhirEngine,
+      TestingUtils.TestDownloadManagerImpl(),
+      AcceptRemoteConflictResolver,
+      flow
+    )
+    // State transition for failed job as below
+    // Started, InProgress, Glitch, Failed (Error)
+    assertThat(res.map { it::class.java })
+      .containsExactly(
+        State.Started::class.java,
+        State.InProgress::class.java,
+        State.Glitch::class.java,
+        State.Failed::class.java
+      )
+      .inOrder()
+
+    val error = (res[3] as State.Failed).result
+
+    assertThat(error.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
+
+    assertThat(error.exceptions[0].exception)
+      .isInstanceOf(java.lang.IllegalStateException::class.java)
+
+    job.cancel()
+  }
 
   @Test
   @Ignore("https://github.com/google/android-fhir/issues/1464")
@@ -243,8 +242,7 @@ class SyncJobTest {
         ExistingPeriodicWorkPolicy.REPLACE,
         worker1
       )
-      .result
-      .get()
+      .result.get()
     Thread.sleep(5000)
     val firstSyncResult = (stateList1[stateList1.size - 1] as State.Finished).result
     assertThat(firstSyncResult.timestamp).isGreaterThan(currentTimeStamp)
@@ -262,8 +260,7 @@ class SyncJobTest {
         ExistingPeriodicWorkPolicy.REPLACE,
         worker2
       )
-      .result
-      .get()
+      .result.get()
     Thread.sleep(5000)
     val secondSyncResult = (stateList2[stateList2.size - 1] as State.Finished).result
     assertThat(secondSyncResult.timestamp).isGreaterThan(firstSyncResult.timestamp)
@@ -318,38 +315,38 @@ class SyncJobTest {
     job.cancel()
   }
 
-  //  @Test
-  //  fun `number of resources loaded equals number of resources in TestDownloaderImpl`() =
-  //      runBlockingTest {
-  //    whenever(database.getAllLocalChanges()).thenReturn(listOf())
-  //    whenever(dataSource.download(any())).thenReturn(Bundle())
-  //
-  //    val res = mutableListOf<State>()
-  //
-  //    val flow = MutableSharedFlow<State>()
-  //
-  //    val job = launch { flow.collect { res.add(it) } }
-  //
-  //    syncJob.run(
-  //      fhirEngine,
-  //      TestingUtils.TestDownloadManagerImplWithQueue(
-  //        listOf("Patient/bob", "Encounter/doc", "Observation/obs")
-  //      ),
-  //      AcceptRemoteConflictResolver,
-  //      flow
-  //    )
-  //
-  //    assertThat(res.map { it::class.java })
-  //      .containsExactly(
-  //        State.Started::class.java,
-  //        State.InProgress::class.java,
-  //        State.Finished::class.java
-  //      )
-  //      .inOrder()
-  //    job.cancel()
-  //
-  //    verify(dataSource, times(3)).download(any())
-  //  }
+  @Test
+  fun `number of resources loaded equals number of resources in TestDownloaderImpl`() =
+    runBlockingTest {
+      whenever(database.getAllLocalChanges()).thenReturn(listOf())
+      whenever(dataSource.download(any())).thenReturn(Bundle())
+
+      val res = mutableListOf<State>()
+
+      val flow = MutableSharedFlow<State>()
+
+      val job = launch { flow.collect { res.add(it) } }
+
+      syncJob.run(
+        fhirEngine,
+        TestingUtils.TestDownloadManagerImplWithQueue(
+          listOf("Patient/bob", "Encounter/doc", "Observation/obs")
+        ),
+        AcceptRemoteConflictResolver,
+        flow
+      )
+
+      assertThat(res.map { it::class.java })
+        .containsExactly(
+          State.Started::class.java,
+          State.InProgress::class.java,
+          State.Finished::class.java
+        )
+        .inOrder()
+      job.cancel()
+
+      verify(dataSource, times(3)).download(any())
+    }
 
   @Test
   fun `should fail when there data source is null`() = runBlockingTest {

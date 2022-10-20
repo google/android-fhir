@@ -34,6 +34,9 @@ const val MAX_RETRIES_ALLOWED = "max_retires"
 /** Constant for the Greater Than Search Prefix */
 @PublishedApi internal const val GREATER_THAN_PREFIX = "gt"
 
+/** Constant for the default number of resource entries in a singe Bundle for upload. */
+const val DEFAULT_BUNDLE_SIZE = 500
+
 val defaultRetryConfiguration =
   RetryConfiguration(BackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3)
 
@@ -103,4 +106,16 @@ data class BackoffCriteria(
 
   /** The time unit for [backoffDelay] */
   val timeUnit: TimeUnit
+)
+
+/**
+ * Configuration for max number of resources to be uploaded in a Bundle.The default size is
+ * [DEFAULT_BUNDLE_SIZE].
+ */
+data class UploadConfiguration(
+  /**
+   * Number of [Resource]s to be added in a singe [Bundle] for upload and default is
+   * [DEFAULT_BUNDLE_SIZE]
+   */
+  val uploadBundleSize: Int = DEFAULT_BUNDLE_SIZE
 )

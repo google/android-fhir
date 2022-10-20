@@ -133,31 +133,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         }
       }
 
-      private fun addContentDescription() {
-        dateInputLayout.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId +
-            "_" +
-            dateInputLayout::class.java.canonicalName
-        dateInputEditText.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId +
-            "_" +
-            dateInputEditText::class.java.canonicalName
-        timeInputLayout.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId +
-            "_" +
-            timeInputLayout::class.java.canonicalName
-        timeInputEditText.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId +
-            "_" +
-            timeInputEditText::class.java.canonicalName
-      }
-
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         clearPreviousState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
-        this.questionnaireItemViewItem = questionnaireItemViewItem
-        addContentDescription()
         dateInputLayout.hint = localeDatePattern
         dateInputEditText.removeTextChangedListener(textWatcher)
         val dateTime = questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType
@@ -171,6 +150,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         )
         textWatcher =
           dateInputEditText.doAfterTextChanged { text ->
+            if (text == null || text.isNullOrEmpty()) {
+              questionnaireItemViewItem.clearAnswer()
+              return@doAfterTextChanged
+            }
             try {
               localDate = parseDate(text.toString(), dateInputEditText.context.applicationContext)
               enableOrDisableTimePicker(enableIt = true)
@@ -179,24 +162,54 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 updateDateTimeAnswer(this)
               }
             } catch (e: ParseException) {
-              this.questionnaireItemViewItem.clearAnswer()
+              displayDateValidationError(
+                Invalid(
+                  listOf(
+                    dateInputEditText.context.getString(
+                      R.string.date_format_validation_error_msg,
+                      localeDatePattern
+                    )
+                  )
+                )
+              )
+              if (!timeInputLayout.isEnabled) {
+                displayTimeValidationError(Valid)
+              }
+              if (questionnaireItemViewItem.answers.isNotEmpty()) {
+                questionnaireItemViewItem.clearAnswer()
+              }
               localDate = null
               enableOrDisableTimePicker(enableIt = false)
             }
           }
       }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {
+      fun displayDateValidationError(validationResult: ValidationResult) {
         dateInputLayout.error =
           when (validationResult) {
-            is NotValidated, Valid -> null
+            is NotValidated,
+            Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
+      }
+
+      fun displayTimeValidationError(validationResult: ValidationResult) {
         timeInputLayout.error =
           when (validationResult) {
-            is NotValidated, Valid -> null
-            is Invalid -> validationResult.getSingleStringValidationMessage()
+            is NotValidated,
+            Valid -> null
+            is Invalid ->
+              if (timeInputLayout.isEnabled) {
+                validationResult.getSingleStringValidationMessage()
+              } else {
+                null
+              }
           }
+      }
+
+      override fun displayValidationResult(validationResult: ValidationResult) {
+        displayDateValidationError(validationResult)
+        displayTimeValidationError(validationResult)
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
@@ -305,7 +318,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       private fun enableOrDisableTimePicker(enableIt: Boolean) {
-        timeInputLayout.isEnabled = enableIt
         timeInputLayout.isEnabled = enableIt
       }
 

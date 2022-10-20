@@ -109,7 +109,8 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         // Because of the above issue, we use separate error textview. But we still use
         // textInputLayout to show the error icon and the box color.
         when (validationResult) {
-          is NotValidated, Valid -> {
+          is NotValidated,
+          Valid -> {
             errorTextView.visibility = View.GONE
             textInputLayout.error = null
           }
@@ -178,8 +179,8 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
       ): Boolean {
         return chipContainer.children.any { chip ->
-          (chip.tag as QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent).value
-            .equalsDeep(answer.value)
+          (chip.tag as QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent)
+            .value.equalsDeep(answer.value)
         }
       }
 

@@ -59,7 +59,7 @@ object Releases {
 
   object Workflow : LibraryArtifact {
     override val artifactId = "workflow"
-    override val version = "0.1.0-alpha01"
+    override val version = "0.1.0-alpha02"
     override val name = "Android FHIR Workflow Library"
   }
 

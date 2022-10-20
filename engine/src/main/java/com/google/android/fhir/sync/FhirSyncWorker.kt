@@ -26,6 +26,10 @@ import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.Result.Error
 import com.google.android.fhir.sync.Result.Success
+import com.google.android.fhir.sync.download.DownloaderImpl
+import com.google.android.fhir.sync.upload.BundleUploader
+import com.google.android.fhir.sync.upload.LocalChangesPaginator
+import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
@@ -48,6 +52,13 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   abstract fun getDownloadWorkManagerModified(): DownloadWorkManagerModified
   private val mutex = Mutex()
   abstract fun getConflictResolver(): ConflictResolver
+
+  /**
+   * Configuration defining the max upload Bundle size (in terms to number of resources in a Bundle)
+   * and optionally defining the order of Resources.
+   */
+  open fun getUploadConfiguration(): UploadConfiguration = UploadConfiguration()
+
   private val gson =
     GsonBuilder()
       .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeTypeAdapter().nullSafe())

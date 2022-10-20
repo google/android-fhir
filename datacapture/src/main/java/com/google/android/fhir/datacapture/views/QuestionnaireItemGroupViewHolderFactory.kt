@@ -52,7 +52,8 @@ internal object QuestionnaireItemGroupViewHolderFactory :
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
-          is NotValidated, Valid -> error.visibility = View.GONE
+          is NotValidated,
+          Valid -> error.visibility = View.GONE
           is Invalid -> {
             error.text = validationResult.getSingleStringValidationMessage()
             error.visibility = View.VISIBLE

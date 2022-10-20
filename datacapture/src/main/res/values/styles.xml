@@ -46,6 +46,15 @@
         <item
             name="questionnaireSubtitleTextStyle"
         >@style/TextAppearance.Material3.BodyMedium</item>
+      <item
+            name="questionnaireHelpHeaderStyle"
+        >@style/TextAppearance.Material3.TitleSmall</item>
+      <item
+            name="questionnaireHelpTextStyle"
+        >@style/TextAppearance.Material3.BodyMedium</item>
+      <item
+            name="questionnaireHelpButtonStyle"
+        >@style/Widget.MaterialComponents.Button.TextButton.Icon</item>
         <item
             name="questionnaireAnswerTextStyle"
         >@style/Questionnaire.AnswerStyle</item>
@@ -67,7 +76,7 @@
         >@style/TextAppearance.Material3.BodyLarge</item>
         <item
             name="questionnaireChipStyle"
-        >@style/Widget.MaterialComponents.Chip.Entry</item>
+        >@style/Widget.Material3.Chip.Input</item>
         <item name="questionnaireButtonStyle">@style/Widget.Material3.Button
         </item>
         <item name="questionnaireErrorTextStyle">
@@ -100,6 +109,24 @@
             name="questionnaireAddAnotherAnswerButtonStyle"
         >@style/Widget.Material3.Button
         </item>
+        <item
+            name="questionnaireLinearProgressIndicatorStyle"
+        >@style/Widget.Material3.LinearProgressIndicator
+        </item>
+    </style>
+
+    <style
+        name="Questionnaire.HelpStyle"
+        parent="TextAppearance.Material3.TitleSmall"
+    >
+      <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style
+        name="Questionnaire.HelpDescriptionStyle"
+        parent="TextAppearance.Material3.BodyMedium"
+    >
+      <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
 
     <style
@@ -186,6 +213,7 @@
         name="Questionnaire.CheckBoxStyle"
         parent="Widget.Material3.CompoundButton.CheckBox"
     >
+        <item name="android:button">@drawable/checkbox_inset</item>
         <item name="android:textColor">@color/checked_text_color</item>
         <item name="android:buttonTint">@color/checked_text_color</item>
         <item
@@ -198,6 +226,7 @@
         name="Questionnaire.RadioButtonStyle"
         parent="Widget.Material3.CompoundButton.RadioButton"
     >
+        <item name="android:button">@drawable/radio_button_inset</item>
         <item name="android:textColor">@color/checked_text_color</item>
         <item name="android:buttonTint">@color/checked_text_color</item>
         <item

@@ -17,17 +17,28 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.hasHelpButton
+import com.google.android.fhir.datacapture.localizedHelpSpanned
 import com.google.android.fhir.datacapture.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.material.card.MaterialCardView
 import org.hl7.fhir.r4.model.Questionnaire
 
 /** View for the prefix, question, and hint of a questionnaire item. */
@@ -44,15 +55,16 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
 
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
-    question.updateTextAndVisibility(questionnaireItem.localizedTextSpanned)
+    updateQuestionText(question, questionnaireItem)
     hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
+    initHelpButton(this, questionnaireItem)
     //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
     visibility = getViewGroupVisibility(prefix, question, hint)
   }
 }
 
-internal fun TextView.updateTextAndVisibility(localizedText: Spanned?) {
+internal fun TextView.updateTextAndVisibility(localizedText: Spanned? = null) {
   text = localizedText
   visibility =
     if (localizedText.isNullOrEmpty()) {
@@ -68,4 +80,67 @@ internal fun getViewGroupVisibility(vararg view: TextView): Int {
     return VISIBLE
   }
   return GONE
+}
+
+internal fun initHelpButton(
+  view: View,
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent
+) {
+  val helpButton = view.findViewById<Button>(R.id.helpButton)
+  helpButton.visibility =
+    if (questionnaireItem.hasHelpButton) {
+      VISIBLE
+    } else {
+      GONE
+    }
+  val helpCardView = view.findViewById<MaterialCardView>(R.id.helpCardView)
+  var isHelpCardViewVisible = false
+  helpButton.setOnClickListener {
+    if (isHelpCardViewVisible) {
+      isHelpCardViewVisible = false
+      helpCardView.visibility = GONE
+    } else {
+      isHelpCardViewVisible = true
+      helpCardView.visibility = VISIBLE
+    }
+  }
+
+  view
+    .findViewById<TextView>(R.id.helpText)
+    .updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
+}
+
+/**
+ * Updates textview [R.id.question] with
+ * [Questionnaire.QuestionnaireItemComponent.localizedTextSpanned] text and `*` if
+ * [Questionnaire.QuestionnaireItemComponent.required] is true. And applies [R.attr.colorError] to
+ * `*`.
+ */
+internal fun updateQuestionText(
+  questionTextView: TextView,
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+) {
+  val builder = SpannableStringBuilder()
+  questionnaireItem.localizedTextSpanned?.let { builder.append(it) }
+  if (questionnaireItem.required) {
+    builder.appendWithSpan(
+      questionTextView.context.applicationContext.getString(R.string.space_asterisk),
+      questionTextView.context.getColorFromAttr(R.attr.colorError)
+    )
+  }
+  questionTextView.updateTextAndVisibility(builder)
+}
+
+private fun SpannableStringBuilder.appendWithSpan(value: String, @ColorInt color: Int) {
+  val start = length
+  append(value)
+  val end = length
+  setSpan(ForegroundColorSpan(color), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+}
+
+@ColorInt
+private fun Context.getColorFromAttr(@AttrRes attrColor: Int): Int {
+  val typedValue = TypedValue()
+  theme.resolveAttribute(attrColor, typedValue, true)
+  return typedValue.data
 }
