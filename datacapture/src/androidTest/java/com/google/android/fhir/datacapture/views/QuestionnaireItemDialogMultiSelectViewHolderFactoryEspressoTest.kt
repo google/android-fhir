@@ -61,12 +61,13 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
   @Test
   fun multipleChoice_selectMultiple_clickSave_shouldSaveMultipleOptions() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -78,12 +79,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnText("Save")
 
     assertDisplayedText().isEqualTo("Coding 1, Coding 3, Coding 5")
-    assertQuestionnaireResponseAtIndex(
-      questionnaireItemViewItem,
-      "Coding 1",
-      "Coding 3",
-      "Coding 5"
-    )
+    assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding 1", "Coding 3", "Coding 5")
   }
 
   @Test
@@ -128,12 +124,13 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
   @Test
   fun shouldSelectSingleOptionOnChangeInOptionFromDropDown() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -144,17 +141,18 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnText("Save")
 
     assertDisplayedText().isEqualTo("Coding 1")
-    assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, "Coding 1")
+    assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding 1")
   }
 
   @Test
   fun singleOption_select_clickSave_shouldSaveSingleOption() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -164,7 +162,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnText("Save")
 
     assertDisplayedText().isEqualTo("Coding 2")
-    assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, "Coding 2")
+    assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding 2")
   }
 
   @Test
