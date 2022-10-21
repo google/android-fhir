@@ -46,7 +46,11 @@ import java.text.ParseException
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.chrono.IsoChronology
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.FormatStyle
 import java.util.Date
+import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.log10
 import org.hl7.fhir.r4.model.DateType
@@ -123,8 +127,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               .singleOrNull()
               ?.takeIf { it.hasValue() }
               ?.valueDateType
-              ?.localDate
-              ?.formattedString(localePattern)
+              ?.localDate?.formattedString(localePattern)
           )
         }
         textWatcher = textInputEditText.doAfterTextChanged { text -> updateAnswer(text.toString()) }
