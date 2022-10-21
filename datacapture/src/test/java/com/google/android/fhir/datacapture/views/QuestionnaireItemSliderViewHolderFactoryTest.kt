@@ -108,18 +108,19 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
 
   @Test
   fun shouldSetQuestionnaireResponseSliderAnswer() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
 
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<Slider>(R.id.slider).value = 10.0F
 
-    assertThat(questionnaireItemViewItem.answers.single().valueIntegerType.value).isEqualTo(10)
+    assertThat(answerHolder!!.single().valueIntegerType.value).isEqualTo(10)
   }
 
   @Test
