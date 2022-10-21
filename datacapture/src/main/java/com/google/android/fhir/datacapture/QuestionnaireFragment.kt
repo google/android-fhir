@@ -126,8 +126,6 @@ open class QuestionnaireFragment : Fragment() {
           paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage
           paginationNextButton.visibility = View.VISIBLE
           paginationNextButton.isEnabled = state.pagination.hasNextPage
-          reviewModeButton.visibility =
-            if (state.pagination.hasNextPage) View.GONE else View.VISIBLE
           questionnaireProgressIndicator.updateProgressIndicator(
             calculateProgressPercentage(
               count =
@@ -155,9 +153,11 @@ open class QuestionnaireFragment : Fragment() {
               }
             }
           )
-        reviewModeButton.visibility =
-            if (state.pagination.showReviewButton) View.VISIBLE else View.GONE
         }
+
+        reviewModeButton.visibility =
+          if (state.pagination.showReviewButton) View.VISIBLE else View.GONE
+
         submitButton.visibility = if (state.pagination.showSubmitButton) View.VISIBLE else View.GONE
       }
     }
