@@ -1,6 +1,10 @@
 import androidx.build.gradle.gcpbuildcache.GcpBuildCache
 import androidx.build.gradle.gcpbuildcache.GcpBuildCacheServiceFactory
 
+include()
+
+include()
+
 plugins {
   id("com.gradle.enterprise") version ("3.10")
   id("androidx.build.gradle.gcpbuildcache") version "1.0.0-beta01"
@@ -38,6 +42,8 @@ include(":datacapture")
 include(":demo")
 
 include(":engine")
+
+include(":implementationguide")
 
 include(":workflow")
 
