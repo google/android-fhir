@@ -39,11 +39,11 @@ data class StringParamFilterCriterion(
   override fun getConditionalParams() =
     listOf(
       ConditionParam(
-        "index_value " +
+        if(modifier == StringFilterModifier.MATCHES_FTS) "'*' || ? || '*'" else "index_value " +
           when (modifier) {
             StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
             StringFilterModifier.MATCHES_EXACTLY -> "= ?"
-            StringFilterModifier.MATCHES_FTS -> "MATCH '*' || ? || '*'"
+            StringFilterModifier.MATCHES_FTS -> "'*' || ? || '*'"
             StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
           },
         value!!
@@ -77,7 +77,7 @@ internal data class StringParamFilterCriteria(
       SearchQuery(
         """
       SELECT resourceUuid FROM StringIndexEntity c JOIN FullTextStringIndexEntity d ON c.id = d.docid
-      WHERE resourceType = ? AND d.index_name = ? AND d.${conditionParams.toQueryString(operation)} 
+      WHERE resourceType = ? AND d.index_name = ? AND d.${conditionParams.toQueryString(operation, true)} 
       """,
         listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }
       )
@@ -112,16 +112,29 @@ internal data class StringParamFilterCriteria(
    * This function takes care of wrapping the conditions in brackets so that they are evaluated as
    * intended.
    */
-  private fun List<ConditionParam<*>>.toQueryString(operation: Operation) =
-    this.joinToString(
-      separator = " ${operation.logicalOperator} ",
-      prefix = if (size > 1) "(" else "",
-      postfix = if (size > 1) ")" else ""
-    ) {
-      if (it.params.size > 1) {
-        "(${it.condition})"
-      } else {
-        it.condition
+  private fun List<ConditionParam<*>>.toQueryString(operation: Operation, isMatchesFts: Boolean = false): String {
+
+   return if(isMatchesFts) {
+
+      this.joinToString(
+        separator = if(operation == Operation.OR) " ${operation.logicalOperator} " else " ",
+        prefix = "index_value MATCH "
+      ) {
+          it.condition
+      }
+    } else {
+      this.joinToString(
+        separator = " ${operation.logicalOperator} ",
+        prefix = if (size > 1) "(" else "",
+        postfix = if (size > 1) ")" else ""
+      ) {
+        if (it.params.size > 1) {
+          "(${it.condition})"
+        } else {
+          it.condition
+        }
       }
     }
+  }
+
 }

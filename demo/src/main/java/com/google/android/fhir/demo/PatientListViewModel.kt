@@ -23,10 +23,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.count
+import com.google.android.fhir.search.filter.StringParamFilterCriterion
 import com.google.android.fhir.search.search
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -77,7 +79,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
         filter(
           Patient.NAME,
           {
-            modifier = StringFilterModifier.CONTAINS
+            modifier = StringFilterModifier.MATCHES_FTS
             value = nameQuery
           }
         )
@@ -93,10 +95,10 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
         if (nameQuery.isNotEmpty()) {
           filter(
             Patient.NAME,
-            {
-              modifier = StringFilterModifier.CONTAINS
-              value = nameQuery
-            }
+             *nameQuery.trim().split(" ").map { nameQueryPart ->
+               createStringParamFilterCriterion(nameQueryPart)
+             }.toTypedArray(),
+            operation = Operation.OR
           )
         }
         filterCity(this)
@@ -114,6 +116,12 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
       }
     }
     return patients
+  }
+  private fun createStringParamFilterCriterion(nameQueryPart: String): StringParamFilterCriterion.() -> Unit {
+    return {
+      modifier = StringFilterModifier.MATCHES_FTS
+      value = nameQueryPart
+    }
   }
 
   private fun filterCity(search: Search) {
