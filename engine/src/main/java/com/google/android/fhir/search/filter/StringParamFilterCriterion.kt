@@ -39,13 +39,15 @@ data class StringParamFilterCriterion(
   override fun getConditionalParams() =
     listOf(
       ConditionParam(
-        if(modifier == StringFilterModifier.MATCHES_FTS) "'*' || ? || '*'" else "index_value " +
-          when (modifier) {
-            StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
-            StringFilterModifier.MATCHES_EXACTLY -> "= ?"
-            StringFilterModifier.MATCHES_FTS -> "'*' || ? || '*'"
-            StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
-          },
+        if (modifier == StringFilterModifier.MATCHES_FTS) "'*' || ? || '*'"
+        else
+          "index_value " +
+            when (modifier) {
+              StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
+              StringFilterModifier.MATCHES_EXACTLY -> "= ?"
+              StringFilterModifier.MATCHES_FTS -> "'*' || ? || '*'"
+              StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
+            },
         value!!
       )
     )
@@ -61,8 +63,8 @@ data class StringParamFilterCriterion(
  * [StringParamFilterCriteria] with two [StringParamFilterCriterion] one with
  * [StringParamFilterCriterion.value] as "John" and other as "Jane."
  *
- * For MATCH_FTS [StringFilterModifier], it returns a query doing JOIN with FullTextStringIndexEntity
- * Table
+ * For MATCH_FTS [StringFilterModifier], it returns a query doing JOIN with
+ * FullTextStringIndexEntity Table
  */
 internal data class StringParamFilterCriteria(
   val parameter: StringClientParam,
@@ -112,16 +114,17 @@ internal data class StringParamFilterCriteria(
    * This function takes care of wrapping the conditions in brackets so that they are evaluated as
    * intended.
    */
-  private fun List<ConditionParam<*>>.toQueryString(operation: Operation, isMatchesFts: Boolean = false): String {
+  private fun List<ConditionParam<*>>.toQueryString(
+    operation: Operation,
+    isMatchesFts: Boolean = false
+  ): String {
 
-   return if(isMatchesFts) {
+    return if (isMatchesFts) {
 
       this.joinToString(
-        separator = if(operation == Operation.OR) " ${operation.logicalOperator} " else " ",
+        separator = if (operation == Operation.OR) " ${operation.logicalOperator} " else " ",
         prefix = "index_value MATCH "
-      ) {
-          it.condition
-      }
+      ) { it.condition }
     } else {
       this.joinToString(
         separator = " ${operation.logicalOperator} ",
@@ -136,5 +139,4 @@ internal data class StringParamFilterCriteria(
       }
     }
   }
-
 }
