@@ -18,9 +18,12 @@ package com.google.android.fhir.datacapture
 
 import android.os.Build
 import com.google.android.fhir.datacapture.mapping.ITEM_INITIAL_EXPRESSION_URL
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.util.Locale
+import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -33,6 +36,7 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Assert.assertThrows
@@ -473,21 +477,46 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun maxSize_shouldReturnKilobytes() {
+  fun maxSize_shouldReturnKibibytes() {
     val questionnaire =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
       }
-    assertThat(questionnaire.maxSizeInKB).isEqualTo(BigDecimal(5120))
+    assertThat(questionnaire.maxSizeInKiB).isEqualTo(BigDecimal(5120))
   }
 
   @Test
-  fun maxSize_shouldReturnMegabytes() {
+  fun maxSize_shouldReturnMebibytes() {
     val questionnaire =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
       }
-    assertThat(questionnaire.maxSizeInMB).isEqualTo(BigDecimal(5))
+    assertThat(questionnaire.maxSizeInMiB).isEqualTo(BigDecimal(5))
+  }
+
+  @Test
+  fun maxSize_whenAnswerSizeIsAboveLimit_shouldBeKnown() {
+    var answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+          questionnaireItem =
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "attachment-1"
+              addExtension(EXTENSION_MAX_SIZE, DecimalType(0))
+            },
+          questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, result -> answers = result },
+        )
+        .apply {
+          setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(Attachment().apply { size = 5242880 })
+          )
+        }
+
+    assertThat(answers.first().valueAttachment.size)
+      .isGreaterThan(questionnaireItemViewItem.questionnaireItem.maxSizeInB?.toInt())
   }
 
   @Test

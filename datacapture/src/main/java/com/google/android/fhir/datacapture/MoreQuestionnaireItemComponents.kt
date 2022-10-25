@@ -189,16 +189,16 @@ internal val Questionnaire.QuestionnaireItemComponent.maxSizeInB: BigDecimal?
       ?.value
   }
 
-/** Maximum size an attachment can be. Unit in Kilobytes. */
-internal val Questionnaire.QuestionnaireItemComponent.maxSizeInKB: BigDecimal?
+/** Maximum size an attachment can be. Unit in Kibibytes. */
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInKiB: BigDecimal?
   get() {
     return maxSizeInB?.div(SIZE_UNIT_DIVIDER)
   }
 
-/** Maximum size an attachment can be. Unit in Megabytes. */
-internal val Questionnaire.QuestionnaireItemComponent.maxSizeInMB: BigDecimal?
+/** Maximum size an attachment can be. Unit in Mebibytes. */
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInMiB: BigDecimal?
   get() {
-    return maxSizeInKB?.div(SIZE_UNIT_DIVIDER)
+    return maxSizeInKiB?.div(SIZE_UNIT_DIVIDER)
   }
 
 /** UI controls relevant to rendering questionnaire items. */
