@@ -22,10 +22,12 @@ import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.utilities.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
 import com.google.android.fhir.logicalId
+import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -173,6 +175,30 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceO
           as CodeType?)
         ?.valueAsString
     return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
+  }
+
+internal const val EXTENSION_MAX_SIZE = "http://hl7.org/fhir/StructureDefinition/maxSize"
+
+private val SIZE_UNIT_DIVIDER = BigDecimal(1024)
+
+/** Maximum size an attachment can be. Unit in Bytes. */
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInB: BigDecimal?
+  get() {
+    return (extension.firstOrNull { it.url == EXTENSION_MAX_SIZE }?.valueAsPrimitive
+        as DecimalType?)
+      ?.value
+  }
+
+/** Maximum size an attachment can be. Unit in Kilobytes. */
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInKB: BigDecimal?
+  get() {
+    return maxSizeInB?.div(SIZE_UNIT_DIVIDER)
+  }
+
+/** Maximum size an attachment can be. Unit in Megabytes. */
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInMB: BigDecimal?
+  get() {
+    return maxSizeInKB?.div(SIZE_UNIT_DIVIDER)
   }
 
 /** UI controls relevant to rendering questionnaire items. */

@@ -25,6 +25,7 @@ import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -460,6 +461,39 @@ class MoreQuestionnaireItemComponentsTest {
         addExtension(EXTENSION_CHOICE_ORIENTATION_URL, CodeType(""))
       }
     assertThat(questionnaire.choiceOrientation).isNull()
+  }
+
+  @Test
+  fun maxSize_shouldReturnBytes() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
+      }
+    assertThat(questionnaire.maxSizeInB).isEqualTo(BigDecimal(5242880))
+  }
+
+  @Test
+  fun maxSize_shouldReturnKilobytes() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
+      }
+    assertThat(questionnaire.maxSizeInKB).isEqualTo(BigDecimal(5120))
+  }
+
+  @Test
+  fun maxSize_shouldReturnMegabytes() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
+      }
+    assertThat(questionnaire.maxSizeInMB).isEqualTo(BigDecimal(5))
+  }
+
+  @Test
+  fun maxSize_missingExtension_shouldReturnNull() {
+    val questionnaire = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaire.maxSizeInB).isNull()
   }
 
   @Test
