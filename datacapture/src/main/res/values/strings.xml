@@ -13,6 +13,11 @@
     <string
         name="max_value_validation_error_msg"
     >Maximum value allowed is:<xliff:g id="max_value">%1$s</xliff:g> </string>
+    <string
+        name="date_format_validation_error_msg"
+    >Date format needs to be <xliff:g
+            id="locale_format"
+        >%1$s</xliff:g> </string>
     <string name="submit_button_text">Submit</string>
     <string name="button_pagination_next">Next</string>
     <string name="button_pagination_previous">Previous</string>
@@ -37,6 +42,7 @@
     <string name="button_review">Review</string>
     <string name="not_answered">"Not Answered"</string>
     <string name="help">Help</string>
+    <string name="space_asterisk">\u0020\u002a</string>
     <string name="take_photo">Take Photo</string>
     <string name="upload_photo">Upload Photo</string>
     <string name="delete_image">Delete image</string>

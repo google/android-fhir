@@ -11,15 +11,15 @@ android {
     targetSdk = Sdk.targetSdk
   }
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = Java.sourceCompatibility
+    targetCompatibility = Java.targetCompatibility
   }
 
   packagingOptions {
     resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
   }
 
-  kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
+  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
 }
 
 dependencies {

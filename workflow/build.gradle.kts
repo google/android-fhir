@@ -13,19 +13,11 @@ android {
   compileSdk = Sdk.compileSdk
 
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.minSdkWorkflow
     targetSdk = Sdk.targetSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.workflow"
-    // Required when setting minSdkVersion to 20 or lower
-    // See https://developer.android.com/studio/write/java8-support
-    multiDexEnabled = true
-  }
-
-  sourceSets {
-    getByName("test").apply { resources.setSrcDirs(listOf("testdata")) }
-    getByName("androidTest").apply { resources.setSrcDirs(listOf("testdata")) }
   }
 
   // Added this for fixing out of memory issue in running test cases
@@ -42,13 +34,8 @@ android {
   }
 
   compileOptions {
-    // Flag to enable support for the new language APIs
-    // See https://developer.android.com/studio/write/java8-support
-    isCoreLibraryDesugaringEnabled = true
-    // Sets Java compatibility to Java 8
-    // See https://developer.android.com/studio/write/java8-support
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = Java.sourceCompatibility
+    targetCompatibility = Java.targetCompatibility
   }
 
   packagingOptions {
@@ -76,29 +63,23 @@ android {
     )
   }
 
-  // See https://developer.android.com/studio/write/java8-support
-  kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
+  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
 
   configureJacocoTestOptions()
 }
 
 configurations {
   all {
-    exclude(module = "json")
     exclude(module = "xpp3")
-    exclude(module = "hamcrest-all")
-    exclude(module = "javax.activation")
+    exclude(module = "xpp3_min")
+    exclude(module = "xmlpull")
+    exclude(module = "javax.json")
+    exclude(module = "jcl-over-slf4j")
     exclude(group = "org.apache.httpcomponents")
-    exclude(module = "activation", group = "javax.activation")
-    exclude(module = "javaee-api", group = "javax")
-    exclude(module = "hamcrest-all")
-    exclude(module = "javax.activation")
-    exclude(group = "xml-apis")
-    exclude(group = "com.google.code.javaparser")
-    exclude(group = "jakarta.activation")
+    // Remove this after this issue has been fixed:
+    // https://github.com/cqframework/clinical_quality_language/issues/799
+    exclude(module = "antlr4")
   }
-
-  compileOnly { exclude(group = "org.eclipse.persistence") }
 }
 
 dependencies {
@@ -107,37 +88,52 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  androidTestImplementation(Dependencies.jsonAssert)
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(Dependencies.xmlUnit)
   androidTestImplementation(project(":testing"))
+  androidTestImplementation(project(":workflow-testing"))
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
-
   implementation(Dependencies.Androidx.coreKtx)
+
+  // Remove this after this issue has been fixed:
+  // https://github.com/cqframework/clinical_quality_language/issues/799
+  implementation(Dependencies.Cql.antlr4Runtime)
+
+  implementation(Dependencies.Cql.engine)
+  implementation(Dependencies.Cql.engineJackson) // Necessary to import Executable XML/JSON CQL libs
   implementation(Dependencies.Cql.evaluator)
   implementation(Dependencies.Cql.evaluatorBuilder)
   implementation(Dependencies.Cql.evaluatorDagger)
   implementation(Dependencies.Cql.evaluatorPlanDef)
-  implementation(Dependencies.Jackson.annotations)
-  implementation(Dependencies.Jackson.core)
-  implementation(Dependencies.Jackson.databind)
-  implementation(Dependencies.JavaJsonTools.jacksonCoreUtils)
-  implementation(Dependencies.JavaJsonTools.msgSimple)
+  implementation(Dependencies.Cql.translatorCqlToElm) // Overrides HAPI's old versions
+  implementation(Dependencies.Cql.translatorElm) // Overrides HAPI's old versions
+  implementation(Dependencies.Cql.translatorElmJackson) // Necessary to import XML/JSON CQL Libs
+  implementation(Dependencies.Cql.translatorModel) // Overrides HAPI's old versions
+  implementation(Dependencies.Cql.translatorModelJackson) // Necessary to import XML/JSON ModelInfos
+
+  // Runtime dependency that is required to run FhirPath (also requires minSDK of 26).
+  // Version 3.0 uses java.lang.System.Logger, which is not available on Android
+  // Replace for Guava when this PR gets merged: https://github.com/hapifhir/hapi-fhir/pull/3977
+  implementation(Dependencies.HapiFhir.caffeine)
+
   implementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
   implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.stdlib)
-  implementation(Dependencies.stax)
-  implementation(Dependencies.woodstox)
   implementation(Dependencies.xerces)
   implementation(project(":engine"))
 
   testImplementation(Dependencies.AndroidxTest.core)
+  testImplementation(Dependencies.jsonAssert)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(Dependencies.xmlUnit)
   testImplementation(project(":testing"))
+  testImplementation(project(":workflow-testing"))
 }
 
 configureDokka(Releases.Workflow.artifactId, Releases.Workflow.version)

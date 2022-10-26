@@ -21,6 +21,9 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.fhir.datacapture.DisplayItemControlType
+import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_SYSTEM
+import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_URL
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.utilities.assertQuestionnaireResponseAtIndex
@@ -28,9 +31,12 @@ import com.google.android.fhir.datacapture.utilities.clickOnText
 import com.google.android.fhir.datacapture.utilities.clickOnTextInDialog
 import com.google.android.fhir.datacapture.utilities.endIconClickInTextInputLayout
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.StringSubject
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
@@ -55,12 +61,13 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
   @Test
   fun multipleChoice_selectMultiple_clickSave_shouldSaveMultipleOptions() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -72,12 +79,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnText("Save")
 
     assertDisplayedText().isEqualTo("Coding 1, Coding 3, Coding 5")
-    assertQuestionnaireResponseAtIndex(
-      questionnaireItemViewItem,
-      "Coding 1",
-      "Coding 3",
-      "Coding 5"
-    )
+    assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding 1", "Coding 3", "Coding 5")
   }
 
   @Test
@@ -122,12 +124,13 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
   @Test
   fun shouldSelectSingleOptionOnChangeInOptionFromDropDown() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -138,17 +141,18 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnText("Save")
 
     assertDisplayedText().isEqualTo("Coding 1")
-    assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, "Coding 1")
+    assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding 1")
   }
 
   @Test
   fun singleOption_select_clickSave_shouldSaveSingleOption() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -158,7 +162,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnText("Save")
 
     assertDisplayedText().isEqualTo("Coding 2")
-    assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, "Coding 2")
+    assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding 2")
   }
 
   @Test
@@ -178,6 +182,44 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     assertDisplayedText().isEmpty()
     assertThat(questionnaireItemViewItem.answers).isEmpty()
+  }
+
+  @Test
+  fun bindView_setHintText() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5")
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "1.1"
+              text = "Select code"
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+              addExtension(
+                Extension()
+                  .setUrl(EXTENSION_ITEM_CONTROL_URL)
+                  .setValue(
+                    CodeableConcept()
+                      .addCoding(
+                        Coding()
+                          .setCode(DisplayItemControlType.FLYOVER.extensionCode)
+                          .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                      )
+                  )
+              )
+            }
+          ),
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
+          .hint.toString()
+      )
+      .isEqualTo("Select code")
   }
 
   @Test
