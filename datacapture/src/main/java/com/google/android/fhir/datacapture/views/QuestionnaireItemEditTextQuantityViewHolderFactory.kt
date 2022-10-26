@@ -40,7 +40,6 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
         // read default unit from initial, as ideally quantity must specify a unit
         return text.let {
           if (text.isEmpty()) {
-            questionnaireItemViewItem.clearAnswer()
             return null
           }
           try {
