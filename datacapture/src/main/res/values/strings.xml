@@ -37,5 +37,22 @@
     <string name="button_review">Review</string>
     <string name="not_answered">"Not Answered"</string>
     <string name="help">Help</string>
+    <string name="take_photo">Take Photo</string>
+    <string name="upload_photo">Upload Photo</string>
+    <string name="delete_image">Delete image</string>
+    <string name="delete_file">Delete file</string>
+    <string name="select_file">Select File</string>
+    <string
+        name="max_size_image_above_limit_validation_error_msg"
+    >Error: Image size is larger than %1$s MB</string>
+    <string
+        name="max_size_file_above_limit_validation_error_msg"
+    >Error: File size is larger than %1$s MB</string>
+    <string name="upload_failed">Upload failed</string>
+    <string
+        name="mime_type_wrong_media_format_validation_error_msg"
+    >Error: Wrong media format</string>
+    <string name="image_uploaded">Image uploaded</string>
+    <string name="file_uploaded">File uploaded</string>
 
 </resources>
