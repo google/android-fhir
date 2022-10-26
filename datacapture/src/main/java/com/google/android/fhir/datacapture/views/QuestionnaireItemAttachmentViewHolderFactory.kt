@@ -210,7 +210,8 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           ) { _, result ->
             val uri =
               (result.get(SelectFileLauncherFragment.RESULT_REQUEST_KEY)
-                ?: return@setFragmentResultListener) as Uri
+                ?: return@setFragmentResultListener)
+                as Uri
 
             val bytes =
               context.contentResolver.openInputStream(uri)?.use { it.buffered().readBytes() }!!
@@ -317,7 +318,8 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
-          is NotValidated, Valid -> error.visibility = View.GONE
+          is NotValidated,
+          Valid -> error.visibility = View.GONE
           is Invalid -> {
             error.text = validationResult.getSingleStringValidationMessage()
             error.visibility = View.VISIBLE

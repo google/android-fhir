@@ -22,8 +22,8 @@ import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.utilities.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
 import com.google.android.fhir.logicalId
-import org.hl7.fhir.r4.model.Base
 import java.math.BigDecimal
+import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -188,9 +188,9 @@ internal const val EXTENSION_MIME_TYPE = "http://hl7.org/fhir/StructureDefinitio
 
 internal val Questionnaire.QuestionnaireItemComponent.mimeTypes: List<String>
   get() {
-    return extension.filter { it.url == EXTENSION_MIME_TYPE }.map {
-      (it.value as CodeType).valueAsString
-    }
+    return extension
+      .filter { it.url == EXTENSION_MIME_TYPE }
+      .map { (it.value as CodeType).valueAsString }
   }
 
 internal fun Questionnaire.QuestionnaireItemComponent.hasMimeType(mimeType: String): Boolean {
@@ -207,8 +207,8 @@ private val SIZE_UNIT_DIVIDER = BigDecimal(1024)
 
 internal val Questionnaire.QuestionnaireItemComponent.maxSizeInB: BigDecimal?
   get() {
-    return (extension.firstOrNull { it.url == EXTENSION_MAX_SIZE }?.valueAsPrimitive as
-        DecimalType?)
+    return (extension.firstOrNull { it.url == EXTENSION_MAX_SIZE }?.valueAsPrimitive
+        as DecimalType?)
       ?.value
   }
 
