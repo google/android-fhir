@@ -1,0 +1,53 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/mimeType",
+          "valueCode": "image/*"
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/mimeType",
+          "valueCode": "audio/*"
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/mimeType",
+          "valueCode": "video/*"
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/mimeType",
+          "valueCode": "application/pdf"
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/maxSize",
+          "valueDecimal": 5242880
+        }
+      ],
+      "linkId": "1",
+      "text": "Select an image to upload",
+      "type": "attachment",
+      "required": true,
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1-media-types-supported",
+          "text": "Media types supported: jpg, png, .mp3, .mp4, pdf",
+          "type": "display"
+        }
+      ]
+    }
+  ]
+}
