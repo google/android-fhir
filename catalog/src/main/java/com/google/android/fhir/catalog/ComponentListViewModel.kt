@@ -41,6 +41,12 @@ class ComponentListViewModel(application: Application, private val state: SavedS
     val questionnaireFileWithValidation: String = "",
     val workflow: WorkflowType = WorkflowType.COMPONENT
   ) {
+    ATTACHMENT(
+      R.drawable.ic_attachment,
+      R.string.component_name_attachment,
+      "attachment_questionnaire.json",
+      "attachment_with_validation_questionnaire.json"
+    ),
     SINGLE_CHOICE(
       R.drawable.ic_singlechoice,
       R.string.component_name_single_choice,
