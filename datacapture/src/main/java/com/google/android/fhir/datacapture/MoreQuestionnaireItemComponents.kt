@@ -19,9 +19,11 @@ package com.google.android.fhir.datacapture
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import com.google.android.fhir.getLocalizedText
+import java.math.BigDecimal
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -126,6 +128,51 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceO
           CodeType?)
         ?.valueAsString
     return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
+  }
+
+internal enum class GeneralMimeTypes(val value: String) {
+  AUDIO("audio"),
+  DOCUMENT("application"),
+  IMAGE("image"),
+  VIDEO("video")
+}
+
+internal const val EXTENSION_MIME_TYPE = "http://hl7.org/fhir/StructureDefinition/mimeType"
+
+internal val Questionnaire.QuestionnaireItemComponent.mimeTypes: List<String>
+  get() {
+    return extension.filter { it.url == EXTENSION_MIME_TYPE }.map {
+      (it.value as CodeType).valueAsString
+    }
+  }
+
+internal fun Questionnaire.QuestionnaireItemComponent.hasMimeType(mimeType: String): Boolean {
+  return mimeTypes.any { it.substringBefore("/") == mimeType.substringBefore("/") }
+}
+
+internal fun Questionnaire.QuestionnaireItemComponent.hasMimeTypeOnly(mimeType: String): Boolean {
+  return mimeTypes.all { it.substringBefore("/") == mimeType.substringBefore("/") }
+}
+
+internal const val EXTENSION_MAX_SIZE = "http://hl7.org/fhir/StructureDefinition/maxSize"
+
+private val SIZE_UNIT_DIVIDER = BigDecimal(1024)
+
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInB: BigDecimal?
+  get() {
+    return (extension.firstOrNull { it.url == EXTENSION_MAX_SIZE }?.valueAsPrimitive as
+        DecimalType?)
+      ?.value
+  }
+
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInKB: BigDecimal?
+  get() {
+    return maxSizeInB?.div(SIZE_UNIT_DIVIDER)
+  }
+
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInMB: BigDecimal?
+  get() {
+    return maxSizeInKB?.div(SIZE_UNIT_DIVIDER)
   }
 
 /** UI controls relevant to rendering questionnaire items. */
