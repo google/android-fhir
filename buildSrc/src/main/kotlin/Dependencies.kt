@@ -38,6 +38,10 @@ object Dependencies {
       "org.opencds.cqf.cql:evaluator.plandefinition:${Versions.Cql.evaluator}"
   }
 
+  object Glide {
+    const val glide = "com.github.bumptech.glide:glide:${Versions.Glide.glide}"
+  }
+
   object HapiFhir {
     const val structuresR4 = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhir}"
     const val validation = "ca.uhn.hapi.fhir:hapi-fhir-validation:${Versions.hapiFhir}"
@@ -161,6 +165,10 @@ object Dependencies {
 
     object Cql {
       const val evaluator = "1.4.2"
+    }
+
+    object Glide {
+      const val glide = "4.14.2"
     }
 
     object JavaJsonTools {
