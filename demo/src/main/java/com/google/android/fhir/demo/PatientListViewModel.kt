@@ -28,7 +28,6 @@ import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.count
-import com.google.android.fhir.search.filter.StringParamFilterCriterion
 import com.google.android.fhir.search.search
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -95,11 +94,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
         if (nameQuery.isNotEmpty()) {
           filter(
             Patient.NAME,
-            *nameQuery
-              .trim()
-              .split(" ")
-              .map { nameQueryPart -> createStringParamFilterCriterion(nameQueryPart) }
-              .toTypedArray(),
+            *nameQuery.toStringParamFilterCriterion(StringFilterModifier.MATCHES_FTS),
             operation = Operation.OR
           )
         }
@@ -118,14 +113,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
       }
     }
     return patients
-  }
-  private fun createStringParamFilterCriterion(
-    nameQueryPart: String
-  ): StringParamFilterCriterion.() -> Unit {
-    return {
-      modifier = StringFilterModifier.MATCHES_FTS
-      value = nameQueryPart
-    }
   }
 
   private fun filterCity(search: Search) {

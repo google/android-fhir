@@ -21,6 +21,7 @@ import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.SearchQuery
+import com.google.android.fhir.search.SetOperation
 import com.google.android.fhir.search.StringFilterModifier
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
@@ -39,15 +40,13 @@ data class StringParamFilterCriterion(
   override fun getConditionalParams() =
     listOf(
       ConditionParam(
-        if (modifier == StringFilterModifier.MATCHES_FTS) "'*' || ? || '*'"
-        else
-          "index_value " +
-            when (modifier) {
-              StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
-              StringFilterModifier.MATCHES_EXACTLY -> "= ?"
-              StringFilterModifier.MATCHES_FTS -> "'*' || ? || '*'"
-              StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
-            },
+        "index_value " +
+          when (modifier) {
+            StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
+            StringFilterModifier.MATCHES_EXACTLY -> "= ?"
+            StringFilterModifier.MATCHES_FTS -> "MATCH '*' || ? || '*'"
+            StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
+          },
         value!!
       )
     )
@@ -76,13 +75,34 @@ internal data class StringParamFilterCriteria(
     val conditionParams = filters.flatMap { it.getConditionalParams() }
 
     return if (filters.first().modifier == StringFilterModifier.MATCHES_FTS)
-      SearchQuery(
-        """
+      if (conditionParams.size > 1) {
+        var string = ""
+        val arguments = mutableListOf<String>()
+        conditionParams.forEachIndexed { index, element ->
+          string +=
+            """
+          SELECT resourceUuid FROM StringIndexEntity c JOIN FullTextStringIndexEntity d ON c.id = d.docid
+          WHERE resourceType = ? AND d.index_name = ? AND d.index_value MATCH '*' || ? || '*'
+            """.trimIndent()
+          arguments +=
+            listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }[index]
+          if (index < conditionParams.size - 1)
+            string +=
+              when (operation) {
+                Operation.OR -> " ${SetOperation.UNION} "
+                Operation.AND -> " ${SetOperation.INTERSECT} "
+              }
+        }
+        SearchQuery(string, arguments)
+      } else {
+        SearchQuery(
+          """
       SELECT resourceUuid FROM StringIndexEntity c JOIN FullTextStringIndexEntity d ON c.id = d.docid
       WHERE resourceType = ? AND d.index_name = ? AND d.${conditionParams.toQueryString(operation, true)} 
       """,
-        listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }
-      )
+          listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }
+        )
+      }
     else
       SearchQuery(
         """
@@ -120,10 +140,8 @@ internal data class StringParamFilterCriteria(
   ): String {
 
     return if (isMatchesFts) {
-
       this.joinToString(
         separator = if (operation == Operation.OR) " ${operation.logicalOperator} " else " ",
-        prefix = "index_value MATCH "
       ) { it.condition }
     } else {
       this.joinToString(

@@ -65,6 +65,24 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     init.forEach { StringParamFilterCriterion(stringParameter).apply(it).also(filters::add) }
     stringFilterCriteria.add(StringParamFilterCriteria(stringParameter, filters, operation))
   }
+  fun String.toStringParamFilterCriterion(
+    modifier: StringFilterModifier
+  ): Array<StringParamFilterCriterion.() -> Unit> {
+    return this.trim()
+      .split(" ")
+      .map { nameQueryPart -> createStringParamFilterCriterion(nameQueryPart, modifier) }
+      .toTypedArray()
+  }
+
+  private fun createStringParamFilterCriterion(
+    nameQueryPart: String,
+    modifier: StringFilterModifier
+  ): StringParamFilterCriterion.() -> Unit {
+    return {
+      this.modifier = modifier
+      value = nameQueryPart
+    }
+  }
 
   fun filter(
     referenceParameter: ReferenceClientParam,
@@ -160,4 +178,9 @@ enum class StringFilterModifier {
 enum class Operation(val logicalOperator: String) {
   OR("OR"),
   AND("AND"),
+}
+
+enum class SetOperation(val setOperationValue: String) {
+  UNION("UNION"),
+  INTERSECT("INTERSECT")
 }
