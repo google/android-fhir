@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views
 
 import android.text.InputType
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.Invalid
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -37,9 +38,11 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
       ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
         // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
         // read default unit from initial, as ideally quantity must specify a unit
-        return text
-          .takeIf { it.isNotBlank() }
-          ?.let {
+        return text.let {
+          if (text.isEmpty()) {
+            return null
+          }
+          try {
             val value = BigDecimal(text)
             val quantity =
               with(questionnaireItemViewItem.questionnaireItem) {
@@ -54,7 +57,17 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
                 else Quantity().apply { this.value = value }
               }
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(quantity)
+          } catch (exception: NumberFormatException) {
+            displayValidationResult(
+              Invalid(
+                listOf(
+                  textInputLayout.context.getString(R.string.number_format_validation_error_msg)
+                )
+              )
+            )
+            null
           }
+        }
       }
 
       override fun getText(

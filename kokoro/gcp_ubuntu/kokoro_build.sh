@@ -63,7 +63,7 @@ function zip_artifacts() {
 function setup() {
   sudo npm cache clean -f
   sudo npm install -g n
-  sudo n stable
+  sudo n 16.18.0
 
   wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip \
     -O ${HOME}/android_sdk.zip -q

@@ -45,7 +45,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderFactory(
 abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputType: Int) :
   QuestionnaireItemViewHolderDelegate {
   private lateinit var header: QuestionnaireItemHeaderView
-  private lateinit var textInputLayout: TextInputLayout
+  protected lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
   private var textWatcher: TextWatcher? = null
