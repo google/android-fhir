@@ -65,6 +65,11 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     init.forEach { StringParamFilterCriterion(stringParameter).apply(it).also(filters::add) }
     stringFilterCriteria.add(StringParamFilterCriteria(stringParameter, filters, operation))
   }
+
+  /**
+   * Converts query string to array of StringParamFilterCriterion.() -> Unit to change it to
+   * multiple StringFilterCriterion
+   */
   fun String.toStringParamFilterCriterion(
     modifier: StringFilterModifier
   ): Array<StringParamFilterCriterion.() -> Unit> {
