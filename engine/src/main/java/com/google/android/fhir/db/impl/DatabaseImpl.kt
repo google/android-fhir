@@ -42,6 +42,7 @@ import org.hl7.fhir.r4.model.Appointment
 import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Immunization
+import org.hl7.fhir.r4.model.Media
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Procedure
@@ -160,8 +161,7 @@ internal class DatabaseImpl(
         iParser.parseResource(it)
       }
         ?: throw ResourceNotFoundException(type.name, id)
-    } as
-      Resource
+    } as Resource
   }
 
   override suspend fun lastUpdate(resourceType: ResourceType): String? {
@@ -231,6 +231,12 @@ internal class DatabaseImpl(
                 it.meta.lastUpdatedElement.valueAsString,
                 it.resourceType
               )
+            ResourceType.Media ->
+              SyncedResourceEntityPatientCentric(
+                (it as Media).subject.reference,
+                it.meta.lastUpdatedElement.valueAsString,
+                it.resourceType
+              )
             else -> {
               null
             }
@@ -284,9 +290,12 @@ internal class DatabaseImpl(
    */
   override suspend fun getAllLocalChanges(): List<SquashedLocalChange> {
     return db.withTransaction {
-      localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
-        SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
-      }
+      localChangeDao
+        .getAllLocalChanges()
+        .groupBy { it.resourceId to it.resourceType }
+        .values.map {
+          SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
+        }
     }
   }
 

@@ -28,6 +28,7 @@ import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -37,7 +38,7 @@ import org.robolectric.RuntimeEnvironment
 class QuestionnaireItemDropDownViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
   private val viewHolder = QuestionnaireItemDropDownViewHolderFactory.create(parent)
 
@@ -72,14 +73,67 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<AutoCompleteTextView>(R.id.auto_complete)
           .adapter
           .getItem(1)
           .toString()
       )
       .isEqualTo("Test Code")
+  }
+
+  @Test
+  fun `should populate dropdown with display for reference value type`() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value =
+          Reference().apply {
+            reference = "Patient/123"
+            display = "John Doe"
+          }
+      }
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<AutoCompleteTextView>(R.id.auto_complete)
+          .adapter
+          .getItem(1)
+          .toString()
+      )
+      .isEqualTo("John Doe")
+  }
+
+  @Test
+  fun `should populate dropdown with type and id for reference value type if missing display`() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value = Reference().apply { reference = "Patient/123" }
+      }
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<AutoCompleteTextView>(R.id.auto_complete)
+          .adapter
+          .getItem(1)
+          .toString()
+      )
+      .isEqualTo("Patient/123")
   }
 
   @Test
@@ -98,8 +152,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<AutoCompleteTextView>(R.id.auto_complete)
           .adapter
           .getItem(1)

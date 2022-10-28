@@ -42,7 +42,8 @@ abstract class SyncStrategy {
     collectAndEmitLocalChange:
       suspend (
         List<LocalChange>,
-        suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit,
+        suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+      ) -> Unit,
     upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   )
 }
@@ -62,7 +63,8 @@ class SequentialSyncStrategy() : SyncStrategy() {
   private lateinit var collectAndEmitLocalChange:
     suspend (
       List<LocalChange>,
-      suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit
+      suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+    ) -> Unit
   private lateinit var upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
 
   override suspend fun rearrangeSyncList(
@@ -71,7 +73,8 @@ class SequentialSyncStrategy() : SyncStrategy() {
     collectAndEmitLocalChange:
       suspend (
         List<LocalChange>,
-        suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit,
+        suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+      ) -> Unit,
     upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
     val idsDone = mutableListOf<String>()
@@ -168,8 +171,7 @@ class SequentialSyncStrategy() : SyncStrategy() {
           val encounter =
             FhirContext.forCached(FhirVersionEnum.R4)
               .newJsonParser()
-              .parseResource(localChange.value.payload) as
-              Encounter
+              .parseResource(localChange.value.payload) as Encounter
           if (encounter.location.size > 1) {
             encounter.location.forEach {
               references.add(
@@ -223,7 +225,8 @@ class AllLocalChangesSyncStrategy() : SyncStrategy() {
     collectAndEmitLocalChange:
       suspend (
         List<LocalChange>,
-        suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit,
+        suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+      ) -> Unit,
     upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {}
 }

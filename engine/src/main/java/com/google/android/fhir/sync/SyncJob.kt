@@ -35,7 +35,8 @@ interface SyncJob {
     downloadManager: DownloadWorkManager,
     downloadWorkManagerModified: DownloadWorkManagerModified,
     resolver: ConflictResolver,
-    subscribeTo: MutableSharedFlow<State>?
+    subscribeTo: MutableSharedFlow<State>?,
+    uploadConfiguration: UploadConfiguration = UploadConfiguration()
   ): Result
 
   fun workInfoFlow(): Flow<WorkInfo>

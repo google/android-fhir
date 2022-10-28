@@ -102,7 +102,8 @@ class SyncJobImpl(private val context: Context) : SyncJob {
     downloadManager: DownloadWorkManager,
     downloadWorkManagerModified: DownloadWorkManagerModified,
     resolver: ConflictResolver,
-    subscribeTo: MutableSharedFlow<State>?
+    subscribeTo: MutableSharedFlow<State>?,
+    uploadConfiguration: UploadConfiguration
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
       FhirSynchronizer(

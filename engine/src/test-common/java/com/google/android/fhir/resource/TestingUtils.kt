@@ -167,12 +167,12 @@ class TestingUtils constructor(private val iParser: IParser) {
       download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
     ) {
       download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType): String {
-            return "123456788"
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType): String {
+              return "123456788"
+            }
           }
-        }
-      )
+        )
         .collect {}
     }
     override suspend fun count(search: Search): Long {
@@ -190,6 +190,9 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
 
     override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {}
+    override suspend fun getSquashedLocalChangeCount(): Int {
+      return 5
+    }
   }
 
   object TestFailingDatasource : DataSource {

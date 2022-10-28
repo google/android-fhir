@@ -121,14 +121,15 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   }
 
   private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {
-    return fhirEngine.search<RiskAssessment> {}.groupBy { it.subject.reference }.mapValues { entry
-      ->
-      entry
-        .value
-        .filter { it.hasOccurrence() }
-        .sortedByDescending { it.occurrenceDateTimeType.value }
-        .firstOrNull()
-    }
+    return fhirEngine
+      .search<RiskAssessment> {}
+      .groupBy { it.subject.reference }
+      .mapValues { entry ->
+        entry.value
+          .filter { it.hasOccurrence() }
+          .sortedByDescending { it.occurrenceDateTimeType.value }
+          .firstOrNull()
+      }
   }
 
   /** The Patient's details for display purposes. */

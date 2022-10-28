@@ -173,7 +173,8 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
 
   override fun getItemViewType(position: Int): Int =
     when (getItem(position)) {
-      is OptionSelectRow.Option, is OptionSelectRow.OtherRow ->
+      is OptionSelectRow.Option,
+      is OptionSelectRow.OtherRow ->
         if (multiSelectEnabled) Types.OPTION_MULTI else Types.OPTION_SINGLE
       is OptionSelectRow.OtherEditText -> Types.OTHER_EDIT_TEXT
       OptionSelectRow.OtherAddAnother -> Types.OTHER_ADD_ANOTHER
@@ -276,7 +277,8 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
     when (this) {
       is OptionSelectRow.Option -> copy(option = option.copy(selected = selected))
       is OptionSelectRow.OtherRow -> copy(selected = selected)
-      OptionSelectRow.OtherAddAnother, is OptionSelectRow.OtherEditText -> null
+      OptionSelectRow.OtherAddAnother,
+      is OptionSelectRow.OtherEditText -> null
     }
 
   private enum class Types {

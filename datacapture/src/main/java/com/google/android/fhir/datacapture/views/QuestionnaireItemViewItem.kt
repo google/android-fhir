@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.answerExpression
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -35,10 +36,10 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * render the data item in the UI. The view SHOULD NOT mutate the data using these properties.
  *
  * The view should use the following answer APIs to update the answer(s):
- * - [setAnswer] (for single answer only)
+ * - [setAnswer] (for single and repeated answers)
+ * - [clearAnswer] (for single and repeated answers)
  * - [addAnswer] (for repeated answers only)
  * - [removeAnswer] (for repeated answers only)
- * - [clearAnswer] (for both single and repated answers)
  *
  * Updates to the answers using these APIs will invoke [answersChangedCallback] to notify the view
  * model that the answer(s) have been changed. This will trigger a re-render of the [RecyclerView]
@@ -51,7 +52,8 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * @param answersChangedCallback the callback to notify the view model that the answers have been
  * changed for the [QuestionnaireResponse.QuestionnaireResponseItemComponent]
  * @param resolveAnswerValueSet the callback to resolve the answer value set and return the answer
- * options
+ * @param resolveAnswerExpression the callback to resolve answer options when answer-expression
+ * extension exists options
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -61,12 +63,19 @@ data class QuestionnaireItemViewItem(
     (
       Questionnaire.QuestionnaireItemComponent,
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
-      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>) -> Unit,
+      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
+    ) -> Unit,
   private val resolveAnswerValueSet:
     suspend (String) -> List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
-      {
-    emptyList()
-  },
+    {
+      emptyList()
+    },
+  private val resolveAnswerExpression:
+    suspend (Questionnaire.QuestionnaireItemComponent) -> List<
+        Questionnaire.QuestionnaireItemAnswerOptionComponent> =
+    {
+      emptyList()
+    }
 ) {
 
   /**
@@ -81,26 +90,30 @@ data class QuestionnaireItemViewItem(
    * [QuestionnaireResponse.QuestionnaireResponseItemComponent] so that proper comparisons can be
    * carried out for the [RecyclerView.Adapter] to decide which items need to be updated.
    */
-  var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
+  val answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
     questionnaireResponseItem.answer.map { it.copy() }
-    private set
 
+  /** Updates the answers. This will override any existing answers. */
   fun setAnswer(
-    questionnaireResponseItemAnswerComponent:
+    vararg questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
   ) {
-    check(!questionnaireItem.repeats) {
-      "Questionnaire item with linkId ${questionnaireItem.linkId} has repeated answers. Use addAnswer instead."
+    check(questionnaireItem.repeats || questionnaireResponseItemAnswerComponent.size <= 1) {
+      "Questionnaire item with linkId ${questionnaireItem.linkId} has repeated answers."
     }
-    answers = listOf(questionnaireResponseItemAnswerComponent)
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
+    answersChangedCallback(
+      questionnaireItem,
+      questionnaireResponseItem,
+      questionnaireResponseItemAnswerComponent.toList()
+    )
   }
 
-  internal fun answerString(context: Context): String {
-    if (!questionnaireResponseItem.hasAnswer()) return context.getString(R.string.not_answered)
-    return questionnaireResponseItem.answer.joinToString { it.displayString(context) }
+  /** Clears existing answers. */
+  fun clearAnswer() {
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf())
   }
 
+  /** Adds an answer to the existing answers. */
   internal fun addAnswer(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
@@ -108,10 +121,14 @@ data class QuestionnaireItemViewItem(
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
-    answers += questionnaireResponseItemAnswerComponent
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
+    answersChangedCallback(
+      questionnaireItem,
+      questionnaireResponseItem,
+      answers + questionnaireResponseItemAnswerComponent
+    )
   }
 
+  /** Removes an answer from the existing answers. */
   internal fun removeAnswer(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
@@ -119,16 +136,18 @@ data class QuestionnaireItemViewItem(
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
-    answers =
+    answersChangedCallback(
+      questionnaireItem,
+      questionnaireResponseItem,
       answers.toMutableList().apply {
         removeIf { it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value) }
       }
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
+    )
   }
 
-  fun clearAnswer() {
-    answers = listOf()
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
+  internal fun answerString(context: Context): String {
+    if (!questionnaireResponseItem.hasAnswer()) return context.getString(R.string.not_answered)
+    return questionnaireResponseItem.answer.joinToString { it.displayString(context) }
   }
 
   fun isAnswerOptionSelected(
@@ -138,12 +157,14 @@ data class QuestionnaireItemViewItem(
   }
 
   /**
-   * In a `choice` or `open-choice` type question, the answer options are defined in one of the two
-   * elements in the questionnaire:
+   * In a `choice` or `open-choice` type question, the answer options are defined in one of the
+   * three elements in the questionnaire:
    *
    * - `Questionnaire.item.answerOption`: a list of permitted answers to the question
    * - `Questionnaire.item.answerValueSet`: a reference to a value set containing a list of
    * permitted answers to the question
+   * - `Extension answer-expression`: an expression based extension which defines the x-fhir-query
+   * or fhirpath to evaluate permitted answer options
    *
    * This property returns the answer options defined in one of the sources above. If the answer
    * options are defined in `Questionnaire.item.answerValueSet`, the answer value set will be
@@ -156,6 +177,7 @@ data class QuestionnaireItemViewItem(
           questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
           !questionnaireItem.answerValueSet.isNullOrEmpty() ->
             resolveAnswerValueSet(questionnaireItem.answerValueSet)
+          questionnaireItem.answerExpression != null -> resolveAnswerExpression(questionnaireItem)
           else -> emptyList()
         }
       }

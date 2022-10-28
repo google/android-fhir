@@ -43,6 +43,7 @@ object Sync {
     fhirEngine: FhirEngine,
     downloadManager: DownloadWorkManager,
     downloadWorkManagerModified: DownloadWorkManagerModified,
+    uploadConfiguration: UploadConfiguration = UploadConfiguration(),
     resolver: ConflictResolver
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {

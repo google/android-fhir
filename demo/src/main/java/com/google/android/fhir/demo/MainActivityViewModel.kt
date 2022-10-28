@@ -51,7 +51,8 @@ class MainActivityViewModel(application: Application, private val state: SavedSt
   /** Requests periodic sync. */
   fun poll() {
     viewModelScope.launch {
-      job.poll(
+      job
+        .poll(
           PeriodicSyncConfiguration(
             syncConstraints = Constraints.Builder().build(),
             repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)

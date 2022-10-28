@@ -48,6 +48,13 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   abstract fun getDownloadWorkManagerModified(): DownloadWorkManagerModified
   private val mutex = Mutex()
   abstract fun getConflictResolver(): ConflictResolver
+
+  /**
+   * Configuration defining the max upload Bundle size (in terms to number of resources in a Bundle)
+   * and optionally defining the order of Resources.
+   */
+  open fun getUploadConfiguration(): UploadConfiguration = UploadConfiguration()
+
   private val gson =
     GsonBuilder()
       .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeTypeAdapter().nullSafe())

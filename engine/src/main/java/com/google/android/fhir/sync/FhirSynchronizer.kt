@@ -22,6 +22,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.impl.FhirEngineImpl
 import com.google.android.fhir.sync.download.DownloaderImpl
 import com.google.android.fhir.sync.upload.BundleUploader
+import com.google.android.fhir.sync.upload.LocalChangesPaginator
 import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -56,7 +57,11 @@ internal class FhirSynchronizer(
   private val downloadManager: DownloadWorkManager,
   private val downloadWorkManagerModified: DownloadWorkManagerModified,
   private val uploader: Uploader =
-    BundleUploader(dataSource, TransactionBundleGenerator.getDefault()),
+    BundleUploader(
+      dataSource,
+      TransactionBundleGenerator.getDefault(),
+      LocalChangesPaginator.DEFAULT
+    ),
   private val downloader: Downloader =
     DownloaderImpl(dataSource, downloadManager, downloadWorkManagerModified),
   private val conflictResolver: ConflictResolver
@@ -106,21 +111,27 @@ internal class FhirSynchronizer(
             }
           }
       SyncWorkType.UPLOAD ->
-        listOf(upload()).filterIsInstance<Result.Error>().flatMap { it.exceptions }.let {
-          if (it.isEmpty()) {
-            setSyncState(Result.Success())
-          } else {
-            setSyncState(Result.Error(it))
+        listOf(upload())
+          .filterIsInstance<Result.Error>()
+          .flatMap { it.exceptions }
+          .let {
+            if (it.isEmpty()) {
+              setSyncState(Result.Success())
+            } else {
+              setSyncState(Result.Error(it))
+            }
           }
-        }
       SyncWorkType.DOWNLOAD ->
-        listOf(downloadModified()).filterIsInstance<Result.Error>().flatMap { it.exceptions }.let {
-          if (it.isEmpty()) {
-            setSyncState(Result.Success())
-          } else {
-            setSyncState(Result.Error(it))
+        listOf(downloadModified())
+          .filterIsInstance<Result.Error>()
+          .flatMap { it.exceptions }
+          .let {
+            if (it.isEmpty()) {
+              setSyncState(Result.Success())
+            } else {
+              setSyncState(Result.Error(it))
+            }
           }
-        }
     }
   }
 

@@ -136,9 +136,11 @@ internal object LocalChangeUtils {
     with(JSONArray(jsonDiff.toString())) {
       val ignorePaths = setOf("/meta", "/text")
       return@with JSONArray(
-        (0 until length()).map { optJSONObject(it) }.filterNot { jsonObject ->
-          ignorePaths.any { jsonObject.optString("path").startsWith(it) }
-        }
+        (0 until length())
+          .map { optJSONObject(it) }
+          .filterNot { jsonObject ->
+            ignorePaths.any { jsonObject.optString("path").startsWith(it) }
+          }
       )
     }
 }

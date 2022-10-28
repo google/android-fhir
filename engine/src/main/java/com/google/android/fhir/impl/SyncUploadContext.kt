@@ -40,7 +40,8 @@ class SyncUploadContext {
     collectAndEmitLocalChange:
       suspend (
         List<LocalChange>,
-        suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit,
+        suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+      ) -> Unit,
     upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
     syncStrategy.rearrangeSyncList(localChanges, database, collectAndEmitLocalChange, upload)

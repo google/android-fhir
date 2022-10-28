@@ -102,15 +102,15 @@ internal class FhirEngineImpl(
     download: suspend (SyncDownloadContextModified) -> Flow<List<Resource>>
   ) {
     download(
-      object : SyncDownloadContextModified {
-        override suspend fun getLatestTimestampForPatientResource(
-          patientId: String,
-          resourceType: ResourceType
-        ): String? {
-          return (database as DatabaseImpl).lastUpdatePatientCentric(patientId, resourceType)
+        object : SyncDownloadContextModified {
+          override suspend fun getLatestTimestampForPatientResource(
+            patientId: String,
+            resourceType: ResourceType
+          ): String? {
+            return (database as DatabaseImpl).lastUpdatePatientCentric(patientId, resourceType)
+          }
         }
-      }
-    )
+      )
       .collect { resources ->
         database.withTransaction {
           val resolved =
@@ -130,10 +130,10 @@ internal class FhirEngineImpl(
     download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
   ) {
     download(
-      object : SyncDownloadContext {
-        override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
-      }
-    )
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
+        }
+      )
       .collect { resources ->
         database.withTransaction {
           val resolved =
@@ -160,9 +160,11 @@ internal class FhirEngineImpl(
     updateSyncedResourceTable: Boolean
   ) {
     val timeStamps =
-      resources.groupBy { it.resourceType }.entries.map {
-        SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
-      }
+      resources
+        .groupBy { it.resourceType }
+        .entries.map {
+          SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+        }
     database.insertSyncedResources(timeStamps, resources, updateSyncedResourceTable)
   }
 
@@ -285,7 +287,8 @@ internal class FhirEngineImpl(
    */
   private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
     get() =
-      location?.split("/")?.takeIf { it.size > 3 }?.let {
-        it[it.size - 3] to ResourceType.fromCode(it[it.size - 4])
-      }
+      location
+        ?.split("/")
+        ?.takeIf { it.size > 3 }
+        ?.let { it[it.size - 3] to ResourceType.fromCode(it[it.size - 4]) }
 }

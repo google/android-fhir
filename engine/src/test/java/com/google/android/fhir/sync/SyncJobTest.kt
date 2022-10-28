@@ -40,7 +40,6 @@ import java.time.OffsetDateTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
@@ -125,8 +124,7 @@ class SyncJobTest {
   //        ExistingPeriodicWorkPolicy.REPLACE,
   //        worker
   //      )
-  //      .result
-  //      .get()
+  //      .result.get()
   //
   //    Thread.sleep(5000)
   //
@@ -162,7 +160,8 @@ class SyncJobTest {
   //
   //    syncJob.run(
   //      fhirEngine,
-  //      TestingUtils.TestDownloadManagerImpl(),
+  //      TestingUtils.TestDownloadManagerImpl(updateSyncedResourceEntity = true),
+  //      TestingUtils.TestDownloadManagerModifiedImpl(updateSyncedResourceEntity = true),
   //      AcceptRemoteConflictResolver,
   //      flow
   //    )
@@ -198,7 +197,8 @@ class SyncJobTest {
   //
   //    syncJob.run(
   //      fhirEngine,
-  //      TestingUtils.TestDownloadManagerImpl(),
+  //      TestingUtils.TestDownloadManagerImpl(updateSyncedResourceEntity = true),
+  //      TestingUtils.TestDownloadManagerModifiedImpl(updateSyncedResourceEntity = true),
   //      AcceptRemoteConflictResolver,
   //      flow
   //    )
@@ -243,8 +243,7 @@ class SyncJobTest {
         ExistingPeriodicWorkPolicy.REPLACE,
         worker1
       )
-      .result
-      .get()
+      .result.get()
     Thread.sleep(5000)
     val firstSyncResult = (stateList1[stateList1.size - 1] as State.Finished).result
     assertThat(firstSyncResult.timestamp).isGreaterThan(currentTimeStamp)
@@ -262,8 +261,7 @@ class SyncJobTest {
         ExistingPeriodicWorkPolicy.REPLACE,
         worker2
       )
-      .result
-      .get()
+      .result.get()
     Thread.sleep(5000)
     val secondSyncResult = (stateList2[stateList2.size - 1] as State.Finished).result
     assertThat(secondSyncResult.timestamp).isGreaterThan(firstSyncResult.timestamp)
@@ -320,36 +318,37 @@ class SyncJobTest {
 
   //  @Test
   //  fun `number of resources loaded equals number of resources in TestDownloaderImpl`() =
-  //      runBlockingTest {
-  //    whenever(database.getAllLocalChanges()).thenReturn(listOf())
-  //    whenever(dataSource.download(any())).thenReturn(Bundle())
+  //    runBlockingTest {
+  //      whenever(database.getAllLocalChanges()).thenReturn(listOf())
+  //      whenever(dataSource.download(any())).thenReturn(Bundle())
   //
-  //    val res = mutableListOf<State>()
+  //      val res = mutableListOf<State>()
   //
-  //    val flow = MutableSharedFlow<State>()
+  //      val flow = MutableSharedFlow<State>()
   //
-  //    val job = launch { flow.collect { res.add(it) } }
+  //      val job = launch { flow.collect { res.add(it) } }
   //
-  //    syncJob.run(
-  //      fhirEngine,
-  //      TestingUtils.TestDownloadManagerImplWithQueue(
-  //        listOf("Patient/bob", "Encounter/doc", "Observation/obs")
-  //      ),
-  //      AcceptRemoteConflictResolver,
-  //      flow
-  //    )
-  //
-  //    assertThat(res.map { it::class.java })
-  //      .containsExactly(
-  //        State.Started::class.java,
-  //        State.InProgress::class.java,
-  //        State.Finished::class.java
+  //      syncJob.run(
+  //        fhirEngine,
+  //        TestingUtils.TestDownloadManagerImplWithQueue(
+  //          listOf("Patient/bob", "Encounter/doc", "Observation/obs")
+  //        ),
+  //        TestingUtils.TestDownloadManagerModifiedImpl(updateSyncedResourceEntity = true),
+  //        AcceptRemoteConflictResolver,
+  //        flow
   //      )
-  //      .inOrder()
-  //    job.cancel()
   //
-  //    verify(dataSource, times(3)).download(any())
-  //  }
+  //      assertThat(res.map { it::class.java })
+  //        .containsExactly(
+  //          State.Started::class.java,
+  //          State.InProgress::class.java,
+  //          State.Finished::class.java
+  //        )
+  //        .inOrder()
+  //      job.cancel()
+  //
+  //      verify(dataSource, times(3)).download(any())
+  //    }
 
   @Test
   fun `should fail when there data source is null`() = runBlockingTest {

@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture.validation
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
-import com.google.android.fhir.datacapture.CQF_CALCULATED_EXPRESSION_URL
+import com.google.android.fhir.datacapture.EXTENSION_CQF_CALCULATED_VALUE_URL
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Type
@@ -27,10 +27,12 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
 
 fun Type.valueOrCalculateValue(): Type? {
   return if (this.hasExtension()) {
-    this.extension.firstOrNull { it.url == CQF_CALCULATED_EXPRESSION_URL }?.let {
-      val expression = (it.value as Expression).expression
-      fhirPathEngine.evaluate(this, expression).firstOrNull()?.let { it as Type }
-    }
+    this.extension
+      .firstOrNull { it.url == EXTENSION_CQF_CALCULATED_VALUE_URL }
+      ?.let {
+        val expression = (it.value as Expression).expression
+        fhirPathEngine.evaluate(this, expression).firstOrNull()?.let { it as Type }
+      }
   } else {
     this
   }

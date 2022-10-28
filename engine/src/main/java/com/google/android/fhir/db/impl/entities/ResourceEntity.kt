@@ -27,7 +27,8 @@ import org.hl7.fhir.r4.model.ResourceType
   indices =
     [
       Index(value = ["resourceUuid"], unique = true),
-      Index(value = ["resourceType", "resourceId"], unique = true)]
+      Index(value = ["resourceType", "resourceId"], unique = true)
+    ]
 )
 data class ResourceEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
