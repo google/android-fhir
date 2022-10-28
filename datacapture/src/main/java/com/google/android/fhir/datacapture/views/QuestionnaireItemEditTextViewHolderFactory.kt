@@ -69,8 +69,8 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     }
     textInputEditText.setOnFocusChangeListener { view, focused ->
       if (!focused) {
-        (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
-            InputMethodManager)
+        (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE)
+            as InputMethodManager)
           .hideSoftInputFromWindow(view.windowToken, 0)
 
         // Update answer even if the text box loses focus without any change. This will mark the
@@ -109,7 +109,8 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   override fun displayValidationResult(validationResult: ValidationResult) {
     textInputLayout.error =
       when (validationResult) {
-        is NotValidated, Valid -> null
+        is NotValidated,
+        Valid -> null
         is Invalid -> validationResult.getSingleStringValidationMessage()
       }
   }

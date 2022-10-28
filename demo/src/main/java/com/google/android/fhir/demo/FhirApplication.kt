@@ -26,6 +26,7 @@ import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.datacapture.DataCaptureConfig
 import com.google.android.fhir.demo.data.FhirPeriodicSyncWorker
 import com.google.android.fhir.sync.Sync
+import com.google.android.fhir.sync.remote.HttpLogger
 import timber.log.Timber
 
 class FhirApplication : Application(), DataCaptureConfig.Provider {
@@ -42,7 +43,15 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
       FhirEngineConfiguration(
         enableEncryptionIfSupported = true,
         RECREATE_AT_OPEN,
-        ServerConfiguration("https://hapi.fhir.org/baseR4/")
+        ServerConfiguration(
+          "https://hapi.fhir.org/baseR4/",
+          httpLogger =
+            HttpLogger(
+              HttpLogger.Configuration(
+                if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC
+              )
+            ) { Timber.tag("App-HttpLog").d(it) }
+        )
       )
     )
     Sync.oneTimeSync<FhirPeriodicSyncWorker>(this)

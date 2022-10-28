@@ -71,8 +71,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
             flow.setWrapMode(Flow.WRAP_NONE)
           }
         }
-        questionnaireItemViewItem
-          .answerOption
+        questionnaireItemViewItem.answerOption
           .map { answerOption -> View.generateViewId() to answerOption }
           .onEach { populateViewWithAnswerOption(it.first, it.second, choiceOrientation) }
           .map { it.first }
@@ -81,7 +80,8 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
-          is NotValidated, Valid -> error.visibility = View.GONE
+          is NotValidated,
+          Valid -> error.visibility = View.GONE
           is Invalid -> {
             error.text = validationResult.getSingleStringValidationMessage()
             error.visibility = View.VISIBLE
@@ -121,11 +121,12 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
             setOnClickListener {
               when (isChecked) {
                 true -> {
-                  questionnaireItemViewItem.addAnswer(
+                  val newAnswers = questionnaireItemViewItem.answers.toMutableList()
+                  newAnswers +=
                     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                       value = answerOption.value
                     }
-                  )
+
                   if (answerOption.optionExclusive) {
                     // if this answer option has optionExclusive extension, then deselect other
                     // answer options.
@@ -135,11 +136,9 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
                         continue
                       }
                       (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
-                      questionnaireItemViewItem.removeAnswer(
-                        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                          value = questionnaireItemViewItem.answerOption[i].value
-                        }
-                      )
+                      newAnswers.removeIf {
+                        it.value.equalsDeep(questionnaireItemViewItem.answerOption[i].value)
+                      }
                     }
                   } else {
                     // deselect optionExclusive answer option.
@@ -148,13 +147,12 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
                         continue
                       }
                       (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
-                      questionnaireItemViewItem.removeAnswer(
-                        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                          value = questionnaireItemViewItem.answerOption[i].value
-                        }
-                      )
+                      newAnswers.removeIf {
+                        it.value.equalsDeep(questionnaireItemViewItem.answerOption[i].value)
+                      }
                     }
                   }
+                  questionnaireItemViewItem.setAnswer(*newAnswers.toTypedArray())
                 }
                 false -> {
                   questionnaireItemViewItem.removeAnswer(

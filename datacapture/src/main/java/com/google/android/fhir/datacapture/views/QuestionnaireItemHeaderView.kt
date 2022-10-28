@@ -17,8 +17,12 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -26,6 +30,8 @@ import android.view.View.VISIBLE
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.hasHelpButton
 import com.google.android.fhir.datacapture.localizedHelpSpanned
@@ -49,7 +55,7 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
 
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
-    question.updateTextAndVisibility(questionnaireItem.localizedTextSpanned)
+    updateQuestionText(question, questionnaireItem)
     hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
     initHelpButton(this, questionnaireItem)
     //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
@@ -58,7 +64,7 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
   }
 }
 
-internal fun TextView.updateTextAndVisibility(localizedText: Spanned?) {
+internal fun TextView.updateTextAndVisibility(localizedText: Spanned? = null) {
   text = localizedText
   visibility =
     if (localizedText.isNullOrEmpty()) {
@@ -102,4 +108,39 @@ internal fun initHelpButton(
   view
     .findViewById<TextView>(R.id.helpText)
     .updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
+}
+
+/**
+ * Updates textview [R.id.question] with
+ * [Questionnaire.QuestionnaireItemComponent.localizedTextSpanned] text and `*` if
+ * [Questionnaire.QuestionnaireItemComponent.required] is true. And applies [R.attr.colorError] to
+ * `*`.
+ */
+internal fun updateQuestionText(
+  questionTextView: TextView,
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+) {
+  val builder = SpannableStringBuilder()
+  questionnaireItem.localizedTextSpanned?.let { builder.append(it) }
+  if (questionnaireItem.required) {
+    builder.appendWithSpan(
+      questionTextView.context.applicationContext.getString(R.string.space_asterisk),
+      questionTextView.context.getColorFromAttr(R.attr.colorError)
+    )
+  }
+  questionTextView.updateTextAndVisibility(builder)
+}
+
+private fun SpannableStringBuilder.appendWithSpan(value: String, @ColorInt color: Int) {
+  val start = length
+  append(value)
+  val end = length
+  setSpan(ForegroundColorSpan(color), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+}
+
+@ColorInt
+private fun Context.getColorFromAttr(@AttrRes attrColor: Int): Int {
+  val typedValue = TypedValue()
+  theme.resolveAttribute(attrColor, typedValue, true)
+  return typedValue.data
 }
