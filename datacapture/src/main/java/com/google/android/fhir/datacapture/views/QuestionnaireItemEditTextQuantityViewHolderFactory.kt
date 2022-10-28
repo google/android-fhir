@@ -38,11 +38,9 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
       ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
         // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
         // read default unit from initial, as ideally quantity must specify a unit
-        return text.let {
-          if (text.isEmpty()) {
-            return null
-          }
-          try {
+        return text
+          .takeIf { it.isNotBlank() }
+          ?.let {
             val value = BigDecimal(text)
             val quantity =
               with(questionnaireItemViewItem.questionnaireItem) {
@@ -57,17 +55,7 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
                 else Quantity().apply { this.value = value }
               }
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(quantity)
-          } catch (exception: NumberFormatException) {
-            displayValidationResult(
-              Invalid(
-                listOf(
-                  textInputLayout.context.getString(R.string.number_format_validation_error_msg)
-                )
-              )
-            )
-            null
           }
-        }
       }
 
       override fun getText(

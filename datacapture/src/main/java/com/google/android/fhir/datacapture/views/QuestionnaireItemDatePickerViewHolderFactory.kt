@@ -232,27 +232,6 @@ internal val localeDatePattern =
     Locale.getDefault()
   )
 
-/**
- * Returns the [AppCompatActivity] if there exists one wrapped inside [ContextThemeWrapper] s, or
- * `null` otherwise.
- *
- * This function is inspired by the function with the same name in `AppCompateDelegateImpl`. See
- * https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:appcompat/appcompat/src/main/java/androidx/appcompat/app/AppCompatDelegateImpl.java;l=1615
- *
- * TODO: find a more robust way to do this as it is not guaranteed that the activity is an
- * AppCompatActivity.
- */
-fun Context.tryUnwrapContext(): AppCompatActivity? {
-  var context = this
-  while (true) {
-    when (context) {
-      is AppCompatActivity -> return context
-      is ContextThemeWrapper -> context = context.baseContext
-      else -> return null
-    }
-  }
-}
-
 internal val DateType.localDate
   get() =
     if (!this.hasValue()) null
