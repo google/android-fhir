@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture
 
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -54,15 +53,13 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     isCancelable = false
-    return MaterialAlertDialogBuilder(requireContext())
-      .setView(createCustomView(requireContext()))
-      .create()
+    return MaterialAlertDialogBuilder(requireContext()).setView(onCreateCustomView()).create()
   }
 
   @VisibleForTesting
-  fun createCustomView(context: Context = requireContext()): View {
+  fun onCreateCustomView(layoutInflater: LayoutInflater = getLayoutInflater()): View {
     val themeId =
-      context.obtainStyledAttributes(R.styleable.QuestionnaireTheme).use {
+      layoutInflater.context.obtainStyledAttributes(R.styleable.QuestionnaireTheme).use {
         it.getResourceId(
           // Use the custom questionnaire theme if it is specified
           R.styleable.QuestionnaireTheme_questionnaire_theme,
@@ -71,7 +68,8 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
         )
       }
 
-    return LayoutInflater.from(ContextThemeWrapper(context, themeId))
+    return layoutInflater
+      .cloneInContext(ContextThemeWrapper(layoutInflater.context, themeId))
       .inflate(R.layout.questionnaire_validation_error_dialog, null)
       .apply {
         findViewById<RecyclerView>(R.id.recycler_view).apply {

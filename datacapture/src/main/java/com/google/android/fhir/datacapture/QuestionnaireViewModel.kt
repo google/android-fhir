@@ -321,10 +321,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaireResponse,
         getApplication()
       )
-      .also {
-        if (it.values.flatten().filterIsInstance<Invalid>().isNotEmpty()) {
+      .also { result ->
+        if (result.values.flatten().filterIsInstance<Invalid>().isNotEmpty()) {
           forceValidate = true
-          modificationCount.update { count -> count + 1 }
+          modificationCount.update { it + 1 }
         }
       }
 

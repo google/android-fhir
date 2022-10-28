@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture
 
+import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.testing.launchFragmentInContainer
@@ -40,38 +41,8 @@ import org.robolectric.RuntimeEnvironment
 @RunWith(RobolectricTestRunner::class)
 class QuestionnaireValidationErrorMessageDialogFragmentTest {
 
-  //
-  //
-  //  @Test fun `createCustomView` () {
-  //    val fragmentFactory : FragmentFactory = mock()
-  //    val viewModel =  QuestionnaireValidationErrorViewModel()
-  //    val factory = object : ViewModelProvider.Factory {
-  //      override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-  //        return viewModel as  T
-  //      }
-  //    }
-  //
-  //    `when`(fragmentFactory.instantiate(any(), any())).then {
-  // QuestionnaireValidationErrorMessageDialogFragment{
-  //      factory
-  //    }}
-  //
-  //   val scenario =
-  // launchFragmentInContainer<QuestionnaireValidationErrorMessageDialogFragment>(initialState =
-  // Lifecycle.State.CREATED)
-  //    val result =  scenario.withFragment {
-  //      createCustomView()
-  //    }
-  //    assertThat(result.findViewById<TextView>(R.id.dialog_title).text).isEqualTo("Complete all
-  // required fields")
-  //    assertThat(result.findViewById<TextView>(R.id.dialog_subtitle).text).isEqualTo("Fields that
-  // need to be completed:")
-  //
-  // assertThat(result.findViewById<RecyclerView>(R.id.recycler_view).adapter!!.itemCount).isEqualTo(0)
-  //  }
-
   @Test
-  fun `createCustomView with invalid`() {
+  fun `createCustomView with an invalid questionnaire response validation result`() {
     val questionnaire =
       Questionnaire().apply {
         url = "questionnaire-1"
@@ -89,44 +60,38 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
         this.questionnaire = "questionnaire-1"
         addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("name-id")))
       }
-
-    val fragmentFactory: FragmentFactory = mock()
-    val viewModel = QuestionnaireValidationErrorViewModel()
-    viewModel.setQuestionnaireAndValidation(
-      questionnaire,
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        questionnaireResponse,
-        RuntimeEnvironment.getApplication()
-      )
-    )
-    val factory =
-      object : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-          return viewModel as T
-        }
-      }
-
-    `when`(fragmentFactory.instantiate(any(), any())).then {
-      QuestionnaireValidationErrorMessageDialogFragment { factory }
-    }
-
     val scenario =
       launchFragmentInContainer<QuestionnaireValidationErrorMessageDialogFragment>(
         initialState = Lifecycle.State.CREATED,
-        factory = fragmentFactory
+        factory = createDialogFragmentFactoryForTests(questionnaire, questionnaireResponse)
       )
-    val result = scenario.withFragment { createCustomView() }
+
+    val result =
+      scenario.withFragment {
+        onCreateCustomView().also {
+          // The following code is required for the recycler view to actually draw. Otherwise,
+          // findViewHolderForLayoutPosition would just return null as recycler view is not drawn.
+          it.findViewById<RecyclerView>(R.id.recycler_view).let { recyclerView ->
+            recyclerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+            recyclerView.layout(0, 0, 1000, 1000)
+          }
+        }
+      }
+
     assertThat(result.findViewById<TextView>(R.id.dialog_title).text)
       .isEqualTo("Complete all required fields")
     assertThat(result.findViewById<TextView>(R.id.dialog_subtitle).text)
       .isEqualTo("Fields that need to be completed:")
     assertThat(result.findViewById<RecyclerView>(R.id.recycler_view).adapter!!.itemCount)
       .isEqualTo(1)
+    val holder =
+      result.findViewById<RecyclerView>(R.id.recycler_view).findViewHolderForLayoutPosition(0)
+        as QuestionnaireValidationErrorMessageDialogFragment.ErrorViewHolder
+    assertThat(holder.textView.text).isEqualTo("• First Name")
   }
 
   @Test
-  fun `createCustomView with no invalid`() {
+  fun `createCustomView with a valid questionnaire response validation result`() {
     val questionnaire =
       Questionnaire().apply {
         url = "questionnaire-1"
@@ -144,20 +109,46 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
         addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("name-id")))
       }
 
-    val fragmentFactory: FragmentFactory = mock()
-    val viewModel = QuestionnaireValidationErrorViewModel()
-    viewModel.setQuestionnaireAndValidation(
-      questionnaire,
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        questionnaireResponse,
-        RuntimeEnvironment.getApplication()
+    val scenario =
+      launchFragmentInContainer<QuestionnaireValidationErrorMessageDialogFragment>(
+        initialState = Lifecycle.State.CREATED,
+        factory = createDialogFragmentFactoryForTests(questionnaire, questionnaireResponse)
       )
-    )
+
+    val result = scenario.withFragment { onCreateCustomView() }
+
+    assertThat(result.findViewById<TextView>(R.id.dialog_title).text)
+      .isEqualTo("Complete all required fields")
+    assertThat(result.findViewById<TextView>(R.id.dialog_subtitle).text)
+      .isEqualTo("Fields that need to be completed:")
+    assertThat(result.findViewById<RecyclerView>(R.id.recycler_view).adapter!!.itemCount)
+      .isEqualTo(0)
+  }
+
+  private fun createTestValidationErrorViewModel(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse
+  ) =
+    QuestionnaireValidationErrorViewModel().apply {
+      setQuestionnaireAndValidation(
+        questionnaire,
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          RuntimeEnvironment.getApplication()
+        )
+      )
+    }
+
+  private fun createDialogFragmentFactoryForTests(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse
+  ): FragmentFactory {
+    val fragmentFactory: FragmentFactory = mock()
     val factory =
       object : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-          return viewModel as T
+          return createTestValidationErrorViewModel(questionnaire, questionnaireResponse) as T
         }
       }
 
@@ -165,17 +156,6 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
       QuestionnaireValidationErrorMessageDialogFragment { factory }
     }
 
-    val scenario =
-      launchFragmentInContainer<QuestionnaireValidationErrorMessageDialogFragment>(
-        initialState = Lifecycle.State.CREATED,
-        factory = fragmentFactory
-      )
-    val result = scenario.withFragment { createCustomView() }
-    assertThat(result.findViewById<TextView>(R.id.dialog_title).text)
-      .isEqualTo("Complete all required fields")
-    assertThat(result.findViewById<TextView>(R.id.dialog_subtitle).text)
-      .isEqualTo("Fields that need to be completed:")
-    assertThat(result.findViewById<RecyclerView>(R.id.recycler_view).adapter!!.itemCount)
-      .isEqualTo(0)
+    return fragmentFactory
   }
 }

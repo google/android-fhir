@@ -43,7 +43,6 @@
     <string name="not_answered">"Not Answered"</string>
     <string name="help">Help</string>
     <string name="space_asterisk">\u0020\u002a</string>
-    <string name="ok">Ok</string>
     <string
         name="questionnaire_validation_error_supporting_text"
     >Fields that need to be completed:</string>
