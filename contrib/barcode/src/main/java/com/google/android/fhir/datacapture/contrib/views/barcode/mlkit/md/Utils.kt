@@ -178,7 +178,8 @@ object Utils {
   private fun maybeTransformBitmap(resolver: ContentResolver, uri: Uri, bitmap: Bitmap?): Bitmap? {
     val matrix: Matrix? =
       when (getExifOrientationTag(resolver, uri)) {
-        ExifInterface.ORIENTATION_UNDEFINED, ExifInterface.ORIENTATION_NORMAL ->
+        ExifInterface.ORIENTATION_UNDEFINED,
+        ExifInterface.ORIENTATION_NORMAL ->
           // Set the matrix to be null to skip the image transform.
           null
         ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> Matrix().apply { postScale(-1.0f, 1.0f) }

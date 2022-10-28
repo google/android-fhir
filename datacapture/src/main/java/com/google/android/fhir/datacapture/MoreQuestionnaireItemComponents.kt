@@ -26,8 +26,8 @@ import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.utilities.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
 import com.google.android.fhir.logicalId
-import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Attachment
+import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
