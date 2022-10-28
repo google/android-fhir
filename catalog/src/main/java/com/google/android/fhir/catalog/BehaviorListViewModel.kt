@@ -36,7 +36,7 @@ class BehaviorListViewModel(application: Application) : AndroidViewModel(applica
     CALCULATED_EXPRESSION(
       R.drawable.ic_calculations_behavior,
       R.string.behavior_name_calculated_expression,
-      "calculated_expression_questionnaire.json"
+      "behavior_calculated_expression.json"
     ),
     SKIP_LOGIC(
       R.drawable.ic_skiplogic_behavior,
