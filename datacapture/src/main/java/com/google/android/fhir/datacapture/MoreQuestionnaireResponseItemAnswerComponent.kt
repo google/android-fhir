@@ -33,8 +33,13 @@ import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
+import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
+/**
+ * Text value for response item answer option
+ * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] depending on the type
+ */
 internal fun QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.displayString(
   context: Context
 ): String {
@@ -69,3 +74,8 @@ internal fun QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.disp
     else -> context.getString(R.string.not_answered)
   }
 }
+
+internal fun List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
+  .hasDifferentAnswerSet(answers: List<Type>) =
+  this.size != answers.size ||
+    this.map { it.value }.zip(answers).any { (v1, v2) -> v1.equalsDeep(v2).not() }

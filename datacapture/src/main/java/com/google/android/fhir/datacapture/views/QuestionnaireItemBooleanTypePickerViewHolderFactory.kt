@@ -56,16 +56,13 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
 
         when (questionnaireItemViewItem.answers.singleOrNull()?.valueBooleanType?.value) {
           true -> {
-            yesRadioButton.isChecked = true
-            noRadioButton.isChecked = false
+            radioGroup.check(yesRadioButton.id)
           }
           false -> {
-            yesRadioButton.isChecked = false
-            noRadioButton.isChecked = true
+            radioGroup.check(noRadioButton.id)
           }
           null -> {
-            yesRadioButton.isChecked = false
-            noRadioButton.isChecked = false
+            radioGroup.clearCheck()
           }
         }
 
@@ -102,7 +99,8 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
-          is NotValidated, Valid -> error.visibility = View.GONE
+          is NotValidated,
+          Valid -> error.visibility = View.GONE
           is Invalid -> {
             error.text = validationResult.getSingleStringValidationMessage()
             error.visibility = View.VISIBLE
