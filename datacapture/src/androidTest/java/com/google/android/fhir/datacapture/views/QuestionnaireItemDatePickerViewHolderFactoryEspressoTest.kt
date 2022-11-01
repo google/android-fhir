@@ -136,7 +136,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shouldSetDateInput_invalid_date_entry() {
+  fun shouldSetDateInput_invalid_date_entry_invalid_month_day_year() {
     val questionnaireItemView =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -148,7 +148,64 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
     onView(withId(R.id.text_input_layout)).perform(ViewActions.click())
-    onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("40/0/2"))
+    onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("40/0/-9992"))
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isEqualTo("Date format needs to be M/d/yy")
+  }
+
+  @Test
+  fun shouldSetDateInput_invalid_date_entry_invalid_day() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    onView(withId(R.id.text_input_layout)).perform(ViewActions.click())
+    onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("1/100/2"))
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isEqualTo("Date format needs to be M/d/yy")
+  }
+
+  @Test
+  fun shouldSetDateInput_invalid_date_entry_invalid_month() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    onView(withId(R.id.text_input_layout)).perform(ViewActions.click())
+    onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("40/1/2"))
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isEqualTo("Date format needs to be M/d/yy")
+  }
+
+  @Test
+  fun shouldSetDateInput_invalid_date_entry_invalid_year() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    onView(withId(R.id.text_input_layout)).perform(ViewActions.click())
+    onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("1/1/22222"))
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isEqualTo("Date format needs to be M/d/yy")
