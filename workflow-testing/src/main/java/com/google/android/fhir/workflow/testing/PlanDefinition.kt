@@ -19,13 +19,16 @@ package com.google.android.fhir.workflow.testing
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import org.hl7.fhir.instance.model.api.IBaseBundle
+import org.hl7.fhir.instance.model.api.IBaseParameters
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CarePlan
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Endpoint
 import org.hl7.fhir.r4.model.IdType
+import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Parameters
+import org.hl7.fhir.r4.model.Resource
 import org.json.JSONException
 import org.junit.Assert.fail
 import org.opencds.cqf.cql.engine.fhir.converter.FhirTypeConverterFactory
@@ -52,13 +55,35 @@ import org.opencds.cqf.cql.evaluator.library.LibraryProcessor
 import org.opencds.cqf.cql.evaluator.plandefinition.r4.OperationParametersParser
 import org.opencds.cqf.cql.evaluator.plandefinition.r4.PlanDefinitionProcessor
 import org.skyscreamer.jsonassert.JSONAssert
+import java.util.UUID
 
 object PlanDefinition : Loadable() {
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
   private val jsonParser = fhirContext.newJsonParser()
 
   fun parse(assetName: String): IBaseResource {
-    return jsonParser.parseResource(open(assetName))
+    return if (assetName.endsWith(".cql"))
+       Bundle().apply {
+         this.addEntry().apply { resource = parseCql(assetName) as Resource }
+       }
+    else
+    jsonParser.parseResource(open(assetName))
+  }
+
+  fun parseCql(assetName: String): IBaseResource {
+    val cql = CqlBuilder.Assert.that(assetName).compiles()
+    val translator = cql.translator
+    val identifier = cql.translator.translatedLibrary.identifier
+
+    return CqlBuilder.assembleFhirLib(
+      cql.cqlText,
+      translator.toJson(),
+      null,
+      identifier.id,
+      identifier.version
+    ).apply {
+      this.idElement = IdType(this.resourceType.name, "12345")
+    }
   }
 
   fun buildProcessor(fhirDal: FhirDal): PlanDefinitionProcessor {
@@ -164,9 +189,10 @@ object PlanDefinition : Loadable() {
     private val encounterID: String?
   ) {
     private val fhirDal = FakeFhirDal()
-    private lateinit var dataEndpoint: Endpoint
+    private var dataEndpoint: Endpoint? = null
     private lateinit var libraryEndpoint: Endpoint
-    private lateinit var baseResource: IBaseResource
+    private var baseResource: IBaseResource? = null
+    private var preFetchData = Parameters()
 
     fun withData(dataAssetName: String): Apply {
       dataEndpoint =
@@ -175,7 +201,25 @@ object PlanDefinition : Loadable() {
           .setConnectionType(Coding().setCode(Constants.HL7_FHIR_FILES))
       baseResource = parse(dataAssetName)
 
-      fhirDal.addAll(baseResource)
+      fhirDal.addAll(baseResource!!)
+      return this
+    }
+
+    fun withResource(dataAssetName: String): Apply {
+      fhirDal.addAll(parse(dataAssetName))
+      return this
+    }
+
+    fun withPlanDefinition(dataAssetName: String): Apply {
+      fhirDal.addAll(parse(dataAssetName))
+      return this
+    }
+
+    fun withPreFetchData(dataAssetName: String): Apply {
+      preFetchData.addParameter().apply {
+        name = org.hl7.fhir.r4.model.PlanDefinition.DEPENDS_ON.paramName
+        resource = parse(dataAssetName) as Resource
+      }
       return this
     }
 
@@ -185,7 +229,15 @@ object PlanDefinition : Loadable() {
           .setAddress(libraryAssetName)
           .setConnectionType(Coding().setCode(Constants.HL7_FHIR_FILES))
 
-      fhirDal.addAll(parse(libraryAssetName))
+      val library = parse(libraryAssetName).let { it as Bundle }.entryFirstRep.resource
+
+      fhirDal.addAll(
+        library.apply {
+          this as Library
+          this.idElement = IdType(this.resourceType.name, UUID.randomUUID().toString())
+          this.url = "/Library/${this.idElement.idPart}"
+        }
+      )
       return this
     }
 
@@ -204,10 +256,10 @@ object PlanDefinition : Loadable() {
             null,
             null,
             null,
-            Parameters(),
+            preFetchData,
             null,
-            baseResource as Bundle,
-            null,
+            baseResource as Bundle?,
+            null/*preFetchData as IBaseParameters*/,
             dataEndpoint,
             libraryEndpoint,
             libraryEndpoint

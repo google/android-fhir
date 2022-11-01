@@ -1,0 +1,22 @@
+{
+  "resourceType": "ActivityDefinition",
+  "id": "careplan-activity",
+  "url": "ActivityDefinition/careplan-activity",
+  "title": "ANC Follow Up Plan",
+  "status": "active",
+  "description": "This action will performed every month for a pregnant woman",
+  "kind": "Task",
+  "timingTiming": {
+    "repeat": {
+      "countMax": 8,
+      "duration": 2,
+      "durationMax": 4,
+      "durationUnit": "h",
+      "frequency": 1,
+      "frequencyMax": 1,
+      "period": 1,
+      "periodMax": 1,
+      "periodUnit": "mo"
+    }
+  }
+}

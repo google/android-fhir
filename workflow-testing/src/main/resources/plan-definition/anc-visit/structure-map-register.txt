@@ -1,0 +1,115 @@
+map "http://hl7.org/fhir/StructureMap/132156" = 'ANCCarePlan'
+
+uses "http://hl7.org/fhir/StructureDefinition/Parameters" as source
+uses "http://hl7.org/fhir/StructureDefinition/CarePlan" as target
+
+group ANCCarePlan(source src : Parameters, target tgt: CarePlan) {
+    src -> evaluate(src, $this.parameter.where(name='subject').resource) as subject,
+            evaluate(src, $this.parameter.where(name='definition').resource) as definition,
+            evaluate(src, $this.parameter.where(name='depends-on').resource.entry.resource) as questionnaireResponse,
+            evaluate(questionnaireResponse, $this.descendants().where(linkId='245679f2-6172-456e-8ff3-425f5cea3243').answer.value) as lmp
+            then ExtractCarePlan(lmp, subject, definition, questionnaireResponse, tgt), ExtractActivityDetail(lmp, subject, definition, tgt) "r_careplan";
+}
+
+group ExtractCarePlan(source lmp: DateType, source subject: Patient, source definition: ActivityDefinition, source questionnaireResponse: QuestionnaireResponse, target careplan : CarePlan) {
+    subject -> careplan.id = uuid() ,
+           careplan.identifier = create('Identifier') as iden, iden.value = uuid(), iden.use = 'official',
+           careplan.status = 'active',
+           careplan.intent = 'plan',
+           careplan.subject = create('Reference') as ref, ref.reference = evaluate(subject, $this.id.replaceMatches('/_history/.*', '')),
+           careplan.created = evaluate(subject, now()),
+           careplan.author = evaluate(subject, $this.generalPractitioner.first()),
+           careplan.period = create('Period') as period,
+                             lmp as offset
+                             then ExtractPeriod_9m(offset, period) "r_cp_data";
+}
+
+group ExtractActivityDetail(source lmp: DateType, source subject : Patient,
+    source definition: ActivityDefinition, target careplan : CarePlan){
+    subject -> careplan.activity = create('CarePlan_Activity') as activity then {
+        subject -> activity.detail = create('CarePlan_ActivityDetail') as det then {
+            subject -> det.kind = 'Task',
+                   det.status = 'in-progress',
+                   det.description = evaluate(definition, $this.title),
+                   det.performer = evaluate(subject, $this.generalPractitioner.first()),
+                   det.code = create('CodeableConcept') as concept then ExtractTimingCode(subject, concept) "r_act_det_data";
+
+            subject -> det.scheduled = evaluate(definition, $this.timing) as timing,
+                   evaluate(timing, $this.repeat) as repeat then {
+
+                subject -> evaluate(subject, today()) as dueDate,
+                           evaluate(lmp, $this + '9 \'months\''.toQuantity()) as edd
+                   then ExtractTasks(dueDate, edd, repeat, subject, careplan, activity, timing) "r_tasks";
+
+                subject -> repeat.count = create('positiveInt') as c, c.value = evaluate(activity, $this.outcomeReference.count().value) "r_task_rep_count";
+
+            } "r_tim_repeat";
+        } "r_act_det";
+
+    } "r_cp_acti";
+}
+
+group ExtractTasks(
+    source dueDate: DateType,
+    source maxDate: DateType,
+    source repeat: TimingRepeat,
+    source subject : Patient,
+    target careplan: CarePlan,
+    target activity : CarePlan_Activity,
+    target timing: Timing){
+
+    // today + total * gap
+    repeat where(dueDate <= maxDate and (today() + ((countMax.toDecimal() * period).toString()+' \'months\'').toQuantity()) >= dueDate) ->
+    // start of task is today OR first date of every month if future month | end is last day of given month
+                create('date') as startOfMonth, startOfMonth.value = evaluate(dueDate, $this.value.substring(0,7) + '-01'),
+                create('date') as start, start.value = evaluate(dueDate, iif($this = today(), $this, startOfMonth).value ),
+                evaluate(startOfMonth, ($this + '1 \'months\''.toQuantity()) - '1 \'days\''.toQuantity()) as end,
+                create('Period') as period,
+                careplan.contained = create('Task') as task then {
+
+        subject then ExtractPeriod(start, end, period) "r_task_period_extr";
+
+        subject -> task.id = uuid(),
+               task.identifier = create('Identifier') as iden, iden.value = uuid(), iden.use = 'official',
+               task.status = 'ready',
+               task.intent = 'plan',
+               task.executionPeriod = period,
+               task.priority = 'routine',
+               task.description = 'ANC Follow Up Task',
+               task.for = create('Reference') as ref, ref.reference = evaluate(subject, $this.id.replaceMatches('/_history/.*', '')),
+               task.basedOn = reference(careplan),
+               task.authoredOn = evaluate(subject, now()),
+               task.requester = evaluate(subject, $this.generalPractitioner.first()),
+               task.owner = evaluate(subject, $this.generalPractitioner.first()) "r_task_data";
+
+        // anc followup form
+        subject -> task.reasonReference = create('Reference') as ref, ref.reference = 'Questionnaire/132155' "r_task_reason_ref";
+
+        subject -> activity.outcomeReference = reference(task) "r_cp_task_ref";
+        subject -> timing.event = evaluate(period, $this.start) "r_activity_timing";
+
+        repeat -> evaluate(period, $this.start + (repeat.period.toString() + ' \'months\'').toQuantity()) as nextDueDate
+                  then ExtractTasks(nextDueDate, maxDate, repeat, subject, careplan, activity, timing) "r_task_repeat";
+    } "r_cp_acti_outcome";
+}
+
+group ExtractTimingCode(source subject : Patient, target concept: CodeableConcept){
+    subject -> concept.coding = c("http://terminology.hl7.org/CodeSystem/v3-GTSAbbreviation", "QD") as coding then {
+        subject -> coding.display = 'QD' "r_cp_cod_disp";
+    } "r_cp_cc_cod";
+    subject -> concept.text = 'QD' "r_cp_cc_txt";
+}
+
+group ExtractPeriod_9m(source offset: DateType, target period: Period){
+    offset -> offset as start,
+              evaluate(offset, $this + '9 \'months\''.toQuantity()) as end then
+              ExtractPeriod(start, end, period) "r_period";
+}
+
+group ExtractPeriod(source start: DateType, source end: DateType, target period: Period) {
+    start -> period.start = create('dateTime') as dt,
+             dt.value = evaluate(start, $this.value.substring(0,10) + 'T00:00:00') "r_per_start";
+
+    end -> period.end = create('dateTime') as dt,
+           dt.value = evaluate(end, $this.value.substring(0,10) + 'T00:00:00') "r_per_end";
+}

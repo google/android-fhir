@@ -16,6 +16,8 @@
 
 package com.google.android.fhir.workflow
 
+import ca.uhn.fhir.context.FhirContext
+import com.google.android.fhir.workflow.testing.CqlBuilder
 import com.google.android.fhir.workflow.testing.PlanDefinition
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -88,4 +90,16 @@ class PlanDefinitionProcessorJavaTest {
       .withLibrary("/plan-definition/rule-filters/RuleFilters-1.0.0-bundle.json")
       .apply()
       .isEqualsTo("/plan-definition/rule-filters/ReportableCarePlan.json")
+
+    @Test
+    fun testAncVisitCarePlan() {
+        PlanDefinition.Assert.that("132157", "TEST_PATIENT", null)
+            .withPlanDefinition("/plan-definition/anc-visit/plandefinition.json")
+            .withLibrary("/plan-definition/anc-visit/library.cql")
+            .withPreFetchData("/plan-definition/anc-visit/sample/questionnaire-response-register.json")
+            .withResource("/plan-definition/anc-visit/activity-definition.json")
+            .apply().run {
+                println(FhirContext.forR4Cached().newJsonParser().encodeResourceToString(this.carePlan))
+            }
+    }
 }

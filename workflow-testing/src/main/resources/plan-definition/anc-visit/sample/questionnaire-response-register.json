@@ -1,0 +1,244 @@
+{
+  "resourceType": "QuestionnaireResponse",
+  "id": "88f6b8d7-ebb7-484e-809b-84d88767100b",
+  "meta": {
+    "lastUpdated": "2022-06-20T05:18:38.789+05:00",
+    "tag": [
+      {
+        "system": "urn:oid:2.16.578.1.12.4.1.1.8655",
+        "display": "eCBIS New Pregnancy Registration"
+      }
+    ]
+  },
+  "questionnaire": "Questionnaire/132152",
+  "subject": {
+    "reference": "Patient/21b5f74c-6fea-4998-bfc3-6b2c3670c88b"
+  },
+  "authored": "2022-06-20T05:18:38+05:00",
+  "item": [
+    {
+      "linkId": "1aa4d0b3-8c3e-47b7-8fa5-effcb5130fac",
+      "answer": [
+        {
+          "valueCoding": {
+            "id": "63c19222-b589-449f-b371-b85ba449fdd9",
+            "system": "urn:uuid:8dc97476-74cc-4c57-8cbf-f0799cfd2ba9",
+            "code": "no",
+            "display": "No"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "da999955-2174-4219-825e-8ae2b948b7e7",
+      "answer": [
+        {
+          "valueCoding": {
+            "id": "30862a15-03b0-42af-8703-857e579aa2b9",
+            "system": "urn:uuid:de9ef3e8-be6b-4639-b196-63905d15c8c6",
+            "code": "yes",
+            "display": "Yes"
+          },
+          "item": [
+            {
+              "linkId": "1b5d6e5e-dd55-4b30-8f77-79da15c53269",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "id": "6eb83dd3-178a-45e7-c6c9-96d9335d0072",
+                    "system": "urn:uuid:1fcf2bfd-0bcb-4278-f86a-d403866a01cb",
+                    "code": "yes",
+                    "display": "Yes"
+                  },
+                  "item": [
+                    {
+                      "linkId": "008b354b-3f6f-4402-8d6d-4de27b6e2071",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "id": "997f9216-f310-4e8e-88f7-93fb783d5611",
+                            "system": "urn:uuid:01dd5475-5280-42b2-87a5-6d9b7ec374c3",
+                            "code": "add-location-hierachy",
+                            "display": "Add location hierachy"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "1272863d-8d9d-4167-86d1-38f5e074607e",
+                      "answer": [
+                        {
+                          "valueDate": "2022-05-02"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "92e8f830-210a-49f6-8d1a-6d01f5bc72b9",
+                      "answer": [
+                        {
+                          "valueInteger": 2
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "245679f2-6172-456e-8ff3-425f5cea3243",
+      "answer": [
+        {
+          "valueDate": "2022-02-04",
+          "item": [
+            {
+              "linkId": "b00a7b16-e9ef-446d-daf9-fca839bae7d6",
+              "answer": [
+                {
+                  "valueInteger": 3
+                }
+              ]
+            },
+            {
+              "linkId": "a887e708-85d8-4fb2-871a-9c9d90887a50",
+              "answer": [
+                {
+                  "valueInteger": 6
+                }
+              ]
+            },
+            {
+              "linkId": "4f04affb-22a8-4da5-88d8-78bc6d0454e7",
+              "answer": [
+                {
+                  "valueDate": "2022-08-31"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "84d77d0b-754d-48ed-800e-905cf47b9ba6",
+      "answer": [
+        {
+          "valueCoding": {
+            "id": "fff11283-6334-4b73-858e-34dd01e199b1",
+            "system": "urn:uuid:8711d963-b2bd-445b-8fb1-e19d999dbc81",
+            "code": "yes",
+            "display": "Yes"
+          },
+          "item": [
+            {
+              "linkId": "d065ac2c-31af-4bbb-8706-2c6a632c5e7a",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "id": "c65d215c-7809-4637-8932-c7b7788ef421",
+                    "system": "urn:uuid:52bafe9a-870c-48c2-cdd5-e6d880d7206a",
+                    "code": "fever/chill",
+                    "display": "Fever/chill"
+                  },
+                  "item": [
+                    {
+                      "linkId": "1b625d5c-d0bc-44d5-8eed-3efc37c51f84",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "id": "90708b0f-de8f-4345-872e-61d9e1589047",
+                            "system": "urn:uuid:5733187d-83d0-449c-e4a6-e60f1bbe26d7",
+                            "code": "yes",
+                            "display": "Yes"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "31009ee0-a0c9-46f0-8ef6-e65b34777aa1",
+      "answer": [
+        {
+          "valueCoding": {
+            "id": "0ac2b549-2300-46f4-9159-5178f9d81f85",
+            "system": "urn:uuid:11f0c610-8a18-41ef-814b-401aa71e9f0a",
+            "code": "yes",
+            "display": "Yes"
+          },
+          "item": [
+            {
+              "linkId": "ac9e4bf3-4691-45d1-93cd-d4d5b293661e",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "id": "03601957-24e3-49ef-82d7-9d5483401908",
+                    "system": "urn:uuid:c952513f-6cf1-4866-a909-ff273045b4c9",
+                    "code": "walking",
+                    "display": "Walking"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "1f94941a-616b-432b-dca6-a5bf12c475ef",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "id": "4b9a3cfe-3ba9-4e1b-e4c9-cf172d038864",
+                    "system": "urn:uuid:345a5eae-ab81-4a0c-9e47-141d5d2b2b25",
+                    "code": "yes",
+                    "display": "Yes"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "d79e1518-f96c-4268-884b-39f63950f578",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "id": "2f768bbb-f9b3-41b3-8347-97c42c1de5c5",
+                    "system": "urn:uuid:3bc0f36f-ca18-44c0-8646-a8402e6e688a",
+                    "code": "yes",
+                    "display": "Yes"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "07736486-4e2a-4c98-ea71-e351f279ff18",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "id": "ef2d6d4c-575d-43ac-8887-ee9dc0f9dc12",
+                    "system": "urn:uuid:b6aa81ee-2a24-49fd-ee5a-8c3a1018e368",
+                    "code": "yes",
+                    "display": "Yes"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "ec905b2f-7fa6-4f74-d7ae-a76539eb2632",
+              "answer": [
+                {
+                  "valueBoolean": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

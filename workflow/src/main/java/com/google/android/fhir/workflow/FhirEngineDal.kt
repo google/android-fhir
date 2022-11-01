@@ -22,9 +22,11 @@ import com.google.android.fhir.search.search
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.instance.model.api.IIdType
+import org.hl7.fhir.r4.model.ActivityDefinition
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Measure
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.PlanDefinition
 import org.hl7.fhir.r4.model.Resource
 import org.opencds.cqf.cql.evaluator.fhir.dal.FhirDal
 
@@ -61,6 +63,8 @@ class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
       when (resourceType) {
         "Measure" -> fhirEngine.search<Measure> { filter(Measure.URL, { value = url }) }
         "Library" -> listOf(libs[url] as Library)
+        "ActivityDefinition" ->
+          fhirEngine.search<PlanDefinition> { }.flatMap { it.contained }.filter { it.id == url }
         else -> listOf()
       }.toMutableList()
     }

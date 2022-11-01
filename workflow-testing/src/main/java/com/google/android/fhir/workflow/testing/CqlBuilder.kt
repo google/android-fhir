@@ -189,7 +189,7 @@ object CqlBuilder : Loadable() {
     fun compiles() = CompiledCql(cqlText, compile(cqlText))
   }
 
-  class CompiledCql(val cqlText: String, private val translator: CqlTranslator) {
+  class CompiledCql(val cqlText: String, val translator: CqlTranslator) {
     private lateinit var expectedElmJsonAsset: String
     private lateinit var expectedElmXmlAsset: String
 
