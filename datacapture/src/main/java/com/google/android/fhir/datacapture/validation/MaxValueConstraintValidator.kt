@@ -25,6 +25,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
 
 internal const val MAX_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/maxValue"
+
 /** A validator to check if the value of an answer exceeded the permitted value. */
 internal object MaxValueConstraintValidator :
   ValueConstraintExtensionValidator(
