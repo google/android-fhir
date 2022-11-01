@@ -19,11 +19,9 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.datacapture.CQF_CALCULATED_EXPRESSION_URL
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
-import kotlin.test.assertTrue
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -48,7 +46,7 @@ class MaxValueConstraintValidatorTest {
   }
 
   @Test
-  fun shouldReturnInvalidResult() {
+  fun `should return invalid result when entered value is greater than maxValue`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -72,7 +70,7 @@ class MaxValueConstraintValidatorTest {
   }
 
   @Test
-  fun shouldReturnValidResult() {
+  fun `should return valid result when entered value is less than maxValue`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -96,61 +94,7 @@ class MaxValueConstraintValidatorTest {
   }
 
   @Test
-  fun minValueFhirExpressionForDateType_shouldReturnDateType() {
-    val today = LocalDate.now().toString()
-    val questionItem =
-      listOf(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension(
-            Extension().apply {
-              url = MIN_VALUE_EXTENSION_URL
-              this.setValue(
-                DateType().apply {
-                  extension =
-                    listOf(
-                      Extension(
-                        CQF_CALCULATED_EXPRESSION_URL,
-                        Expression().apply {
-                          language = "text/fhirpath"
-                          expression = "today()"
-                        }
-                      )
-                    )
-                }
-              )
-            }
-          )
-        }
-      )
-    assertTrue(
-      (MinValueConstraintValidator.getMinValue(questionItem.first()) as? DateType)
-        ?.valueAsString.equals(today) == true
-    )
-  }
-
-  @Test
-  fun minValueExpressionForDateType_shouldReturnDateType() {
-    val dateType = DateType(SimpleDateFormat("yyyy-MM-dd").parse("2021-06-01"))
-    val questionItem =
-      listOf(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension(
-            Extension().apply {
-              url = MIN_VALUE_EXTENSION_URL
-              this.setValue(dateType)
-            }
-          )
-        }
-      )
-
-    assertTrue(
-      (MinValueConstraintValidator.getMinValue(questionItem.first()) as? DateType)
-        ?.value?.equals(dateType.value) == true
-    )
-  }
-
-  @Test
-  fun maxValueExpressionForDateType_shouldReturnDateType() {
+  fun `should return maxValue date`() {
     val dateType = DateType(SimpleDateFormat("yyyy-MM-dd").parse("2023-06-01"))
     val questionItem =
       listOf(
@@ -164,14 +108,12 @@ class MaxValueConstraintValidatorTest {
         }
       )
 
-    assertTrue(
-      (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)
-        ?.value?.equals(dateType.value) == true
-    )
+    assertThat((MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)?.value)
+      .isEqualTo(dateType.value)
   }
 
   @Test
-  fun maxValueFhirExpressionForDateType_shouldReturnTodaysDateType() {
+  fun `should return today's date when expression evaluates to today`() {
     val today = LocalDate.now().toString()
     val questionItem =
       listOf(
@@ -198,14 +140,14 @@ class MaxValueConstraintValidatorTest {
         }
       )
 
-    assertTrue(
-      (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)
-        ?.valueAsString?.equals(today) == true
-    )
+    assertThat(
+        (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)?.valueAsString
+      )
+      .isEqualTo(today)
   }
 
   @Test
-  fun maxValueFhirExpressionForDateType_shouldReturnFutureDateType() {
+  fun `should return future's date when expression evaluates`() {
     val fiveDaysAhead = LocalDate.now().plusDays(5).toString()
     val questionItem =
       listOf(
@@ -232,9 +174,9 @@ class MaxValueConstraintValidatorTest {
         }
       )
 
-    assertTrue(
-      (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)
-        ?.valueAsString?.equals(fiveDaysAhead) == true
-    )
+    assertThat(
+        (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)?.valueAsString
+      )
+      .isEqualTo(fiveDaysAhead)
   }
 }
