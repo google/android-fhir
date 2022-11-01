@@ -26,7 +26,6 @@ import org.hl7.fhir.r4.model.ActivityDefinition
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Measure
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.PlanDefinition
 import org.hl7.fhir.r4.model.Resource
 import org.opencds.cqf.cql.evaluator.fhir.dal.FhirDal
 
@@ -64,7 +63,7 @@ class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
         "Measure" -> fhirEngine.search<Measure> { filter(Measure.URL, { value = url }) }
         "Library" -> listOf(libs[url] as Library)
         "ActivityDefinition" ->
-          fhirEngine.search<PlanDefinition> { }.flatMap { it.contained }.filter { it.id == url }
+          fhirEngine.search<ActivityDefinition> { filter(ActivityDefinition.URL, { value = url }) }
         else -> listOf()
       }.toMutableList()
     }

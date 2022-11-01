@@ -160,7 +160,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     OperationParametersParser(adapterFactory, fhirTypeConverter)
 
   private val planDefinitionProcessor =
-    PlanDefinitionProcessorExt(
+    PlanDefinitionProcessor(
       fhirContext,
       fhirEngineDal,
       libraryProcessor,
@@ -237,7 +237,11 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     )
   }
 
-  fun generateCarePlan(planDefinitionId: String, patientId: String, encounterId: String?): CarePlan {
+  fun generateCarePlan(
+    planDefinitionId: String,
+    patientId: String,
+    encounterId: String?
+  ): CarePlan {
     return planDefinitionProcessor.apply(
       IdType("PlanDefinition", planDefinitionId),
       patientId,

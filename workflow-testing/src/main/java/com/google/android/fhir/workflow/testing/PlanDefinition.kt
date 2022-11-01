@@ -18,8 +18,8 @@ package com.google.android.fhir.workflow.testing
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import java.util.UUID
 import org.hl7.fhir.instance.model.api.IBaseBundle
-import org.hl7.fhir.instance.model.api.IBaseParameters
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CarePlan
@@ -55,7 +55,6 @@ import org.opencds.cqf.cql.evaluator.library.LibraryProcessor
 import org.opencds.cqf.cql.evaluator.plandefinition.r4.OperationParametersParser
 import org.opencds.cqf.cql.evaluator.plandefinition.r4.PlanDefinitionProcessor
 import org.skyscreamer.jsonassert.JSONAssert
-import java.util.UUID
 
 object PlanDefinition : Loadable() {
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
@@ -63,11 +62,8 @@ object PlanDefinition : Loadable() {
 
   fun parse(assetName: String): IBaseResource {
     return if (assetName.endsWith(".cql"))
-       Bundle().apply {
-         this.addEntry().apply { resource = parseCql(assetName) as Resource }
-       }
-    else
-    jsonParser.parseResource(open(assetName))
+      Bundle().apply { this.addEntry().apply { resource = parseCql(assetName) as Resource } }
+    else jsonParser.parseResource(open(assetName))
   }
 
   fun parseCql(assetName: String): IBaseResource {
@@ -76,14 +72,13 @@ object PlanDefinition : Loadable() {
     val identifier = cql.translator.translatedLibrary.identifier
 
     return CqlBuilder.assembleFhirLib(
-      cql.cqlText,
-      translator.toJson(),
-      null,
-      identifier.id,
-      identifier.version
-    ).apply {
-      this.idElement = IdType(this.resourceType.name, "12345")
-    }
+        cql.cqlText,
+        translator.toJson(),
+        null,
+        identifier.id,
+        identifier.version
+      )
+      .apply { this.idElement = IdType(this.resourceType.name, "12345") }
   }
 
   fun buildProcessor(fhirDal: FhirDal): PlanDefinitionProcessor {
@@ -259,7 +254,7 @@ object PlanDefinition : Loadable() {
             preFetchData,
             null,
             baseResource as Bundle?,
-            null/*preFetchData as IBaseParameters*/,
+            null /*preFetchData as IBaseParameters*/,
             dataEndpoint,
             libraryEndpoint,
             libraryEndpoint
