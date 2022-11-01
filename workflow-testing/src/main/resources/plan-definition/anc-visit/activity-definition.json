@@ -4,8 +4,78 @@
   "url": "ActivityDefinition/careplan-activity",
   "title": "ANC Follow Up Plan",
   "status": "active",
+  "extension": [{
+    "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/targetStatus",
+    "valueString": "ready"
+  }],
   "description": "This action will performed every month for a pregnant woman",
   "kind": "Task",
+  "library": ["/Library/ANCVISIT"],
+  "dynamicValue": [
+    {
+      "path": "intent",
+      "expression": {
+        "language": "text/cql-identifier",
+        "expression": "TaskIntent"
+      }
+    },
+    {
+      "path": "executionPeriod",
+      "expression": {
+        "language": "text/cql-identifier",
+        "expression": "TaskExecutionPeriod"
+      }
+    },
+    {
+      "path": "priority",
+      "expression": {
+        "language": "text/cql-identifier",
+        "expression": "TaskPriority"
+      }
+    },
+    {
+      "path": "for",
+      "expression": {
+        "language": "text/cql-identifier",
+        "expression": "TaskFor"
+      }
+    },
+    {
+      "path": "basedOn",
+      "expression": {
+        "language": "text/cql-identifier",
+        "expression": "TaskBasedOn"
+      }
+    },
+    {
+      "path": "authoredOn",
+      "expression": {
+        "language": "text/cql-identifier",
+        "expression": "TaskAuthoredOn"
+      }
+    },
+    {
+      "path": "requester",
+      "expression": {
+        "language": "text/cql-identifier",
+        "expression": "TaskRequester"
+      }
+    },
+    {
+      "path": "owner",
+      "expression": {
+        "language": "text/cql-identifier",
+        "expression": "TaskOwner"
+      }
+    },
+    {
+      "path": "reasonReference",
+      "expression": {
+        "language": "text/cql-identifier",
+        "expression": "TaskReasonReference"
+      }
+    }
+  ],
   "timingTiming": {
     "repeat": {
       "countMax": 8,
