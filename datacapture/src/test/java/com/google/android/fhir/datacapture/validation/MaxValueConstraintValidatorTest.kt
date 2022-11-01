@@ -126,7 +126,7 @@ class MaxValueConstraintValidatorTest {
                   extension =
                     listOf(
                       Extension(
-                        EXTENSION_CQF_CALCULATED_VALUE_URL,
+                        CQF_CALCULATED_EXPRESSION_URL,
                         Expression().apply {
                           language = "text/fhirpath"
                           expression = "today()"
@@ -160,7 +160,7 @@ class MaxValueConstraintValidatorTest {
                   extension =
                     listOf(
                       Extension(
-                        EXTENSION_CQF_CALCULATED_VALUE_URL,
+                        CQF_CALCULATED_EXPRESSION_URL,
                         Expression().apply {
                           language = "text/fhirpath"
                           expression = "today() + 5 'days' "

@@ -111,7 +111,7 @@ class MinValueConstraintValidatorTest {
                 extension =
                   listOf(
                     Extension(
-                      EXTENSION_CQF_CALCULATED_VALUE_URL,
+                      CQF_CALCULATED_EXPRESSION_URL,
                       Expression().apply {
                         language = "text/fhirpath"
                         expression = "today() - 1 'days'"
@@ -161,7 +161,7 @@ class MinValueConstraintValidatorTest {
                 extension =
                   listOf(
                     Extension(
-                      EXTENSION_CQF_CALCULATED_VALUE_URL,
+                      CQF_CALCULATED_EXPRESSION_URL,
                       Expression().apply {
                         language = "text/fhirpath"
                         expression = "today() - 1 'days'"
