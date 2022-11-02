@@ -273,8 +273,8 @@ class QuestionnaireItemHeaderViewTest {
   }
 
   @Test
-  fun `shows custom error text`() {
-    view.showCustomErrorText("missing answer for required field")
+  fun `shows error text`() {
+    view.showErrorText("missing answer for required field")
     assertThat(view.findViewById<TextView>(R.id.error_text_at_header).text.toString())
       .isEqualTo("missing answer for required field")
     assertThat(view.findViewById<TextView>(R.id.error_text_at_header).visibility)
@@ -282,8 +282,8 @@ class QuestionnaireItemHeaderViewTest {
   }
 
   @Test
-  fun `hides custom error text`() {
-    view.showCustomErrorText(isErrorTextVisible = false)
+  fun `hides error text`() {
+    view.showErrorText(isErrorTextVisible = false)
     assertThat(view.findViewById<TextView>(R.id.error_text_at_header).visibility)
       .isEqualTo(View.GONE)
   }

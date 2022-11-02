@@ -78,11 +78,9 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
           is NotValidated,
-          Valid -> header.showCustomErrorText(isErrorTextVisible = false)
+          Valid -> header.showErrorText(isErrorTextVisible = false)
           is Invalid -> {
-            header.showCustomErrorText(
-              errorText = validationResult.getSingleStringValidationMessage()
-            )
+            header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
           }
         }
       }

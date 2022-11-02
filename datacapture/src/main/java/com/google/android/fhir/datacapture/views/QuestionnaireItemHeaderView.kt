@@ -64,20 +64,17 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
     visibility = getViewGroupVisibility(prefix, question, hint)
   }
 
-  fun showCustomErrorText(errorText: String? = null, isErrorTextVisible: Boolean = true) {
-    fun TextView.showError() {
-      visibility =
-        when (isErrorTextVisible) {
-          true -> {
-            VISIBLE
-          }
-          false -> {
-            GONE
-          }
+  fun showErrorText(errorText: String? = null, isErrorTextVisible: Boolean = true) {
+    errorTextView.visibility =
+      when (isErrorTextVisible) {
+        true -> {
+          VISIBLE
         }
-      text = errorText
-    }
-    errorTextView.showError()
+        false -> {
+          GONE
+        }
+      }
+    errorTextView.text = errorText
   }
 }
 
