@@ -118,7 +118,7 @@ object ResourceMapper {
     val profiles: List<CanonicalType> = questionnaire.meta.profile
     if (!profiles.isNullOrEmpty()) {
       profiles.forEach {
-        if (FHIR_PROFILE_CANONICAL_URL_LIST.contains(it.toString())) {
+        if (it.toString().startsWith(FHIR_PROFILE_CANONICAL_URL_PREFIX)) {
           Timber.d("resource conform to FHIR standard profile $it")
         } else if (loadProfile == null) {
           throw IllegalArgumentException(
@@ -354,7 +354,7 @@ object ResourceMapper {
         // 2) define a new complex value (e.g. HumanName) to extract using the `definition` field
         // (see http://www.hl7.org/fhir/datatypes.html#complex)
         // 3) simply group questions (e.g. for display reasons) without altering the extraction
-        // semanticMutableMap<String, StructureDefinition>s
+        // semantics
         when {
           questionnaireItem.itemExtractionContextNameToExpressionPair != null ->
             // Extract a new resource for a new item extraction context
@@ -559,7 +559,6 @@ private fun isExtensionSupportedByProfile(
     } // it.id.contains(extensionForType+".extension:")
   listOfElementDefinition.forEach {
     if (it.id.substringAfterLast(":").equals(fieldName)) {
-      // If field not found in resource class, assume this is an extension
       return true
     }
   }

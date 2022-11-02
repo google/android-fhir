@@ -16,4 +16,7 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-val FHIR_PROFILE_CANONICAL_URL_LIST = listOf("http://hl7.org/fhir/StructureDefinition/Patient")
+// TODO Either keep list of all FHIR resource canonical URL url
+// OR
+// check for url starts with "http://hl7.org/fhir/StructureDefinition/"
+val FHIR_PROFILE_CANONICAL_URL_PREFIX = "http://hl7.org/fhir/StructureDefinition/"
