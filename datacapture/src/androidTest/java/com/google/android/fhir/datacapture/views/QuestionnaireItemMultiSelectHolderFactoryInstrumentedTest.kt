@@ -151,6 +151,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
 private fun answerOptions(vararg options: String) =
   Questionnaire.QuestionnaireItemComponent().apply {
     linkId = "1"
+    repeats = true
     options.forEach { option ->
       addAnswerOption(
         Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
