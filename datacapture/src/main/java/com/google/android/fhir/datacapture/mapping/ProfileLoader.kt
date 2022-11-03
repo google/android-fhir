@@ -29,5 +29,5 @@ interface ProfileLoader {
    * field (eg. questionnaire.meta.profile)
    * @return StructureDefinition resource conform to this StructureDefinition/Profile
    */
-  fun loadProfile(url: CanonicalType): StructureDefinition
+  fun loadProfile(url: CanonicalType): StructureDefinition?
 }

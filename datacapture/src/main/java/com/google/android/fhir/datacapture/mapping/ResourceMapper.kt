@@ -120,16 +120,19 @@ object ResourceMapper {
       profiles.forEach {
         if (it.toString().startsWith(FHIR_PROFILE_CANONICAL_URL_PREFIX)) {
           Timber.d("resource conform to FHIR standard profile $it")
-        } else if (loadProfile == null) {
-          throw IllegalArgumentException(
-            "LoadProfileCallback implementation required to load StructureDefinition that this resource claims to conform to"
-          )
         } else {
+          requireNotNull(loadProfile) {
+            "ProfileLoader implementation required to load StructureDefinition that this resource claims to conform to"
+          }
           val structureDefinition = loadProfile.loadProfile(it)
-          if (structureDefinitionMap.containsKey(structureDefinition.type)) {
-            structureDefinitionMap.get(structureDefinition.type)?.add(structureDefinition)
-          } else {
-            structureDefinitionMap.put(structureDefinition.type, mutableListOf(structureDefinition))
+          // Base FHIR resource will be extracted as StructureDefinition is not provided for
+          // resource conforming profile.
+          structureDefinition?.let {
+            if (structureDefinitionMap.containsKey(it.type)) {
+              structureDefinitionMap.get(it.type)?.add(it)
+            } else {
+              structureDefinitionMap.put(it.type, mutableListOf(it))
+            }
           }
         }
       }
