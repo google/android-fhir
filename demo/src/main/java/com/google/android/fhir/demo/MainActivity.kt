@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     initActionBar()
     initNavigationDrawer()
     observeLastSyncTime()
-    // viewModel.updateLastSyncTimestamp()
+    viewModel.updateLastSyncTimestamp()
   }
 
   override fun onBackPressed() {
@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
 
   fun openNavigationDrawer() {
     binding.drawer.openDrawer(GravityCompat.START)
-    // viewModel.updateLastSyncTimestamp()
+    viewModel.updateLastSyncTimestamp()
   }
 
   private fun initActionBar() {

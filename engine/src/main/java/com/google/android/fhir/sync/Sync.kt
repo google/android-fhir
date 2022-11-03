@@ -25,6 +25,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
+import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -104,6 +105,11 @@ object Sync {
             gson.fromJson(stateData, Class.forName(state)) as SyncJobStatus
           }
       }
+
+  /** Gets the timestamp of the last sync job. */
+  fun getLastSyncTimestamp(context: Context): OffsetDateTime? {
+    return DatastoreUtil(context).readLastSyncTimestamp()
+  }
 
   @PublishedApi
   internal inline fun <W : FhirSyncWorker> createOneTimeWorkRequest(

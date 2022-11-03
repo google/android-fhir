@@ -17,6 +17,8 @@
 package com.google.android.fhir.demo
 
 import android.app.Application
+import android.text.format.DateFormat
+import android.text.format.DateFormat.is24HourFormat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -28,6 +30,7 @@ import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.RepeatInterval
 import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.SyncJobStatus
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -57,5 +60,20 @@ class MainActivityViewModel(application: Application, private val state: SavedSt
         )
         .collect { _pollState.emit(it) }
     }
+  }
+
+  /** Emits last sync time. */
+  fun updateLastSyncTimestamp() {
+    val formatter =
+      DateTimeFormatter.ofPattern(
+        if (DateFormat.is24HourFormat(getApplication())) formatString24 else formatString12
+      )
+    _lastSyncTimestampLiveData.value =
+      Sync.getLastSyncTimestamp(getApplication())?.toLocalDateTime()?.format(formatter) ?: ""
+  }
+
+  companion object {
+    private const val formatString24 = "yyyy-MM-dd HH:mm:ss"
+    private const val formatString12 = "yyyy-MM-dd hh:mm:ss a"
   }
 }
