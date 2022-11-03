@@ -65,6 +65,8 @@ function setup() {
   sudo npm install -g n
   sudo n 16.18.0
 
+  gcloud components update --version 408.01 --quiet
+
   wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip \
     -O ${HOME}/android_sdk.zip -q
   unzip ${HOME}/android_sdk.zip -d ${ANDROID_HOME}
