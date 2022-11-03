@@ -16,18 +16,8 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import org.hl7.fhir.r4.model.CanonicalType
-import org.hl7.fhir.r4.model.StructureDefinition
-
 /**
- * This provides an interface to load profile/structure definition in SDK based on canonical url for
- * FHIR Resource conforms to different profile than standard FHIR profile
+ * Here it is assumed that if the canonical url from resource meta field starts with
+ * "http://hl7.org/fhir/StructureDefinition/" then it is a base fhir resource.
  */
-interface LoadProfileCallback {
-  /**
-   * @param url : Canonical URL from list of Canonical urls defines as profiles in Resource meta
-   * field (eg. questionnaire.meta.profile)
-   * @return StructureDefinition resource conform to this StructureDefinition/Profile
-   */
-  fun loadProfile(url: CanonicalType): StructureDefinition
-}
+val FHIR_PROFILE_CANONICAL_URL_PREFIX = "http://hl7.org/fhir/StructureDefinition/"

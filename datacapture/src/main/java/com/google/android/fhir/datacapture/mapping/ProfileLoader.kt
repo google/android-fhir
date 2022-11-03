@@ -16,7 +16,18 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-// TODO Either keep list of all FHIR resource canonical URL url
-// OR
-// check for url starts with "http://hl7.org/fhir/StructureDefinition/"
-val FHIR_PROFILE_CANONICAL_URL_PREFIX = "http://hl7.org/fhir/StructureDefinition/"
+import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.StructureDefinition
+
+/**
+ * Loads `StructureDefinition` for profile based on canonical URL for FHIR resources conforming to
+ * different profiles.
+ */
+interface ProfileLoader {
+  /**
+   * @param url : Canonical URL from list of Canonical urls defines as profiles in Resource meta
+   * field (eg. questionnaire.meta.profile)
+   * @return StructureDefinition resource conform to this StructureDefinition/Profile
+   */
+  fun loadProfile(url: CanonicalType): StructureDefinition
+}

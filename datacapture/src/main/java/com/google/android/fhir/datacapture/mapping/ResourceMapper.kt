@@ -112,7 +112,7 @@ object ResourceMapper {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     structureMapExtractionContext: StructureMapExtractionContext? = null,
-    loadProfile: LoadProfileCallback? = null,
+    loadProfile: ProfileLoader? = null,
   ): Bundle {
     val structureDefinitionMap: MutableMap<String, MutableList<StructureDefinition>> = hashMapOf()
     val profiles: List<CanonicalType> = questionnaire.meta.profile

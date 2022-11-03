@@ -22,7 +22,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.DateTimeType
@@ -112,7 +112,7 @@ class ResourceMapperInstrumentedTest {
       )
     val patient = bundle.entry.single().resource as Patient
 
-    Truth.assertThat(patient).isNotNull()
+    assertThat(patient).isNotNull()
     val dateTimeType =
       patient
         .getExtensionByUrl(
@@ -120,13 +120,13 @@ class ResourceMapperInstrumentedTest {
         )
         .value as DateTimeType
     val expectedDateTimeType = DateTimeType("2022-02-07T13:28:17-05:00")
-    Truth.assertThat(dateTimeType.year).isEqualTo(expectedDateTimeType.year)
-    Truth.assertThat(dateTimeType.month).isEqualTo(expectedDateTimeType.month)
-    Truth.assertThat(dateTimeType.day).isEqualTo(expectedDateTimeType.day)
-    Truth.assertThat(dateTimeType.hour).isEqualTo(expectedDateTimeType.hour)
-    Truth.assertThat(dateTimeType.minute).isEqualTo(expectedDateTimeType.minute)
-    Truth.assertThat(dateTimeType.second).isEqualTo(expectedDateTimeType.second)
-    Truth.assertThat(dateTimeType.timeZone).isEqualTo(expectedDateTimeType.timeZone)
+    assertThat(dateTimeType.year).isEqualTo(expectedDateTimeType.year)
+    assertThat(dateTimeType.month).isEqualTo(expectedDateTimeType.month)
+    assertThat(dateTimeType.day).isEqualTo(expectedDateTimeType.day)
+    assertThat(dateTimeType.hour).isEqualTo(expectedDateTimeType.hour)
+    assertThat(dateTimeType.minute).isEqualTo(expectedDateTimeType.minute)
+    assertThat(dateTimeType.second).isEqualTo(expectedDateTimeType.second)
+    assertThat(dateTimeType.timeZone).isEqualTo(expectedDateTimeType.timeZone)
   }
 
   @Test
@@ -195,8 +195,8 @@ class ResourceMapperInstrumentedTest {
       )
     val patient = bundle.entry.single().resource as Patient
 
-    Truth.assertThat(patient).isNotNull()
-    Truth.assertThat(
+    assertThat(patient).isNotNull()
+    assertThat(
         patient
           .getExtensionByUrl(
             "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.reminder"
@@ -267,8 +267,8 @@ class ResourceMapperInstrumentedTest {
       )
     val patient = bundle.entry.single().resource as Patient
 
-    Truth.assertThat(patient).isNotNull()
-    Truth.assertThat(
+    assertThat(patient).isNotNull()
+    assertThat(
         patient.getExtensionByUrl(
           "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.birthTime"
         )
@@ -344,7 +344,7 @@ class ResourceMapperInstrumentedTest {
           )
         }
       }
-    Truth.assertThat(exception.message)
+    assertThat(exception.message)
       .isEqualTo(
         "LoadProfileCallback implementation required to load StructureDefinition that this resource claims to conform to"
       )
@@ -352,7 +352,7 @@ class ResourceMapperInstrumentedTest {
 
   @After fun tearDown() {}
 
-  private class LoadProfile(private val context: Context) : LoadProfileCallback {
+  private class LoadProfile(private val context: Context) : ProfileLoader {
     override fun loadProfile(url: CanonicalType): StructureDefinition {
       val structureDefinition =
         when (url.toString()) {
