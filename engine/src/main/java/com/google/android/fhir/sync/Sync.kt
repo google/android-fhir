@@ -44,7 +44,8 @@ object Sync {
   /**
    * Starts a one time sync job based on [FhirSyncWorker].
    *
-   * Use the returned [Flow] to get updates of the sync job. Alternatively, use [getWorkerInfo] with the same [FhirSyncWorker] to retrieve the status of the job.
+   * Use the returned [Flow] to get updates of the sync job. Alternatively, use [getWorkerInfo] with
+   * the same [FhirSyncWorker] to retrieve the status of the job.
    *
    * @param retryConfiguration configuration to guide the retry mechanism, or `null` to stop retry.
    * @return a [Flow] of [SyncJobStatus]
@@ -66,7 +67,8 @@ object Sync {
   /**
    * Starts a periodic sync job based on [FhirSyncWorker].
    *
-   * Use the returned [Flow] to get updates of the sync job. Alternatively, use [getWorkerInfo] with the same [FhirSyncWorker] to retrieve the status of the job.
+   * Use the returned [Flow] to get updates of the sync job. Alternatively, use [getWorkerInfo] with
+   * the same [FhirSyncWorker] to retrieve the status of the job.
    *
    * @param periodicSyncConfiguration configuration to determine the sync frequency and retry
    * mechanism
@@ -129,10 +131,10 @@ object Sync {
   ): PeriodicWorkRequest {
     val periodicWorkRequestBuilder =
       PeriodicWorkRequest.Builder(
-        clazz,
-        periodicSyncConfiguration.repeat.interval,
-        periodicSyncConfiguration.repeat.timeUnit
-      )
+          clazz,
+          periodicSyncConfiguration.repeat.interval,
+          periodicSyncConfiguration.repeat.timeUnit
+        )
         .setConstraints(periodicSyncConfiguration.syncConstraints)
 
     periodicSyncConfiguration.retryConfiguration?.let {
