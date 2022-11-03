@@ -109,5 +109,6 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_auto_complete.json",
       "component_auto_complete_with_validation.json"
     ),
+    HELP(R.drawable.ic_help, R.string.component_name_help, "component_help.json", ""),
   }
 }
