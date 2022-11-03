@@ -26,22 +26,24 @@ import androidx.work.Constraints
 import com.google.android.fhir.demo.data.FhirSyncWorker
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.RepeatInterval
-import com.google.android.fhir.sync.State
 import com.google.android.fhir.sync.Sync
+import com.google.android.fhir.sync.SyncJobStatus
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 /** View model for [MainActivity]. */
+@OptIn(InternalCoroutinesApi::class)
 class MainActivityViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
   private val _lastSyncTimestampLiveData = MutableLiveData<String>()
   val lastSyncTimestampLiveData: LiveData<String>
     get() = _lastSyncTimestampLiveData
 
-  private val _pollState = MutableSharedFlow<State>()
-  val pollState: Flow<State>
+  private val _pollState = MutableSharedFlow<SyncJobStatus>()
+  val pollState: Flow<SyncJobStatus>
     get() = _pollState
 
   init {

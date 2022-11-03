@@ -42,14 +42,18 @@ object Sync {
       .create()
 
   /**
-   * Starts a one time sync based on [FhirSyncWorker]. In case of a failure, [RetryConfiguration]
-   * will guide the retry mechanism. Caller can set [retryConfiguration] to [null] to stop retry.
+   * Starts a one time sync job based on [FhirSyncWorker].
+   *
+   * Use the returned [Flow] to get updates of the sync job. Alternatively, use [getWorkerInfo] with the same [FhirSyncWorker] to retrieve the status of the job.
+   *
+   * @param retryConfiguration configuration to guide the retry mechanism, or `null` to stop retry.
+   * @return a [Flow] of [SyncJobStatus]
    */
   inline fun <reified W : FhirSyncWorker> oneTimeSync(
     context: Context,
     retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
-  ): Flow<State> {
-    val flow = getStateFlow<W>(context)
+  ): Flow<SyncJobStatus> {
+    val flow = getWorkerInfo<W>(context)
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
         W::class.java.name,
@@ -60,16 +64,20 @@ object Sync {
   }
 
   /**
-   * Starts a periodic sync based on [FhirSyncWorker]. It takes [PeriodicSyncConfiguration] to
-   * determine the sync frequency and [RetryConfiguration] to guide the retry mechanism. Caller can
-   * set [retryConfiguration] to [null] to stop retry.
+   * Starts a periodic sync job based on [FhirSyncWorker].
+   *
+   * Use the returned [Flow] to get updates of the sync job. Alternatively, use [getWorkerInfo] with the same [FhirSyncWorker] to retrieve the status of the job.
+   *
+   * @param periodicSyncConfiguration configuration to determine the sync frequency and retry
+   * mechanism
+   * @return a [Flow] of [SyncJobStatus]
    */
   @ExperimentalCoroutinesApi
   inline fun <reified W : FhirSyncWorker> periodicSync(
     context: Context,
     periodicSyncConfiguration: PeriodicSyncConfiguration
-  ): Flow<State> {
-    val flow = getStateFlow<W>(context)
+  ): Flow<SyncJobStatus> {
+    val flow = getWorkerInfo<W>(context)
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
         W::class.java.name,
@@ -79,7 +87,8 @@ object Sync {
     return flow
   }
 
-  inline fun <reified W : FhirSyncWorker> getStateFlow(context: Context) =
+  /** Gets the worker info for the [FhirSyncWorker] */
+  inline fun <reified W : FhirSyncWorker> getWorkerInfo(context: Context) =
     WorkManager.getInstance(context)
       .getWorkInfosForUniqueWorkLiveData(W::class.java.name)
       .asFlow()
@@ -90,7 +99,7 @@ object Sync {
           ?.let {
             val state = it.getString("StateType")!!
             val stateData = it.getString("State")
-            gson.fromJson(stateData, Class.forName(state)) as State
+            gson.fromJson(stateData, Class.forName(state)) as SyncJobStatus
           }
       }
 
@@ -120,10 +129,10 @@ object Sync {
   ): PeriodicWorkRequest {
     val periodicWorkRequestBuilder =
       PeriodicWorkRequest.Builder(
-          clazz,
-          periodicSyncConfiguration.repeat.interval,
-          periodicSyncConfiguration.repeat.timeUnit
-        )
+        clazz,
+        periodicSyncConfiguration.repeat.interval,
+        periodicSyncConfiguration.repeat.timeUnit
+      )
         .setConstraints(periodicSyncConfiguration.syncConstraints)
 
     periodicSyncConfiguration.retryConfiguration?.let {
@@ -138,11 +147,4 @@ object Sync {
     }
     return periodicWorkRequestBuilder.build()
   }
-}
-
-/** Defines different types of synchronisation workers: download and upload */
-enum class SyncWorkType(val workerName: String) {
-  DOWNLOAD_UPLOAD("fhir-engine-download-upload-worker"),
-  DOWNLOAD("download"),
-  UPLOAD("upload")
 }
