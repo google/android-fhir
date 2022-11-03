@@ -26,11 +26,6 @@
           "code": "years"
         }
       }]
-    },
-    {
-      "linkId": "a-age-acknowledge",
-      "text": "Input age to automatically calculate birthdate until birthdate is updated manually",
-      "type": "display"
     }
   ]
 }
