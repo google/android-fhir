@@ -84,7 +84,7 @@ object Sync {
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
         W::class.java.name,
-        ExistingPeriodicWorkPolicy.REPLACE,
+        ExistingPeriodicWorkPolicy.KEEP,
         createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java)
       )
     return flow
