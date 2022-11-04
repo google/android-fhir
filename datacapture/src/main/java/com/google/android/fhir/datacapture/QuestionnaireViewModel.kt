@@ -36,9 +36,9 @@ import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValid
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.android.fhir.search.search
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -359,7 +359,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /** [QuestionnaireState] to be displayed in the UI. */
-  internal val questionnaireStateFlow: Flow<QuestionnaireState> =
+  internal val questionnaireStateFlow: StateFlow<QuestionnaireState> =
     combine(modificationCount, currentPageIndexFlow, reviewFlow) { _, pagination, reviewFlow ->
         if (reviewFlow) {
           getQuestionnaireState(
