@@ -193,12 +193,16 @@ internal val Questionnaire.QuestionnaireItemComponent.mimeTypes: List<String>
       .map { (it.value as CodeType).valueAsString }
   }
 
-internal fun Questionnaire.QuestionnaireItemComponent.hasMimeType(mimeType: String): Boolean {
-  return mimeTypes.any { it.substringBefore("/") == mimeType.substringBefore("/") }
+internal fun Questionnaire.QuestionnaireItemComponent.hasGeneralMimeType(
+  generalMimeType: String
+): Boolean {
+  return mimeTypes.any { it.substringBefore("/") == generalMimeType }
 }
 
-internal fun Questionnaire.QuestionnaireItemComponent.hasMimeTypeOnly(mimeType: String): Boolean {
-  return mimeTypes.all { it.substringBefore("/") == mimeType.substringBefore("/") }
+internal fun Questionnaire.QuestionnaireItemComponent.hasGeneralMimeTypeOnly(
+  generalMimeType: String
+): Boolean {
+  return mimeTypes.all { it.substringBefore("/") == generalMimeType }
 }
 
 internal const val EXTENSION_MAX_SIZE = "http://hl7.org/fhir/StructureDefinition/maxSize"

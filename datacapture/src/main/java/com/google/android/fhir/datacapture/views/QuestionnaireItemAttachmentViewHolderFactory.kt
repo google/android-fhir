@@ -31,8 +31,8 @@ import androidx.core.os.bundleOf
 import com.bumptech.glide.Glide
 import com.google.android.fhir.datacapture.GeneralMimeTypes
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.hasMimeType
-import com.google.android.fhir.datacapture.hasMimeTypeOnly
+import com.google.android.fhir.datacapture.hasGeneralMimeType
+import com.google.android.fhir.datacapture.hasGeneralMimeTypeOnly
 import com.google.android.fhir.datacapture.maxSizeInB
 import com.google.android.fhir.datacapture.maxSizeInMB
 import com.google.android.fhir.datacapture.mimeTypes
@@ -107,10 +107,10 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           }
         }
 
-        if (questionnaireItem.hasMimeTypeOnly("${GeneralMimeTypes.IMAGE.value}/")) {
+        if (questionnaireItem.hasGeneralMimeTypeOnly(GeneralMimeTypes.IMAGE.value)) {
           takePhoto.visibility = View.VISIBLE
           loadUploadButton(R.drawable.image_file, R.string.upload_photo)
-        } else if (questionnaireItem.hasMimeType("${GeneralMimeTypes.IMAGE.value}/")) {
+        } else if (questionnaireItem.hasGeneralMimeType(GeneralMimeTypes.IMAGE.value)) {
           takePhoto.visibility = View.VISIBLE
           loadUploadButton(R.drawable.file, R.string.select_file)
         } else {
@@ -151,7 +151,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             }
 
             val mimeType = context.contentResolver.getType(uri) ?: "*/*"
-            if (!questionnaireItem.hasMimeType(mimeType)) {
+            if (!questionnaireItem.hasGeneralMimeType(mimeType.getGeneralMimeType())) {
               displayValidationResult(
                 Invalid(
                   listOf(
@@ -236,7 +236,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             }
 
             val mimeType = context.contentResolver.getType(uri) ?: "*/*"
-            if (!questionnaireItem.hasMimeType(mimeType)) {
+            if (!questionnaireItem.hasGeneralMimeType(mimeType.getGeneralMimeType())) {
               displayValidationResult(
                 Invalid(
                   listOf(
