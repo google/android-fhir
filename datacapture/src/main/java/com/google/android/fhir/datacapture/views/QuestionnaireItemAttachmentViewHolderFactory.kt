@@ -182,7 +182,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             return@setFragmentResultListener
           }
 
-          val mimeType = context.contentResolver.getType(uri) ?: "*/*"
+          val mimeType = context.getMimeTypeFromUri(uri)
           if (!questionnaireItem.hasGeneralMimeType(mimeType.getGeneralMimeType())) {
             displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
             displaySnackbar(takePhoto, R.string.upload_failed)
@@ -237,7 +237,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             return@setFragmentResultListener
           }
 
-          val mimeType = context.contentResolver.getType(uri) ?: "*/*"
+          val mimeType = context.getMimeTypeFromUri(uri)
           if (!questionnaireItem.hasGeneralMimeType(mimeType.getGeneralMimeType())) {
             displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
             displaySnackbar(upload, R.string.upload_failed)
@@ -375,4 +375,8 @@ private fun String.getGeneralMimeType(): String {
 
 private fun Context.readBytesFromUri(uri: Uri): ByteArray {
   return contentResolver.openInputStream(uri)?.use { it.buffered().readBytes() } ?: ByteArray(0)
+}
+
+private fun Context.getMimeTypeFromUri(uri: Uri): String {
+  return contentResolver.getType(uri) ?: "*/*"
 }
