@@ -158,13 +158,13 @@ class PatientListFragment : Fragment() {
           is SyncJobStatus.Finished -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            // mainActivityViewModel.updateLastSyncTimestamp()
+            mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
           is SyncJobStatus.Failed -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            // mainActivityViewModel.updateLastSyncTimestamp()
+            mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
           else -> Timber.i("Sync: Unknown state.")
