@@ -130,15 +130,9 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             if (!isSaved) return@setFragmentResultListener
 
             if (file.length().toBigDecimal() > questionnaireItem.maxSizeInB) {
-              displayValidationResult(
-                Invalid(
-                  listOf(
-                    context.getString(
-                      R.string.max_size_image_above_limit_validation_error_msg,
-                      questionnaireItem.maxSizeInMB
-                    )
-                  )
-                )
+              displayError(
+                R.string.max_size_image_above_limit_validation_error_msg,
+                questionnaireItem.maxSizeInMB
               )
               displaySnackbar(takePhoto, R.string.upload_failed)
               file.delete()
@@ -147,13 +141,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
             val mimeType = context.contentResolver.getType(uri) ?: "*/*"
             if (!questionnaireItem.hasGeneralMimeType(mimeType.getGeneralMimeType())) {
-              displayValidationResult(
-                Invalid(
-                  listOf(
-                    context.getString(R.string.mime_type_wrong_media_format_validation_error_msg)
-                  )
-                )
-              )
+              displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
               displaySnackbar(takePhoto, R.string.upload_failed)
               return@setFragmentResultListener
             }
@@ -201,15 +189,9 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             val bytes =
               context.contentResolver.openInputStream(uri)?.use { it.buffered().readBytes() }!!
             if (bytes.size.toBigDecimal() > questionnaireItem.maxSizeInB) {
-              displayValidationResult(
-                Invalid(
-                  listOf(
-                    context.getString(
-                      R.string.max_size_file_above_limit_validation_error_msg,
-                      questionnaireItem.maxSizeInMB
-                    )
-                  )
-                )
+              displayError(
+                R.string.max_size_file_above_limit_validation_error_msg,
+                questionnaireItem.maxSizeInMB
               )
               displaySnackbar(upload, R.string.upload_failed)
               return@setFragmentResultListener
@@ -217,13 +199,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
             val mimeType = context.contentResolver.getType(uri) ?: "*/*"
             if (!questionnaireItem.hasGeneralMimeType(mimeType.getGeneralMimeType())) {
-              displayValidationResult(
-                Invalid(
-                  listOf(
-                    context.getString(R.string.mime_type_wrong_media_format_validation_error_msg)
-                  )
-                )
-              )
+              displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
               displaySnackbar(upload, R.string.upload_failed)
               return@setFragmentResultListener
             }
@@ -357,6 +333,22 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
       private fun displaySnackbar(anchorView: Button, @StringRes textResource: Int) {
         Snackbar.make(anchorView, context.getString(textResource), Snackbar.LENGTH_SHORT).show()
+      }
+
+      private fun displayError(@StringRes textResource: Int) {
+        displayValidationResult(
+          Invalid(
+            listOf(
+              context.getString(
+                textResource,
+              )
+            )
+          )
+        )
+      }
+
+      private fun displayError(@StringRes textResource: Int, vararg formatArgs: Any?) {
+        displayValidationResult(Invalid(listOf(context.getString(textResource, formatArgs))))
       }
 
       private fun getFileName(uri: Uri): String {
