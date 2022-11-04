@@ -228,13 +228,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
               return@setFragmentResultListener
             }
 
-            var fileName = ""
-            val columns = arrayOf(OpenableColumns.DISPLAY_NAME)
-            context.contentResolver.query(uri, columns, null, null, null)?.use { cursor ->
-              val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-              cursor.moveToFirst()
-              fileName = cursor.getString(nameIndex)
-            }
+            val fileName = getFileName(uri)
 
             val answer =
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -363,6 +357,17 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
       private fun displaySnackbar(anchorView: Button, @StringRes textResource: Int) {
         Snackbar.make(anchorView, context.getString(textResource), Snackbar.LENGTH_SHORT).show()
+      }
+
+      private fun getFileName(uri: Uri): String {
+        var fileName = ""
+        val columns = arrayOf(OpenableColumns.DISPLAY_NAME)
+        context.contentResolver.query(uri, columns, null, null, null)?.use { cursor ->
+          val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+          cursor.moveToFirst()
+          fileName = cursor.getString(nameIndex)
+        }
+        return fileName
       }
     }
 
