@@ -121,9 +121,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         }
 
         takePhoto.setOnClickListener { onTakePhoto(questionnaireItem) }
-
         upload.setOnClickListener { onUpload(questionnaireItem) }
-
         delete.setOnClickListener {
           questionnaireItemViewItem.clearAnswer()
           clearDeleteButton()
