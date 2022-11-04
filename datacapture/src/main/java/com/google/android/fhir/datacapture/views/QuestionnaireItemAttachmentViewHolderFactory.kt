@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.view.View
@@ -188,8 +189,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             return@setFragmentResultListener
           }
 
-          val bytes =
-            context.contentResolver.openInputStream(uri)?.use { it.buffered().readBytes() }
+          val bytes = context.readBytesFromUri(uri)
           val answer =
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
@@ -227,8 +227,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
               ?: return@setFragmentResultListener)
               as Uri
 
-          val bytes =
-            context.contentResolver.openInputStream(uri)?.use { it.buffered().readBytes() }!!
+          val bytes = context.readBytesFromUri(uri)
           if (bytes.size.toBigDecimal() > questionnaireItem.maxSizeInB) {
             displayError(
               R.string.max_size_file_above_limit_validation_error_msg,
@@ -372,4 +371,8 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
 private fun String.getGeneralMimeType(): String {
   return substringBefore("/")
+}
+
+private fun Context.readBytesFromUri(uri: Uri): ByteArray {
+  return contentResolver.openInputStream(uri)?.use { it.buffered().readBytes() } ?: ByteArray(0)
 }
