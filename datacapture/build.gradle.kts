@@ -46,6 +46,8 @@ android {
   kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
   configureJacocoTestOptions()
 
+  sourceSets { getByName("androidTest").apply { resources.setSrcDirs(listOf("sampledata")) } }
+
   testOptions { animationsDisabled = true }
 }
 
@@ -60,7 +62,10 @@ dependencies {
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.Espresso.espressoCore)
-
+  androidTestImplementation(Dependencies.Espresso.espressoContrib) {
+    // build fails with error "Duplicate class found" (org.checkerframework.checker.*)
+    exclude(group = "org.checkerframework", module = "checker")
+  }
   api(Dependencies.HapiFhir.structuresR4)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
