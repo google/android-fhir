@@ -92,6 +92,7 @@
             android:layout_marginStart="@dimen/padding_half_size"
             android:ellipsize="middle"
             android:maxLines="1"
+            android:singleLine="true"
             android:textAppearance="@style/TextAppearance.Material3.BodySmall"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
