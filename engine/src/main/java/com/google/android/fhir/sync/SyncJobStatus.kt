@@ -22,9 +22,18 @@ import org.hl7.fhir.r4.model.ResourceType
 sealed class SyncJobStatus {
   val timestamp: OffsetDateTime = OffsetDateTime.now()
 
+  /** Sync job has been started on the client but the syncing is not necessarily in progress. */
   class Started : SyncJobStatus()
+
+  /** Syncing in progress with the server. */
   data class InProgress(val resourceType: ResourceType?) : SyncJobStatus()
+
+  /** Glitched but sync job is being retried. */
   data class Glitch(val exceptions: List<ResourceSyncException>) : SyncJobStatus()
+
+  /** Sync job finished successfully. */
   class Finished : SyncJobStatus()
+
+  /** Sync job failed. */
   data class Failed(val exceptions: List<ResourceSyncException>) : SyncJobStatus()
 }
