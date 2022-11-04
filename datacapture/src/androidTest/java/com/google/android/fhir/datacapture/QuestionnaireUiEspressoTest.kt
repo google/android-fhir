@@ -59,7 +59,6 @@ class QuestionnaireUiEspressoTest {
       }
     }
 
-    clickOnText("Next")
     onView(ViewMatchers.withId(R.id.review_mode_button))
       .check(
         ViewAssertions.matches(

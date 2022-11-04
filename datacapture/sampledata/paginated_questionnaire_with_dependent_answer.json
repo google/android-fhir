@@ -19,37 +19,16 @@
           }
         }
       ],
-      "linkId": "page-1",
+      "linkId": "1",
       "type": "group",
       "item": [
         {
-          "text": "What is your age?",
-          "type": "integer",
           "linkId": "1.1",
-          "extension": [
+          "text": "Are you Omar?",
+          "type": "boolean",
+          "initial": [
             {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
-              "valueCoding": {
-                "system": "http://unitsofmeasure.org",
-                "code": "a",
-                "display": "year"
-              }
-            },
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
-              "valueCoding": {
-                "system": "http://unitsofmeasure.org",
-                "code": "a",
-                "display": "year"
-              }
-            },
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/minValue",
-              "valueInteger": 0
-            },
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
-              "valueInteger": 120
+              "valueBoolean": false
             }
           ]
         }
@@ -73,40 +52,9 @@
       ],
       "linkId": "2",
       "type": "group",
-      "item": [
-        {
-          "linkId": "2.1",
-          "text": "Are you Omar?",
-          "type": "boolean",
-          "initial": [
-            {
-              "valueBoolean": false
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-          "valueCodeableConcept": {
-            "coding": [
-              {
-                "system": "http://hl7.org/fhir/questionnaire-item-control",
-                "code": "page",
-                "display": "Page 3"
-              }
-            ],
-            "text": "Page 3"
-          }
-        }
-      ],
-      "linkId": "3",
-      "type": "group",
       "enableWhen": [
         {
-          "question": "2.1",
+          "question": "1.1",
           "operator": "=",
           "answerBoolean": true
         }
@@ -114,7 +62,7 @@
       "item": [
         {
           "text": "What is your favourite animal?",
-          "linkId": "3.1",
+          "linkId": "2.1",
           "type": "string"
         }
       ]
