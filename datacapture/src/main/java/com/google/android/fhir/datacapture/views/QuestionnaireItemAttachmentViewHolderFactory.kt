@@ -148,7 +148,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
             val bytes =
               context.contentResolver.openInputStream(uri)?.use { it.buffered().readBytes() }
-            questionnaireItemViewItem.setAnswer(
+            val answer =
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value =
                   Attachment().apply {
@@ -158,12 +158,11 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
                     creation = Date()
                   }
               }
-            )
+            questionnaireItemViewItem.setAnswer(answer)
 
             loadPhotoPreviewInUri(uri)
             clearFilePreview()
             loadDeleteButton(R.string.delete_image)
-
             displaySnackbar(takePhoto, R.string.image_uploaded)
             file.delete()
           }
@@ -205,7 +204,6 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             }
 
             val fileName = getFileName(uri)
-
             val answer =
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value =
