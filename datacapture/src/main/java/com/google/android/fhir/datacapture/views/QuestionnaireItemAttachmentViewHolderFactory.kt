@@ -46,6 +46,7 @@ import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.util.Date
 import org.hl7.fhir.r4.model.Attachment
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemAttachmentViewHolderFactory :
@@ -118,62 +119,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           loadUploadButton(R.drawable.file, R.string.select_file)
         }
 
-        takePhoto.setOnClickListener {
-          val file = File.createTempFile("IMG_", ".jpeg", context.cacheDir)
-          val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-
-          context.supportFragmentManager.setFragmentResultListener(
-            CameraLauncherFragment.RESULT_REQUEST_KEY,
-            context
-          ) { _, result ->
-            val isSaved = result.getBoolean(CameraLauncherFragment.RESULT_REQUEST_KEY)
-            if (!isSaved) return@setFragmentResultListener
-
-            if (file.length().toBigDecimal() > questionnaireItem.maxSizeInB) {
-              displayError(
-                R.string.max_size_image_above_limit_validation_error_msg,
-                questionnaireItem.maxSizeInMB
-              )
-              displaySnackbar(takePhoto, R.string.upload_failed)
-              file.delete()
-              return@setFragmentResultListener
-            }
-
-            val mimeType = context.contentResolver.getType(uri) ?: "*/*"
-            if (!questionnaireItem.hasGeneralMimeType(mimeType.getGeneralMimeType())) {
-              displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
-              displaySnackbar(takePhoto, R.string.upload_failed)
-              return@setFragmentResultListener
-            }
-
-            val bytes =
-              context.contentResolver.openInputStream(uri)?.use { it.buffered().readBytes() }
-            val answer =
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value =
-                  Attachment().apply {
-                    contentType = mimeType
-                    data = bytes
-                    title = file.name
-                    creation = Date()
-                  }
-              }
-            questionnaireItemViewItem.setAnswer(answer)
-
-            loadPhotoPreviewInUri(uri)
-            clearFilePreview()
-            loadDeleteButton(R.string.delete_image)
-            displaySnackbar(takePhoto, R.string.image_uploaded)
-            file.delete()
-          }
-
-          CameraLauncherFragment()
-            .apply { arguments = bundleOf(SAVED_PHOTO_URI to uri) }
-            .show(
-              context.supportFragmentManager,
-              QuestionnaireItemAttachmentViewHolderFactory.javaClass.simpleName
-            )
-        }
+        takePhoto.setOnClickListener { onTakePhoto(questionnaireItem) }
 
         upload.setOnClickListener {
           context.supportFragmentManager.setFragmentResultListener(
@@ -256,6 +202,63 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           clearPhotoPreview()
           clearFilePreview()
         }
+      }
+
+      private fun onTakePhoto(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
+        val file = File.createTempFile("IMG_", ".jpeg", context.cacheDir)
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+
+        context.supportFragmentManager.setFragmentResultListener(
+          CameraLauncherFragment.RESULT_REQUEST_KEY,
+          context
+        ) { _, result ->
+          val isSaved = result.getBoolean(CameraLauncherFragment.RESULT_REQUEST_KEY)
+          if (!isSaved) return@setFragmentResultListener
+
+          if (file.length().toBigDecimal() > questionnaireItem.maxSizeInB) {
+            displayError(
+              R.string.max_size_image_above_limit_validation_error_msg,
+              questionnaireItem.maxSizeInMB
+            )
+            displaySnackbar(takePhoto, R.string.upload_failed)
+            file.delete()
+            return@setFragmentResultListener
+          }
+
+          val mimeType = context.contentResolver.getType(uri) ?: "*/*"
+          if (!questionnaireItem.hasGeneralMimeType(mimeType.getGeneralMimeType())) {
+            displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
+            displaySnackbar(takePhoto, R.string.upload_failed)
+            return@setFragmentResultListener
+          }
+
+          val bytes =
+            context.contentResolver.openInputStream(uri)?.use { it.buffered().readBytes() }
+          val answer =
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value =
+                Attachment().apply {
+                  contentType = mimeType
+                  data = bytes
+                  title = file.name
+                  creation = Date()
+                }
+            }
+          questionnaireItemViewItem.setAnswer(answer)
+
+          loadPhotoPreviewInUri(uri)
+          clearFilePreview()
+          loadDeleteButton(R.string.delete_image)
+          displaySnackbar(takePhoto, R.string.image_uploaded)
+          file.delete()
+        }
+
+        CameraLauncherFragment()
+          .apply { arguments = bundleOf(SAVED_PHOTO_URI to uri) }
+          .show(
+            context.supportFragmentManager,
+            QuestionnaireItemAttachmentViewHolderFactory.javaClass.simpleName
+          )
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
