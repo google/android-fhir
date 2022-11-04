@@ -140,13 +140,8 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
                   )
                 )
               )
+              displaySnackbar(takePhoto, R.string.upload_failed)
               file.delete()
-              Snackbar.make(
-                  takePhoto,
-                  context.getString(R.string.upload_failed),
-                  Snackbar.LENGTH_SHORT
-                )
-                .show()
               return@setFragmentResultListener
             }
 
@@ -159,12 +154,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
                   )
                 )
               )
-              Snackbar.make(
-                  upload,
-                  context.getString(R.string.upload_failed),
-                  Snackbar.LENGTH_SHORT
-                )
-                .show()
+              displaySnackbar(takePhoto, R.string.upload_failed)
               return@setFragmentResultListener
             }
 
@@ -186,12 +176,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             clearFilePreview()
             loadDeleteButton(R.string.delete_image)
 
-            Snackbar.make(
-                takePhoto,
-                context.getString(R.string.image_uploaded),
-                Snackbar.LENGTH_SHORT
-              )
-              .show()
+            displaySnackbar(takePhoto, R.string.image_uploaded)
             file.delete()
           }
 
@@ -226,12 +211,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
                   )
                 )
               )
-              Snackbar.make(
-                  upload,
-                  context.getString(R.string.upload_failed),
-                  Snackbar.LENGTH_SHORT
-                )
-                .show()
+              displaySnackbar(upload, R.string.upload_failed)
               return@setFragmentResultListener
             }
 
@@ -244,12 +224,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
                   )
                 )
               )
-              Snackbar.make(
-                  upload,
-                  context.getString(R.string.upload_failed),
-                  Snackbar.LENGTH_SHORT
-                )
-                .show()
+              displaySnackbar(upload, R.string.upload_failed)
               return@setFragmentResultListener
             }
 
@@ -296,8 +271,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
               }
             }
 
-            Snackbar.make(upload, context.getString(R.string.file_uploaded), Snackbar.LENGTH_SHORT)
-              .show()
+            displaySnackbar(upload, R.string.file_uploaded)
           }
 
           SelectFileLauncherFragment()
@@ -385,6 +359,10 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
       private fun clearDeleteButton() {
         delete.visibility = View.GONE
         delete.text = ""
+      }
+
+      private fun displaySnackbar(anchorView: Button, @StringRes textResource: Int) {
+        Snackbar.make(anchorView, context.getString(textResource), Snackbar.LENGTH_SHORT).show()
       }
     }
 
