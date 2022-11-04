@@ -226,6 +226,12 @@ internal val Questionnaire.QuestionnaireItemComponent.maxSizeInMB: BigDecimal?
     return maxSizeInKB?.div(SIZE_UNIT_DIVIDER)
   }
 
+internal fun Questionnaire.QuestionnaireItemComponent.isMaxSizeOverLimit(
+  uploadedFileSize: BigDecimal
+): Boolean {
+  return uploadedFileSize > (maxSizeInB ?: BigDecimal(0))
+}
+
 /** UI controls relevant to rendering questionnaire items. */
 internal enum class DisplayItemControlType(val extensionCode: String) {
   FLYOVER("flyover"),

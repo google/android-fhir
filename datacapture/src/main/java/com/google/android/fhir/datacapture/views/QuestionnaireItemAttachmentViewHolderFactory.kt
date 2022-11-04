@@ -34,7 +34,7 @@ import com.google.android.fhir.datacapture.GeneralMimeTypes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.hasGeneralMimeType
 import com.google.android.fhir.datacapture.hasGeneralMimeTypeOnly
-import com.google.android.fhir.datacapture.maxSizeInB
+import com.google.android.fhir.datacapture.isMaxSizeOverLimit
 import com.google.android.fhir.datacapture.maxSizeInMB
 import com.google.android.fhir.datacapture.mimeTypes
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -170,7 +170,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           val isSaved = result.getBoolean(CameraLauncherFragment.RESULT_REQUEST_KEY)
           if (!isSaved) return@setFragmentResultListener
 
-          if (file.length().toBigDecimal() > questionnaireItem.maxSizeInB) {
+          if (questionnaireItem.isMaxSizeOverLimit(file.length().toBigDecimal())) {
             displayError(
               R.string.max_size_image_above_limit_validation_error_msg,
               questionnaireItem.maxSizeInMB
@@ -226,7 +226,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
               as Uri
 
           val bytes = context.readBytesFromUri(uri)
-          if (bytes.size.toBigDecimal() > questionnaireItem.maxSizeInB) {
+          if (questionnaireItem.isMaxSizeOverLimit(bytes.size.toBigDecimal())) {
             displayError(
               R.string.max_size_file_above_limit_validation_error_msg,
               questionnaireItem.maxSizeInMB
