@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -170,10 +170,11 @@ internal class OptionSelectDialogFragment(
 
 private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
   ListAdapter<OptionSelectRow, OptionSelectViewHolder>(DIFF_CALLBACK) {
-
+  lateinit var recyclerView: RecyclerView
   override fun getItemViewType(position: Int): Int =
     when (getItem(position)) {
-      is OptionSelectRow.Option, is OptionSelectRow.OtherRow ->
+      is OptionSelectRow.Option,
+      is OptionSelectRow.OtherRow ->
         if (multiSelectEnabled) Types.OPTION_MULTI else Types.OPTION_SINGLE
       is OptionSelectRow.OtherEditText -> Types.OTHER_EDIT_TEXT
       OptionSelectRow.OtherAddAnother -> Types.OTHER_ADD_ANOTHER
@@ -215,6 +216,10 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
         compoundButton.isChecked = item.selected
         compoundButton.setOnCheckedChangeListener { _, checked ->
           submitSelectedChange(position = holder.adapterPosition, selected = checked)
+          // Scroll down the recyclerview to show the Add another answer button on the screen.
+          if (checked) {
+            recyclerView.smoothScrollToPosition(this@OptionSelectAdapter.itemCount)
+          }
         }
       }
       is OptionSelectRow.OtherEditText -> {
@@ -236,6 +241,8 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
               it.add(holder.adapterPosition, OptionSelectRow.OtherEditText.fromText(""))
             }
           submitList(newList)
+          // Scroll down the recyclerview to show the Add another answer button on the screen.
+          recyclerView.smoothScrollToPosition(this@OptionSelectAdapter.itemCount)
         }
       }
     }
@@ -273,7 +280,8 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
     when (this) {
       is OptionSelectRow.Option -> copy(option = option.copy(selected = selected))
       is OptionSelectRow.OtherRow -> copy(selected = selected)
-      OptionSelectRow.OtherAddAnother, is OptionSelectRow.OtherEditText -> null
+      OptionSelectRow.OtherAddAnother,
+      is OptionSelectRow.OtherEditText -> null
     }
 
   private enum class Types {
@@ -281,6 +289,11 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
     OPTION_MULTI,
     OTHER_EDIT_TEXT,
     OTHER_ADD_ANOTHER,
+  }
+
+  override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+    super.onAttachedToRecyclerView(recyclerView)
+    this.recyclerView = recyclerView
   }
 }
 
