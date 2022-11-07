@@ -22,7 +22,7 @@ fun Project.configureLicensee() {
   apply(plugin = "app.cash.licensee")
   configure<app.cash.licensee.LicenseeExtension> {
     allow("Apache-2.0")
-    allow("BSD")
+    allow("BSD-2-Clause")
     allow("MIT")
 
     // Occasionally, dependencies may add their licenses via a direct URL instead of an SPDX id.
