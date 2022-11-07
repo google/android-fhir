@@ -52,7 +52,12 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
   private var prefix: TextView = findViewById(R.id.prefix)
   private var question: TextView = findViewById(R.id.question)
   private var hint: TextView = findViewById(R.id.hint)
+  private var errorTextView: TextView = findViewById(R.id.error_text_at_header)
 
+  /**
+   * Shows error in the header,and widgets could either use this, or use another view (i.e.
+   * TextInputLayout's error field) to display error.
+   */
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
     updateQuestionText(question, questionnaireItem)
@@ -61,6 +66,19 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
     //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
     visibility = getViewGroupVisibility(prefix, question, hint)
+  }
+
+  fun showErrorText(errorText: String? = null, isErrorTextVisible: Boolean = true) {
+    errorTextView.visibility =
+      when (isErrorTextVisible) {
+        true -> {
+          VISIBLE
+        }
+        false -> {
+          GONE
+        }
+      }
+    errorTextView.text = errorText
   }
 }
 
