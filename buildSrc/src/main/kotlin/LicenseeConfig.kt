@@ -22,7 +22,7 @@ fun Project.configureLicensee() {
   apply(plugin = "app.cash.licensee")
   configure<app.cash.licensee.LicenseeExtension> {
     allow("Apache-2.0")
-    allow("BSD-2")
+    allow("BSD")
     allow("MIT")
 
     // Occasionally, dependencies may add their licenses via a direct URL instead of an SPDX id.
@@ -150,6 +150,11 @@ fun Project.configureLicensee() {
     // Vision Common
     // https://developers.google.com/android/reference/com/google/mlkit/vision/common/package-summary
     allowDependency("com.google.mlkit", "vision-internal-vkp", "18.0.0") { because("") }
+
+    // Glide
+    allowDependency("com.github.bumptech.glide", "glide", "4.14.2") {
+      because("BSD Clause. https://github.com/bumptech/glide#license")
+    }
   }
 }
 
