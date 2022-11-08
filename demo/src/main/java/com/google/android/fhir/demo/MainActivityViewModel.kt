@@ -60,7 +60,11 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
   }
 
   fun triggerOneTimeSync() {
-    Sync.oneTimeSync<FhirSyncWorker>(application.applicationContext).collect { _pollState.emit(it) }
+    viewModelScope.launch {
+      Sync.oneTimeSync<FhirSyncWorker>(getApplication()).collect {
+        _pollState.emit(it)
+      }
+    }
   }
 
   /** Emits last sync time. */
