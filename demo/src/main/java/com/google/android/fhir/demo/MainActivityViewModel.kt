@@ -18,11 +18,9 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.text.format.DateFormat
-import android.text.format.DateFormat.is24HourFormat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
 import com.google.android.fhir.demo.data.FhirSyncWorker
@@ -39,8 +37,7 @@ import kotlinx.coroutines.launch
 
 /** View model for [MainActivity]. */
 @OptIn(InternalCoroutinesApi::class)
-class MainActivityViewModel(application: Application, private val state: SavedStateHandle) :
-  AndroidViewModel(application) {
+class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
   private val _lastSyncTimestampLiveData = MutableLiveData<String>()
   val lastSyncTimestampLiveData: LiveData<String>
     get() = _lastSyncTimestampLiveData
@@ -60,6 +57,10 @@ class MainActivityViewModel(application: Application, private val state: SavedSt
         )
         .collect { _pollState.emit(it) }
     }
+  }
+
+  fun triggerOneTimeSync() {
+    Sync.oneTimeSync<FhirSyncWorker>(application.applicationContext).collect { _pollState.emit(it) }
   }
 
   /** Emits last sync time. */

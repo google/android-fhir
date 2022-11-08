@@ -24,9 +24,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import com.google.android.fhir.demo.data.FhirSyncWorker
 import com.google.android.fhir.demo.databinding.ActivityMainBinding
-import com.google.android.fhir.sync.Sync
 
 const val MAX_RESOURCE_COUNT = 20
 
@@ -80,7 +78,7 @@ class MainActivity : AppCompatActivity() {
   private fun onNavigationItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.menu_sync -> {
-        Sync.oneTimeSync<FhirSyncWorker>(this)
+        viewModel.triggerOneTimeSync()
         true
       }
     }
@@ -89,11 +87,8 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun observeLastSyncTime() {
-    viewModel.lastSyncTimestampLiveData.observe(
-      this,
-      {
-        binding.navigationView.getHeaderView(0).findViewById<TextView>(R.id.last_sync_tv).text = it
-      }
-    )
+    viewModel.lastSyncTimestampLiveData.observe(this) {
+      binding.navigationView.getHeaderView(0).findViewById<TextView>(R.id.last_sync_tv).text = it
+    }
   }
 }
