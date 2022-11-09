@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync
+package com.google.android.fhir.demo.data
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.google.android.fhir.resource.TestingUtils
+import com.google.android.fhir.demo.FhirApplication
+import com.google.android.fhir.sync.AcceptLocalConflictResolver
+import com.google.android.fhir.sync.DownloadWorkManager
+import com.google.android.fhir.sync.FhirSyncWorker
 
-class TestSyncWorker(appContext: Context, workerParams: WorkerParameters) :
+class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   FhirSyncWorker(appContext, workerParams) {
 
-  override fun getDataSource() = TestingUtils.TestDataSourceImpl
+  override fun getDownloadWorkManager(): DownloadWorkManager {
+    return DownloadWorkManagerImpl()
+  }
 
-  override fun getFhirEngine() = TestingUtils.TestFhirEngineImpl
+  override fun getConflictResolver() = AcceptLocalConflictResolver
 
-  override fun getDownloadWorkManager() = TestingUtils.TestDownloadManagerImpl()
-
-  override fun getConflictResolver() = AcceptRemoteConflictResolver
+  override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)
 }
