@@ -272,6 +272,22 @@ class QuestionnaireItemHeaderViewTest {
       .isEqualTo(view.context.applicationContext.resources.getString(R.string.space_asterisk))
   }
 
+  @Test
+  fun `shows error text`() {
+    view.showErrorText("missing answer for required field")
+    assertThat(view.findViewById<TextView>(R.id.error_text_at_header).text.toString())
+      .isEqualTo("missing answer for required field")
+    assertThat(view.findViewById<TextView>(R.id.error_text_at_header).visibility)
+      .isEqualTo(View.VISIBLE)
+  }
+
+  @Test
+  fun `hides error text`() {
+    view.showErrorText(isErrorTextVisible = false)
+    assertThat(view.findViewById<TextView>(R.id.error_text_at_header).visibility)
+      .isEqualTo(View.GONE)
+  }
+
   private val displayCategoryExtensionWithInstructionsCode =
     Extension().apply {
       url = EXTENSION_DISPLAY_CATEGORY_URL
