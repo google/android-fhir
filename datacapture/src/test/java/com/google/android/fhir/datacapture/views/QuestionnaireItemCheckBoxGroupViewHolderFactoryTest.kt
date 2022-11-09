@@ -368,7 +368,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).text)
       .isEqualTo("Missing answer for required field.")
   }
 
@@ -397,7 +397,8 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.isEmpty()).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).text.isEmpty())
+      .isTrue()
   }
 
   @Test

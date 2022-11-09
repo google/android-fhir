@@ -54,6 +54,4 @@
         />
     </RadioGroup>
 
-    <include android:id="@+id/error" layout="@layout/input_error_text_view" />
-
 </LinearLayout>
