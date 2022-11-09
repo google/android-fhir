@@ -46,6 +46,8 @@ android {
   kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
   configureJacocoTestOptions()
 
+  sourceSets { getByName("androidTest").apply { resources.setSrcDirs(listOf("sampledata")) } }
+
   testOptions { animationsDisabled = true }
 }
 
