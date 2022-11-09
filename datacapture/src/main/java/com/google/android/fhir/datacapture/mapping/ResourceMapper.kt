@@ -21,7 +21,6 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
-import com.google.android.fhir.datacapture.utilities.fhirPathEngine
 import com.google.android.fhir.datacapture.utilities.toCodeType
 import com.google.android.fhir.datacapture.utilities.toCoding
 import com.google.android.fhir.datacapture.utilities.toIdType
@@ -536,6 +535,22 @@ private fun updateFieldWithEnum(base: Base, field: Field, value: Base) {
     .invoke(base, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
 
+/**
+ * Listing down api's that may be used to updateField values. For any primitive value e.g for
+ * Patient.active which is of BooleanType
+ * 1. setActiveElement(BooleanType)
+ * 2. setActive(boolean)
+ *
+ * For Parameterized list of custom type e.g Patient.name of type List<HumanName>
+ * 1. addName() - add an empty HumanName and return it.
+ * 2. addName(HumanName) - adds a new Name to the list.
+ * 3. setName(List<HumanName>) - replaces old list if any with the new list.
+ *
+ * For Parameterized list of primitive type e.g HumanName.given of type List<StringType>
+ * 1. addGivenElement() - add an empty StringType and return it.
+ * 2. addGiven(String) - adds a new StringType to the list.
+ * 3. setGiven(List<StringType>) - replaces old list if any with the new list.
+ */
 private fun updateField(
   base: Base,
   field: Field,
@@ -545,7 +560,11 @@ private fun updateField(
     answers.map { wrapAnswerInFieldType(it.value, field) }.toCollection(mutableListOf())
 
   try {
-    updateFieldWithAnswer(base, field, answersOfFieldType.first())
+    if (field.isParameterized && field.isList) {
+      addAnswerToListField(base, field, answersOfFieldType)
+    } else {
+      updateFieldWithAnswer(base, field, answersOfFieldType.first())
+    }
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
     updateListFieldWithAnswer(base, field, answersOfFieldType)
@@ -556,6 +575,15 @@ private fun updateFieldWithAnswer(base: Base, field: Field, answerValue: Base) {
   base.javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}Element", field.type)
     .invoke(base, answerValue)
+}
+
+private fun addAnswerToListField(base: Base, field: Field, answerValue: List<Base>) {
+  base.javaClass
+    .getMethod(
+      "add${field.name.capitalize(Locale.ROOT)}",
+      answerValue.first().primitiveValue().javaClass
+    )
+    .let { method -> answerValue.forEach { method.invoke(base, it.primitiveValue()) } }
 }
 
 private fun updateListFieldWithAnswer(base: Base, field: Field, answerValue: List<Base>) {
