@@ -143,6 +143,23 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
       .isNotEmpty()
   }
 
+  @Test
+  fun showsTimePickerInInputMode() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+    onView(withId(R.id.time_input_layout)).perform(clickIcon(true))
+    onView(allOf(withId(R.id.material_textinput_timepicker)))
+      .inRoot(isDialog())
+      .check(matches(isDisplayed()))
+  }
+
   /** Method to run code snippet on UI/main thread */
   private fun runOnUI(action: () -> Unit) {
     activityScenarioRule.getScenario().onActivity { activity -> action() }

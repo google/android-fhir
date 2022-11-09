@@ -37,6 +37,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_KEYBOARD
 import com.google.android.material.timepicker.TimeFormat
 import java.text.ParseException
 import java.time.Instant
@@ -298,6 +299,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             } else {
               setTimeFormat(TimeFormat.CLOCK_12H)
             }
+            setInputMode(INPUT_MODE_KEYBOARD)
           }
           .build()
       }
