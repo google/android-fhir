@@ -112,34 +112,35 @@ object ResourceMapper {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     structureMapExtractionContext: StructureMapExtractionContext? = null,
-    loadProfile: ProfileLoader? = null,
+    profileLoader: ProfileLoader? = null,
   ): Bundle {
-    val structureDefinitionMap: MutableMap<String, MutableList<StructureDefinition>> = hashMapOf()
+    /**
+     * mutable map of key-canonical url as string for profile and value- StructureDefinition of
+     * Resource claims to conforms to.
+     */
+    val structureDefinitionMap: MutableMap<String, StructureDefinition> = hashMapOf()
     val profiles: List<CanonicalType> = questionnaire.meta.profile
     if (!profiles.isNullOrEmpty()) {
       profiles.forEach {
         if (it.toString().startsWith(FHIR_PROFILE_CANONICAL_URL_PREFIX)) {
           Timber.d("resource conform to FHIR standard profile $it")
         } else {
-          requireNotNull(loadProfile) {
-            "ProfileLoader implementation required to load StructureDefinition that this resource claims to conform to"
-          }
-          val structureDefinition = loadProfile.loadProfile(it)
+
+          val structureDefinition = loadProfile(it, profileLoader)
           // Base FHIR resource will be extracted as StructureDefinition is not provided for
           // resource conforming profile.
-          structureDefinition?.let {
-            if (structureDefinitionMap.containsKey(it.type)) {
-              structureDefinitionMap.get(it.type)?.add(it)
-            } else {
-              structureDefinitionMap.put(it.type, mutableListOf(it))
-            }
-          }
+          structureDefinition?.let { structureDefinitionMap.put(it.url, it) }
         }
       }
     }
     return when {
       questionnaire.targetStructureMap == null ->
-        extractByDefinition(questionnaire, questionnaireResponse, structureDefinitionMap)
+        extractByDefinition(
+          questionnaire,
+          questionnaireResponse,
+          structureDefinitionMap,
+          profileLoader
+        )
       structureMapExtractionContext != null -> {
         extractByStructureMap(questionnaire, questionnaireResponse, structureMapExtractionContext)
       }
@@ -159,7 +160,8 @@ object ResourceMapper {
   private fun extractByDefinition(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    structureDefinitionMap: MutableMap<String, MutableList<StructureDefinition>>? = null
+    structureDefinitionMap: MutableMap<String, StructureDefinition>,
+    profileLoader: ProfileLoader?
   ): Bundle {
     val rootResource: Resource? = questionnaire.createResource()
     val extractedResources = mutableListOf<Resource>()
@@ -169,7 +171,8 @@ object ResourceMapper {
       questionnaireResponse.item,
       rootResource,
       extractedResources,
-      structureDefinitionMap
+      structureDefinitionMap,
+      profileLoader
     )
 
     if (rootResource != null) {
@@ -306,7 +309,8 @@ object ResourceMapper {
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     extractionContext: Base?,
     extractionResult: MutableList<Resource>,
-    structureDefinitionMap: MutableMap<String, MutableList<StructureDefinition>>? = null
+    structureDefinitionMap: MutableMap<String, StructureDefinition>,
+    profileLoader: ProfileLoader?
   ) {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
@@ -327,7 +331,8 @@ object ResourceMapper {
           currentQuestionnaireResponseItem,
           extractionContext,
           extractionResult,
-          structureDefinitionMap
+          structureDefinitionMap,
+          profileLoader
         )
       }
     }
@@ -347,7 +352,8 @@ object ResourceMapper {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     extractionContext: Base?,
     extractionResult: MutableList<Resource>,
-    structureDefinitionMap: MutableMap<String, MutableList<StructureDefinition>>? = null
+    structureDefinitionMap: MutableMap<String, StructureDefinition>,
+    profileLoader: ProfileLoader?
   ) {
     when (questionnaireItem.type) {
       Questionnaire.QuestionnaireItemType.GROUP ->
@@ -365,7 +371,8 @@ object ResourceMapper {
               questionnaireItem,
               questionnaireResponseItem,
               extractionResult,
-              structureDefinitionMap
+              structureDefinitionMap,
+              profileLoader
             )
           questionnaireItem.definition != null -> {
             // Extract a new element (which is not a resource) e.g. HumanName, Quantity, etc
@@ -377,7 +384,8 @@ object ResourceMapper {
               questionnaireResponseItem,
               extractionContext,
               extractionResult,
-              structureDefinitionMap
+              structureDefinitionMap,
+              profileLoader
             )
           }
           else ->
@@ -387,7 +395,8 @@ object ResourceMapper {
               questionnaireResponseItem.item,
               extractionContext,
               extractionResult,
-              structureDefinitionMap
+              structureDefinitionMap,
+              profileLoader
             )
         }
       else ->
@@ -400,7 +409,8 @@ object ResourceMapper {
             questionnaireItem,
             questionnaireResponseItem,
             extractionContext,
-            structureDefinitionMap?.get(extractionContext.fhirType())
+            structureDefinitionMap,
+            profileLoader
           )
         }
     }
@@ -415,7 +425,8 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     extractionResult: MutableList<Resource>,
-    structureDefinitionMap: MutableMap<String, MutableList<StructureDefinition>>? = null
+    structureDefinitionMap: MutableMap<String, StructureDefinition>,
+    profileLoader: ProfileLoader?
   ) {
     val resource = questionnaireItem.createResource() as Resource
     extractByDefinition(
@@ -423,7 +434,8 @@ object ResourceMapper {
       questionnaireResponseItem.item,
       resource,
       extractionResult,
-      structureDefinitionMap
+      structureDefinitionMap,
+      profileLoader
     )
     extractionResult += resource
   }
@@ -438,7 +450,8 @@ object ResourceMapper {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     base: Base,
     extractionResult: MutableList<Resource>,
-    structureDefinitionMap: MutableMap<String, MutableList<StructureDefinition>>? = null
+    structureDefinitionMap: MutableMap<String, StructureDefinition>,
+    profileLoader: ProfileLoader?
   ) {
     val fieldName = getFieldNameByDefinition(questionnaireItem.definition)
     val value =
@@ -455,7 +468,8 @@ object ResourceMapper {
       questionnaireResponseItem.item,
       value,
       extractionResult,
-      structureDefinitionMap
+      structureDefinitionMap,
+      profileLoader
     )
   }
 
@@ -467,7 +481,8 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     base: Base,
-    structureDefinitionList: List<StructureDefinition>?
+    structureDefinitionMap: MutableMap<String, StructureDefinition>,
+    profileLoader: ProfileLoader?
   ) {
     if (questionnaireResponseItem.answer.isEmpty()) return
 
@@ -506,14 +521,25 @@ object ResourceMapper {
     if (base.javaClass.getFieldOrNull(fieldName) == null) {
       // Variable to check whether extension defined in profile
       var isExtensionSupported = false
-      if (structureDefinitionList.isNullOrEmpty()) {
-        Timber.w(
-          "StructureDefinition for ${base.fhirType()} is not available to which resource " +
-            "claims to conform to. So, field ''$fieldName'' is not added as extension to resource"
-        )
-        return
-      }
+      // base url from definition
+      val canonicalUrl =
+        questionnaireItem.definition.substring(0, questionnaireItem.definition.lastIndexOf("#"))
+      // if existing map contains structureDefinition
+      var structureDefinition = structureDefinitionMap.get(canonicalUrl)
+      if (structureDefinition == null) {
+        structureDefinition = loadProfile(CanonicalType(canonicalUrl), profileLoader)
 
+        // Base FHIR resource will be extracted as StructureDefinition is not provided for
+        // resource conforming profile.
+        if (structureDefinition == null) {
+          Timber.w(
+            "StructureDefinition for ${base.fhirType()} is not available to which resource " +
+              "claims to conform to. So, field ''$fieldName'' is not added as extension to resource"
+          )
+          return
+        }
+        structureDefinitionMap.put(structureDefinition.url, structureDefinition)
+      }
       /* eg for "definition": "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.address.address-preferred"
       extensionForType is "Patient.address" */
       val extensionForType =
@@ -523,32 +549,35 @@ object ResourceMapper {
         )
       // Here Consideration is - even there are multiple profile available for Resource, here ony
       // one java resource object is extracted
-      for (structureDefinition in structureDefinitionList) {
-        val isExtensionSupported =
+      structureDefinitionMap.get(canonicalUrl)?.let {
+        isExtensionSupported =
           isExtensionSupportedByProfile(
-            structureDefinition = structureDefinition,
+            structureDefinition = it,
             extendedResource = extensionForType,
             fieldName = fieldName
           )
-        if (isExtensionSupported) {
-          addDefinitionBasedCustomExtension(questionnaireItem, questionnaireResponseItem, base)
-          return
-        }
       }
-      if (!isExtensionSupported) {
-        // This check is added just for message in log
-        if (structureDefinitionList.size > 1) {
-          Timber.w(
-            "Extension for field '$fieldName' is not defined in any of the StructureDefinition of ${base.fhirType()}, so field is ignored"
-          )
-        } else {
-          Timber.w(
-            "Extension for field '$fieldName' is not defined in StructureDefinition of ${base.fhirType()}, so field is ignored"
-          )
-        }
+
+      if (isExtensionSupported) {
+        addDefinitionBasedCustomExtension(questionnaireItem, questionnaireResponseItem, base)
+        return
+      } else {
+        Timber.w(
+          "Extension for field '$fieldName' is not defined in StructureDefinition of ${base.fhirType()}, so field is ignored"
+        )
       }
     }
   }
+}
+
+private fun loadProfile(
+  canonicalUrl: CanonicalType,
+  profileLoader: ProfileLoader?
+): StructureDefinition? {
+  requireNotNull(profileLoader) {
+    "ProfileLoader implementation required to load StructureDefinition that this resource claims to conform to"
+  }
+  return profileLoader.loadProfile(canonicalUrl)
 }
 
 private fun isExtensionSupportedByProfile(
