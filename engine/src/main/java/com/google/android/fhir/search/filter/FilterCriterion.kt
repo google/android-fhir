@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.IParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchQuery
-import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.ResourceType
 
 /** Represents filter for a [IParam] */
 internal interface FilterCriterion {

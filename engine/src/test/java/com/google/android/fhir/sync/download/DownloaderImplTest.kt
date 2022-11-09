@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.sync.download
 
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
@@ -23,12 +24,13 @@ import com.google.common.truth.Truth.assertThat
 import java.net.UnknownHostException
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.instance.model.api.IAnyResource
+import org.hl7.fhir.instance.model.api.IBaseBundle
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -95,7 +97,7 @@ class DownloaderImplTest {
             }
           }
 
-          override suspend fun upload(bundle: Bundle): Resource {
+          override suspend fun upload(bundle: IBaseBundle): IAnyResource {
             TODO("Not yet implemented")
           }
         },
@@ -108,7 +110,8 @@ class DownloaderImplTest {
       )
 
     val result = mutableListOf<DownloadState>()
-    downloader.download(
+    downloader
+      .download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
         }
@@ -129,130 +132,132 @@ class DownloaderImplTest {
 
   @Test
   fun `downloader with patient and observations should return failure in case of server or network error`() =
-      runBlocking {
-    val downloader =
-      DownloaderImpl(
-        object : DataSource {
-          override suspend fun download(path: String): Resource {
-            return when {
-              path.contains("patient-page1") ->
-                searchPageParamToSearchResponseBundleMap["patient-page1"]!!
-              path.contains("patient-page2") ->
-                OperationOutcome().apply {
-                  addIssue(
-                    OperationOutcome.OperationOutcomeIssueComponent().apply {
-                      diagnostics = "Server couldn't fulfil the request."
-                    }
+    runBlocking {
+      val downloader =
+        DownloaderImpl(
+          object : DataSource {
+            override suspend fun download(path: String): IAnyResource {
+              return when {
+                path.contains("patient-page1") ->
+                  searchPageParamToSearchResponseBundleMap["patient-page1"]!!
+                path.contains("patient-page2") ->
+                  OperationOutcome().apply {
+                    addIssue(
+                      OperationOutcome.OperationOutcomeIssueComponent().apply {
+                        diagnostics = "Server couldn't fulfil the request."
+                      }
+                    )
+                  }
+                path.contains("observation-page1") ->
+                  searchPageParamToSearchResponseBundleMap["observation-page1"]!!
+                path.contains("observation-page2") ->
+                  throw UnknownHostException(
+                    "Url host can't be found. Check if device is connected to internet."
                   )
-                }
-              path.contains("observation-page1") ->
-                searchPageParamToSearchResponseBundleMap["observation-page1"]!!
-              path.contains("observation-page2") ->
-                throw UnknownHostException(
-                  "Url host can't be found. Check if device is connected to internet."
-                )
-              else -> OperationOutcome()
+                else -> OperationOutcome()
+              }
             }
-          }
 
-          override suspend fun upload(bundle: Bundle): Resource {
-            TODO("Upload not tested in this path")
-          }
-        },
-        ResourceParamsBasedDownloadWorkManager(
-          mapOf(
-            ResourceType.Patient to mapOf("param" to "patient-page1"),
-            ResourceType.Observation to mapOf("param" to "observation-page1")
+            override suspend fun upload(bundle: IBaseBundle): IAnyResource {
+              TODO("Upload not tested in this path")
+            }
+          },
+          ResourceParamsBasedDownloadWorkManager(
+            mapOf(
+              ResourceType.Patient to mapOf("param" to "patient-page1"),
+              ResourceType.Observation to mapOf("param" to "observation-page1")
+            )
           )
         )
-      )
 
-    val result = mutableListOf<DownloadState>()
-    downloader.download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = null
-        }
-      )
-      .collect { result.add(it) }
+      val result = mutableListOf<DownloadState>()
+      downloader
+        .download(
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType) = null
+          }
+        )
+        .collect { result.add(it) }
 
-    assertThat(result.filterIsInstance<DownloadState.Started>())
-      .containsExactly(
-        DownloadState.Started(ResourceType.Bundle),
-      )
+      assertThat(result.filterIsInstance<DownloadState.Started>())
+        .containsExactly(
+          DownloadState.Started(ResourceType.Bundle),
+        )
 
-    assertThat(result.filterIsInstance<DownloadState.Failure>()).hasSize(2)
+      assertThat(result.filterIsInstance<DownloadState.Failure>()).hasSize(2)
 
-    assertThat(result.filterIsInstance<DownloadState.Failure>().map { it.syncError.resourceType })
-      .containsExactly(ResourceType.Patient, ResourceType.Observation)
-      .inOrder()
-    assertThat(
-        result.filterIsInstance<DownloadState.Failure>().map { it.syncError.exception.message }
-      )
-      .containsExactly(
-        "Server couldn't fulfil the request.",
-        "Url host can't be found. Check if device is connected to internet."
-      )
-      .inOrder()
-  }
+      assertThat(result.filterIsInstance<DownloadState.Failure>().map { it.syncError.resourceType })
+        .containsExactly(ResourceType.Patient, ResourceType.Observation)
+        .inOrder()
+      assertThat(
+          result.filterIsInstance<DownloadState.Failure>().map { it.syncError.exception.message }
+        )
+        .containsExactly(
+          "Server couldn't fulfil the request.",
+          "Url host can't be found. Check if device is connected to internet."
+        )
+        .inOrder()
+    }
 
   @Test
   fun `downloader with patient and observations should continue to download observations if patient download fail`() =
-      runBlocking {
-    val downloader =
-      DownloaderImpl(
-        object : DataSource {
-          override suspend fun download(path: String): Resource {
-            return when {
-              path.contains("patient-page1") || path.contains("patient-page2") ->
-                OperationOutcome().apply {
-                  addIssue(
-                    OperationOutcome.OperationOutcomeIssueComponent().apply {
-                      diagnostics = "Server couldn't fulfil the request."
-                    }
-                  )
-                }
-              path.contains("observation-page1") ->
-                searchPageParamToSearchResponseBundleMap["observation-page1"]!!
-              path.contains("observation-page2") ->
-                searchPageParamToSearchResponseBundleMap["observation-page2"]!!
-              else -> OperationOutcome()
+    runBlocking {
+      val downloader =
+        DownloaderImpl(
+          object : DataSource {
+            override suspend fun download(path: String): IAnyResource {
+              return when {
+                path.contains("patient-page1") || path.contains("patient-page2") ->
+                  OperationOutcome().apply {
+                    addIssue(
+                      OperationOutcome.OperationOutcomeIssueComponent().apply {
+                        diagnostics = "Server couldn't fulfil the request."
+                      }
+                    )
+                  }
+                path.contains("observation-page1") ->
+                  searchPageParamToSearchResponseBundleMap["observation-page1"]!!
+                path.contains("observation-page2") ->
+                  searchPageParamToSearchResponseBundleMap["observation-page2"]!!
+                else -> OperationOutcome()
+              }
             }
-          }
 
-          override suspend fun upload(bundle: Bundle): Resource {
-            TODO("Not yet implemented")
-          }
-        },
-        ResourceParamsBasedDownloadWorkManager(
-          mapOf(
-            ResourceType.Patient to mapOf("param" to "patient-page1"),
-            ResourceType.Observation to mapOf("param" to "observation-page1")
+            override suspend fun upload(bundle: IBaseBundle): IAnyResource {
+              TODO("Not yet implemented")
+            }
+          },
+          ResourceParamsBasedDownloadWorkManager(
+            mapOf(
+              ResourceType.Patient to mapOf("param" to "patient-page1"),
+              ResourceType.Observation to mapOf("param" to "observation-page1")
+            )
           )
         )
-      )
 
-    val result = mutableListOf<DownloadState>()
-    downloader.download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = null
-        }
-      )
-      .collect { result.add(it) }
+      val result = mutableListOf<DownloadState>()
+      downloader
+        .download(
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType) = null
+          }
+        )
+        .collect { result.add(it) }
 
-    assertThat(result.filterIsInstance<DownloadState.Started>())
-      .containsExactly(
-        DownloadState.Started(ResourceType.Bundle),
-      )
+      assertThat(result.filterIsInstance<DownloadState.Started>())
+        .containsExactly(
+          DownloadState.Started(ResourceType.Bundle),
+        )
 
-    assertThat(result.filterIsInstance<DownloadState.Failure>().map { it.syncError.resourceType })
-      .containsExactly(ResourceType.Patient)
+      assertThat(result.filterIsInstance<DownloadState.Failure>().map { it.syncError.resourceType })
+        .containsExactly(ResourceType.Patient)
 
-    assertThat(
-        result
-          .filterIsInstance<DownloadState.Success>()
-          .flatMap { it.resources }
-          .filterIsInstance<Observation>()
-      )
-      .hasSize(2)
-  }
+      assertThat(
+          result
+            .filterIsInstance<DownloadState.Success>()
+            .flatMap { it.resources }
+            .filterIsInstance<Observation>()
+        )
+        .hasSize(2)
+    }
 }

@@ -18,7 +18,7 @@ package com.google.android.fhir.db.impl.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import org.hl7.fhir.r4.model.ResourceType
+import com.google.android.fhir.ResourceType
 
 /**
  * Class that models a table that holds all resource types that were synced and the highest

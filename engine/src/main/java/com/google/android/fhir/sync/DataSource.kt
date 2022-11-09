@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@
 
 package com.google.android.fhir.sync
 
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.OperationOutcome
-import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.instance.model.api.IAnyResource
+import org.hl7.fhir.instance.model.api.IBaseBundle
 
 /**
  * Interface for an abstraction of retrieving FHIR data from a network source. The network
@@ -29,12 +28,12 @@ internal interface DataSource {
    * @return [Bundle] of type [BundleType.SEARCHSET] for a successful operation, [OperationOutcome]
    * otherwise. Call this api with the relative path of the resource search url to be downloaded.
    */
-  suspend fun download(path: String): Resource
+  suspend fun download(path: String): IAnyResource
 
   /**
    * @return [Bundle] of type [BundleType.TRANSACTIONRESPONSE] for a successful operation,
    * [OperationOutcome] otherwise. Call this api with the [Bundle] that needs to be uploaded to the
    * server.
    */
-  suspend fun upload(bundle: Bundle): Resource
+  suspend fun upload(bundle: IBaseBundle): IAnyResource
 }

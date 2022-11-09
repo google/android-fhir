@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,11 +38,11 @@ import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.launch
 import org.apache.commons.lang3.StringUtils
-import org.hl7.fhir.r4.model.Condition
-import org.hl7.fhir.r4.model.Observation
-import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.codesystems.RiskProbability
+import org.hl7.fhir.r5.model.Condition
+import org.hl7.fhir.r5.model.Observation
+import org.hl7.fhir.r5.model.Patient
+import org.hl7.fhir.r5.model.RiskAssessment
 
 /**
  * The ViewModel helper class for PatientItemRecyclerViewAdapter, that is responsible for preparing

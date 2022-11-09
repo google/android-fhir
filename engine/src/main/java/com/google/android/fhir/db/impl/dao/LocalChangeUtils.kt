@@ -24,7 +24,7 @@ import com.github.fge.jsonpatch.diff.JsonDiff
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
-import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.instance.model.api.IAnyResource
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -92,7 +92,7 @@ internal object LocalChangeUtils {
   }
 
   /** Calculates the JSON patch between two [Resource] s. */
-  internal fun diff(parser: IParser, source: Resource, target: Resource): JSONArray {
+  internal fun diff(parser: IParser, source: IAnyResource, target: IAnyResource): JSONArray {
     val objectMapper = ObjectMapper()
     return getFilteredJSONArray(
       JsonDiff.asJson(
@@ -136,9 +136,11 @@ internal object LocalChangeUtils {
     with(JSONArray(jsonDiff.toString())) {
       val ignorePaths = setOf("/meta", "/text")
       return@with JSONArray(
-        (0 until length()).map { optJSONObject(it) }.filterNot { jsonObject ->
-          ignorePaths.any { jsonObject.optString("path").startsWith(it) }
-        }
+        (0 until length())
+          .map { optJSONObject(it) }
+          .filterNot { jsonObject ->
+            ignorePaths.any { jsonObject.optString("path").startsWith(it) }
+          }
       )
     }
 }

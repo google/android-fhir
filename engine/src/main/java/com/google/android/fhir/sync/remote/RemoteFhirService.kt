@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.instance.model.api.IAnyResource
+import org.hl7.fhir.instance.model.api.IBaseBundle
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
@@ -35,9 +35,9 @@ import retrofit2.http.Url
 /** Interface to make http requests to the FHIR server. */
 internal interface RemoteFhirService : DataSource {
 
-  @GET override suspend fun download(@Url path: String): Resource
+  @GET override suspend fun download(@Url path: String): IAnyResource
 
-  @POST(".") override suspend fun upload(@Body bundle: Bundle): Resource
+  @POST(".") override suspend fun upload(@Body bundle: IBaseBundle): IAnyResource
 
   class Builder(
     private val baseUrl: String,

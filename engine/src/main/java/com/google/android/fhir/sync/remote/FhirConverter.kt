@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import java.lang.reflect.Type
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
-import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.instance.model.api.IAnyResource
 import retrofit2.Converter
 import retrofit2.Retrofit
 
@@ -44,22 +44,23 @@ internal class FhirConverterFactory private constructor(val fhirContext: FhirCon
   ): Converter<*, RequestBody> = FhirRequestBodyConverter(fhirContext.newJsonParser())
 
   companion object {
-    fun create() = FhirConverterFactory(FhirContext.forCached(FhirVersionEnum.R4))
+    // TODO: Set parser version
+    fun create() = FhirConverterFactory(FhirContext.forCached(FhirVersionEnum.R5))
   }
 }
 
 /** Retrofit converter that allows us to parse FHIR resources in the response. */
 private class FhirResponseBodyConverter(private val parser: IParser) :
-  Converter<ResponseBody, Resource> {
-  override fun convert(value: ResponseBody): Resource {
-    return parser.parseResource(value.string()) as Resource
+  Converter<ResponseBody, IAnyResource> {
+  override fun convert(value: ResponseBody): IAnyResource {
+    return parser.parseResource(value.string()) as IAnyResource
   }
 }
 
 /** Retrofit converter that allows us to parse FHIR resources in the requests. */
 private class FhirRequestBodyConverter(private val parser: IParser) :
-  Converter<Resource, RequestBody> {
-  override fun convert(value: Resource): RequestBody {
+  Converter<IAnyResource, RequestBody> {
+  override fun convert(value: IAnyResource): RequestBody {
     return parser.encodeResourceToString(value).toRequestBody(MediaTypes.MEDIA_TYPE_FHIR_JSON)
   }
 }

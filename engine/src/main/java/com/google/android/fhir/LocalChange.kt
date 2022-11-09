@@ -17,7 +17,6 @@
 package com.google.android.fhir
 
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import org.hl7.fhir.r4.model.Resource
 
 /** Data class for squashed local changes for resource */
 data class LocalChange(

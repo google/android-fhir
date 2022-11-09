@@ -31,9 +31,9 @@ import java.math.BigDecimal
 import java.util.Date
 import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
+import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.Resource
 
 /**
  * The multiplier used to determine the range for the `ap` search prefix. See
@@ -41,7 +41,7 @@ import org.hl7.fhir.r4.model.Resource
  */
 private const val APPROXIMATION_COEFFICIENT = 0.1
 
-internal suspend fun <R : Resource> Search.execute(database: Database): List<R> {
+internal suspend fun <R : IAnyResource> Search.execute(database: Database): List<R> {
   return database.search(getQuery())
 }
 
@@ -295,7 +295,8 @@ internal fun getConditionParamPair(
       (prefix != ParamPrefixEnum.STARTS_AFTER && prefix != ParamPrefixEnum.ENDS_BEFORE)
   ) { "Prefix $prefix not allowed for Integer type" }
   return when (prefix) {
-    ParamPrefixEnum.EQUAL, null -> {
+    ParamPrefixEnum.EQUAL,
+    null -> {
       val precision = value.getRange()
       ConditionParam(
         "index_value >= ? AND index_value < ?",

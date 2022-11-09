@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.gclient.UriClientParam
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.search.filter.DateClientParamFilterCriteria
 import com.google.android.fhir.search.filter.DateParamFilterCriterion
 import com.google.android.fhir.search.filter.NumberParamFilterCriteria
@@ -39,10 +40,10 @@ import com.google.android.fhir.search.filter.TokenParamFilterCriterion
 import com.google.android.fhir.search.filter.UriFilterCriteria
 import com.google.android.fhir.search.filter.UriParamFilterCriterion
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.ResourceType
 
 @SearchDslMarker
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
+  // TODO(omarismail): Figure out what this patient variable is needed
   internal val p = Patient()
   internal val stringFilterCriteria = mutableListOf<StringParamFilterCriteria>()
   internal val dateTimeFilterCriteria = mutableListOf<DateClientParamFilterCriteria>()

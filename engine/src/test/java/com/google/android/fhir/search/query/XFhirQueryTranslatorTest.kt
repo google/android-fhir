@@ -17,6 +17,7 @@
 package com.google.android.fhir.search.query
 
 import android.os.Build
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.index.SearchParamDefinition
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
@@ -25,7 +26,6 @@ import com.google.android.fhir.search.query.XFhirQueryTranslator.applySortParam
 import com.google.android.fhir.search.query.XFhirQueryTranslator.translate
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Enumerations
-import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -20,12 +20,17 @@ import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
+import com.google.android.fhir.hasLastUpdated
+import com.google.android.fhir.hasMeta
+import com.google.android.fhir.hasVersionId
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.resourceType
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
@@ -35,23 +40,23 @@ import com.google.android.fhir.toTimeZoneString
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import org.hl7.fhir.instance.model.api.IAnyResource
+import org.hl7.fhir.instance.model.api.IBaseBundle
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
 /** Implementation of [FhirEngine]. */
 internal class FhirEngineImpl(private val database: Database, private val context: Context) :
   FhirEngine {
-  override suspend fun create(vararg resource: Resource): List<String> {
+  override suspend fun create(vararg resource: IAnyResource): List<String> {
     return database.insert(*resource)
   }
 
-  override suspend fun get(type: ResourceType, id: String): Resource {
+  override suspend fun get(type: ResourceType, id: String): IAnyResource {
     return database.select(type, id)
   }
 
-  override suspend fun update(vararg resource: Resource) {
+  override suspend fun update(vararg resource: IAnyResource) {
     database.update(*resource)
   }
 
@@ -59,7 +64,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     database.delete(type, id)
   }
 
-  override suspend fun <R : Resource> search(search: Search): List<R> {
+  override suspend fun <R : IAnyResource> search(search: Search): List<R> {
     return search.execute(database)
   }
 
@@ -85,13 +90,13 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+    download: suspend (SyncDownloadContext) -> Flow<List<IAnyResource>>
   ) {
     download(
-      object : SyncDownloadContext {
-        override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
-      }
-    )
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
+        }
+      )
       .collect { resources ->
         database.withTransaction {
           val resolved =
@@ -106,23 +111,25 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       }
   }
 
-  private suspend fun saveResolvedResourcesToDatabase(resolved: List<Resource>?) {
+  private suspend fun saveResolvedResourcesToDatabase(resolved: List<IAnyResource>?) {
     resolved?.let {
       database.deleteUpdates(it)
       database.update(*it.toTypedArray())
     }
   }
 
-  private suspend fun saveRemoteResourcesToDatabase(resources: List<Resource>) {
+  private suspend fun saveRemoteResourcesToDatabase(resources: List<IAnyResource>) {
     val timeStamps =
-      resources.groupBy { it.resourceType }.entries.map {
-        SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
-      }
+      resources
+        .groupBy { it.resourceType }
+        .entries.map {
+          SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+        }
     database.insertSyncedResources(timeStamps, resources)
   }
 
   private suspend fun resolveConflictingResources(
-    resources: List<Resource>,
+    resources: List<IAnyResource>,
     conflictingResourceIds: Set<String>,
     conflictResolver: ConflictResolver
   ) =
@@ -133,41 +140,61 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       .map { it.resolved }
       .takeIf { it.isNotEmpty() }
 
-  private suspend fun getConflictingResourceIds(resources: List<Resource>) =
+  private suspend fun getConflictingResourceIds(resources: List<IAnyResource>) =
     resources
       .map { it.logicalId }
       .toSet()
       .intersect(database.getAllLocalChanges().map { it.localChange.resourceId }.toSet())
 
   override suspend fun syncUpload(
-    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, IAnyResource>>
   ) {
     val localChanges = database.getAllLocalChanges()
     if (localChanges.isNotEmpty()) {
       upload(localChanges.map { it.toLocalChange() }).collect {
         database.deleteUpdates(it.first)
         when (it.second) {
-          is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
+          is Bundle -> updateVersionIdAndLastUpdatedForBundle(it.second as Bundle)
+          is org.hl7.fhir.r5.model.Bundle ->
+            updateVersionIdAndLastUpdatedForBundle(it.second as org.hl7.fhir.r5.model.Bundle)
           else -> updateVersionIdAndLastUpdated(it.second)
         }
       }
     }
   }
 
-  private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {
-    when (bundle.type) {
-      Bundle.BundleType.TRANSACTIONRESPONSE -> {
-        bundle.entry.forEach {
-          when {
-            it.hasResource() -> updateVersionIdAndLastUpdated(it.resource)
-            it.hasResponse() -> updateVersionIdAndLastUpdated(it.response)
+  private suspend fun updateVersionIdAndLastUpdatedForBundle(bundle: IBaseBundle) {
+    when (bundle) {
+      is Bundle ->
+        when (bundle.type) {
+          Bundle.BundleType.TRANSACTIONRESPONSE -> {
+            bundle.entry.forEach {
+              when {
+                it.hasResource() -> updateVersionIdAndLastUpdated(it.resource)
+                it.hasResponse() -> updateVersionIdAndLastUpdated(it.response)
+              }
+            }
+          }
+          else -> {
+            // Leave it for now.
+            Timber.i("Received request to update meta values for ${bundle.type}")
           }
         }
-      }
-      else -> {
-        // Leave it for now.
-        Timber.i("Received request to update meta values for ${bundle.type}")
-      }
+      is org.hl7.fhir.r5.model.Bundle ->
+        when (bundle.type) {
+          org.hl7.fhir.r5.model.Bundle.BundleType.TRANSACTIONRESPONSE -> {
+            bundle.entry.forEach {
+              when {
+                it.hasResource() -> updateVersionIdAndLastUpdated(it.resource)
+                it.hasResponse() -> updateVersionIdAndLastUpdated(it.response)
+              }
+            }
+          }
+          else -> {
+            // Leave it for now.
+            Timber.i("Received request to update meta values for ${bundle.type}")
+          }
+        }
     }
   }
 
@@ -184,7 +211,21 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     }
   }
 
-  private suspend fun updateVersionIdAndLastUpdated(resource: Resource) {
+  private suspend fun updateVersionIdAndLastUpdated(
+    response: org.hl7.fhir.r5.model.Bundle.BundleEntryResponseComponent
+  ) {
+    if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
+      response.resourceIdAndType?.let { (id, type) ->
+        database.updateVersionIdAndLastUpdated(
+          id,
+          type,
+          response.etag,
+          response.lastModified.toInstant()
+        )
+      }
+    }
+  }
+  private suspend fun updateVersionIdAndLastUpdated(resource: IAnyResource) {
     if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
       database.updateVersionIdAndLastUpdated(
         resource.id,
@@ -207,7 +248,16 @@ internal class FhirEngineImpl(private val database: Database, private val contex
    */
   private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
     get() =
-      location?.split("/")?.takeIf { it.size > 3 }?.let {
-        it[it.size - 3] to ResourceType.fromCode(it[it.size - 4])
-      }
+      location
+        ?.split("/")
+        ?.takeIf { it.size > 3 }
+        ?.let { it[it.size - 3] to ResourceType.fromCode(it[it.size - 4]) }
+
+  private val org.hl7.fhir.r5.model.Bundle.BundleEntryResponseComponent.resourceIdAndType:
+    Pair<String, ResourceType>?
+    get() =
+      location
+        ?.split("/")
+        ?.takeIf { it.size > 3 }
+        ?.let { it[it.size - 3] to ResourceType.fromCode(it[it.size - 4]) }
 }

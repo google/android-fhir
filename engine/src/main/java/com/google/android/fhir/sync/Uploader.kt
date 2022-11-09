@@ -19,7 +19,7 @@ package com.google.android.fhir.sync
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import kotlinx.coroutines.flow.Flow
-import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.instance.model.api.IAnyResource
 
 /** Module for uploading local changes to a [DataSource]. */
 internal interface Uploader {
@@ -34,6 +34,7 @@ internal interface Uploader {
 }
 
 internal sealed class UploadResult {
-  data class Success(val localChangeToken: LocalChangeToken, val resource: Bundle) : UploadResult()
+  data class Success(val localChangeToken: LocalChangeToken, val resource: IAnyResource) :
+    UploadResult()
   data class Failure(val syncError: ResourceSyncException) : UploadResult()
 }

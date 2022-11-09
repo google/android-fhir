@@ -47,15 +47,6 @@ internal fun isValidDateOnly(date: String) =
   runCatching { LocalDate.parse(date, DateTimeFormatter.ISO_DATE) }.isSuccess
 
 /**
- * The logical (unqualified) part of the ID. For example, if the ID is
- * "http://example.com/fhir/Patient/123/_history/456", then this value would be "123".
- */
-val Resource.logicalId: String
-  get() {
-    return this.idElement?.idPart.orEmpty()
-  }
-
-/**
  * Determines if the upload operation was successful or not.
  *
  * Current HAPI FHIR implementation does not give any signal other than 'severity' level for

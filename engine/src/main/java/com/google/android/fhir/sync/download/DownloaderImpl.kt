@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.sync.download
 
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
@@ -24,7 +25,6 @@ import com.google.android.fhir.sync.Downloader
 import com.google.android.fhir.sync.ResourceSyncException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Implementation of the [Downloader]. It orchestrates the pre & post processing of resources via
@@ -47,11 +47,10 @@ internal class DownloaderImpl(
         resourceTypeToDownload =
           ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
 
-        emit(
-          DownloadState.Success(
-            downloadWorkManager.processResponse(dataSource.download(url!!)).toList()
-          )
-        )
+        val processedResponse =
+          downloadWorkManager.processResponse(dataSource.download(url!!)).toList()
+
+        emit(DownloadState.Success(processedResponse))
       } catch (exception: Exception) {
         emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
       }

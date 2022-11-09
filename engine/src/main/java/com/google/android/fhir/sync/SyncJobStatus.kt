@@ -16,8 +16,8 @@
 
 package com.google.android.fhir.sync
 
+import com.google.android.fhir.ResourceType
 import java.time.OffsetDateTime
-import org.hl7.fhir.r4.model.ResourceType
 
 sealed class SyncJobStatus {
   val timestamp: OffsetDateTime = OffsetDateTime.now()

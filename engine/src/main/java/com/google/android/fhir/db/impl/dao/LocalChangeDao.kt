@@ -21,15 +21,16 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.resourceType
 import com.google.android.fhir.toTimeZoneString
 import com.google.android.fhir.versionId
 import java.util.Date
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.instance.model.api.IAnyResource
 import timber.log.Timber
 
 /**
@@ -46,11 +47,11 @@ internal abstract class LocalChangeDao {
   @Insert abstract suspend fun addLocalChange(localChangeEntity: LocalChangeEntity)
 
   @Transaction
-  open suspend fun addInsertAll(resources: List<Resource>) {
+  open suspend fun addInsertAll(resources: List<IAnyResource>) {
     resources.forEach { resource -> addInsert(resource) }
   }
 
-  suspend fun addInsert(resource: Resource) {
+  suspend fun addInsert(resource: IAnyResource) {
     val resourceId = resource.logicalId
     val resourceType = resource.resourceType
     val timestamp = Date().toTimeZoneString()
@@ -69,7 +70,7 @@ internal abstract class LocalChangeDao {
     )
   }
 
-  suspend fun addUpdate(oldEntity: ResourceEntity, resource: Resource) {
+  suspend fun addUpdate(oldEntity: ResourceEntity, resource: IAnyResource) {
     val resourceId = resource.logicalId
     val resourceType = resource.resourceType
     val timestamp = Date().toTimeZoneString()
@@ -84,7 +85,7 @@ internal abstract class LocalChangeDao {
     val jsonDiff =
       LocalChangeUtils.diff(
         iParser,
-        iParser.parseResource(oldEntity.serializedResource) as Resource,
+        iParser.parseResource(oldEntity.serializedResource) as IAnyResource,
         resource
       )
     if (jsonDiff.length() == 0) {
@@ -178,7 +179,7 @@ internal abstract class LocalChangeDao {
   )
   abstract suspend fun discardLocalChanges(resourceId: String, resourceType: ResourceType)
 
-  suspend fun discardLocalChanges(resources: List<Resource>) {
+  suspend fun discardLocalChanges(resources: List<IAnyResource>) {
     resources.forEach { discardLocalChanges(it.logicalId, it.resourceType) }
   }
 

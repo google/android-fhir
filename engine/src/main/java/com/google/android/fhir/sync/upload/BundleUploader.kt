@@ -17,7 +17,9 @@
 package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.resourceType
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.UploadResult
@@ -25,10 +27,9 @@ import com.google.android.fhir.sync.Uploader
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.exceptions.FHIRException
+import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 
 /** [Uploader] implementation to work with Fhir [Bundle]. */
 internal class BundleUploader(
@@ -51,7 +52,7 @@ internal class BundleUploader(
     }
   }
 
-  private fun getUploadResult(response: Resource, localChangeTokens: List<LocalChangeToken>) =
+  private fun getUploadResult(response: IAnyResource, localChangeTokens: List<LocalChangeToken>) =
     when {
       response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
         UploadResult.Success(LocalChangeToken(localChangeTokens.flatMap { it.ids }), response)

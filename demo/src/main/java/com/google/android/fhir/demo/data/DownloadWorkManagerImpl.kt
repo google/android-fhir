@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,20 @@
 
 package com.google.android.fhir.demo.data
 
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DownloadWorkManager
 import java.util.LinkedList
 import org.hl7.fhir.exceptions.FHIRException
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.ListResource
-import org.hl7.fhir.r4.model.OperationOutcome
-import org.hl7.fhir.r4.model.Reference
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.instance.model.api.IAnyResource
+import org.hl7.fhir.r5.model.Bundle
+import org.hl7.fhir.r5.model.ListResource
+import org.hl7.fhir.r5.model.OperationOutcome
+import org.hl7.fhir.r5.model.Reference
 
 class DownloadWorkManagerImpl : DownloadWorkManager {
   private val resourceTypeList = ResourceType.values().map { it.name }
-  private val urls = LinkedList(listOf("Patient?address-city=NAIROBI"))
+  private val urls = LinkedList(listOf("Patient?family=Jackson"))
 
   override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? {
     var url = urls.poll() ?: return null
@@ -42,7 +42,7 @@ class DownloadWorkManagerImpl : DownloadWorkManager {
     return url
   }
 
-  override suspend fun processResponse(response: Resource): Collection<Resource> {
+  override suspend fun processResponse(response: IAnyResource): Collection<IAnyResource> {
     // As per FHIR documentation :
     // If the search fails (cannot be executed, not that there are no matches), the
     // return value SHALL be a status code 4xx or 5xx with an OperationOutcome.
@@ -73,7 +73,7 @@ class DownloadWorkManagerImpl : DownloadWorkManager {
     }
 
     // Finally, extract the downloaded resources from the bundle.
-    var bundleCollection: Collection<Resource> = mutableListOf()
+    var bundleCollection: Collection<IAnyResource> = mutableListOf()
     if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
       bundleCollection = response.entry.map { it.resource }
     }

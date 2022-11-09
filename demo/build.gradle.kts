@@ -44,6 +44,9 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
+  api(Dependencies.HapiFhir.structuresR5)
+  api(Dependencies.HapiFhir.hapiFhirConverter)
+
   implementation(Dependencies.Androidx.activity)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)

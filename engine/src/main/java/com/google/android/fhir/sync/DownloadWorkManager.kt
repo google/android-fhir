@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package com.google.android.fhir.sync
 
 import com.google.android.fhir.SyncDownloadContext
-import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.instance.model.api.IAnyResource
 
 /**
  * Manager that generates the FHIR requests and handles the FHIR responses of a download job.
@@ -35,5 +35,5 @@ interface DownloadWorkManager {
   /**
    * Processes the download response and returns the resources to be saved to the local database.
    */
-  suspend fun processResponse(response: Resource): Collection<Resource>
+  suspend fun processResponse(response: IAnyResource): Collection<IAnyResource>
 }

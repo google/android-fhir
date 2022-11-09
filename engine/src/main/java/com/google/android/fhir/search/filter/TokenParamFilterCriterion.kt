@@ -86,6 +86,47 @@ data class TokenParamFilterCriterion(var parameter: TokenClientParam) : FilterCr
         TokenParamFilterValueInstance(uri = contactPoint.use?.toCode(), code = contactPoint.value)
       )
     }
+  /** Returns [TokenFilterValue] from [UriType]. */
+  fun of(uriType: org.hl7.fhir.r5.model.UriType) =
+    TokenFilterValue().apply {
+      tokenFilters.add(TokenParamFilterValueInstance(code = uriType.value))
+    }
+
+  /** Returns [TokenFilterValue] from [CodeType]. */
+  fun of(codeType: org.hl7.fhir.r5.model.CodeType) =
+    TokenFilterValue().apply {
+      tokenFilters.add(TokenParamFilterValueInstance(code = codeType.value))
+    }
+
+  /** Returns [TokenFilterValue] from [Coding]. */
+  fun of(coding: org.hl7.fhir.r5.model.Coding) =
+    TokenFilterValue().apply {
+      tokenFilters.add(TokenParamFilterValueInstance(uri = coding.system, code = coding.code))
+    }
+
+  /** Returns [TokenFilterValue] from [CodeableConcept]. */
+  fun of(codeableConcept: org.hl7.fhir.r5.model.CodeableConcept) =
+    TokenFilterValue().apply {
+      codeableConcept.coding.forEach {
+        tokenFilters.add(TokenParamFilterValueInstance(uri = it.system, code = it.code))
+      }
+    }
+
+  /** Returns [TokenFilterValue] from [Identifier]. */
+  fun of(identifier: org.hl7.fhir.r5.model.Identifier) =
+    TokenFilterValue().apply {
+      tokenFilters.add(
+        TokenParamFilterValueInstance(uri = identifier.system, code = identifier.value)
+      )
+    }
+
+  /** Returns [TokenFilterValue] from [ContactPoint]. */
+  fun of(contactPoint: org.hl7.fhir.r5.model.ContactPoint) =
+    TokenFilterValue().apply {
+      tokenFilters.add(
+        TokenParamFilterValueInstance(uri = contactPoint.use?.toCode(), code = contactPoint.value)
+      )
+    }
 
   override fun getConditionalParams() =
     value!!.tokenFilters.map {

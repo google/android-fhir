@@ -54,7 +54,10 @@ object Dependencies {
   }
 
   object HapiFhir {
+    const val coreLibrary = "ca.uhn.hapi.fhir:hapi-fhir-base:${Versions.hapiFhir}"
+    const val hapiFhirConverter = "ca.uhn.hapi.fhir:hapi-fhir-converter:${Versions.hapiFhir}"
     const val structuresR4 = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhir}"
+    const val structuresR5 = "ca.uhn.hapi.fhir:hapi-fhir-structures-r5:${Versions.hapiFhir}"
     const val validation = "ca.uhn.hapi.fhir:hapi-fhir-validation:${Versions.hapiFhir}"
 
     // Runtime dependency that is required to run FhirPath (also requires minSDK of 26).

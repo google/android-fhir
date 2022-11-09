@@ -22,8 +22,7 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.instance.model.api.IAnyResource
 
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface FhirEngine {
@@ -32,13 +31,13 @@ interface FhirEngine {
    *
    * @return the logical IDs of the newly created resources.
    */
-  suspend fun create(vararg resource: Resource): List<String>
+  suspend fun create(vararg resource: IAnyResource): List<String>
 
   /** Loads a FHIR resource given the class and the logical ID. */
-  suspend fun get(type: ResourceType, id: String): Resource
+  suspend fun get(type: ResourceType, id: String): IAnyResource
 
   /** Updates a FHIR [resource] in the local storage. */
-  suspend fun update(vararg resource: Resource)
+  suspend fun update(vararg resource: IAnyResource)
 
   /** Removes a FHIR resource given the class and the logical ID. */
   suspend fun delete(type: ResourceType, id: String)
@@ -46,7 +45,7 @@ interface FhirEngine {
   /**
    * Searches the database and returns a list resources according to the [search] specifications.
    */
-  suspend fun <R : Resource> search(search: Search): List<R>
+  suspend fun <R : IAnyResource> search(search: Search): List<R>
 
   /**
    * Synchronizes the [upload] result in the database. [upload] operation may result in multiple
@@ -54,7 +53,7 @@ interface FhirEngine {
    * api caller should [Flow.collect] it.
    */
   suspend fun syncUpload(
-    upload: (suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>)
+    upload: (suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, IAnyResource>>)
   )
 
   /**
@@ -63,7 +62,7 @@ interface FhirEngine {
    */
   suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+    download: suspend (SyncDownloadContext) -> Flow<List<IAnyResource>>
   )
 
   /**
@@ -116,7 +115,7 @@ interface FhirEngine {
  * @throws ResourceNotFoundException if the resource is not found
  */
 @Throws(ResourceNotFoundException::class)
-suspend inline fun <reified R : Resource> FhirEngine.get(id: String): R {
+suspend inline fun <reified R : IAnyResource> FhirEngine.get(id: String): R {
   return get(getResourceType(R::class.java), id) as R
 }
 
@@ -124,7 +123,7 @@ suspend inline fun <reified R : Resource> FhirEngine.get(id: String): R {
  * Deletes a FHIR resource of type [R] with [id] from the local storage.
  * @param <R> The resource type which should be a subtype of [Resource].
  */
-suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
+suspend inline fun <reified R : IAnyResource> FhirEngine.delete(id: String) {
   delete(getResourceType(R::class.java), id)
 }
 

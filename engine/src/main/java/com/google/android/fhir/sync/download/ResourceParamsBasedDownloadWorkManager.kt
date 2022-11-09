@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.sync.download
 
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.GREATER_THAN_PREFIX
@@ -24,10 +25,9 @@ import com.google.android.fhir.sync.SyncDataParams
 import com.google.android.fhir.sync.concatParams
 import java.util.LinkedList
 import org.hl7.fhir.exceptions.FHIRException
+import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 
 typealias ResourceSearchParams = Map<ResourceType, ParamMap>
 /**
@@ -61,15 +61,15 @@ class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
     }
   }
 
-  override suspend fun processResponse(response: Resource): Collection<Resource> {
+  override suspend fun processResponse(response: IAnyResource): Collection<IAnyResource> {
     if (response is OperationOutcome) {
       throw FHIRException(response.issueFirstRep.diagnostics)
     }
 
     return if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
-      response.link.firstOrNull { component -> component.relation == "next" }?.url?.let { next ->
-        urlOfTheNextPagesToDownloadForAResource.add(next)
-      }
+      response.link
+        .firstOrNull { component -> component.relation == "next" }
+        ?.url?.let { next -> urlOfTheNextPagesToDownloadForAResource.add(next) }
 
       response.entry.map { it.resource }
     } else {

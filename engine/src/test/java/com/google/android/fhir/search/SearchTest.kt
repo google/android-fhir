@@ -20,6 +20,7 @@ import android.os.Build
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.epochDay
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -40,7 +41,6 @@ import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.UriType
 import org.junit.Test

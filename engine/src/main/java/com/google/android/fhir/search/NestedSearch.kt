@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@ package com.google.android.fhir.search
 
 import ca.uhn.fhir.rest.gclient.IParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
+import com.google.android.fhir.ResourceType
+import com.google.android.fhir.resourceType
+import org.hl7.fhir.instance.model.api.IAnyResource
 
 /** Lets users perform a nested search using [Search.has] api. */
 @PublishedApi internal data class NestedSearch(val param: ReferenceClientParam, val search: Search)
@@ -39,7 +40,7 @@ internal data class NestedContext(val parentType: ResourceType, val param: IPara
  *     }
  * ```
  */
-inline fun <reified R : Resource> Search.has(
+inline fun <reified R : IAnyResource> Search.has(
   referenceParam: ReferenceClientParam,
   init: Search.() -> Unit
 ) {
@@ -61,16 +62,17 @@ internal fun List<NestedSearch>.nestedQuery(
   return if (isEmpty()) {
     null
   } else {
-    map { it.nestedQuery(type) }.let {
-      SearchQuery(
-        query =
-          it.joinToString(
-            prefix = "AND a.resourceUuid IN ",
-            separator = " ${operation.logicalOperator} a.resourceUuid IN"
-          ) { "(\n${it.query}\n) " },
-        args = it.flatMap { it.args }
-      )
-    }
+    map { it.nestedQuery(type) }
+      .let {
+        SearchQuery(
+          query =
+            it.joinToString(
+              prefix = "AND a.resourceUuid IN ",
+              separator = " ${operation.logicalOperator} a.resourceUuid IN"
+            ) { "(\n${it.query}\n) " },
+          args = it.flatMap { it.args }
+        )
+      }
   }
 }
 

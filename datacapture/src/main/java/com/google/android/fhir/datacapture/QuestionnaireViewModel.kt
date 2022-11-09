@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
@@ -492,7 +493,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     expression: Expression
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     val data =
-      if (expression.isXFhirQuery) fhirEngine.search(expression.expression)
+      if (expression.isXFhirQuery) fhirEngine.search(expression.expression) as List<Base>
       else if (expression.isFhirPath)
         fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
       else

@@ -17,6 +17,7 @@
 package com.google.android.fhir
 
 import android.content.Context
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
@@ -67,6 +68,7 @@ object FhirEngineProvider {
           .apply {
             if (configuration.enableEncryptionIfSupported) enableEncryptionIfSupported()
             setDatabaseErrorStrategy(configuration.databaseErrorStrategy)
+            setFhirVersion(configuration.fhirVersionEnum)
             configuration.serverConfiguration?.let { setServerConfiguration(it) }
             if (configuration.testMode) {
               inMemory()
@@ -104,6 +106,7 @@ object FhirEngineProvider {
 data class FhirEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
   val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
+  val fhirVersionEnum: FhirVersionEnum = FhirVersionEnum.R4,
   val serverConfiguration: ServerConfiguration? = null,
   val testMode: Boolean = false
 )

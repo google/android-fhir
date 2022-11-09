@@ -23,6 +23,7 @@ import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.DatabaseErrorStrategy
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
@@ -32,11 +33,11 @@ import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.resourceType
 import com.google.android.fhir.search.SearchQuery
 import java.lang.IllegalStateException
 import java.time.Instant
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.instance.model.api.IAnyResource
 
 /**
  * The implementation for the persistence layer using Room. See docs for
@@ -100,7 +101,7 @@ internal class DatabaseImpl(
   private val syncedResourceDao = db.syncedResourceDao()
   private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 
-  override suspend fun <R : Resource> insert(vararg resource: R): List<String> {
+  override suspend fun <R : IAnyResource> insert(vararg resource: R): List<String> {
     val logicalIds = mutableListOf<String>()
     db.withTransaction {
       logicalIds.addAll(resourceDao.insertAll(resource.toList()))
@@ -109,11 +110,11 @@ internal class DatabaseImpl(
     return logicalIds
   }
 
-  override suspend fun <R : Resource> insertRemote(vararg resource: R) {
+  override suspend fun <R : IAnyResource> insertRemote(vararg resource: R) {
     db.withTransaction { resourceDao.insertAll(resource.toList()) }
   }
 
-  override suspend fun update(vararg resources: Resource) {
+  override suspend fun update(vararg resources: IAnyResource) {
     db.withTransaction {
       resources.forEach {
         val oldResourceEntity = selectEntity(it.resourceType, it.logicalId)
@@ -139,14 +140,13 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun select(type: ResourceType, id: String): Resource {
+  override suspend fun select(type: ResourceType, id: String): IAnyResource {
     return db.withTransaction {
       resourceDao.getResource(resourceId = id, resourceType = type)?.let {
         iParser.parseResource(it)
       }
         ?: throw ResourceNotFoundException(type.name, id)
-    } as
-      Resource
+    } as IAnyResource
   }
 
   override suspend fun lastUpdate(resourceType: ResourceType): String? {
@@ -155,7 +155,7 @@ internal class DatabaseImpl(
 
   override suspend fun insertSyncedResources(
     syncedResources: List<SyncedResourceEntity>,
-    resources: List<Resource>
+    resources: List<IAnyResource>
   ) {
     db.withTransaction {
       syncedResourceDao.insertAll(syncedResources)
@@ -181,7 +181,7 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun <R : Resource> search(query: SearchQuery): List<R> {
+  override suspend fun <R : IAnyResource> search(query: SearchQuery): List<R> {
     return db.withTransaction {
       resourceDao
         .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
@@ -202,9 +202,12 @@ internal class DatabaseImpl(
    */
   override suspend fun getAllLocalChanges(): List<SquashedLocalChange> {
     return db.withTransaction {
-      localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
-        SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
-      }
+      localChangeDao
+        .getAllLocalChanges()
+        .groupBy { it.resourceId to it.resourceType }
+        .values.map {
+          SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
+        }
     }
   }
 
@@ -223,7 +226,7 @@ internal class DatabaseImpl(
     db.withTransaction(block)
   }
 
-  override suspend fun deleteUpdates(resources: List<Resource>) {
+  override suspend fun deleteUpdates(resources: List<IAnyResource>) {
     localChangeDao.discardLocalChanges(resources)
   }
 

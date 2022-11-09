@@ -25,9 +25,8 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import java.io.File
 import java.util.Locale
 import kotlin.collections.HashMap
+import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Enumerations
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.SearchParameter
 
 /**
@@ -63,6 +62,7 @@ internal object SearchParameterRepositoryGenerator {
 
   private val searchParamMap: HashMap<String, MutableList<SearchParamDefinition>> = HashMap()
   private val searchParamDefinitionClass = ClassName(indexPackage, "SearchParamDefinition")
+  private val searchParamTypeClass = ClassName(indexPackage, "SearchParamType")
 
   fun generate(bundle: Bundle, outputPath: File, testOutputPath: File) {
     for (entry in bundle.entry) {
@@ -88,7 +88,7 @@ internal object SearchParameterRepositoryGenerator {
 
     val getSearchParamListFunction =
       FunSpec.builder("getSearchParamList")
-        .addParameter("resource", Resource::class)
+        .addParameter("resource", IAnyResource::class)
         .returns(
           ClassName("kotlin.collections", "List").parameterizedBy(searchParamDefinitionClass)
         )
@@ -98,7 +98,7 @@ internal object SearchParameterRepositoryGenerator {
 
     // Helper function used in SearchParameterRepositoryGeneratedTest
     val testHelperFunctionCodeBlock =
-      CodeBlock.builder().addStatement("val resourceList = listOf<%T>(", Resource::class.java)
+      CodeBlock.builder().addStatement("val resourceList = listOf<%T>(", IAnyResource::class.java)
     searchParamMap.entries.forEach { (resource, definitions) ->
       val resourceClass = ClassName(hapiPackage, resource.toHapiName())
       val klass =
@@ -122,7 +122,7 @@ internal object SearchParameterRepositoryGenerator {
                   "add(%T(%S, %T.%L, %S))",
                   definition.className,
                   definition.name,
-                  Enumerations.SearchParamType::class,
+                  searchParamTypeClass,
                   definition.paramTypeCode,
                   definition.path
                 )
@@ -149,7 +149,7 @@ internal object SearchParameterRepositoryGenerator {
         .addFunction(
           FunSpec.builder("getAllResources")
             .addModifiers(KModifier.INTERNAL)
-            .returns(List::class.parameterizedBy(Resource::class))
+            .returns(List::class.parameterizedBy(IAnyResource::class))
             .addCode(testHelperFunctionCodeBlock.build())
             .addKdoc(generatedComment)
             .build()
@@ -175,8 +175,7 @@ internal object SearchParameterRepositoryGenerator {
     return if (searchParam.base.size == 1) {
       mapOf(searchParam.base.single().valueAsString to searchParam.expression)
     } else {
-      searchParam
-        .expression
+      searchParam.expression
         .split("|")
         .groupBy { splitString -> splitString.split(".").first().trim().removePrefix("(") }
         .mapValues { it.value.joinToString(" | ") { join -> join.trim() } }

@@ -23,21 +23,22 @@ import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.gclient.UriClientParam
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.getResourceClass
+import com.google.android.fhir.index.Coding
+import com.google.android.fhir.index.Quantity
 import com.google.android.fhir.index.SearchParamDefinition
+import com.google.android.fhir.index.SearchParamType
 import com.google.android.fhir.index.getSearchParamList
 import com.google.android.fhir.isValidDateOnly
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.filter.TokenFilterValue
 import com.google.android.fhir.search.filter.TokenParamFilterValueInstance
-import org.hl7.fhir.r4.model.Coding
+import java.math.BigDecimal
+import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.Enumerations
-import org.hl7.fhir.r4.model.Quantity
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Supports translation of x-fhir-query defined in
@@ -113,15 +114,15 @@ object XFhirQueryTranslator {
 
   fun Search.applyFilterParam(param: SearchParamDefinition, filterValue: String) =
     when (param.type) {
-      Enumerations.SearchParamType.NUMBER -> {
+      SearchParamType.NUMBER -> {
         this.filter(NumberClientParam(param.name), { value = filterValue.toBigDecimal() })
       }
-      Enumerations.SearchParamType.DATE -> {
+      SearchParamType.DATE -> {
         if (!isValidDateOnly(filterValue))
           this.filter(DateClientParam(param.name), { value = of(DateTimeType(filterValue)) })
         else this.filter(DateClientParam(param.name), { value = of(DateType(filterValue)) })
       }
-      Enumerations.SearchParamType.QUANTITY -> {
+      SearchParamType.QUANTITY -> {
         filterValue.toQuantity().let {
           this.filter(
             QuantityClientParam(param.name),
@@ -133,26 +134,26 @@ object XFhirQueryTranslator {
           )
         }
       }
-      Enumerations.SearchParamType.STRING -> {
+      SearchParamType.STRING -> {
         this.filter(StringClientParam(param.name), { value = filterValue })
       }
-      Enumerations.SearchParamType.TOKEN -> {
+      SearchParamType.TOKEN -> {
         filterValue.toCoding().let {
           this.filter(
             TokenClientParam(param.name),
             {
               value =
                 TokenFilterValue().apply {
-                  tokenFilters.add(TokenParamFilterValueInstance(uri = it.system, code = it.code))
+                  tokenFilters.add(TokenParamFilterValueInstance(uri = it.system, code = it.code!!))
                 }
             }
           )
         }
       }
-      Enumerations.SearchParamType.REFERENCE -> {
+      SearchParamType.REFERENCE -> {
         this.filter(ReferenceClientParam(param.name), { value = filterValue })
       }
-      Enumerations.SearchParamType.URI -> {
+      SearchParamType.URI -> {
         this.filter(UriClientParam(param.name), { value = filterValue })
       }
       else ->
@@ -161,13 +162,13 @@ object XFhirQueryTranslator {
 
   internal fun Search.applySortParam(param: SearchParamDefinition, order: Order = Order.ASCENDING) =
     when (param.type) {
-      Enumerations.SearchParamType.NUMBER -> {
+      SearchParamType.NUMBER -> {
         this.sort(NumberClientParam(param.name), order)
       }
-      Enumerations.SearchParamType.DATE -> {
+      SearchParamType.DATE -> {
         this.sort(DateClientParam(param.name), order)
       }
-      Enumerations.SearchParamType.STRING -> {
+      SearchParamType.STRING -> {
         this.sort(StringClientParam(param.name), order)
       }
       else ->
@@ -175,7 +176,7 @@ object XFhirQueryTranslator {
     }
 
   private val ResourceType.resourceSearchParameters
-    get() = getSearchParamList(getResourceClass<Resource>(this).newInstance())
+    get() = getSearchParamList(getResourceClass<IAnyResource>(this).newInstance())
 
   /** Parse string key-val map to SearchParamDefinition-Value map */
   private fun Map<String, String>.toSearchParamDefinitionValueMap(
@@ -201,13 +202,17 @@ object XFhirQueryTranslator {
    */
   private fun String.toQuantity() =
     this.split("|").let { parts ->
-      Quantity(parts.first().toDouble()).apply {
-        if (parts.size == 3) // system exists at index 1 only if all 3 components are specified
-         system = parts.elementAt(1)
-
-        if (parts.size > 1)
-          unit = parts.last() // unit exists as last element only for two or more components
-      }
+      Quantity(
+        code = null,
+        value = BigDecimal.valueOf(parts.first().toDouble()),
+        system =
+          if (parts.size == 3) // system exists at index 1 only if all 3 components are specified
+           parts.elementAt(1)
+          else null,
+        unit =
+          if (parts.size > 1) parts.last()
+          else null // unit exists as last element only for two or more components
+      )
     }
 
   /**
@@ -219,11 +224,13 @@ object XFhirQueryTranslator {
    */
   private fun String.toCoding() =
     this.split("|").let { parts ->
-      Coding().apply {
-        if (parts.size == 2) // system exists as first element only if both components are specified
-         system = parts.first()
-
+      Coding(
+        system =
+          if (parts.size == 2
+          ) // system exists as first element only if both components are specified
+           parts.first()
+          else null,
         code = parts.last() // code would always be specified and would exists as last element
-      }
+      )
     }
 }

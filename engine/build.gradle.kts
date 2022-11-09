@@ -93,6 +93,7 @@ dependencies {
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
 
+  api(Dependencies.HapiFhir.coreLibrary) { exclude(module = "junit") }
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)

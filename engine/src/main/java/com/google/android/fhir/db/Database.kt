@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.db
 
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -23,8 +24,7 @@ import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.instance.model.api.IAnyResource
 
 /** The interface for the FHIR resource database. */
 internal interface Database {
@@ -35,7 +35,7 @@ internal interface Database {
    * @param <R> The resource type
    * @return the logical IDs of the newly created resources.
    */
-  suspend fun <R : Resource> insert(vararg resource: R): List<String>
+  suspend fun <R : IAnyResource> insert(vararg resource: R): List<String>
 
   /**
    * Inserts a list of remote `resources` into the FHIR resource database. If any of the resources
@@ -43,7 +43,7 @@ internal interface Database {
    *
    * @param <R> The resource type
    */
-  suspend fun <R : Resource> insertRemote(vararg resource: R)
+  suspend fun <R : IAnyResource> insertRemote(vararg resource: R)
 
   /**
    * Updates the `resource` in the FHIR resource database. If the resource does not already exist,
@@ -51,7 +51,7 @@ internal interface Database {
    *
    * @param <R> The resource type
    */
-  suspend fun update(vararg resources: Resource)
+  suspend fun update(vararg resources: IAnyResource)
 
   /** Updates the `resource` meta in the FHIR resource database. */
   suspend fun updateVersionIdAndLastUpdated(
@@ -68,7 +68,7 @@ internal interface Database {
    * @throws ResourceNotFoundException if the resource is not found in the database
    */
   @Throws(ResourceNotFoundException::class)
-  suspend fun select(type: ResourceType, id: String): Resource
+  suspend fun select(type: ResourceType, id: String): IAnyResource
 
   /**
    * Selects the saved `ResourceEntity` of type `clazz` with `id`.
@@ -93,7 +93,7 @@ internal interface Database {
    */
   suspend fun insertSyncedResources(
     syncedResources: List<SyncedResourceEntity>,
-    resources: List<Resource>
+    resources: List<IAnyResource>
   )
 
   /**
@@ -103,7 +103,7 @@ internal interface Database {
    */
   suspend fun delete(type: ResourceType, id: String)
 
-  suspend fun <R : Resource> search(query: SearchQuery): List<R>
+  suspend fun <R : IAnyResource> search(query: SearchQuery): List<R>
 
   suspend fun count(query: SearchQuery): Long
 
@@ -118,7 +118,7 @@ internal interface Database {
   suspend fun deleteUpdates(token: LocalChangeToken)
 
   /** Remove the [LocalChangeEntity] s with matching resource ids. */
-  suspend fun deleteUpdates(resources: List<Resource>)
+  suspend fun deleteUpdates(resources: List<IAnyResource>)
 
   /** Runs the block as a database transaction. */
   suspend fun withTransaction(block: suspend () -> Unit)

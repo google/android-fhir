@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
 import com.google.android.fhir.get
 import kotlinx.coroutines.launch
+import org.hl7.fhir.convertors.factory.VersionConvertorFactory_40_50
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -48,8 +49,8 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
     val question = readFileFromAssets("new-patient-registration-paginated.json").trimIndent()
     val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
     val questionnaire =
-      parser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, question) as
-        Questionnaire
+      parser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, question)
+        as Questionnaire
 
     val questionnaireResponse: QuestionnaireResponse =
       ResourceMapper.populate(questionnaire, patient)
@@ -63,8 +64,8 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
 
   private val questionnaireResource: Questionnaire
     get() =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire) as
-        Questionnaire
+      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire)
+        as Questionnaire
 
   private var questionnaireJson: String? = null
 
@@ -86,7 +87,7 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
           patient.telecom[0].value != null
       ) {
         patient.id = patientId
-        fhirEngine.update(patient)
+        fhirEngine.update(VersionConvertorFactory_40_50.convertResource(patient))
         isPatientSaved.value = true
         return@launch
       }

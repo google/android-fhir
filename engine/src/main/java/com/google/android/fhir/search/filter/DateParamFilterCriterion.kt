@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
@@ -25,7 +26,6 @@ import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.search.getConditionParamPair
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Represents a criterion for filtering [DateClientParam]. e.g. filter(Patient.BIRTHDATE, { value
@@ -85,14 +85,17 @@ internal data class DateClientParamFilterCriteria(
     // Join the individual Date and DateTime queries to create a unified DateClientParam query. The
     // user may have provided either a single type or both types of criterion. So filter weeds
     // FilterCriteria with no criterion.
-    return filterCriteria.filter { it.filters.isNotEmpty() }.map { it.query(type) }.let { queries ->
-      SearchQuery(
-        queries.joinToString(separator = " ${operation.logicalOperator} ") {
-          if (queries.size > 1) "(${it.query})" else it.query
-        },
-        queries.flatMap { it.args }
-      )
-    }
+    return filterCriteria
+      .filter { it.filters.isNotEmpty() }
+      .map { it.query(type) }
+      .let { queries ->
+        SearchQuery(
+          queries.joinToString(separator = " ${operation.logicalOperator} ") {
+            if (queries.size > 1) "(${it.query})" else it.query
+          },
+          queries.flatMap { it.args }
+        )
+      }
   }
 
   /** Internal class used to generate query for Date type Criterion */

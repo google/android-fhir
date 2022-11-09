@@ -18,6 +18,7 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.content.Context
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
@@ -41,8 +42,9 @@ class FhirApplication : Application() {
       FhirEngineConfiguration(
         enableEncryptionIfSupported = true,
         RECREATE_AT_OPEN,
+        FhirVersionEnum.R5,
         ServerConfiguration(
-          "https://hapi.fhir.org/baseR4/",
+          "https://hapi.fhir.org/baseR5/",
           httpLogger =
             HttpLogger(
               HttpLogger.Configuration(

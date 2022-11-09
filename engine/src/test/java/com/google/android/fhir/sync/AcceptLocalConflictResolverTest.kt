@@ -22,6 +22,7 @@ import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Resource
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -56,6 +57,6 @@ class AcceptLocalConflictResolverTest {
 
     val result = AcceptLocalConflictResolver.resolve(localResource, remoteResource)
     assertThat(result).isInstanceOf(Resolved::class.java)
-    testingUtils.assertResourceEquals(localResource, (result as Resolved).resolved)
+    testingUtils.assertResourceEquals(localResource, (result as Resolved).resolved as Resource)
   }
 }

@@ -27,6 +27,7 @@ import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.remote.RemoteFhirService
+import org.hl7.fhir.exceptions.FHIRException
 import timber.log.Timber
 
 internal data class FhirServices(
@@ -39,6 +40,7 @@ internal data class FhirServices(
     private var inMemory: Boolean = false
     private var enableEncryption: Boolean = false
     private var databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
+    private var fhirVersion: FhirVersionEnum = FhirVersionEnum.R4
     private var serverConfiguration: ServerConfiguration? = null
 
     internal fun inMemory() = apply { inMemory = true }
@@ -59,8 +61,16 @@ internal data class FhirServices(
       this.serverConfiguration = serverConfiguration
     }
 
+    internal fun setFhirVersion(fhirVersionEnum: FhirVersionEnum) = apply {
+      when (fhirVersionEnum) {
+        FhirVersionEnum.R5 -> this.fhirVersion = fhirVersionEnum
+        FhirVersionEnum.R4 -> this.fhirVersion = fhirVersionEnum
+        else -> throw FHIRException("FHIR Version: $fhirVersionEnum is not supported.")
+      }
+    }
+
     fun build(): FhirServices {
-      val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+      val parser = FhirContext.forCached(fhirVersion).newJsonParser()
       val db =
         DatabaseImpl(
           context = context,

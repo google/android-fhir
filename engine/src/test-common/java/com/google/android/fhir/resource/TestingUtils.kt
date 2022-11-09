@@ -20,6 +20,7 @@ import androidx.work.Data
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.search.Search
@@ -32,11 +33,11 @@ import java.util.Date
 import java.util.LinkedList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import org.hl7.fhir.instance.model.api.IAnyResource
+import org.hl7.fhir.instance.model.api.IBaseBundle
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -44,13 +45,13 @@ import org.json.JSONObject
 class TestingUtils constructor(private val iParser: IParser) {
 
   /** Asserts that the `expected` and the `actual` FHIR resources are equal. */
-  fun assertResourceEquals(expected: Resource?, actual: Resource?) {
+  fun assertResourceEquals(expected: IAnyResource?, actual: IAnyResource?) {
     assertThat(iParser.encodeResourceToString(actual))
       .isEqualTo(iParser.encodeResourceToString(expected))
   }
 
   /** Asserts that the `expected` and the `actual` FHIR resources are not equal. */
-  fun assertResourceNotEquals(expected: Resource?, actual: Resource?) {
+  fun assertResourceNotEquals(expected: IAnyResource?, actual: IAnyResource?) {
     assertThat(iParser.encodeResourceToString(actual))
       .isNotEqualTo(iParser.encodeResourceToString(expected))
   }
@@ -69,7 +70,7 @@ class TestingUtils constructor(private val iParser: IParser) {
   }
 
   /** Reads a [Resource] from given file in the `sampledata` dir */
-  fun <R : Resource> readFromFile(clazz: Class<R>, filename: String): R {
+  fun <R : IAnyResource> readFromFile(clazz: Class<R>, filename: String): R {
     val resourceJson = readJsonFromFile(filename)
     return iParser.parseResource(clazz, resourceJson.toString()) as R
   }
@@ -90,11 +91,11 @@ class TestingUtils constructor(private val iParser: IParser) {
 
   object TestDataSourceImpl : DataSource {
 
-    override suspend fun download(path: String): Resource {
+    override suspend fun download(path: String): IAnyResource {
       return Bundle().apply { type = Bundle.BundleType.SEARCHSET }
     }
 
-    override suspend fun upload(bundle: Bundle): Resource {
+    override suspend fun upload(bundle: IBaseBundle): IAnyResource {
       return Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
     }
   }
@@ -106,7 +107,7 @@ class TestingUtils constructor(private val iParser: IParser) {
 
     override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? = urls.poll()
 
-    override suspend fun processResponse(response: Resource): Collection<Resource> {
+    override suspend fun processResponse(response: IAnyResource): Collection<IAnyResource> {
       val patient = Patient().setMeta(Meta().setLastUpdated(Date()))
       return listOf(patient)
     }
@@ -117,37 +118,37 @@ class TestingUtils constructor(private val iParser: IParser) {
   ) : TestDownloadManagerImpl(queries)
 
   object TestFhirEngineImpl : FhirEngine {
-    override suspend fun create(vararg resource: Resource) = emptyList<String>()
+    override suspend fun create(vararg resource: IAnyResource) = emptyList<String>()
 
-    override suspend fun update(vararg resource: Resource) {}
+    override suspend fun update(vararg resource: IAnyResource) {}
 
-    override suspend fun get(type: ResourceType, id: String): Resource {
+    override suspend fun get(type: ResourceType, id: String): IAnyResource {
       return Patient()
     }
 
     override suspend fun delete(type: ResourceType, id: String) {}
 
-    override suspend fun <R : Resource> search(search: Search): List<R> {
+    override suspend fun <R : IAnyResource> search(search: Search): List<R> {
       return emptyList()
     }
 
     override suspend fun syncUpload(
-      upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+      upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, IAnyResource>>
     ) {
       upload(listOf())
     }
 
     override suspend fun syncDownload(
       conflictResolver: ConflictResolver,
-      download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+      download: suspend (SyncDownloadContext) -> Flow<List<IAnyResource>>
     ) {
       download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType): String {
-            return "123456788"
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType): String {
+              return "123456788"
+            }
           }
-        }
-      )
+        )
         .collect {}
     }
     override suspend fun count(search: Search): Long {
@@ -169,7 +170,7 @@ class TestingUtils constructor(private val iParser: IParser) {
 
   object TestFailingDatasource : DataSource {
 
-    override suspend fun download(path: String): Resource {
+    override suspend fun download(path: String): IAnyResource {
       val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
       // data size exceeding the bytes acceptable by WorkManager serializer
       val dataSize = Data.MAX_DATA_BYTES + 1
@@ -177,17 +178,17 @@ class TestingUtils constructor(private val iParser: IParser) {
       throw Exception(hugeStackTraceMessage)
     }
 
-    override suspend fun upload(bundle: Bundle): Resource {
+    override suspend fun upload(bundle: IBaseBundle): IAnyResource {
       throw Exception("Posting Bundle failed...")
     }
   }
 
-  class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSource {
+  class BundleDataSource(val onPostBundle: suspend (IBaseBundle) -> IAnyResource) : DataSource {
 
-    override suspend fun download(path: String): Resource {
+    override suspend fun download(path: String): IAnyResource {
       TODO("Not yet implemented")
     }
 
-    override suspend fun upload(bundle: Bundle) = onPostBundle(bundle)
+    override suspend fun upload(bundle: IBaseBundle) = onPostBundle(bundle)
   }
 }

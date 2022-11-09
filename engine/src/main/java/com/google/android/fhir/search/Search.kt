@@ -17,21 +17,22 @@
 package com.google.android.fhir.search
 
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.resourceType
 import com.google.android.fhir.search.query.XFhirQueryTranslator.translate
-import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.instance.model.api.IAnyResource
 
-suspend inline fun <reified R : Resource> FhirEngine.search(init: Search.() -> Unit): List<R> {
+suspend inline fun <reified R : IAnyResource> FhirEngine.search(init: Search.() -> Unit): List<R> {
   val search = Search(type = R::class.java.newInstance().resourceType)
   search.init()
   return this.search(search)
 }
 
-suspend inline fun <reified R : Resource> FhirEngine.count(init: Search.() -> Unit): Long {
+suspend inline fun <reified R : IAnyResource> FhirEngine.count(init: Search.() -> Unit): Long {
   val search = Search(type = R::class.java.newInstance().resourceType)
   search.init()
   return this.count(search)
 }
 
-suspend fun FhirEngine.search(xFhirQuery: String): List<Resource> {
+suspend fun FhirEngine.search(xFhirQuery: String): List<IAnyResource> {
   return this.search(translate(xFhirQuery))
 }

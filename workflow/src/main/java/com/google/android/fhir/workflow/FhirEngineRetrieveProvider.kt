@@ -23,18 +23,18 @@ import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.db.ResourceNotFoundException
+import com.google.android.fhir.index.SearchParamType
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.filter.TokenParamFilterCriterion
 import com.google.android.fhir.search.query.XFhirQueryTranslator.applyFilterParam
 import java.math.BigDecimal
 import java.util.Date
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
-import org.hl7.fhir.r4.model.Enumerations
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 import org.opencds.cqf.cql.engine.retrieve.TerminologyAwareRetrieveProvider
 import org.opencds.cqf.cql.engine.runtime.Code
 import org.opencds.cqf.cql.engine.runtime.DateTime
@@ -201,7 +201,7 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
 
     if (ann != null) {
       // If found, uses the applyFilterParam
-      if (ann.type == Enumerations.SearchParamType.REFERENCE) {
+      if (ann.type == SearchParamType.REFERENCE) {
         search.filter(
           ReferenceClientParam(ann.name),
           { value = "$context/$contextValue" },
@@ -227,9 +227,13 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
     }
   }
 
-  private suspend fun safeGet(fhirEngine: FhirEngine, type: ResourceType, id: String): Resource? {
+  private suspend fun safeGet(
+    fhirEngine: FhirEngine,
+    type: ResourceType,
+    id: String
+  ): IAnyResource? {
     return try {
-      fhirEngine.get(type, id)
+      fhirEngine.get(ResourceType.fromCode(type.name), id)
     } catch (e: ResourceNotFoundException) {
       null
     }
@@ -244,11 +248,9 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
       }
       .filter { it.path == "$dataType.$path" }
       .map {
-        com.google.android.fhir.index.SearchParamDefinition(
-          it.name,
-          Enumerations.SearchParamType.fromCode(it.type),
-          it.path
-        )
+        SearchParamType.fromCode(it.type)?.let { it1 ->
+          com.google.android.fhir.index.SearchParamDefinition(it.name, it1, it.path)
+        }
       }
       .firstOrNull()
 

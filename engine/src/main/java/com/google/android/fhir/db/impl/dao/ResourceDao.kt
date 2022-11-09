@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
@@ -38,11 +39,11 @@ import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.ResourceIndices
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.resourceType
 import com.google.android.fhir.versionId
 import java.time.Instant
 import java.util.UUID
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.instance.model.api.IAnyResource
 
 @Dao
 internal abstract class ResourceDao {
@@ -50,7 +51,7 @@ internal abstract class ResourceDao {
   // the dao
   lateinit var iParser: IParser
 
-  open suspend fun update(resource: Resource) {
+  open suspend fun update(resource: IAnyResource) {
     updateResource(
       resource.logicalId,
       resource.resourceType,
@@ -73,11 +74,11 @@ internal abstract class ResourceDao {
       ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
   }
 
-  open suspend fun insert(resource: Resource): String {
+  open suspend fun insert(resource: IAnyResource): String {
     return insertResource(resource)
   }
 
-  open suspend fun insertAll(resources: List<Resource>): List<String> {
+  open suspend fun insertAll(resources: List<IAnyResource>): List<String> {
     return resources.map { resource -> insertResource(resource) }
   }
 
@@ -172,7 +173,7 @@ internal abstract class ResourceDao {
 
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
-  private suspend fun insertResource(resource: Resource): String {
+  private suspend fun insertResource(resource: IAnyResource): String {
     val resourceUuid = UUID.randomUUID()
 
     // Use the local UUID as the logical ID of the resource
