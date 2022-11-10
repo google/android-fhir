@@ -170,7 +170,7 @@ internal class OptionSelectDialogFragment(
 
 private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
   ListAdapter<OptionSelectRow, OptionSelectViewHolder>(DIFF_CALLBACK) {
-
+  lateinit var recyclerView: RecyclerView
   override fun getItemViewType(position: Int): Int =
     when (getItem(position)) {
       is OptionSelectRow.Option,
@@ -218,6 +218,10 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
         compoundButton.isChecked = item.selected
         compoundButton.setOnCheckedChangeListener { _, checked ->
           submitSelectedChange(position = holder.adapterPosition, selected = checked)
+          // Scroll down the recyclerview to show the Add another answer button on the screen.
+          if (checked) {
+            recyclerView.smoothScrollToPosition(this@OptionSelectAdapter.itemCount)
+          }
         }
       }
       is OptionSelectRow.OtherEditText -> {
@@ -240,6 +244,8 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
               it.add(holder.adapterPosition, OptionSelectRow.OtherEditText.fromText(""))
             }
           submitList(newList)
+          // Scroll down the recyclerview to show the Add another answer button on the screen.
+          recyclerView.smoothScrollToPosition(this@OptionSelectAdapter.itemCount)
         }
       }
     }
@@ -286,6 +292,11 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
     OPTION_MULTI,
     OTHER_EDIT_TEXT,
     OTHER_ADD_ANOTHER,
+  }
+
+  override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+    super.onAttachedToRecyclerView(recyclerView)
+    this.recyclerView = recyclerView
   }
 }
 

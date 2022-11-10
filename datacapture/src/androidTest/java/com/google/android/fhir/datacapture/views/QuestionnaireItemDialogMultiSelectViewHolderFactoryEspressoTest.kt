@@ -19,11 +19,20 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
+import androidx.test.espresso.contrib.RecyclerViewActions
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.DisplayItemControlType
 import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.ItemControlTypes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.utilities.assertQuestionnaireResponseAtIndex
@@ -241,6 +250,104 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     assertThat(questionnaireItemViewItem.answers).isEmpty()
   }
 
+  @Test
+  fun selectOther_shouldScrollDownToShowAddAnotherAnswer() {
+    val questionnaireItem =
+      answerOptions(
+        true,
+        "Coding 1",
+        "Coding 2",
+        "Coding 3",
+        "Coding 4",
+        "Coding 5",
+        "Coding 6",
+        "Coding 7",
+        "Coding 8"
+      )
+    questionnaireItem.addExtension(openChoiceType)
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        questionnaireItem,
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
+    onView(withId(R.id.recycler_view))
+      .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(8))
+    clickOnTextInDialog("Other")
+    onView(withId(R.id.add_another)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+  }
+
+  @Test
+  fun unselectOther_shouldHideAddAnotherAnswer() {
+    val questionnaireItem =
+      answerOptions(
+        true,
+        "Coding 1",
+        "Coding 2",
+        "Coding 3",
+        "Coding 4",
+        "Coding 5",
+        "Coding 6",
+        "Coding 7",
+        "Coding 8"
+      )
+    questionnaireItem.addExtension(openChoiceType)
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        questionnaireItem,
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
+    onView(withId(R.id.recycler_view))
+      .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(8))
+    clickOnTextInDialog("Other")
+    clickOnTextInDialog("Other")
+    onView(ViewMatchers.withId(R.id.add_another)).check(doesNotExist())
+  }
+
+  @Test
+  fun clickAddAnotherAnswer_shouldScrollDownToShowAddAnotherAnswer() {
+    val questionnaireItem =
+      answerOptions(
+        true,
+        "Coding 1",
+        "Coding 2",
+        "Coding 3",
+        "Coding 4",
+        "Coding 5",
+        "Coding 6",
+        "Coding 7",
+        "Coding 8"
+      )
+    questionnaireItem.addExtension(openChoiceType)
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        questionnaireItem,
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
+    onView(withId(R.id.recycler_view))
+      .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(8))
+    clickOnTextInDialog("Other")
+    onView(withId(R.id.add_another)).perform(click())
+    onView(withId(R.id.add_another)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+  }
+
   /** Method to run code snippet on UI/main thread */
   private fun runOnUI(action: () -> Unit) {
     activityScenarioRule.scenario.onActivity { activity -> action() }
@@ -256,6 +363,20 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     assertThat(
       viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
     )
+
+  private val openChoiceType =
+    Extension().apply {
+      url = EXTENSION_ITEM_CONTROL_URL
+      setValue(
+        CodeableConcept()
+          .addCoding(
+            Coding()
+              .setCode(ItemControlTypes.OPEN_CHOICE.extensionCode)
+              .setDisplay("Open Choice")
+              .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+          )
+      )
+    }
 
   internal companion object {
     private fun answerOptions(multiSelect: Boolean, vararg options: String) =

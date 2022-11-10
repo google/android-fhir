@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
   private fun onNavigationItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.menu_sync -> {
-        viewModel.poll()
+        viewModel.triggerOneTimeSync()
       }
     }
     binding.drawer.closeDrawer(GravityCompat.START)

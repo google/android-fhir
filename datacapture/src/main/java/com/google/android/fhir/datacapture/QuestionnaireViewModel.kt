@@ -518,60 +518,56 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     reviewMode: Boolean
   ): QuestionnaireState {
 
-    val showReviewButton =
-      enableReviewPage &&
-        !reviewFlow.value &&
-        (currentPageIndex == null ||
-          !QuestionnairePagination(pages = pages!!, currentPageIndex = currentPageIndex)
-            .hasNextPage)
-
-    val showSubmitButton =
-      showSubmitButtonFlag &&
-        !showReviewButton &&
-        (currentPageIndex == null ||
-          !QuestionnairePagination(pages = pages!!, currentPageIndex = currentPageIndex)
-            .hasNextPage)
-
+    // Single-page questionnaire
     if (currentPageIndex == null) {
-      // Single-page questionnaire
+      val showReviewButton = enableReviewPage && !reviewFlow.value
+      val showSubmitButton = showSubmitButtonFlag && !showReviewButton
       return QuestionnaireState(
         items = getQuestionnaireItemViewItems(questionnaireItemList, questionnaireResponseItemList),
         pagination =
           QuestionnairePagination(false, emptyList(), -1, showSubmitButton, showReviewButton),
         reviewMode = reviewMode
       )
-    }
-
-    // Paginated questionnaire
-    pages =
-      questionnaireItemList.zip(questionnaireResponseItemList).mapIndexed {
-        index,
-        (questionnaireItem, questionnaireResponseItem) ->
-        QuestionnairePage(
+    } else {
+      // Paginated questionnaire
+      pages =
+        questionnaireItemList.zip(questionnaireResponseItemList).mapIndexed {
           index,
-          EnablementEvaluator.evaluate(
-            questionnaireItem,
-            questionnaireResponseItem,
-            questionnaireResponse
-          ) { item, linkId -> findEnableWhenQuestionnaireResponseItem(item, linkId) }
-        )
-      }
-    return QuestionnaireState(
-      items =
-        getQuestionnaireItemViewItems(
-          questionnaireItemList[currentPageIndex],
-          questionnaireResponseItemList[currentPageIndex]
-        ),
-      pagination =
-        QuestionnairePagination(
-          true,
-          pages!!,
-          currentPageIndex,
-          showSubmitButton,
-          showReviewButton
-        ),
-      reviewMode = reviewMode
-    )
+          (questionnaireItem, questionnaireResponseItem) ->
+          QuestionnairePage(
+            index,
+            EnablementEvaluator.evaluate(
+              questionnaireItem,
+              questionnaireResponseItem,
+              questionnaireResponse
+            ) { item, linkId -> findEnableWhenQuestionnaireResponseItem(item, linkId) }
+          )
+        }
+      val showReviewButton =
+        enableReviewPage &&
+          !reviewFlow.value &&
+          !QuestionnairePagination(pages = pages!!, currentPageIndex = currentPageIndex).hasNextPage
+      val showSubmitButton =
+        showSubmitButtonFlag &&
+          !showReviewButton &&
+          !QuestionnairePagination(pages = pages!!, currentPageIndex = currentPageIndex).hasNextPage
+      return QuestionnaireState(
+        items =
+          getQuestionnaireItemViewItems(
+            questionnaireItemList[currentPageIndex],
+            questionnaireResponseItemList[currentPageIndex]
+          ),
+        pagination =
+          QuestionnairePagination(
+            true,
+            pages!!,
+            currentPageIndex,
+            showSubmitButton,
+            showReviewButton
+          ),
+        reviewMode = reviewMode
+      )
+    }
   }
 
   /**

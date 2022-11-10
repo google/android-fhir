@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.RadioButton
 import android.widget.RadioGroup
-import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -36,7 +35,6 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
       private lateinit var radioGroup: RadioGroup
       private lateinit var yesRadioButton: RadioButton
       private lateinit var noRadioButton: RadioButton
-      private lateinit var error: TextView
 
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
@@ -45,7 +43,6 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
         radioGroup = itemView.findViewById(R.id.radio_group)
         yesRadioButton = itemView.findViewById(R.id.yes_radio_button)
         noRadioButton = itemView.findViewById(R.id.no_radio_button)
-        error = itemView.findViewById(R.id.error)
       }
 
       private fun addContentDescription() {
@@ -72,16 +69,13 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
         header.bind(questionnaireItem)
         when (questionnaireItemViewItem.answers.singleOrNull()?.valueBooleanType?.value) {
           true -> {
-            yesRadioButton.isChecked = true
-            noRadioButton.isChecked = false
+            radioGroup.check(yesRadioButton.id)
           }
           false -> {
-            yesRadioButton.isChecked = false
-            noRadioButton.isChecked = true
+            radioGroup.check(noRadioButton.id)
           }
           null -> {
-            yesRadioButton.isChecked = false
-            noRadioButton.isChecked = false
+            radioGroup.clearCheck()
           }
         }
 
@@ -119,10 +113,9 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
           is NotValidated,
-          Valid -> error.visibility = View.GONE
+          Valid -> header.showErrorText(isErrorTextVisible = false)
           is Invalid -> {
-            error.text = validationResult.getSingleStringValidationMessage()
-            error.visibility = View.VISIBLE
+            header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
           }
         }
       }
