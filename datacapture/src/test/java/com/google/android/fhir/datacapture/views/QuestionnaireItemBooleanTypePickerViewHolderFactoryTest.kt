@@ -18,8 +18,8 @@ package com.google.android.fhir.datacapture.views
 
 import android.widget.FrameLayout
 import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -351,7 +351,13 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
     )
 
     assertThat(
-        (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0)
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1)
+            as RadioButton)
+          .isEnabled
+      )
+      .isFalse()
+    assertThat(
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2)
             as RadioButton)
           .isEnabled
       )

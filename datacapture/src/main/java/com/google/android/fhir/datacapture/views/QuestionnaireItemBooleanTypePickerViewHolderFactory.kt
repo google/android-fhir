@@ -17,10 +17,14 @@
 package com.google.android.fhir.datacapture.views
 
 import android.view.View
+import android.view.ViewGroup
 import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.constraintlayout.helper.widget.Flow
+import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.choiceOrientation
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -33,10 +37,11 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: QuestionnaireItemHeaderView
-      private lateinit var radioGroup: RadioGroup
+      private lateinit var radioGroup: ConstraintLayout
       private lateinit var yesRadioButton: RadioButton
       private lateinit var noRadioButton: RadioButton
       private lateinit var error: TextView
+      private lateinit var flow: Flow
 
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
@@ -46,23 +51,33 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
         yesRadioButton = itemView.findViewById(R.id.yes_radio_button)
         noRadioButton = itemView.findViewById(R.id.no_radio_button)
         error = itemView.findViewById(R.id.error)
+        flow = itemView.findViewById(R.id.flow)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
-
         header.bind(questionnaireItem)
+        val choiceOrientation =
+          questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
+        if (choiceOrientation == ChoiceOrientationTypes.HORIZONTAL) {
+          with(flow) {
+            setOrientation(Flow.HORIZONTAL)
+            setWrapMode(Flow.WRAP_CHAIN)
+          }
+        }
+        yesRadioButton.setLayoutParamsByOrientation()
+        noRadioButton.setLayoutParamsByOrientation()
+
+        yesRadioButton.isChecked = false
+        noRadioButton.isChecked = false
 
         when (questionnaireItemViewItem.answers.singleOrNull()?.valueBooleanType?.value) {
           true -> {
-            radioGroup.check(yesRadioButton.id)
+            yesRadioButton.isChecked = true
           }
           false -> {
-            radioGroup.check(noRadioButton.id)
-          }
-          null -> {
-            radioGroup.clearCheck()
+            noRadioButton.isChecked = true
           }
         }
 
@@ -71,7 +86,8 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
               true
           ) {
             questionnaireItemViewItem.clearAnswer()
-            radioGroup.clearCheck()
+            yesRadioButton.isChecked = false
+            //            radioGroup.clearCheck()
           } else {
             questionnaireItemViewItem.setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -86,7 +102,8 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
               false
           ) {
             questionnaireItemViewItem.clearAnswer()
-            radioGroup.clearCheck()
+            noRadioButton.isChecked = false
+            //            radioGroup.clearCheck()
           } else {
             questionnaireItemViewItem.setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -113,6 +130,20 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
           val view = radioGroup.getChildAt(i)
           view.isEnabled = !isReadOnly
         }
+      }
+
+      private fun RadioButton.setLayoutParamsByOrientation() {
+        val choiceOrientation =
+          questionnaireItemViewItem.questionnaireItem.choiceOrientation
+            ?: ChoiceOrientationTypes.VERTICAL
+        layoutParams =
+          ViewGroup.LayoutParams(
+            when (choiceOrientation) {
+              ChoiceOrientationTypes.HORIZONTAL -> ViewGroup.LayoutParams.WRAP_CONTENT
+              ChoiceOrientationTypes.VERTICAL -> ViewGroup.LayoutParams.MATCH_PARENT
+            },
+            ViewGroup.LayoutParams.WRAP_CONTENT
+          )
       }
     }
 }
