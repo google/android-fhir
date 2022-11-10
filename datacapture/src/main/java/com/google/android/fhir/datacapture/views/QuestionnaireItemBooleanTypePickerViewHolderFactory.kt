@@ -84,7 +84,6 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
           ) {
             questionnaireItemViewItem.clearAnswer()
             yesRadioButton.isChecked = false
-            //            radioGroup.clearCheck()
           } else {
             questionnaireItemViewItem.setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -100,7 +99,6 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
           ) {
             questionnaireItemViewItem.clearAnswer()
             noRadioButton.isChecked = false
-            //            radioGroup.clearCheck()
           } else {
             questionnaireItemViewItem.setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
