@@ -121,8 +121,7 @@ fun Project.publishArtifact(artifact: LibraryArtifact) {
               url = uri("file://${rootProject.buildDir}/ci-repo")
               version =
                 if (project.providers.environmentVariable("GITHUB_ACTIONS").isPresent) {
-                  val buildNumber = System.getenv("GITHUB_RUN_ID")
-                  "${artifact.version}-build_$buildNumber"
+                  "${artifact.version}-build_${System.getenv("GITHUB_RUN_ID")}"
                 } else {
                   artifact.version
                 }
