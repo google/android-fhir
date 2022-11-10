@@ -117,10 +117,9 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
           is NotValidated,
-          Valid -> error.visibility = View.GONE
+          Valid -> header.showErrorText(isErrorTextVisible = false)
           is Invalid -> {
-            error.text = validationResult.getSingleStringValidationMessage()
-            error.visibility = View.VISIBLE
+            header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
           }
         }
       }
