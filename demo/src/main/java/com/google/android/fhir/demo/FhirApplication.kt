@@ -54,7 +54,7 @@ class FhirApplication : Application() {
         )
       )
     )
-    Sync.oneTimeSync<FhirSyncWorker>(this)
+    Sync.oneTimeSync<FhirSyncWorker>(this, fhirVersionEnum = FhirVersionEnum.R5)
   }
 
   private fun constructFhirEngine(): FhirEngine {

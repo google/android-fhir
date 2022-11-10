@@ -16,12 +16,15 @@
 
 package com.google.android.fhir.sync.upload
 
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import org.hl7.fhir.exceptions.FHIRException
+import org.hl7.fhir.instance.model.api.IBaseBundle
 import org.hl7.fhir.r4.model.Bundle
 
-typealias ResourceBundleAndAssociatedLocalChangeTokens = Pair<Bundle, List<LocalChangeToken>>
+typealias ResourceBundleAndAssociatedLocalChangeTokens = Pair<IBaseBundle, List<LocalChangeToken>>
 
 /**
  * Generates pairs of Transaction [Bundle] and [LocalChangeToken]s associated with the resources
@@ -33,21 +36,41 @@ internal open class TransactionBundleGenerator(
 ) {
 
   fun generate(
-    localChanges: List<List<LocalChange>>
+    localChanges: List<List<LocalChange>>,
+    fhirVersionEnum: FhirVersionEnum
   ): List<ResourceBundleAndAssociatedLocalChangeTokens> {
-    return localChanges.filter { it.isNotEmpty() }.map { generateBundle(it) }
+    return localChanges.filter { it.isNotEmpty() }.map { generateBundle(it, fhirVersionEnum) }
   }
 
   private fun generateBundle(
-    localChanges: List<LocalChange>
-  ): ResourceBundleAndAssociatedLocalChangeTokens {
-    return Bundle().apply {
-      type = Bundle.BundleType.TRANSACTION
-      localChanges.forEach {
-        this.addEntry(getBundleEntryComponentGeneratorForLocalChangeType(it.type).getEntry(it))
+    localChanges: List<LocalChange>,
+    fhirVersionEnum: FhirVersionEnum
+  ): ResourceBundleAndAssociatedLocalChangeTokens =
+    when (fhirVersionEnum) {
+      FhirVersionEnum.R4 -> {
+        Bundle().apply {
+          type = Bundle.BundleType.TRANSACTION
+          localChanges.forEach {
+            this.addEntry(
+              getBundleEntryComponentGeneratorForLocalChangeType(it.type)
+                .getEntryForR4(it, FhirVersionEnum.R4)
+            )
+          }
+        } to localChanges.map { it.token }
       }
-    } to localChanges.map { it.token }
-  }
+      FhirVersionEnum.R5 -> {
+        org.hl7.fhir.r5.model.Bundle().apply {
+          type = org.hl7.fhir.r5.model.Bundle.BundleType.TRANSACTION
+          localChanges.forEach {
+            this.addEntry(
+              getBundleEntryComponentGeneratorForLocalChangeType(it.type)
+                .getEntryForR5(it, FhirVersionEnum.R5)
+            )
+          }
+        } to localChanges.map { it.token }
+      }
+      else -> throw FHIRException("Im done")
+    }
 
   companion object Factory {
 

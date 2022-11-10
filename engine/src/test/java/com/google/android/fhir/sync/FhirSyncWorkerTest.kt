@@ -79,7 +79,8 @@ class FhirSyncWorkerTest {
     val worker =
       TestListenableWorkerBuilder<PassingPeriodicSyncWorker>(
           context,
-          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 1).build(),
+          inputData =
+            Data.Builder().putInt(MAX_RETRIES_ALLOWED, 1).putString(FHIR_VERSION, "R4").build(),
           runAttemptCount = 0
         )
         .build()
@@ -92,7 +93,8 @@ class FhirSyncWorkerTest {
     val worker =
       TestListenableWorkerBuilder<FailingPeriodicSyncWorker>(
           context,
-          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 0).build(),
+          inputData =
+            Data.Builder().putInt(MAX_RETRIES_ALLOWED, 0).putString(FHIR_VERSION, "R4").build(),
           runAttemptCount = 0
         )
         .build()
@@ -105,7 +107,8 @@ class FhirSyncWorkerTest {
     val worker =
       TestListenableWorkerBuilder<FailingPeriodicSyncWorker>(
           context,
-          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 2).build(),
+          inputData =
+            Data.Builder().putInt(MAX_RETRIES_ALLOWED, 2).putString(FHIR_VERSION, "R4").build(),
           runAttemptCount = 2
         )
         .build()
@@ -118,7 +121,8 @@ class FhirSyncWorkerTest {
     val worker =
       TestListenableWorkerBuilder<FailingPeriodicSyncWorker>(
           context,
-          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 2).build(),
+          inputData =
+            Data.Builder().putInt(MAX_RETRIES_ALLOWED, 2).putString(FHIR_VERSION, "R4").build(),
           runAttemptCount = 1
         )
         .build()

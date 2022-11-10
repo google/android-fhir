@@ -236,12 +236,14 @@ internal object ResourceIndexer {
               com.google.android.fhir.index.DateTimeType(value.value, value.precision)
             else -> throw FHIRException("Unsupported FHIR Version")
           }
-        DateTimeIndex(
-          searchParam.name,
-          searchParam.path,
-          dateTime.value.time,
-          dateTime.precision.add(dateTime.value, 1).time - 1
-        )
+        dateTime.value?.let {
+          DateTimeIndex(
+            searchParam.name,
+            searchParam.path,
+            it.time,
+            dateTime.precision.add(dateTime.value, 1).time - 1
+          )
+        }
       }
       // No need to add precision because an instant is meant to have zero width
       "instant" -> {
@@ -284,7 +286,7 @@ internal object ResourceIndexer {
         DateTimeIndex(
           searchParam.name,
           searchParam.path,
-          if (period.hasStart) period.start.time else 0,
+          if (period.hasStart) period.start!!.time else 0,
           if (period.hasEnd) period.endElement.precision.add(period.end, 1).time - 1
           else Long.MAX_VALUE
         )
@@ -313,7 +315,7 @@ internal object ResourceIndexer {
           DateTimeIndex(
             searchParam.name,
             searchParam.path,
-            timing.event.minOf { it.value.time },
+            timing.event.minOf { it.value!!.time },
             timing.event.maxOf { it.precision.add(it.value, 1).time } - 1
           )
         } else null
@@ -337,12 +339,14 @@ internal object ResourceIndexer {
                 )
               else -> throw FHIRException("Unsupported FHIR Version")
             }
-          DateTimeIndex(
-            searchParam.name,
-            searchParam.path,
-            dateTime.value.time,
-            dateTime.precision.add(dateTime.value, 1).time - 1
-          )
+          dateTime.value?.let {
+            DateTimeIndex(
+              searchParam.name,
+              searchParam.path,
+              it.time,
+              dateTime.precision.add(dateTime.value, 1).time - 1
+            )
+          }
         } catch (e: IllegalArgumentException) {
           null
         }
@@ -619,12 +623,12 @@ data class InstantType(val value: Date)
 
 data class DateType(val value: Date, val precision: TemporalPrecisionEnum)
 
-data class DateTimeType(val value: Date, val precision: TemporalPrecisionEnum)
+data class DateTimeType(val value: Date?, val precision: TemporalPrecisionEnum)
 
 data class Period(
   val hasStart: Boolean,
   val hasEnd: Boolean,
-  val start: Date,
+  val start: Date?,
   val endElement: com.google.android.fhir.index.DateTimeType,
-  val end: Date
+  val end: Date?
 )

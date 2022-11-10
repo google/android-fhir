@@ -19,6 +19,7 @@ package com.google.android.fhir.sync
 import android.content.Context
 import androidx.work.BackoffPolicy
 import androidx.work.WorkerParameters
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
@@ -46,6 +47,7 @@ class SyncTest {
     val workRequest =
       Sync.createOneTimeWorkRequest(
         RetryConfiguration(BackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3),
+        FhirVersionEnum.R4,
         PassingPeriodicSyncWorker::class.java
       )
     assertThat(workRequest.workSpec.backoffPolicy).isEqualTo(BackoffPolicy.LINEAR)
@@ -55,7 +57,8 @@ class SyncTest {
 
   @Test
   fun createOneTimeWorkRequest_withoutRetryConfiguration_shouldHaveZeroMaxTries() {
-    val workRequest = Sync.createOneTimeWorkRequest(null, PassingPeriodicSyncWorker::class.java)
+    val workRequest =
+      Sync.createOneTimeWorkRequest(null, FhirVersionEnum.R4, PassingPeriodicSyncWorker::class.java)
     assertThat(workRequest.workSpec.input.getInt(MAX_RETRIES_ALLOWED, 0)).isEqualTo(0)
     //    Not checking [workRequest.workSpec.backoffPolicy] and
     // [workRequest.workSpec.backoffDelayDuration] as they have default values.
@@ -70,6 +73,7 @@ class SyncTest {
           retryConfiguration =
             RetryConfiguration(BackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3)
         ),
+        FhirVersionEnum.R4,
         PassingPeriodicSyncWorker::class.java
       )
     assertThat(workRequest.workSpec.intervalDuration).isEqualTo(TimeUnit.MINUTES.toMillis(20))
@@ -86,6 +90,7 @@ class SyncTest {
           repeat = RepeatInterval(20, TimeUnit.MINUTES),
           retryConfiguration = null
         ),
+        FhirVersionEnum.R4,
         PassingPeriodicSyncWorker::class.java
       )
     assertThat(workRequest.workSpec.intervalDuration).isEqualTo(TimeUnit.MINUTES.toMillis(20))

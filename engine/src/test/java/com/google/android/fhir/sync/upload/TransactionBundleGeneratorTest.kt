@@ -39,7 +39,7 @@ class TransactionBundleGeneratorTest {
   @Test
   fun `generate() should return empty list if there are no local changes`() = runBlocking {
     val generator = TransactionBundleGenerator.Factory.getDefault()
-    val result = generator.generate(listOf(listOf(), listOf()))
+    val result = generator.generate(listOf(listOf(), listOf()), FhirVersionEnum.R4)
     assertThat(result).isEmpty()
   }
 
@@ -121,10 +121,11 @@ class TransactionBundleGeneratorTest {
           .apply { LocalChangeToken(listOf(3)) }
       )
     val generator = TransactionBundleGenerator.Factory.getDefault()
-    val result = generator.generate(listOf(changes))
+    val result = generator.generate(listOf(changes), FhirVersionEnum.R4)
 
     assertThat(result).hasSize(1)
     val (bundle, _) = result.first()
+    bundle as Bundle
     assertThat(bundle.type).isEqualTo(Bundle.BundleType.TRANSACTION)
     assertThat(bundle.entry).hasSize(3)
     assertThat(bundle.entry.map { it.request.method })
@@ -210,15 +211,15 @@ class TransactionBundleGeneratorTest {
           .apply { LocalChangeToken(listOf(3)) }
       )
     val generator = TransactionBundleGenerator.Factory.getDefault()
-    val result = generator.generate(changes.chunked(1))
+    val result = generator.generate(changes.chunked(1), FhirVersionEnum.R4)
 
     // Exactly 3 Bundles are generated
     assertThat(result).hasSize(3)
     // Each Bundle is of type transaction
-    assertThat(result.all { it.first.type == Bundle.BundleType.TRANSACTION }).isTrue()
+    assertThat(result.all { (it.first as Bundle).type == Bundle.BundleType.TRANSACTION }).isTrue()
     // Each Bundle has exactly 1 entry
-    assertThat(result.all { it.first.entry.size == 1 }).isTrue()
-    assertThat(result.map { it.first.entry.first().request.method })
+    assertThat(result.all { (it.first as Bundle).entry.size == 1 }).isTrue()
+    assertThat(result.map { (it.first as Bundle).entry.first().request.method })
       .containsExactly(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, Bundle.HTTPVerb.DELETE)
       .inOrder()
   }

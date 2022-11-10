@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync.remote
 
 import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.MediaTypes
 import java.lang.reflect.Type
@@ -28,7 +27,7 @@ import org.hl7.fhir.instance.model.api.IAnyResource
 import retrofit2.Converter
 import retrofit2.Retrofit
 
-internal class FhirConverterFactory private constructor(val fhirContext: FhirContext) :
+internal class FhirConverterFactory private constructor(private val fhirContext: FhirContext) :
   Converter.Factory() {
   override fun responseBodyConverter(
     type: Type,
@@ -44,8 +43,7 @@ internal class FhirConverterFactory private constructor(val fhirContext: FhirCon
   ): Converter<*, RequestBody> = FhirRequestBodyConverter(fhirContext.newJsonParser())
 
   companion object {
-    // TODO: Set parser version
-    fun create() = FhirConverterFactory(FhirContext.forCached(FhirVersionEnum.R5))
+    fun create(fhirContext: FhirContext) = FhirConverterFactory(fhirContext)
   }
 }
 

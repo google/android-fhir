@@ -19,13 +19,13 @@ package com.google.android.fhir.search.query
 import android.os.Build
 import com.google.android.fhir.ResourceType
 import com.google.android.fhir.index.SearchParamDefinition
+import com.google.android.fhir.index.SearchParamType
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.query.XFhirQueryTranslator.applyFilterParam
 import com.google.android.fhir.search.query.XFhirQueryTranslator.applySortParam
 import com.google.android.fhir.search.query.XFhirQueryTranslator.translate
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.Enumerations
 import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -143,11 +143,7 @@ class XFhirQueryTranslatorTest {
     val search = Search(ResourceType.Patient)
 
     search.applySortParam(
-      SearchParamDefinition(
-        "address-country",
-        Enumerations.SearchParamType.STRING,
-        "Patient.address.country"
-      )
+      SearchParamDefinition("address-country", SearchParamType.STRING, "Patient.address.country")
     )
 
     assertThat(search.sort!!.paramName).isEqualTo("address-country")
@@ -160,7 +156,7 @@ class XFhirQueryTranslatorTest {
     search.applySortParam(
       SearchParamDefinition(
         "probability",
-        Enumerations.SearchParamType.NUMBER,
+        SearchParamType.NUMBER,
         "RiskAssessment.prediction.probability"
       )
     )
@@ -173,7 +169,7 @@ class XFhirQueryTranslatorTest {
     val search = Search(ResourceType.Patient)
 
     search.applySortParam(
-      SearchParamDefinition("birthdate", Enumerations.SearchParamType.DATE, "Patient.birthDate")
+      SearchParamDefinition("birthdate", SearchParamType.DATE, "Patient.birthDate")
     )
 
     assertThat(search.sort!!.paramName).isEqualTo("birthdate")
@@ -188,7 +184,7 @@ class XFhirQueryTranslatorTest {
         search.applySortParam(
           SearchParamDefinition(
             "deceased",
-            Enumerations.SearchParamType.TOKEN,
+            SearchParamType.TOKEN,
             "Patient.deceased.exists() and Patient.deceased != false"
           )
         )
@@ -203,7 +199,7 @@ class XFhirQueryTranslatorTest {
     search.applyFilterParam(
       SearchParamDefinition(
         "probability",
-        Enumerations.SearchParamType.NUMBER,
+        SearchParamType.NUMBER,
         "RiskAssessment.prediction.probability"
       ),
       "12"
@@ -219,7 +215,7 @@ class XFhirQueryTranslatorTest {
     val search = Search(ResourceType.Patient)
 
     search.applyFilterParam(
-      SearchParamDefinition("birthdate", Enumerations.SearchParamType.DATE, "Patient.birthDate"),
+      SearchParamDefinition("birthdate", SearchParamType.DATE, "Patient.birthDate"),
       "2022-01-21"
     )
 
@@ -233,7 +229,7 @@ class XFhirQueryTranslatorTest {
     val search = Search(ResourceType.Patient)
 
     search.applyFilterParam(
-      SearchParamDefinition("birthdate", Enumerations.SearchParamType.DATE, "Patient.birthDate"),
+      SearchParamDefinition("birthdate", SearchParamType.DATE, "Patient.birthDate"),
       "2022-01-21T12:21:59"
     )
 
@@ -248,7 +244,7 @@ class XFhirQueryTranslatorTest {
     val search = Search(ResourceType.Encounter)
 
     search.applyFilterParam(
-      SearchParamDefinition("length", Enumerations.SearchParamType.QUANTITY, "Encounter.length"),
+      SearchParamDefinition("length", SearchParamType.QUANTITY, "Encounter.length"),
       "3|http://unitsofmeasure.org|months"
     )
 
@@ -264,11 +260,7 @@ class XFhirQueryTranslatorTest {
     val search = Search(ResourceType.Patient)
 
     search.applyFilterParam(
-      SearchParamDefinition(
-        "address-country",
-        Enumerations.SearchParamType.STRING,
-        "Patient.address.country"
-      ),
+      SearchParamDefinition("address-country", SearchParamType.STRING, "Patient.address.country"),
       "Karachi"
     )
 
@@ -282,7 +274,7 @@ class XFhirQueryTranslatorTest {
     val search = Search(ResourceType.Patient)
 
     search.applyFilterParam(
-      SearchParamDefinition("identifier", Enumerations.SearchParamType.TOKEN, "Patient.identifier"),
+      SearchParamDefinition("identifier", SearchParamType.TOKEN, "Patient.identifier"),
       "http://snomed.org|001122"
     )
 
@@ -299,7 +291,7 @@ class XFhirQueryTranslatorTest {
     search.applyFilterParam(
       SearchParamDefinition(
         "general-practitioner",
-        Enumerations.SearchParamType.REFERENCE,
+        SearchParamType.REFERENCE,
         "Patient.generalPractitioner"
       ),
       "Practitioner/111"
@@ -315,7 +307,7 @@ class XFhirQueryTranslatorTest {
     val search = Search(ResourceType.Measure)
 
     search.applyFilterParam(
-      SearchParamDefinition("url", Enumerations.SearchParamType.URI, "Measure.url"),
+      SearchParamDefinition("url", SearchParamType.URI, "Measure.url"),
       "http://fhir.org/Measure/meaure-1"
     )
 
@@ -331,7 +323,7 @@ class XFhirQueryTranslatorTest {
     val exception =
       assertThrows(UnsupportedOperationException::class.java) {
         search.applyFilterParam(
-          SearchParamDefinition("near", Enumerations.SearchParamType.SPECIAL, "Location.position"),
+          SearchParamDefinition("near", SearchParamType.SPECIAL, "Location.position"),
           "20.000839 30.378273"
         )
       }

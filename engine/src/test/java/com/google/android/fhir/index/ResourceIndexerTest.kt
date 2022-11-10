@@ -18,6 +18,7 @@ package com.google.android.fhir.index
 
 import android.os.Build
 import ca.uhn.fhir.context.FhirContext
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.epochDay
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.DateTimeIndex
@@ -591,7 +592,7 @@ class ResourceIndexerTest {
         resourceIndices.tokenIndices.any { tokenIndex -> tokenIndex.path == "Observation.code" }
       )
       .isFalse()
-    assertThat(resourceIndices.tokenIndices.any { tokenIndex -> tokenIndex.name.equals("code") })
+    assertThat(resourceIndices.tokenIndices.any { tokenIndex -> tokenIndex.name == "code" })
       .isFalse()
   }
 
@@ -967,7 +968,8 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.resourceId).isEqualTo(testInvoice.logicalId)
 
-    assertThat(resourceIndices.resourceType).isEqualTo(testInvoice.resourceType)
+    assertThat(resourceIndices.resourceType)
+      .isEqualTo(ResourceType.fromCode(testInvoice.resourceType.name))
 
     assertThat(resourceIndices.quantityIndices)
       .containsExactly(
@@ -1044,7 +1046,8 @@ class ResourceIndexerTest {
 
     val resourceIndices = ResourceIndexer.index(testQuestionnaire)
 
-    assertThat(resourceIndices.resourceType).isEqualTo(testQuestionnaire.resourceType)
+    assertThat(resourceIndices.resourceType)
+      .isEqualTo(ResourceType.fromCode(testQuestionnaire.resourceType.name))
 
     assertThat(resourceIndices.resourceId).isEqualTo(testQuestionnaire.logicalId)
 
@@ -1101,7 +1104,8 @@ class ResourceIndexerTest {
 
     val resourceIndices = ResourceIndexer.index(testPatient)
 
-    assertThat(resourceIndices.resourceType).isEqualTo(testPatient.resourceType)
+    assertThat(resourceIndices.resourceType)
+      .isEqualTo(ResourceType.fromCode(testPatient.resourceType.name))
 
     assertThat(resourceIndices.resourceId).isEqualTo(testPatient.logicalId)
 
@@ -1197,7 +1201,8 @@ class ResourceIndexerTest {
 
     val resourceIndices = ResourceIndexer.index(testLocation)
 
-    assertThat(resourceIndices.resourceType).isEqualTo(testLocation.resourceType)
+    assertThat(resourceIndices.resourceType)
+      .isEqualTo(ResourceType.fromCode(testLocation.resourceType.name))
 
     assertThat(resourceIndices.resourceId).isEqualTo(testLocation.logicalId)
 

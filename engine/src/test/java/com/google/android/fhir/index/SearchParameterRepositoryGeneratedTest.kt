@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package com.google.android.fhir.index
 
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.r4.model.Resource
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,25 +32,19 @@ class SearchParameterRepositoryGeneratedTest(private val resource: Resource) {
   }
 
   private fun getSearchParamListReflection(resource: Resource): MutableList<SearchParamDefinition> {
-    return resource
-      .javaClass
-      .fields
+    return resource.javaClass.fields
       .asSequence()
       .mapNotNull {
         it.getAnnotation(ca.uhn.fhir.model.api.annotation.SearchParamDefinition::class.java)
       }
       .filter { it.path.isNotEmpty() }
       .map {
-        SearchParamDefinition(
-          it.name,
-          Enumerations.SearchParamType.valueOf(it.type.toUpperCase()),
-          it.path
-        )
+        SearchParamDefinition(it.name, SearchParamType.valueOf(it.type.toUpperCase()), it.path)
       }
       .toMutableList()
   }
 
   private companion object {
-    @Parameterized.Parameters @JvmStatic fun data(): List<Resource> = getAllResources()
+    @Parameterized.Parameters @JvmStatic fun data(): List<IAnyResource> = getAllResources()
   }
 }

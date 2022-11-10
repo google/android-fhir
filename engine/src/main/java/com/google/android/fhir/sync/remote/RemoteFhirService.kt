@@ -16,6 +16,8 @@
 
 package com.google.android.fhir.sync.remote
 
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
@@ -41,7 +43,8 @@ internal interface RemoteFhirService : DataSource {
 
   class Builder(
     private val baseUrl: String,
-    private val networkConfiguration: NetworkConfiguration
+    private val networkConfiguration: NetworkConfiguration,
+    private val fhirContext: FhirContext
   ) {
     private var authenticator: Authenticator? = null
     private var httpLoggingInterceptor: HttpLoggingInterceptor? = null
@@ -81,7 +84,7 @@ internal interface RemoteFhirService : DataSource {
       return Retrofit.Builder()
         .baseUrl(baseUrl)
         .client(client)
-        .addConverterFactory(FhirConverterFactory.create())
+        .addConverterFactory(FhirConverterFactory.create(fhirContext))
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(RemoteFhirService::class.java)
@@ -89,7 +92,10 @@ internal interface RemoteFhirService : DataSource {
   }
 
   companion object {
-    fun builder(baseUrl: String, networkConfiguration: NetworkConfiguration) =
-      Builder(baseUrl, networkConfiguration)
+    fun builder(
+      baseUrl: String,
+      networkConfiguration: NetworkConfiguration,
+      fhirVersionEnum: FhirVersionEnum
+    ) = Builder(baseUrl, networkConfiguration, FhirContext.forCached(fhirVersionEnum))
   }
 }

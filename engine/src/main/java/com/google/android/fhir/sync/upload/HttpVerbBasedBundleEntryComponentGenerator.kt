@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.sync.upload
 
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import org.hl7.fhir.instance.model.api.IBaseResource
@@ -31,32 +32,51 @@ import org.hl7.fhir.r4.model.UriType
  * [Resource] for the [LocalChangeEntity]. See [https://www.hl7.org/fhir/http.html#transaction] for
  * more info regarding the supported [Bundle.HTTPVerb].
  */
-internal abstract class HttpVerbBasedBundleEntryComponentGenerator(
-  private val httpVerb: Bundle.HTTPVerb
-) {
-
+internal abstract class HttpVerbBasedBundleEntryComponentGenerator(private val httpVerb: String) {
   /**
    * Return [IBaseResource]? for the [LocalChangeEntity]. Implementation may return [null] when a
    * [Resource] may not be required in the request like in the case of a [Bundle.HTTPVerb.DELETE]
    * request.
    */
-  protected abstract fun getEntryResource(localChange: LocalChange): IBaseResource?
+  protected abstract fun getEntryResource(
+    localChange: LocalChange,
+    fhirVersionEnum: FhirVersionEnum
+  ): IBaseResource?
 
   /**
    * Returns a [Bundle.BundleEntryComponent] for a [SquashedLocalChange] to be added to the [Bundle]
    * .
    */
-  fun getEntry(squashedLocalChange: LocalChange): Bundle.BundleEntryComponent {
+  fun getEntryForR4(
+    squashedLocalChange: LocalChange,
+    fhirVersionEnum: FhirVersionEnum
+  ): Bundle.BundleEntryComponent {
     return Bundle.BundleEntryComponent().apply {
-      resource = getEntryResource(squashedLocalChange) as Resource?
-      request = getEntryRequest(squashedLocalChange)
+      resource = getEntryResource(squashedLocalChange, fhirVersionEnum) as Resource?
+      request =
+        Bundle.BundleEntryRequestComponent(
+          Enumeration(Bundle.HTTPVerbEnumFactory()).apply {
+            value = Bundle.HTTPVerb.fromCode(httpVerb)
+          },
+          UriType("${squashedLocalChange.resourceType}/${squashedLocalChange.resourceId}")
+        )
       fullUrl = request?.url
     }
   }
 
-  private fun getEntryRequest(localChange: LocalChange) =
-    Bundle.BundleEntryRequestComponent(
-      Enumeration(Bundle.HTTPVerbEnumFactory()).apply { value = httpVerb },
-      UriType("${localChange.resourceType}/${localChange.resourceId}")
-    )
+  fun getEntryForR5(
+    squashedLocalChange: LocalChange,
+    fhirVersionEnum: FhirVersionEnum
+  ): org.hl7.fhir.r5.model.Bundle.BundleEntryComponent {
+    return org.hl7.fhir.r5.model.Bundle.BundleEntryComponent().apply {
+      resource =
+        getEntryResource(squashedLocalChange, fhirVersionEnum) as org.hl7.fhir.r5.model.Resource?
+      request =
+        org.hl7.fhir.r5.model.Bundle.BundleEntryRequestComponent(
+          org.hl7.fhir.r5.model.Bundle.HTTPVerb.fromCode(httpVerb),
+          "${squashedLocalChange.resourceType}/${squashedLocalChange.resourceId}"
+        )
+      fullUrl = request?.url
+    }
+  }
 }

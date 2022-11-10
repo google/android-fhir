@@ -46,6 +46,7 @@ class BundleUploaderTest {
           TestingUtils.BundleDataSource {
             Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
           },
+          FhirVersionEnum.R4,
           TransactionBundleGenerator.getDefault(),
           LocalChangesPaginator.DEFAULT
         )
@@ -70,6 +71,7 @@ class BundleUploaderTest {
               )
             }
           },
+          FhirVersionEnum.R4,
           TransactionBundleGenerator.getDefault(),
           LocalChangesPaginator.DEFAULT
         )
@@ -85,6 +87,7 @@ class BundleUploaderTest {
     val result =
       BundleUploader(
           TestingUtils.BundleDataSource { throw ConnectException("Failed to connect to server.") },
+          FhirVersionEnum.R4,
           TransactionBundleGenerator.getDefault(),
           LocalChangesPaginator.DEFAULT
         )

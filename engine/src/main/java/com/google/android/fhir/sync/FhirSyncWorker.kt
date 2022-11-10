@@ -21,6 +21,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
@@ -87,6 +88,8 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         }
       }
 
+    val fhirVersionEnum = FhirVersionEnum.forVersionString(inputData.getString(FHIR_VERSION))
+
     Timber.v("Subscribed to flow for progress")
     val result =
       FhirSynchronizer(
@@ -94,6 +97,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
           getFhirEngine(),
           BundleUploader(
             dataSource,
+            fhirVersionEnum,
             TransactionBundleGenerator.getDefault(),
             LocalChangesPaginator.create(getUploadConfiguration())
           ),
