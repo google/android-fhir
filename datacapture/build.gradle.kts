@@ -70,7 +70,7 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  debugImplementation(project(":engine"))
+  implementation(project(":engine"))
 
   implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.Androidx.appCompat)
@@ -88,8 +88,6 @@ dependencies {
   implementation(Dependencies.material)
   implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.timber)
-
-  releaseImplementation(Dependencies.androidFhirEngine)
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)

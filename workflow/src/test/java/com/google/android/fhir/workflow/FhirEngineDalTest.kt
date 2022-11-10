@@ -19,6 +19,7 @@ package com.google.android.fhir.workflow
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.ResourceType
 import com.google.android.fhir.search.search
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
@@ -26,7 +27,6 @@ import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.ResourceType
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
