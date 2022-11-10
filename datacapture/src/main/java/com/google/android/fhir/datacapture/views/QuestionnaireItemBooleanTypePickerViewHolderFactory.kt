@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
-import android.widget.TextView
 import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
@@ -40,7 +39,6 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
       private lateinit var radioGroup: ConstraintLayout
       private lateinit var yesRadioButton: RadioButton
       private lateinit var noRadioButton: RadioButton
-      private lateinit var error: TextView
       private lateinit var flow: Flow
 
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
@@ -50,7 +48,6 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
         radioGroup = itemView.findViewById(R.id.radio_group)
         yesRadioButton = itemView.findViewById(R.id.yes_radio_button)
         noRadioButton = itemView.findViewById(R.id.no_radio_button)
-        error = itemView.findViewById(R.id.error)
         flow = itemView.findViewById(R.id.flow)
       }
 
