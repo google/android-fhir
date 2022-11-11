@@ -273,9 +273,13 @@ internal val Date.localDate
 internal fun parseDate(text: CharSequence?, context: Context): LocalDate {
   val localDate =
     if (isAndroidIcuSupported()) {
-        DateFormat.getDateInstance(DateFormat.SHORT).parse(text.toString())
+        DateFormat.getDateInstance(DateFormat.SHORT)
+          .apply { isLenient = false }
+          .parse(text.toString())
       } else {
-        android.text.format.DateFormat.getDateFormat(context).parse(text.toString())
+        android.text.format.DateFormat.getDateFormat(context)
+          .apply { isLenient = false }
+          .parse(text.toString())
       }
       .localDate
   // date/localDate with year more than 4 digit throws data format exception if deep copy
@@ -289,7 +293,7 @@ internal fun parseDate(text: CharSequence?, context: Context): LocalDate {
   return localDate
 }
 
-// https://stackoverflow.com/questions/42950812/count-number-of-digits-in-kotlin
+// Count the number of digits in an Integer
 internal fun Int.length() =
   when (this) {
     0 -> 1
