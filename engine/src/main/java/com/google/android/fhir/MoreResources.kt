@@ -20,10 +20,6 @@ import java.lang.reflect.InvocationTargetException
 import java.util.Date
 import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.instance.model.api.IBaseMetaType
-import org.hl7.fhir.r4.model.Configuration
-
-/** The HAPI Fhir package prefix for R4 resources. */
-internal const val R4_RESOURCE_PACKAGE_PREFIX = "org.hl7.fhir.r4.model."
 
 /**
  * Returns the FHIR resource type.
@@ -44,21 +40,13 @@ fun <R : IAnyResource> getResourceType(clazz: Class<R>): ResourceType {
   }
 }
 
-// TODO: Figure out how to make the R4_RESOURCE_PACKAGE_PREFIX a variable where we can sub in
-// version
 /** Returns the {@link Class} object for the resource type. */
-fun <R : IAnyResource> getResourceClass(resourceType: ResourceType): Class<R> =
+inline fun <reified R : IAnyResource> getResourceClass(resourceType: ResourceType): Class<R> =
   getResourceClass(resourceType.name)
 
 /** Returns the {@link Class} object for the resource type. */
-fun <R : IAnyResource> getResourceClass(resourceType: String): Class<R> {
-  // Remove any curly brackets in the resource type string. This is to work around an issue with
-  // JSON deserialization in the CQL engine on Android. The resource type string incorrectly
-  // includes namespace prefix in curly brackets, e.g. "{http://hl7.org/fhir}Patient" instead of
-  // "Patient".
-  // TODO: remove this once a fix has been found for the CQL engine on Android.
-  val className = resourceType.replace(Regex("\\{[^}]*\\}"), "")
-  return Class.forName(R4_RESOURCE_PACKAGE_PREFIX + className) as Class<R>
+inline fun <reified R : IAnyResource> getResourceClass(resourceType: String): Class<R> {
+  return Class.forName(R::class.java.`package`?.name + "." + resourceType) as Class<R>
 }
 
 val IAnyResource.resourceType: ResourceType
@@ -94,13 +82,7 @@ internal fun IBaseMetaType.hasLastUpdated(): Boolean {
 internal val IBaseMetaType.lastUpdatedElement: Long
   get() {
     if (this.lastUpdated == null) {
-      if (Configuration.errorOnAutoCreate()) {
-        throw Error("Attempt to auto-create Meta.lastUpdated")
-      }
-
-      if (Configuration.doAutoCreate()) {
-        this.lastUpdated = Date()
-      }
+      this.lastUpdated = Date()
     }
     return this.lastUpdated.time
   }
