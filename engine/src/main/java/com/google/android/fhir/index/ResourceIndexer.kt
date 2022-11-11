@@ -601,7 +601,7 @@ data class LocationPositionComponent(val latitude: Double, val longitude: Double
 
 data class Money(val currency: String, val value: BigDecimal)
 
-data class Identifier(val system: String, val value: String?)
+data class Identifier(val system: String?, val value: String?)
 
 data class Quantity(
   val unit: String?,

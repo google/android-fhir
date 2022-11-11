@@ -39,12 +39,9 @@ import com.google.android.fhir.search.filter.TokenParamFilterCriteria
 import com.google.android.fhir.search.filter.TokenParamFilterCriterion
 import com.google.android.fhir.search.filter.UriFilterCriteria
 import com.google.android.fhir.search.filter.UriParamFilterCriterion
-import org.hl7.fhir.r4.model.Patient
 
 @SearchDslMarker
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
-  // TODO(omarismail): Figure out what this patient variable is needed
-  internal val p = Patient()
   internal val stringFilterCriteria = mutableListOf<StringParamFilterCriteria>()
   internal val dateTimeFilterCriteria = mutableListOf<DateClientParamFilterCriteria>()
   internal val numberFilterCriteria = mutableListOf<NumberParamFilterCriteria>()
