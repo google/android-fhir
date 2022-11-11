@@ -20,9 +20,6 @@ import java.lang.reflect.InvocationTargetException
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
-/** The HAPI Fhir package prefix for R4 resources. */
-internal const val R4_RESOURCE_PACKAGE_PREFIX = "org.hl7.fhir.r4.model."
-
 /**
  * Returns the FHIR resource type.
  *
@@ -43,18 +40,18 @@ fun <R : Resource> getResourceType(clazz: Class<R>): ResourceType {
 }
 
 /** Returns the {@link Class} object for the resource type. */
-fun <R : Resource> getResourceClass(resourceType: ResourceType): Class<R> =
+inline fun <reified R : Resource> getResourceClass(resourceType: ResourceType): Class<R> =
   getResourceClass(resourceType.name)
 
 /** Returns the {@link Class} object for the resource type. */
-fun <R : Resource> getResourceClass(resourceType: String): Class<R> {
+inline fun <reified R : Resource> getResourceClass(resourceType: String): Class<R> {
   // Remove any curly brackets in the resource type string. This is to work around an issue with
   // JSON deserialization in the CQL engine on Android. The resource type string incorrectly
   // includes namespace prefix in curly brackets, e.g. "{http://hl7.org/fhir}Patient" instead of
   // "Patient".
   // TODO: remove this once a fix has been found for the CQL engine on Android.
   val className = resourceType.replace(Regex("\\{[^}]*\\}"), "")
-  return Class.forName(R4_RESOURCE_PACKAGE_PREFIX + className) as Class<R>
+  return Class.forName(R::class.java.`package`?.name + "." + className) as Class<R>
 }
 
 internal val Resource.versionId
