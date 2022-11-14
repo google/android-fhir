@@ -1796,7 +1796,11 @@ class QuestionnaireViewModelTest(
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
-            pages = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true)),
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = false)
+              ),
             currentPageIndex = 0
           )
         )
@@ -1853,7 +1857,11 @@ class QuestionnaireViewModelTest(
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
-            pages = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true)),
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = false)
+              ),
             currentPageIndex = 1
           )
         )
@@ -1902,7 +1910,11 @@ class QuestionnaireViewModelTest(
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
-            pages = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true)),
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = false)
+              ),
             currentPageIndex = 0
           )
         )
@@ -1971,10 +1983,151 @@ class QuestionnaireViewModelTest(
             isPaginated = true,
             pages =
               listOf(
-                QuestionnairePage(0, true),
-                QuestionnairePage(1, false),
-                QuestionnairePage(2, true)
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = false, hidden = false),
+                QuestionnairePage(2, enabled = true, hidden = false),
               ),
+            currentPageIndex = 2
+          )
+        )
+    }
+  }
+
+  @Test
+  fun `should skip first page if it is hidden in a paginated questionnaire`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addExtension().apply {
+              url = EXTENSION_HIDDEN_URL
+              setValue(BooleanType(true))
+            }
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 1"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 2"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page3"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page3-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 3"
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages =
+            listOf(
+              QuestionnairePage(0, enabled = true, hidden = true),
+              QuestionnairePage(1, enabled = true, hidden = false),
+              QuestionnairePage(2, enabled = true, hidden = false)
+            ),
+            currentPageIndex = 2
+          )
+        )
+    }
+  }
+
+  @Test
+  fun `should skip hidden page in a paginated questionnaire`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 1"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addExtension().apply {
+              url = EXTENSION_HIDDEN_URL
+              setValue(BooleanType(true))
+            }
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 2"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page3"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page3-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 3"
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
+      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages =
+            listOf(
+              QuestionnairePage(0, enabled = true, hidden = false),
+              QuestionnairePage(1, enabled = true, hidden = true),
+              QuestionnairePage(2, enabled = true, hidden = false)
+            ),
             currentPageIndex = 2
           )
         )
