@@ -82,6 +82,11 @@ object ResourceMapper {
     with(FhirContext.forCached(FhirVersionEnum.R4)) {
       FHIRPathEngine(HapiWorkerContext(this, this.validationSupport))
     }
+  /**
+   * mutable map of key-canonical url as string for profile and value- StructureDefinition of
+   * Resource claims to conforms to.
+   */
+  private val structureDefinitionMap: MutableMap<String, StructureDefinition> = hashMapOf()
 
   /**
    * Extract FHIR resources from a [questionnaire] and [questionnaireResponse].
@@ -114,33 +119,11 @@ object ResourceMapper {
     structureMapExtractionContext: StructureMapExtractionContext? = null,
     profileLoader: ProfileLoader? = null,
   ): Bundle {
-    /**
-     * mutable map of key-canonical url as string for profile and value- StructureDefinition of
-     * Resource claims to conforms to.
-     */
-    val structureDefinitionMap: MutableMap<String, StructureDefinition> = hashMapOf()
-    val profiles: List<CanonicalType> = questionnaire.meta.profile
-    if (!profiles.isNullOrEmpty()) {
-      profiles.forEach {
-        if (it.toString().startsWith(FHIR_PROFILE_CANONICAL_URL_PREFIX)) {
-          Timber.d("resource conform to FHIR standard profile $it")
-        } else {
-
-          val structureDefinition = loadProfile(it, profileLoader)
-          // Base FHIR resource will be extracted as StructureDefinition is not provided for
-          // resource conforming profile.
-          structureDefinition?.let { structureDefinitionMap.put(it.url, it) }
-        }
-      }
-    }
+    // clear map before every questionnaire extraction
+    structureDefinitionMap.clear()
     return when {
       questionnaire.targetStructureMap == null ->
-        extractByDefinition(
-          questionnaire,
-          questionnaireResponse,
-          structureDefinitionMap,
-          profileLoader
-        )
+        extractByDefinition(questionnaire, questionnaireResponse, profileLoader)
       structureMapExtractionContext != null -> {
         extractByStructureMap(questionnaire, questionnaireResponse, structureMapExtractionContext)
       }
@@ -160,7 +143,6 @@ object ResourceMapper {
   private fun extractByDefinition(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    structureDefinitionMap: MutableMap<String, StructureDefinition>,
     profileLoader: ProfileLoader?
   ): Bundle {
     val rootResource: Resource? = questionnaire.createResource()
@@ -171,7 +153,6 @@ object ResourceMapper {
       questionnaireResponse.item,
       rootResource,
       extractedResources,
-      structureDefinitionMap,
       profileLoader
     )
 
@@ -309,7 +290,6 @@ object ResourceMapper {
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     extractionContext: Base?,
     extractionResult: MutableList<Resource>,
-    structureDefinitionMap: MutableMap<String, StructureDefinition>,
     profileLoader: ProfileLoader?
   ) {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
@@ -331,7 +311,6 @@ object ResourceMapper {
           currentQuestionnaireResponseItem,
           extractionContext,
           extractionResult,
-          structureDefinitionMap,
           profileLoader
         )
       }
@@ -352,7 +331,6 @@ object ResourceMapper {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     extractionContext: Base?,
     extractionResult: MutableList<Resource>,
-    structureDefinitionMap: MutableMap<String, StructureDefinition>,
     profileLoader: ProfileLoader?
   ) {
     when (questionnaireItem.type) {
@@ -371,7 +349,6 @@ object ResourceMapper {
               questionnaireItem,
               questionnaireResponseItem,
               extractionResult,
-              structureDefinitionMap,
               profileLoader
             )
           questionnaireItem.definition != null -> {
@@ -384,7 +361,6 @@ object ResourceMapper {
               questionnaireResponseItem,
               extractionContext,
               extractionResult,
-              structureDefinitionMap,
               profileLoader
             )
           }
@@ -395,7 +371,6 @@ object ResourceMapper {
               questionnaireResponseItem.item,
               extractionContext,
               extractionResult,
-              structureDefinitionMap,
               profileLoader
             )
         }
@@ -409,7 +384,6 @@ object ResourceMapper {
             questionnaireItem,
             questionnaireResponseItem,
             extractionContext,
-            structureDefinitionMap,
             profileLoader
           )
         }
@@ -425,7 +399,6 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     extractionResult: MutableList<Resource>,
-    structureDefinitionMap: MutableMap<String, StructureDefinition>,
     profileLoader: ProfileLoader?
   ) {
     val resource = questionnaireItem.createResource() as Resource
@@ -434,7 +407,6 @@ object ResourceMapper {
       questionnaireResponseItem.item,
       resource,
       extractionResult,
-      structureDefinitionMap,
       profileLoader
     )
     extractionResult += resource
@@ -450,7 +422,6 @@ object ResourceMapper {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     base: Base,
     extractionResult: MutableList<Resource>,
-    structureDefinitionMap: MutableMap<String, StructureDefinition>,
     profileLoader: ProfileLoader?
   ) {
     val fieldName = getFieldNameByDefinition(questionnaireItem.definition)
@@ -468,7 +439,6 @@ object ResourceMapper {
       questionnaireResponseItem.item,
       value,
       extractionResult,
-      structureDefinitionMap,
       profileLoader
     )
   }
@@ -481,7 +451,6 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     base: Base,
-    structureDefinitionMap: MutableMap<String, StructureDefinition>,
     profileLoader: ProfileLoader?
   ) {
     if (questionnaireResponseItem.answer.isEmpty()) return

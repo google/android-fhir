@@ -252,6 +252,11 @@ class ResourceMapperInstrumentedTest {
       val structureDefinition =
         when (url.valueAsString) {
           "http://fhir.org/guides/who/core/StructureDefinition/who-patient" -> {
+            /**
+             * ThIs json file is available at
+             * https://build.fhir.org/ig/WorldHealthOrganization/smart-anc/branches/master/StructureDefinition-who-patient.profile.json.html
+             * in WHO IG can be downloaded as raw json file
+             */
             getStructureDefinition("structure_definition_who_patient.json", context)
           }
           else -> null
