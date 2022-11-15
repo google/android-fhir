@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,12 @@ import org.junit.runners.Parameterized
 class SearchParameterRepositoryGeneratedTest(private val resource: Resource) {
   @Test
   fun testResources() {
-    assertThat(getSearchParamList(resource))
+    assertThat(getSearchParamList(resource.resourceType))
       .containsExactlyElementsIn(getSearchParamListReflection(resource))
   }
 
   private fun getSearchParamListReflection(resource: Resource): MutableList<SearchParamDefinition> {
-    return resource
-      .javaClass
-      .fields
+    return resource.javaClass.fields
       .asSequence()
       .mapNotNull {
         it.getAnnotation(ca.uhn.fhir.model.api.annotation.SearchParamDefinition::class.java)

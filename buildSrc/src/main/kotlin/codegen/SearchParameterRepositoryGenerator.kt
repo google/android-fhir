@@ -28,6 +28,7 @@ import kotlin.collections.HashMap
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.SearchParameter
 
 /**
@@ -88,13 +89,13 @@ internal object SearchParameterRepositoryGenerator {
 
     val getSearchParamListFunction =
       FunSpec.builder("getSearchParamList")
-        .addParameter("resource", Resource::class)
+        .addParameter("resourceType", ResourceType::class)
         .returns(
           ClassName("kotlin.collections", "List").parameterizedBy(searchParamDefinitionClass)
         )
         .addModifiers(KModifier.INTERNAL)
         .addKdoc(generatedComment)
-        .beginControlFlow("return when (resource.fhirType())")
+        .beginControlFlow("return when (resourceType.name)")
 
     // Helper function used in SearchParameterRepositoryGeneratedTest
     val testHelperFunctionCodeBlock =
@@ -175,8 +176,7 @@ internal object SearchParameterRepositoryGenerator {
     return if (searchParam.base.size == 1) {
       mapOf(searchParam.base.single().valueAsString to searchParam.expression)
     } else {
-      searchParam
-        .expression
+      searchParam.expression
         .split("|")
         .groupBy { splitString -> splitString.split(".").first().trim().removePrefix("(") }
         .mapValues { it.value.joinToString(" | ") { join -> join.trim() } }

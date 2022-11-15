@@ -23,7 +23,6 @@ import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.gclient.UriClientParam
-import com.google.android.fhir.getResourceClass
 import com.google.android.fhir.index.SearchParamDefinition
 import com.google.android.fhir.index.getSearchParamList
 import com.google.android.fhir.isValidDateOnly
@@ -36,7 +35,6 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Quantity
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /**
@@ -174,9 +172,6 @@ object XFhirQueryTranslator {
         throw UnsupportedOperationException("${param.type} sort not supported in x-fhir-query")
     }
 
-  private val ResourceType.resourceSearchParameters
-    get() = getSearchParamList(getResourceClass<Resource>(this).newInstance())
-
   /** Parse string key-val map to SearchParamDefinition-Value map */
   private fun Map<String, String>.toSearchParamDefinitionValueMap(
     type: ResourceType
@@ -189,7 +184,7 @@ object XFhirQueryTranslator {
 
   /** Parse param to SearchParamDefinition for given resourceType */
   private fun String.toSearchParamDefinition(resourceType: ResourceType) =
-    resourceType.resourceSearchParameters.find { it.name == this }
+    getSearchParamList(resourceType).find { it.name == this }
       ?: throw IllegalArgumentException("$this not found in ${resourceType.name}")
 
   /**

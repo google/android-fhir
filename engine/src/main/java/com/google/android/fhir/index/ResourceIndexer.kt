@@ -72,7 +72,7 @@ internal object ResourceIndexer {
 
   private fun <R : Resource> extractIndexValues(resource: R): ResourceIndices {
     val indexBuilder = ResourceIndices.Builder(resource.resourceType, resource.logicalId)
-    getSearchParamList(resource)
+    getSearchParamList(resource.resourceType)
       .map { it to fhirPathEngine.evaluate(resource, it.path) }
       .flatMap { pair -> pair.second.map { pair.first to it } }
       .forEach { pair ->
