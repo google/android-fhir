@@ -20,6 +20,7 @@ import android.app.Application
 import android.net.Uri
 import android.os.Build
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
@@ -44,9 +45,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 import kotlin.test.assertFailsWith
-import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -76,14 +75,13 @@ import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.ParameterizedRobolectricTestRunner.Parameters
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
-import org.robolectric.shadows.ShadowLooper
 import org.robolectric.util.ReflectionHelpers
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
 class QuestionnaireViewModelTest(
   private val questionnaireSource: QuestionnaireSource,
-  private val questionnaireResponseSource: QuestionnaireResponseSource
+  private val questionnaireResponseSource: QuestionnaireResponseSource,
 ) {
   @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
 
@@ -1312,23 +1310,11 @@ class QuestionnaireViewModelTest(
       }
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    var questionnaireItemViewItem: QuestionnaireItemViewItem? = null
 
-    val observer =
-      launch(Dispatchers.Main) {
-        viewModel.questionnaireStateFlow.collect { questionnaireItemViewItem = it.items.single() }
-      }
-    try {
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-      questionnaireItemViewItem!!.clearAnswer()
-
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-      assertThat(questionnaireItemViewItem!!.validationResult)
+    viewModel.runViewModelBlocking {
+      viewModel.getQuestionnaireItemViewItemList().single().clearAnswer()
+      assertThat(viewModel.getQuestionnaireItemViewItemList().single().validationResult)
         .isEqualTo(Invalid(listOf("Missing answer for required field.")))
-    } finally {
-      observer.cancel()
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-      observer.cancelAndJoin()
     }
   }
 
@@ -1529,6 +1515,181 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
+  fun questionnaireHasNestedItem_ofTypeRepeatedGroup_shouldNestMultipleItems() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "repeated-group-a"
+            text = "Group question A"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            repeats = true
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-item-a"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "another-nested-item-a"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "repeated-group-b"
+            text = "Group question B"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            repeats = true
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-item-b"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "another-nested-item-b"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    fun repeatedGroupA() =
+      viewModel.getQuestionnaireItemViewItemList().single {
+        it.questionnaireItem.linkId == "repeated-group-a"
+      }
+
+    fun repeatedGroupB() =
+      viewModel.getQuestionnaireItemViewItemList().single {
+        it.questionnaireItem.linkId == "repeated-group-b"
+      }
+    viewModel.runViewModelBlocking {
+      // Calling addAnswer out of order should not result in the answers in the response being out
+      // of order; all of the answers to repeated-group-a should come before repeated-group-b.
+      repeat(times = 2) {
+        repeatedGroupA()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item = repeatedGroupA().questionnaireItem.getNestedQuestionnaireResponseItems()
+            }
+          )
+        repeatedGroupB()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item = repeatedGroupB().questionnaireItem.getNestedQuestionnaireResponseItems()
+            }
+          )
+      }
+
+      assertThat(viewModel.getQuestionnaireItemViewItemList().map { it.questionnaireItem.linkId })
+        .containsExactly(
+          "repeated-group-a",
+          "nested-item-a",
+          "another-nested-item-a",
+          "nested-item-a",
+          "another-nested-item-a",
+          "repeated-group-b",
+          "nested-item-b",
+          "another-nested-item-b",
+          "nested-item-b",
+          "another-nested-item-b"
+        )
+        .inOrder()
+
+      assertResourceEquals(
+        actual = viewModel.getQuestionnaireResponse(),
+        expected =
+          QuestionnaireResponse().apply {
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "repeated-group-a"
+                text = "Group question A"
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-item-a"
+                    text = "Basic question"
+                  }
+                )
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "another-nested-item-a"
+                    text = "Basic question"
+                  }
+                )
+              }
+            )
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "repeated-group-a"
+                text = "Group question A"
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-item-a"
+                    text = "Basic question"
+                  }
+                )
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "another-nested-item-a"
+                    text = "Basic question"
+                  }
+                )
+              }
+            )
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "repeated-group-b"
+                text = "Group question B"
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-item-b"
+                    text = "Basic question"
+                  }
+                )
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "another-nested-item-b"
+                    text = "Basic question"
+                  }
+                )
+              }
+            )
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "repeated-group-b"
+                text = "Group question B"
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-item-b"
+                    text = "Basic question"
+                  }
+                )
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "another-nested-item-b"
+                    text = "Basic question"
+                  }
+                )
+              }
+            )
+          }
+      )
+    }
+  }
+
+  @Test
   @Ignore("https://github.com/google/android-fhir/issues/487")
   fun questionnaireHasNestedItem_notOfTypeGroup_shouldNestItemWithinAnswerItem() = runBlocking {
     val questionnaire =
@@ -1686,18 +1847,9 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    var pagination: QuestionnairePagination? = null
-
-    val observer =
-      launch(Dispatchers.Main) {
-        viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
-      }
-    try {
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+    viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
-
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-      assertThat(pagination)
+      assertThat(viewModel.questionnaireStateFlow.value.pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -1705,10 +1857,6 @@ class QuestionnaireViewModelTest(
             currentPageIndex = 1
           )
         )
-    } finally {
-      observer.cancel()
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-      observer.cancelAndJoin()
     }
   }
 
@@ -1747,19 +1895,10 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    var pagination: QuestionnairePagination? = null
-
-    val observer =
-      launch(Dispatchers.Main) {
-        viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
-      }
-    try {
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+    viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       viewModel.goToPreviousPage()
-
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-      assertThat(pagination)
+      assertThat(viewModel.questionnaireStateFlow.value.pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -1767,10 +1906,6 @@ class QuestionnaireViewModelTest(
             currentPageIndex = 0
           )
         )
-    } finally {
-      observer.cancel()
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-      observer.cancelAndJoin()
     }
   }
 
@@ -1828,18 +1963,9 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    var pagination: QuestionnairePagination? = null
-
-    val observer =
-      launch(Dispatchers.Main) {
-        viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
-      }
-    try {
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+    viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
-
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-      assertThat(pagination)
+      assertThat(viewModel.questionnaireStateFlow.value.pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -1852,10 +1978,6 @@ class QuestionnaireViewModelTest(
             currentPageIndex = 2
           )
         )
-    } finally {
-      observer.cancel()
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-      observer.cancelAndJoin()
     }
   }
 
@@ -1900,18 +2022,10 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    var pagination: QuestionnairePagination? = null
-    val observer =
-      launch(Dispatchers.Main) {
-        viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
-      }
-    try {
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+    viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-      assertThat(pagination)
+      assertThat(viewModel.questionnaireStateFlow.value.pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -1919,10 +2033,6 @@ class QuestionnaireViewModelTest(
             currentPageIndex = 1
           )
         )
-    } finally {
-      observer.cancel()
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-      observer.cancelAndJoin()
     }
   }
 
@@ -1967,19 +2077,12 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    var pagination: QuestionnairePagination? = null
-    val observer =
-      launch(Dispatchers.Main) {
-        viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
-      }
-    try {
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+    viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       viewModel.goToPreviousPage()
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-      assertThat(pagination)
+      assertThat(viewModel.questionnaireStateFlow.value.pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -1987,10 +2090,6 @@ class QuestionnaireViewModelTest(
             currentPageIndex = 0
           )
         )
-    } finally {
-      observer.cancel()
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-      observer.cancelAndJoin()
     }
   }
 
@@ -2034,17 +2133,10 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    var pagination: QuestionnairePagination? = null
-    val observer =
-      launch(Dispatchers.Main) {
-        viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
-      }
-    try {
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+    viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
-      assertThat(pagination)
+      assertThat(viewModel.questionnaireStateFlow.value.pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2052,10 +2144,6 @@ class QuestionnaireViewModelTest(
             currentPageIndex = 0
           )
         )
-    } finally {
-      observer.cancel()
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-      observer.cancelAndJoin()
     }
   }
 
@@ -2103,7 +2191,7 @@ class QuestionnaireViewModelTest(
     viewModel.goToNextPage()
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.pages?.last()?.index)
+    assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.last()?.index)
   }
 
   @Test
@@ -2151,7 +2239,7 @@ class QuestionnaireViewModelTest(
     viewModel.goToPreviousPage()
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertTrue(viewModel.currentPageIndexFlow.value == viewModel.pages?.first()?.index)
+    assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.first()?.index)
   }
 
   @Test
@@ -2278,18 +2366,11 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    var pagination: QuestionnairePagination? = null
-    val observer =
-      launch(Dispatchers.Main) {
-        viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
-      }
-    try {
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+    viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
-      assertThat(pagination)
+      assertThat(viewModel.questionnaireStateFlow.value.pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2297,10 +2378,6 @@ class QuestionnaireViewModelTest(
             currentPageIndex = 1
           )
         )
-    } finally {
-      observer.cancel()
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-      observer.cancelAndJoin()
     }
   }
 
@@ -2344,17 +2421,10 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    var pagination: QuestionnairePagination? = null
-    val observer =
-      launch(Dispatchers.Main) {
-        viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
-      }
-    try {
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+    viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
-      assertThat(pagination)
+      assertThat(viewModel.questionnaireStateFlow.value.pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2362,10 +2432,6 @@ class QuestionnaireViewModelTest(
             currentPageIndex = 0
           )
         )
-    } finally {
-      observer.cancel()
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-      observer.cancelAndJoin()
     }
   }
 
@@ -2410,18 +2476,11 @@ class QuestionnaireViewModelTest(
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    var pagination: QuestionnairePagination? = null
-    val observer =
-      launch(Dispatchers.Main) {
-        viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
-      }
-    try {
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+    viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       viewModel.goToPreviousPage()
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
-      assertThat(pagination)
+      assertThat(viewModel.questionnaireStateFlow.value.pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2429,10 +2488,6 @@ class QuestionnaireViewModelTest(
             currentPageIndex = 1
           )
         )
-    } finally {
-      observer.cancel()
-      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-      observer.cancelAndJoin()
     }
   }
 
@@ -2928,21 +2983,10 @@ class QuestionnaireViewModelTest(
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
-      var pagination: QuestionnairePagination? = null
-      val observer =
-        launch(Dispatchers.Main) {
-          viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
-        }
-      try {
-        ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      viewModel.runViewModelBlocking {
         viewModel.goToNextPage()
-        ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
-        assertThat(pagination?.showReviewButton).isFalse()
-      } finally {
-        observer.cancel()
-        ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-        observer.cancelAndJoin()
+        assertThat(viewModel.questionnaireStateFlow.value.pagination.showReviewButton).isFalse()
       }
     }
 
@@ -2982,21 +3026,10 @@ class QuestionnaireViewModelTest(
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
-      var pagination: QuestionnairePagination? = null
-      val observer =
-        launch(Dispatchers.Main) {
-          viewModel.questionnaireStateFlow.collect { pagination = it.pagination }
-        }
-      try {
-        ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      viewModel.runViewModelBlocking {
         viewModel.goToNextPage()
-        ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
 
-        assertThat(pagination?.showReviewButton).isTrue()
-      } finally {
-        observer.cancel()
-        ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
-        observer.cancelAndJoin()
+        assertThat(viewModel.questionnaireStateFlow.value.pagination.showReviewButton).isTrue()
       }
     }
 
@@ -3351,7 +3384,7 @@ class QuestionnaireViewModelTest(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse? = null,
     enableReviewPage: Boolean = false,
-    showReviewPageFirst: Boolean = false
+    showReviewPageFirst: Boolean = false,
   ): QuestionnaireViewModel {
     if (questionnaireSource == QuestionnaireSource.STRING) {
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
@@ -3388,8 +3421,8 @@ class QuestionnaireViewModelTest(
     return QuestionnaireViewModel(context, state)
   }
 
-  private suspend fun QuestionnaireViewModel.getQuestionnaireItemViewItemList() =
-    questionnaireStateFlow.first().items
+  private fun QuestionnaireViewModel.getQuestionnaireItemViewItemList() =
+    questionnaireStateFlow.value.items
 
   private fun QuestionnaireItemViewItem.getQuestionnaireResponseItem() =
     ReflectionHelpers.getField<QuestionnaireResponse.QuestionnaireResponseItemComponent>(
@@ -3415,8 +3448,9 @@ class QuestionnaireViewModelTest(
 
     val printer: IParser = FhirContext.forR4().newJsonParser()
 
-    fun assertResourceEquals(r1: IBaseResource, r2: IBaseResource) {
-      assertThat(printer.encodeResourceToString(r1)).isEqualTo(printer.encodeResourceToString(r2))
+    fun <T : IBaseResource> assertResourceEquals(actual: T, expected: T) {
+      assertThat(printer.encodeResourceToString(actual))
+        .isEqualTo(printer.encodeResourceToString(expected))
     }
 
     @JvmStatic
@@ -3429,6 +3463,26 @@ class QuestionnaireViewModelTest(
         arrayOf(QuestionnaireSource.STRING, QuestionnaireResponseSource.STRING)
       )
   }
+}
+
+/**
+ * Runs code that relies on the [QuestionnaireViewModel.viewModelScope]. Runs on [Dispatchers.Main],
+ * so that `ShadowLooper` idle functions are not necessary.
+ */
+private inline fun QuestionnaireViewModel.runViewModelBlocking(
+  crossinline block: suspend () -> Unit,
+) {
+  // Workaround for viewModelScope printing exceptions to the console, but not failing the test:
+  // https://github.com/Kotlin/kotlinx.coroutines/issues/1205
+  var throwable: Throwable? = null
+  viewModelScope.launch(Dispatchers.Main) {
+    try {
+      block()
+    } catch (t: Throwable) {
+      throwable = t
+    }
+  }
+  throwable?.let { throw it }
 }
 
 /** The source of questionnaire. */
