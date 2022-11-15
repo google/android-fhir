@@ -2052,11 +2052,11 @@ class QuestionnaireViewModelTest(
           QuestionnairePagination(
             isPaginated = true,
             pages =
-            listOf(
-              QuestionnairePage(0, enabled = true, hidden = true),
-              QuestionnairePage(1, enabled = true, hidden = false),
-              QuestionnairePage(2, enabled = true, hidden = false)
-            ),
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = true),
+                QuestionnairePage(1, enabled = true, hidden = false),
+                QuestionnairePage(2, enabled = true, hidden = false)
+              ),
             currentPageIndex = 2
           )
         )
@@ -2123,11 +2123,11 @@ class QuestionnaireViewModelTest(
           QuestionnairePagination(
             isPaginated = true,
             pages =
-            listOf(
-              QuestionnairePage(0, enabled = true, hidden = false),
-              QuestionnairePage(1, enabled = true, hidden = true),
-              QuestionnairePage(2, enabled = true, hidden = false)
-            ),
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = true),
+                QuestionnairePage(2, enabled = true, hidden = false)
+              ),
             currentPageIndex = 2
           )
         )
