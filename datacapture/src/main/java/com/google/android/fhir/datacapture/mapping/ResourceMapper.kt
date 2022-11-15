@@ -536,20 +536,20 @@ private fun updateFieldWithEnum(base: Base, field: Field, value: Base) {
 }
 
 /**
- * Listing down api's that may be used to updateField values. For any primitive value e.g for
- * Patient.active which is of BooleanType
- * 1. setActiveElement(BooleanType)
- * 2. setActive(boolean)
+ * The api's used to updateField with answers are:
  *
- * For Parameterized list of custom type e.g Patient.name of type List<HumanName>
- * 1. addName() - add an empty HumanName and return it.
- * 2. addName(HumanName) - adds a new Name to the list.
- * 3. setName(List<HumanName>) - replaces old list if any with the new list.
- *
- * For Parameterized list of primitive type e.g HumanName.given of type List<StringType>
- * 1. addGivenElement() - add an empty StringType and return it.
- * 2. addGiven(String) - adds a new StringType to the list.
- * 3. setGiven(List<StringType>) - replaces old list if any with the new list.
+ * * For Parameterized list of primitive type e.g HumanName.given of type List<StringType>
+ * ```
+ *     addGiven(String) - adds a new StringType to the list.
+ * ```
+ * * For any primitive value e.g for Patient.active which is of BooleanType
+ * ```
+ *     setActiveElement(BooleanType)
+ * ```
+ * * In case they fail,
+ * ```
+ *     setName(List<HumanName>) - replaces old list if any with the new list.
+ * ```
  */
 private fun updateField(
   base: Base,
@@ -563,7 +563,7 @@ private fun updateField(
     if (field.isParameterized && field.isList) {
       addAnswerToListField(base, field, answersOfFieldType)
     } else {
-      updateFieldWithAnswer(base, field, answersOfFieldType.first())
+      setFieldElementValue(base, field, answersOfFieldType.first())
     }
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
@@ -571,7 +571,7 @@ private fun updateField(
   }
 }
 
-private fun updateFieldWithAnswer(base: Base, field: Field, answerValue: Base) {
+private fun setFieldElementValue(base: Base, field: Field, answerValue: Base) {
   base.javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}Element", field.type)
     .invoke(base, answerValue)
