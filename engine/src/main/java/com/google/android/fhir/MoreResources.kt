@@ -46,7 +46,13 @@ inline fun <reified R : IAnyResource> getResourceClass(resourceType: ResourceTyp
 
 /** Returns the {@link Class} object for the resource type. */
 inline fun <reified R : IAnyResource> getResourceClass(resourceType: String): Class<R> {
-  return Class.forName(R::class.java.`package`?.name + "." + resourceType) as Class<R>
+  // Remove any curly brackets in the resource type string. This is to work around an issue with
+  // JSON deserialization in the CQL engine on Android. The resource type string incorrectly
+  // includes namespace prefix in curly brackets, e.g. "{http://hl7.org/fhir}Patient" instead of
+  // "Patient".
+  // TODO: remove this once a fix has been found for the CQL engine on Android.
+  val className = resourceType.replace(Regex("\\{[^}]*\\}"), "")
+  return Class.forName(R::class.java.`package`?.name + "." + className) as Class<R>
 }
 
 val IAnyResource.resourceType: ResourceType

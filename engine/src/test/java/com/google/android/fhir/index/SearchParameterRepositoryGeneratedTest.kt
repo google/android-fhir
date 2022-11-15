@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.index
 
+import com.google.android.fhir.ResourceType
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.r4.model.Resource
@@ -27,7 +28,7 @@ import org.junit.runners.Parameterized
 class SearchParameterRepositoryGeneratedTest(private val resource: Resource) {
   @Test
   fun testResources() {
-    assertThat(getSearchParamList(resource))
+    assertThat(getSearchParamList(ResourceType.fromCode(resource.resourceType.name)))
       .containsExactlyElementsIn(getSearchParamListReflection(resource))
   }
 

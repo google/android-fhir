@@ -24,7 +24,6 @@ import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.gclient.UriClientParam
 import com.google.android.fhir.ResourceType
-import com.google.android.fhir.getResourceClass
 import com.google.android.fhir.index.Coding
 import com.google.android.fhir.index.Quantity
 import com.google.android.fhir.index.SearchParamDefinition
@@ -36,7 +35,6 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.filter.TokenFilterValue
 import com.google.android.fhir.search.filter.TokenParamFilterValueInstance
 import java.math.BigDecimal
-import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 
@@ -176,7 +174,7 @@ object XFhirQueryTranslator {
     }
 
   private val ResourceType.resourceSearchParameters
-    get() = getSearchParamList(getResourceClass<IAnyResource>(this).newInstance())
+    get() = getSearchParamList(this)
 
   /** Parse string key-val map to SearchParamDefinition-Value map */
   private fun Map<String, String>.toSearchParamDefinitionValueMap(

@@ -92,7 +92,7 @@ internal object ResourceIndexer {
 
   private fun <R : IAnyResource> extractIndexValues(resource: R): ResourceIndices {
     val indexBuilder = ResourceIndices.Builder(resource.resourceType, resource.logicalId)
-    getSearchParamList(resource)
+    getSearchParamList(resource.resourceType)
       .map {
         when (resource) {
           is Resource -> it to fhirPathEngineR4.evaluate(resource, it.path)
@@ -466,7 +466,7 @@ internal object ResourceIndexer {
             else -> throw FHIRException("Unsupported FHIR Version")
           }
         codeableConcept.coding
-          .filter { it.code != null && it.code.isNotEmpty() }
+          .filter { !it.code.isNullOrEmpty() }
           .map { TokenIndex(searchParam.name, searchParam.path, it.system ?: "", it.code!!) }
       }
       "code",
