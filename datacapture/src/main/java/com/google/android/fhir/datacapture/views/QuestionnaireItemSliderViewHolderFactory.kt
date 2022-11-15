@@ -21,11 +21,15 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.sliderStepValue
 import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.MaxValueConstraintValidator
+import com.google.android.fhir.datacapture.validation.MinValueConstraintValidator
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.slider.Slider
+import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemSliderViewHolderFactory :
@@ -47,13 +51,12 @@ internal object QuestionnaireItemSliderViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         header.bind(questionnaireItemViewItem.questionnaireItem)
         val answer = questionnaireItemViewItem.answers.singleOrNull()
-        slider.valueFrom = 0.0F
-        slider.valueTo = 100.0F
+        slider.updateValueFrom(questionnaireItemViewItem.questionnaireItem)
+        slider.updateValueTo(questionnaireItemViewItem.questionnaireItem)
         slider.stepSize =
           (questionnaireItemViewItem.questionnaireItem?.sliderStepValue ?: SLIDER_DEFAULT_STEP_SIZE)
             .toFloat()
-        val sliderValue = answer?.valueIntegerType?.value?.toString() ?: "0.0"
-        slider.value = sliderValue.toFloat()
+        slider.value = answer?.valueIntegerType?.value?.toFloat() ?: slider.valueFrom
 
         slider.addOnChangeListener { _, newValue, _ ->
           // Responds to when slider's value is changed
@@ -80,3 +83,25 @@ internal object QuestionnaireItemSliderViewHolderFactory :
 }
 
 private const val SLIDER_DEFAULT_STEP_SIZE = 1
+private const val SLIDER_DEFAULT_VALUE_FROM = 0.0F
+private const val SLIDER_DEFAULT_VALUE_TO = 100.0F
+
+private fun Slider.updateValueFrom(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
+  val minValue = MinValueConstraintValidator.getMinValue(questionnaireItem)
+  valueFrom =
+    when (minValue) {
+      is IntegerType -> minValue.value.toFloat()
+      is DecimalType -> minValue.value.toFloat()
+      else -> SLIDER_DEFAULT_VALUE_FROM
+    }
+}
+
+private fun Slider.updateValueTo(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
+  val maxValue = MaxValueConstraintValidator.getMaxValue(questionnaireItem)
+  valueTo =
+    when (maxValue) {
+      is IntegerType -> maxValue.value.toFloat()
+      is DecimalType -> maxValue.value.toFloat()
+      else -> SLIDER_DEFAULT_VALUE_TO
+    }
+}
