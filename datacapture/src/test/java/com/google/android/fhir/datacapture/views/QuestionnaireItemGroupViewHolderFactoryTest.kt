@@ -35,7 +35,7 @@ import org.robolectric.RuntimeEnvironment
 class QuestionnaireItemGroupViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
   private val viewHolder = QuestionnaireItemGroupViewHolderFactory.create(parent)
 
@@ -117,18 +117,15 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder
-          .itemView
-          .findViewById<QuestionnaireItemHeaderView>(R.id.header)
+        viewHolder.itemView
+          .findViewById<QuestionnaireGroupTypeHeaderView>(R.id.header)
           .findViewById<TextView>(R.id.hint)
-          .text
-          .isNullOrEmpty()
+          .text.isNullOrEmpty()
       )
       .isTrue()
     assertThat(
-        viewHolder
-          .itemView
-          .findViewById<QuestionnaireItemHeaderView>(R.id.header)
+        viewHolder.itemView
+          .findViewById<QuestionnaireGroupTypeHeaderView>(R.id.header)
           .findViewById<TextView>(R.id.hint)
           .visibility
       )
@@ -146,7 +143,7 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
       )
     )
     assertThat(
-        viewHolder.itemView.findViewById<QuestionnaireItemHeaderView>(R.id.header).visibility
+        viewHolder.itemView.findViewById<QuestionnaireGroupTypeHeaderView>(R.id.header).visibility
       )
       .isEqualTo(View.VISIBLE)
   }
@@ -163,8 +160,38 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<QuestionnaireItemHeaderView>(R.id.header).visibility
+        viewHolder.itemView.findViewById<QuestionnaireGroupTypeHeaderView>(R.id.header).visibility
       )
+      .isEqualTo(View.GONE)
+  }
+
+  @Test
+  fun repeatingGroup_shouldHaveAddItemButtonVisible() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { repeats = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<View>(R.id.add_item).visibility)
+      .isEqualTo(View.VISIBLE)
+  }
+
+  @Test
+  fun nonRepeatingGroup_shouldHaveAddItemButtonGone() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { repeats = false },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<View>(R.id.add_item).visibility)
       .isEqualTo(View.GONE)
   }
 }

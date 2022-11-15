@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.sliderStepValue
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -48,7 +49,9 @@ internal object QuestionnaireItemSliderViewHolderFactory :
         val answer = questionnaireItemViewItem.answers.singleOrNull()
         slider.valueFrom = 0.0F
         slider.valueTo = 100.0F
-        slider.stepSize = 10.0F
+        slider.stepSize =
+          (questionnaireItemViewItem.questionnaireItem?.sliderStepValue ?: SLIDER_DEFAULT_STEP_SIZE)
+            .toFloat()
         val sliderValue = answer?.valueIntegerType?.value?.toString() ?: "0.0"
         slider.value = sliderValue.toFloat()
 
@@ -64,7 +67,8 @@ internal object QuestionnaireItemSliderViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         error.text =
           when (validationResult) {
-            is NotValidated, Valid -> null
+            is NotValidated,
+            Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
       }
@@ -74,3 +78,5 @@ internal object QuestionnaireItemSliderViewHolderFactory :
       }
     }
 }
+
+private const val SLIDER_DEFAULT_STEP_SIZE = 1

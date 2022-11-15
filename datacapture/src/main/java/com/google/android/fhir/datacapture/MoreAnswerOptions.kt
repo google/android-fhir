@@ -22,6 +22,7 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 
@@ -30,13 +31,16 @@ internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
 
 /**
  * Text value for answer option [Questionnaire.QuestionnaireItemAnswerOptionComponent] if answer
- * option is [IntegerType] or [StringType] or [Coding] type.
+ * option is [IntegerType], [StringType], [Coding], or [Reference] type.
  */
 internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
   get() {
     return when (value) {
-      is IntegerType, is DateType, is TimeType -> value.primitiveValue()
+      is IntegerType,
+      is DateType,
+      is TimeType -> value.primitiveValue()
       is StringType -> (value as StringType).getLocalizedText() ?: value.toString()
+      is Reference -> valueReference.display ?: valueReference.reference
       is Coding -> {
         val display = valueCoding.displayElement.getLocalizedText() ?: valueCoding.display
         if (display.isNullOrEmpty()) {

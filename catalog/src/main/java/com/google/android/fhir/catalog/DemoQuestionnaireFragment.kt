@@ -24,6 +24,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -40,12 +41,16 @@ import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.BUNDLE
 import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.REQUEST_ERROR_KEY
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.SUBMIT_REQUEST_KEY
+import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
 
 class DemoQuestionnaireFragment : Fragment() {
   private val viewModel: DemoQuestionnaireViewModel by viewModels()
   private val args: DemoQuestionnaireFragmentArgs by navArgs()
   private var isErrorState = false
+  private lateinit var infoCard: MaterialCardView
+  private lateinit var infoCardHeader: TextView
+  private lateinit var infoCardText: TextView
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -58,6 +63,24 @@ class DemoQuestionnaireFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    infoCard = view.findViewById(R.id.infoCard)
+    when (args.questionnaireTitleKey) {
+      getString(R.string.behavior_name_skip_logic) -> {
+        infoCardHeader = view.findViewById(R.id.infoCardHeader)
+        infoCardHeader.text = args.questionnaireTitleKey
+        infoCardText = view.findViewById(R.id.infoCardText)
+        infoCardText.text = getString(R.string.behavior_name_skip_logic_info)
+        infoCard.visibility = View.VISIBLE
+      }
+      getString(R.string.behavior_name_calculated_expression) -> {
+        infoCardHeader = view.findViewById(R.id.infoCardHeader)
+        infoCardHeader.text = args.questionnaireTitleKey
+        infoCardText = view.findViewById(R.id.infoCardText)
+        infoCardText.text = getString(R.string.behavior_name_calculated_expression_info)
+        infoCard.visibility = View.VISIBLE
+      }
+      else -> infoCard.visibility = View.GONE
+    }
     setFragmentResultListener(REQUEST_ERROR_KEY) { _, bundle ->
       isErrorState = bundle.getBoolean(BUNDLE_ERROR_KEY)
       replaceQuestionnaireFragmentWithQuestionnaireJson()
@@ -98,7 +121,7 @@ class DemoQuestionnaireFragment : Fragment() {
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
-    inflater.inflate(getMenu(), menu)
+    getMenu()?.let { inflater.inflate(it, menu) }
   }
 
   private fun setUpActionBar() {
@@ -171,15 +194,16 @@ class DemoQuestionnaireFragment : Fragment() {
   private fun getThemeId(): Int {
     return when (args.workflow) {
       WorkflowType.DEFAULT -> R.style.Theme_Androidfhir_DefaultLayout
-      WorkflowType.COMPONENT -> R.style.Theme_Androidfhir_Component
+      WorkflowType.COMPONENT,
+      WorkflowType.BEHAVIOR -> R.style.Theme_Androidfhir_Component
       WorkflowType.PAGINATED -> R.style.Theme_Androidfhir_PaginatedLayout
     }
   }
 
-  private fun getMenu(): Int {
+  private fun getMenu(): Int? {
     return when (args.workflow) {
-      WorkflowType.DEFAULT, WorkflowType.PAGINATED -> R.menu.layout_menu
       WorkflowType.COMPONENT -> R.menu.component_menu
+      else -> null
     }
   }
 
@@ -219,5 +243,6 @@ class DemoQuestionnaireFragment : Fragment() {
 enum class WorkflowType {
   COMPONENT,
   DEFAULT,
-  PAGINATED
+  PAGINATED,
+  BEHAVIOR
 }

@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.mapping
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
@@ -38,6 +37,7 @@ import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.DomainResource
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -76,7 +76,7 @@ object ResourceMapper {
 
   private val fhirPathEngine: FHIRPathEngine =
     with(FhirContext.forCached(FhirVersionEnum.R4)) {
-      FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this)))
+      FHIRPathEngine(HapiWorkerContext(this, this.validationSupport))
     }
 
   /**
@@ -169,8 +169,7 @@ object ResourceMapper {
     val structureMapProvider = structureMapExtractionContext.structureMapProvider
     val simpleWorkerContext =
       DataCapture.getConfiguration(structureMapExtractionContext.context)
-        .simpleWorkerContext
-        .apply { setExpansionProfile(Parameters()) }
+        .simpleWorkerContext.apply { setExpansionProfile(Parameters()) }
     val structureMap = structureMapProvider(questionnaire.targetStructureMap!!, simpleWorkerContext)
 
     return Bundle().apply {
@@ -253,9 +252,9 @@ object ResourceMapper {
 
   private val Questionnaire.QuestionnaireItemComponent.initialExpression: Expression?
     get() {
-      return this.extension.firstOrNull { it.url == ITEM_INITIAL_EXPRESSION_URL }?.let {
-        it.value as Expression
-      }
+      return this.extension
+        .firstOrNull { it.url == ITEM_INITIAL_EXPRESSION_URL }
+        ?.let { it.value as Expression }
     }
 
   /**
@@ -441,13 +440,50 @@ object ResourceMapper {
     // answer, e.g., `Observation#setValue`. We set the answer component of the questionnaire
     // response item directly as the value (e.g `StringType`).
     try {
-      base
-        .javaClass
+      base.javaClass
         .getMethod("setValue", Type::class.java)
         .invoke(base, questionnaireResponseItem.answer.singleOrNull()?.value)
+      return
     } catch (e: NoSuchMethodException) {
       // Do nothing
     }
+
+    if (base.javaClass.getFieldOrNull(fieldName) == null) {
+      // If field not found in resource class, assume this is an extension
+      addDefinitionBasedCustomExtension(questionnaireItem, questionnaireResponseItem, base)
+    }
+  }
+}
+
+/**
+ * Adds custom extension for Resource.
+ * @param questionnaireItem QuestionnaireItemComponent with details for extension
+ * @param questionnaireResponseItem QuestionnaireResponseItemComponent for response value
+ * @param base
+ * - resource's Base class instance See
+ * https://hapifhir.io/hapi-fhir/docs/model/profiles_and_extensions.html#extensions for more on
+ * custom extensions
+ */
+private fun addDefinitionBasedCustomExtension(
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+  questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  base: Base
+) {
+  if (base is Type) {
+    // Create an extension
+    val ext = Extension()
+    ext.url = questionnaireItem.definition
+    ext.setValue(questionnaireResponseItem.answer.first().value)
+    // Add the extension to the resource
+    base.addExtension(ext)
+  }
+  if (base is DomainResource) {
+    // Create an extension
+    val ext = Extension()
+    ext.url = questionnaireItem.definition
+    ext.setValue(questionnaireResponseItem.answer.first().value)
+    // Add the extension to the resource
+    base.addExtension(ext)
   }
 }
 
@@ -494,12 +530,27 @@ private fun updateFieldWithEnum(base: Base, field: Field, value: Base) {
 
   val stringValue = if (value is Coding) value.code else value.toString()
 
-  base
-    .javaClass
+  base.javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.nonParameterizedType)
     .invoke(base, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
 
+/**
+ * The api's used to updateField with answers are:
+ *
+ * * For Parameterized list of primitive type e.g HumanName.given of type List<StringType>
+ * ```
+ *     addGiven(String) - adds a new StringType to the list.
+ * ```
+ * * For any primitive value e.g for Patient.active which is of BooleanType
+ * ```
+ *     setActiveElement(BooleanType)
+ * ```
+ * * In case they fail,
+ * ```
+ *     setName(List<HumanName>) - replaces old list if any with the new list.
+ * ```
+ */
 private fun updateField(
   base: Base,
   field: Field,
@@ -509,23 +560,34 @@ private fun updateField(
     answers.map { wrapAnswerInFieldType(it.value, field) }.toCollection(mutableListOf())
 
   try {
-    updateFieldWithAnswer(base, field, answersOfFieldType.first())
+    if (field.isParameterized && field.isList) {
+      addAnswerToListField(base, field, answersOfFieldType)
+    } else {
+      setFieldElementValue(base, field, answersOfFieldType.first())
+    }
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
     updateListFieldWithAnswer(base, field, answersOfFieldType)
   }
 }
 
-private fun updateFieldWithAnswer(base: Base, field: Field, answerValue: Base) {
-  base
-    .javaClass
+private fun setFieldElementValue(base: Base, field: Field, answerValue: Base) {
+  base.javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}Element", field.type)
     .invoke(base, answerValue)
 }
 
+private fun addAnswerToListField(base: Base, field: Field, answerValue: List<Base>) {
+  base.javaClass
+    .getMethod(
+      "add${field.name.capitalize(Locale.ROOT)}",
+      answerValue.first().primitiveValue().javaClass
+    )
+    .let { method -> answerValue.forEach { method.invoke(base, it.primitiveValue()) } }
+}
+
 private fun updateListFieldWithAnswer(base: Base, field: Field, answerValue: List<Base>) {
-  base
-    .javaClass
+  base.javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.type)
     .invoke(base, if (field.isParameterized && field.isList) answerValue else answerValue.first())
 }
@@ -646,10 +708,11 @@ private val Questionnaire.QuestionnaireItemComponent.itemExtractionContextNameTo
  */
 private val List<Extension>.itemExtractionContextExtensionNameToExpressionPair
   get() =
-    this.singleOrNull { it.url == ITEM_CONTEXT_EXTENSION_URL }?.let {
-      val expression = it.value as Expression
-      expression.name to expression.expression
-    }
+    this.singleOrNull { it.url == ITEM_CONTEXT_EXTENSION_URL }
+      ?.let {
+        val expression = it.value as Expression
+        expression.name to expression.expression
+      }
 
 /**
  * URL for the

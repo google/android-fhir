@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
+import com.google.android.fhir.datacapture.isHidden
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -39,6 +40,8 @@ internal object QuestionnaireResponseItemValidator {
     answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
     context: Context
   ): ValidationResult {
+    if (questionnaireItem.isHidden) return NotValidated
+
     val validationResults = validators.map { it.validate(questionnaireItem, answers, context) }
 
     return if (validationResults.all { it.isValid }) {

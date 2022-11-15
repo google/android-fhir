@@ -45,7 +45,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderFactory(
 abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputType: Int) :
   QuestionnaireItemViewHolderDelegate {
   private lateinit var header: QuestionnaireItemHeaderView
-  private lateinit var textInputLayout: TextInputLayout
+  protected lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
   private var textWatcher: TextWatcher? = null
@@ -67,8 +67,8 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     }
     textInputEditText.setOnFocusChangeListener { view, focused ->
       if (!focused) {
-        (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
-            InputMethodManager)
+        (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE)
+            as InputMethodManager)
           .hideSoftInputFromWindow(view.windowToken, 0)
 
         // Update answer even if the text box loses focus without any change. This will mark the
@@ -106,7 +106,8 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   override fun displayValidationResult(validationResult: ValidationResult) {
     textInputLayout.error =
       when (validationResult) {
-        is NotValidated, Valid -> null
+        is NotValidated,
+        Valid -> null
         is Invalid -> validationResult.getSingleStringValidationMessage()
       }
   }

@@ -58,7 +58,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         val adapter =
           ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
         autoCompleteTextView.setText(
-          questionnaireItemViewItem.answers.singleOrNull()?.valueCoding?.display ?: ""
+          questionnaireItemViewItem.answers.singleOrNull()?.displayString(header.context) ?: ""
         )
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.onItemClickListener =
@@ -77,7 +77,8 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         textInputLayout.error =
           when (validationResult) {
-            is NotValidated, Valid -> null
+            is NotValidated,
+            Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
       }

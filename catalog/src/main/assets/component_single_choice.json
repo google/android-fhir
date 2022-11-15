@@ -1,0 +1,81 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "radio-button",
+                "display": "Radio Button"
+              }
+            ]
+          }
+        }
+      ],
+      "linkId": "1",
+      "text": "What is the highest level of education achieved?",
+      "type": "choice",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0532",
+            "code": "Y",
+            "display": "Does not know level of education"
+          }
+        },
+        {
+          "valueCoding": {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0532",
+            "code": "no",
+            "display": "No education"
+          }
+        },
+        {
+          "valueCoding": {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0532",
+            "code": "primary",
+            "display": "Primary school"
+          }
+        },
+        {
+          "valueCoding": {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0532",
+            "code": "secondary",
+            "display": "Secondary school"
+          }
+        },
+        {
+          "valueCoding": {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0532",
+            "code": "higher",
+            "display": "Higher education"
+          }
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1-select-one",
+          "text": "Select one",
+          "type": "display"
+        }
+      ]
+    }
+  ]
+}

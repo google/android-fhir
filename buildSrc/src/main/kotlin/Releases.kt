@@ -15,6 +15,7 @@
  */
 
 import org.gradle.api.Project
+import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.configure
@@ -47,19 +48,19 @@ object Releases {
 
   object Engine : LibraryArtifact {
     override val artifactId = "engine"
-    override val version = "0.1.0-beta01"
+    override val version = "0.1.0-beta02"
     override val name = "Android FHIR Engine Library"
   }
 
   object DataCapture : LibraryArtifact {
     override val artifactId = "data-capture"
-    override val version = "0.1.0-beta04"
+    override val version = "0.1.0-beta06"
     override val name = "Android FHIR Structured Data Capture Library"
   }
 
   object Workflow : LibraryArtifact {
     override val artifactId = "workflow"
-    override val version = "0.1.0-alpha01"
+    override val version = "0.1.0-alpha02"
     override val name = "Android FHIR Workflow Library"
   }
 
@@ -88,7 +89,7 @@ object Releases {
 
 fun Project.publishArtifact(artifact: LibraryArtifact) {
   afterEvaluate {
-    configure<org.gradle.api.publish.PublishingExtension> {
+    configure<PublishingExtension> {
       publications {
         register("release", MavenPublication::class) {
           from(components["release"])
@@ -112,6 +113,18 @@ fun Project.publishArtifact(artifact: LibraryArtifact) {
                 name.set("The Apache License, Version 2.0")
                 url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
               }
+            }
+          }
+          repositories {
+            maven {
+              name = "CI"
+              url = uri("file://${rootProject.buildDir}/ci-repo")
+              version =
+                if (project.providers.environmentVariable("GITHUB_ACTIONS").isPresent) {
+                  "${artifact.version}-build_${System.getenv("GITHUB_RUN_ID")}"
+                } else {
+                  artifact.version
+                }
             }
           }
         }

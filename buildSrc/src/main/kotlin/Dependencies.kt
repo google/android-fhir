@@ -31,29 +31,42 @@ object Dependencies {
   }
 
   object Cql {
-    const val evaluator = "org.opencds.cqf.cql:evaluator:${Versions.Cql.evaluator}"
-    const val evaluatorBuilder = "org.opencds.cqf.cql:evaluator.builder:${Versions.Cql.evaluator}"
-    const val evaluatorDagger = "org.opencds.cqf.cql:evaluator.dagger:${Versions.Cql.evaluator}"
-    const val evaluatorPlanDef =
-      "org.opencds.cqf.cql:evaluator.plandefinition:${Versions.Cql.evaluator}"
+    const val openCdsGroup = "org.opencds.cqf.cql"
+    const val translatorGroup = "info.cqframework"
+
+    // Remove this after this issue has been fixed:
+    // https://github.com/cqframework/clinical_quality_language/issues/799
+    const val antlr4Runtime = "org.antlr:antlr4-runtime:${Versions.Cql.antlr}"
+
+    const val engine = "$openCdsGroup:engine:${Versions.Cql.engine}"
+    const val engineJackson = "$openCdsGroup:engine.jackson:${Versions.Cql.engine}"
+
+    const val evaluator = "$openCdsGroup:evaluator:${Versions.Cql.evaluator}"
+    const val evaluatorBuilder = "$openCdsGroup:evaluator.builder:${Versions.Cql.evaluator}"
+    const val evaluatorDagger = "$openCdsGroup:evaluator.dagger:${Versions.Cql.evaluator}"
+    const val evaluatorPlanDef = "$openCdsGroup:evaluator.plandefinition:${Versions.Cql.evaluator}"
+    const val translatorCqlToElm = "$translatorGroup:cql-to-elm:${Versions.Cql.translator}"
+    const val translatorElm = "$translatorGroup:elm:${Versions.Cql.translator}"
+    const val translatorModel = "$translatorGroup:model:${Versions.Cql.translator}"
+
+    const val translatorElmJackson = "$translatorGroup:elm-jackson:${Versions.Cql.translator}"
+    const val translatorModelJackson = "$translatorGroup:model-jackson:${Versions.Cql.translator}"
   }
 
   object HapiFhir {
     const val structuresR4 = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhir}"
     const val validation = "ca.uhn.hapi.fhir:hapi-fhir-validation:${Versions.hapiFhir}"
+
+    // Runtime dependency that is required to run FhirPath (also requires minSDK of 26).
+    // Version 3.0 uses java.lang.System.Logger, which is not available on Android
+    // Replace for Guava when this PR gets merged: https://github.com/hapifhir/hapi-fhir/pull/3977
+    const val caffeine = "com.github.ben-manes.caffeine:caffeine:${Versions.caffeine}"
   }
 
   object Jackson {
     const val annotations = "com.fasterxml.jackson.core:jackson-annotations:${Versions.jackson}"
     const val core = "com.fasterxml.jackson.core:jackson-core:${Versions.jackson}"
     const val databind = "com.fasterxml.jackson.core:jackson-databind:${Versions.jackson}"
-  }
-
-  object JavaJsonTools {
-    const val jacksonCoreUtils =
-      "com.github.java-json-tools:jackson-coreutils:${Versions.JavaJsonTools.jacksonCoreUtils}"
-    const val msgSimple =
-      "com.github.java-json-tools:msg-simple:${Versions.JavaJsonTools.msgSimple}"
   }
 
   object Kotlin {
@@ -64,7 +77,7 @@ object Dependencies {
     const val kotlinTestJunit = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.Kotlin.stdlib}"
     const val kotlinCoroutinesTest =
       "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.kotlinCoroutinesCore}"
-    const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.Kotlin.stdlib}"
+    const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.Kotlin.stdlib}"
   }
 
   object Lifecycle {
@@ -101,7 +114,12 @@ object Dependencies {
       "com.google.mlkit:object-detection-custom:${Versions.Mlkit.objectDetectionCustom}"
   }
 
-  const val androidFhirCommon = "com.google.android.fhir:common:${Versions.androidFhirCommon}"
+  const val androidFhirGroup = "com.google.android.fhir"
+  const val androidFhirCommon = "$androidFhirGroup:common:${Versions.androidFhirCommon}"
+  const val androidFhirEngineModule = "engine"
+  const val androidFhirEngine =
+    "$androidFhirGroup:$androidFhirEngineModule:${Versions.androidFhirEngine}"
+
   const val lifecycleExtensions =
     "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
@@ -109,13 +127,13 @@ object Dependencies {
   const val guava = "com.google.guava:guava:${Versions.guava}"
   const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.http}"
   const val http = "com.squareup.okhttp3:okhttp:${Versions.http}"
-  const val stax = "javax.xml.stream:stax-api:${Versions.stax}"
+
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
   const val kotlinPoet = "com.squareup:kotlinpoet:${Versions.kotlinPoet}"
   const val material = "com.google.android.material:material:${Versions.material}"
   const val sqlcipher = "net.zetetic:android-database-sqlcipher:${Versions.sqlcipher}"
   const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
-  const val woodstox = "org.codehaus.woodstox:woodstox-core-asl:${Versions.woodstox}"
+  const val woodstox = "com.fasterxml.woodstox:woodstox-core:${Versions.woodstox}"
   const val xerces = "xerces:xercesImpl:${Versions.xerces}"
 
   // Dependencies for testing go here
@@ -134,14 +152,20 @@ object Dependencies {
 
   object Espresso {
     const val espressoCore = "androidx.test.espresso:espresso-core:${Versions.espresso}"
+    const val espressoContrib = "androidx.test.espresso:espresso-contrib:${Versions.espresso}"
   }
 
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
+  // Makes Json assertions where the order of elements, tabs/whitespaces are not important.
+  const val jsonAssert = "org.skyscreamer:jsonassert:${Versions.jsonAssert}"
   const val junit = "junit:junit:${Versions.junit}"
   const val mockitoKotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mockitoKotlin}"
   const val mockitoInline = "org.mockito:mockito-inline:${Versions.mockitoInline}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
+  const val slf4j = "org.slf4j:slf4j-android:${Versions.slf4j}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
+  // Makes XML assertions where the order of elements, tabs/whitespaces are not important.
+  const val xmlUnit = "org.xmlunit:xmlunit-core:${Versions.xmlUnit}"
 
   object Versions {
     object Androidx {
@@ -160,12 +184,10 @@ object Dependencies {
     }
 
     object Cql {
-      const val evaluator = "1.4.2"
-    }
-
-    object JavaJsonTools {
-      const val jacksonCoreUtils = "2.0"
-      const val msgSimple = "1.2"
+      const val antlr = "4.10.1"
+      const val engine = "2.1.0"
+      const val evaluator = "2.1.0"
+      const val translator = "2.2.0"
     }
 
     object Kotlin {
@@ -174,25 +196,26 @@ object Dependencies {
     }
 
     const val androidFhirCommon = "0.1.0-alpha03"
+    const val androidFhirEngine = "0.1.0-beta02"
     const val desugarJdkLibs = "1.1.5"
+    const val caffeine = "2.9.1"
     const val fhirUcum = "1.0.3"
     const val guava = "28.2-android"
-    const val hapiFhir = "5.4.0"
+    const val hapiFhir = "6.0.1"
     const val http = "4.9.1"
-    // TODO: The next release of HAPI FHIR will hopefully have
-    // https://github.com/hapifhir/hapi-fhir/pull/3043 merged in. If it does, when we update, we
-    // should remove any excludes directives for "net.sf.saxon" across our build.gradle files.
     const val jackson = "2.12.2"
     const val jsonToolsPatch = "1.13"
+    const val jsonAssert = "1.5.1"
     const val kotlinPoet = "1.9.0"
     const val material = "1.6.0"
     const val retrofit = "2.7.2"
-    const val stax = "1.0-2"
+    const val slf4j = "1.7.36"
     const val sqlcipher = "4.5.0"
     const val timber = "5.0.1"
     const val truth = "1.0.1"
-    const val woodstox = "4.4.1"
-    const val xerces = "2.11.0"
+    const val woodstox = "6.2.7"
+    const val xerces = "2.12.2"
+    const val xmlUnit = "2.9.0"
 
     // Test dependencies
 
@@ -207,7 +230,7 @@ object Dependencies {
 
     const val espresso = "3.4.0"
     const val jacoco = "0.8.7"
-    const val junit = "4.12"
+    const val junit = "4.13.2"
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
     const val robolectric = "4.7.3"

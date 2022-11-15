@@ -1,0 +1,48 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "slider",
+                "display": "Slider"
+              }
+            ]
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue",
+          "valueInteger": 10
+        }
+      ],
+      "linkId": "1",
+      "text": "How many times have you been pregnant?",
+      "type": "integer",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1-select-one",
+          "text": "Including this pregnancy",
+          "type": "display"
+        }
+      ]
+    }
+  ]
+}
