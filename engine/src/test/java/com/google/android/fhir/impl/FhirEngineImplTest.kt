@@ -242,7 +242,7 @@ class FhirEngineImplTest {
           fhirEngine.search("CustomResource?active=true&gender=male&_sort=name&_count=2")
         }
       }
-    assertThat(exception.message).isEqualTo("Unknown resource typeCustomResource")
+    assertThat(exception.message).isEqualTo("Unknown resource type CustomResource")
   }
 
   @Test
