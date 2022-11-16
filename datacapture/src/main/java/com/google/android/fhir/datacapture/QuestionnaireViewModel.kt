@@ -366,13 +366,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: StateFlow<QuestionnaireState> =
-    combine(modificationCount, currentPageIndexFlow, reviewFlow) { _, currentPageIndex, reviewFlow
-        ->
-        if (reviewFlow) {
-          getQuestionnaireState(reviewMode = reviewFlow)
-        } else {
-          getQuestionnaireState(reviewMode = reviewFlow)
-        }
+    combine(modificationCount, currentPageIndexFlow, reviewFlow) { _, _, reviewMode ->
+        getQuestionnaireState(reviewMode = reviewMode)
       }
       .stateIn(
         viewModelScope,
@@ -742,6 +737,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       null
     }
 
+  /** Gets a list of [QuestionnairePage]s for a paginated questionnaire. */
   private fun getQuestionnairePages() =
     if (questionnaire.isPaginated) {
       questionnaire.item.zip(questionnaireResponse.item).mapIndexed {
