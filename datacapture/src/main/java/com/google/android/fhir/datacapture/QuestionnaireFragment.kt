@@ -89,7 +89,7 @@ open class QuestionnaireFragment : Fragment() {
           QuestionnaireValidationErrorMessageDialogFragment()
             .show(
               requireActivity().supportFragmentManager,
-              "QuestionnaireValidationErrorMessageDialogFragment"
+              QuestionnaireValidationErrorMessageDialogFragment.TAG
             )
         }
       }

@@ -112,6 +112,10 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
         )
     }
   }
+
+  companion object {
+    const val TAG = "QuestionnaireValidationErrorMessageDialogFragment"
+  }
 }
 
 private val ValidationDiffCallback =
