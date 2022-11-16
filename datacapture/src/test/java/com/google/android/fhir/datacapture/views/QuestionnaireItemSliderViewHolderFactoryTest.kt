@@ -24,6 +24,8 @@ import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.material.slider.Slider
 import com.google.common.truth.Truth.assertThat
+import java.lang.IllegalStateException
+import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -170,6 +172,29 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).valueFrom).isEqualTo(0.0F)
+  }
+
+  @Test
+  fun `throws exception if minValue is greater than maxvalue`() {
+    assertFailsWith<IllegalStateException> {
+      viewHolder.bind(
+        QuestionnaireItemViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            addExtension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/minValue"
+              setValue(IntegerType("100"))
+            }
+            addExtension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+              setValue(IntegerType("50"))
+            }
+          },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _ -> },
+        )
+      )
+    }
   }
 
   @Test
