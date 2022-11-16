@@ -154,7 +154,12 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
-    onView(withId(R.id.time_input_layout)).perform(clickIcon(true))
+    onView(withId(R.id.date_input_layout)).perform(clickIcon(true))
+    onView(allOf(withText("OK")))
+      .inRoot(isDialog())
+      .check(matches(isDisplayed()))
+      .perform(ViewActions.click())
+    onView(withId(R.id.time_input_edit_text)).perform(ViewActions.click())
     onView(allOf(withId(R.id.material_textinput_timepicker)))
       .inRoot(isDialog())
       .check(matches(isDisplayed()))
