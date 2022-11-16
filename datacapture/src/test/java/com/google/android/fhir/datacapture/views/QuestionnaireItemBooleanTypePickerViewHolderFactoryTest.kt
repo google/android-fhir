@@ -352,14 +352,16 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
     )
 
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1)
-            as RadioButton)
+        (viewHolder.itemView
+            .findViewById<ConstraintLayout>(R.id.radio_constraint_layout)
+            .getChildAt(1) as RadioButton)
           .isEnabled
       )
       .isFalse()
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2)
-            as RadioButton)
+        (viewHolder.itemView
+            .findViewById<ConstraintLayout>(R.id.radio_constraint_layout)
+            .getChildAt(2) as RadioButton)
           .isEnabled
       )
       .isFalse()

@@ -45,7 +45,7 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
-        radioGroup = itemView.findViewById(R.id.radio_group)
+        radioGroup = itemView.findViewById(R.id.radio_constraint_layout)
         yesRadioButton = itemView.findViewById(R.id.yes_radio_button)
         noRadioButton = itemView.findViewById(R.id.no_radio_button)
         flow = itemView.findViewById(R.id.flow)
@@ -57,12 +57,19 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
         header.bind(questionnaireItem)
         val choiceOrientation =
           questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
-        if (choiceOrientation == ChoiceOrientationTypes.HORIZONTAL) {
-          with(flow) {
-            setOrientation(Flow.HORIZONTAL)
-            setWrapMode(Flow.WRAP_CHAIN)
+        with(flow) {
+          when (choiceOrientation) {
+            ChoiceOrientationTypes.HORIZONTAL -> {
+              setOrientation(Flow.HORIZONTAL)
+              setWrapMode(Flow.WRAP_CHAIN)
+            }
+            ChoiceOrientationTypes.VERTICAL -> {
+              setOrientation(Flow.VERTICAL)
+              flow.setWrapMode(Flow.WRAP_NONE)
+            }
           }
         }
+
         yesRadioButton.setLayoutParamsByOrientation()
         noRadioButton.setLayoutParamsByOrientation()
 

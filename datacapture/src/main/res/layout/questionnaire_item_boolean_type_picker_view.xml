@@ -32,7 +32,7 @@
     />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/radio_group"
+        android:id="@+id/radio_constraint_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
     >
