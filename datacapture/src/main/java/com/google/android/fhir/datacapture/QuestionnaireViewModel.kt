@@ -217,19 +217,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   @VisibleForTesting val currentPageIndexFlow: MutableStateFlow<Int?> = MutableStateFlow(null)
 
   /** Flag to support fragment for review-feature */
-  private val enableReviewPage: Boolean
-
-  init {
-    enableReviewPage = state[QuestionnaireFragment.EXTRA_ENABLE_REVIEW_PAGE] ?: false
-  }
+  private val enableReviewPage = state[QuestionnaireFragment.EXTRA_ENABLE_REVIEW_PAGE] ?: false
 
   /** Flag to open fragment first in data-collection or review-mode */
-  private val showReviewPageFirst: Boolean
+  private val showReviewPageFirst =
+    enableReviewPage && state[QuestionnaireFragment.EXTRA_SHOW_REVIEW_PAGE_FIRST] ?: false
 
-  init {
-    showReviewPageFirst =
-      enableReviewPage && state[QuestionnaireFragment.EXTRA_SHOW_REVIEW_PAGE_FIRST] ?: false
-  }
+  /** Flag to determine if the questionnaire should be read-only. */
+  private val readOnly = state[QuestionnaireFragment.EXTRA_READ_ONLY] ?: false
 
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)

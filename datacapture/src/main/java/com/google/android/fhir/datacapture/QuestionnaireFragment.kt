@@ -247,6 +247,9 @@ open class QuestionnaireFragment : Fragment() {
      */
     const val EXTRA_SHOW_REVIEW_PAGE_FIRST = "show-review-page-first"
 
+    /** An [Boolean] extra to control if the questionnaire is read-only. */
+    const val EXTRA_READ_ONLY = "read-only"
+
     const val SUBMIT_REQUEST_KEY = "submit-request-key"
   }
 
