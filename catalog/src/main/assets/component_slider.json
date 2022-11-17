@@ -16,8 +16,8 @@
           }
         },
         {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue",
-          "valueInteger": 10
+          "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+          "valueInteger": 13
         }
       ],
       "linkId": "1",
