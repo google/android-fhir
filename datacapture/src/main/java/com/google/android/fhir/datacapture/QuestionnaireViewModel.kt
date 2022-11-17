@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture
 
 import android.app.Application
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
@@ -467,6 +468,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return options
   }
 
+  internal suspend fun resolveContainedBinary(containedId :String):Drawable?{
+    return questionnaire.getContainedImage(containedId)
+  }
+
   // TODO persist previous answers incase options are changing and new list does not have selected
   // answer and FHIRPath in x-fhir-query
   // https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
@@ -639,7 +644,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           validationResult = validationResult,
           answersChangedCallback = answersChangedCallback,
           resolveAnswerValueSet = { resolveAnswerValueSet(it) },
-          resolveAnswerExpression = { resolveAnswerExpression(it) }
+          resolveAnswerExpression = { resolveAnswerExpression(it) },
+          resolveContainedBinary = { resolveContainedBinary(it) }
         )
       )
       val nestedResponses: List<List<QuestionnaireResponse.QuestionnaireResponseItemComponent>> =

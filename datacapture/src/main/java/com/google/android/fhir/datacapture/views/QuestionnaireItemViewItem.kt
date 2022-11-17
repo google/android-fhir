@@ -17,17 +17,27 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.util.Base64
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.EXTENSION_REFERENCES_CONTAINED
+import com.google.android.fhir.datacapture.EXTENSION_RENDERING_XHTML
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.answerExpression
+import com.google.android.fhir.datacapture.common.datatype.asStringValue
+import com.google.android.fhir.datacapture.displayDrawable
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
 
 /**
  * Data item for [QuestionnaireItemViewHolder] in [RecyclerView].
@@ -75,7 +85,9 @@ data class QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemAnswerOptionComponent> =
     {
       emptyList()
-    }
+    },
+  private val resolveContainedBinary:
+    suspend (String) -> Drawable?
 ) {
 
   /**
@@ -181,6 +193,75 @@ data class QuestionnaireItemViewItem(
           else -> emptyList()
         }
       }
+
+  internal fun displayDrawable(answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent): Drawable?=
+    runBlocking(Dispatchers.IO) {
+      when(answerOption.value){
+        is Coding -> {
+          val codingValue = answerOption.valueCoding.displayElement.extension.singleOrNull{
+            it.url == EXTENSION_RENDERING_XHTML
+          }?.value
+          codingValue?.asStringValue()?.let {
+            if (it.startsWith("<img src='data:")) {
+               val imageString = it.substringAfter(",").substringBeforeLast("'")
+              val imageBytes = Base64.decode(imageString, Base64.DEFAULT);
+              val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+              return@runBlocking BitmapDrawable(null, bitmap)
+            }else if (it.startsWith("<img src='#")){
+              val reference = codingValue.extension.singleOrNull {
+                it.url == EXTENSION_REFERENCES_CONTAINED
+              }?.value as Reference
+
+              //val imgIdFromContainedList = reference.reference.substringAfter("#")
+              return@runBlocking resolveContainedBinary(reference.reference.toString())
+            }
+          }
+        }
+        else -> //val imgIdFromContainedList = reference.reference.substringAfter("#")
+        {
+          return@runBlocking null
+        }
+      }
+      /*
+       when (value) {
+      is Coding -> {
+        var drawable: Drawable? = null
+        val value = valueCoding.displayElement.extension.singleOrNull {
+          it.url == EXTENSION_RENDERING_XHTML
+        }?.value
+        value?.asStringValue()?.let {
+          if (it.startsWith("<img src='data:")) {
+            val imageString = it.substringAfter(",").substringBeforeLast("'")
+            val imageBytes = Base64.decode(imageString, Base64.DEFAULT);
+            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+          drawable = BitmapDrawable(null, bitmap)
+          } else if (it.startsWith("<img src='#")) {
+           val reference = value.extension.singleOrNull {
+              it.url == EXTENSION_REFERENCES_CONTAINED
+            }?.value as Reference
+
+            val imgIdFromContainedList = reference.reference.substringAfter("#")
+           // drawable =
+          }
+        }
+        drawable
+      }
+      else -> null
+    }
+
+      */
+
+      /* when {
+         questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
+         !questionnaireItem.answerValueSet.isNullOrEmpty() ->
+           resolveAnswerValueSet(questionnaireItem.answerValueSet)
+         questionnaireItem.answerExpression != null -> resolveAnswerExpression(questionnaireItem)
+         else -> null
+       }*/
+      return@runBlocking null
+    }
+
+
 
   /**
    * Returns whether this [QuestionnaireItemViewItem] and the `other` [QuestionnaireItemViewItem]

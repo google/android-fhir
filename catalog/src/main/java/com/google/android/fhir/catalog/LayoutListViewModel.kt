@@ -38,7 +38,7 @@ class LayoutListViewModel(application: Application, private val state: SavedStat
     DEFAULT(
       R.drawable.ic_defaultlayout,
       R.string.layout_name_default_text,
-      "layout_default.json",
+      "questionnaire_sdc_profile_example_image_options.json",
       WorkflowType.DEFAULT
     ),
     PAGINATED(

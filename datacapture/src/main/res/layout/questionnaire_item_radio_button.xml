@@ -5,5 +5,7 @@
     android:id="@+id/radio_button"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:drawableLeft="@drawable/ic_help_48px"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+    android:drawablePadding="@dimen/item_margin_horizontal"
 />

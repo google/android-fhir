@@ -26,6 +26,7 @@ import androidx.core.view.children
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
+import com.google.android.fhir.datacapture.displayDrawable
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -104,6 +105,14 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
           radioButtonItem.findViewById<RadioButton>(R.id.radio_button).apply {
             id = viewId
             text = answerOption.displayString
+           // val drawable = answerOption.displayDrawable
+            setCompoundDrawablesWithIntrinsicBounds(
+              questionnaireItemViewItem.displayDrawable(answerOption),
+             // answerOption.displayDrawable,
+              null,
+              null,
+              null
+            )
             layoutParams =
               ViewGroup.LayoutParams(
                 when (choiceOrientation) {

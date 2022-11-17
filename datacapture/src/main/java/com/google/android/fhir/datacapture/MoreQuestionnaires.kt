@@ -16,9 +16,15 @@
 
 package com.google.android.fhir.datacapture
 
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.util.Base64
+import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * The StructureMap url in the
@@ -55,6 +61,17 @@ private const val TARGET_STRUCTURE_MAP: String =
 
 val Questionnaire.isPaginated: Boolean
   get() = item.any { item -> item.displayItemControl == DisplayItemControlType.PAGE }
+
+internal fun Questionnaire.getContainedImage(id: String): Drawable?
+ {
+  val resource = this.contained.filter { it.id == id && it.resourceType == ResourceType.Binary }.first() as Binary
+   if( resource.contentType == "image/png") {
+     //val imageBytes = Base64.decode(resource.data, Base64.DEFAULT)//check if required
+     val bitmap = BitmapFactory.decodeByteArray(resource.data, 0, resource.data.size)
+     return BitmapDrawable( bitmap)
+   }
+   return null
+}
 
 /**
  * See
