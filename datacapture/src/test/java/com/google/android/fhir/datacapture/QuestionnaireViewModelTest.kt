@@ -1391,10 +1391,7 @@ class QuestionnaireViewModelTest(
             linkId = "a-boolean-item-1"
             text = "a question"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addExtension().apply {
-              url = EXTENSION_HIDDEN_URL
-              setValue(BooleanType(true))
-            }
+            addExtension(hiddenExtension)
           }
         )
       }
@@ -1796,7 +1793,11 @@ class QuestionnaireViewModelTest(
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
-            pages = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true)),
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = false)
+              ),
             currentPageIndex = 0
           )
         )
@@ -1853,7 +1854,11 @@ class QuestionnaireViewModelTest(
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
-            pages = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true)),
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = false)
+              ),
             currentPageIndex = 1
           )
         )
@@ -1902,7 +1907,11 @@ class QuestionnaireViewModelTest(
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
-            pages = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true)),
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = false)
+              ),
             currentPageIndex = 0
           )
         )
@@ -1971,9 +1980,144 @@ class QuestionnaireViewModelTest(
             isPaginated = true,
             pages =
               listOf(
-                QuestionnairePage(0, true),
-                QuestionnairePage(1, false),
-                QuestionnairePage(2, true)
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = false, hidden = false),
+                QuestionnairePage(2, enabled = true, hidden = false),
+              ),
+            currentPageIndex = 2
+          )
+        )
+    }
+  }
+
+  @Test
+  fun `should skip first page if it is hidden in a paginated questionnaire`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addExtension(hiddenExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 1"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 2"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page3"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page3-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 3"
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = true),
+                QuestionnairePage(1, enabled = true, hidden = false),
+                QuestionnairePage(2, enabled = true, hidden = false)
+              ),
+            currentPageIndex = 2
+          )
+        )
+    }
+  }
+
+  @Test
+  fun `should skip hidden page in a paginated questionnaire`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 1"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addExtension(hiddenExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 2"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page3"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page3-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 3"
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
+      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = true),
+                QuestionnairePage(2, enabled = true, hidden = false)
               ),
             currentPageIndex = 2
           )
@@ -2991,6 +3135,47 @@ class QuestionnaireViewModelTest(
     }
 
   @Test
+  fun `paginated questionnaire with no review feature should not show review button when last page is hidden`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "page1"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              addExtension(paginationExtension)
+              addExtension(hiddenExtension)
+              addItem(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "page1-1"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  text = "Question on page 1"
+                }
+              )
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "page2"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              addExtension(paginationExtension)
+              addItem(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "page2-1"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  text = "Question on page 2"
+                }
+              )
+            }
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
+
+      assertThat(viewModel.questionnaireStateFlow.value.pagination.showReviewButton).isFalse()
+    }
+
+  @Test
   fun `paginated questionnaire with review feature should show review button when moved to next page`() =
     runBlocking {
       val questionnaire =
@@ -3031,6 +3216,47 @@ class QuestionnaireViewModelTest(
 
         assertThat(viewModel.questionnaireStateFlow.value.pagination.showReviewButton).isTrue()
       }
+    }
+
+  @Test
+  fun `paginated questionnaire with review feature should show review button when last page is hidden`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "page1"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              addExtension(paginationExtension)
+              addExtension(hiddenExtension)
+              addItem(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "page1-1"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  text = "Question on page 1"
+                }
+              )
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "page2"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              addExtension(paginationExtension)
+              addItem(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "page2-1"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  text = "Question on page 2"
+                }
+              )
+            }
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
+
+      assertThat(viewModel.questionnaireStateFlow.value.pagination.showReviewButton).isTrue()
     }
 
   @Test
@@ -3444,6 +3670,12 @@ class QuestionnaireViewModelTest(
             }
           )
         )
+      }
+
+    private val hiddenExtension =
+      Extension().apply {
+        url = EXTENSION_HIDDEN_URL
+        setValue(BooleanType(true))
       }
 
     val printer: IParser = FhirContext.forR4().newJsonParser()
