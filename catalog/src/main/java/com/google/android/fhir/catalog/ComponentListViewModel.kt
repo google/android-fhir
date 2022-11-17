@@ -112,7 +112,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
     REPEATED_GROUP(
       R.drawable.ic_textfield,
       R.string.component_name_repeated_group,
-      "repeated_group_questionnaire.json",
+      "component_repeated_group.json",
     ),
   }
 }
