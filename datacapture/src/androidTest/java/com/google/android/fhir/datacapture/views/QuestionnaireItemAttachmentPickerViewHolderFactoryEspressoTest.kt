@@ -143,7 +143,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shouldShowPreviewPhotoFromAnswer() {
+  fun shouldShowPreviewImageFromAnswer() {
     val questionnaireItemView =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -241,7 +241,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("application/pdf"))
+            setValue(CodeType("video/*"))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
@@ -255,7 +255,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
                       "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
                       Base64.DEFAULT
                     )
-                  contentType = "application/pdf"
+                  contentType = "video/*"
                 }
             }
           )
@@ -289,7 +289,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("application/pdf"))
+            setValue(CodeType("audio/*"))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
@@ -303,7 +303,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
                       "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
                       Base64.DEFAULT
                     )
-                  contentType = "application/pdf"
+                  contentType = "audio/*"
                 }
             }
           )
