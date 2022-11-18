@@ -48,6 +48,7 @@ import java.io.File
 import java.util.Date
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemAttachmentViewHolderFactory :
@@ -83,43 +84,8 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         header.bind(questionnaireItem)
-
-        questionnaireItemViewItem.answers.firstOrNull()?.valueAttachment?.let { attachment ->
-          when (attachment.contentType.getGeneralMimeType()) {
-            GeneralMimeTypes.IMAGE.value -> {
-              loadPhotoPreviewInBytes(attachment.data)
-              clearFilePreview()
-              loadDeleteButton(R.string.delete_image)
-            }
-            GeneralMimeTypes.DOCUMENT.value -> {
-              loadFilePreview(R.drawable.file, attachment.title)
-              clearPhotoPreview()
-              loadDeleteButton(R.string.delete_file)
-            }
-            GeneralMimeTypes.VIDEO.value -> {
-              loadFilePreview(R.drawable.video_file, attachment.title)
-              clearPhotoPreview()
-              loadDeleteButton(R.string.delete_file)
-            }
-            GeneralMimeTypes.AUDIO.value -> {
-              loadFilePreview(R.drawable.audio_file, attachment.title)
-              clearPhotoPreview()
-              loadDeleteButton(R.string.delete_file)
-            }
-          }
-        }
-
-        if (questionnaireItem.hasGeneralMimeTypeOnly(GeneralMimeTypes.IMAGE.value)) {
-          takePhoto.visibility = View.VISIBLE
-          loadUploadButton(R.drawable.image_file, R.string.upload_photo)
-        } else if (questionnaireItem.hasGeneralMimeType(GeneralMimeTypes.IMAGE.value)) {
-          takePhoto.visibility = View.VISIBLE
-          loadUploadButton(R.drawable.file, R.string.select_file)
-        } else {
-          takePhoto.visibility = View.GONE
-          loadUploadButton(R.drawable.file, R.string.select_file)
-        }
-
+        displayInitialAttachmentPreview()
+        displayActionButtons(questionnaireItem)
         takePhoto.setOnClickListener { onTakePhotoClicked(questionnaireItem) }
         selectFile.setOnClickListener { onSelectFileClicked(questionnaireItem) }
         delete.setOnClickListener {
@@ -156,6 +122,46 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           selectFile.alpha = 1F
           delete.isClickable = true
           delete.alpha = 1F
+        }
+      }
+
+      private fun displayInitialAttachmentPreview() {
+        questionnaireItemViewItem.answers.firstOrNull()?.valueAttachment?.let { attachment ->
+          when (attachment.contentType.getGeneralMimeType()) {
+            GeneralMimeTypes.IMAGE.value -> {
+              loadPhotoPreviewInBytes(attachment.data)
+              clearFilePreview()
+              loadDeleteButton(R.string.delete_image)
+            }
+            GeneralMimeTypes.DOCUMENT.value -> {
+              loadFilePreview(R.drawable.file, attachment.title)
+              clearPhotoPreview()
+              loadDeleteButton(R.string.delete_file)
+            }
+            GeneralMimeTypes.VIDEO.value -> {
+              loadFilePreview(R.drawable.video_file, attachment.title)
+              clearPhotoPreview()
+              loadDeleteButton(R.string.delete_file)
+            }
+            GeneralMimeTypes.AUDIO.value -> {
+              loadFilePreview(R.drawable.audio_file, attachment.title)
+              clearPhotoPreview()
+              loadDeleteButton(R.string.delete_file)
+            }
+          }
+        }
+      }
+
+      private fun displayActionButtons(questionnaireItem: QuestionnaireItemComponent) {
+        if (questionnaireItem.hasGeneralMimeTypeOnly(GeneralMimeTypes.IMAGE.value)) {
+          takePhoto.visibility = View.VISIBLE
+          loadUploadButton(R.drawable.image_file, R.string.upload_photo)
+        } else if (questionnaireItem.hasGeneralMimeType(GeneralMimeTypes.IMAGE.value)) {
+          takePhoto.visibility = View.VISIBLE
+          loadUploadButton(R.drawable.file, R.string.select_file)
+        } else {
+          takePhoto.visibility = View.GONE
+          loadUploadButton(R.drawable.file, R.string.select_file)
         }
       }
 
