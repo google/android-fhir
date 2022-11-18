@@ -132,6 +132,9 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.take_photo).visibility)
+      .isEqualTo(View.GONE)
+
     assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).visibility)
       .isEqualTo(View.VISIBLE)
 
