@@ -348,7 +348,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
       }
 
       private fun displayError(@StringRes textResource: Int, vararg formatArgs: Any?) {
-        displayValidationResult(Invalid(listOf(context.getString(textResource, formatArgs))))
+        displayValidationResult(Invalid(listOf(context.getString(textResource, *formatArgs))))
       }
 
       private fun getFileName(uri: Uri): String {
