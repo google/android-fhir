@@ -226,10 +226,13 @@ internal val Questionnaire.QuestionnaireItemComponent.maxSizeInMB: BigDecimal?
     return maxSizeInKB?.div(SIZE_UNIT_DIVIDER)
   }
 
+/** Written as Binary Bytes. Equals to 1 MB of file size. */
+private val DEFAULT_FILE_SIZE = BigDecimal(1048576)
+
 internal fun Questionnaire.QuestionnaireItemComponent.isMaxSizeOverLimit(
   uploadedFileSize: BigDecimal
 ): Boolean {
-  return uploadedFileSize > (maxSizeInB ?: BigDecimal(0))
+  return uploadedFileSize > (maxSizeInB ?: DEFAULT_FILE_SIZE)
 }
 
 /** UI controls relevant to rendering questionnaire items. */
