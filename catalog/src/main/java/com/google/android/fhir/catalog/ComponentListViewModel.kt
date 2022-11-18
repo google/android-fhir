@@ -44,8 +44,8 @@ class ComponentListViewModel(application: Application, private val state: SavedS
     ATTACHMENT(
       R.drawable.ic_attachment,
       R.string.component_name_attachment,
-      "attachment_questionnaire.json",
-      "attachment_with_validation_questionnaire.json"
+      "component_attachment.json",
+      "component_attachment_with_validation.json"
     ),
     BOOLEAN_CHOICE(
       R.drawable.ic_booleanchoice,
