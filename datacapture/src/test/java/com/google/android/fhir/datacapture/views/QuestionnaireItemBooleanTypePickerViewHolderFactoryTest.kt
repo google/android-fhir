@@ -306,7 +306,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).text)
       .isEqualTo("Missing answer for required field.")
   }
 
@@ -327,7 +327,8 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text).isEqualTo("")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).text)
+      .isEqualTo("")
   }
 
   @Test
