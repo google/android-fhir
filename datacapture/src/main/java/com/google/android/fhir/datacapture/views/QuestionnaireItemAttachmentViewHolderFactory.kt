@@ -184,6 +184,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           if (!questionnaireItem.hasGeneralMimeType(mimeType.getGeneralMimeType())) {
             displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
             displaySnackbar(takePhoto, R.string.upload_failed)
+            file.delete()
             return@setFragmentResultListener
           }
 
