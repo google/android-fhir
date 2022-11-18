@@ -77,10 +77,10 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
     assertThat(viewHolder.itemView.findViewById<Button>(R.id.take_photo).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload).visibility)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload).text)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).text)
       .isEqualTo(parent.context.getString(R.string.upload_photo))
   }
 
@@ -108,10 +108,10 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
     assertThat(viewHolder.itemView.findViewById<Button>(R.id.take_photo).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload).visibility)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload).text)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).text)
       .isEqualTo(parent.context.getString(R.string.select_file))
   }
 
@@ -132,10 +132,10 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload).visibility)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload).text)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).text)
       .isEqualTo(parent.context.getString(R.string.select_file))
   }
 
@@ -173,10 +173,10 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
     assertThat(viewHolder.itemView.findViewById<Button>(R.id.take_photo).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload).visibility)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload).text)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).text)
       .isEqualTo(parent.context.getString(R.string.upload_photo))
 
     assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.photo_preview).visibility)
@@ -215,10 +215,10 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload).visibility)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload).text)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).text)
       .isEqualTo(parent.context.getString(R.string.select_file))
 
     assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.file_preview).visibility)
@@ -263,10 +263,10 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload).visibility)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload).text)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).text)
       .isEqualTo(parent.context.getString(R.string.select_file))
 
     assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.file_preview).visibility)
@@ -311,10 +311,10 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload).visibility)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload).text)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).text)
       .isEqualTo(parent.context.getString(R.string.select_file))
 
     assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.file_preview).visibility)
