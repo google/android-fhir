@@ -1,0 +1,665 @@
+{
+  "resourceType": "Measure",
+  "id": "ANCIND01",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/computable-measure-cqfm"
+    ]
+  },
+  "contained": [
+    {
+      "resourceType": "Library",
+      "id": "effective-data-requirements",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-directReferenceCode",
+          "valueCoding": {
+            "system": "http://ohie.org/CodeSystem/iso-8601-derived-periods",
+            "code": "P10Y--P14Y",
+            "display": "10-14 years"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-directReferenceCode",
+          "valueCoding": {
+            "system": "http://ohie.org/CodeSystem/iso-8601-derived-periods",
+            "code": "P15Y--P19Y",
+            "display": "15-19 years"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-directReferenceCode",
+          "valueCoding": {
+            "system": "http://ohie.org/CodeSystem/iso-8601-derived-periods",
+            "code": "P20Y--P9999Y",
+            "display": "20+ years"
+          }
+        },
+        {
+          "extension": [
+            {
+              "url": "libraryName",
+              "valueString": "ANCBaseDataElements"
+            },
+            {
+              "url": "name",
+              "valueString": "Antenatal care contact"
+            },
+            {
+              "url": "statement",
+              "valueString": "define \"Antenatal care contact\":\n  [\"Encounter\": type in BCx.\"Antenatal care contact\"]"
+            },
+            {
+              "url": "displaySequence",
+              "valueInteger": 0
+            }
+          ],
+          "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition"
+        },
+        {
+          "extension": [
+            {
+              "url": "libraryName",
+              "valueString": "ANCIND01"
+            },
+            {
+              "url": "name",
+              "valueString": "First antenatal care contact"
+            },
+            {
+              "url": "statement",
+              "valueString": "define \"First antenatal care contact\":\n  BaseData.\"Antenatal care contact\" C\n    where C.reasonCode in Cx.\"First Antenatal Care Contact Choices\""
+            },
+            {
+              "url": "displaySequence",
+              "valueInteger": 1
+            }
+          ],
+          "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition"
+        },
+        {
+          "extension": [
+            {
+              "url": "libraryName",
+              "valueString": "ANCContactDataElements"
+            },
+            {
+              "url": "name",
+              "valueString": "Gestational age"
+            },
+            {
+              "url": "statement",
+              "valueString": "/*\n  @dataElement: ANC.B6.DE17 Gestational age\n  @activity: ANC.B6. Collect woman's profile and history\n  @description: Gestational age in weeks and/or days depending on the source of gestational age\n*/\ndefine \"Gestational age\":\n  WC.MostRecent(\n  [Observation: Cx.\"Gestational age\"] O\n    where O.status in { 'final', 'amended', 'corrected' }\n      and Coalesce(WC.ModifierExtension(O, 'who-notDone').value, false) is false\n      and Last(Split(O.encounter.reference, '/')) = Encounter.id\n  ).value as FHIR.Quantity"
+            },
+            {
+              "url": "displaySequence",
+              "valueInteger": 2
+            }
+          ],
+          "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition"
+        },
+        {
+          "extension": [
+            {
+              "url": "libraryName",
+              "valueString": "ANCIND01"
+            },
+            {
+              "url": "name",
+              "valueString": "Numerator"
+            },
+            {
+              "url": "statement",
+              "valueString": "/*\nNumerator: Number of pregnant women who had their first ANC contact before 12 weeks (facility level)\nNumerator Computation: Count of women whose gestational age <= 12 weeks at the time of first contact\n*/\ndefine Numerator:\n  exists (\n    \"First antenatal care contact\" C\n      where C.period starts during \"Measurement Period\"\n        and ContactData.\"Gestational age\" <= 12 weeks\n  )"
+            },
+            {
+              "url": "displaySequence",
+              "valueInteger": 3
+            }
+          ],
+          "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition"
+        },
+        {
+          "extension": [
+            {
+              "url": "libraryName",
+              "valueString": "ANCStratifiers"
+            },
+            {
+              "url": "name",
+              "valueString": "By Age"
+            },
+            {
+              "url": "statement",
+              "valueString": "/*\nBy Patient Age as of the start of the Measurement Period\nAge (10-14, 15-19, 20+)\n*/\ndefine \"By Age\":\n  case\n    when AgeInYearsAt(start of \"Measurement Period\") in Interval[10, 14] then \"P10Y--P14Y\"\n    when AgeInYearsAt(start of \"Measurement Period\") in Interval[15, 19] then \"P15Y--P19Y\"\n    when AgeInYearsAt(start of \"Measurement Period\") >= 20 then \"P20Y--P9999Y\"\n    else null\n  end"
+            },
+            {
+              "url": "displaySequence",
+              "valueInteger": 4
+            }
+          ],
+          "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition"
+        },
+        {
+          "extension": [
+            {
+              "url": "libraryName",
+              "valueString": "ANCIND01"
+            },
+            {
+              "url": "name",
+              "valueString": "Age Stratifier"
+            },
+            {
+              "url": "statement",
+              "valueString": "/*\nDisaggregation: Age (10-14, 15-19, 20+)\n*/\ndefine \"Age Stratifier\":\n  Stratifiers.\"By Age\""
+            },
+            {
+              "url": "displaySequence",
+              "valueInteger": 5
+            }
+          ],
+          "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition"
+        },
+        {
+          "extension": [
+            {
+              "url": "libraryName",
+              "valueString": "ANCIND01"
+            },
+            {
+              "url": "name",
+              "valueString": "Denominator"
+            },
+            {
+              "url": "statement",
+              "valueString": "/*\nDenominator: Total number of antenatal clients with a first contact\nDenominator Computation: Count of all women who had first contact within the last reporting period\n*/\ndefine Denominator:\n  exists (\n    \"First antenatal care contact\" C\n      where C.period starts during \"Measurement Period\"\n  )"
+            },
+            {
+              "url": "displaySequence",
+              "valueInteger": 6
+            }
+          ],
+          "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition"
+        },
+        {
+          "extension": [
+            {
+              "url": "libraryName",
+              "valueString": "ANCStratifiers"
+            },
+            {
+              "url": "name",
+              "valueString": "By Education Level"
+            },
+            {
+              "url": "statement",
+              "valueString": "/*\nBy Patient Education Level (none, don't know, primary, secondary, higher)\n*/\ndefine \"By Education Level\":\n  Patient.extension E\n    where E.url = 'http://fhir.org/guides/who/anc-cds/StructureDefinition/educationlevel'\n    return E.value as CodeableConcept"
+            },
+            {
+              "url": "displaySequence",
+              "valueInteger": 7
+            }
+          ],
+          "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition"
+        },
+        {
+          "extension": [
+            {
+              "url": "libraryName",
+              "valueString": "ANCIND01"
+            },
+            {
+              "url": "name",
+              "valueString": "Education Level Stratifier"
+            },
+            {
+              "url": "statement",
+              "valueString": "/*\nDisaggregation: Education Level (none, don't know, primary, secondary, higher)\n*/\ndefine \"Education Level Stratifier\":\n  Stratifiers.\"By Education Level\""
+            },
+            {
+              "url": "displaySequence",
+              "valueInteger": 8
+            }
+          ],
+          "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition"
+        },
+        {
+          "extension": [
+            {
+              "url": "libraryName",
+              "valueString": "ANCBaseDataElements"
+            },
+            {
+              "url": "name",
+              "valueString": "Antenatal care case"
+            },
+            {
+              "url": "statement",
+              "valueString": "/*\ndefine \"Pregnant\":\n  \"Pregnancy\" is not null\n    or \"Pregnancy status\" in BCx.\"Pregnancy status - pregnant\"\n\ndefine \"Pregnancy status\":\n  FHIRHelpers.ToConcept(\n    Last(\n      [Observation: BCx.\"Pregnancy status\"] O\n        where O.status = 'final'\n        sort by FHIRHelpers.ToDateTime(effective as FHIR.dateTime)\n    ).value\n  )\n*/\ndefine \"Antenatal care case\":\n  [\"EpisodeOfCare\": type in BCx.\"Antenatal care case\"]"
+            },
+            {
+              "url": "displaySequence",
+              "valueInteger": 9
+            }
+          ],
+          "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition"
+        },
+        {
+          "extension": [
+            {
+              "url": "libraryName",
+              "valueString": "ANCIND01"
+            },
+            {
+              "url": "name",
+              "valueString": "Initial Population"
+            },
+            {
+              "url": "statement",
+              "valueString": "/*\nInitial population: Antenatal clients\n*/\ndefine \"Initial Population\":\n  exists (BaseData.\"Antenatal care case\")"
+            },
+            {
+              "url": "displaySequence",
+              "valueInteger": 10
+            }
+          ],
+          "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition"
+        }
+      ],
+      "status": "active",
+      "type": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/library-type",
+            "code": "module-definition"
+          }
+        ]
+      },
+      "date": "2022-02-10T09:38:52-07:00",
+      "relatedArtifact": [
+        {
+          "type": "depends-on",
+          "display": "Library BaseData",
+          "resource": "http://fhir.org/guides/who/anc-cds/Library/ANCBaseDataElements"
+        },
+        {
+          "type": "depends-on",
+          "display": "Library BCx",
+          "resource": "http://fhir.org/guides/who/anc-cds/Library/ANCBaseConcepts"
+        },
+        {
+          "type": "depends-on",
+          "display": "Library FHIRHelpers",
+          "resource": "http://fhir.org/guides/who/anc-cds/Library/FHIRHelpers|4.0.1"
+        },
+        {
+          "type": "depends-on",
+          "display": "Library Cx",
+          "resource": "http://fhir.org/guides/who/anc-cds/Library/ANCConcepts"
+        },
+        {
+          "type": "depends-on",
+          "display": "Library ContactData",
+          "resource": "http://fhir.org/guides/who/anc-cds/Library/ANCContactDataElements"
+        },
+        {
+          "type": "depends-on",
+          "display": "Library WC",
+          "resource": "http://fhir.org/guides/who/anc-cds/Library/WHOCommon"
+        },
+        {
+          "type": "depends-on",
+          "display": "Library Stratifiers",
+          "resource": "http://fhir.org/guides/who/anc-cds/Library/ANCStratifiers"
+        },
+        {
+          "type": "depends-on",
+          "display": "Code system ISO-8601-Derived Periods",
+          "resource": "http://ohie.org/CodeSystem/iso-8601-derived-periods"
+        },
+        {
+          "type": "depends-on",
+          "display": "Value set Antenatal care contact",
+          "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/antenatal-care-contact"
+        },
+        {
+          "type": "depends-on",
+          "display": "Value set First Antenatal Care Contact Choices",
+          "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b5-de2"
+        },
+        {
+          "type": "depends-on",
+          "display": "Value set Gestational age",
+          "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de17"
+        },
+        {
+          "type": "depends-on",
+          "display": "Value set Antenatal care case",
+          "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/antenatal-care-case"
+        }
+      ],
+      "parameter": [
+        {
+          "name": "Measurement Period",
+          "use": "in",
+          "min": 0,
+          "max": "1",
+          "type": "Period"
+        },
+        {
+          "name": "Numerator",
+          "use": "out",
+          "min": 0,
+          "max": "1",
+          "type": "boolean"
+        },
+        {
+          "name": "Age Stratifier",
+          "use": "out",
+          "min": 0,
+          "max": "1",
+          "type": "Coding"
+        },
+        {
+          "name": "Denominator",
+          "use": "out",
+          "min": 0,
+          "max": "1",
+          "type": "boolean"
+        },
+        {
+          "name": "Education Level Stratifier",
+          "use": "out",
+          "min": 0,
+          "max": "*",
+          "type": "CodeableConcept"
+        },
+        {
+          "name": "Initial Population",
+          "use": "out",
+          "min": 0,
+          "max": "1",
+          "type": "boolean"
+        }
+      ],
+      "dataRequirement": [
+        {
+          "type": "Encounter",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/Encounter"
+          ]
+        },
+        {
+          "type": "Encounter",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/Encounter"
+          ],
+          "mustSupport": [
+            "period",
+            "reasonCode",
+            "type"
+          ],
+          "codeFilter": [
+            {
+              "path": "type",
+              "valueSet": "http://fhir.org/guides/who/anc-cds/ValueSet/antenatal-care-contact"
+            }
+          ]
+        },
+        {
+          "type": "Observation",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/Observation"
+          ],
+          "mustSupport": [
+            "code",
+            "encounter.reference",
+            "encounter",
+            "status"
+          ],
+          "codeFilter": [
+            {
+              "path": "code",
+              "valueSet": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de17"
+            }
+          ]
+        },
+        {
+          "type": "Patient",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/Patient"
+          ],
+          "mustSupport": [
+            "value",
+            "url"
+          ]
+        },
+        {
+          "type": "EpisodeOfCare",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/EpisodeOfCare"
+          ],
+          "mustSupport": [
+            "type"
+          ],
+          "codeFilter": [
+            {
+              "path": "type",
+              "valueSet": "http://fhir.org/guides/who/anc-cds/ValueSet/antenatal-care-case"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    },
+    {
+      "id": "effective-data-requirements",
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-effectiveDataRequirements",
+      "valueReference": {
+        "reference": "#effective-data-requirements"
+      }
+    }
+  ],
+  "url": "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+  "version": "0.3.0",
+  "name": "ANCIND01",
+  "title": "ANC.IND.01 Percentage of pregnant women with first ANC contact in the first trimester",
+  "status": "draft",
+  "experimental": false,
+  "date": "2022-02-10T10:38:52-06:00",
+  "publisher": "World Health Organization (WHO)",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "https://www.who.int"
+        }
+      ]
+    }
+  ],
+  "description": "Percentage of pregnant women with first ANC contact in the first trimester (before 12 weeks of gestation)",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+          "code": "001"
+        }
+      ]
+    }
+  ],
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "display": "Library BaseData",
+      "resource": "http://fhir.org/guides/who/anc-cds/Library/ANCBaseDataElements"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library BCx",
+      "resource": "http://fhir.org/guides/who/anc-cds/Library/ANCBaseConcepts"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library FHIRHelpers",
+      "resource": "http://fhir.org/guides/who/anc-cds/Library/FHIRHelpers|4.0.1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library Cx",
+      "resource": "http://fhir.org/guides/who/anc-cds/Library/ANCConcepts"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library ContactData",
+      "resource": "http://fhir.org/guides/who/anc-cds/Library/ANCContactDataElements"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library WC",
+      "resource": "http://fhir.org/guides/who/anc-cds/Library/WHOCommon"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library Stratifiers",
+      "resource": "http://fhir.org/guides/who/anc-cds/Library/ANCStratifiers"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ISO-8601-Derived Periods",
+      "resource": "http://ohie.org/CodeSystem/iso-8601-derived-periods"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Antenatal care contact",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/antenatal-care-contact"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set First Antenatal Care Contact Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b5-de2"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Gestational age",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de17"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Antenatal care case",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/antenatal-care-case"
+    }
+  ],
+  "library": [
+    "http://fhir.org/guides/who/anc-cds/Library/ANCIND01"
+  ],
+  "scoring": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/measure-scoring",
+        "code": "proportion"
+      }
+    ]
+  },
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/measure-type",
+          "code": "process"
+        }
+      ]
+    }
+  ],
+  "improvementNotation": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/measure-improvement-notation",
+        "code": "increase"
+      }
+    ]
+  },
+  "group": [
+    {
+      "id": "group-1",
+      "population": [
+        {
+          "id": "initial-population",
+          "code": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+                "code": "initial-population"
+              }
+            ]
+          },
+          "criteria": {
+            "language": "text/cql-identifier",
+            "expression": "Initial Population"
+          }
+        },
+        {
+          "id": "denominator",
+          "code": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+                "code": "denominator"
+              }
+            ]
+          },
+          "criteria": {
+            "language": "text/cql-identifier",
+            "expression": "Denominator"
+          }
+        },
+        {
+          "id": "numerator",
+          "code": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/measure-population",
+                "code": "numerator"
+              }
+            ]
+          },
+          "criteria": {
+            "language": "text/cql-identifier",
+            "expression": "Numerator"
+          }
+        }
+      ],
+      "stratifier": [
+        {
+          "id": "by-age",
+          "criteria": {
+            "language": "text/cql-identifier",
+            "expression": "Age Stratifier"
+          }
+        },
+        {
+          "id": "by-education-level",
+          "criteria": {
+            "language": "text/cql-identifier",
+            "expression": "Education Level Stratifier"
+          }
+        }
+      ]
+    }
+  ]
+}
