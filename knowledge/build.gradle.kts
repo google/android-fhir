@@ -106,6 +106,12 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+
+  // remove me
+  implementation("org.apache.commons:commons-compress:1.20")
+  implementation("com.google.code.gson:gson:2.10")
+  implementation("ca.uhn.hapi.fhir:org.hl7.fhir.convertors:5.6.36")
+  implementation(Dependencies.Cql.engineJackson) // Necessary to import Executable XML/JSON CQL libs
 }
 
 tasks.dokkaHtml.configure {
