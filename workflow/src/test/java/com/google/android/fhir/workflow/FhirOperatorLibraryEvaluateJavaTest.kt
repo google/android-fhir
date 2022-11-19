@@ -40,6 +40,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
 
   private lateinit var fhirEngine: FhirEngine
   private lateinit var fhirOperator: FhirOperator
+  private lateinit var fhirEngineApiProvider: FhirEngineApiProvider
 
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
   private val jsonParser = fhirContext.newJsonParser()
@@ -55,7 +56,8 @@ class FhirOperatorLibraryEvaluateJavaTest {
   @Before
   fun setUp() = runBlocking {
     fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
-    fhirOperator = FhirOperator(fhirContext, fhirEngine)
+    fhirEngineApiProvider = FhirEngineApiProvider(fhirContext, fhirEngine)
+    fhirOperator = FhirOperator(fhirContext, fhirEngineApiProvider)
   }
 
   /**
@@ -101,7 +103,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
     }
 
     // Load Library that checks if Patient has taken a vaccine
-    fhirOperator.loadLibs(load("/immunity-check/ImmunityCheck.json"))
+    fhirEngineApiProvider.loadLibs(load("/immunity-check/ImmunityCheck.json"))
 
     // Evaluates a specific Patient
     val results =

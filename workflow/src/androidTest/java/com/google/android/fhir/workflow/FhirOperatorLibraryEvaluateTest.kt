@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ class FhirOperatorLibraryEvaluateTest {
 
   private lateinit var fhirEngine: FhirEngine
   private lateinit var fhirOperator: FhirOperator
+  private lateinit var fhirEngineApiProvider: FhirEngineApiProvider
 
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
   private val jsonParser = fhirContext.newJsonParser()
@@ -55,7 +56,8 @@ class FhirOperatorLibraryEvaluateTest {
   @Before
   fun setUp() = runBlocking {
     fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
-    fhirOperator = FhirOperator(fhirContext, fhirEngine)
+    fhirEngineApiProvider = FhirEngineApiProvider(fhirContext, fhirEngine)
+    fhirOperator = FhirOperator(fhirContext, fhirEngineApiProvider)
   }
 
   /**
@@ -101,7 +103,7 @@ class FhirOperatorLibraryEvaluateTest {
     }
 
     // Load Library that checks if Patient has taken a vaccine
-    fhirOperator.loadLibs(load("/immunity-check/ImmunityCheck.json"))
+    fhirEngineApiProvider.loadLibs(load("/immunity-check/ImmunityCheck.json"))
 
     // Evaluates a specific Patient
     val results =
@@ -109,8 +111,7 @@ class FhirOperatorLibraryEvaluateTest {
         "http://localhost/Library/ImmunityCheck|1.0.0",
         "d4d35004-24f8-40e4-8084-1ad75924514f",
         setOf("CompletedImmunization")
-      ) as
-        Parameters
+      ) as Parameters
 
     assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
   }

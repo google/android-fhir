@@ -46,6 +46,7 @@ class FhirOperatorTest {
 
   private lateinit var fhirEngine: FhirEngine
   private lateinit var fhirOperator: FhirOperator
+  private lateinit var fhirEngineApiProvider: FhirEngineApiProvider
 
   companion object {
     private val libraryBundle: Bundle by lazy { parseJson("/ANCIND01-bundle.json") }
@@ -66,7 +67,9 @@ class FhirOperatorTest {
   @Before
   fun setUp() = runBlocking {
     fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
-    fhirOperator = FhirOperator(fhirContext, fhirEngine)
+    fhirEngineApiProvider = FhirEngineApiProvider(fhirContext, fhirEngine)
+    fhirOperator = FhirOperator(fhirContext, fhirEngineApiProvider)
+
     TimeZone.setDefault(TimeZone.getTimeZone("GMT"))
   }
 
@@ -202,7 +205,7 @@ class FhirOperatorTest {
   private suspend fun loadBundle(bundle: Bundle) {
     for (entry in bundle.entry) {
       when (entry.resource.resourceType) {
-        ResourceType.Library -> fhirOperator.loadLib(entry.resource as Library)
+        ResourceType.Library -> fhirEngineApiProvider.loadLib(entry.resource as Library)
         ResourceType.Bundle -> Unit
         else -> fhirEngine.create(entry.resource)
       }
