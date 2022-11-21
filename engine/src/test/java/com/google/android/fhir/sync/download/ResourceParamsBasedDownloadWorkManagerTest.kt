@@ -37,7 +37,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
   @Test
   fun getNextRequestUrl_shouldReturnNextResourceUrls() = runBlockingTest {
     val downloadManager =
-      ResourceParamsBasedDownloadWorkManager(
+      com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(
         mapOf(
           ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"),
           ResourceType.Immunization to emptyMap(),
@@ -69,7 +69,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
   @Test
   fun getNextRequestUrl_shouldReturnResourceAndPageUrlsAsNextUrls() = runBlockingTest {
     val downloadManager =
-      ResourceParamsBasedDownloadWorkManager(
+      com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(
         mapOf(ResourceType.Patient to emptyMap(), ResourceType.Observation to emptyMap())
       )
 
@@ -117,7 +117,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
   fun getNextRequestUrl_withLastUpdatedTimeProvidedInContext_ShouldAppendGtPrefixToLastUpdatedSearchParam() =
     runBlockingTest {
       val downloadManager =
-        ResourceParamsBasedDownloadWorkManager(mapOf(ResourceType.Patient to emptyMap()))
+        com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(mapOf(ResourceType.Patient to emptyMap()))
       val url =
         downloadManager.getNextRequestUrl(
           object : SyncDownloadContext {
@@ -131,7 +131,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
   fun getNextRequestUrl_withLastUpdatedSyncParamProvided_shouldReturnUrlWithExactProvidedLastUpdatedSyncParam() =
     runBlockingTest {
       val downloadManager =
-        ResourceParamsBasedDownloadWorkManager(
+        com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(
           mapOf(
             ResourceType.Patient to
               mapOf(
@@ -153,7 +153,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
   fun getNextRequestUrl_withLastUpdatedSyncParamHavingGtPrefix_shouldReturnUrlWithExactProvidedLastUpdatedSyncParam() =
     runBlockingTest {
       val downloadManager =
-        ResourceParamsBasedDownloadWorkManager(
+        com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(
           mapOf(ResourceType.Patient to mapOf(SyncDataParams.LAST_UPDATED_KEY to "gt2022-06-28"))
         )
       val url =
@@ -169,7 +169,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
   fun getNextRequestUrl_withNullUpdatedTimeStamp_shouldReturnUrlWithoutLastUpdatedQueryParam() =
     runBlockingTest {
       val downloadManager =
-        ResourceParamsBasedDownloadWorkManager(
+        com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(
           mapOf(ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"))
         )
       val actual =
@@ -185,7 +185,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
   fun getNextRequestUrl_withEmptyUpdatedTimeStamp_shouldReturnUrlWithoutLastUpdatedQueryParam() =
     runBlockingTest {
       val downloadManager =
-        ResourceParamsBasedDownloadWorkManager(
+        com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(
           mapOf(ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"))
         )
       val actual =
@@ -199,7 +199,8 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
   @Test
   fun processResponse_withBundleTypeSearchSet_shouldReturnPatient() = runBlockingTest {
-    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
+    val downloadManager =
+      com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(emptyMap())
     val response =
       Bundle().apply {
         type = Bundle.BundleType.SEARCHSET
@@ -220,7 +221,8 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
   @Test
   fun processResponse_withTransactionResponseBundle_shouldReturnEmptyList() = runBlockingTest {
-    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
+    val downloadManager =
+      com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(emptyMap())
     val response =
       Bundle().apply {
         type = Bundle.BundleType.TRANSACTIONRESPONSE
@@ -242,7 +244,8 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
   @Test
   fun processResponse_withOperationOutcome_shouldThrowException() {
-    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
+    val downloadManager =
+      com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(emptyMap())
     val response =
       OperationOutcome().apply {
         addIssue(

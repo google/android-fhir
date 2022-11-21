@@ -22,7 +22,6 @@ import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
 import com.google.common.truth.Truth.assertThat
 import java.net.UnknownHostException
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.instance.model.api.IBaseBundle
@@ -101,7 +100,7 @@ class DownloaderImplTest {
             TODO("Not yet implemented")
           }
         },
-        ResourceParamsBasedDownloadWorkManager(
+        com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(
           mapOf(
             ResourceType.Patient to mapOf("param" to "patient-page1"),
             ResourceType.Observation to mapOf("param" to "observation-page1")
@@ -162,7 +161,7 @@ class DownloaderImplTest {
               TODO("Upload not tested in this path")
             }
           },
-          ResourceParamsBasedDownloadWorkManager(
+          com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(
             mapOf(
               ResourceType.Patient to mapOf("param" to "patient-page1"),
               ResourceType.Observation to mapOf("param" to "observation-page1")
@@ -227,7 +226,7 @@ class DownloaderImplTest {
               TODO("Not yet implemented")
             }
           },
-          ResourceParamsBasedDownloadWorkManager(
+          com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(
             mapOf(
               ResourceType.Patient to mapOf("param" to "patient-page1"),
               ResourceType.Observation to mapOf("param" to "observation-page1")

@@ -94,24 +94,26 @@ dependencies {
   androidTestImplementation(Dependencies.truth)
 
   api(Dependencies.HapiFhir.coreLibrary) { exclude(module = "junit") }
-  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+  testApi(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.Androidx.datastorePref)
   implementation(Dependencies.Androidx.sqliteKtx)
   implementation(Dependencies.Androidx.workRuntimeKtx)
-  implementation(Dependencies.HapiFhir.validation) {
-    exclude(module = "commons-logging")
-    exclude(module = "httpclient")
-  }
+  // implementation(Dependencies.HapiFhir.validation) {
+  //   exclude(module = "commons-logging")
+  //   exclude(module = "httpclient")
+  // }
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Retrofit.coreRetrofit)
   implementation(Dependencies.Retrofit.gsonConverter)
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.Room.runtime)
-  implementation(Dependencies.androidFhirCommon)
+  implementation(Dependencies.androidFhirCommon) {
+    exclude(module = "hapi-fhir-structures-r4")
+  }
   implementation(Dependencies.guava)
   implementation(Dependencies.httpInterceptor)
   implementation(Dependencies.jsonToolsPatch)

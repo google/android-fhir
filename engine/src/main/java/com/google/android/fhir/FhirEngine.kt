@@ -18,8 +18,10 @@ package com.google.android.fhir
 
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.impl.FhirEngineImpl
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
+import java.time.Instant
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.instance.model.api.IAnyResource
@@ -53,6 +55,7 @@ interface FhirEngine {
    * api caller should [Flow.collect] it.
    */
   suspend fun syncUpload(
+    getResourceTypeToSave: (IAnyResource) -> ResourceForDatabaseToSave?,
     upload: (suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, IAnyResource>>)
   )
 
@@ -130,3 +133,10 @@ suspend inline fun <reified R : IAnyResource> FhirEngine.delete(id: String) {
 interface SyncDownloadContext {
   suspend fun getLatestTimestampFor(type: ResourceType): String?
 }
+
+data class ResourceForDatabaseToSave(
+  val id: String,
+  val resourceType: ResourceType,
+  val versionId: String,
+  val lastUpdated: Instant
+)

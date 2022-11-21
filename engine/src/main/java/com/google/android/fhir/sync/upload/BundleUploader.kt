@@ -16,96 +16,43 @@
 
 package com.google.android.fhir.sync.upload
 
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.ResourceForDatabaseToSave
 import com.google.android.fhir.ResourceType
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.resourceType
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.UploadResult
+import com.google.android.fhir.sync.UploadWorkManager
 import com.google.android.fhir.sync.Uploader
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.instance.model.api.IAnyResource
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.OperationOutcome
+
 
 /** [Uploader] implementation to work with Fhir [Bundle]. */
 internal class BundleUploader(
   private val dataSource: DataSource,
-  private val fhirVersionEnum: FhirVersionEnum,
-  private val bundleGenerator: TransactionBundleGenerator,
+  private val bundleGenerator: UploadWorkManager,
+  private val functionToGetResources: (IAnyResource) -> ResourceForDatabaseToSave?,
   private val localChangesPaginator: LocalChangesPaginator,
 ) : Uploader {
 
   override suspend fun upload(
     localChanges: List<LocalChange>,
   ): Flow<UploadResult> = flow {
-    bundleGenerator.generate(localChangesPaginator.page(localChanges), fhirVersionEnum).forEach {
+    bundleGenerator.generate(localChangesPaginator.page(localChanges)).forEach {
       (bundle, localChangeTokens) ->
       try {
         val response = dataSource.upload(bundle)
-        emit(getUploadResult(response, localChangeTokens))
+        val localChangeToken  = bundleGenerator.getUploadResult(response, localChangeTokens)
+        emit(UploadResult.Success(localChangeToken, response))
       } catch (e: Exception) {
         emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
       }
     }
   }
 
-  private fun getUploadResult(response: IAnyResource, localChangeTokens: List<LocalChangeToken>) =
-    when (fhirVersionEnum) {
-      FhirVersionEnum.R4 -> {
-        when {
-          response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
-            UploadResult.Success(LocalChangeToken(localChangeTokens.flatMap { it.ids }), response)
-          }
-          response is OperationOutcome && response.issue.isNotEmpty() -> {
-            UploadResult.Failure(
-              ResourceSyncException(
-                ResourceType.Bundle,
-                FHIRException(response.issueFirstRep.diagnostics)
-              )
-            )
-          }
-          else -> {
-            UploadResult.Failure(
-              ResourceSyncException(
-                ResourceType.Bundle,
-                FHIRException("Unknown response for ${response.resourceType}")
-              )
-            )
-          }
-        }
-      }
-      FhirVersionEnum.R5 -> {
-        when {
-          response is org.hl7.fhir.r5.model.Bundle &&
-            response.type == org.hl7.fhir.r5.model.Bundle.BundleType.TRANSACTIONRESPONSE -> {
-            UploadResult.Success(LocalChangeToken(localChangeTokens.flatMap { it.ids }), response)
-          }
-          response is org.hl7.fhir.r5.model.OperationOutcome && response.issue.isNotEmpty() -> {
-            UploadResult.Failure(
-              ResourceSyncException(
-                ResourceType.Bundle,
-                FHIRException(response.issueFirstRep.diagnostics)
-              )
-            )
-          }
-          else -> {
-            UploadResult.Failure(
-              ResourceSyncException(
-                ResourceType.Bundle,
-                FHIRException("Unknown response for ${response.resourceType}")
-              )
-            )
-          }
-        }
-      }
-      else ->
-        UploadResult.Failure(
-          ResourceSyncException(ResourceType.Bundle, FHIRException("Unsupported FHIR Version"))
-        )
-    }
+  override suspend fun getResourceTypeToSave(): (IAnyResource) -> ResourceForDatabaseToSave? {
+   return  functionToGetResources
+  }
 }

@@ -1,25 +1,8 @@
-/*
- * Copyright 2022 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package com.google.android.fhir.sync.download
+package com.google.android.fhir.demo.data
 
 import com.google.android.fhir.ResourceType
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DownloadWorkManager
-import com.google.android.fhir.sync.GREATER_THAN_PREFIX
 import com.google.android.fhir.sync.ParamMap
 import com.google.android.fhir.sync.SyncDataParams
 import com.google.android.fhir.sync.concatParams
@@ -30,6 +13,7 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
 
 typealias ResourceSearchParams = Map<ResourceType, ParamMap>
+
 /**
  * [DownloadWorkManager] implementation based on the provided [ResourceSearchParams] to generate
  * [Resource] search queries and parse [Bundle.BundleType.SEARCHSET] type [Bundle]. This
@@ -53,7 +37,7 @@ class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
       if (!params.containsKey(SyncDataParams.LAST_UPDATED_KEY)) {
         val lastUpdate = context.getLatestTimestampFor(resourceType)
         if (!lastUpdate.isNullOrEmpty()) {
-          newParams[SyncDataParams.LAST_UPDATED_KEY] = "$GREATER_THAN_PREFIX$lastUpdate"
+          newParams[SyncDataParams.LAST_UPDATED_KEY] = "gt$lastUpdate"
         }
       }
 

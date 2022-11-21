@@ -18,26 +18,29 @@ package com.google.android.fhir.sync
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.ResourceForDatabaseToSave
+import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.instance.model.api.IAnyResource
+import org.hl7.fhir.instance.model.api.IBaseBundle
 
-/** Module for uploading local changes to a [DataSource]. */
-internal interface Uploader {
 
+typealias ResourceBundleAndAssociatedLocalChangeTokens = Pair<IBaseBundle, List<LocalChangeToken>>
+
+
+/**
+ * Manager that generates the FHIR requests and handles the FHIR responses of a upload job.
+ */
+interface UploadWorkManager {
   /**
-   * Uploads the local changes to the [DataSource]. Particular implementations should take care of
-   * transforming the [SquashedLocalChange]s to particular network operations.
+   * Returns the URL for the next download request, or `null` if there is no more download request
+   * to be issued.
    */
-  suspend fun upload(
-    localChanges: List<LocalChange>,
-  ): Flow<UploadResult>
+  fun generate(
+    localChanges: List<List<LocalChange>>
+  ): List<ResourceBundleAndAssociatedLocalChangeTokens>
 
-   suspend fun getResourceTypeToSave(): (IAnyResource) -> ResourceForDatabaseToSave?
-}
 
-internal sealed class UploadResult {
-  data class Success(val localChangeToken: LocalChangeToken, val resource: IAnyResource) :
-    UploadResult()
-  data class Failure(val syncError: ResourceSyncException) : UploadResult()
+
+  fun getUploadResult(response: IAnyResource, localChangeTokens: List<LocalChangeToken>): LocalChangeToken
+
 }
