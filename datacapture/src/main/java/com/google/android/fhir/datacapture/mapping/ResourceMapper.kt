@@ -84,12 +84,6 @@ object ResourceMapper {
     }
 
   /**
-   * mutable map of key-canonical url as string for profile and value- StructureDefinition of
-   * Resource claims to conforms to.
-   */
-  private val structureDefinitionMap: MutableMap<String, StructureDefinition> = hashMapOf()
-
-  /**
    * Extract FHIR resources from a [questionnaire] and [questionnaireResponse].
    *
    * This method will perform
@@ -118,13 +112,39 @@ object ResourceMapper {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     structureMapExtractionContext: StructureMapExtractionContext? = null,
-    profileLoader: ProfileLoader? = null,
+    profileLoader: ProfileLoader? = null
   ): Bundle {
-    // clear map before every questionnaire extraction
-    structureDefinitionMap.clear()
+
     return when {
       questionnaire.targetStructureMap == null ->
-        extractByDefinition(questionnaire, questionnaireResponse, profileLoader)
+        extractByDefinition(
+          questionnaire,
+          questionnaireResponse,
+          object : ProfileLoader {
+            /**
+             * mutable map of key-canonical url as string for profile and value- StructureDefinition
+             * of Resource claims to conforms to.
+             */
+            val structureDefinitionMap: MutableMap<String, StructureDefinition?> = hashMapOf()
+
+            override fun loadProfile(url: CanonicalType): StructureDefinition? {
+
+              if (profileLoader == null) {
+                Timber.w(
+                  "ProfileLoader implementation required to load StructureDefinition that this resource claims to conform to"
+                )
+                return null
+              }
+
+              if (structureDefinitionMap.containsKey(url.toString())) {
+                return structureDefinitionMap[url.toString()]
+              }
+              return profileLoader.loadProfile(url).also {
+                structureDefinitionMap[url.toString()] = it
+              }
+            }
+          }
+        )
       structureMapExtractionContext != null -> {
         extractByStructureMap(questionnaire, questionnaireResponse, structureMapExtractionContext)
       }
@@ -495,13 +515,11 @@ object ResourceMapper {
       val canonicalUrl =
         questionnaireItem.definition.substring(0, questionnaireItem.definition.lastIndexOf("#"))
       // if existing map contains structureDefinition
-      val structureDefinition = loadProfile(CanonicalType(canonicalUrl), profileLoader)
-      structureDefinition?.let {
-        structureDefinitionMap.getOrPut(canonicalUrl) { structureDefinition }
-      }
+      val structureDefinition: StructureDefinition? =
+        profileLoader?.loadProfile(CanonicalType(canonicalUrl))
       // Here Consideration is - even there are multiple profile available for Resource, here ony
       // one java resource object is extracted
-      structureDefinitionMap[canonicalUrl]?.let {
+      structureDefinition?.let {
         /* eg for "definition": "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.address.address-preferred"
         extensionForType is "Patient.address" */
         val extensionForType =
@@ -526,19 +544,6 @@ object ResourceMapper {
       }
     }
   }
-}
-
-private fun loadProfile(
-  canonicalUrl: CanonicalType,
-  profileLoader: ProfileLoader?
-): StructureDefinition? {
-  if (profileLoader == null) {
-    Timber.w(
-      "ProfileLoader implementation required to load StructureDefinition that this resource claims to conform to"
-    )
-    return null
-  }
-  return profileLoader.loadProfile(canonicalUrl)
 }
 
 private fun isExtensionSupportedByProfile(
