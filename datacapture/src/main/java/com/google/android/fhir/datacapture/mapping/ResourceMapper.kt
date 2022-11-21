@@ -82,6 +82,7 @@ object ResourceMapper {
     with(FhirContext.forCached(FhirVersionEnum.R4)) {
       FHIRPathEngine(HapiWorkerContext(this, this.validationSupport))
     }
+
   /**
    * mutable map of key-canonical url as string for profile and value- StructureDefinition of
    * Resource claims to conforms to.
@@ -488,37 +489,26 @@ object ResourceMapper {
      "definition": "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.address.address-preferred"
     */
     if (base.javaClass.getFieldOrNull(fieldName) == null) {
-      // Variable to check whether extension defined in profile
+      // Whether the field is defined as an extension in the profile
       var isExtensionSupported = false
       // base url from definition
       val canonicalUrl =
         questionnaireItem.definition.substring(0, questionnaireItem.definition.lastIndexOf("#"))
       // if existing map contains structureDefinition
-      var structureDefinition = structureDefinitionMap.get(canonicalUrl)
-      if (structureDefinition == null) {
-        structureDefinition = loadProfile(CanonicalType(canonicalUrl), profileLoader)
-
-        // Base FHIR resource will be extracted as StructureDefinition is not provided for
-        // resource conforming profile.
-        if (structureDefinition == null) {
-          Timber.w(
-            "StructureDefinition for ${base.fhirType()} is not available to which resource " +
-              "claims to conform to. So, field ''$fieldName'' is not added as extension to resource"
-          )
-          return
-        }
-        structureDefinitionMap.put(structureDefinition.url, structureDefinition)
+      val structureDefinition = loadProfile(CanonicalType(canonicalUrl), profileLoader)
+      structureDefinition?.let {
+        structureDefinitionMap.getOrPut(canonicalUrl) { structureDefinition }
       }
-      /* eg for "definition": "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.address.address-preferred"
-      extensionForType is "Patient.address" */
-      val extensionForType =
-        questionnaireItem.definition.substring(
-          questionnaireItem.definition.lastIndexOf("#") + 1,
-          questionnaireItem.definition.lastIndexOf(".")
-        )
       // Here Consideration is - even there are multiple profile available for Resource, here ony
       // one java resource object is extracted
-      structureDefinitionMap.get(canonicalUrl)?.let {
+      structureDefinitionMap[canonicalUrl]?.let {
+        /* eg for "definition": "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.address.address-preferred"
+        extensionForType is "Patient.address" */
+        val extensionForType =
+          questionnaireItem.definition.substring(
+            questionnaireItem.definition.lastIndexOf("#") + 1,
+            questionnaireItem.definition.lastIndexOf(".")
+          )
         isExtensionSupported =
           isExtensionSupportedByProfile(
             structureDefinition = it,
@@ -526,7 +516,6 @@ object ResourceMapper {
             fieldName = fieldName
           )
       }
-
       if (isExtensionSupported) {
         addDefinitionBasedCustomExtension(questionnaireItem, questionnaireResponseItem, base)
         return
@@ -543,8 +532,11 @@ private fun loadProfile(
   canonicalUrl: CanonicalType,
   profileLoader: ProfileLoader?
 ): StructureDefinition? {
-  requireNotNull(profileLoader) {
-    "ProfileLoader implementation required to load StructureDefinition that this resource claims to conform to"
+  if (profileLoader == null) {
+    Timber.w(
+      "ProfileLoader implementation required to load StructureDefinition that this resource claims to conform to"
+    )
+    return null
   }
   return profileLoader.loadProfile(canonicalUrl)
 }

@@ -32,7 +32,6 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StructureDefinition
 import org.intellij.lang.annotations.Language
 import org.junit.After
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,14 +39,10 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ResourceMapperInstrumentedTest {
   private lateinit var mContext: Context
-  private lateinit var questionnaire: Questionnaire
-  private lateinit var questionnaireResponse: QuestionnaireResponse
 
-  @Before
-  fun setUp() {
-    mContext = InstrumentationRegistry.getInstrumentation().context
-    val questionnaireJson =
-      """
+  @Language("JSON")
+  private val questionnaireJson =
+    """
        {
          "resourceType": "Questionnaire",
          "extension": [
@@ -69,11 +64,11 @@ class ResourceMapperInstrumentedTest {
            }
          ]
        }
-      """.trimIndent()
+    """.trimIndent()
 
-    @Language("JSON")
-    val questionnaireResponseJson =
-      """
+  @Language("JSON")
+  private val questionnaireResponseJson =
+    """
         {
           "resourceType": "QuestionnaireResponse",
           "item": [
@@ -87,14 +82,17 @@ class ResourceMapperInstrumentedTest {
             }
           ]
         }
-      """.trimIndent()
+    """.trimIndent()
+  val iParser: IParser = FhirContext.forR4().newJsonParser()
+  private val questionnaireWithBirthTimeExt: Questionnaire =
+    iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+  private val questionnaireResponseWithBirthTimeExt: QuestionnaireResponse =
+    iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+      as QuestionnaireResponse
 
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
-    questionnaire =
-      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
-    questionnaireResponse =
-      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
-        as QuestionnaireResponse
+  @Before
+  fun setUp() {
+    mContext = InstrumentationRegistry.getInstrumentation().context
   }
 
   @Test
@@ -103,10 +101,10 @@ class ResourceMapperInstrumentedTest {
     @Language("JSON")
     val bundle =
       ResourceMapper.extract(
-        questionnaire = questionnaire,
-        questionnaireResponse = questionnaireResponse,
+        questionnaire = questionnaireWithBirthTimeExt,
+        questionnaireResponse = questionnaireResponseWithBirthTimeExt,
         structureMapExtractionContext = null,
-        profileLoader = ProfileLoaderImpl(mContext),
+        profileLoader = ProfileLoaderImplWithExt(mContext),
       )
     val patient = bundle.entry.single().resource as Patient
 
@@ -130,98 +128,22 @@ class ResourceMapperInstrumentedTest {
   @Test
   fun extract_resourceExtension_notPresentInConformingProfile_shouldNotPerformDefinitionBasedExtraction():
     Unit = runBlocking {
-    @Language("JSON")
-    val questionnaire =
-      """
-       {
-         "resourceType": "Questionnaire",
-         "meta": {
-           "profile": [
-             "http://fhir.org/guides/who/core/StructureDefinition/who-patient"
-           ]
-         },
-         "extension": [
-           {
-             "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-             "valueExpression": {
-               "language": "application/x-fhir-query",
-               "expression": "Patient",
-               "name": "patient"
-             }
-           }
-         ],
-         "item": [
-           {
-             "linkId": "1",
-             "definition": "http://fhir.org/guides/who/core/StructureDefinition/who-patient#Patient.reminder",
-             "text": "Woman wants to receive reminders during pregnancy",
-             "type": "boolean"
-           }
-         ]
-       }
-      """.trimIndent()
-
-    @Language("JSON")
-    val response =
-      """
-        {
-          "resourceType": "QuestionnaireResponse",
-          "item": [
-            {
-              "linkId": "1",
-              "answer": [
-                {
-                  "valueBoolean": true
-                }
-              ]
-            }
-          ]
-        }
-      """.trimIndent()
-
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
-    val questionnaireObj =
-      iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
-    val temperatureQuestionnaireResponse =
-      iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
     val bundle =
       ResourceMapper.extract(
-        questionnaire = questionnaireObj,
-        questionnaireResponse = temperatureQuestionnaireResponse,
+        questionnaire = questionnaireWithBirthTimeExt,
+        questionnaireResponse = questionnaireResponseWithBirthTimeExt,
         structureMapExtractionContext = null,
-        profileLoader = ProfileLoaderImpl(mContext),
+        profileLoader = ProfileLoaderImplWithoutBirthTimeExt(mContext),
       )
     val patient = bundle.entry.single().resource as Patient
 
     assertThat(patient).isNotNull()
     assertThat(
-        patient
-          .getExtensionByUrl(
-            "http://fhir.org/guides/who/core/StructureDefinition/who-patient#Patient.reminder"
-          )
-          ?.valueAsPrimitive
-          ?.value
+        patient.getExtensionByUrl(
+          "http://fhir.org/guides/who/core/StructureDefinition/who-patient#Patient.birthTime"
+        )
       )
       .isEqualTo(null)
-  }
-
-  @Test
-  fun extract_resourceExtension_loadProfileImplementationNotProvided_shouldThrowIllegalArgumentException():
-    Unit = runBlocking {
-    val exception =
-      Assert.assertThrows(IllegalArgumentException::class.java) {
-        runBlocking {
-          ResourceMapper.extract(
-            questionnaire = questionnaire,
-            questionnaireResponse = questionnaireResponse,
-            structureMapExtractionContext = null
-          )
-        }
-      }
-    assertThat(exception.message)
-      .isEqualTo(
-        "ProfileLoader implementation required to load StructureDefinition that this resource claims to conform to"
-      )
   }
 
   @Test
@@ -229,10 +151,10 @@ class ResourceMapperInstrumentedTest {
     runBlocking {
       val bundle =
         ResourceMapper.extract(
-          questionnaire = questionnaire,
-          questionnaireResponse = questionnaireResponse,
+          questionnaire = questionnaireWithBirthTimeExt,
+          questionnaireResponse = questionnaireResponseWithBirthTimeExt,
           structureMapExtractionContext = null,
-          profileLoader = ProfileLoaderImpl(mContext),
+          profileLoader = ProfileLoaderImplWithExt(mContext),
         )
       val patient = bundle.entry.single().resource as Patient
 
@@ -247,7 +169,7 @@ class ResourceMapperInstrumentedTest {
 
   @After fun tearDown() {}
 
-  private class ProfileLoaderImpl(private val context: Context) : ProfileLoader {
+  private class ProfileLoaderImplWithExt(private val context: Context) : ProfileLoader {
     override fun loadProfile(url: CanonicalType): StructureDefinition? {
       val structureDefinition =
         when (url.valueAsString) {
@@ -263,16 +185,37 @@ class ResourceMapperInstrumentedTest {
         }
       return structureDefinition
     }
+  }
 
-    private fun getStructureDefinition(
-      StructureDefinitionUri: String,
-      context: Context
-    ): StructureDefinition {
-      val structureDefinitionJson =
-        context.assets.open(StructureDefinitionUri).bufferedReader().use { it.readText() }
-      return FhirContext.forCached(FhirVersionEnum.R4)
-        .newJsonParser()
-        .parseResource(structureDefinitionJson) as StructureDefinition
+  private class ProfileLoaderImplWithoutBirthTimeExt(private val context: Context) : ProfileLoader {
+    override fun loadProfile(url: CanonicalType): StructureDefinition? {
+      val structureDefinition =
+        when (url.valueAsString) {
+          "http://fhir.org/guides/who/core/StructureDefinition/who-patient" -> {
+            /**
+             * ThIs json file is available at
+             * https://build.fhir.org/ig/WorldHealthOrganization/smart-anc/branches/master/StructureDefinition-who-patient.profile.json.html
+             * in WHO IG can be downloaded as raw json file
+             */
+            getStructureDefinition(
+              "structure_definition_who_patient_without_birthtime.json",
+              context
+            )
+          }
+          else -> null
+        }
+      return structureDefinition
     }
   }
+}
+
+private fun getStructureDefinition(
+  StructureDefinitionUri: String,
+  context: Context
+): StructureDefinition {
+  val structureDefinitionJson =
+    context.assets.open(StructureDefinitionUri).bufferedReader().use { it.readText() }
+  return FhirContext.forCached(FhirVersionEnum.R4)
+    .newJsonParser()
+    .parseResource(structureDefinitionJson) as StructureDefinition
 }
