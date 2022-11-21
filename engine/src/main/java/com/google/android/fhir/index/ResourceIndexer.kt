@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.index
 
-import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import com.google.android.fhir.ConverterException
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
@@ -38,7 +37,6 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.resourceType
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
-import java.util.Date
 import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.instance.model.api.IBase
 import org.hl7.fhir.instance.model.api.IBaseDecimalDatatype
@@ -240,7 +238,7 @@ internal object ResourceIndexer {
       StringIndex(
         searchParam.name,
         searchParam.path,
-        value = resourceIndexerManager.convertResourceToString(value)!!
+        value = resourceIndexerManager.createStringType(value)
       )
     } else {
       null
@@ -279,7 +277,7 @@ internal object ResourceIndexer {
 
 
   private fun referenceIndex(searchParam: SearchParamDefinition, value: IBase): ReferenceIndex? =
-    resourceIndexerManager.convertResourceToString(value)?.let { ReferenceIndex(searchParam.name, searchParam.path, it) }
+    resourceIndexerManager.createReferenceType(value)?.let { ReferenceIndex(searchParam.name, searchParam.path, it) }
 
   private fun quantityIndex(searchParam: SearchParamDefinition, value: IBase): List<QuantityIndex> =
     when (value.fhirType()) {
@@ -333,7 +331,7 @@ internal object ResourceIndexer {
     }
 
   private fun uriIndex(searchParam: SearchParamDefinition, value: IBase?): UriIndex? {
-    val uri = value?.let { resourceIndexerManager.convertResourceToString(it) }
+    val uri = value?.let { resourceIndexerManager.createReferenceType(it) }
     return if (uri.isNullOrEmpty()) {
       null
     } else {
@@ -359,39 +357,3 @@ internal object ResourceIndexer {
 }
 
 data class SearchParamDefinition(val name: String, val type: SearchParamType, val path: String)
-
-data class LocationPositionComponent(val latitude: Double, val longitude: Double)
-
-data class Money(val currency: String, val value: BigDecimal)
-
-data class Identifier(val system: String?, val value: String?)
-
-data class Quantity(
-  val unit: String?,
-  val code: String?,
-  val system: String?,
-  val value: BigDecimal,
-)
-
-data class Timing(
-  val hasEvent: Boolean,
-  val event: List<DateTimeType>,
-)
-
-data class Coding(val system: String?, val code: String?)
-
-data class CodeableConcept(val coding: List<Coding>)
-
-data class InstantType(val value: Date)
-
-data class DateType(val value: Date, val precision: TemporalPrecisionEnum)
-
-data class DateTimeType(val value: Date?, val precision: TemporalPrecisionEnum)
-
-data class Period(
-  val hasStart: Boolean,
-  val hasEnd: Boolean,
-  val start: Date?,
-  val endElement: DateTimeType,
-  val end: Date?,
-)

@@ -19,6 +19,7 @@ package com.google.android.fhir
 import android.content.Context
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
+import com.google.android.fhir.index.ResourceIndexerManager
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.remote.HttpLogger
@@ -26,6 +27,7 @@ import com.google.android.fhir.sync.remote.HttpLogger
 /** The provider for [FhirEngine] instance. */
 object FhirEngineProvider {
   private var fhirEngineConfiguration: FhirEngineConfiguration? = null
+  private var resourceIndexerManager: ResourceIndexerManager? = null
   private var fhirServices: FhirServices? = null
 
   /**
@@ -34,11 +36,12 @@ object FhirEngineProvider {
    * This method throws [IllegalStateException] if it is called multiple times
    */
   @Synchronized
-  fun init(fhirEngineConfiguration: FhirEngineConfiguration) {
+  fun init(fhirEngineConfiguration: FhirEngineConfiguration, resourceIndexerManager: ResourceIndexerManager) {
     check(this.fhirEngineConfiguration == null) {
       "FhirEngineProvider: FhirEngineConfiguration has already been initialized."
     }
     this.fhirEngineConfiguration = fhirEngineConfiguration
+    this.resourceIndexerManager = resourceIndexerManager
   }
 
   /**
@@ -60,6 +63,7 @@ object FhirEngineProvider {
 
   @Synchronized
   private fun getOrCreateFhirService(context: Context): FhirServices {
+    checkNotNull(resourceIndexerManager)
     if (fhirServices == null) {
       fhirEngineConfiguration = fhirEngineConfiguration ?: FhirEngineConfiguration()
       val configuration = checkNotNull(fhirEngineConfiguration)
@@ -69,6 +73,7 @@ object FhirEngineProvider {
             if (configuration.enableEncryptionIfSupported) enableEncryptionIfSupported()
             setDatabaseErrorStrategy(configuration.databaseErrorStrategy)
             setFhirVersion(configuration.fhirVersionEnum)
+            setResourceIndexerManager(resourceIndexerManager!!)
             configuration.serverConfiguration?.let { setServerConfiguration(it) }
             if (configuration.testMode) {
               inMemory()

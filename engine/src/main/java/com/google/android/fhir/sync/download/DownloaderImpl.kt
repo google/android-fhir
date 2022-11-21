@@ -59,8 +59,4 @@ internal class DownloaderImpl(
       url = downloadWorkManager.getNextRequestUrl(context)
     }
   }
-
-  override suspend fun getFhirPathEvaluateFunction(): (IBase, String) -> List<IBase> {
-    return downloadWorkManager.getEvaluateFunction()
-  }
 }

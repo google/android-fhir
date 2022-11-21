@@ -25,9 +25,9 @@ import com.google.android.fhir.db.impl.DatabaseConfig
 import com.google.android.fhir.db.impl.DatabaseEncryptionKeyProvider.isDatabaseEncryptionSupported
 import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
+import com.google.android.fhir.index.ResourceIndexerManager
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.remote.RemoteFhirService
-import org.hl7.fhir.exceptions.FHIRException
 import timber.log.Timber
 
 internal data class FhirServices(
@@ -42,6 +42,7 @@ internal data class FhirServices(
     private var databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
     private var fhirVersion: FhirVersionEnum = FhirVersionEnum.R4
     private var serverConfiguration: ServerConfiguration? = null
+    private var resourceIndexerManager : ResourceIndexerManager? = null
 
     internal fun inMemory() = apply { inMemory = true }
 
@@ -61,11 +62,15 @@ internal data class FhirServices(
       this.serverConfiguration = serverConfiguration
     }
 
+    internal fun setResourceIndexerManager(resourceIndexerManager: ResourceIndexerManager) = apply {
+      this.resourceIndexerManager = resourceIndexerManager
+    }
+
     internal fun setFhirVersion(fhirVersionEnum: FhirVersionEnum) = apply {
       when (fhirVersionEnum) {
         FhirVersionEnum.R5 -> this.fhirVersion = fhirVersionEnum
         FhirVersionEnum.R4 -> this.fhirVersion = fhirVersionEnum
-        else -> throw FHIRException("FHIR Version: $fhirVersionEnum is not supported.")
+        else -> throw Exception("FHIR Version: $fhirVersionEnum is not supported.")
       }
     }
 
@@ -75,9 +80,10 @@ internal data class FhirServices(
         DatabaseImpl(
           context = context,
           iParser = parser,
-          DatabaseConfig(inMemory, enableEncryption, databaseErrorStrategy)
+          DatabaseConfig(inMemory, enableEncryption, databaseErrorStrategy),
+          resourceIndexerManager!!
         )
-      val engine = FhirEngineImpl(database = db, context = context, resourceIndexManager: ResourceIndexManager)
+      val engine = FhirEngineImpl(database = db, context = context)
       val remoteDataSource =
         serverConfiguration?.let {
           RemoteFhirService.builder(it.baseUrl, it.networkConfiguration, fhirVersion)

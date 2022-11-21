@@ -25,6 +25,7 @@ import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.demo.data.FhirSyncWorker
+import com.google.android.fhir.demo.data.ResourceIndexerManagerForR4
 import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.remote.HttpLogger
 import timber.log.Timber
@@ -52,7 +53,8 @@ class FhirApplication : Application() {
               )
             ) { Timber.tag("App-HttpLog").d(it) }
         )
-      )
+      ),
+      resourceIndexerManager =  ResourceIndexerManagerForR4
     )
     Sync.oneTimeSync<FhirSyncWorker>(this, fhirVersionEnum = FhirVersionEnum.R5)
   }

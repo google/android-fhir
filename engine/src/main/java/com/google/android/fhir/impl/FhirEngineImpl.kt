@@ -27,7 +27,6 @@ import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.index.ResourceIndexerManager
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resourceType
 import com.google.android.fhir.search.Search
@@ -44,16 +43,16 @@ import org.hl7.fhir.instance.model.api.IAnyResource
 /** Implementation of [FhirEngine]. */
 internal class FhirEngineImpl(private val database: Database, private val context: Context) :
   FhirEngine {
-  override suspend fun create(vararg resource: IAnyResource, resourcedIndexerManager: ResourceIndexerManager): List<String> {
-    return database.insert(*resource, resourcedIndexerManager  = resourcedIndexerManager )
+  override suspend fun create(vararg resource: IAnyResource, ): List<String> {
+    return database.insert(*resource)
   }
 
   override suspend fun get(type: ResourceType, id: String): IAnyResource {
     return database.select(type, id)
   }
 
-  override suspend fun update(vararg resource: IAnyResource, resourcedIndexerManager: ResourceIndexerManager) {
-    database.update(*resource, resourcedIndexerManager  = resourcedIndexerManager )
+  override suspend fun update(vararg resource: IAnyResource, ) {
+    database.update(*resource)
   }
 
   override suspend fun delete(type: ResourceType, id: String) {
@@ -86,7 +85,6 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    resourcedIndexerManager: ResourceIndexerManager,
     download: suspend (SyncDownloadContext) -> Flow<List<IAnyResource>>,
   ) {
     download(
@@ -102,30 +100,27 @@ internal class FhirEngineImpl(private val database: Database, private val contex
               getConflictingResourceIds(resources),
               conflictResolver
             )
-          saveRemoteResourcesToDatabase(resources, resourcedIndexerManager )
-          saveResolvedResourcesToDatabase(resolved, resourcedIndexerManager )
+          saveRemoteResourcesToDatabase(resources)
+          saveResolvedResourcesToDatabase(resolved)
         }
       }
   }
 
-  private suspend fun saveResolvedResourcesToDatabase(resolved: List<IAnyResource>?, resourcedIndexerManager: ResourceIndexerManager ) {
+  private suspend fun saveResolvedResourcesToDatabase(resolved: List<IAnyResource>?,  ) {
     resolved?.let {
       database.deleteUpdates(it)
-      database.update(*it.toTypedArray(), resourcedIndexerManager  = resourcedIndexerManager )
+      database.update(*it.toTypedArray())
     }
   }
 
-  private suspend fun saveRemoteResourcesToDatabase(
-    resources: List<IAnyResource>,
-    resourcedIndexerManager: ResourceIndexerManager
-  ) {
+  private suspend fun saveRemoteResourcesToDatabase(resources: List<IAnyResource>) {
     val timeStamps =
       resources
         .groupBy { it.resourceType }
         .entries.map {
           SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
         }
-    database.insertSyncedResources(timeStamps, resourcedIndexerManager , resources)
+    database.insertSyncedResources(timeStamps , resources)
   }
 
   private suspend fun resolveConflictingResources(

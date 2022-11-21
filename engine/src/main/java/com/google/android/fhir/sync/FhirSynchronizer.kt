@@ -92,7 +92,7 @@ internal class FhirSynchronizer(
 
   private suspend fun download(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
-    fhirEngine.syncDownload(conflictResolver, downloader.getFhirPathEvaluateFunction()) {
+    fhirEngine.syncDownload(conflictResolver) {
       flow {
         downloader.download(it).collect {
           when (it) {

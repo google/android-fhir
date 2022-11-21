@@ -16,7 +16,6 @@
 
 package com.google.android.fhir
 
-import org.hl7.fhir.exceptions.FHIRException
 
 enum class ResourceType {
   Account,
@@ -369,7 +368,7 @@ enum class ResourceType {
     }
 
   companion object {
-    @Throws(FHIRException::class)
+    @Throws(Exception::class)
     fun fromCode(code: String): ResourceType {
       if ("Account" == code) return Account
       if ("ActivityDefinition" == code) return ActivityDefinition
@@ -542,7 +541,7 @@ enum class ResourceType {
       if ("ValueSet" == code) return ValueSet
       if ("VerificationResult" == code) return VerificationResult
       if ("VisionPrescription" == code) return VisionPrescription
-      throw FHIRException("Unknown resource type $code")
+      throw Exception("Unknown resource type $code")
     }
   }
 }

@@ -29,9 +29,6 @@ internal interface Downloader {
    * response of each page download request.
    */
   suspend fun download(context: SyncDownloadContext): Flow<DownloadState>
-
-  suspend fun getFhirPathEvaluateFunction() : (IBase, String) -> List<IBase>
-
 }
 
 internal sealed class DownloadState {

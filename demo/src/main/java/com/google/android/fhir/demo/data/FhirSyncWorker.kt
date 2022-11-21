@@ -21,6 +21,7 @@ import androidx.work.WorkerParameters
 import com.google.android.fhir.ResourceForDatabaseToSave
 import com.google.android.fhir.ResourceType
 import com.google.android.fhir.demo.FhirApplication
+import com.google.android.fhir.index.ResourceIndexerManager
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker

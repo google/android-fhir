@@ -48,7 +48,8 @@ import org.hl7.fhir.instance.model.api.IAnyResource
 internal class DatabaseImpl(
   context: Context,
   private val iParser: IParser,
-  databaseConfig: DatabaseConfig
+  databaseConfig: DatabaseConfig,
+  override val resourceIndexerManager: ResourceIndexerManager
 ) : com.google.android.fhir.db.Database {
 
   val db: ResourceDatabase
@@ -102,24 +103,24 @@ internal class DatabaseImpl(
   private val syncedResourceDao = db.syncedResourceDao()
   private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 
-  override suspend fun <R : IAnyResource> insert(vararg resource: R, resourcedIndexerManager: ResourceIndexerManager): List<String> {
+  override suspend fun <R : IAnyResource> insert(vararg resource: R): List<String> {
     val logicalIds = mutableListOf<String>()
     db.withTransaction {
-      logicalIds.addAll(resourceDao.insertAll(resource.toList(), resourcedIndexerManager))
+      logicalIds.addAll(resourceDao.insertAll(resource.toList(), resourceIndexerManager))
       localChangeDao.addInsertAll(resource.toList())
     }
     return logicalIds
   }
 
-  override suspend fun <R : IAnyResource> insertRemote(vararg resource: R, resourcedIndexerManager: ResourceIndexerManager) {
-    db.withTransaction { resourceDao.insertAll(resource.toList(), resourcedIndexerManager) }
+  override suspend fun <R : IAnyResource> insertRemote(vararg resource: R) {
+    db.withTransaction { resourceDao.insertAll(resource.toList(), resourceIndexerManager) }
   }
 
-  override suspend fun update(vararg resources: IAnyResource, resourcedIndexerManager: ResourceIndexerManager) {
+  override suspend fun update(vararg resources: IAnyResource) {
     db.withTransaction {
       resources.forEach {
         val oldResourceEntity = selectEntity(it.resourceType, it.logicalId)
-        resourceDao.update(it, resourcedIndexerManager)
+        resourceDao.update(it, resourceIndexerManager)
         localChangeDao.addUpdate(oldResourceEntity, it)
       }
     }
@@ -156,12 +157,11 @@ internal class DatabaseImpl(
 
   override suspend fun insertSyncedResources(
     syncedResources: List<SyncedResourceEntity>,
-    resourcedIndexerManager: ResourceIndexerManager,
     resources: List<IAnyResource>
   ) {
     db.withTransaction {
       syncedResourceDao.insertAll(syncedResources)
-      insertRemote(*resources.toTypedArray(), resourcedIndexerManager =  resourcedIndexerManager)
+      insertRemote(*resources.toTypedArray())
     }
   }
 
