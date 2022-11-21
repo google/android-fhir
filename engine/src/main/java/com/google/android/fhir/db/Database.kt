@@ -30,7 +30,7 @@ import org.hl7.fhir.instance.model.api.IAnyResource
 /** The interface for the FHIR resource database. */
 internal interface Database {
 
-  val resourceIndexerManager : ResourceIndexerManager
+  val resourceIndexerManager: ResourceIndexerManager
   /**
    * Inserts a list of local `resources` into the FHIR resource database. If any of the resources
    * already exists, it will be overwritten.

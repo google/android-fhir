@@ -42,7 +42,7 @@ internal data class FhirServices(
     private var databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
     private var fhirVersion: FhirVersionEnum = FhirVersionEnum.R4
     private var serverConfiguration: ServerConfiguration? = null
-    private var resourceIndexerManager : ResourceIndexerManager? = null
+    private var resourceIndexerManager: ResourceIndexerManager? = null
 
     internal fun inMemory() = apply { inMemory = true }
 

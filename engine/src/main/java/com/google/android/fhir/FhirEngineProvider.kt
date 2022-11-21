@@ -36,7 +36,10 @@ object FhirEngineProvider {
    * This method throws [IllegalStateException] if it is called multiple times
    */
   @Synchronized
-  fun init(fhirEngineConfiguration: FhirEngineConfiguration, resourceIndexerManager: ResourceIndexerManager) {
+  fun init(
+    fhirEngineConfiguration: FhirEngineConfiguration,
+    resourceIndexerManager: ResourceIndexerManager
+  ) {
     check(this.fhirEngineConfiguration == null) {
       "FhirEngineProvider: FhirEngineConfiguration has already been initialized."
     }

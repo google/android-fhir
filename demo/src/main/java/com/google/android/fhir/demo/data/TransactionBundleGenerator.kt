@@ -18,8 +18,6 @@ package com.google.android.fhir.demo.data
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
-import com.google.android.fhir.ResourceForDatabaseToSave
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.resourceType
 import com.google.android.fhir.sync.ResourceBundleAndAssociatedLocalChangeTokens
@@ -28,8 +26,6 @@ import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
-import org.hl7.fhir.r4.model.Resource
-import timber.log.Timber
 
 /**
  * Generates pairs of Transaction [Bundle] and [LocalChangeToken]s associated with the resources
@@ -62,7 +58,6 @@ open class TransactionBundleGenerator(
       response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
         LocalChangeToken(localChangeTokens.flatMap { it.ids })
       }
-
       response is OperationOutcome && response.issue.isNotEmpty() -> {
         throw FHIRException(response.issueFirstRep.diagnostics)
       }
@@ -86,7 +81,7 @@ open class TransactionBundleGenerator(
     ): TransactionBundleGenerator {
 
       return if (httpVerbToUseForCreate == Bundle.HTTPVerb.PUT &&
-        httpVerbToUseForUpdate == Bundle.HTTPVerb.PATCH
+          httpVerbToUseForUpdate == Bundle.HTTPVerb.PATCH
       ) {
         PutForCreateAndPatchForUpdateBasedTransactionGenerator
       } else {
@@ -100,9 +95,9 @@ open class TransactionBundleGenerator(
 
 object PutForCreateAndPatchForUpdateBasedTransactionGenerator :
   TransactionBundleGenerator({ type ->
-                               when (type) {
-                                 Type.INSERT -> HttpPutForCreateEntryComponentGenerator
-                                 Type.UPDATE -> HttpPatchForUpdateEntryComponentGenerator
-                                 Type.DELETE -> HttpDeleteEntryComponentGenerator
-                               }
-                             })
+    when (type) {
+      Type.INSERT -> HttpPutForCreateEntryComponentGenerator
+      Type.UPDATE -> HttpPatchForUpdateEntryComponentGenerator
+      Type.DELETE -> HttpDeleteEntryComponentGenerator
+    }
+  })

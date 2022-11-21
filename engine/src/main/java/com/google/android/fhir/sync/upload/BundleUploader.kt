@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.instance.model.api.IAnyResource
 
-
 /** [Uploader] implementation to work with Fhir [Bundle]. */
 internal class BundleUploader(
   private val dataSource: DataSource,
@@ -44,7 +43,7 @@ internal class BundleUploader(
       (bundle, localChangeTokens) ->
       try {
         val response = dataSource.upload(bundle)
-        val localChangeToken  = bundleGenerator.getUploadResult(response, localChangeTokens)
+        val localChangeToken = bundleGenerator.getUploadResult(response, localChangeTokens)
         emit(UploadResult.Success(localChangeToken, response))
       } catch (e: Exception) {
         emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
@@ -53,6 +52,6 @@ internal class BundleUploader(
   }
 
   override suspend fun getResourceTypeToSave(): (IAnyResource) -> ResourceForDatabaseToSave? {
-   return  functionToGetResources
+    return functionToGetResources
   }
 }

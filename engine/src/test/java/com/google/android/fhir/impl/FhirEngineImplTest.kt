@@ -24,6 +24,7 @@ import com.google.android.fhir.ResourceForDatabaseToSave
 import com.google.android.fhir.ResourceType
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.demo.data.SearchManagerForR4
 import com.google.android.fhir.get
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
@@ -191,7 +192,7 @@ class FhirEngineImplTest {
 
     fhirEngine.create(*patients.toTypedArray())
 
-    val result = fhirEngine.search("Patient?gender=female")
+    val result = fhirEngine.search("Patient?gender=female", searchManager = SearchManagerForR4)
 
     assertThat(result.size).isEqualTo(2)
     assertThat(result.all { (it as Patient).gender == Enumerations.AdministrativeGender.FEMALE })
@@ -209,7 +210,7 @@ class FhirEngineImplTest {
 
     fhirEngine.create(*patients.toTypedArray())
 
-    val result = fhirEngine.search("Patient?_sort=-name").map { it as Patient }
+    val result = fhirEngine.search("Patient?_sort=-name", searchManager = SearchManagerForR4).map { it as Patient }
 
     assertThat(result.mapNotNull { it.nameFirstRep.given.firstOrNull()?.value })
       .isEqualTo(listOf("C", "B", "A"))
@@ -226,14 +227,14 @@ class FhirEngineImplTest {
 
     fhirEngine.create(*patients.toTypedArray())
 
-    val result = fhirEngine.search("Patient?_count=1").map { it as Patient }
+    val result = fhirEngine.search("Patient?_count=1", searchManager = SearchManagerForR4).map { it as Patient }
 
     assertThat(result.size).isEqualTo(1)
   }
 
   @Test
   fun `search() by x-fhir-query should return all patients for empty params`() = runBlocking {
-    val result = fhirEngine.search("Patient")
+    val result = fhirEngine.search("Patient", searchManager = SearchManagerForR4)
 
     assertThat(result.size).isEqualTo(1)
   }
@@ -243,7 +244,7 @@ class FhirEngineImplTest {
     val exception =
       assertThrows(FHIRException::class.java) {
         runBlocking {
-          fhirEngine.search("CustomResource?active=true&gender=male&_sort=name&_count=2")
+          fhirEngine.search("CustomResource?active=true&gender=male&_sort=name&_count=2", searchManager = SearchManagerForR4)
         }
       }
     assertThat(exception.message).isEqualTo("Unknown resource type CustomResource")
@@ -253,7 +254,7 @@ class FhirEngineImplTest {
   fun `search() by x-fhir-query should throw IllegalArgumentException for unrecognized param name`() {
     val exception =
       assertThrows(IllegalArgumentException::class.java) {
-        runBlocking { fhirEngine.search("Patient?customParam=true&gender=male&_sort=name") }
+        runBlocking { fhirEngine.search("Patient?customParam=true&gender=male&_sort=name", searchManager = SearchManagerForR4) }
       }
     assertThat(exception.message).isEqualTo("customParam not found in Patient")
   }
@@ -261,7 +262,9 @@ class FhirEngineImplTest {
   @Test
   fun syncUpload_uploadLocalChange() = runBlocking {
     val localChanges = mutableListOf<LocalChange>()
-    fhirEngine.syncUpload( { ResourceForDatabaseToSave(it.id, it.resourceType, it.versionId, it.lastUpdated!!) } ) {
+    fhirEngine.syncUpload({
+      ResourceForDatabaseToSave(it.id, it.resourceType, it.versionId, it.lastUpdated!!)
+    }) {
       flow {
         localChanges.addAll(it)
         emit(LocalChangeToken(it.flatMap { it.token.ids }) to TEST_PATIENT_1)

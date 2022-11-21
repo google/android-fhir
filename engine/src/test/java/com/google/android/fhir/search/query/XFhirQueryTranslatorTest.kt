@@ -18,6 +18,7 @@ package com.google.android.fhir.search.query
 
 import android.os.Build
 import com.google.android.fhir.ResourceType
+import com.google.android.fhir.demo.data.SearchManagerForR4
 import com.google.android.fhir.index.SearchParamDefinition
 import com.google.android.fhir.index.SearchParamType
 import com.google.android.fhir.search.Order
@@ -26,6 +27,8 @@ import com.google.android.fhir.search.query.XFhirQueryTranslator.applyFilterPara
 import com.google.android.fhir.search.query.XFhirQueryTranslator.applySortParam
 import com.google.android.fhir.search.query.XFhirQueryTranslator.translate
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
 import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,7 +41,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `translate() should add descending sort for sort param with hyphen`() {
-    val search = translate("Patient?_sort=-name")
+    val search = translate("Patient?_sort=-name", searchManager = SearchManagerForR4)
 
     assertThat(search.sort!!.paramName).isEqualTo("name")
     assertThat(search.order!!).isEqualTo(Order.DESCENDING)
@@ -46,7 +49,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `translate() should add ascending sort for sort param`() {
-    val search = translate("Patient?_sort=address-country")
+    val search = translate("Patient?_sort=address-country", searchManager = SearchManagerForR4)
 
     assertThat(search.sort!!.paramName).isEqualTo("address-country")
     assertThat(search.order!!).isEqualTo(Order.ASCENDING)
@@ -54,7 +57,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `translate() should not add sort for missing value for sort param`() {
-    val search = translate("Patient?_sort=")
+    val search = translate("Patient?_sort=", searchManager = SearchManagerForR4)
 
     assertThat(search.sort).isNull()
     assertThat(search.order).isNull()
@@ -62,7 +65,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `translate() should not add sort for missing sort param`() {
-    val search = translate("Patient")
+    val search = translate("Patient", searchManager = SearchManagerForR4)
 
     assertThat(search.sort).isNull()
     assertThat(search.order).isNull()
@@ -71,27 +74,27 @@ class XFhirQueryTranslatorTest {
   @Test
   fun `translate() should throw IllegalArgumentException for unrecognized sort param`() {
     val exception =
-      assertThrows(IllegalArgumentException::class.java) { translate("Patient?_sort=customParam") }
+      assertThrows(IllegalArgumentException::class.java) { translate("Patient?_sort=customParam", searchManager = SearchManagerForR4) }
     assertThat(exception.message).isEqualTo("customParam not found in Patient")
   }
 
   @Test
   fun `translate() should add limit for count param`() {
-    val search = translate("Patient?_count=10")
+    val search = translate("Patient?_count=10", searchManager = SearchManagerForR4)
 
     assertThat(search.count).isEqualTo(10)
   }
 
   @Test
   fun `translate() should not add limit for missing value for count param`() {
-    val search = translate("Patient?_count=")
+    val search = translate("Patient?_count=", searchManager = SearchManagerForR4)
 
     assertThat(search.count).isNull()
   }
 
   @Test
   fun `translate() should not add limit for missing count param`() {
-    val search = translate("Patient")
+    val search = translate("Patient", searchManager = SearchManagerForR4)
 
     assertThat(search.count).isNull()
   }
@@ -99,7 +102,7 @@ class XFhirQueryTranslatorTest {
   @Test
   fun `translate() should add filters`() {
     val search =
-      translate("Patient?gender=male&name=John&birthdate=2012-01-11&general-practitioner=12345")
+      translate("Patient?gender=male&name=John&birthdate=2012-01-11&general-practitioner=12345", searchManager = SearchManagerForR4)
 
     search.stringFilterCriteria.first().run {
       assertThat(this.parameter.paramName).isEqualTo("name")
@@ -112,7 +115,7 @@ class XFhirQueryTranslatorTest {
     }
     search.dateTimeFilterCriteria.first().run {
       assertThat(this.parameter.paramName).isEqualTo("birthdate")
-      assertThat(this.filters.first().value!!.date!!.toHumanDisplay()).isEqualTo("2012-01-11")
+      assertThat(DateType(this.filters.first().value!!.date!!.value).toHumanDisplay()).isEqualTo("2012-01-11")
     }
     search.referenceFilterCriteria.first().run {
       assertThat(this.parameter.paramName).isEqualTo("general-practitioner")
@@ -123,13 +126,13 @@ class XFhirQueryTranslatorTest {
   @Test
   fun `translate() should throw IllegalArgumentException for unrecognized filter param`() {
     val exception =
-      assertThrows(IllegalArgumentException::class.java) { translate("Patient?customParam=Abc") }
+      assertThrows(IllegalArgumentException::class.java) { translate("Patient?customParam=Abc", searchManager = SearchManagerForR4) }
     assertThat(exception.message).isEqualTo("customParam not found in Patient")
   }
 
   @Test
   fun `translate() should not add filters for missing value for filter param`() {
-    val search = translate("Patient?gender=&name=&birthdate=&general-practitioner=")
+    val search = translate("Patient?gender=&name=&birthdate=&general-practitioner=", searchManager = SearchManagerForR4)
 
     assertThat(search.stringFilterCriteria).isEmpty()
 
@@ -140,7 +143,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `applySortParam() should add sort param for string type`() {
-    val search = Search(ResourceType.Patient)
+    val search = Search(ResourceType.Patient, searchManager = SearchManagerForR4)
 
     search.applySortParam(
       SearchParamDefinition("address-country", SearchParamType.STRING, "Patient.address.country")
@@ -151,7 +154,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `applySortParam() should add sort param for number type`() {
-    val search = Search(ResourceType.RiskAssessment)
+    val search = Search(ResourceType.RiskAssessment, searchManager = SearchManagerForR4)
 
     search.applySortParam(
       SearchParamDefinition(
@@ -166,7 +169,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `applySortParam() should add sort param for date type`() {
-    val search = Search(ResourceType.Patient)
+    val search = Search(ResourceType.Patient, searchManager = SearchManagerForR4)
 
     search.applySortParam(
       SearchParamDefinition("birthdate", SearchParamType.DATE, "Patient.birthDate")
@@ -177,7 +180,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `applySortParam() should throw UnsupportedOperationException for unsupported type`() {
-    val search = Search(ResourceType.Patient)
+    val search = Search(ResourceType.Patient, searchManager = SearchManagerForR4)
 
     val exception =
       assertThrows(UnsupportedOperationException::class.java) {
@@ -194,7 +197,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `applyFilterParam() should add filter param for number type`() {
-    val search = Search(ResourceType.RiskAssessment)
+    val search = Search(ResourceType.RiskAssessment, searchManager = SearchManagerForR4)
 
     search.applyFilterParam(
       SearchParamDefinition(
@@ -212,7 +215,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `applyFilterParam() should add filter param for date type`() {
-    val search = Search(ResourceType.Patient)
+    val search = Search(ResourceType.Patient, searchManager = SearchManagerForR4)
 
     search.applyFilterParam(
       SearchParamDefinition("birthdate", SearchParamType.DATE, "Patient.birthDate"),
@@ -221,12 +224,12 @@ class XFhirQueryTranslatorTest {
 
     val applyFilterParam = search.dateTimeFilterCriteria.first().filters.first()
     assertThat(applyFilterParam.parameter.paramName).isEqualTo("birthdate")
-    assertThat(applyFilterParam.value!!.date!!.toHumanDisplay()).isEqualTo("2022-01-21")
+    assertThat(DateType(applyFilterParam.value!!.date!!.value).toHumanDisplay()).isEqualTo("2022-01-21")
   }
 
   @Test
   fun `applyFilterParam() should add filter param for datetime type`() {
-    val search = Search(ResourceType.Patient)
+    val search = Search(ResourceType.Patient, searchManager = SearchManagerForR4)
 
     search.applyFilterParam(
       SearchParamDefinition("birthdate", SearchParamType.DATE, "Patient.birthDate"),
@@ -235,13 +238,13 @@ class XFhirQueryTranslatorTest {
 
     val applyFilterParam = search.dateTimeFilterCriteria.first().filters.first()
     assertThat(applyFilterParam.parameter.paramName).isEqualTo("birthdate")
-    assertThat(applyFilterParam.value!!.dateTime!!.toHumanDisplay())
+    assertThat(DateTimeType(applyFilterParam.value!!.dateTime!!.value).toHumanDisplay())
       .isEqualTo("Jan 21, 2022, 12:21:59 PM")
   }
 
   @Test
   fun `applyFilterParam() should add filter param for quantity type`() {
-    val search = Search(ResourceType.Encounter)
+    val search = Search(ResourceType.Encounter, searchManager = SearchManagerForR4)
 
     search.applyFilterParam(
       SearchParamDefinition("length", SearchParamType.QUANTITY, "Encounter.length"),
@@ -257,7 +260,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `applyFilterParam() should add filter param for string type`() {
-    val search = Search(ResourceType.Patient)
+    val search = Search(ResourceType.Patient, searchManager = SearchManagerForR4)
 
     search.applyFilterParam(
       SearchParamDefinition("address-country", SearchParamType.STRING, "Patient.address.country"),
@@ -271,7 +274,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `applyFilterParam() should add filter param for token type`() {
-    val search = Search(ResourceType.Patient)
+    val search = Search(ResourceType.Patient, searchManager = SearchManagerForR4)
 
     search.applyFilterParam(
       SearchParamDefinition("identifier", SearchParamType.TOKEN, "Patient.identifier"),
@@ -286,7 +289,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `applyFilterParam() should add filter param for reference type`() {
-    val search = Search(ResourceType.Patient)
+    val search = Search(ResourceType.Patient, searchManager = SearchManagerForR4)
 
     search.applyFilterParam(
       SearchParamDefinition(
@@ -304,7 +307,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `applyFilterParam() should add filter param for uri type`() {
-    val search = Search(ResourceType.Measure)
+    val search = Search(ResourceType.Measure, searchManager = SearchManagerForR4)
 
     search.applyFilterParam(
       SearchParamDefinition("url", SearchParamType.URI, "Measure.url"),
@@ -318,7 +321,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `applyFilterParam() should throw UnsupportedOperationException for unrecognized type`() {
-    val search = Search(ResourceType.Location)
+    val search = Search(ResourceType.Location, searchManager = SearchManagerForR4)
 
     val exception =
       assertThrows(UnsupportedOperationException::class.java) {

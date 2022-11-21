@@ -42,12 +42,15 @@ internal data class NestedContext(val parentType: ResourceType, val param: IPara
  */
 inline fun <reified R : IAnyResource> Search.has(
   referenceParam: ReferenceClientParam,
+  searchManager: SearchManager,
   init: Search.() -> Unit
 ) {
   nestedSearches.add(
-    NestedSearch(referenceParam, Search(type = R::class.java.newInstance().resourceType)).apply {
-      search.init()
-    }
+    NestedSearch(
+        referenceParam,
+        Search(type = R::class.java.newInstance().resourceType, searchManager = searchManager)
+      )
+      .apply { search.init() }
   )
 }
 

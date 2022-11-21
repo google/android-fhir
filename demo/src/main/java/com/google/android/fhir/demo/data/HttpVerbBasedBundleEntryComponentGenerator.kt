@@ -30,9 +30,7 @@ import org.hl7.fhir.r4.model.UriType
  * [Resource] for the [LocalChangeEntity]. See [https://www.hl7.org/fhir/http.html#transaction] for
  * more info regarding the supported [Bundle.HTTPVerb].
  */
-abstract class HttpVerbBasedBundleEntryComponentGenerator(
-  private val httpVerb: Bundle.HTTPVerb
-) {
+abstract class HttpVerbBasedBundleEntryComponentGenerator(private val httpVerb: Bundle.HTTPVerb) {
 
   /**
    * Return [IBaseResource]? for the [LocalChangeEntity]. Implementation may return [null] when a

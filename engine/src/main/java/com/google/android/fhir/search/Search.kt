@@ -21,18 +21,29 @@ import com.google.android.fhir.resourceType
 import com.google.android.fhir.search.query.XFhirQueryTranslator.translate
 import org.hl7.fhir.instance.model.api.IAnyResource
 
-suspend inline fun <reified R : IAnyResource> FhirEngine.search(init: Search.() -> Unit): List<R> {
-  val search = Search(type = R::class.java.newInstance().resourceType)
+suspend inline fun <reified R : IAnyResource> FhirEngine.search(
+  init: Search.() -> Unit,
+  searchManager: SearchManager,
+): List<R> {
+  val search =
+    Search(type = R::class.java.newInstance().resourceType, searchManager = searchManager)
   search.init()
   return this.search(search)
 }
 
-suspend inline fun <reified R : IAnyResource> FhirEngine.count(init: Search.() -> Unit): Long {
-  val search = Search(type = R::class.java.newInstance().resourceType)
+suspend inline fun <reified R : IAnyResource> FhirEngine.count(
+  init: Search.() -> Unit,
+  searchManager: SearchManager,
+): Long {
+  val search =
+    Search(type = R::class.java.newInstance().resourceType, searchManager = searchManager)
   search.init()
   return this.count(search)
 }
 
-suspend fun FhirEngine.search(xFhirQuery: String): List<IAnyResource> {
-  return this.search(translate(xFhirQuery))
+suspend fun FhirEngine.search(
+  xFhirQuery: String,
+  searchManager: SearchManager
+): List<IAnyResource> {
+  return this.search(translate(xFhirQuery, searchManager))
 }

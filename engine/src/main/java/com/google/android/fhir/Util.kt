@@ -43,7 +43,6 @@ internal fun Date.toTimeZoneString(): String {
 internal fun isValidDateOnly(date: String) =
   runCatching { LocalDate.parse(date, DateTimeFormatter.ISO_DATE) }.isSuccess
 
-
 class OffsetDateTimeTypeAdapter : TypeAdapter<OffsetDateTime>() {
   override fun write(out: JsonWriter, value: OffsetDateTime) {
     out.value(DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(value))

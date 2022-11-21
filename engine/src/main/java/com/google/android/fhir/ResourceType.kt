@@ -16,7 +16,6 @@
 
 package com.google.android.fhir
 
-
 enum class ResourceType {
   Account,
   ActivityDefinition,

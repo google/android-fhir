@@ -54,7 +54,7 @@ class FhirApplication : Application() {
             ) { Timber.tag("App-HttpLog").d(it) }
         )
       ),
-      resourceIndexerManager =  ResourceIndexerManagerForR4
+      resourceIndexerManager = ResourceIndexerManagerForR4
     )
     Sync.oneTimeSync<FhirSyncWorker>(this, fhirVersionEnum = FhirVersionEnum.R5)
   }

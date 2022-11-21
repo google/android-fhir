@@ -41,7 +41,12 @@ import com.google.android.fhir.search.filter.UriFilterCriteria
 import com.google.android.fhir.search.filter.UriParamFilterCriterion
 
 @SearchDslMarker
-data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
+data class Search(
+  val type: ResourceType,
+  var count: Int? = null,
+  var from: Int? = null,
+  val searchManager: SearchManager
+) {
   internal val stringFilterCriteria = mutableListOf<StringParamFilterCriteria>()
   internal val dateTimeFilterCriteria = mutableListOf<DateClientParamFilterCriteria>()
   internal val numberFilterCriteria = mutableListOf<NumberParamFilterCriteria>()

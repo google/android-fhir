@@ -939,7 +939,7 @@ class ResourceIndexerTest {
         position = Location.LocationPositionComponent(DecimalType(latitude), DecimalType(longitude))
       }
 
-    val resourceIndices =ResourceIndexer.index(location, ResourceIndexerManagerForR4Test)
+    val resourceIndices = ResourceIndexer.index(location, ResourceIndexerManagerForR4Test)
 
     assertThat(resourceIndices.positionIndices).contains(PositionIndex(latitude, longitude))
   }
@@ -952,7 +952,7 @@ class ResourceIndexerTest {
         position = null
       }
 
-    val resourceIndices =ResourceIndexer.index(location, ResourceIndexerManagerForR4Test)
+    val resourceIndices = ResourceIndexer.index(location, ResourceIndexerManagerForR4Test)
 
     assertThat(resourceIndices.positionIndices).isEmpty()
   }
@@ -964,7 +964,7 @@ class ResourceIndexerTest {
       TestingUtils(FhirContext.forR4().newJsonParser())
         .readFromFile(Invoice::class.java, "/quantity_test_invoice.json")
 
-    val resourceIndices =ResourceIndexer.index(testInvoice, ResourceIndexerManagerForR4Test)
+    val resourceIndices = ResourceIndexer.index(testInvoice, ResourceIndexerManagerForR4Test)
 
     assertThat(resourceIndices.resourceId).isEqualTo(testInvoice.logicalId)
 

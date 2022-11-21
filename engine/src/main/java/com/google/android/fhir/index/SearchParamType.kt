@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.index
 
-
 enum class SearchParamType {
   /** Search parameter SHALL be a number (a whole number, or a decimal). */
   NUMBER,

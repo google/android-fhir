@@ -21,7 +21,6 @@ import androidx.work.WorkerParameters
 import com.google.android.fhir.ResourceForDatabaseToSave
 import com.google.android.fhir.ResourceType
 import com.google.android.fhir.demo.FhirApplication
-import com.google.android.fhir.index.ResourceIndexerManager
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
@@ -38,15 +37,14 @@ class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
     return DownloadWorkManagerImpl()
   }
   override fun getUploadWorkManager(): UploadWorkManager = TransactionBundleGenerator.getDefault()
-  override fun getResourceToSave(): (IAnyResource) -> ResourceForDatabaseToSave? =
-  {it ->
+  override fun getResourceToSave(): (IAnyResource) -> ResourceForDatabaseToSave? = { it ->
     when (it) {
       is Bundle -> updateVersionIdAndLastUpdated(it)
-      else ->  updateVersionIdAndLastUpdated(it as Resource)
+      else -> updateVersionIdAndLastUpdated(it as Resource)
     }
   }
 
-  private fun updateVersionIdAndLastUpdated(bundle: Bundle) : ResourceForDatabaseToSave? {
+  private fun updateVersionIdAndLastUpdated(bundle: Bundle): ResourceForDatabaseToSave? {
     when (bundle.type) {
       Bundle.BundleType.TRANSACTIONRESPONSE -> {
         bundle.entry.forEach {
@@ -67,15 +65,12 @@ class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   override fun getConflictResolver() = AcceptLocalConflictResolver
 
   override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)
-  private fun updateVersionIdAndLastUpdated(response: Bundle.BundleEntryResponseComponent) : ResourceForDatabaseToSave?  {
+  private fun updateVersionIdAndLastUpdated(
+    response: Bundle.BundleEntryResponseComponent
+  ): ResourceForDatabaseToSave? {
     if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
       return response.resourceIdAndType?.let { (id, type) ->
-        ResourceForDatabaseToSave(
-          id,
-          type,
-          response.etag,
-          response.lastModified.toInstant()
-        )
+        ResourceForDatabaseToSave(id, type, response.etag, response.lastModified.toInstant())
       }
     }
     return null

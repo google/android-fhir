@@ -33,7 +33,7 @@ internal interface Uploader {
     localChanges: List<LocalChange>,
   ): Flow<UploadResult>
 
-   suspend fun getResourceTypeToSave(): (IAnyResource) -> ResourceForDatabaseToSave?
+  suspend fun getResourceTypeToSave(): (IAnyResource) -> ResourceForDatabaseToSave?
 }
 
 internal sealed class UploadResult {

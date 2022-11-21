@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.demo.data
 
 import com.google.android.fhir.index.CodeableConcept
@@ -29,22 +45,13 @@ object ResourceIndexerManagerForR4 : ResourceIndexerManager {
   }
 
   override fun createDateType(value: IBase): DateType =
-    DateType(
-      (value as org.hl7.fhir.r4.model.DateType).value,
-      value.precision
-    )
+    DateType((value as org.hl7.fhir.r4.model.DateType).value, value.precision)
 
   override fun createDateTimeType(value: IBase): DateTimeType =
-    DateTimeType(
-      (value as org.hl7.fhir.r4.model.DateTimeType).value,
-      value.precision
-    )
-
+    DateTimeType((value as org.hl7.fhir.r4.model.DateTimeType).value, value.precision)
 
   override fun createInstantType(value: IBase): InstantType =
-    InstantType(
-      (value as org.hl7.fhir.r4.model.InstantType).value
-    )
+    InstantType((value as org.hl7.fhir.r4.model.InstantType).value)
 
   override fun createPeriodType(value: IBase): Period =
     Period(
@@ -62,52 +69,36 @@ object ResourceIndexerManagerForR4 : ResourceIndexerManager {
     )
 
   override fun createStringType(value: IBase): String =
-    when(value){
+    when (value) {
       is HumanName -> value.asString()
       is Address -> value.asString()
       else -> value.toString()
     }
 
   override fun createReferenceType(value: IBase): String? =
-    when(value){
-      is Reference  -> value.reference
+    when (value) {
+      is Reference -> value.reference
       is CanonicalType -> value.value
       is UriType -> value.value
       else -> throw UnsupportedOperationException("Value $value is not readable by SDK")
     }
 
   override fun createIdentifierType(value: IBase): Identifier =
-    Identifier(
-      (value as org.hl7.fhir.r4.model.Identifier).system,
-      value.value
-    )
+    Identifier((value as org.hl7.fhir.r4.model.Identifier).system, value.value)
 
   override fun createCodeableConceptType(value: IBase): CodeableConcept =
     CodeableConcept(
-      (value as org.hl7.fhir.r4.model.CodeableConcept).coding.map {
-        Coding(it.system, it.code)
-      }
+      (value as org.hl7.fhir.r4.model.CodeableConcept).coding.map { Coding(it.system, it.code) }
     )
 
   override fun createCodingType(value: IBase): Coding =
-    Coding(
-      (value as org.hl7.fhir.r4.model.Coding).system,
-      value.code
-    )
+    Coding((value as org.hl7.fhir.r4.model.Coding).system, value.code)
 
   override fun createMoneyType(value: IBase): Money =
-    Money(
-      (value as org.hl7.fhir.r4.model.Money).currency,
-      value.value
-    )
+    Money((value as org.hl7.fhir.r4.model.Money).currency, value.value)
 
   override fun createQuantityType(value: IBase): Quantity =
-    Quantity(
-      (value as org.hl7.fhir.r4.model.Quantity).unit,
-      value.code,
-      value.system,
-      value.value
-    )
+    Quantity((value as org.hl7.fhir.r4.model.Quantity).unit, value.code, value.system, value.value)
 
   override fun createLocationPositionComponentType(value: IBase): LocationPositionComponent =
     LocationPositionComponent(
@@ -115,9 +106,7 @@ object ResourceIndexerManagerForR4 : ResourceIndexerManager {
       value.longitude.toDouble()
     )
 
-
-  override fun getPrimitiveValue(value: IBase): String =
-    (value as Base).primitiveValue()
+  override fun getPrimitiveValue(value: IBase): String = (value as Base).primitiveValue()
 }
 
 /**
@@ -126,10 +115,10 @@ object ResourceIndexerManagerForR4 : ResourceIndexerManager {
  */
 private fun HumanName.asString(separator: CharSequence = " "): String {
   return (prefix.filterNotNull().map { it.value } +
-    given.filterNotNull().map { it.value } +
-    family +
-    suffix.filterNotNull().map { it.value } +
-    text)
+      given.filterNotNull().map { it.value } +
+      family +
+      suffix.filterNotNull().map { it.value } +
+      text)
     .filterNotNull()
     .filter { it.isNotBlank() }
     .joinToString(separator)
@@ -141,12 +130,12 @@ private fun HumanName.asString(separator: CharSequence = " "): String {
  */
 private fun Address.asString(separator: CharSequence = ", "): String {
   return (line.filterNotNull().map { it.value } +
-    city +
-    district +
-    state +
-    country +
-    postalCode +
-    text)
+      city +
+      district +
+      state +
+      country +
+      postalCode +
+      text)
     .filterNotNull()
     .filter { it.isNotBlank() }
     .joinToString(separator)

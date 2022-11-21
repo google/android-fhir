@@ -43,7 +43,9 @@ import org.hl7.fhir.instance.model.api.IAnyResource
 /** Implementation of [FhirEngine]. */
 internal class FhirEngineImpl(private val database: Database, private val context: Context) :
   FhirEngine {
-  override suspend fun create(vararg resource: IAnyResource, ): List<String> {
+  override suspend fun create(
+    vararg resource: IAnyResource,
+  ): List<String> {
     return database.insert(*resource)
   }
 
@@ -51,7 +53,9 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     return database.select(type, id)
   }
 
-  override suspend fun update(vararg resource: IAnyResource, ) {
+  override suspend fun update(
+    vararg resource: IAnyResource,
+  ) {
     database.update(*resource)
   }
 
@@ -106,7 +110,9 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       }
   }
 
-  private suspend fun saveResolvedResourcesToDatabase(resolved: List<IAnyResource>?,  ) {
+  private suspend fun saveResolvedResourcesToDatabase(
+    resolved: List<IAnyResource>?,
+  ) {
     resolved?.let {
       database.deleteUpdates(it)
       database.update(*it.toTypedArray())
@@ -120,7 +126,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
         .entries.map {
           SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
         }
-    database.insertSyncedResources(timeStamps , resources)
+    database.insertSyncedResources(timeStamps, resources)
   }
 
   private suspend fun resolveConflictingResources(
@@ -151,10 +157,14 @@ internal class FhirEngineImpl(private val database: Database, private val contex
         database.deleteUpdates(it.first)
         val omar = getResourceTypeToSave(it.second)
         if (omar != null) {
-          database.updateVersionIdAndLastUpdated(omar.id, omar.resourceType, omar.versionId, omar.lastUpdated)
+          database.updateVersionIdAndLastUpdated(
+            omar.id,
+            omar.resourceType,
+            omar.versionId,
+            omar.lastUpdated
+          )
         }
       }
     }
   }
-
 }

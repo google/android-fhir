@@ -86,6 +86,7 @@ configurations {
 }
 
 dependencies {
+  testImplementation(project(mapOf("path" to ":demo")))
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
@@ -111,9 +112,7 @@ dependencies {
   implementation(Dependencies.Retrofit.gsonConverter)
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.Room.runtime)
-  implementation(Dependencies.androidFhirCommon) {
-    exclude(module = "hapi-fhir-structures-r4")
-  }
+  implementation(Dependencies.androidFhirCommon) { exclude(module = "hapi-fhir-structures-r4") }
   implementation(Dependencies.guava)
   implementation(Dependencies.httpInterceptor)
   implementation(Dependencies.jsonToolsPatch)

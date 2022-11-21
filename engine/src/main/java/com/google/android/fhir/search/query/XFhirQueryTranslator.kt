@@ -25,6 +25,8 @@ import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.gclient.UriClientParam
 import com.google.android.fhir.ResourceType
 import com.google.android.fhir.index.Coding
+import com.google.android.fhir.index.DateTimeType
+import com.google.android.fhir.index.DateType
 import com.google.android.fhir.index.Quantity
 import com.google.android.fhir.index.SearchParamDefinition
 import com.google.android.fhir.index.SearchParamType
@@ -32,11 +34,10 @@ import com.google.android.fhir.index.getSearchParamList
 import com.google.android.fhir.isValidDateOnly
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
+import com.google.android.fhir.search.SearchManager
 import com.google.android.fhir.search.filter.TokenFilterValue
 import com.google.android.fhir.search.filter.TokenParamFilterValueInstance
 import java.math.BigDecimal
-import org.hl7.fhir.r4.model.DateTimeType
-import org.hl7.fhir.r4.model.DateType
 
 /**
  * Supports translation of x-fhir-query defined in
@@ -57,7 +58,7 @@ object XFhirQueryTranslator {
    * Complex queries including fhirpath expressions, global common search params, modifiers,
    * prefixes, chained parameters are not supported.
    */
-  internal fun translate(xFhirQuery: String): Search {
+  internal fun translate(xFhirQuery: String, searchManager: SearchManager): Search {
     val (type, queryStringPairs) =
       xFhirQuery.split("?").let {
         ResourceType.fromCode(it.first()) to it.elementAtOrNull(1)?.split("&")
@@ -96,7 +97,7 @@ object XFhirQueryTranslator {
 
     val querySearchParameters = searchParams?.toSearchParamDefinitionValueMap(type)
 
-    return Search(type, count).apply {
+    return Search(type, count, searchManager = searchManager).apply {
       querySearchParameters?.forEach {
         val (param, filterValue) = it
         this.applyFilterParam(param, filterValue)
@@ -116,9 +117,13 @@ object XFhirQueryTranslator {
         this.filter(NumberClientParam(param.name), { value = filterValue.toBigDecimal() })
       }
       SearchParamType.DATE -> {
-        if (!isValidDateOnly(filterValue))
-          this.filter(DateClientParam(param.name), { value = of(DateTimeType(filterValue)) })
-        else this.filter(DateClientParam(param.name), { value = of(DateType(filterValue)) })
+        if (!isValidDateOnly(filterValue)) {
+          val omar: DateTimeType = searchManager.createDateTimeType(filterValue)
+          this.filter(DateClientParam(param.name), { value = of(omar) })
+        } else {
+          val omar: DateType = searchManager.createDateType(filterValue)
+          this.filter(DateClientParam(param.name), { value = of(omar) })
+        }
       }
       SearchParamType.QUANTITY -> {
         filterValue.toQuantity().let {

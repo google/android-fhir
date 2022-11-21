@@ -25,7 +25,6 @@ import com.google.android.fhir.sync.Downloader
 import com.google.android.fhir.sync.ResourceSyncException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import org.hl7.fhir.instance.model.api.IBase
 
 /**
  * Implementation of the [Downloader]. It orchestrates the pre & post processing of resources via

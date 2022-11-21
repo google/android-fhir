@@ -117,7 +117,9 @@ class ResourceParamsBasedDownloadWorkManagerTest {
   fun getNextRequestUrl_withLastUpdatedTimeProvidedInContext_ShouldAppendGtPrefixToLastUpdatedSearchParam() =
     runBlockingTest {
       val downloadManager =
-        com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(mapOf(ResourceType.Patient to emptyMap()))
+        com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(
+          mapOf(ResourceType.Patient to emptyMap())
+        )
       val url =
         downloadManager.getNextRequestUrl(
           object : SyncDownloadContext {

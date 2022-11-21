@@ -35,6 +35,9 @@ import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemV
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.index.DateTimeType
+import com.google.android.fhir.index.DateType
+import com.google.android.fhir.search.SearchManager
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -481,7 +484,22 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     expression: Expression,
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     val data =
-      if (expression.isXFhirQuery) fhirEngine.search(expression.expression) as List<Base>
+      if (expression.isXFhirQuery)
+        fhirEngine.search(
+          expression.expression,
+          searchManager =
+            object : SearchManager {
+              override fun createDateTimeType(filterValue: String): DateTimeType {
+                val dateTime = org.hl7.fhir.r4.model.DateTimeType(filterValue)
+                return DateTimeType(dateTime.value, dateTime.precision)
+              }
+
+              override fun createDateType(filterValue: String): DateType {
+                val date = org.hl7.fhir.r4.model.DateType(filterValue)
+                return DateType(date.value, date.precision)
+              }
+            }
+        ) as List<Base>
       else if (expression.isFhirPath)
         fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
       else

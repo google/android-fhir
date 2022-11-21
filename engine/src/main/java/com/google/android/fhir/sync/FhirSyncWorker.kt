@@ -25,7 +25,6 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.ResourceForDatabaseToSave
-import com.google.android.fhir.index.ResourceIndexerManager
 import com.google.android.fhir.sync.download.DownloaderImpl
 import com.google.android.fhir.sync.upload.BundleUploader
 import com.google.android.fhir.sync.upload.LocalChangesPaginator
@@ -47,7 +46,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDownloadWorkManager(): DownloadWorkManager
-  abstract  fun getUploadWorkManager() : UploadWorkManager
+  abstract fun getUploadWorkManager(): UploadWorkManager
   abstract fun getResourceToSave(): (IAnyResource) -> ResourceForDatabaseToSave?
   abstract fun getConflictResolver(): ConflictResolver
 

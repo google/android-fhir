@@ -26,14 +26,14 @@ import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.epochDay
+import com.google.android.fhir.index.DateTimeType
+import com.google.android.fhir.index.DateType
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import java.util.Date
 import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
 import org.hl7.fhir.instance.model.api.IAnyResource
-import org.hl7.fhir.r4.model.DateTimeType
-import org.hl7.fhir.r4.model.DateType
 
 /**
  * The multiplier used to determine the range for the `ap` search prefix. See
@@ -413,7 +413,7 @@ internal val DateType.rangeEpochDays: LongRange
  * of 2001-01-02)
  */
 internal val DateTimeType.rangeEpochMillis
-  get() = LongRange(value.time, precision.add(value, 1).time - 1)
+  get() = LongRange(value!!.time, precision.add(value, 1).time - 1)
 
 data class ConditionParam<T>(val condition: String, val params: List<T>) {
   constructor(condition: String, vararg params: T) : this(condition, params.asList())

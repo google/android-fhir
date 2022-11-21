@@ -50,7 +50,10 @@ internal object ResourceIndexer {
 
   private lateinit var resourceIndexerManager: ResourceIndexerManager
 
-  fun <R : IAnyResource> index(resource: R, resourceIndexerManager: ResourceIndexerManager): ResourceIndices {
+  fun <R : IAnyResource> index(
+    resource: R,
+    resourceIndexerManager: ResourceIndexerManager
+  ): ResourceIndices {
     this.resourceIndexerManager = resourceIndexerManager
     return extractIndexValues(resource)
   }
@@ -190,7 +193,7 @@ internal object ResourceIndexer {
       // No need to add precision because an instant is meant to have zero width
       "instant" -> {
         val instant = resourceIndexerManager.createInstantType(value)
-          DateTimeIndex(searchParam.name, searchParam.path, instant.value.time, instant.value.time)
+        DateTimeIndex(searchParam.name, searchParam.path, instant.value.time, instant.value.time)
       }
       "Period" -> {
         val period = resourceIndexerManager.createPeriodType(value)
@@ -248,7 +251,12 @@ internal object ResourceIndexer {
     when (value.fhirType()) {
       "boolean" ->
         listOf(
-          TokenIndex(searchParam.name, searchParam.path, system = null, resourceIndexerManager.getPrimitiveValue(value))
+          TokenIndex(
+            searchParam.name,
+            searchParam.path,
+            system = null,
+            resourceIndexerManager.getPrimitiveValue(value)
+          )
         )
       "Identifier" -> {
         val identifier = resourceIndexerManager.createIdentifierType(value)
@@ -267,17 +275,17 @@ internal object ResourceIndexer {
           .map { TokenIndex(searchParam.name, searchParam.path, it.system ?: "", it.code!!) }
       }
       "code",
-      "Coding",
-      -> {
+      "Coding", -> {
         val coding = resourceIndexerManager.createCodingType(value)
         listOf(TokenIndex(searchParam.name, searchParam.path, coding.system ?: "", coding.code!!))
       }
       else -> listOf()
     }
 
-
   private fun referenceIndex(searchParam: SearchParamDefinition, value: IBase): ReferenceIndex? =
-    resourceIndexerManager.createReferenceType(value)?.let { ReferenceIndex(searchParam.name, searchParam.path, it) }
+    resourceIndexerManager.createReferenceType(value)?.let {
+      ReferenceIndex(searchParam.name, searchParam.path, it)
+    }
 
   private fun quantityIndex(searchParam: SearchParamDefinition, value: IBase): List<QuantityIndex> =
     when (value.fhirType()) {

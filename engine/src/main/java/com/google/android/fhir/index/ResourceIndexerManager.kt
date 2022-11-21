@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.index
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
@@ -7,11 +23,11 @@ import org.hl7.fhir.instance.model.api.IBase
 
 interface ResourceIndexerManager {
 
-  fun evaluateFunction(resource: IBase, path: String):  List<IBase>
+  fun evaluateFunction(resource: IBase, path: String): List<IBase>
 
-  fun createDateType(value: IBase) : DateType
+  fun createDateType(value: IBase): DateType
 
-  fun createDateTimeType(value: IBase) : DateTimeType
+  fun createDateTimeType(value: IBase): DateTimeType
   fun createInstantType(value: IBase): InstantType
   fun createPeriodType(value: IBase): Period
 
@@ -45,12 +61,11 @@ data class Period(
   val end: Date?,
 )
 
-
 data class LocationPositionComponent(val latitude: Double, val longitude: Double)
 
 data class Money(val currency: String, val value: BigDecimal)
 
-data class Identifier(val system: String?, val value: String?)
+data class Identifier(val system: String?, val value: String)
 
 data class Quantity(
   val unit: String?,
@@ -64,6 +79,6 @@ data class Timing(
   val event: List<DateTimeType>,
 )
 
-data class Coding(val system: String?, val code: String?)
+data class Coding(val system: String?, val code: String)
 
 data class CodeableConcept(val coding: List<Coding>)

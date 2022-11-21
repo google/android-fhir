@@ -66,27 +66,6 @@ class UtilTest : TestCase() {
   }
 
   @Test
-  fun operationOutcomeIsSuccess_noIssue_shouldReturnFalse() {
-    val outcome = OperationOutcome()
-    assertThat(outcome.isUploadSuccess()).isFalse()
-  }
-
-  @Test
-  fun operationOutcomeIsSuccess_errorIssue_shouldReturnFalse() {
-    assertThat(TEST_OPERATION_OUTCOME_ERROR.isUploadSuccess()).isFalse()
-  }
-
-  @Test
-  fun operationOutcomeIsSuccess_infoIssue_shouldReturnTrue() {
-    assertThat(TEST_OPERATION_OUTCOME_INFO.isUploadSuccess()).isTrue()
-  }
-
-  @Test
-  fun operationOutcomeIsSuccess_patient_shouldReturnFalse() {
-    assertThat(Patient().isUploadSuccess()).isFalse()
-  }
-
-  @Test
   fun `isValidDateOnly() should return true for valid date only string`() {
     assertThat(isValidDateOnly("2022-01-02")).isTrue()
   }

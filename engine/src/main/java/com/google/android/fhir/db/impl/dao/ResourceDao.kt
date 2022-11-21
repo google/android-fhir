@@ -75,11 +75,17 @@ internal abstract class ResourceDao {
       ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
   }
 
-  open suspend fun insert(resource: IAnyResource, resourceIndexerManager: ResourceIndexerManager): String {
+  open suspend fun insert(
+    resource: IAnyResource,
+    resourceIndexerManager: ResourceIndexerManager
+  ): String {
     return insertResource(resource, resourceIndexerManager)
   }
 
-  open suspend fun insertAll(resources: List<IAnyResource>, resourceIndexerManager: ResourceIndexerManager): List<String> {
+  open suspend fun insertAll(
+    resources: List<IAnyResource>,
+    resourceIndexerManager: ResourceIndexerManager
+  ): List<String> {
     return resources.map { resource -> insertResource(resource, resourceIndexerManager) }
   }
 
@@ -174,7 +180,10 @@ internal abstract class ResourceDao {
 
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
-  private suspend fun insertResource(resource: IAnyResource, resourceIndexerManager: ResourceIndexerManager): String {
+  private suspend fun insertResource(
+    resource: IAnyResource,
+    resourceIndexerManager: ResourceIndexerManager
+  ): String {
     val resourceUuid = UUID.randomUUID()
 
     // Use the local UUID as the logical ID of the resource

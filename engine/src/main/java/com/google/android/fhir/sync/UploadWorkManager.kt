@@ -17,19 +17,13 @@
 package com.google.android.fhir.sync
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.ResourceForDatabaseToSave
-import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.instance.model.api.IBaseBundle
 
-
 typealias ResourceBundleAndAssociatedLocalChangeTokens = Pair<IBaseBundle, List<LocalChangeToken>>
 
-
-/**
- * Manager that generates the FHIR requests and handles the FHIR responses of a upload job.
- */
+/** Manager that generates the FHIR requests and handles the FHIR responses of a upload job. */
 interface UploadWorkManager {
   /**
    * Returns the URL for the next download request, or `null` if there is no more download request
@@ -39,8 +33,8 @@ interface UploadWorkManager {
     localChanges: List<List<LocalChange>>
   ): List<ResourceBundleAndAssociatedLocalChangeTokens>
 
-
-
-  fun getUploadResult(response: IAnyResource, localChangeTokens: List<LocalChangeToken>): LocalChangeToken
-
+  fun getUploadResult(
+    response: IAnyResource,
+    localChangeTokens: List<LocalChangeToken>
+  ): LocalChangeToken
 }

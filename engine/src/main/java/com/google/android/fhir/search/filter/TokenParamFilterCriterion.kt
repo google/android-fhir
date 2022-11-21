@@ -17,15 +17,12 @@
 package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.TokenClientParam
+import com.google.android.fhir.index.CodeableConcept
+import com.google.android.fhir.index.Coding
+import com.google.android.fhir.index.Identifier
 import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
-import org.hl7.fhir.r4.model.CodeType
-import org.hl7.fhir.r4.model.CodeableConcept
-import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.ContactPoint
-import org.hl7.fhir.r4.model.Identifier
-import org.hl7.fhir.r4.model.UriType
 
 /**
  * Represents a criterion for filtering [TokenClientParam]. e.g. filter(Patient.GENDER, { value =
@@ -46,16 +43,16 @@ data class TokenParamFilterCriterion(var parameter: TokenClientParam) : FilterCr
     TokenFilterValue().apply { tokenFilters.add(TokenParamFilterValueInstance(code = string)) }
 
   /** Returns [TokenFilterValue] from [UriType]. */
-  fun of(uriType: UriType) =
-    TokenFilterValue().apply {
-      tokenFilters.add(TokenParamFilterValueInstance(code = uriType.value))
-    }
+  // fun of(uriType: UriType) =
+  //   TokenFilterValue().apply {
+  //     tokenFilters.add(TokenParamFilterValueInstance(code = uriType.value))
+  //   }
 
   /** Returns [TokenFilterValue] from [CodeType]. */
-  fun of(codeType: CodeType) =
-    TokenFilterValue().apply {
-      tokenFilters.add(TokenParamFilterValueInstance(code = codeType.value))
-    }
+  // fun of(codeType: CodeType) =
+  //   TokenFilterValue().apply {
+  //     tokenFilters.add(TokenParamFilterValueInstance(code = codeType.value))
+  //   }
 
   /** Returns [TokenFilterValue] from [Coding]. */
   fun of(coding: Coding) =
@@ -80,53 +77,13 @@ data class TokenParamFilterCriterion(var parameter: TokenClientParam) : FilterCr
     }
 
   /** Returns [TokenFilterValue] from [ContactPoint]. */
-  fun of(contactPoint: ContactPoint) =
-    TokenFilterValue().apply {
-      tokenFilters.add(
-        TokenParamFilterValueInstance(uri = contactPoint.use?.toCode(), code = contactPoint.value)
-      )
-    }
-  /** Returns [TokenFilterValue] from [UriType]. */
-  fun of(uriType: org.hl7.fhir.r5.model.UriType) =
-    TokenFilterValue().apply {
-      tokenFilters.add(TokenParamFilterValueInstance(code = uriType.value))
-    }
-
-  /** Returns [TokenFilterValue] from [CodeType]. */
-  fun of(codeType: org.hl7.fhir.r5.model.CodeType) =
-    TokenFilterValue().apply {
-      tokenFilters.add(TokenParamFilterValueInstance(code = codeType.value))
-    }
-
-  /** Returns [TokenFilterValue] from [Coding]. */
-  fun of(coding: org.hl7.fhir.r5.model.Coding) =
-    TokenFilterValue().apply {
-      tokenFilters.add(TokenParamFilterValueInstance(uri = coding.system, code = coding.code))
-    }
-
-  /** Returns [TokenFilterValue] from [CodeableConcept]. */
-  fun of(codeableConcept: org.hl7.fhir.r5.model.CodeableConcept) =
-    TokenFilterValue().apply {
-      codeableConcept.coding.forEach {
-        tokenFilters.add(TokenParamFilterValueInstance(uri = it.system, code = it.code))
-      }
-    }
-
-  /** Returns [TokenFilterValue] from [Identifier]. */
-  fun of(identifier: org.hl7.fhir.r5.model.Identifier) =
-    TokenFilterValue().apply {
-      tokenFilters.add(
-        TokenParamFilterValueInstance(uri = identifier.system, code = identifier.value)
-      )
-    }
-
-  /** Returns [TokenFilterValue] from [ContactPoint]. */
-  fun of(contactPoint: org.hl7.fhir.r5.model.ContactPoint) =
-    TokenFilterValue().apply {
-      tokenFilters.add(
-        TokenParamFilterValueInstance(uri = contactPoint.use?.toCode(), code = contactPoint.value)
-      )
-    }
+  // fun of(contactPoint: ContactPoint) =
+  //   TokenFilterValue().apply {
+  //     tokenFilters.add(
+  //       TokenParamFilterValueInstance(uri = contactPoint.use?.toCode(), code =
+  // contactPoint.value)
+  //     )
+  //   }
 
   override fun getConditionalParams() =
     value!!.tokenFilters.map {
