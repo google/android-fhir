@@ -13,4 +13,6 @@
     <dimen name="info_card_header_margin_bottom">8dp</dimen>
     <dimen name="info_card_header_margin">16dp</dimen>
     <dimen name="info_card_icon_padding">8dp</dimen>
+    <dimen name="component_header_top_margin">32dp</dimen>
+    <dimen name="component_header_bottom_margin">8dp</dimen>
 </resources>

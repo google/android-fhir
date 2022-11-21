@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,32 +21,67 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.catalog.databinding.ComponentHeaderLayoutBinding
 import com.google.android.fhir.catalog.databinding.LandingPageItemBinding
 
 class ComponentsRecyclerViewAdapter(
   private val onItemClick: (ComponentListViewModel.Component) -> Unit
-) : ListAdapter<ComponentListViewModel.Component, ComponentListViewHolder>(ComponentDiffUtil()) {
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComponentListViewHolder {
-    return ComponentListViewHolder(
-      LandingPageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-      onItemClick
-    )
+) : ListAdapter<ComponentListViewModel.Component, RecyclerView.ViewHolder>(ComponentDiffUtil()) {
+
+  enum class ViewType {
+    HEADER_TYPE,
+    ITEM_TYPE
   }
 
-  override fun onBindViewHolder(holder: ComponentListViewHolder, position: Int) {
-    holder.bind(getItem(position))
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    return when (viewType) {
+      ViewType.HEADER_TYPE.ordinal ->
+        ComponentHeaderViewHolder(
+          ComponentHeaderLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
+      ViewType.ITEM_TYPE.ordinal ->
+        ComponentListViewHolder(
+          LandingPageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+          onItemClick
+        )
+      else -> throw IllegalArgumentException("$viewType must be ViewType.")
+    }
   }
+
+  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    if (holder is ComponentViewHolder) {
+      holder.bind(getItem(position))
+    }
+  }
+
+  override fun getItemViewType(position: Int): Int {
+    return when (getItem(position).viewType) {
+      ViewType.HEADER_TYPE -> ViewType.HEADER_TYPE.ordinal
+      ViewType.ITEM_TYPE -> ViewType.ITEM_TYPE.ordinal
+    }
+  }
+}
+
+interface ComponentViewHolder {
+  fun bind(component: ComponentListViewModel.Component)
 }
 
 class ComponentListViewHolder(
   private val binding: LandingPageItemBinding,
   private val onItemClick: (ComponentListViewModel.Component) -> Unit
-) : RecyclerView.ViewHolder(binding.root) {
-  fun bind(component: ComponentListViewModel.Component) {
+) : RecyclerView.ViewHolder(binding.root), ComponentViewHolder {
+  override fun bind(component: ComponentListViewModel.Component) {
     binding.componentLayoutIconImageview.setImageResource(component.iconId)
     binding.componentLayoutTextView.text =
       binding.componentLayoutTextView.context.getString(component.textId)
     binding.root.setOnClickListener { onItemClick(component) }
+  }
+}
+
+class ComponentHeaderViewHolder(private val binding: ComponentHeaderLayoutBinding) :
+  RecyclerView.ViewHolder(binding.root), ComponentViewHolder {
+  override fun bind(component: ComponentListViewModel.Component) {
+    binding.tvComponentHeader.text = binding.tvComponentHeader.context.getString(component.textId)
   }
 }
 

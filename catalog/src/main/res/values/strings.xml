@@ -61,4 +61,6 @@
     <string name="hide_error_state">Hide error state</string>
     <string name="options">Options</string>
     <string name="error">Error</string>
+    <string name="widgets">Widgets</string>
+    <string name="misc_components">Misc components</string>
 </resources>
