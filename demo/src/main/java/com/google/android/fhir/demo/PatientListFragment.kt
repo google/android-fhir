@@ -43,8 +43,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
-import com.google.android.fhir.sync.State
-import kotlinx.coroutines.flow.collect
+import com.google.android.fhir.sync.SyncJobStatus
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -63,10 +62,9 @@ class PatientListFragment : Fragment() {
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? {
+  ): View {
     _binding = FragmentPatientListBinding.inflate(inflater, container, false)
-    val view = binding.root
-    return view
+    return binding.root
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -91,13 +89,10 @@ class PatientListFragment : Fragment() {
       }
     )
 
-    patientListViewModel.liveSearchedPatients.observe(
-      viewLifecycleOwner,
-      {
-        Timber.d("Submitting ${it.count()} patient records")
-        adapter.submitList(it)
-      }
-    )
+    patientListViewModel.liveSearchedPatients.observe(viewLifecycleOwner) {
+      Timber.d("Submitting ${it.count()} patient records")
+      adapter.submitList(it)
+    }
 
     patientListViewModel.patientCount.observe(
       viewLifecycleOwner,
@@ -127,8 +122,7 @@ class PatientListFragment : Fragment() {
       }
     }
     requireActivity()
-      .onBackPressedDispatcher
-      .addCallback(
+      .onBackPressedDispatcher.addCallback(
         viewLifecycleOwner,
         object : OnBackPressedCallback(true) {
           override fun handleOnBackPressed() {
@@ -153,22 +147,22 @@ class PatientListFragment : Fragment() {
       mainActivityViewModel.pollState.collect {
         Timber.d("onViewCreated: pollState Got status $it")
         when (it) {
-          is State.Started -> {
+          is SyncJobStatus.Started -> {
             Timber.i("Sync: ${it::class.java.simpleName}")
             fadeInTopBanner()
           }
-          is State.InProgress -> {
+          is SyncJobStatus.InProgress -> {
             Timber.i("Sync: ${it::class.java.simpleName} with ${it.resourceType?.name}")
             fadeInTopBanner()
           }
-          is State.Finished -> {
-            Timber.i("Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
+          is SyncJobStatus.Finished -> {
+            Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
-          is State.Failed -> {
-            Timber.i("Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
+          is SyncJobStatus.Failed -> {
+            Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
@@ -215,7 +209,7 @@ class PatientListFragment : Fragment() {
     }
   }
 
-  private fun fadeOutTopBanner(state: State) {
+  private fun fadeOutTopBanner(state: SyncJobStatus) {
     if (topBanner.visibility == View.VISIBLE) {
       syncStatus.text = state::class.java.simpleName.uppercase()
       val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_out)

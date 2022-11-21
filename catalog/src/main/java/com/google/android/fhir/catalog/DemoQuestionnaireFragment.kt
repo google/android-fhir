@@ -72,6 +72,13 @@ class DemoQuestionnaireFragment : Fragment() {
         infoCardText.text = getString(R.string.behavior_name_skip_logic_info)
         infoCard.visibility = View.VISIBLE
       }
+      getString(R.string.behavior_name_calculated_expression) -> {
+        infoCardHeader = view.findViewById(R.id.infoCardHeader)
+        infoCardHeader.text = args.questionnaireTitleKey
+        infoCardText = view.findViewById(R.id.infoCardText)
+        infoCardText.text = getString(R.string.behavior_name_calculated_expression_info)
+        infoCard.visibility = View.VISIBLE
+      }
       else -> infoCard.visibility = View.GONE
     }
     setFragmentResultListener(REQUEST_ERROR_KEY) { _, bundle ->
