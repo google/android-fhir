@@ -109,6 +109,11 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_auto_complete.json",
       "component_auto_complete_with_validation.json"
     ),
+    REPEATED_GROUP(
+      R.drawable.ic_textfield,
+      R.string.component_name_repeated_group,
+      "component_repeated_group.json",
+    ),
     HELP(R.drawable.ic_help, R.string.component_name_help, "component_help.json", ""),
   }
 }
