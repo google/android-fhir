@@ -18,6 +18,7 @@ package com.google.android.fhir.sync
 
 import com.google.android.fhir.SyncDownloadContext
 import org.hl7.fhir.instance.model.api.IAnyResource
+import org.hl7.fhir.instance.model.api.IBase
 
 /**
  * Manager that generates the FHIR requests and handles the FHIR responses of a download job.
@@ -36,4 +37,5 @@ interface DownloadWorkManager {
    * Processes the download response and returns the resources to be saved to the local database.
    */
   suspend fun processResponse(response: IAnyResource): Collection<IAnyResource>
+  suspend fun getEvaluateFunction(): (IBase, String) -> List<IBase>
 }

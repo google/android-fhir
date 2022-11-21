@@ -20,6 +20,7 @@ import com.google.android.fhir.ResourceType
 import com.google.android.fhir.SyncDownloadContext
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.instance.model.api.IAnyResource
+import org.hl7.fhir.instance.model.api.IBase
 
 /** Module for downloading the resources from the server. */
 internal interface Downloader {
@@ -28,6 +29,9 @@ internal interface Downloader {
    * response of each page download request.
    */
   suspend fun download(context: SyncDownloadContext): Flow<DownloadState>
+
+  suspend fun getFhirPathEvaluateFunction() : (IBase, String) -> List<IBase>
+
 }
 
 internal sealed class DownloadState {

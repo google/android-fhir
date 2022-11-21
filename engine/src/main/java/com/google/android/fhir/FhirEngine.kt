@@ -18,7 +18,7 @@ package com.google.android.fhir
 
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.impl.FhirEngineImpl
+import com.google.android.fhir.index.ResourceIndexerManager
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
 import java.time.Instant
@@ -33,13 +33,13 @@ interface FhirEngine {
    *
    * @return the logical IDs of the newly created resources.
    */
-  suspend fun create(vararg resource: IAnyResource): List<String>
+  suspend fun create(vararg resource: IAnyResource, resourcedIndexerManager: ResourceIndexerManager): List<String>
 
   /** Loads a FHIR resource given the class and the logical ID. */
   suspend fun get(type: ResourceType, id: String): IAnyResource
 
   /** Updates a FHIR [resource] in the local storage. */
-  suspend fun update(vararg resource: IAnyResource)
+  suspend fun update(vararg resource: IAnyResource, resourcedIndexerManager: ResourceIndexerManager)
 
   /** Removes a FHIR resource given the class and the logical ID. */
   suspend fun delete(type: ResourceType, id: String)
@@ -65,7 +65,8 @@ interface FhirEngine {
    */
   suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend (SyncDownloadContext) -> Flow<List<IAnyResource>>
+    resourcedIndexerManager: ResourceIndexerManager,
+    download: suspend (SyncDownloadContext) -> Flow<List<IAnyResource>>,
   )
 
   /**

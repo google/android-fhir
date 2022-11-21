@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.index
 
-import org.hl7.fhir.exceptions.FHIRException
 
 enum class SearchParamType {
   /** Search parameter SHALL be a number (a whole number, or a decimal). */
@@ -129,7 +128,7 @@ enum class SearchParamType {
     }
 
   companion object {
-    @Throws(FHIRException::class)
+    @Throws(Exception::class)
     fun fromCode(codeString: String?): SearchParamType? {
       if (codeString.isNullOrBlank()) return null
       if ("number" == codeString) return NUMBER
@@ -141,7 +140,7 @@ enum class SearchParamType {
       if ("quantity" == codeString) return QUANTITY
       if ("uri" == codeString) return URI
       if ("special" == codeString) return SPECIAL
-      throw FHIRException("Unknown SearchParamType code '$codeString'")
+      throw Exception("Unknown SearchParamType code '$codeString'")
     }
   }
 }

@@ -27,9 +27,7 @@ import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.hasLastUpdated
-import com.google.android.fhir.hasMeta
-import com.google.android.fhir.hasVersionId
+import com.google.android.fhir.index.ResourceIndexerManager
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resourceType
 import com.google.android.fhir.search.Search
@@ -38,31 +36,24 @@ import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
 import com.google.android.fhir.toTimeZoneString
-import java.time.Instant
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.instance.model.api.IAnyResource
-import org.hl7.fhir.instance.model.api.IBaseBundle
-import org.hl7.fhir.instance.model.api.IBaseMetaType
-import org.hl7.fhir.instance.model.api.IBaseResource
-import org.hl7.fhir.instance.model.api.IIdType
-import org.hl7.fhir.instance.model.api.IPrimitiveType
-import timber.log.Timber
 
 /** Implementation of [FhirEngine]. */
 internal class FhirEngineImpl(private val database: Database, private val context: Context) :
   FhirEngine {
-  override suspend fun create(vararg resource: IAnyResource): List<String> {
-    return database.insert(*resource)
+  override suspend fun create(vararg resource: IAnyResource, resourcedIndexerManager: ResourceIndexerManager): List<String> {
+    return database.insert(*resource, resourcedIndexerManager  = resourcedIndexerManager )
   }
 
   override suspend fun get(type: ResourceType, id: String): IAnyResource {
     return database.select(type, id)
   }
 
-  override suspend fun update(vararg resource: IAnyResource) {
-    database.update(*resource)
+  override suspend fun update(vararg resource: IAnyResource, resourcedIndexerManager: ResourceIndexerManager) {
+    database.update(*resource, resourcedIndexerManager  = resourcedIndexerManager )
   }
 
   override suspend fun delete(type: ResourceType, id: String) {
@@ -95,7 +86,8 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend (SyncDownloadContext) -> Flow<List<IAnyResource>>
+    resourcedIndexerManager: ResourceIndexerManager,
+    download: suspend (SyncDownloadContext) -> Flow<List<IAnyResource>>,
   ) {
     download(
         object : SyncDownloadContext {
@@ -110,27 +102,30 @@ internal class FhirEngineImpl(private val database: Database, private val contex
               getConflictingResourceIds(resources),
               conflictResolver
             )
-          saveRemoteResourcesToDatabase(resources)
-          saveResolvedResourcesToDatabase(resolved)
+          saveRemoteResourcesToDatabase(resources, resourcedIndexerManager )
+          saveResolvedResourcesToDatabase(resolved, resourcedIndexerManager )
         }
       }
   }
 
-  private suspend fun saveResolvedResourcesToDatabase(resolved: List<IAnyResource>?) {
+  private suspend fun saveResolvedResourcesToDatabase(resolved: List<IAnyResource>?, resourcedIndexerManager: ResourceIndexerManager ) {
     resolved?.let {
       database.deleteUpdates(it)
-      database.update(*it.toTypedArray())
+      database.update(*it.toTypedArray(), resourcedIndexerManager  = resourcedIndexerManager )
     }
   }
 
-  private suspend fun saveRemoteResourcesToDatabase(resources: List<IAnyResource>) {
+  private suspend fun saveRemoteResourcesToDatabase(
+    resources: List<IAnyResource>,
+    resourcedIndexerManager: ResourceIndexerManager
+  ) {
     val timeStamps =
       resources
         .groupBy { it.resourceType }
         .entries.map {
           SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
         }
-    database.insertSyncedResources(timeStamps, resources)
+    database.insertSyncedResources(timeStamps, resourcedIndexerManager , resources)
   }
 
   private suspend fun resolveConflictingResources(

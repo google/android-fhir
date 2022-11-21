@@ -22,9 +22,11 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
+import com.google.android.fhir.index.ResourceIndexerManager
 import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
 import org.hl7.fhir.instance.model.api.IAnyResource
+import org.hl7.fhir.instance.model.api.IBase
 
 /** The interface for the FHIR resource database. */
 internal interface Database {
@@ -35,7 +37,7 @@ internal interface Database {
    * @param <R> The resource type
    * @return the logical IDs of the newly created resources.
    */
-  suspend fun <R : IAnyResource> insert(vararg resource: R): List<String>
+  suspend fun <R : IAnyResource> insert(vararg resource: R, resourcedIndexerManager: ResourceIndexerManager): List<String>
 
   /**
    * Inserts a list of remote `resources` into the FHIR resource database. If any of the resources
@@ -43,7 +45,7 @@ internal interface Database {
    *
    * @param <R> The resource type
    */
-  suspend fun <R : IAnyResource> insertRemote(vararg resource: R)
+  suspend fun <R : IAnyResource> insertRemote(vararg resource: R, resourcedIndexerManager: ResourceIndexerManager)
 
   /**
    * Updates the `resource` in the FHIR resource database. If the resource does not already exist,
@@ -51,7 +53,7 @@ internal interface Database {
    *
    * @param <R> The resource type
    */
-  suspend fun update(vararg resources: IAnyResource)
+  suspend fun update(vararg resources: IAnyResource, resourcedIndexerManager: ResourceIndexerManager)
 
   /** Updates the `resource` meta in the FHIR resource database. */
   suspend fun updateVersionIdAndLastUpdated(
@@ -93,6 +95,7 @@ internal interface Database {
    */
   suspend fun insertSyncedResources(
     syncedResources: List<SyncedResourceEntity>,
+    resourcedIndexerManager: ResourceIndexerManager,
     resources: List<IAnyResource>
   )
 

@@ -36,6 +36,7 @@ import com.google.android.fhir.db.impl.entities.StringIndexEntity
 import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
 import com.google.android.fhir.index.ResourceIndexer
+import com.google.android.fhir.index.ResourceIndexerManager
 import com.google.android.fhir.index.ResourceIndices
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
@@ -51,7 +52,7 @@ internal abstract class ResourceDao {
   // the dao
   lateinit var iParser: IParser
 
-  open suspend fun update(resource: IAnyResource) {
+  open suspend fun update(resource: IAnyResource, resourceIndexerManager: ResourceIndexerManager) {
     updateResource(
       resource.logicalId,
       resource.resourceType,
@@ -68,18 +69,18 @@ internal abstract class ResourceDao {
           versionId = it.versionId,
           lastUpdatedRemote = it.lastUpdatedRemote
         )
-      val index = ResourceIndexer.index(resource)
+      val index = ResourceIndexer.index(resource, resourceIndexerManager)
       updateIndicesForResource(index, entity, it.resourceUuid)
     }
       ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
   }
 
-  open suspend fun insert(resource: IAnyResource): String {
-    return insertResource(resource)
+  open suspend fun insert(resource: IAnyResource, resourceIndexerManager: ResourceIndexerManager): String {
+    return insertResource(resource, resourceIndexerManager)
   }
 
-  open suspend fun insertAll(resources: List<IAnyResource>): List<String> {
-    return resources.map { resource -> insertResource(resource) }
+  open suspend fun insertAll(resources: List<IAnyResource>, resourceIndexerManager: ResourceIndexerManager): List<String> {
+    return resources.map { resource -> insertResource(resource, resourceIndexerManager) }
   }
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -173,7 +174,7 @@ internal abstract class ResourceDao {
 
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
-  private suspend fun insertResource(resource: IAnyResource): String {
+  private suspend fun insertResource(resource: IAnyResource, resourceIndexerManager: ResourceIndexerManager): String {
     val resourceUuid = UUID.randomUUID()
 
     // Use the local UUID as the logical ID of the resource
@@ -192,7 +193,7 @@ internal abstract class ResourceDao {
         lastUpdatedRemote = resource.lastUpdated
       )
     insertResource(entity)
-    val index = ResourceIndexer.index(resource)
+    val index = ResourceIndexer.index(resource, resourceIndexerManager)
     updateIndicesForResource(index, entity, resourceUuid)
 
     return resource.id

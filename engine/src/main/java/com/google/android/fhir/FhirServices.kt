@@ -77,7 +77,7 @@ internal data class FhirServices(
           iParser = parser,
           DatabaseConfig(inMemory, enableEncryption, databaseErrorStrategy)
         )
-      val engine = FhirEngineImpl(database = db, context = context)
+      val engine = FhirEngineImpl(database = db, context = context, resourceIndexManager: ResourceIndexManager)
       val remoteDataSource =
         serverConfiguration?.let {
           RemoteFhirService.builder(it.baseUrl, it.networkConfiguration, fhirVersion)

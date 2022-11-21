@@ -35,6 +35,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import org.hl7.fhir.r4.model.DateType
 
 /** View model for [MainActivity]. */
 @OptIn(InternalCoroutinesApi::class)
@@ -62,6 +63,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
   }
 
   fun triggerOneTimeSync() {
+    val omar = DateType()
+    omar.precision
     viewModelScope.launch {
       Sync.oneTimeSync<FhirSyncWorker>(getApplication(), fhirVersionEnum = FhirVersionEnum.R5)
         .collect { _pollState.emit(it) }

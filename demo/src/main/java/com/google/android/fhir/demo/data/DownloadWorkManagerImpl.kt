@@ -22,6 +22,10 @@ import com.google.android.fhir.sync.DownloadWorkManager
 import java.util.LinkedList
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.instance.model.api.IAnyResource
+import org.hl7.fhir.instance.model.api.IBase
+import org.hl7.fhir.r4.context.SimpleWorkerContext
+import org.hl7.fhir.r4.model.Base
+import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r5.model.Bundle
 import org.hl7.fhir.r5.model.ListResource
 import org.hl7.fhir.r5.model.OperationOutcome
@@ -78,6 +82,11 @@ class DownloadWorkManagerImpl : DownloadWorkManager {
       bundleCollection = response.entry.map { it.resource }
     }
     return bundleCollection
+  }
+
+  override suspend fun getEvaluateFunction(): (IBase, String) -> List<IBase> = { a: IBase, b: String ->
+    val c = FHIRPathEngine(SimpleWorkerContext())
+     c.evaluate(a as Base,b)
   }
 }
 
