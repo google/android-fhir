@@ -2374,6 +2374,93 @@ class ResourceMapperTest {
       )
   }
 
+  @Test
+  fun `extract() definition based extraction should extract multiple values of a list field in a group`():
+    Unit = runBlocking {
+    @Language("JSON")
+    val questionnaire =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "subjectType": [
+          "Patient"
+        ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Patient",
+                "name": "patient"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "PR-name",
+              "type": "group",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
+              "item": [
+                {
+                  "linkId": "PR-name-text",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
+                  "type": "string",
+                  "text": "First Name"
+                },
+                {
+                  "linkId": "PR-name-middle",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#Patient.name.given",
+                  "type": "string",
+                  "text": "Middle Name"
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    @Language("JSON")
+    val response =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "PR-name",
+              "item": [
+                {
+                  "linkId": "PR-name-text",
+                  "answer": [
+                        {
+                          "valueString": "TestName-First"
+                        }
+                      ]
+                },{
+                  "linkId": "PR-name-middle",
+                  "answer": [
+                        {
+                          "valueString": "TestName-Middle"
+                        }
+                      ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+    val questionnaireObj =
+      iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
+    val temperatureQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
+    val bundle = ResourceMapper.extract(questionnaireObj, temperatureQuestionnaireResponse)
+    val patient = bundle.entry.single().resource as Patient
+
+    assertThat(patient).isNotNull()
+    assertThat(patient.name.first().given.map { it.value })
+      .containsExactly("TestName-First", "TestName-Middle")
+  }
+
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)
 
   class TransformSupportServices(private val outputs: MutableList<Base>) :

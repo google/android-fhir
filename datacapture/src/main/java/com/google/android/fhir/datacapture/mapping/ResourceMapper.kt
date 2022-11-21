@@ -646,6 +646,22 @@ private fun updateFieldWithEnum(base: Base, field: Field, value: Base) {
     .invoke(base, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
 
+/**
+ * The api's used to updateField with answers are:
+ *
+ * * For Parameterized list of primitive type e.g HumanName.given of type List<StringType>
+ * ```
+ *     addGiven(String) - adds a new StringType to the list.
+ * ```
+ * * For any primitive value e.g for Patient.active which is of BooleanType
+ * ```
+ *     setActiveElement(BooleanType)
+ * ```
+ * * In case they fail,
+ * ```
+ *     setName(List<HumanName>) - replaces old list if any with the new list.
+ * ```
+ */
 private fun updateField(
   base: Base,
   field: Field,
@@ -655,17 +671,30 @@ private fun updateField(
     answers.map { wrapAnswerInFieldType(it.value, field) }.toCollection(mutableListOf())
 
   try {
-    updateFieldWithAnswer(base, field, answersOfFieldType.first())
+    if (field.isParameterized && field.isList) {
+      addAnswerToListField(base, field, answersOfFieldType)
+    } else {
+      setFieldElementValue(base, field, answersOfFieldType.first())
+    }
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
     updateListFieldWithAnswer(base, field, answersOfFieldType)
   }
 }
 
-private fun updateFieldWithAnswer(base: Base, field: Field, answerValue: Base) {
+private fun setFieldElementValue(base: Base, field: Field, answerValue: Base) {
   base.javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}Element", field.type)
     .invoke(base, answerValue)
+}
+
+private fun addAnswerToListField(base: Base, field: Field, answerValue: List<Base>) {
+  base.javaClass
+    .getMethod(
+      "add${field.name.capitalize(Locale.ROOT)}",
+      answerValue.first().primitiveValue().javaClass
+    )
+    .let { method -> answerValue.forEach { method.invoke(base, it.primitiveValue()) } }
 }
 
 private fun updateListFieldWithAnswer(base: Base, field: Field, answerValue: List<Base>) {
