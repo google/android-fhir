@@ -75,7 +75,7 @@ object Releases {
   object ImplmentationGuide : LibraryArtifact {
     override val artifactId = "implementationguide"
     override val version = "0.1.0-alpha001"
-    override val name = "Android FHIR Implementation Guide management Library"
+    override val name = "Android FHIR Implementation Guide Library"
   }
 
   // Demo apps
