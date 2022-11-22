@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync
 
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.ResourceForDatabaseToSave
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.instance.model.api.IBaseBundle
@@ -36,5 +37,5 @@ interface UploadWorkManager {
   fun getUploadResult(
     response: IAnyResource,
     localChangeTokens: List<LocalChangeToken>
-  ): LocalChangeToken
+  ): Pair<LocalChangeToken, List<ResourceForDatabaseToSave>>
 }

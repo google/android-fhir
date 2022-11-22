@@ -20,7 +20,6 @@ import com.google.android.fhir.LocalChange
 import com.google.android.fhir.ResourceForDatabaseToSave
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import kotlinx.coroutines.flow.Flow
-import org.hl7.fhir.instance.model.api.IAnyResource
 
 /** Module for uploading local changes to a [DataSource]. */
 internal interface Uploader {
@@ -32,12 +31,12 @@ internal interface Uploader {
   suspend fun upload(
     localChanges: List<LocalChange>,
   ): Flow<UploadResult>
-
-  suspend fun getResourceTypeToSave(): (IAnyResource) -> ResourceForDatabaseToSave?
 }
 
 internal sealed class UploadResult {
-  data class Success(val localChangeToken: LocalChangeToken, val resource: IAnyResource) :
-    UploadResult()
+  data class Success(
+    val localChangeToken: LocalChangeToken,
+    val listOfResourcesToSave: List<ResourceForDatabaseToSave>
+  ) : UploadResult()
   data class Failure(val syncError: ResourceSyncException) : UploadResult()
 }

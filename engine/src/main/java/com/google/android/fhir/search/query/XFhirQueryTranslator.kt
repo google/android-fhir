@@ -118,11 +118,11 @@ object XFhirQueryTranslator {
       }
       SearchParamType.DATE -> {
         if (!isValidDateOnly(filterValue)) {
-          val omar: DateTimeType = searchManager.createDateTimeType(filterValue)
-          this.filter(DateClientParam(param.name), { value = of(omar) })
+          val dateTimeType: DateTimeType = searchManager.createDateTimeType(filterValue)
+          this.filter(DateClientParam(param.name), { value = of(dateTimeType) })
         } else {
-          val omar: DateType = searchManager.createDateType(filterValue)
-          this.filter(DateClientParam(param.name), { value = of(omar) })
+          val dateType: DateType = searchManager.createDateType(filterValue)
+          this.filter(DateClientParam(param.name), { value = of(dateType) })
         }
       }
       SearchParamType.QUANTITY -> {

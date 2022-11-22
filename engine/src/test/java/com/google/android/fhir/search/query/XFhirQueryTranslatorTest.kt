@@ -74,7 +74,9 @@ class XFhirQueryTranslatorTest {
   @Test
   fun `translate() should throw IllegalArgumentException for unrecognized sort param`() {
     val exception =
-      assertThrows(IllegalArgumentException::class.java) { translate("Patient?_sort=customParam", searchManager = SearchManagerForR4) }
+      assertThrows(IllegalArgumentException::class.java) {
+        translate("Patient?_sort=customParam", searchManager = SearchManagerForR4)
+      }
     assertThat(exception.message).isEqualTo("customParam not found in Patient")
   }
 
@@ -102,7 +104,10 @@ class XFhirQueryTranslatorTest {
   @Test
   fun `translate() should add filters`() {
     val search =
-      translate("Patient?gender=male&name=John&birthdate=2012-01-11&general-practitioner=12345", searchManager = SearchManagerForR4)
+      translate(
+        "Patient?gender=male&name=John&birthdate=2012-01-11&general-practitioner=12345",
+        searchManager = SearchManagerForR4
+      )
 
     search.stringFilterCriteria.first().run {
       assertThat(this.parameter.paramName).isEqualTo("name")
@@ -115,7 +120,8 @@ class XFhirQueryTranslatorTest {
     }
     search.dateTimeFilterCriteria.first().run {
       assertThat(this.parameter.paramName).isEqualTo("birthdate")
-      assertThat(DateType(this.filters.first().value!!.date!!.value).toHumanDisplay()).isEqualTo("2012-01-11")
+      assertThat(DateType(this.filters.first().value!!.date!!.value).toHumanDisplay())
+        .isEqualTo("2012-01-11")
     }
     search.referenceFilterCriteria.first().run {
       assertThat(this.parameter.paramName).isEqualTo("general-practitioner")
@@ -126,13 +132,19 @@ class XFhirQueryTranslatorTest {
   @Test
   fun `translate() should throw IllegalArgumentException for unrecognized filter param`() {
     val exception =
-      assertThrows(IllegalArgumentException::class.java) { translate("Patient?customParam=Abc", searchManager = SearchManagerForR4) }
+      assertThrows(IllegalArgumentException::class.java) {
+        translate("Patient?customParam=Abc", searchManager = SearchManagerForR4)
+      }
     assertThat(exception.message).isEqualTo("customParam not found in Patient")
   }
 
   @Test
   fun `translate() should not add filters for missing value for filter param`() {
-    val search = translate("Patient?gender=&name=&birthdate=&general-practitioner=", searchManager = SearchManagerForR4)
+    val search =
+      translate(
+        "Patient?gender=&name=&birthdate=&general-practitioner=",
+        searchManager = SearchManagerForR4
+      )
 
     assertThat(search.stringFilterCriteria).isEmpty()
 
@@ -224,7 +236,8 @@ class XFhirQueryTranslatorTest {
 
     val applyFilterParam = search.dateTimeFilterCriteria.first().filters.first()
     assertThat(applyFilterParam.parameter.paramName).isEqualTo("birthdate")
-    assertThat(DateType(applyFilterParam.value!!.date!!.value).toHumanDisplay()).isEqualTo("2022-01-21")
+    assertThat(DateType(applyFilterParam.value!!.date!!.value).toHumanDisplay())
+      .isEqualTo("2022-01-21")
   }
 
   @Test

@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.ResourceForDatabaseToSave
 import com.google.android.fhir.ResourceType
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
@@ -26,13 +25,11 @@ import com.google.android.fhir.sync.UploadWorkManager
 import com.google.android.fhir.sync.Uploader
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import org.hl7.fhir.instance.model.api.IAnyResource
 
 /** [Uploader] implementation to work with Fhir [Bundle]. */
 internal class BundleUploader(
   private val dataSource: DataSource,
   private val bundleGenerator: UploadWorkManager,
-  private val functionToGetResources: (IAnyResource) -> ResourceForDatabaseToSave?,
   private val localChangesPaginator: LocalChangesPaginator,
 ) : Uploader {
 
@@ -43,15 +40,17 @@ internal class BundleUploader(
       (bundle, localChangeTokens) ->
       try {
         val response = dataSource.upload(bundle)
-        val localChangeToken = bundleGenerator.getUploadResult(response, localChangeTokens)
-        emit(UploadResult.Success(localChangeToken, response))
+        val pairOfLocalChangeTokenToResourcesToSave =
+          bundleGenerator.getUploadResult(response, localChangeTokens)
+        emit(
+          UploadResult.Success(
+            pairOfLocalChangeTokenToResourcesToSave.first,
+            pairOfLocalChangeTokenToResourcesToSave.second
+          )
+        )
       } catch (e: Exception) {
         emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
       }
     }
-  }
-
-  override suspend fun getResourceTypeToSave(): (IAnyResource) -> ResourceForDatabaseToSave? {
-    return functionToGetResources
   }
 }

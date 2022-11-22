@@ -73,7 +73,10 @@ class SearchTest {
 
   @Test
   fun search_size() {
-    val query = Search(ResourceType.Patient, searchManager = SearchManagerForR4).apply { count = 10 }.getQuery()
+    val query =
+      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+        .apply { count = 10 }
+        .getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -111,9 +114,14 @@ class SearchTest {
 
   @Test
   fun search_filter_date_approximate() {
-    val mockDateType = com.google.android.fhir.index.DateType(Date(mockEpochTimeStamp), TemporalPrecisionEnum.DAY)
+    val mockDateType =
+      com.google.android.fhir.index.DateType(Date(mockEpochTimeStamp), TemporalPrecisionEnum.DAY)
     DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
-    val value = com.google.android.fhir.index.DateType(DateType("2013-03-14").value,  DateType("2013-03-14").precision)
+    val value =
+      com.google.android.fhir.index.DateType(
+        DateType("2013-03-14").value,
+        DateType("2013-03-14").precision
+      )
     val query =
       Search(ResourceType.Patient, searchManager = SearchManagerForR4)
         .apply {

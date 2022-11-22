@@ -210,7 +210,10 @@ class FhirEngineImplTest {
 
     fhirEngine.create(*patients.toTypedArray())
 
-    val result = fhirEngine.search("Patient?_sort=-name", searchManager = SearchManagerForR4).map { it as Patient }
+    val result =
+      fhirEngine.search("Patient?_sort=-name", searchManager = SearchManagerForR4).map {
+        it as Patient
+      }
 
     assertThat(result.mapNotNull { it.nameFirstRep.given.firstOrNull()?.value })
       .isEqualTo(listOf("C", "B", "A"))
@@ -227,7 +230,10 @@ class FhirEngineImplTest {
 
     fhirEngine.create(*patients.toTypedArray())
 
-    val result = fhirEngine.search("Patient?_count=1", searchManager = SearchManagerForR4).map { it as Patient }
+    val result =
+      fhirEngine.search("Patient?_count=1", searchManager = SearchManagerForR4).map {
+        it as Patient
+      }
 
     assertThat(result.size).isEqualTo(1)
   }
@@ -244,7 +250,10 @@ class FhirEngineImplTest {
     val exception =
       assertThrows(FHIRException::class.java) {
         runBlocking {
-          fhirEngine.search("CustomResource?active=true&gender=male&_sort=name&_count=2", searchManager = SearchManagerForR4)
+          fhirEngine.search(
+            "CustomResource?active=true&gender=male&_sort=name&_count=2",
+            searchManager = SearchManagerForR4
+          )
         }
       }
     assertThat(exception.message).isEqualTo("Unknown resource type CustomResource")
@@ -254,7 +263,12 @@ class FhirEngineImplTest {
   fun `search() by x-fhir-query should throw IllegalArgumentException for unrecognized param name`() {
     val exception =
       assertThrows(IllegalArgumentException::class.java) {
-        runBlocking { fhirEngine.search("Patient?customParam=true&gender=male&_sort=name", searchManager = SearchManagerForR4) }
+        runBlocking {
+          fhirEngine.search(
+            "Patient?customParam=true&gender=male&_sort=name",
+            searchManager = SearchManagerForR4
+          )
+        }
       }
     assertThat(exception.message).isEqualTo("customParam not found in Patient")
   }

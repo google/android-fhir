@@ -54,8 +54,8 @@ interface FhirEngine {
    * api caller should [Flow.collect] it.
    */
   suspend fun syncUpload(
-    getResourceTypeToSave: (IAnyResource) -> ResourceForDatabaseToSave?,
-    upload: (suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, IAnyResource>>)
+    upload:
+      (suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, List<ResourceForDatabaseToSave>>>)
   )
 
   /**

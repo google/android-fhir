@@ -48,12 +48,12 @@ class BundleUploaderTest {
   fun `upload Bundle transaction should emit Success`() = runBlocking {
     val result =
       BundleUploader(
-        TestingUtils.BundleDataSource {
+          TestingUtils.BundleDataSource {
             Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
           },
-        TransactionBundleGenerator.getDefault(),
-        { ResourceForDatabaseToSave(it.id, it.resourceType, it.versionId, it.lastUpdated!!) },
-        LocalChangesPaginator.DEFAULT
+          TransactionBundleGenerator.getDefault(),
+          { ResourceForDatabaseToSave(it.id, it.resourceType, it.versionId, it.lastUpdated!!) },
+          LocalChangesPaginator.DEFAULT
         )
         .upload(localChanges)
         .toList()

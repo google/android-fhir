@@ -148,20 +148,19 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       .intersect(database.getAllLocalChanges().map { it.localChange.resourceId }.toSet())
 
   override suspend fun syncUpload(
-    getResourceTypeToSave: (IAnyResource) -> ResourceForDatabaseToSave?,
-    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, IAnyResource>>
+    upload:
+      suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, List<ResourceForDatabaseToSave>>>,
   ) {
     val localChanges = database.getAllLocalChanges()
     if (localChanges.isNotEmpty()) {
       upload(localChanges.map { it.toLocalChange() }).collect {
         database.deleteUpdates(it.first)
-        val omar = getResourceTypeToSave(it.second)
-        if (omar != null) {
+        it.second.forEach { resource ->
           database.updateVersionIdAndLastUpdated(
-            omar.id,
-            omar.resourceType,
-            omar.versionId,
-            omar.lastUpdated
+            resource.id,
+            resource.resourceType,
+            resource.versionId,
+            resource.lastUpdated
           )
         }
       }

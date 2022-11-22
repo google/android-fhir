@@ -119,11 +119,11 @@ internal class FhirSynchronizer(
 
   private suspend fun upload(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
-    fhirEngine.syncUpload(uploader.getResourceTypeToSave()) { list ->
+    fhirEngine.syncUpload { list ->
       flow {
         uploader.upload(list).collect {
           when (it) {
-            is UploadResult.Success -> emit(it.localChangeToken to it.resource)
+            is UploadResult.Success -> emit(it.localChangeToken to it.listOfResourcesToSave)
             is UploadResult.Failure -> exceptions.add(it.syncError)
           }
         }
