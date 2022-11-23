@@ -33,8 +33,12 @@ internal object QuestionnaireItemEditTextIntegerViewHolderFactory :
       override fun getValue(
         text: String
       ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
-        return text.toIntOrNull()?.let {
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(IntegerType(it))
+        return text.toBigIntegerOrNull()?.let {
+          if (it > Int.MAX_VALUE.toBigInteger()) {
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(IntegerType(Int.MAX_VALUE))
+          } else {
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(IntegerType(it.toInt()))
+          }
         }
       }
 
