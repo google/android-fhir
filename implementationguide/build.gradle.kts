@@ -60,4 +60,6 @@ android {
   configureJacocoTestOptions()
 }
 
+dependencies { coreLibraryDesugaring(Dependencies.desugarJdkLibs) }
+
 configureDokka(Releases.ImplmentationGuide.artifactId, Releases.ImplmentationGuide.version)
