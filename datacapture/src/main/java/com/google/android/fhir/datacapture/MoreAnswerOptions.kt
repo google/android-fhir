@@ -16,7 +16,12 @@
 
 package com.google.android.fhir.datacapture
 
+import android.content.Context
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import com.google.android.fhir.getLocalizedText
+import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateType
@@ -28,6 +33,8 @@ import org.hl7.fhir.r4.model.TimeType
 
 internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive"
+internal const val EXTENSION_ITEM_ANSWER_MEDIA =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemAnswerMedia"
 
 /**
  * Text value for answer option [Questionnaire.QuestionnaireItemAnswerOptionComponent] if answer
@@ -64,3 +71,29 @@ internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.optionExclusiv
     }
     return false
   }
+
+fun Questionnaire.QuestionnaireItemAnswerOptionComponent.itemAnswerOptionImage(
+  context: Context
+): Drawable? {
+  val extension =
+    this.extension.singleOrNull { it.url == EXTENSION_ITEM_ANSWER_MEDIA }?.value as Attachment?
+  extension?.let {
+    if (it.hasContentType() && it.hasData()) {
+      when (it.contentType) {
+        "image/jpeg",
+        "image/png",
+        "image/jpg" -> {
+          val bitmap = BitmapFactory.decodeByteArray(it.data, 0, it.data.size)
+          val px = context.resources.getDimensionPixelOffset(R.dimen.choice_button_image)
+          val drawable: Drawable = BitmapDrawable(context.resources, bitmap)
+          drawable.setBounds(0, 0, px, px)
+          return drawable
+        }
+        // return null as for now only mime type image is supported with binary data
+        else -> return null
+      }
+    }
+  }
+  // return null as extension does not have content type ot data available
+  return null
+}
