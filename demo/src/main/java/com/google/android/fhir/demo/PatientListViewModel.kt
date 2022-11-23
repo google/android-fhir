@@ -23,7 +23,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.demo.data.SearchManagerForR4
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
@@ -73,8 +72,24 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
    * which only returns a fixed range.
    */
   private suspend fun count(nameQuery: String = ""): Long {
-    return fhirEngine.count<Patient>(
-      {
+    return fhirEngine.count<Patient> {
+      if (nameQuery.isNotEmpty()) {
+        filter(
+          Patient.NAME,
+          {
+            modifier = StringFilterModifier.CONTAINS
+            value = nameQuery
+          }
+        )
+      }
+      // filterCity(this)
+    }
+  }
+
+  private suspend fun getSearchResults(nameQuery: String = ""): List<PatientItem> {
+    val patients: MutableList<PatientItem> = mutableListOf()
+    fhirEngine
+      .search<Patient> {
         if (nameQuery.isNotEmpty()) {
           filter(
             Patient.NAME,
@@ -85,32 +100,10 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
           )
         }
         // filterCity(this)
-      },
-      searchManager = SearchManagerForR4
-    )
-  }
-
-  private suspend fun getSearchResults(nameQuery: String = ""): List<PatientItem> {
-    val patients: MutableList<PatientItem> = mutableListOf()
-    fhirEngine
-      .search<Patient>(
-        {
-          if (nameQuery.isNotEmpty()) {
-            filter(
-              Patient.NAME,
-              {
-                modifier = StringFilterModifier.CONTAINS
-                value = nameQuery
-              }
-            )
-          }
-          // filterCity(this)
-          sort(Patient.GIVEN, Order.ASCENDING)
-          count = 100
-          from = 0
-        },
-        searchManager = SearchManagerForR4
-      )
+        sort(Patient.GIVEN, Order.ASCENDING)
+        count = 100
+        from = 0
+      }
       .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
       .let { patients.addAll(it) }
 
@@ -129,7 +122,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
 
   private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {
     return fhirEngine
-      .search<RiskAssessment>({}, searchManager = SearchManagerForR4)
+      .search<RiskAssessment> {}
       .groupBy { it.subject.reference }
       .mapValues { entry ->
         entry.value

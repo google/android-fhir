@@ -20,9 +20,6 @@ import com.google.android.fhir.ConverterException
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.epochDay
-import com.google.android.fhir.hasLastUpdated
-import com.google.android.fhir.hasProfile
-import com.google.android.fhir.hasTag
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.DateTimeIndex
 import com.google.android.fhir.index.entities.NumberIndex
@@ -32,7 +29,6 @@ import com.google.android.fhir.index.entities.ReferenceIndex
 import com.google.android.fhir.index.entities.StringIndex
 import com.google.android.fhir.index.entities.TokenIndex
 import com.google.android.fhir.index.entities.UriIndex
-import com.google.android.fhir.lastUpdatedElement
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resourceType
 import com.google.android.fhir.ucumUrl
@@ -114,8 +110,8 @@ internal object ResourceIndexer {
       )
     )
     // Add 'lastUpdated' index to all resources.
-    if (resource.meta.hasLastUpdated()) {
-      val lastUpdatedElement = resource.meta.lastUpdatedElement
+    if (resourceIndexerManager.hasLastUpdated(resource.meta)) {
+      val lastUpdatedElement = resourceIndexerManager.getLastUpdatedElement(resource.meta)
       indexBuilder.addDateTimeIndex(
         DateTimeIndex(
           name = "_lastUpdated",
@@ -126,7 +122,7 @@ internal object ResourceIndexer {
       )
     }
 
-    if (resource.meta.hasProfile()) {
+    if (resourceIndexerManager.hasProfile(resource.meta)) {
       resource.meta.profile
         .filter { it.value != null && it.value.isNotEmpty() }
         .forEach {
@@ -140,7 +136,7 @@ internal object ResourceIndexer {
         }
     }
 
-    if (resource.meta.hasTag()) {
+    if (resourceIndexerManager.hasTag(resource.meta)) {
       resource.meta.tag
         .filter { it.code != null && it.code!!.isNotEmpty() }
         .forEach {
@@ -297,7 +293,7 @@ internal object ResourceIndexer {
             searchParam.path,
             FHIR_CURRENCY_CODE_SYSTEM,
             money.currency,
-            money.value
+            money.value!!
           )
         )
       }
@@ -308,7 +304,7 @@ internal object ResourceIndexer {
         // Add quantity indexing record for the human readable unit
         if (quantity.unit != null) {
           quantityIndices.add(
-            QuantityIndex(searchParam.name, searchParam.path, "", quantity.unit, quantity.value)
+            QuantityIndex(searchParam.name, searchParam.path, "", quantity.unit, quantity.value!!)
           )
         }
 
@@ -317,7 +313,8 @@ internal object ResourceIndexer {
         var canonicalValue = quantity.value
         if (quantity.system == ucumUrl && quantity.code != null) {
           try {
-            val ucumUnit = UnitConverter.getCanonicalForm(UcumValue(quantity.code, quantity.value))
+            val ucumUnit =
+              UnitConverter.getCanonicalForm(UcumValue(quantity.code, quantity.value!!))
             canonicalCode = ucumUnit.code
             canonicalValue = ucumUnit.value
           } catch (exception: ConverterException) {
@@ -330,7 +327,7 @@ internal object ResourceIndexer {
             searchParam.path,
             quantity.system ?: "",
             canonicalCode ?: "",
-            canonicalValue
+            canonicalValue!!
           )
         )
         quantityIndices

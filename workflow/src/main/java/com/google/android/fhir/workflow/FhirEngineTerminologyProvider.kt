@@ -18,9 +18,7 @@ package com.google.android.fhir.workflow
 
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.db.ResourceNotFoundException
-import com.google.android.fhir.search.search
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.CodeSystem
 import org.hl7.fhir.r4.model.Resource

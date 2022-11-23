@@ -19,7 +19,6 @@ package com.google.android.fhir.db.impl.entities
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.google.android.fhir.ResourceType
 import java.time.Instant
 import java.util.UUID
 
@@ -33,7 +32,7 @@ import java.util.UUID
 internal data class ResourceEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceUuid: UUID,
-  val resourceType: ResourceType,
+  val resourceType: String,
   val resourceId: String,
   val serializedResource: String,
   val versionId: String?,

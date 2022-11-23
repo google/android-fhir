@@ -52,9 +52,9 @@ class FhirApplication : Application() {
                 if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC
               )
             ) { Timber.tag("App-HttpLog").d(it) }
-        )
-      ),
-      resourceIndexerManager = ResourceIndexerManagerForR4
+        ),
+        resourceIndexerManager = ResourceIndexerManagerForR4
+      )
     )
     Sync.oneTimeSync<FhirSyncWorker>(this, fhirVersionEnum = FhirVersionEnum.R5)
   }

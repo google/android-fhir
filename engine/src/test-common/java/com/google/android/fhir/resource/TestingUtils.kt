@@ -20,24 +20,26 @@ import androidx.work.Data
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.ResourceType
+import com.google.android.fhir.ResourceForDatabaseToSave
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadWorkManager
+import com.google.android.fhir.sync.ResourceBundleAndAssociatedLocalChangeTokens
+import com.google.android.fhir.sync.UploadWorkManager
 import com.google.common.truth.Truth.assertThat
 import java.time.OffsetDateTime
 import java.util.Date
 import java.util.LinkedList
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.instance.model.api.IBaseBundle
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.ResourceType
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -101,7 +103,8 @@ class TestingUtils constructor(private val iParser: IParser) {
   }
 
   open class TestDownloadManagerImpl(
-    queries: List<String> = listOf("Patient?address-city=NAIROBI")
+    queries: List<String> = listOf("Patient?address-city=NAIROBI"),
+    override val resourceTypeList: Collection<String> = ResourceType.values().map { it.name }
   ) : DownloadWorkManager {
     private val urls = LinkedList(queries)
 
@@ -122,18 +125,19 @@ class TestingUtils constructor(private val iParser: IParser) {
 
     override suspend fun update(vararg resource: IAnyResource) {}
 
-    override suspend fun get(type: ResourceType, id: String): IAnyResource {
+    override suspend fun get(resourceType: String, id: String): IAnyResource {
       return Patient()
     }
 
-    override suspend fun delete(type: ResourceType, id: String) {}
+    override suspend fun delete(resourceType: String, id: String) {}
 
     override suspend fun <R : IAnyResource> search(search: Search): List<R> {
       return emptyList()
     }
 
     override suspend fun syncUpload(
-      upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, IAnyResource>>
+      upload:
+        suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, List<ResourceForDatabaseToSave>>>
     ) {
       upload(listOf())
     }
@@ -144,7 +148,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     ) {
       download(
           object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType): String {
+            override suspend fun getLatestTimestampFor(resourceType: String): String {
               return "123456788"
             }
           }
@@ -161,11 +165,11 @@ class TestingUtils constructor(private val iParser: IParser) {
 
     override suspend fun clearDatabase() {}
 
-    override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange? {
+    override suspend fun getLocalChange(resourceType: String, id: String): LocalChange? {
       TODO("Not yet implemented")
     }
 
-    override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {}
+    override suspend fun purge(resourceType: String, id: String, forcePurge: Boolean) {}
   }
 
   object TestFailingDatasource : DataSource {
@@ -190,5 +194,20 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
 
     override suspend fun upload(bundle: IBaseBundle) = onPostBundle(bundle)
+  }
+
+  class TestUploadWorkManagerImpl : UploadWorkManager {
+    override fun generate(
+      localChanges: List<List<LocalChange>>
+    ): List<ResourceBundleAndAssociatedLocalChangeTokens> {
+      return listOf()
+    }
+
+    override fun getUploadResult(
+      response: IAnyResource,
+      localChangeTokens: List<LocalChangeToken>,
+    ): Pair<LocalChangeToken, List<ResourceForDatabaseToSave>> {
+      return localChangeTokens[0] to listOf()
+    }
   }
 }

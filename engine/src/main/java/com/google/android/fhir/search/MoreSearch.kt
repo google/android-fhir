@@ -109,7 +109,7 @@ internal fun Search.getQuery(
         dateTimeFilterCriteria +
         tokenFilterCriteria +
         uriFilterCriteria)
-      .map { it.query(type) }
+      .map { it.query(resourceType) }
   filterQuery.forEachIndexed { i, it ->
     filterStatement +=
       """
@@ -132,7 +132,7 @@ internal fun Search.getQuery(
     }
   }
 
-  nestedSearches.nestedQuery(type, operation)?.let {
+  nestedSearches.nestedQuery(resourceType, operation)?.let {
     filterStatement += it.query
     filterArgs.addAll(it.args)
   }
@@ -152,7 +152,7 @@ internal fun Search.getQuery(
         }
         nestedContext != null -> {
           whereArgs.add(nestedContext.param.paramName)
-          val start = "${nestedContext.parentType.name}/".length + 1
+          val start = "${nestedContext.parentType}/".length + 1
           """
         SELECT resourceUuid
         FROM ResourceEntity a
@@ -180,7 +180,7 @@ internal fun Search.getQuery(
       .split("\n")
       .filter { it.isNotBlank() }
       .joinToString("\n") { it.trim() }
-  return SearchQuery(query, sortArgs + type.name + whereArgs + filterArgs + limitArgs)
+  return SearchQuery(query, sortArgs + resourceType + whereArgs + filterArgs + limitArgs)
 }
 
 private val Order?.sqlString: String

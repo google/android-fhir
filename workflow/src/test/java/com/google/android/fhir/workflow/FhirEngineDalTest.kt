@@ -19,8 +19,6 @@ package com.google.android.fhir.workflow
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.ResourceType
-import com.google.android.fhir.search.search
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking

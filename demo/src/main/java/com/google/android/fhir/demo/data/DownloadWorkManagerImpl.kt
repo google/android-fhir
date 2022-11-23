@@ -16,26 +16,25 @@
 
 package com.google.android.fhir.demo.data
 
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DownloadWorkManager
 import java.util.LinkedList
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.instance.model.api.IAnyResource
+import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r5.model.Bundle
 import org.hl7.fhir.r5.model.ListResource
 import org.hl7.fhir.r5.model.OperationOutcome
 import org.hl7.fhir.r5.model.Reference
 
 class DownloadWorkManagerImpl : DownloadWorkManager {
-  private val resourceTypeList = ResourceType.values().map { it.name }
+  override val resourceTypeList: Collection<String> = ResourceType.values().map { it.name }
   private val urls = LinkedList(listOf("Patient?family=Jackson"))
 
   override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? {
     var url = urls.poll() ?: return null
 
-    val resourceTypeToDownload =
-      ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
+    val resourceTypeToDownload = url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second
     context.getLatestTimestampFor(resourceTypeToDownload)?.let {
       url = affixLastUpdatedTimestamp(url!!, it)
     }

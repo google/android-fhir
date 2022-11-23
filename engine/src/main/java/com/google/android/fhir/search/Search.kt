@@ -23,20 +23,16 @@ import org.hl7.fhir.instance.model.api.IAnyResource
 
 suspend inline fun <reified R : IAnyResource> FhirEngine.search(
   init: Search.() -> Unit,
-  searchManager: SearchManager,
 ): List<R> {
-  val search =
-    Search(type = R::class.java.newInstance().resourceType, searchManager = searchManager)
+  val search = Search(resourceType = R::class.java.newInstance().resourceType)
   search.init()
   return this.search(search)
 }
 
 suspend inline fun <reified R : IAnyResource> FhirEngine.count(
   init: Search.() -> Unit,
-  searchManager: SearchManager,
 ): Long {
-  val search =
-    Search(type = R::class.java.newInstance().resourceType, searchManager = searchManager)
+  val search = Search(resourceType = R::class.java.newInstance().resourceType)
   search.init()
   return this.count(search)
 }

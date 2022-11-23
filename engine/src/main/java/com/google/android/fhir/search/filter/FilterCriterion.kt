@@ -18,7 +18,6 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.IParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchQuery
@@ -52,14 +51,14 @@ internal sealed class FilterCriteria(
    * particular FilterCriteria wants to return [SearchQuery] in custom manner, it should override
    * [query] and provide its own implementation. See [DateClientParamFilterCriteria] for reference.
    */
-  open fun query(type: ResourceType): SearchQuery {
+  open fun query(resourceType: String): SearchQuery {
     val conditionParams = filters.flatMap { it.getConditionalParams() }
     return SearchQuery(
       """
       SELECT resourceUuid FROM $entityTableName
       WHERE resourceType = ? AND index_name = ? AND ${conditionParams.toQueryString(operation)} 
       """,
-      listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }
+      listOf(resourceType, param.paramName) + conditionParams.flatMap { it.params }
     )
   }
 

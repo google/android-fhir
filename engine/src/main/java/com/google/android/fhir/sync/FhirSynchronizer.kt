@@ -19,7 +19,6 @@ package com.google.android.fhir.sync
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.ResourceType
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
@@ -32,7 +31,7 @@ private sealed class SyncResult {
   data class Error(val exceptions: List<ResourceSyncException>) : SyncResult()
 }
 
-data class ResourceSyncException(val resourceType: ResourceType, val exception: Exception)
+data class ResourceSyncException(val resourceType: String, val exception: Exception)
 
 /** Class that helps synchronize the data source and save it in the local database */
 internal class FhirSynchronizer(
@@ -97,7 +96,7 @@ internal class FhirSynchronizer(
         downloader.download(it).collect {
           when (it) {
             is DownloadState.Started -> {
-              setSyncState(SyncJobStatus.InProgress(it.type))
+              setSyncState(SyncJobStatus.InProgress(it.resourceType))
             }
             is DownloadState.Success -> {
               emit(it.resources)

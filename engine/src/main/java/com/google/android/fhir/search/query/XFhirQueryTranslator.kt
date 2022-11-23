@@ -23,10 +23,7 @@ import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.gclient.UriClientParam
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.index.Coding
-import com.google.android.fhir.index.DateTimeType
-import com.google.android.fhir.index.DateType
 import com.google.android.fhir.index.Quantity
 import com.google.android.fhir.index.SearchParamDefinition
 import com.google.android.fhir.index.SearchParamType
@@ -59,10 +56,10 @@ object XFhirQueryTranslator {
    * prefixes, chained parameters are not supported.
    */
   internal fun translate(xFhirQuery: String, searchManager: SearchManager): Search {
-    val (type, queryStringPairs) =
-      xFhirQuery.split("?").let {
-        ResourceType.fromCode(it.first()) to it.elementAtOrNull(1)?.split("&")
-      }
+    val (resourceType, queryStringPairs) =
+      xFhirQuery.split("?").let { it.first() to it.elementAtOrNull(1)?.split("&") }
+
+    searchManager.validateResourceType(resourceType)
     val queryParams =
       queryStringPairs?.mapNotNull {
         // skip missing values like active=[missing]
@@ -95,35 +92,42 @@ object XFhirQueryTranslator {
         }
         ?.toMap()
 
-    val querySearchParameters = searchParams?.toSearchParamDefinitionValueMap(type)
+    val querySearchParameters = searchParams?.toSearchParamDefinitionValueMap(resourceType)
 
-    return Search(type, count, searchManager = searchManager).apply {
+    return Search(resourceType, count).apply {
       querySearchParameters?.forEach {
         val (param, filterValue) = it
-        this.applyFilterParam(param, filterValue)
+        this.applyFilterParam(param, filterValue, searchManager)
       }
 
       sort?.forEach { sortParam ->
-        sortParam.first.toSearchParamDefinition(type).let { sort ->
+        sortParam.first.toSearchParamDefinition(resourceType).let { sort ->
           this.applySortParam(sort, sortParam.second)
         }
       }
     }
   }
 
-  fun Search.applyFilterParam(param: SearchParamDefinition, filterValue: String) =
+  fun Search.applyFilterParam(
+    param: SearchParamDefinition,
+    filterValue: String,
+    searchManager: SearchManager
+  ) =
     when (param.type) {
       SearchParamType.NUMBER -> {
         this.filter(NumberClientParam(param.name), { value = filterValue.toBigDecimal() })
       }
       SearchParamType.DATE -> {
-        if (!isValidDateOnly(filterValue)) {
-          val dateTimeType: DateTimeType = searchManager.createDateTimeType(filterValue)
-          this.filter(DateClientParam(param.name), { value = of(dateTimeType) })
-        } else {
-          val dateType: DateType = searchManager.createDateType(filterValue)
-          this.filter(DateClientParam(param.name), { value = of(dateType) })
-        }
+        if (!isValidDateOnly(filterValue))
+          this.filter(
+            DateClientParam(param.name),
+            { value = of(searchManager.createDateTimeType(filterValue)) }
+          )
+        else
+          this.filter(
+            DateClientParam(param.name),
+            { value = of(searchManager.createDateType(filterValue)) },
+          )
       }
       SearchParamType.QUANTITY -> {
         filterValue.toQuantity().let {
@@ -178,23 +182,23 @@ object XFhirQueryTranslator {
         throw UnsupportedOperationException("${param.type} sort not supported in x-fhir-query")
     }
 
-  private val ResourceType.resourceSearchParameters
+  private val String.resourceSearchParameters
     get() = getSearchParamList(this)
 
   /** Parse string key-val map to SearchParamDefinition-Value map */
   private fun Map<String, String>.toSearchParamDefinitionValueMap(
-    type: ResourceType
+    resourceType: String
   ): List<Pair<SearchParamDefinition, String>> {
     return this.map { (paramKey, paramValue) ->
-      val paramDefinition = paramKey.toSearchParamDefinition(type)
+      val paramDefinition = paramKey.toSearchParamDefinition(resourceType)
       Pair(paramDefinition, paramValue)
     }
   }
 
   /** Parse param to SearchParamDefinition for given resourceType */
-  private fun String.toSearchParamDefinition(resourceType: ResourceType) =
+  private fun String.toSearchParamDefinition(resourceType: String) =
     resourceType.resourceSearchParameters.find { it.name == this }
-      ?: throw IllegalArgumentException("$this not found in ${resourceType.name}")
+      ?: throw IllegalArgumentException("$this not found in $resourceType")
 
   /**
    * Parse quantity string as defined in specs https://hl7.org/fhir/search.html#quantity The

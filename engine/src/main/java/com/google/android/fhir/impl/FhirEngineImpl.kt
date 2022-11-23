@@ -21,7 +21,6 @@ import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.ResourceForDatabaseToSave
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
@@ -49,8 +48,8 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     return database.insert(*resource)
   }
 
-  override suspend fun get(type: ResourceType, id: String): IAnyResource {
-    return database.select(type, id)
+  override suspend fun get(resourceType: String, id: String): IAnyResource {
+    return database.select(resourceType, id)
   }
 
   override suspend fun update(
@@ -59,8 +58,8 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     database.update(*resource)
   }
 
-  override suspend fun delete(type: ResourceType, id: String) {
-    database.delete(type, id)
+  override suspend fun delete(resourceType: String, id: String) {
+    database.delete(resourceType, id)
   }
 
   override suspend fun <R : IAnyResource> search(search: Search): List<R> {
@@ -79,12 +78,12 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     database.clearDatabase()
   }
 
-  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange? {
-    return database.getLocalChange(type, id)?.toLocalChange()
+  override suspend fun getLocalChange(resourceType: String, id: String): LocalChange? {
+    return database.getLocalChange(resourceType, id)?.toLocalChange()
   }
 
-  override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
-    database.purge(type, id, forcePurge)
+  override suspend fun purge(resourceType: String, id: String, forcePurge: Boolean) {
+    database.purge(resourceType, id, forcePurge)
   }
 
   override suspend fun syncDownload(
@@ -93,7 +92,8 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   ) {
     download(
         object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
+          override suspend fun getLatestTimestampFor(resourceType: String) =
+            database.lastUpdate(resourceType)
         }
       )
       .collect { resources ->

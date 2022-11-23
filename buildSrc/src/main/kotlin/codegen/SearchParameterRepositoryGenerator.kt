@@ -63,7 +63,6 @@ internal object SearchParameterRepositoryGenerator {
   private val searchParamMap: HashMap<String, MutableList<SearchParamDefinition>> = HashMap()
   private val searchParamDefinitionClass = ClassName(indexPackage, "SearchParamDefinition")
   private val searchParamTypeClass = ClassName(indexPackage, "SearchParamType")
-  private val resourceType = ClassName("com.google.android.fhir", "ResourceType")
 
   fun generate(bundle: Bundle, outputPath: File, testOutputPath: File) {
     for (entry in bundle.entry) {
@@ -89,13 +88,13 @@ internal object SearchParameterRepositoryGenerator {
 
     val getSearchParamListFunction =
       FunSpec.builder("getSearchParamList")
-        .addParameter("resourceType", resourceType)
+        .addParameter("resourceType", String::class)
         .returns(
           ClassName("kotlin.collections", "List").parameterizedBy(searchParamDefinitionClass)
         )
         .addModifiers(KModifier.INTERNAL)
         .addKdoc(generatedComment)
-        .beginControlFlow("return when (resourceType.name)")
+        .beginControlFlow("return when (resourceType)")
 
     // Helper function used in SearchParameterRepositoryGeneratedTest
     val testHelperFunctionCodeBlock =

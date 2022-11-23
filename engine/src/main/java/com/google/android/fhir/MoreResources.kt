@@ -17,18 +17,16 @@
 package com.google.android.fhir
 
 import java.lang.reflect.InvocationTargetException
-import java.util.Date
 import org.hl7.fhir.instance.model.api.IAnyResource
-import org.hl7.fhir.instance.model.api.IBaseMetaType
 
 /**
  * Returns the FHIR resource type.
  *
  * @throws IllegalArgumentException if class name cannot be mapped to valid resource type
  */
-fun <R : IAnyResource> getResourceType(clazz: Class<R>): ResourceType {
+fun <R : IAnyResource> getResourceType(clazz: Class<R>): String {
   try {
-    return ResourceType.fromCode(clazz.getConstructor().newInstance().fhirType())
+    return clazz.getConstructor().newInstance().fhirType()
   } catch (e: NoSuchMethodException) {
     throw IllegalArgumentException("Cannot resolve resource type for " + clazz.name, e)
   } catch (e: IllegalAccessException) {
@@ -41,10 +39,6 @@ fun <R : IAnyResource> getResourceType(clazz: Class<R>): ResourceType {
 }
 
 /** Returns the {@link Class} object for the resource type. */
-inline fun <reified R : IAnyResource> getResourceClass(resourceType: ResourceType): Class<R> =
-  getResourceClass(resourceType.name)
-
-/** Returns the {@link Class} object for the resource type. */
 inline fun <reified R : IAnyResource> getResourceClass(resourceType: String): Class<R> {
   // Remove any curly brackets in the resource type string. This is to work around an issue with
   // JSON deserialization in the CQL engine on Android. The resource type string incorrectly
@@ -55,8 +49,8 @@ inline fun <reified R : IAnyResource> getResourceClass(resourceType: String): Cl
   return Class.forName(R::class.java.`package`?.name + "." + className) as Class<R>
 }
 
-val IAnyResource.resourceType: ResourceType
-  get() = ResourceType.fromCode(this.fhirType())
+val IAnyResource.resourceType: String
+  get() = this.fhirType()
 
 /**
  * The logical (unqualified) part of the ID. For example, if the ID is
@@ -67,40 +61,8 @@ val IAnyResource.logicalId: String
     return this.idElement?.idPart.orEmpty()
   }
 
-internal val IAnyResource.versionId
-  get() = meta.versionId
+// internal val IAnyResource.versionId
+//   get() = meta.versionId
 
 internal val IAnyResource.lastUpdated
   get() = if (this.meta != null && !this.meta.isEmpty) meta.lastUpdated?.toInstant() else null
-
-internal fun IAnyResource.hasMeta(): Boolean {
-  return this.meta != null && !this.meta.isEmpty
-}
-
-internal fun IBaseMetaType.hasVersionId(): Boolean {
-  return this.versionId != null && this.versionId.isNotEmpty()
-}
-
-internal fun IBaseMetaType.hasLastUpdated(): Boolean {
-  return lastUpdated != null && lastUpdated.toTimeZoneString().isNotBlank()
-}
-
-internal val IBaseMetaType.lastUpdatedElement: Long
-  get() {
-    if (this.lastUpdated == null) {
-      this.lastUpdated = Date()
-    }
-    return this.lastUpdated.time
-  }
-
-internal fun IBaseMetaType.hasProfile(): Boolean {
-  if (this.profile == null) return false
-  for (item in this.profile) if (!item.isEmpty) return true
-  return false
-}
-
-internal fun IBaseMetaType.hasTag(): Boolean {
-  if (this.tag == null) return false
-  for (item in this.tag) if (!item.isEmpty) return true
-  return false
-}

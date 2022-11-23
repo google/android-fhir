@@ -35,13 +35,13 @@ interface FhirEngine {
   suspend fun create(vararg resource: IAnyResource): List<String>
 
   /** Loads a FHIR resource given the class and the logical ID. */
-  suspend fun get(type: ResourceType, id: String): IAnyResource
+  suspend fun get(resourceType: String, id: String): IAnyResource
 
   /** Updates a FHIR [resource] in the local storage. */
   suspend fun update(vararg resource: IAnyResource)
 
   /** Removes a FHIR resource given the class and the logical ID. */
-  suspend fun delete(type: ResourceType, id: String)
+  suspend fun delete(resourceType: String, id: String)
 
   /**
    * Searches the database and returns a list resources according to the [search] specifications.
@@ -96,7 +96,7 @@ interface FhirEngine {
    * @return [LocalChange] A squashed local changes for given [resourceType] and [Resource.id] . If
    * there is no local change for given [resourceType] and [Resource.id], return `null`.
    */
-  suspend fun getLocalChange(type: ResourceType, id: String): LocalChange?
+  suspend fun getLocalChange(resourceType: String, id: String): LocalChange?
 
   /**
    * Purges a resource from the database based on resource type and id without any deletion of data
@@ -108,7 +108,7 @@ interface FhirEngine {
    * either sync with server or FORCE_PURGE required") if local change exists. If true this API will
    * delete resource entry from LocalChangeEntity table.
    */
-  suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
+  suspend fun purge(resourceType: String, id: String, forcePurge: Boolean = false)
 }
 
 /**
@@ -130,12 +130,12 @@ suspend inline fun <reified R : IAnyResource> FhirEngine.delete(id: String) {
 }
 
 interface SyncDownloadContext {
-  suspend fun getLatestTimestampFor(type: ResourceType): String?
+  suspend fun getLatestTimestampFor(resourceType: String): String?
 }
 
 data class ResourceForDatabaseToSave(
   val id: String,
-  val resourceType: ResourceType,
+  val resourceType: String,
   val versionId: String,
   val lastUpdated: Instant
 )

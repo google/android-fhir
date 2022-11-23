@@ -17,9 +17,12 @@
 package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.TokenClientParam
+import com.google.android.fhir.index.CodeType
 import com.google.android.fhir.index.CodeableConcept
 import com.google.android.fhir.index.Coding
+import com.google.android.fhir.index.ContactPoint
 import com.google.android.fhir.index.Identifier
+import com.google.android.fhir.index.UriType
 import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
@@ -43,28 +46,28 @@ data class TokenParamFilterCriterion(var parameter: TokenClientParam) : FilterCr
     TokenFilterValue().apply { tokenFilters.add(TokenParamFilterValueInstance(code = string)) }
 
   /** Returns [TokenFilterValue] from [UriType]. */
-  // fun of(uriType: UriType) =
-  //   TokenFilterValue().apply {
-  //     tokenFilters.add(TokenParamFilterValueInstance(code = uriType.value))
-  //   }
+  fun of(uriType: UriType) =
+    TokenFilterValue().apply {
+      tokenFilters.add(TokenParamFilterValueInstance(code = uriType.value))
+    }
 
   /** Returns [TokenFilterValue] from [CodeType]. */
-  // fun of(codeType: CodeType) =
-  //   TokenFilterValue().apply {
-  //     tokenFilters.add(TokenParamFilterValueInstance(code = codeType.value))
-  //   }
+  fun of(codeType: CodeType) =
+    TokenFilterValue().apply {
+      tokenFilters.add(TokenParamFilterValueInstance(code = codeType.value))
+    }
 
   /** Returns [TokenFilterValue] from [Coding]. */
   fun of(coding: Coding) =
     TokenFilterValue().apply {
-      tokenFilters.add(TokenParamFilterValueInstance(uri = coding.system, code = coding.code))
+      tokenFilters.add(TokenParamFilterValueInstance(uri = coding.system, code = coding.code!!))
     }
 
   /** Returns [TokenFilterValue] from [CodeableConcept]. */
   fun of(codeableConcept: CodeableConcept) =
     TokenFilterValue().apply {
       codeableConcept.coding.forEach {
-        tokenFilters.add(TokenParamFilterValueInstance(uri = it.system, code = it.code))
+        tokenFilters.add(TokenParamFilterValueInstance(uri = it.system, code = it.code!!))
       }
     }
 
@@ -72,18 +75,17 @@ data class TokenParamFilterCriterion(var parameter: TokenClientParam) : FilterCr
   fun of(identifier: Identifier) =
     TokenFilterValue().apply {
       tokenFilters.add(
-        TokenParamFilterValueInstance(uri = identifier.system, code = identifier.value)
+        TokenParamFilterValueInstance(uri = identifier.system, code = identifier.value!!)
       )
     }
 
   /** Returns [TokenFilterValue] from [ContactPoint]. */
-  // fun of(contactPoint: ContactPoint) =
-  //   TokenFilterValue().apply {
-  //     tokenFilters.add(
-  //       TokenParamFilterValueInstance(uri = contactPoint.use?.toCode(), code =
-  // contactPoint.value)
-  //     )
-  //   }
+  fun of(contactPoint: ContactPoint) =
+    TokenFilterValue().apply {
+      tokenFilters.add(
+        TokenParamFilterValueInstance(uri = contactPoint.use, code = contactPoint.value)
+      )
+    }
 
   override fun getConditionalParams() =
     value!!.tokenFilters.map {

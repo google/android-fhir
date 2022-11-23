@@ -19,7 +19,6 @@ package com.google.android.fhir.demo.data
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.ResourceForDatabaseToSave
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.resourceType
 import com.google.android.fhir.sync.ResourceBundleAndAssociatedLocalChangeTokens
@@ -86,7 +85,7 @@ open class TransactionBundleGenerator(
     if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
       return ResourceForDatabaseToSave(
         resource.id,
-        ResourceType.fromCode(resource.fhirType()),
+        resource.fhirType(),
         resource.meta.versionId,
         resource.meta.lastUpdated.toInstant()
       )
@@ -115,12 +114,8 @@ open class TransactionBundleGenerator(
    *
    * 2. relative path: `<resource-type>/<resource-id>/_history/<version>`
    */
-  private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
-    get() =
-      location
-        ?.split("/")
-        ?.takeIf { it.size > 3 }
-        ?.let { it[it.size - 3] to ResourceType.fromCode(it[it.size - 4]) }
+  private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, String>?
+    get() = location?.split("/")?.takeIf { it.size > 3 }?.let { it[it.size - 3] to it[it.size - 4] }
 
   companion object Factory {
 

@@ -18,7 +18,6 @@ package com.google.android.fhir.search
 
 import ca.uhn.fhir.rest.gclient.IParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.resourceType
 import org.hl7.fhir.instance.model.api.IAnyResource
 
@@ -26,7 +25,7 @@ import org.hl7.fhir.instance.model.api.IAnyResource
 @PublishedApi internal data class NestedSearch(val param: ReferenceClientParam, val search: Search)
 
 /** Keeps the parent context for a nested query loop. */
-internal data class NestedContext(val parentType: ResourceType, val param: IParam)
+internal data class NestedContext(val parentType: String, val param: IParam)
 
 /**
  * Provides limited support for the reverse chaining on [Search]
@@ -42,14 +41,10 @@ internal data class NestedContext(val parentType: ResourceType, val param: IPara
  */
 inline fun <reified R : IAnyResource> Search.has(
   referenceParam: ReferenceClientParam,
-  searchManager: SearchManager,
   init: Search.() -> Unit
 ) {
   nestedSearches.add(
-    NestedSearch(
-        referenceParam,
-        Search(type = R::class.java.newInstance().resourceType, searchManager = searchManager)
-      )
+    NestedSearch(referenceParam, Search(resourceType = R::class.java.newInstance().resourceType))
       .apply { search.init() }
   )
 }
@@ -59,13 +54,13 @@ inline fun <reified R : IAnyResource> Search.has(
  * specified by the user .
  */
 internal fun List<NestedSearch>.nestedQuery(
-  type: ResourceType,
+  resourceType: String,
   operation: Operation
 ): SearchQuery? {
   return if (isEmpty()) {
     null
   } else {
-    map { it.nestedQuery(type) }
+    map { it.nestedQuery(resourceType) }
       .let {
         SearchQuery(
           query =
@@ -79,6 +74,6 @@ internal fun List<NestedSearch>.nestedQuery(
   }
 }
 
-private fun NestedSearch.nestedQuery(type: ResourceType): SearchQuery {
-  return search.getQuery(nestedContext = NestedContext(type, param))
+private fun NestedSearch.nestedQuery(resourceType: String): SearchQuery {
+  return search.getQuery(nestedContext = NestedContext(resourceType, param))
 }

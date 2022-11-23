@@ -35,16 +35,27 @@ import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemV
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.index.CodeType
+import com.google.android.fhir.index.CodeableConcept
+import com.google.android.fhir.index.ContactPoint
 import com.google.android.fhir.index.DateTimeType
 import com.google.android.fhir.index.DateType
+import com.google.android.fhir.index.Identifier
+import com.google.android.fhir.index.UriType
 import com.google.android.fhir.search.SearchManager
 import com.google.android.fhir.search.search
+import java.util.Date
+import kotlin.jvm.Throws
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import org.hl7.fhir.exceptions.FHIRException
+import org.hl7.fhir.instance.model.api.IBaseCoding
+import org.hl7.fhir.instance.model.api.ICompositeType
+import org.hl7.fhir.instance.model.api.IPrimitiveType
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Expression
@@ -489,14 +500,67 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           expression.expression,
           searchManager =
             object : SearchManager {
-              override fun createDateTimeType(filterValue: String): DateTimeType {
-                val dateTime = org.hl7.fhir.r4.model.DateTimeType(filterValue)
+              override fun createDateTimeType(value: String): DateTimeType {
+                val dateTime = org.hl7.fhir.r4.model.DateTimeType(value)
                 return DateTimeType(dateTime.value, dateTime.precision)
               }
 
-              override fun createDateType(filterValue: String): DateType {
-                val date = org.hl7.fhir.r4.model.DateType(filterValue)
+              override fun createDateTimeType(value: IPrimitiveType<Date>): DateTimeType {
+                val dateTime = value as org.hl7.fhir.r4.model.DateTimeType
+                return DateTimeType(dateTime.value, dateTime.precision)
+              }
+
+              override fun createDateType(value: String): DateType {
+                val date = org.hl7.fhir.r4.model.DateType(value)
                 return DateType(date.value, date.precision)
+              }
+
+              override fun createDateType(value: IPrimitiveType<Date>): DateType {
+                val date = value as org.hl7.fhir.r4.model.DateTimeType
+                return DateType(date.value, date.precision)
+              }
+
+              override fun createIdentifierType(value: ICompositeType): Identifier {
+                val identifier = value as org.hl7.fhir.r4.model.Identifier
+                return Identifier(identifier.system, identifier.value)
+              }
+
+              override fun createCodingType(
+                value: IBaseCoding
+              ): com.google.android.fhir.index.Coding {
+                val coding = value as org.hl7.fhir.r4.model.Coding
+                return com.google.android.fhir.index.Coding(coding.system, coding.code)
+              }
+
+              override fun createCodeableConceptType(value: ICompositeType): CodeableConcept {
+                val codeableConcept = value as org.hl7.fhir.r4.model.CodeableConcept
+                return CodeableConcept(
+                  codeableConcept.coding.map {
+                    com.google.android.fhir.index.Coding(it.system, it.code)
+                  }
+                )
+              }
+
+              override fun createContactPointType(value: ICompositeType): ContactPoint {
+                val contactPoint = value as org.hl7.fhir.r4.model.ContactPoint
+                return ContactPoint(
+                  contactPoint.system.toCode(),
+                  contactPoint.value,
+                  contactPoint.use.toCode()
+                )
+              }
+
+              override fun createCodeType(value: IPrimitiveType<String>): CodeType {
+                return CodeType(value.value)
+              }
+
+              override fun createUriType(value: IPrimitiveType<String>): UriType {
+                return UriType(value.value)
+              }
+
+              @Throws(FHIRException::class)
+              override fun validateResourceType(resourceType: String) {
+                ResourceType.fromCode(resourceType)
               }
             }
         ) as List<Base>

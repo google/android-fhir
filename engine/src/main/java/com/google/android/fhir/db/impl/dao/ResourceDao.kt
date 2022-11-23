@@ -23,7 +23,6 @@ import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
@@ -41,7 +40,6 @@ import com.google.android.fhir.index.ResourceIndices
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resourceType
-import com.google.android.fhir.versionId
 import java.time.Instant
 import java.util.UUID
 import org.hl7.fhir.instance.model.api.IAnyResource
@@ -72,7 +70,7 @@ internal abstract class ResourceDao {
       val index = ResourceIndexer.index(resource, resourceIndexerManager)
       updateIndicesForResource(index, entity, it.resourceUuid)
     }
-      ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
+      ?: throw ResourceNotFoundException(resource.resourceType, resource.id)
   }
 
   open suspend fun insert(
@@ -129,7 +127,7 @@ internal abstract class ResourceDao {
   )
   abstract suspend fun updateResource(
     resourceId: String,
-    resourceType: ResourceType,
+    resourceType: String,
     serializedResource: String
   )
 
@@ -144,7 +142,7 @@ internal abstract class ResourceDao {
   )
   abstract suspend fun updateRemoteVersionIdAndLastUpdate(
     resourceId: String,
-    resourceType: ResourceType,
+    resourceType: String,
     versionId: String?,
     lastUpdatedRemote: Instant?
   )
@@ -154,7 +152,7 @@ internal abstract class ResourceDao {
         DELETE FROM ResourceEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType"""
   )
-  abstract suspend fun deleteResource(resourceId: String, resourceType: ResourceType): Int
+  abstract suspend fun deleteResource(resourceId: String, resourceType: String): Int
 
   @Query(
     """
@@ -162,7 +160,7 @@ internal abstract class ResourceDao {
         FROM ResourceEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType"""
   )
-  abstract suspend fun getResource(resourceId: String, resourceType: ResourceType): String?
+  abstract suspend fun getResource(resourceId: String, resourceType: String): String?
 
   @Query(
     """
@@ -171,10 +169,7 @@ internal abstract class ResourceDao {
         WHERE resourceId = :resourceId AND resourceType = :resourceType
     """
   )
-  abstract suspend fun getResourceEntity(
-    resourceId: String,
-    resourceType: ResourceType
-  ): ResourceEntity?
+  abstract suspend fun getResourceEntity(resourceId: String, resourceType: String): ResourceEntity?
 
   @RawQuery abstract suspend fun getResources(query: SupportSQLiteQuery): List<String>
 
@@ -198,7 +193,7 @@ internal abstract class ResourceDao {
         resourceUuid = resourceUuid,
         resourceId = resource.logicalId,
         serializedResource = iParser.encodeResourceToString(resource),
-        versionId = resource.versionId,
+        versionId = resource.meta.versionId,
         lastUpdatedRemote = resource.lastUpdated
       )
     insertResource(entity)

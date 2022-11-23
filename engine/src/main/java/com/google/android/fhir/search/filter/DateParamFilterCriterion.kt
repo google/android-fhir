@@ -18,7 +18,6 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.index.DateTimeType
 import com.google.android.fhir.index.DateType
 import com.google.android.fhir.search.ConditionParam
@@ -74,7 +73,7 @@ internal data class DateClientParamFilterCriteria(
   override val operation: Operation
 ) : FilterCriteria(filters, operation, parameter, "") {
 
-  override fun query(type: ResourceType): SearchQuery {
+  override fun query(resourceType: String): SearchQuery {
 
     val filterCriteria =
       listOf(
@@ -87,7 +86,7 @@ internal data class DateClientParamFilterCriteria(
     // FilterCriteria with no criterion.
     return filterCriteria
       .filter { it.filters.isNotEmpty() }
-      .map { it.query(type) }
+      .map { it.query(resourceType) }
       .let { queries ->
         SearchQuery(
           queries.joinToString(separator = " ${operation.logicalOperator} ") {

@@ -20,10 +20,7 @@ import android.os.Build
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
-import com.google.android.fhir.ResourceType
-import com.google.android.fhir.demo.data.SearchManagerForR4
 import com.google.android.fhir.epochDay
-import com.google.android.fhir.index.Coding
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
@@ -31,6 +28,21 @@ import java.util.Date
 import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.CodeType
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Condition
+import org.hl7.fhir.r4.model.ContactPoint
+import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Identifier
+import org.hl7.fhir.r4.model.Immunization
+import org.hl7.fhir.r4.model.Library
+import org.hl7.fhir.r4.model.Observation
+import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.RiskAssessment
+import org.hl7.fhir.r4.model.UriType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -41,9 +53,11 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class SearchTest {
 
+  private val searchManager: SearchManager = SearchManagerForR4Test
+
   @Test
   fun search() = runBlocking {
-    val query = Search(ResourceType.Patient, searchManager = SearchManagerForR4).getQuery()
+    val query = Search(ResourceType.Patient.name).getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -58,7 +72,7 @@ class SearchTest {
 
   @Test
   fun count() = runBlocking {
-    val query = Search(ResourceType.Patient, searchManager = SearchManagerForR4).getQuery(true)
+    val query = Search(ResourceType.Patient.name).getQuery(true)
 
     assertThat(query.query)
       .isEqualTo(
@@ -73,10 +87,7 @@ class SearchTest {
 
   @Test
   fun search_size() {
-    val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
-        .apply { count = 10 }
-        .getQuery()
+    val query = Search(ResourceType.Patient.name).apply { count = 10 }.getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -93,7 +104,7 @@ class SearchTest {
   @Test
   fun search_size_from() {
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply {
           count = 10
           from = 20
@@ -115,15 +126,11 @@ class SearchTest {
   @Test
   fun search_filter_date_approximate() {
     val mockDateType =
-      com.google.android.fhir.index.DateType(Date(mockEpochTimeStamp), TemporalPrecisionEnum.DAY)
+      searchManager.createDateType(DateType(Date(mockEpochTimeStamp), TemporalPrecisionEnum.DAY))
     DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
-    val value =
-      com.google.android.fhir.index.DateType(
-        DateType("2013-03-14").value,
-        DateType("2013-03-14").precision
-      )
+    val value = searchManager.createDateType(DateType("2013-03-14"))
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
@@ -175,13 +182,13 @@ class SearchTest {
   @Test
   fun search_filter_date_starts_after() {
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
             {
               prefix = ParamPrefixEnum.STARTS_AFTER
-              value = of(DateType("2013-03-14"))
+              value = of(searchManager.createDateType(DateType("2013-03-14")))
             }
           )
         }
@@ -214,12 +221,12 @@ class SearchTest {
   @Test
   fun search_filter_date_ends_before() {
     val query =
-      Search(ResourceType.Patient)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(DateType("2013-03-14"))
+              value = of(searchManager.createDateType(DateType("2013-03-14")))
               prefix = ParamPrefixEnum.ENDS_BEFORE
             }
           )
@@ -253,12 +260,12 @@ class SearchTest {
   @Test
   fun search_filter_date_not_equal() {
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(DateType("2013-03-14"))
+              value = of(searchManager.createDateType(DateType("2013-03-14")))
               prefix = ParamPrefixEnum.NOT_EQUAL
             }
           )
@@ -295,8 +302,13 @@ class SearchTest {
   @Test
   fun search_filter_date_equal() {
     val query =
-      Search(ResourceType.Patient)
-        .apply { filter(Patient.BIRTHDATE, { value = of(DateType("2013-03-14")) }) }
+      Search(ResourceType.Patient.name)
+        .apply {
+          filter(
+            Patient.BIRTHDATE,
+            { value = of(searchManager.createDateType(DateType("2013-03-14"))) }
+          )
+        }
         .getQuery()
 
     assertThat(query.query)
@@ -329,12 +341,12 @@ class SearchTest {
   @Test
   fun search_filter_date_greater() {
     val query =
-      Search(ResourceType.Patient)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(DateType("2013-03-14"))
+              value = of(searchManager.createDateType(DateType("2013-03-14")))
               prefix = ParamPrefixEnum.GREATERTHAN
             }
           )
@@ -368,12 +380,12 @@ class SearchTest {
   @Test
   fun search_filter_date_greaterOrEqual() {
     val query =
-      Search(ResourceType.Patient)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(DateType("2013-03-14"))
+              value = of(searchManager.createDateType(DateType("2013-03-14")))
               prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
             }
           )
@@ -407,12 +419,12 @@ class SearchTest {
   @Test
   fun search_filter_date_less() {
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(DateType("2013-03-14"))
+              value = of(searchManager.createDateType(DateType("2013-03-14")))
               prefix = ParamPrefixEnum.LESSTHAN
             }
           )
@@ -446,12 +458,12 @@ class SearchTest {
   @Test
   fun search_filter_date_lessOrEqual() {
     val query =
-      Search(ResourceType.Patient)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(DateType("2013-03-14"))
+              value = of(searchManager.createDateType(DateType("2013-03-14")))
               prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
             }
           )
@@ -485,12 +497,14 @@ class SearchTest {
   @Test
   fun search_filter_dateTime_approximate() {
     val mockDateTimeType =
-      DateTimeType(Date.from(Instant.ofEpochMilli(mockEpochTimeStamp)), TemporalPrecisionEnum.DAY)
+      searchManager.createDateTimeType(
+        DateTimeType(Date.from(Instant.ofEpochMilli(mockEpochTimeStamp)), TemporalPrecisionEnum.DAY)
+      )
     DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
-    val value = DateTimeType("2013-03-14")
+    val value = searchManager.createDateTimeType(DateTimeType("2013-03-14"))
 
     val query =
-      Search(ResourceType.Patient)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
@@ -543,12 +557,12 @@ class SearchTest {
   @Test
   fun search_filter_dateTime_starts_after() {
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(DateTimeType("2013-03-14"))
+              value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
               prefix = ParamPrefixEnum.STARTS_AFTER
             }
           )
@@ -582,12 +596,12 @@ class SearchTest {
   @Test
   fun search_filter_dateTime_ends_before() {
     val query =
-      Search(ResourceType.Patient)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(DateTimeType("2013-03-14"))
+              value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
               prefix = ParamPrefixEnum.ENDS_BEFORE
             }
           )
@@ -621,12 +635,12 @@ class SearchTest {
   @Test
   fun search_filter_dateTime_not_equal() {
     val query =
-      Search(ResourceType.Patient)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(DateTimeType("2013-03-14"))
+              value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
               prefix = ParamPrefixEnum.NOT_EQUAL
             }
           )
@@ -663,12 +677,12 @@ class SearchTest {
   @Test
   fun search_filter_dateTime_equal() {
     val query =
-      Search(ResourceType.Patient)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(DateTimeType("2013-03-14"))
+              value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
               prefix = ParamPrefixEnum.EQUAL
             }
           )
@@ -705,12 +719,12 @@ class SearchTest {
   @Test
   fun search_filter_dateTime_greater() {
     val query =
-      Search(ResourceType.Patient)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(DateTimeType("2013-03-14"))
+              value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
               prefix = ParamPrefixEnum.GREATERTHAN
             }
           )
@@ -744,12 +758,12 @@ class SearchTest {
   @Test
   fun search_filter_dateTime_greaterOrEqual() {
     val query =
-      Search(ResourceType.Patient)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(DateTimeType("2013-03-14"))
+              value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
               prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
             }
           )
@@ -783,12 +797,12 @@ class SearchTest {
   @Test
   fun search_filter_dateTime_less() {
     val query =
-      Search(ResourceType.Patient)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(DateTimeType("2013-03-14"))
+              value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
               prefix = ParamPrefixEnum.LESSTHAN
             }
           )
@@ -822,12 +836,12 @@ class SearchTest {
   @Test
   fun search_filter_dateTime_lessOrEqual() {
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(DateTimeType("2013-03-14"))
+              value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
               prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
             }
           )
@@ -861,7 +875,7 @@ class SearchTest {
   @Test
   fun search_filter_string_default() {
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply { filter(Patient.ADDRESS, { value = "someValue" }) }
         .getQuery()
 
@@ -889,7 +903,7 @@ class SearchTest {
   @Test
   fun search_filter_string_exact() {
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.ADDRESS,
@@ -925,7 +939,7 @@ class SearchTest {
   @Test
   fun search_filter_string_contains() {
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.ADDRESS,
@@ -961,13 +975,17 @@ class SearchTest {
   @Test
   fun search_filter_token_coding() {
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.GENDER,
             {
               value =
-                of(Coding("http://hl7.org/fhir/ValueSet/administrative-gender", "male", "Male"))
+                of(
+                  searchManager.createCodingType(
+                    Coding("http://hl7.org/fhir/ValueSet/administrative-gender", "male", "Male")
+                  )
+                )
             }
           )
         }
@@ -1000,13 +1018,17 @@ class SearchTest {
   @Test
   fun search_filter_token_codeableConcept() {
     val query =
-      Search(ResourceType.Immunization, searchManager = SearchManagerForR4)
+      Search(ResourceType.Immunization.name)
         .apply {
           filter(
             Immunization.VACCINE_CODE,
             {
               value =
-                of(CodeableConcept(Coding("http://snomed.info/sct", "260385009", "Allergy X")))
+                of(
+                  searchManager.createCodeableConceptType(
+                    CodeableConcept(Coding("http://snomed.info/sct", "260385009", "Allergy X"))
+                  )
+                )
             }
           )
         }
@@ -1043,8 +1065,10 @@ class SearchTest {
     identifier.system = "http://acme.org/patient"
 
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
-        .apply { filter(Patient.IDENTIFIER, { value = of(identifier) }) }
+      Search(ResourceType.Patient.name)
+        .apply {
+          filter(Patient.IDENTIFIER, { value = of(searchManager.createIdentifierType(identifier)) })
+        }
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
@@ -1073,18 +1097,20 @@ class SearchTest {
   @Test
   fun search_filter_token_contactPoint() {
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.TELECOM,
             {
               value =
                 of(
-                  ContactPoint().apply {
-                    system = ContactPoint.ContactPointSystem.EMAIL
-                    use = ContactPoint.ContactPointUse.HOME
-                    value = "test@gmail.com"
-                  }
+                  searchManager.createContactPointType(
+                    ContactPoint().apply {
+                      system = ContactPoint.ContactPointSystem.EMAIL
+                      use = ContactPoint.ContactPointUse.HOME
+                      value = "test@gmail.com"
+                    }
+                  )
                 )
             }
           )
@@ -1117,17 +1143,19 @@ class SearchTest {
   @Test
   fun search_filter_token_contactPoint_missingUse() {
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.TELECOM,
             {
               value =
                 of(
-                  ContactPoint().apply {
-                    system = ContactPoint.ContactPointSystem.EMAIL
-                    value = "test@gmail.com"
-                  }
+                  searchManager.createContactPointType(
+                    ContactPoint().apply {
+                      system = ContactPoint.ContactPointSystem.EMAIL
+                      value = "test@gmail.com"
+                    }
+                  )
                 )
             }
           )
@@ -1159,8 +1187,10 @@ class SearchTest {
   @Test
   fun search_filter_token_codeType() {
     val query =
-      Search(ResourceType.Patient)
-        .apply { filter(Patient.GENDER, { value = of(CodeType("male")) }) }
+      Search(ResourceType.Patient.name)
+        .apply {
+          filter(Patient.GENDER, { value = of(searchManager.createCodeType(CodeType("male"))) })
+        }
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
@@ -1188,7 +1218,9 @@ class SearchTest {
   @Test
   fun search_filter_token_boolean() {
     val query =
-      Search(ResourceType.Patient).apply { filter(Patient.ACTIVE, { value = of(true) }) }.getQuery()
+      Search(ResourceType.Patient.name)
+        .apply { filter(Patient.ACTIVE, { value = of(true) }) }
+        .getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -1216,11 +1248,14 @@ class SearchTest {
   @Test
   fun search_filter_token_uriType() {
     val query =
-      Search(ResourceType.Patient)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.IDENTIFIER,
-            { value = of(UriType("16009886-bd57-11eb-8529-0242ac130003")) }
+            {
+              value =
+                of(searchManager.createUriType(UriType("16009886-bd57-11eb-8529-0242ac130003")))
+            }
           )
         }
         .getQuery()
@@ -1251,7 +1286,7 @@ class SearchTest {
   @Test
   fun search_filter_token_string() {
     val query =
-      Search(ResourceType.Patient)
+      Search(ResourceType.Patient.name)
         .apply { filter(Patient.PHONE, { value = of("+14845219791") }) }
         .getQuery()
 
@@ -1281,7 +1316,7 @@ class SearchTest {
   @Test
   fun search_filter_quantity_equals() {
     val query =
-      Search(ResourceType.Observation, searchManager = SearchManagerForR4)
+      Search(ResourceType.Observation.name)
         .apply {
           filter(
             Observation.VALUE_QUANTITY,
@@ -1321,7 +1356,7 @@ class SearchTest {
   @Test
   fun search_filter_quantity_less() {
     val query =
-      Search(ResourceType.Observation, searchManager = SearchManagerForR4)
+      Search(ResourceType.Observation.name)
         .apply {
           filter(
             Observation.VALUE_QUANTITY,
@@ -1360,7 +1395,7 @@ class SearchTest {
   @Test
   fun search_filter_quantity_less_or_equal() {
     val query =
-      Search(ResourceType.Observation)
+      Search(ResourceType.Observation.name)
         .apply {
           filter(
             Observation.VALUE_QUANTITY,
@@ -1399,7 +1434,7 @@ class SearchTest {
   @Test
   fun search_filter_quantity_greater() {
     val query =
-      Search(ResourceType.Observation, searchManager = SearchManagerForR4)
+      Search(ResourceType.Observation.name)
         .apply {
           filter(
             Observation.VALUE_QUANTITY,
@@ -1438,7 +1473,7 @@ class SearchTest {
   @Test
   fun search_filter_quantity_greater_equal() {
     val query =
-      Search(ResourceType.Observation, searchManager = SearchManagerForR4)
+      Search(ResourceType.Observation.name)
         .apply {
           filter(
             Observation.VALUE_QUANTITY,
@@ -1475,7 +1510,7 @@ class SearchTest {
   @Test
   fun search_filter_quantity_not_equal() {
     val query =
-      Search(ResourceType.Observation, searchManager = SearchManagerForR4)
+      Search(ResourceType.Observation.name)
         .apply {
           filter(
             Observation.VALUE_QUANTITY,
@@ -1513,7 +1548,7 @@ class SearchTest {
   @Test
   fun search_filter_quantity_starts_after() {
     val query =
-      Search(ResourceType.Observation, searchManager = SearchManagerForR4)
+      Search(ResourceType.Observation.name)
         .apply {
           filter(
             Observation.VALUE_QUANTITY,
@@ -1550,7 +1585,7 @@ class SearchTest {
   @Test
   fun search_filter_quantity_ends_before() {
     val query =
-      Search(ResourceType.Observation)
+      Search(ResourceType.Observation.name)
         .apply {
           filter(
             Observation.VALUE_QUANTITY,
@@ -1587,7 +1622,7 @@ class SearchTest {
   @Test
   fun search_filter_quantity_canonical_match() {
     val query =
-      Search(ResourceType.Observation)
+      Search(ResourceType.Observation.name)
         .apply {
           filter(
             Observation.VALUE_QUANTITY,
@@ -1629,7 +1664,9 @@ class SearchTest {
   @Test
   fun search_filter_uri() {
     val query =
-      Search(ResourceType.Library).apply { filter(Library.URL, { value = "someValue" }) }.getQuery()
+      Search(ResourceType.Library.name)
+        .apply { filter(Library.URL, { value = "someValue" }) }
+        .getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -1655,7 +1692,7 @@ class SearchTest {
   @Test
   fun search_sort_string_ascending() {
     val query =
-      Search(ResourceType.Patient).apply { sort(Patient.GIVEN, Order.ASCENDING) }.getQuery()
+      Search(ResourceType.Patient.name).apply { sort(Patient.GIVEN, Order.ASCENDING) }.getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -1674,7 +1711,7 @@ class SearchTest {
   @Test
   fun search_sort_string_descending() {
     val query =
-      Search(ResourceType.Patient).apply { sort(Patient.GIVEN, Order.DESCENDING) }.getQuery()
+      Search(ResourceType.Patient.name).apply { sort(Patient.GIVEN, Order.DESCENDING) }.getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -1693,7 +1730,7 @@ class SearchTest {
   @Test
   fun search_sort_numbers_ascending() {
     val query =
-      Search(ResourceType.RiskAssessment, searchManager = SearchManagerForR4)
+      Search(ResourceType.RiskAssessment.name)
         .apply { sort(RiskAssessment.PROBABILITY, Order.ASCENDING) }
         .getQuery()
 
@@ -1713,7 +1750,7 @@ class SearchTest {
   @Test
   fun search_filter_sort_size_from() {
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(Patient.FAMILY, { value = "Jones" })
           sort(Patient.GIVEN, Order.ASCENDING)
@@ -1755,12 +1792,19 @@ class SearchTest {
   @Test
   fun search_has_patient_with_diabetes() {
     val query =
-      Search(ResourceType.Patient)
+      Search(ResourceType.Patient.name)
         .apply {
           has<Condition>(Condition.SUBJECT) {
             filter(
               Condition.CODE,
-              { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) }
+              {
+                value =
+                  of(
+                    searchManager.createCodingType(
+                      Coding("http://snomed.info/sct", "44054006", "Diabetes")
+                    )
+                  )
+              }
             )
           }
         }
@@ -1805,18 +1849,20 @@ class SearchTest {
   @Test
   fun search_has_patient_with_influenza_vaccine_status_completed_in_India() {
     val query =
-      Search(ResourceType.Patient)
+      Search(ResourceType.Patient.name)
         .apply {
-          has<Immunization>(Immunization.PATIENT, searchManager = SearchManagerForR4) {
+          has<Immunization>(Immunization.PATIENT) {
             filter(
               Immunization.VACCINE_CODE,
               {
                 value =
                   of(
-                    Coding(
-                      "http://hl7.org/fhir/sid/cvx",
-                      "140",
-                      "Influenza, seasonal, injectable, preservative free"
+                    searchManager.createCodingType(
+                      Coding(
+                        "http://hl7.org/fhir/sid/cvx",
+                        "140",
+                        "Influenza, seasonal, injectable, preservative free"
+                      )
                     )
                   )
               }
@@ -1824,7 +1870,14 @@ class SearchTest {
             //      Follow Immunization.ImmunizationStatus
             filter(
               Immunization.STATUS,
-              { value = of(Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")) }
+              {
+                value =
+                  of(
+                    searchManager.createCodingType(
+                      Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")
+                    )
+                  )
+              }
             )
           }
 
@@ -1892,18 +1945,32 @@ class SearchTest {
   @Test
   fun practitioner_has_patient_has_condition_diabetes_and_hypertension() {
     val query =
-      Search(ResourceType.Patient)
+      Search(ResourceType.Patient.name)
         .apply {
           has<Condition>(Condition.SUBJECT) {
             filter(
               Condition.CODE,
-              { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) }
+              {
+                value =
+                  of(
+                    searchManager.createCodingType(
+                      Coding("http://snomed.info/sct", "44054006", "Diabetes")
+                    )
+                  )
+              }
             )
           }
           has<Condition>(Condition.SUBJECT) {
             filter(
               Condition.CODE,
-              { value = of(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")) }
+              {
+                value =
+                  of(
+                    searchManager.createCodingType(
+                      Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")
+                    )
+                  )
+              }
             )
           }
         }
@@ -1966,7 +2033,9 @@ class SearchTest {
   @Test
   fun search_date_sort() {
     val query =
-      Search(ResourceType.Patient).apply { sort(Patient.BIRTHDATE, Order.ASCENDING) }.getQuery()
+      Search(ResourceType.Patient.name)
+        .apply { sort(Patient.BIRTHDATE, Order.ASCENDING) }
+        .getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -1986,7 +2055,9 @@ class SearchTest {
   @Test
   fun search_date_sort_descending() {
     val query =
-      Search(ResourceType.Patient).apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }.getQuery()
+      Search(ResourceType.Patient.name)
+        .apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }
+        .getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -2006,7 +2077,7 @@ class SearchTest {
   @Test
   fun search_patient_single_search_param_multiple_values_disjunction() {
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.GIVEN,
@@ -2042,7 +2113,7 @@ class SearchTest {
   @Test
   fun search_patient_single_search_param_multiple_params_disjunction() {
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.GIVEN,
@@ -2087,7 +2158,7 @@ class SearchTest {
   @Test
   fun search_patient_search_params_single_given_multiple_family() {
     val query =
-      Search(ResourceType.Patient, searchManager = SearchManagerForR4)
+      Search(ResourceType.Patient.name)
         .apply {
           filter(Patient.GIVEN, { value = "John" })
           filter(Patient.FAMILY, { value = "Doe" }, { value = "Roe" })
@@ -2118,9 +2189,12 @@ class SearchTest {
   @Test
   fun `search filter should append index name only for token filter with code only`() {
     val query =
-      Search(ResourceType.Condition, searchManager = SearchManagerForR4)
+      Search(ResourceType.Condition.name)
         .apply {
-          filter(Condition.CLINICAL_STATUS, { value = of(Coding().apply { code = "test-code" }) })
+          filter(
+            Condition.CLINICAL_STATUS,
+            { value = of(searchManager.createCodingType(Coding().apply { code = "test-code" })) }
+          )
         }
         .getQuery()
 
@@ -2144,17 +2218,19 @@ class SearchTest {
   @Test
   fun `search filter should append index name and index system for token filter with code and system`() {
     val query =
-      Search(ResourceType.Condition)
+      Search(ResourceType.Condition.name)
         .apply {
           filter(
             Condition.CLINICAL_STATUS,
             {
               value =
                 of(
-                  Coding().apply {
-                    code = "test-code"
-                    system = "http://my-code-system.org"
-                  }
+                  searchManager.createCodingType(
+                    Coding().apply {
+                      code = "test-code"
+                      system = "http://my-code-system.org"
+                    }
+                  )
                 )
             }
           )

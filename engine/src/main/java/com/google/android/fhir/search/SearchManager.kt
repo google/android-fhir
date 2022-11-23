@@ -16,10 +16,37 @@
 
 package com.google.android.fhir.search
 
+import com.google.android.fhir.index.CodeType
+import com.google.android.fhir.index.CodeableConcept
+import com.google.android.fhir.index.Coding
+import com.google.android.fhir.index.ContactPoint
 import com.google.android.fhir.index.DateTimeType
 import com.google.android.fhir.index.DateType
+import com.google.android.fhir.index.Identifier
+import com.google.android.fhir.index.UriType
+import java.util.Date
+import org.hl7.fhir.instance.model.api.IBaseCoding
+import org.hl7.fhir.instance.model.api.ICompositeType
+import org.hl7.fhir.instance.model.api.IPrimitiveType
 
 interface SearchManager {
-  fun createDateTimeType(filterValue: String): DateTimeType
-  fun createDateType(filterValue: String): DateType
+  fun createDateTimeType(value: String): DateTimeType
+
+  fun createDateTimeType(value: IPrimitiveType<Date>): DateTimeType
+
+  fun createDateType(value: String): DateType
+  fun createDateType(value: IPrimitiveType<Date>): DateType
+
+  fun createIdentifierType(value: ICompositeType): Identifier
+
+  fun createCodingType(value: IBaseCoding): Coding
+
+  fun createCodeableConceptType(value: ICompositeType): CodeableConcept
+
+  fun createContactPointType(value: ICompositeType): ContactPoint
+
+  fun createCodeType(value: IPrimitiveType<String>): CodeType
+
+  fun createUriType(value: IPrimitiveType<String>): UriType
+  fun validateResourceType(resourceType: String)
 }

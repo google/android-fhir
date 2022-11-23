@@ -27,7 +27,6 @@ import com.google.android.fhir.sync.remote.HttpLogger
 /** The provider for [FhirEngine] instance. */
 object FhirEngineProvider {
   private var fhirEngineConfiguration: FhirEngineConfiguration? = null
-  private var resourceIndexerManager: ResourceIndexerManager? = null
   private var fhirServices: FhirServices? = null
 
   /**
@@ -36,15 +35,11 @@ object FhirEngineProvider {
    * This method throws [IllegalStateException] if it is called multiple times
    */
   @Synchronized
-  fun init(
-    fhirEngineConfiguration: FhirEngineConfiguration,
-    resourceIndexerManager: ResourceIndexerManager
-  ) {
+  fun init(fhirEngineConfiguration: FhirEngineConfiguration) {
     check(this.fhirEngineConfiguration == null) {
       "FhirEngineProvider: FhirEngineConfiguration has already been initialized."
     }
     this.fhirEngineConfiguration = fhirEngineConfiguration
-    this.resourceIndexerManager = resourceIndexerManager
   }
 
   /**
@@ -66,7 +61,6 @@ object FhirEngineProvider {
 
   @Synchronized
   private fun getOrCreateFhirService(context: Context): FhirServices {
-    checkNotNull(resourceIndexerManager)
     if (fhirServices == null) {
       fhirEngineConfiguration = fhirEngineConfiguration ?: FhirEngineConfiguration()
       val configuration = checkNotNull(fhirEngineConfiguration)
@@ -76,7 +70,7 @@ object FhirEngineProvider {
             if (configuration.enableEncryptionIfSupported) enableEncryptionIfSupported()
             setDatabaseErrorStrategy(configuration.databaseErrorStrategy)
             setFhirVersion(configuration.fhirVersionEnum)
-            setResourceIndexerManager(resourceIndexerManager!!)
+            setResourceIndexerManager(configuration.resourceIndexerManager)
             configuration.serverConfiguration?.let { setServerConfiguration(it) }
             if (configuration.testMode) {
               inMemory()
@@ -116,6 +110,7 @@ data class FhirEngineConfiguration(
   val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
   val fhirVersionEnum: FhirVersionEnum = FhirVersionEnum.R4,
   val serverConfiguration: ServerConfiguration? = null,
+  val resourceIndexerManager: ResourceIndexerManager? = null,
   val testMode: Boolean = false
 )
 

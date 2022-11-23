@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.UploadResult
@@ -49,7 +48,7 @@ internal class BundleUploader(
           )
         )
       } catch (e: Exception) {
-        emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
+        emit(UploadResult.Failure(ResourceSyncException("Bundle", e)))
       }
     }
   }

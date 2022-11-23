@@ -43,6 +43,10 @@ class FhirSyncWorkerTest {
     override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
     override fun getDownloadWorkManager(): DownloadWorkManager =
       TestingUtils.TestDownloadManagerImpl()
+
+    override fun getUploadWorkManager(): UploadWorkManager =
+      TestingUtils.TestUploadWorkManagerImpl()
+
     override fun getConflictResolver() = AcceptRemoteConflictResolver
   }
 
@@ -53,6 +57,10 @@ class FhirSyncWorkerTest {
     override fun getDataSource(): DataSource = TestingUtils.TestFailingDatasource
     override fun getDownloadWorkManager(): DownloadWorkManager =
       TestingUtils.TestDownloadManagerImpl()
+
+    override fun getUploadWorkManager(): UploadWorkManager =
+      TestingUtils.TestUploadWorkManagerImpl()
+
     override fun getConflictResolver() = AcceptRemoteConflictResolver
   }
 
@@ -65,6 +73,8 @@ class FhirSyncWorkerTest {
     override fun getDownloadWorkManager() = TestingUtils.TestDownloadManagerImpl()
     override fun getDataSource(): DataSource? = null
     override fun getConflictResolver() = AcceptRemoteConflictResolver
+    override fun getUploadWorkManager(): UploadWorkManager =
+      TestingUtils.TestUploadWorkManagerImpl()
   }
 
   @Before

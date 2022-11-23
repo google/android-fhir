@@ -18,11 +18,10 @@ package com.google.android.fhir.search
 
 import android.os.Build
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
-import com.google.android.fhir.ResourceType
-import com.google.android.fhir.demo.data.SearchManagerForR4
 import com.google.common.truth.Truth.assertThat
 import java.lang.IllegalArgumentException
 import java.math.BigDecimal
+import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.junit.Assert
 import org.junit.Test
@@ -62,7 +61,7 @@ class NumberSearchParameterizedTest(
   @Test
   fun `should search equal values`() {
     val search =
-      Search(ResourceType.RiskAssessment, searchManager = SearchManagerForR4)
+      Search(ResourceType.RiskAssessment.name)
         .apply {
           filter(
             RiskAssessment.PROBABILITY,
@@ -96,7 +95,7 @@ class NumberSearchParameterizedTest(
   @Test
   fun `should search unequal values`() {
     val search =
-      Search(ResourceType.RiskAssessment, searchManager = SearchManagerForR4)
+      Search(ResourceType.RiskAssessment.name)
         .apply {
           filter(
             RiskAssessment.PROBABILITY,
@@ -130,7 +129,7 @@ class NumberSearchParameterizedTest(
   @Test
   fun `should search values greater than a number`() {
     val search =
-      Search(ResourceType.RiskAssessment, searchManager = SearchManagerForR4)
+      Search(ResourceType.RiskAssessment.name)
         .apply {
           filter(
             RiskAssessment.PROBABILITY,
@@ -163,7 +162,7 @@ class NumberSearchParameterizedTest(
   @Test
   fun `should search values greater than or equal to a number`() {
     val search =
-      Search(ResourceType.RiskAssessment, searchManager = SearchManagerForR4)
+      Search(ResourceType.RiskAssessment.name)
         .apply {
           filter(
             RiskAssessment.PROBABILITY,
@@ -196,7 +195,7 @@ class NumberSearchParameterizedTest(
   @Test
   fun `should search values less than a number`() {
     val search =
-      Search(ResourceType.RiskAssessment, searchManager = SearchManagerForR4)
+      Search(ResourceType.RiskAssessment.name)
         .apply {
           filter(
             RiskAssessment.PROBABILITY,
@@ -229,7 +228,7 @@ class NumberSearchParameterizedTest(
   @Test
   fun `should search values less than or equal to a number`() {
     val search =
-      Search(ResourceType.RiskAssessment, searchManager = SearchManagerForR4)
+      Search(ResourceType.RiskAssessment.name)
         .apply {
           filter(
             RiskAssessment.PROBABILITY,
@@ -262,7 +261,7 @@ class NumberSearchParameterizedTest(
   fun `should throw error when ENDS_BEFORE prefix given with integer value`() {
     val illegalArgumentException =
       Assert.assertThrows(IllegalArgumentException::class.java) {
-        Search(ResourceType.RiskAssessment, searchManager = SearchManagerForR4)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -281,7 +280,7 @@ class NumberSearchParameterizedTest(
   @Test
   fun `should search value when ENDS_BEFORE prefix given with decimal value`() {
     val search =
-      Search(ResourceType.RiskAssessment, searchManager = SearchManagerForR4)
+      Search(ResourceType.RiskAssessment.name)
         .apply {
           filter(
             RiskAssessment.PROBABILITY,
@@ -315,7 +314,7 @@ class NumberSearchParameterizedTest(
   fun `should throw error when STARTS_AFTER prefix given with integer value`() {
     val illegalArgumentException =
       Assert.assertThrows(IllegalArgumentException::class.java) {
-        Search(ResourceType.RiskAssessment, searchManager = SearchManagerForR4)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -334,7 +333,7 @@ class NumberSearchParameterizedTest(
   @Test
   fun `should search value when STARTS_AFTER prefix given with decimal value`() {
     val search =
-      Search(ResourceType.RiskAssessment, searchManager = SearchManagerForR4)
+      Search(ResourceType.RiskAssessment.name)
         .apply {
           filter(
             RiskAssessment.PROBABILITY,
@@ -367,7 +366,7 @@ class NumberSearchParameterizedTest(
   @Test
   fun `should search approximate values`() {
     val search =
-      Search(ResourceType.RiskAssessment, searchManager = SearchManagerForR4)
+      Search(ResourceType.RiskAssessment.name)
         .apply {
           filter(
             RiskAssessment.PROBABILITY,

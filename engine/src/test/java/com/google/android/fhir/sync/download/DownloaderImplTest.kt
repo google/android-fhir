@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync.download
 
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
@@ -30,6 +29,7 @@ import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -102,9 +102,10 @@ class DownloaderImplTest {
         },
         com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(
           mapOf(
-            ResourceType.Patient to mapOf("param" to "patient-page1"),
-            ResourceType.Observation to mapOf("param" to "observation-page1")
-          )
+            ResourceType.Patient.name to mapOf("param" to "patient-page1"),
+            ResourceType.Observation.name to mapOf("param" to "observation-page1")
+          ),
+          ResourceType.values().map { it.name }
         )
       )
 
@@ -112,14 +113,14 @@ class DownloaderImplTest {
     downloader
       .download(
         object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
+          override suspend fun getLatestTimestampFor(resourceType: String): String? = null
         }
       )
       .collect { result.add(it) }
 
     assertThat(result.filterIsInstance<DownloadState.Started>())
       .containsExactly(
-        DownloadState.Started(ResourceType.Bundle),
+        DownloadState.Started(ResourceType.Bundle.name),
       )
 
     assertThat(
@@ -163,9 +164,10 @@ class DownloaderImplTest {
           },
           com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(
             mapOf(
-              ResourceType.Patient to mapOf("param" to "patient-page1"),
-              ResourceType.Observation to mapOf("param" to "observation-page1")
-            )
+              ResourceType.Patient.name to mapOf("param" to "patient-page1"),
+              ResourceType.Observation.name to mapOf("param" to "observation-page1")
+            ),
+            ResourceType.values().map { it.name }
           )
         )
 
@@ -173,20 +175,20 @@ class DownloaderImplTest {
       downloader
         .download(
           object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = null
+            override suspend fun getLatestTimestampFor(resourceType: String) = null
           }
         )
         .collect { result.add(it) }
 
       assertThat(result.filterIsInstance<DownloadState.Started>())
         .containsExactly(
-          DownloadState.Started(ResourceType.Bundle),
+          DownloadState.Started(ResourceType.Bundle.name),
         )
 
       assertThat(result.filterIsInstance<DownloadState.Failure>()).hasSize(2)
 
       assertThat(result.filterIsInstance<DownloadState.Failure>().map { it.syncError.resourceType })
-        .containsExactly(ResourceType.Patient, ResourceType.Observation)
+        .containsExactly(ResourceType.Patient.name, ResourceType.Observation.name)
         .inOrder()
       assertThat(
           result.filterIsInstance<DownloadState.Failure>().map { it.syncError.exception.message }
@@ -228,9 +230,10 @@ class DownloaderImplTest {
           },
           com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(
             mapOf(
-              ResourceType.Patient to mapOf("param" to "patient-page1"),
-              ResourceType.Observation to mapOf("param" to "observation-page1")
-            )
+              ResourceType.Patient.name to mapOf("param" to "patient-page1"),
+              ResourceType.Observation.name to mapOf("param" to "observation-page1")
+            ),
+            ResourceType.values().map { it.name }
           )
         )
 
@@ -238,18 +241,18 @@ class DownloaderImplTest {
       downloader
         .download(
           object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = null
+            override suspend fun getLatestTimestampFor(resourceType: String) = null
           }
         )
         .collect { result.add(it) }
 
       assertThat(result.filterIsInstance<DownloadState.Started>())
         .containsExactly(
-          DownloadState.Started(ResourceType.Bundle),
+          DownloadState.Started(ResourceType.Bundle.name),
         )
 
       assertThat(result.filterIsInstance<DownloadState.Failure>().map { it.syncError.resourceType })
-        .containsExactly(ResourceType.Patient)
+        .containsExactly(ResourceType.Patient.name)
 
       assertThat(
           result

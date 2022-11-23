@@ -29,12 +29,15 @@ import com.google.android.fhir.index.Quantity
 import com.google.android.fhir.index.ResourceIndexerManager
 import com.google.android.fhir.index.Timing
 import org.hl7.fhir.instance.model.api.IBase
+import org.hl7.fhir.instance.model.api.IBaseMetaType
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.ICoding
 import org.hl7.fhir.r4.model.Location
+import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
@@ -92,7 +95,7 @@ object ResourceIndexerManagerForR4 : ResourceIndexerManager {
     )
 
   override fun createCodingType(value: IBase): Coding =
-    Coding((value as org.hl7.fhir.r4.model.Coding).system, value.code)
+    Coding((value as ICoding).system, value.code)
 
   override fun createMoneyType(value: IBase): Money =
     Money((value as org.hl7.fhir.r4.model.Money).currency, value.value)
@@ -107,6 +110,15 @@ object ResourceIndexerManagerForR4 : ResourceIndexerManager {
     )
 
   override fun getPrimitiveValue(value: IBase): String = (value as Base).primitiveValue()
+
+  override fun hasLastUpdated(meta: IBaseMetaType?): Boolean = (meta as Meta).hasLastUpdated()
+
+  override fun getLastUpdatedElement(meta: IBaseMetaType?): Long =
+    (meta as Meta).lastUpdatedElement.value.time
+
+  override fun hasProfile(meta: IBaseMetaType?): Boolean = (meta as Meta).hasProfile()
+
+  override fun hasTag(meta: IBaseMetaType?): Boolean = (meta as Meta).hasTag()
 }
 
 /**

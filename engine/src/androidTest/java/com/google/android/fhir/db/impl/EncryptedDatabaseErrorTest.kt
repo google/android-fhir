@@ -23,10 +23,10 @@ import androidx.test.filters.MediumTest
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.DATABASE_PASSPHRASE_NAME
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.ENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
+import com.google.android.fhir.demo.data.ResourceIndexerManagerForR4
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.getQuery
@@ -36,6 +36,7 @@ import kotlinx.coroutines.runBlocking
 import net.sqlcipher.database.SQLiteException
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.ResourceType
 import org.junit.After
 import org.junit.Assert.assertThrows
 import org.junit.Test
@@ -65,7 +66,8 @@ class EncryptedDatabaseErrorTest {
               inMemory = false,
               enableEncryption = false,
               databaseErrorStrategy = UNSPECIFIED
-            )
+            ),
+            ResourceIndexerManagerForR4
           )
           .let {
             it.insert(TEST_PATIENT_1)
@@ -81,11 +83,12 @@ class EncryptedDatabaseErrorTest {
               inMemory = false,
               enableEncryption = true,
               databaseErrorStrategy = UNSPECIFIED
-            )
+            ),
+            ResourceIndexerManagerForR4
           )
           .let {
             it.search<Patient>(
-              Search(ResourceType.Patient)
+              Search(ResourceType.Patient.name)
                 .apply {
                   sort(Patient.GIVEN, Order.ASCENDING)
                   count = 100
@@ -110,7 +113,8 @@ class EncryptedDatabaseErrorTest {
               inMemory = false,
               enableEncryption = true,
               databaseErrorStrategy = UNSPECIFIED
-            )
+            ),
+            ResourceIndexerManagerForR4
           )
           .let {
             it.insert(TEST_PATIENT_1)
@@ -132,11 +136,12 @@ class EncryptedDatabaseErrorTest {
               inMemory = false,
               enableEncryption = true,
               databaseErrorStrategy = UNSPECIFIED
-            )
+            ),
+            ResourceIndexerManagerForR4
           )
           .let {
             it.search<Patient>(
-              Search(ResourceType.Patient)
+              Search(ResourceType.Patient.name)
                 .apply {
                   sort(Patient.GIVEN, Order.ASCENDING)
                   count = 100
@@ -160,7 +165,8 @@ class EncryptedDatabaseErrorTest {
             inMemory = false,
             enableEncryption = true,
             databaseErrorStrategy = UNSPECIFIED
-          )
+          ),
+          ResourceIndexerManagerForR4
         )
         .let {
           it.insert(TEST_PATIENT_1)
@@ -182,12 +188,13 @@ class EncryptedDatabaseErrorTest {
             inMemory = false,
             enableEncryption = true,
             databaseErrorStrategy = RECREATE_AT_OPEN
-          )
+          ),
+          ResourceIndexerManagerForR4
         )
         .let {
           assertThat(
               it.search<Patient>(
-                Search(ResourceType.Patient)
+                Search(ResourceType.Patient.name)
                   .apply {
                     sort(Patient.GIVEN, Order.ASCENDING)
                     count = 100
@@ -213,7 +220,8 @@ class EncryptedDatabaseErrorTest {
               inMemory = false,
               enableEncryption = true,
               databaseErrorStrategy = UNSPECIFIED
-            )
+            ),
+            ResourceIndexerManagerForR4
           )
           .let {
             it.insert(TEST_PATIENT_1)
@@ -229,12 +237,13 @@ class EncryptedDatabaseErrorTest {
               inMemory = false,
               enableEncryption = false,
               databaseErrorStrategy = UNSPECIFIED
-            )
+            ),
+            ResourceIndexerManagerForR4
           )
           .let {
             assertThat(
                 it.search<Patient>(
-                  Search(ResourceType.Patient)
+                  Search(ResourceType.Patient.name)
                     .apply {
                       sort(Patient.GIVEN, Order.ASCENDING)
                       count = 100

@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync.download
 
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
@@ -36,17 +35,15 @@ internal class DownloaderImpl(
   private val dataSource: DataSource,
   private val downloadWorkManager: DownloadWorkManager
 ) : Downloader {
-  private val resourceTypeList = ResourceType.values().map { it.name }
 
   override suspend fun download(context: SyncDownloadContext): Flow<DownloadState> = flow {
-    var resourceTypeToDownload: ResourceType = ResourceType.Bundle
+    var resourceTypeToDownload = "Bundle"
     emit(DownloadState.Started(resourceTypeToDownload))
     var url = downloadWorkManager.getNextRequestUrl(context)
     while (url != null) {
       try {
         resourceTypeToDownload =
-          ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
-
+          url.findAnyOf(downloadWorkManager.resourceTypeList, ignoreCase = true)!!.second
         val processedResponse =
           downloadWorkManager.processResponse(dataSource.download(url!!)).toList()
 

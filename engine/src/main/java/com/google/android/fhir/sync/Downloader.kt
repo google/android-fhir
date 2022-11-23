@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync
 
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.SyncDownloadContext
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.instance.model.api.IAnyResource
@@ -32,7 +31,7 @@ internal interface Downloader {
 
 internal sealed class DownloadState {
 
-  data class Started(val type: ResourceType) : DownloadState()
+  data class Started(val resourceType: String) : DownloadState()
 
   data class Success(val resources: List<IAnyResource>) : DownloadState()
 

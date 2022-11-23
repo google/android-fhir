@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.index
 
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.DateTimeIndex
 import com.google.android.fhir.index.entities.NumberIndex
@@ -34,7 +33,7 @@ import com.google.android.fhir.index.entities.UriIndex
  * See https://www.hl7.org/fhir/search.html.
  */
 internal data class ResourceIndices(
-  val resourceType: ResourceType,
+  val resourceType: String,
   val resourceId: String,
   val numberIndices: List<NumberIndex>,
   val dateIndices: List<DateIndex>,
@@ -46,7 +45,7 @@ internal data class ResourceIndices(
   val referenceIndices: List<ReferenceIndex>,
   val positionIndices: List<PositionIndex>
 ) {
-  class Builder(private val resourceType: ResourceType, private val resourceId: String) {
+  class Builder(private val resourceType: String, private val resourceId: String) {
     private val stringIndices = mutableListOf<StringIndex>()
     private val referenceIndices = mutableListOf<ReferenceIndex>()
     private val tokenIndices = mutableListOf<TokenIndex>()

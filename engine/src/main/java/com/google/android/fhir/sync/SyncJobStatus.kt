@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync
 
-import com.google.android.fhir.ResourceType
 import java.time.OffsetDateTime
 
 sealed class SyncJobStatus {
@@ -26,7 +25,7 @@ sealed class SyncJobStatus {
   class Started : SyncJobStatus()
 
   /** Syncing in progress with the server. */
-  data class InProgress(val resourceType: ResourceType?) : SyncJobStatus()
+  data class InProgress(val resourceType: String?) : SyncJobStatus()
 
   /** Glitched but sync job is being retried. */
   data class Glitch(val exceptions: List<ResourceSyncException>) : SyncJobStatus()

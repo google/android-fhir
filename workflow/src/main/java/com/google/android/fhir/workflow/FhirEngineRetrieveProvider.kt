@@ -23,7 +23,6 @@ import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.index.SearchParamType
 import com.google.android.fhir.search.Search

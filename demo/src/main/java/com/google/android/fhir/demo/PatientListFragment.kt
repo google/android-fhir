@@ -152,7 +152,7 @@ class PatientListFragment : Fragment() {
             fadeInTopBanner()
           }
           is SyncJobStatus.InProgress -> {
-            Timber.i("Sync: ${it::class.java.simpleName} with ${it.resourceType?.name}")
+            Timber.i("Sync: ${it::class.java.simpleName} with ${it.resourceType}")
             fadeInTopBanner()
           }
           is SyncJobStatus.Finished -> {

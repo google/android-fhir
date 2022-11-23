@@ -27,7 +27,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.demo.data.SearchManagerForR4
 import com.google.android.fhir.get
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.search
@@ -69,10 +68,7 @@ class PatientDetailsViewModel(
   private suspend fun getPatientObservations(): List<PatientListViewModel.ObservationItem> {
     val observations: MutableList<PatientListViewModel.ObservationItem> = mutableListOf()
     fhirEngine
-      .search<Observation>(
-        { filter(Observation.SUBJECT, { value = "Patient/$patientId" }) },
-        searchManager = SearchManagerForR4
-      )
+      .search<Observation> { filter(Observation.SUBJECT, { value = "Patient/$patientId" }) }
       .take(MAX_RESOURCE_COUNT)
       .map { createObservationItem(it, getApplication<Application>().resources) }
       .let { observations.addAll(it) }
@@ -82,10 +78,7 @@ class PatientDetailsViewModel(
   private suspend fun getPatientConditions(): List<PatientListViewModel.ConditionItem> {
     val conditions: MutableList<PatientListViewModel.ConditionItem> = mutableListOf()
     fhirEngine
-      .search<Condition>(
-        { filter(Condition.SUBJECT, { value = "Patient/$patientId" }) },
-        searchManager = SearchManagerForR4
-      )
+      .search<Condition> { filter(Condition.SUBJECT, { value = "Patient/$patientId" }) }
       .take(MAX_RESOURCE_COUNT)
       .map { createConditionItem(it, getApplication<Application>().resources) }
       .let { conditions.addAll(it) }
@@ -182,10 +175,7 @@ class PatientDetailsViewModel(
   private suspend fun getPatientRiskAssessment(): RiskAssessmentItem {
     val riskAssessment =
       fhirEngine
-        .search<RiskAssessment>(
-          { filter(RiskAssessment.SUBJECT, { value = "Patient/$patientId" }) },
-          searchManager = SearchManagerForR4
-        )
+        .search<RiskAssessment> { filter(RiskAssessment.SUBJECT, { value = "Patient/$patientId" }) }
         .filter { it.hasOccurrence() }
         .sortedByDescending { it.occurrenceDateTimeType.value }
         .firstOrNull()

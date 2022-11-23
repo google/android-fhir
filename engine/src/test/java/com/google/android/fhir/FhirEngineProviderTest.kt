@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.google.android.fhir
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.fhir.index.ResourceIndexerManagerForR4Test
 import com.google.common.truth.Truth.assertThat
 import java.lang.IllegalStateException
 import org.junit.After
@@ -52,7 +53,12 @@ class FhirEngineProviderTest {
 
   @Test
   fun build_twiceWithAppContext_afterCleanup_shouldReturnDifferentInstances() {
-    provider.init(FhirEngineConfiguration(testMode = true))
+    provider.init(
+      FhirEngineConfiguration(
+        testMode = true,
+        resourceIndexerManager = ResourceIndexerManagerForR4Test
+      )
+    )
     val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
     provider.cleanup()
     val engineTwo = provider.getInstance(ApplicationProvider.getApplicationContext())
@@ -61,7 +67,12 @@ class FhirEngineProviderTest {
 
   @Test
   fun cleanup_not_in_test_mode_fails() {
-    provider.init(FhirEngineConfiguration(testMode = false))
+    provider.init(
+      FhirEngineConfiguration(
+        testMode = false,
+        resourceIndexerManager = ResourceIndexerManagerForR4Test
+      )
+    )
 
     provider.getInstance(ApplicationProvider.getApplicationContext())
 

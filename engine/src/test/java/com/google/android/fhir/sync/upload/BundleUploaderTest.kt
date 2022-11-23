@@ -18,16 +18,12 @@ package com.google.android.fhir.sync.upload
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.ResourceForDatabaseToSave
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.demo.data.TransactionBundleGenerator
-import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.resource.TestingUtils
-import com.google.android.fhir.resourceType
 import com.google.android.fhir.sync.UploadResult
-import com.google.android.fhir.versionId
 import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
 import kotlinx.coroutines.flow.toList
@@ -52,7 +48,6 @@ class BundleUploaderTest {
             Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
           },
           TransactionBundleGenerator.getDefault(),
-          { ResourceForDatabaseToSave(it.id, it.resourceType, it.versionId, it.lastUpdated!!) },
           LocalChangesPaginator.DEFAULT
         )
         .upload(localChanges)
@@ -77,7 +72,6 @@ class BundleUploaderTest {
             }
           },
           TransactionBundleGenerator.getDefault(),
-          { ResourceForDatabaseToSave(it.id, it.resourceType, it.versionId, it.lastUpdated!!) },
           LocalChangesPaginator.DEFAULT
         )
         .upload(localChanges)
@@ -93,7 +87,6 @@ class BundleUploaderTest {
       BundleUploader(
           TestingUtils.BundleDataSource { throw ConnectException("Failed to connect to server.") },
           TransactionBundleGenerator.getDefault(),
-          { ResourceForDatabaseToSave(it.id, it.resourceType, it.versionId, it.lastUpdated!!) },
           LocalChangesPaginator.DEFAULT
         )
         .upload(localChanges)

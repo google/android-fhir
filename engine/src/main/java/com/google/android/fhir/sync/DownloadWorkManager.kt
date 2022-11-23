@@ -26,6 +26,9 @@ import org.hl7.fhir.instance.model.api.IAnyResource
  * manager be created or should there be an API to restart a new download job.
  */
 interface DownloadWorkManager {
+
+  val resourceTypeList: Collection<String>
+
   /**
    * Returns the URL for the next download request, or `null` if there is no more download request
    * to be issued.

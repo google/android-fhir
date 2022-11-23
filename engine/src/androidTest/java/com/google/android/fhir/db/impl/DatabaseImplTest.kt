@@ -23,10 +23,12 @@ import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.FhirServices
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.ResourceType
+import com.google.android.fhir.ResourceForDatabaseToSave
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.demo.data.SearchManagerForR4
+import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.search.Operation
@@ -35,7 +37,6 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
-import com.google.android.fhir.versionId
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
@@ -59,6 +60,7 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.json.JSONArray
 import org.junit.After
@@ -91,6 +93,7 @@ class DatabaseImplTest {
       .build()
   private val testingUtils = TestingUtils(services.parser)
   private val database = services.database
+  private val searchManager = SearchManagerForR4
 
   @Before fun setUp(): Unit = runBlocking { database.insert(TEST_PATIENT_1) }
 
@@ -104,7 +107,7 @@ class DatabaseImplTest {
     database.insert(TEST_PATIENT_2)
     testingUtils.assertResourceEquals(
       TEST_PATIENT_2,
-      database.select(ResourceType.Patient, TEST_PATIENT_2_ID)
+      database.select(ResourceType.Patient.name, TEST_PATIENT_2_ID)
     )
   }
 
@@ -116,11 +119,11 @@ class DatabaseImplTest {
     database.insert(*patients.toTypedArray())
     testingUtils.assertResourceEquals(
       TEST_PATIENT_1,
-      database.select(ResourceType.Patient, TEST_PATIENT_1_ID)
+      database.select(ResourceType.Patient.name, TEST_PATIENT_1_ID)
     )
     testingUtils.assertResourceEquals(
       TEST_PATIENT_2,
-      database.select(ResourceType.Patient, TEST_PATIENT_2_ID)
+      database.select(ResourceType.Patient.name, TEST_PATIENT_2_ID)
     )
   }
 
@@ -132,7 +135,7 @@ class DatabaseImplTest {
     database.update(patient)
     testingUtils.assertResourceEquals(
       patient,
-      database.select(ResourceType.Patient, TEST_PATIENT_1_ID)
+      database.select(ResourceType.Patient.name, TEST_PATIENT_1_ID)
     )
   }
 
@@ -150,7 +153,7 @@ class DatabaseImplTest {
     assertThat(squashedLocalChange.token.ids.size).isEqualTo(3)
     with(squashedLocalChange.localChange) {
       assertThat(resourceId).isEqualTo(patient.logicalId)
-      assertThat(resourceType).isEqualTo(ResourceType.fromCode(patient.resourceType.name).name)
+      assertThat(resourceType).isEqualTo(patient.resourceType.name)
       assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
@@ -161,7 +164,7 @@ class DatabaseImplTest {
     assertThat(squashedLocalChangeWithNoFurtherUpdate.token.ids.size).isEqualTo(3)
     with(squashedLocalChangeWithNoFurtherUpdate.toLocalChange()) {
       assertThat(resourceId).isEqualTo(patient.logicalId)
-      assertThat(resourceType).isEqualTo(ResourceType.fromCode(patient.resourceType.name).name)
+      assertThat(resourceType).isEqualTo(patient.resourceType.name)
       assertThat(LocalChange.Type.from(type.value)).isEqualTo(LocalChange.Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
@@ -172,11 +175,10 @@ class DatabaseImplTest {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
     val patientString = services.parser.encodeResourceToString(patient)
-    val squashedLocalChange =
-      database.getLocalChange(ResourceType.fromCode(patient.resourceType.name), patient.logicalId)
+    val squashedLocalChange = database.getLocalChange(patient.resourceType.name, patient.logicalId)
     with(squashedLocalChange!!.localChange) {
       assertThat(resourceId).isEqualTo(patient.logicalId)
-      assertThat(resourceType).isEqualTo(ResourceType.fromCode(patient.resourceType.name).name)
+      assertThat(resourceType).isEqualTo(patient.resourceType.name)
       assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
@@ -193,11 +195,10 @@ class DatabaseImplTest {
     database.update(patient)
 
     val patientString = services.parser.encodeResourceToString(patient)
-    val squashedLocalChange =
-      database.getLocalChange(ResourceType.fromCode(patient.resourceType.name), patient.logicalId)
+    val squashedLocalChange = database.getLocalChange(patient.resourceType.name, patient.logicalId)
     with(squashedLocalChange!!.toLocalChange()) {
       assertThat(resourceId).isEqualTo(patient.logicalId)
-      assertThat(resourceType).isEqualTo(ResourceType.fromCode(patient.resourceType.name).name)
+      assertThat(resourceType).isEqualTo(patient.resourceType.name)
       assertThat(type).isEqualTo(LocalChange.Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
@@ -207,20 +208,14 @@ class DatabaseImplTest {
   fun getLocalChanges_withWrongResourceId_shouldReturnNull() = runBlocking {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
-    assertThat(
-        database.getLocalChange(
-          ResourceType.fromCode(patient.resourceType.name),
-          "nonexistent_patient"
-        )
-      )
-      .isNull()
+    assertThat(database.getLocalChange(patient.resourceType.name, "nonexistent_patient")).isNull()
   }
 
   @Test
   fun getLocalChanges_withWrongResourceType_shouldReturnNull() = runBlocking {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
-    assertThat(database.getLocalChange(ResourceType.Encounter, patient.logicalId)).isNull()
+    assertThat(database.getLocalChange(ResourceType.Encounter.name, patient.logicalId)).isNull()
   }
 
   @Test
@@ -228,28 +223,24 @@ class DatabaseImplTest {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
     val patientString = services.parser.encodeResourceToString(patient)
-    val squashedLocalChange =
-      database.getLocalChange(ResourceType.fromCode(patient.resourceType.name), patient.logicalId)
+    val squashedLocalChange = database.getLocalChange(patient.resourceType.name, patient.logicalId)
     with(squashedLocalChange!!.toLocalChange()) {
       assertThat(resourceId).isEqualTo(patient.logicalId)
-      assertThat(resourceType).isEqualTo(ResourceType.fromCode(patient.resourceType.name).name)
+      assertThat(resourceType).isEqualTo(patient.resourceType.name)
       assertThat(LocalChange.Type.from(type.value)).isEqualTo(LocalChange.Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
     testingUtils.assertResourceEquals(
       patient,
-      database.select(ResourceType.Patient, patient.logicalId)
+      database.select(ResourceType.Patient.name, patient.logicalId)
     )
     database.clearDatabase()
 
-    assertThat(
-        database.getLocalChange(ResourceType.fromCode(patient.resourceType.name), patient.logicalId)
-      )
-      .isNull()
+    assertThat(database.getLocalChange(patient.resourceType.name, patient.logicalId)).isNull()
 
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
-        runBlocking { database.select(ResourceType.Patient, patient.logicalId) }
+        runBlocking { database.select(ResourceType.Patient.name, patient.logicalId) }
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo("Resource not found with type Patient and id ${patient.logicalId}!")
@@ -257,24 +248,24 @@ class DatabaseImplTest {
 
   @Test
   fun purge_withLocalChangeAndForcePurgeTrue_shouldPurgeResource() = runBlocking {
-    database.purge(ResourceType.Patient, TEST_PATIENT_1_ID, true)
+    database.purge(ResourceType.Patient.name, TEST_PATIENT_1_ID, true)
     // after purge the resource is not available in database
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
-        runBlocking { database.select(ResourceType.Patient, TEST_PATIENT_1_ID) }
+        runBlocking { database.select(ResourceType.Patient.name, TEST_PATIENT_1_ID) }
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo(
         "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID!"
       )
-    assertThat(database.getLocalChange(ResourceType.Patient, TEST_PATIENT_1_ID)).isNull()
+    assertThat(database.getLocalChange(ResourceType.Patient.name, TEST_PATIENT_1_ID)).isNull()
   }
 
   @Test
   fun purge_withLocalChangeAndForcePurgeFalse_shouldThrowIllegalStateException() = runBlocking {
     val resourceIllegalStateException =
       assertThrows(IllegalStateException::class.java) {
-        runBlocking { database.purge(ResourceType.Patient, TEST_PATIENT_1_ID) }
+        runBlocking { database.purge(ResourceType.Patient.name, TEST_PATIENT_1_ID) }
       }
     assertThat(resourceIllegalStateException.message)
       .isEqualTo(
@@ -286,17 +277,17 @@ class DatabaseImplTest {
   fun purge_withNoLocalChangeAndForcePurgeFalse_shouldPurgeResource() = runBlocking {
     database.insertRemote(TEST_PATIENT_2)
 
-    assertThat(database.getLocalChange(ResourceType.Patient, TEST_PATIENT_2_ID)).isNull()
+    assertThat(database.getLocalChange(ResourceType.Patient.name, TEST_PATIENT_2_ID)).isNull()
     testingUtils.assertResourceEquals(
       TEST_PATIENT_2,
-      database.select(ResourceType.Patient, TEST_PATIENT_2_ID)
+      database.select(ResourceType.Patient.name, TEST_PATIENT_2_ID)
     )
 
-    database.purge(ResourceType.fromCode(TEST_PATIENT_2.resourceType.name), TEST_PATIENT_2_ID)
+    database.purge(TEST_PATIENT_2.resourceType.name, TEST_PATIENT_2_ID)
 
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
-        runBlocking { database.select(ResourceType.Patient, TEST_PATIENT_2_ID) }
+        runBlocking { database.select(ResourceType.Patient.name, TEST_PATIENT_2_ID) }
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo("Resource not found with type ${ResourceType.Patient} and id $TEST_PATIENT_2_ID!")
@@ -305,18 +296,18 @@ class DatabaseImplTest {
   @Test
   fun purge_withNoLocalChangeAndForcePurgeTrue_shouldPurgeResource() = runBlocking {
     database.insertRemote(TEST_PATIENT_2)
-    assertThat(database.getLocalChange(ResourceType.Patient, TEST_PATIENT_2_ID)).isNull()
+    assertThat(database.getLocalChange(ResourceType.Patient.name, TEST_PATIENT_2_ID)).isNull()
 
     testingUtils.assertResourceEquals(
       TEST_PATIENT_2,
-      database.select(ResourceType.Patient, TEST_PATIENT_2_ID)
+      database.select(ResourceType.Patient.name, TEST_PATIENT_2_ID)
     )
 
-    database.purge(ResourceType.fromCode(TEST_PATIENT_2.resourceType.name), TEST_PATIENT_2_ID, true)
+    database.purge(TEST_PATIENT_2.resourceType.name, TEST_PATIENT_2_ID, true)
 
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
-        runBlocking { database.select(ResourceType.Patient, TEST_PATIENT_2_ID) }
+        runBlocking { database.select(ResourceType.Patient.name, TEST_PATIENT_2_ID) }
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo("Resource not found with type ${ResourceType.Patient} and id $TEST_PATIENT_2_ID!")
@@ -326,7 +317,7 @@ class DatabaseImplTest {
   fun purge_resourceNotAvailable_shouldThrowResourceNotFoundException() = runBlocking {
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
-        runBlocking { database.purge(ResourceType.Patient, TEST_PATIENT_2_ID) }
+        runBlocking { database.purge(ResourceType.Patient.name, TEST_PATIENT_2_ID) }
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo(
@@ -343,7 +334,7 @@ class DatabaseImplTest {
     /* ktlint-disable max-line-length */
     assertThat(resourceNotFoundException.message)
       .isEqualTo(
-        "Resource not found with type ${ResourceType.fromCode(TEST_PATIENT_2.resourceType.name).name} and id $TEST_PATIENT_2_ID!"
+        "Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!"
         /* ktlint-enable max-line-length */
         )
   }
@@ -352,7 +343,7 @@ class DatabaseImplTest {
   fun select_nonexistentResource_shouldThrowResourceNotFoundException() {
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
-        runBlocking { database.select(ResourceType.Patient, "nonexistent_patient") }
+        runBlocking { database.select(ResourceType.Patient.name, "nonexistent_patient") }
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo("Resource not found with type Patient and id nonexistent_patient!")
@@ -362,7 +353,7 @@ class DatabaseImplTest {
   fun select_shouldReturnResource() = runBlocking {
     testingUtils.assertResourceEquals(
       TEST_PATIENT_1,
-      database.select(ResourceType.Patient, TEST_PATIENT_1_ID)
+      database.select(ResourceType.Patient.name, TEST_PATIENT_1_ID)
     )
   }
 
@@ -377,7 +368,7 @@ class DatabaseImplTest {
         .localChange
     assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
     assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
-    assertThat(resourceType).isEqualTo(ResourceType.fromCode(TEST_PATIENT_2.resourceType.name).name)
+    assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
     assertThat(payload).isEqualTo(testPatient2String)
   }
 
@@ -395,7 +386,7 @@ class DatabaseImplTest {
         .localChange
     assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
     assertThat(resourceId).isEqualTo(patient.logicalId)
-    assertThat(resourceType).isEqualTo(ResourceType.fromCode(patient.resourceType.name).name)
+    assertThat(resourceType).isEqualTo(patient.resourceType.name)
     assertThat(payload).isEqualTo(patientString)
   }
 
@@ -431,7 +422,7 @@ class DatabaseImplTest {
       }
     database.update(updatedPatient)
 
-    val selectedEntity = database.selectEntity(ResourceType.Patient, "remote-patient-1")
+    val selectedEntity = database.selectEntity(ResourceType.Patient.name, "remote-patient-1")
     assertThat(selectedEntity.resourceId).isEqualTo("remote-patient-1")
     assertThat(selectedEntity.versionId).isEqualTo(patient.meta.versionId)
     assertThat(selectedEntity.lastUpdatedRemote).isEqualTo(patient.meta.lastUpdated.toInstant())
@@ -447,7 +438,7 @@ class DatabaseImplTest {
 
   @Test
   fun delete_shouldAddDeleteLocalChange() = runBlocking {
-    database.delete(ResourceType.Patient, TEST_PATIENT_1_ID)
+    database.delete(ResourceType.Patient.name, TEST_PATIENT_1_ID)
     val (_, resourceType, resourceId, _, type, payload, _) =
       database
         .getAllLocalChanges()
@@ -461,7 +452,7 @@ class DatabaseImplTest {
 
   @Test
   fun delete_nonExistent_shouldNotInsertLocalChange() = runBlocking {
-    database.delete(ResourceType.Patient, "nonexistent_patient")
+    database.delete(ResourceType.Patient.name, "nonexistent_patient")
     assertThat(
         database
           .getAllLocalChanges()
@@ -515,7 +506,7 @@ class DatabaseImplTest {
           }
       }
     database.insertRemote(patient)
-    val selectedEntity = database.selectEntity(ResourceType.Patient, "remote-patient-1")
+    val selectedEntity = database.selectEntity(ResourceType.Patient.name, "remote-patient-1")
     assertThat(selectedEntity.versionId).isEqualTo("remote-patient-1-version-1")
     assertThat(selectedEntity.lastUpdatedRemote).isEqualTo(patient.meta.lastUpdated.toInstant())
   }
@@ -524,7 +515,7 @@ class DatabaseImplTest {
   fun insert_remoteResourceWithNoMeta_shouldSaveNullRemoteVersionAndLastUpdated() = runBlocking {
     val patient = Patient().apply { id = "remote-patient-2" }
     database.insertRemote(patient)
-    val selectedEntity = database.selectEntity(ResourceType.Patient, "remote-patient-2")
+    val selectedEntity = database.selectEntity(ResourceType.Patient.name, "remote-patient-2")
     assertThat(selectedEntity.versionId).isNull()
     assertThat(selectedEntity.lastUpdatedRemote).isNull()
   }
@@ -533,7 +524,7 @@ class DatabaseImplTest {
   fun insert_localResourceWithNoMeta_shouldSaveNullRemoteVersionAndLastUpdated() = runBlocking {
     val patient = Patient().apply { id = "local-patient-2" }
     database.insert(patient)
-    val selectedEntity = database.selectEntity(ResourceType.Patient, "local-patient-2")
+    val selectedEntity = database.selectEntity(ResourceType.Patient.name, "local-patient-2")
     assertThat(selectedEntity.versionId).isNull()
     assertThat(selectedEntity.lastUpdatedRemote).isNull()
   }
@@ -553,14 +544,28 @@ class DatabaseImplTest {
         .let {
           flowOf(
             it.token to
-              Patient().apply {
-                id = it.resourceId
-                meta = remoteMeta
-              }
+              listOf(
+                ResourceForDatabaseToSave(
+                  it.resourceId,
+                  Patient().fhirType(),
+                  Patient()
+                    .apply {
+                      id = it.resourceId
+                      meta = remoteMeta
+                    }
+                    .versionId,
+                  Patient()
+                    .apply {
+                      id = it.resourceId
+                      meta = remoteMeta
+                    }
+                    .lastUpdated!!
+                )
+              )
           )
         }
     }
-    val selectedEntity = database.selectEntity(ResourceType.Patient, "remote-patient-3")
+    val selectedEntity = database.selectEntity(ResourceType.Patient.name, "remote-patient-3")
     assertThat(selectedEntity.versionId).isEqualTo(remoteMeta.versionId)
     assertThat(selectedEntity.lastUpdatedRemote).isEqualTo(remoteMeta.lastUpdated.toInstant())
   }
@@ -593,7 +598,7 @@ class DatabaseImplTest {
         .localChange
     assertThat(type).isEqualTo(LocalChangeEntity.Type.UPDATE)
     assertThat(resourceId).isEqualTo(patient.logicalId)
-    assertThat(resourceType).isEqualTo(ResourceType.fromCode(patient.resourceType.name).name)
+    assertThat(resourceType).isEqualTo(patient.resourceType.name)
     testingUtils.assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
   }
 
@@ -619,8 +624,8 @@ class DatabaseImplTest {
         .localChange
     assertThat(type).isEqualTo(LocalChangeEntity.Type.UPDATE)
     assertThat(resourceId).isEqualTo(patient.logicalId)
-    assertThat(resourceType).isEqualTo(ResourceType.fromCode(patient.resourceType.name).name)
-    assertThat(resourceType).isEqualTo(ResourceType.fromCode(patient.resourceType.name).name)
+    assertThat(resourceType).isEqualTo(patient.resourceType.name)
+    assertThat(resourceType).isEqualTo(patient.resourceType.name)
     assertThat(versionId).isEqualTo(remoteMeta.versionId)
     testingUtils.assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
   }
@@ -628,7 +633,7 @@ class DatabaseImplTest {
   @Test
   fun delete_remoteResource_shouldReturnDeleteLocalChange() = runBlocking {
     database.insertRemote(TEST_PATIENT_2)
-    database.delete(ResourceType.Patient, TEST_PATIENT_2_ID)
+    database.delete(ResourceType.Patient.name, TEST_PATIENT_2_ID)
     val (_, resourceType, resourceId, _, type, payload, versionId) =
       database
         .getAllLocalChanges()
@@ -637,7 +642,7 @@ class DatabaseImplTest {
         .localChange
     assertThat(type).isEqualTo(LocalChangeEntity.Type.DELETE)
     assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
-    assertThat(resourceType).isEqualTo(ResourceType.fromCode(TEST_PATIENT_2.resourceType.name).name)
+    assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
     assertThat(versionId).isEqualTo(TEST_PATIENT_2.versionId)
     assertThat(payload).isEmpty()
   }
@@ -649,7 +654,7 @@ class DatabaseImplTest {
     database.update(TEST_PATIENT_2)
     TEST_PATIENT_2.name = listOf(HumanName().addGiven("Jimmy").setFamily("Doe"))
     database.update(TEST_PATIENT_2)
-    database.delete(ResourceType.Patient, TEST_PATIENT_2_ID)
+    database.delete(ResourceType.Patient.name, TEST_PATIENT_2_ID)
     val (_, resourceType, resourceId, _, type, payload, _) =
       database
         .getAllLocalChanges()
@@ -658,7 +663,7 @@ class DatabaseImplTest {
         .localChange
     assertThat(type).isEqualTo(LocalChangeEntity.Type.DELETE)
     assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
-    assertThat(resourceType).isEqualTo(ResourceType.fromCode(TEST_PATIENT_2.resourceType.name).name)
+    assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
     assertThat(payload).isEmpty()
   }
 
@@ -673,7 +678,7 @@ class DatabaseImplTest {
 
     val results =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply { sort(RiskAssessment.PROBABILITY, Order.DESCENDING) }
           .getQuery()
       )
@@ -705,7 +710,9 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "eve" }) }.getQuery()
+        Search(ResourceType.Patient.name)
+          .apply { filter(Patient.GIVEN, { value = "eve" }) }
+          .getQuery()
       )
 
     assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
@@ -721,7 +728,9 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "eve" }) }.getQuery()
+        Search(ResourceType.Patient.name)
+          .apply { filter(Patient.GIVEN, { value = "eve" }) }
+          .getQuery()
       )
 
     assertThat(result).isEmpty()
@@ -737,7 +746,7 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.GIVEN,
@@ -763,7 +772,7 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.GIVEN,
@@ -790,7 +799,7 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.GIVEN,
@@ -816,7 +825,7 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.GIVEN,
@@ -845,7 +854,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -874,7 +883,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -903,7 +912,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -931,7 +940,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -960,7 +969,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -989,7 +998,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -1018,7 +1027,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -1047,7 +1056,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -1076,7 +1085,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -1105,7 +1114,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -1134,7 +1143,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -1162,7 +1171,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -1191,7 +1200,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -1220,7 +1229,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -1249,7 +1258,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -1278,7 +1287,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -1307,7 +1316,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -1336,7 +1345,7 @@ class DatabaseImplTest {
     database.insert(riskAssessment)
     val result =
       database.search<RiskAssessment>(
-        Search(ResourceType.RiskAssessment)
+        Search(ResourceType.RiskAssessment.name)
           .apply {
             filter(
               RiskAssessment.PROBABILITY,
@@ -1363,12 +1372,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.APPROXIMATE
               }
             )
@@ -1389,12 +1398,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2020-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2020-03-14")))
                 prefix = ParamPrefixEnum.APPROXIMATE
               }
             )
@@ -1415,12 +1424,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.BIRTHDATE,
               {
-                value = of(DateType("2013-03-14"))
+                value = of(searchManager.createDateType(DateType("2013-03-14")))
                 prefix = ParamPrefixEnum.APPROXIMATE
               }
             )
@@ -1441,12 +1450,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.BIRTHDATE,
               {
-                value = of(DateType("2020-03-14"))
+                value = of(searchManager.createDateType(DateType("2020-03-14")))
                 prefix = ParamPrefixEnum.APPROXIMATE
               }
             )
@@ -1466,12 +1475,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.STARTS_AFTER
               }
             )
@@ -1491,12 +1500,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.STARTS_AFTER
               }
             )
@@ -1516,12 +1525,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.ENDS_BEFORE
               }
             )
@@ -1541,12 +1550,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.ENDS_BEFORE
               }
             )
@@ -1566,12 +1575,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.NOT_EQUAL
               }
             )
@@ -1591,12 +1600,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.NOT_EQUAL
               }
             )
@@ -1616,12 +1625,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.EQUAL
               }
             )
@@ -1641,12 +1650,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.EQUAL
               }
             )
@@ -1666,12 +1675,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.GREATERTHAN
               }
             )
@@ -1691,12 +1700,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.GREATERTHAN
               }
             )
@@ -1716,12 +1725,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
               }
             )
@@ -1741,12 +1750,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
               }
             )
@@ -1766,12 +1775,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.LESSTHAN
               }
             )
@@ -1791,12 +1800,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.LESSTHAN
               }
             )
@@ -1816,12 +1825,12 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
               }
             )
@@ -1841,12 +1850,13 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14T00:00:00-00:00"))
+                value =
+                  of(searchManager.createDateTimeType(DateTimeType("2013-03-14T00:00:00-00:00")))
                 prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
               }
             )
@@ -1871,7 +1881,7 @@ class DatabaseImplTest {
     database.insert(observation)
     val result =
       database.search<Observation>(
-        Search(ResourceType.Observation)
+        Search(ResourceType.Observation.name)
           .apply {
             filter(
               Observation.VALUE_QUANTITY,
@@ -1903,7 +1913,7 @@ class DatabaseImplTest {
     database.insert(observation)
     val result =
       database.search<Observation>(
-        Search(ResourceType.Observation)
+        Search(ResourceType.Observation.name)
           .apply {
             filter(
               Observation.VALUE_QUANTITY,
@@ -1935,7 +1945,7 @@ class DatabaseImplTest {
     database.insert(observation)
     val result =
       database.search<Observation>(
-        Search(ResourceType.Observation)
+        Search(ResourceType.Observation.name)
           .apply {
             filter(
               Observation.VALUE_QUANTITY,
@@ -1967,7 +1977,7 @@ class DatabaseImplTest {
     database.insert(observation)
     val result =
       database.search<Observation>(
-        Search(ResourceType.Observation)
+        Search(ResourceType.Observation.name)
           .apply {
             filter(
               Observation.VALUE_QUANTITY,
@@ -1999,7 +2009,7 @@ class DatabaseImplTest {
     database.insert(observation)
     val result =
       database.search<Observation>(
-        Search(ResourceType.Observation)
+        Search(ResourceType.Observation.name)
           .apply {
             filter(
               Observation.VALUE_QUANTITY,
@@ -2031,7 +2041,7 @@ class DatabaseImplTest {
     database.insert(observation)
     val result =
       database.search<Observation>(
-        Search(ResourceType.Observation)
+        Search(ResourceType.Observation.name)
           .apply {
             filter(
               Observation.VALUE_QUANTITY,
@@ -2063,7 +2073,7 @@ class DatabaseImplTest {
     database.insert(observation)
     val result =
       database.search<Observation>(
-        Search(ResourceType.Observation)
+        Search(ResourceType.Observation.name)
           .apply {
             filter(
               Observation.VALUE_QUANTITY,
@@ -2095,7 +2105,7 @@ class DatabaseImplTest {
     database.insert(observation)
     val result =
       database.search<Observation>(
-        Search(ResourceType.Observation)
+        Search(ResourceType.Observation.name)
           .apply {
             filter(
               Observation.VALUE_QUANTITY,
@@ -2127,7 +2137,7 @@ class DatabaseImplTest {
     database.insert(observation)
     val result =
       database.search<Observation>(
-        Search(ResourceType.Observation)
+        Search(ResourceType.Observation.name)
           .apply {
             filter(
               Observation.VALUE_QUANTITY,
@@ -2159,7 +2169,7 @@ class DatabaseImplTest {
     database.insert(observation)
     val result =
       database.search<Observation>(
-        Search(ResourceType.Observation)
+        Search(ResourceType.Observation.name)
           .apply {
             filter(
               Observation.VALUE_QUANTITY,
@@ -2191,7 +2201,7 @@ class DatabaseImplTest {
     database.insert(observation)
     val result =
       database.search<Observation>(
-        Search(ResourceType.Observation)
+        Search(ResourceType.Observation.name)
           .apply {
             filter(
               Observation.VALUE_QUANTITY,
@@ -2223,7 +2233,7 @@ class DatabaseImplTest {
     database.insert(observation)
     val result =
       database.search<Observation>(
-        Search(ResourceType.Observation)
+        Search(ResourceType.Observation.name)
           .apply {
             filter(
               Observation.VALUE_QUANTITY,
@@ -2255,7 +2265,7 @@ class DatabaseImplTest {
     database.insert(observation)
     val result =
       database.search<Observation>(
-        Search(ResourceType.Observation)
+        Search(ResourceType.Observation.name)
           .apply {
             filter(
               Observation.VALUE_QUANTITY,
@@ -2287,7 +2297,7 @@ class DatabaseImplTest {
     database.insert(observation)
     val result =
       database.search<Observation>(
-        Search(ResourceType.Observation)
+        Search(ResourceType.Observation.name)
           .apply {
             filter(
               Observation.VALUE_QUANTITY,
@@ -2319,7 +2329,7 @@ class DatabaseImplTest {
     database.insert(observation)
     val result =
       database.search<Observation>(
-        Search(ResourceType.Observation)
+        Search(ResourceType.Observation.name)
           .apply {
             filter(
               Observation.VALUE_QUANTITY,
@@ -2343,7 +2353,7 @@ class DatabaseImplTest {
     database.insertRemote(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             sort(Patient.GIVEN, Order.ASCENDING)
             count = 100
@@ -2378,7 +2388,7 @@ class DatabaseImplTest {
     database.insert(patient, TEST_PATIENT_1, immunization)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             has<Immunization>(Immunization.PATIENT) {
               filter(
@@ -2386,10 +2396,12 @@ class DatabaseImplTest {
                 {
                   value =
                     of(
-                      Coding(
-                        "http://hl7.org/fhir/sid/cvx",
-                        "140",
-                        "Influenza, seasonal, injectable, preservative free"
+                      searchManager.createCodingType(
+                        Coding(
+                          "http://hl7.org/fhir/sid/cvx",
+                          "140",
+                          "Influenza, seasonal, injectable, preservative free"
+                        )
                       )
                     )
                 }
@@ -2399,7 +2411,12 @@ class DatabaseImplTest {
               filter(
                 Immunization.STATUS,
                 {
-                  value = of(Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight"))
+                  value =
+                    of(
+                      searchManager.createCodingType(
+                        Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")
+                      )
+                    )
                 }
               )
             }
@@ -2440,7 +2457,7 @@ class DatabaseImplTest {
     database.insert(patient, TEST_PATIENT_1, carePlan)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             has<CarePlan>(CarePlan.SUBJECT) {
               filter(
@@ -2448,7 +2465,13 @@ class DatabaseImplTest {
                 {
                   value =
                     of(
-                      Coding("http://snomed.info/sct", "698360004", "Diabetes self management plan")
+                      searchManager.createCodingType(
+                        Coding(
+                          "http://snomed.info/sct",
+                          "698360004",
+                          "Diabetes self management plan"
+                        )
+                      )
                     )
                 }
               )
@@ -2519,13 +2542,20 @@ class DatabaseImplTest {
 
     val result =
       database.search<Practitioner>(
-        Search(ResourceType.Practitioner)
+        Search(ResourceType.Practitioner.name)
           .apply {
             has<Patient>(Patient.GENERAL_PRACTITIONER) {
               has<Condition>(Condition.SUBJECT) {
                 filter(
                   Condition.CODE,
-                  { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) }
+                  {
+                    value =
+                      of(
+                        searchManager.createCodingType(
+                          Coding("http://snomed.info/sct", "44054006", "Diabetes")
+                        )
+                      )
+                  }
                 )
               }
             }
@@ -2535,7 +2565,11 @@ class DatabaseImplTest {
                   Condition.CODE,
                   {
                     value =
-                      of(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1"))
+                      of(
+                        searchManager.createCodingType(
+                          Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")
+                        )
+                      )
                   }
                 )
               }
@@ -2568,7 +2602,7 @@ class DatabaseImplTest {
     assertThat(
         database
           .search<Patient>(
-            Search(ResourceType.Patient)
+            Search(ResourceType.Patient.name)
               .apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }
               .getQuery()
           )
@@ -2596,7 +2630,7 @@ class DatabaseImplTest {
     assertThat(
         database
           .search<Patient>(
-            Search(ResourceType.Patient)
+            Search(ResourceType.Patient.name)
               .apply { sort(Patient.BIRTHDATE, Order.ASCENDING) }
               .getQuery()
           )
@@ -2655,27 +2689,31 @@ class DatabaseImplTest {
 
     val result =
       database.search<Immunization>(
-        Search(ResourceType.Immunization)
+        Search(ResourceType.Immunization.name)
           .apply {
             filter(
               Immunization.VACCINE_CODE,
               {
                 value =
                   of(
-                    Coding(
-                      "http://id.who.int/icd11/mms",
-                      "XM1NL1",
-                      "COVID-19 vaccine, inactivated virus"
+                    searchManager.createCodingType(
+                      Coding(
+                        "http://id.who.int/icd11/mms",
+                        "XM1NL1",
+                        "COVID-19 vaccine, inactivated virus"
+                      )
                     )
                   )
               },
               {
                 value =
                   of(
-                    Coding(
-                      "http://id.who.int/icd11/mms",
-                      "XM5DF6",
-                      "COVID-19 vaccine, inactivated virus"
+                    searchManager.createCodingType(
+                      Coding(
+                        "http://id.who.int/icd11/mms",
+                        "XM5DF6",
+                        "COVID-19 vaccine, inactivated virus"
+                      )
                     )
                   )
               },
@@ -2740,16 +2778,30 @@ class DatabaseImplTest {
 
     val result =
       database.search<Immunization>(
-        Search(ResourceType.Immunization)
+        Search(ResourceType.Immunization.name)
           .apply {
             filter(
               Immunization.VACCINE_CODE,
-              { value = of(Coding("http://id.who.int/icd11/mms", "XM1NL1", "")) }
+              {
+                value =
+                  of(
+                    searchManager.createCodingType(
+                      Coding("http://id.who.int/icd11/mms", "XM1NL1", "")
+                    )
+                  )
+              }
             )
 
             filter(
               Immunization.VACCINE_CODE,
-              { value = of(Coding("http://id.who.int/icd11/mms", "XM5DF6", "")) }
+              {
+                value =
+                  of(
+                    searchManager.createCodingType(
+                      Coding("http://id.who.int/icd11/mms", "XM5DF6", "")
+                    )
+                  )
+              }
             )
             operation = Operation.OR
           }
@@ -2815,7 +2867,7 @@ class DatabaseImplTest {
 
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient)
+        Search(ResourceType.Patient.name)
           .apply {
             filter(
               Patient.GIVEN,

@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.demo.data
 
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.ParamMap
@@ -28,7 +27,7 @@ import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
 
-typealias ResourceSearchParams = Map<ResourceType, ParamMap>
+typealias ResourceSearchParams = Map<String, ParamMap>
 
 /**
  * [DownloadWorkManager] implementation based on the provided [ResourceSearchParams] to generate
@@ -36,8 +35,10 @@ typealias ResourceSearchParams = Map<ResourceType, ParamMap>
  * implementation takes a DFS approach and downloads all available resources for a particular
  * [ResourceType] before moving on to the next [ResourceType].
  */
-class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
-  DownloadWorkManager {
+class ResourceParamsBasedDownloadWorkManager(
+  syncParams: ResourceSearchParams,
+  override val resourceTypeList: Collection<String>
+) : DownloadWorkManager {
   private val resourcesToDownloadWithSearchParams = LinkedList(syncParams.entries)
   private val urlOfTheNextPagesToDownloadForAResource = LinkedList<String>()
 
@@ -57,7 +58,7 @@ class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
         }
       }
 
-      "${resourceType.name}?${newParams.concatParams()}"
+      "$resourceType?${newParams.concatParams()}"
     }
   }
 

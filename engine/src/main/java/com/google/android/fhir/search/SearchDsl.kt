@@ -24,7 +24,6 @@ import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.gclient.UriClientParam
-import com.google.android.fhir.ResourceType
 import com.google.android.fhir.search.filter.DateClientParamFilterCriteria
 import com.google.android.fhir.search.filter.DateParamFilterCriterion
 import com.google.android.fhir.search.filter.NumberParamFilterCriteria
@@ -42,10 +41,9 @@ import com.google.android.fhir.search.filter.UriParamFilterCriterion
 
 @SearchDslMarker
 data class Search(
-  val type: ResourceType,
+  val resourceType: String,
   var count: Int? = null,
   var from: Int? = null,
-  val searchManager: SearchManager
 ) {
   internal val stringFilterCriteria = mutableListOf<StringParamFilterCriteria>()
   internal val dateTimeFilterCriteria = mutableListOf<DateClientParamFilterCriteria>()
