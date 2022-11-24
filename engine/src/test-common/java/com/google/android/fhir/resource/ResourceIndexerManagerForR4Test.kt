@@ -14,8 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.index
+package com.google.android.fhir.resource
 
+import com.google.android.fhir.index.CodeableConcept
+import com.google.android.fhir.index.Coding
+import com.google.android.fhir.index.DateTimeType
+import com.google.android.fhir.index.DateType
+import com.google.android.fhir.index.Identifier
+import com.google.android.fhir.index.InstantType
+import com.google.android.fhir.index.LocationPositionComponent
+import com.google.android.fhir.index.Money
+import com.google.android.fhir.index.Period
+import com.google.android.fhir.index.Quantity
+import com.google.android.fhir.index.ResourceIndexerManager
+import com.google.android.fhir.index.Timing
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.instance.model.api.IBase
 import org.hl7.fhir.instance.model.api.IBaseMetaType

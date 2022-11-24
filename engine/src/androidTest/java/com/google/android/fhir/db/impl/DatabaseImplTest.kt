@@ -27,9 +27,10 @@ import com.google.android.fhir.ResourceForDatabaseToSave
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
-import com.google.android.fhir.demo.data.SearchManagerForR4
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.resource.ResourceIndexerManagerForR4Test
+import com.google.android.fhir.resource.SearchManagerForR4Test
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.Order
@@ -88,12 +89,13 @@ class DatabaseImplTest {
   private val context: Context = ApplicationProvider.getApplicationContext()
   private val services =
     FhirServices.builder(context)
+      .setResourceIndexerManager(ResourceIndexerManagerForR4Test)
       .inMemory()
       .apply { if (encrypted) enableEncryptionIfSupported() }
       .build()
   private val testingUtils = TestingUtils(services.parser)
   private val database = services.database
-  private val searchManager = SearchManagerForR4
+  private val searchManager = SearchManagerForR4Test
 
   @Before fun setUp(): Unit = runBlocking { database.insert(TEST_PATIENT_1) }
 
@@ -553,7 +555,7 @@ class DatabaseImplTest {
                       id = it.resourceId
                       meta = remoteMeta
                     }
-                    .versionId,
+                    .meta.versionId,
                   Patient()
                     .apply {
                       id = it.resourceId
@@ -643,7 +645,7 @@ class DatabaseImplTest {
     assertThat(type).isEqualTo(LocalChangeEntity.Type.DELETE)
     assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
     assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
-    assertThat(versionId).isEqualTo(TEST_PATIENT_2.versionId)
+    assertThat(versionId).isEqualTo(TEST_PATIENT_2.meta.versionId)
     assertThat(payload).isEmpty()
   }
 

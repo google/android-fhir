@@ -23,10 +23,10 @@ import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.get
-import com.google.android.fhir.index.ResourceIndexerManagerForR4Test
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.resource.ResourceIndexerManagerForR4Test
+import com.google.android.fhir.resource.SearchManagerForR4Test
 import com.google.android.fhir.resource.TestingUtils
-import com.google.android.fhir.search.SearchManagerForR4Test
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver

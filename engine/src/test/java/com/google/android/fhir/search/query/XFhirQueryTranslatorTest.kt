@@ -19,9 +19,9 @@ package com.google.android.fhir.search.query
 import android.os.Build
 import com.google.android.fhir.index.SearchParamDefinition
 import com.google.android.fhir.index.SearchParamType
+import com.google.android.fhir.resource.SearchManagerForR4Test
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
-import com.google.android.fhir.search.SearchManagerForR4Test
 import com.google.android.fhir.search.query.XFhirQueryTranslator.applyFilterParam
 import com.google.android.fhir.search.query.XFhirQueryTranslator.applySortParam
 import com.google.android.fhir.search.query.XFhirQueryTranslator.translate

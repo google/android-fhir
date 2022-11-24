@@ -21,6 +21,7 @@ import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.epochDay
+import com.google.android.fhir.resource.SearchManagerForR4Test
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant

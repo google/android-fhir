@@ -34,6 +34,7 @@ import java.time.OffsetDateTime
 import java.util.Date
 import java.util.LinkedList
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.instance.model.api.IBaseBundle
 import org.hl7.fhir.r4.model.Bundle

@@ -29,6 +29,7 @@ import com.google.android.fhir.index.entities.StringIndex
 import com.google.android.fhir.index.entities.TokenIndex
 import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.resource.ResourceIndexerManagerForR4Test
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal

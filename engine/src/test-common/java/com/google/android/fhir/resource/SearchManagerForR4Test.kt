@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.search
+package com.google.android.fhir.resource
 
 import com.google.android.fhir.index.CodeType
 import com.google.android.fhir.index.CodeableConcept
@@ -24,6 +24,7 @@ import com.google.android.fhir.index.DateTimeType
 import com.google.android.fhir.index.DateType
 import com.google.android.fhir.index.Identifier
 import com.google.android.fhir.index.UriType
+import com.google.android.fhir.search.SearchManager
 import java.util.Date
 import kotlin.jvm.Throws
 import org.hl7.fhir.exceptions.FHIRException
