@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.resource
+package com.google.android.fhir.testing
 
 import com.google.android.fhir.index.CodeableConcept
 import com.google.android.fhir.index.Coding

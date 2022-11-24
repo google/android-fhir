@@ -18,11 +18,10 @@ package com.google.android.fhir
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.fhir.resource.ResourceIndexerManagerForR4Test
+import com.google.android.fhir.testing.ResourceIndexerManagerForR4Test
 import com.google.common.truth.Truth.assertThat
 import java.lang.IllegalStateException
 import org.junit.After
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -38,16 +37,16 @@ class FhirEngineProviderTest {
   }
 
   @Test
-  @Ignore("omarismail: Figure out how to set ResourceIndexerManager")
   fun build_twiceWithAppContext_shouldReturnSameFhirEngine() {
+    provider.init(FhirEngineConfiguration(resourceIndexerManager = ResourceIndexerManagerForR4Test))
     val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
     val engineTwo = provider.getInstance(ApplicationProvider.getApplicationContext())
     assertThat(engineOne).isSameInstanceAs(engineTwo)
   }
 
   @Test
-  @Ignore("omarismail: Figure out how to set ResourceIndexerManager")
   fun build_withAppAndActivityContext_shouldReturnSameFhirEngine() {
+    provider.init(FhirEngineConfiguration(resourceIndexerManager = ResourceIndexerManagerForR4Test))
     val engineAppContext = provider.getInstance(ApplicationProvider.getApplicationContext())
     val engineActivityContext =
       provider.getInstance(InstrumentationRegistry.getInstrumentation().context)
@@ -55,7 +54,6 @@ class FhirEngineProviderTest {
   }
 
   @Test
-  @Ignore("omarismail: Figure out how to set ResourceIndexerManager")
   fun build_twiceWithAppContext_afterCleanup_shouldReturnDifferentInstances() {
     provider.init(
       FhirEngineConfiguration(
@@ -65,6 +63,7 @@ class FhirEngineProviderTest {
     )
     val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
     provider.cleanup()
+    provider.init(FhirEngineConfiguration(resourceIndexerManager = ResourceIndexerManagerForR4Test))
     val engineTwo = provider.getInstance(ApplicationProvider.getApplicationContext())
     assertThat(engineOne).isNotSameInstanceAs(engineTwo)
   }

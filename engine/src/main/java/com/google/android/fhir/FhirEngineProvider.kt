@@ -70,7 +70,7 @@ object FhirEngineProvider {
             if (configuration.enableEncryptionIfSupported) enableEncryptionIfSupported()
             setDatabaseErrorStrategy(configuration.databaseErrorStrategy)
             setFhirVersion(configuration.fhirVersionEnum)
-            setResourceIndexerManager(configuration.resourceIndexerManager)
+            configuration.resourceIndexerManager?.let { setResourceIndexerManager(it) }
             configuration.serverConfiguration?.let { setServerConfiguration(it) }
             if (configuration.testMode) {
               inMemory()

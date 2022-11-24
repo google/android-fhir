@@ -62,10 +62,9 @@ internal data class FhirServices(
       this.serverConfiguration = serverConfiguration
     }
 
-    internal fun setResourceIndexerManager(resourceIndexerManager: ResourceIndexerManager?) =
-      apply {
-        this.resourceIndexerManager = resourceIndexerManager
-      }
+    internal fun setResourceIndexerManager(resourceIndexerManager: ResourceIndexerManager) = apply {
+      this.resourceIndexerManager = resourceIndexerManager
+    }
 
     internal fun setFhirVersion(fhirVersionEnum: FhirVersionEnum) = apply {
       when (fhirVersionEnum) {

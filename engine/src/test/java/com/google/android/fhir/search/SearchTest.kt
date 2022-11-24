@@ -21,7 +21,7 @@ import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.epochDay
-import com.google.android.fhir.resource.SearchManagerForR4Test
+import com.google.android.fhir.testing.SearchManagerForR4Test
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
@@ -54,7 +54,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class SearchTest {
 
-  private val searchManager: SearchManager = SearchManagerForR4Test
+  private val searchManager: SearchManager = com.google.android.fhir.testing.SearchManagerForR4Test
 
   @Test
   fun search() = runBlocking {

@@ -24,6 +24,7 @@ android {
 
 dependencies {
   api(project(":engine"))
+  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
   implementation(Dependencies.AndroidxTest.rules)
 }

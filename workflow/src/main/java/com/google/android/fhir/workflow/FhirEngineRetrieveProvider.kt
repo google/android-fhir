@@ -34,6 +34,7 @@ import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.ResourceType
 import org.opencds.cqf.cql.engine.retrieve.TerminologyAwareRetrieveProvider
 import org.opencds.cqf.cql.engine.runtime.Code
 import org.opencds.cqf.cql.engine.runtime.DateTime
@@ -70,7 +71,7 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
       } else if (codePath == "id" && codes != null) {
         codes.mapNotNull { safeGet(fhirEngine, ResourceType.fromCode(dataType), it.code) }
       } else {
-        val search = Search(ResourceType.fromCode(dataType))
+        val search = Search(ResourceType.fromCode(dataType).name)
 
         // filter by context
         filterByContext(context, contextPath, contextValue, dataType, search)
@@ -103,7 +104,7 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
           prefix =
             if (dateRange.lowClosed) ParamPrefixEnum.GREATERTHAN_OR_EQUALS
             else ParamPrefixEnum.GREATERTHAN
-          value = of(DateTimeType(convertDate(dateRange.low)))
+          value = of(SearchManagerImpl.createDateTimeType(DateTimeType(convertDate(dateRange.low))))
         }
       )
     }
@@ -115,7 +116,8 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
           prefix =
             if (dateRange.highClosed) ParamPrefixEnum.LESSTHAN_OR_EQUALS
             else ParamPrefixEnum.LESSTHAN
-          value = of(DateTimeType(convertDate(dateRange.high)))
+          value =
+            of(SearchManagerImpl.createDateTimeType(DateTimeType(convertDate(dateRange.high))))
         }
       )
     }
@@ -127,7 +129,7 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
           prefix =
             if (dateRange.lowClosed) ParamPrefixEnum.GREATERTHAN_OR_EQUALS
             else ParamPrefixEnum.GREATERTHAN
-          value = of(DateTimeType(convertDate(dateRange.low)))
+          value = of(SearchManagerImpl.createDateTimeType(DateTimeType(convertDate(dateRange.low))))
         }
       )
     }
@@ -139,7 +141,8 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
           prefix =
             if (dateRange.highClosed) ParamPrefixEnum.LESSTHAN_OR_EQUALS
             else ParamPrefixEnum.LESSTHAN
-          value = of(DateTimeType(convertDate(dateRange.high)))
+          value =
+            of(SearchManagerImpl.createDateTimeType(DateTimeType(convertDate(dateRange.high))))
         }
       )
     }
@@ -163,7 +166,8 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
     val inCodes =
       codes.map {
         val apply: TokenParamFilterCriterion.() -> Unit = {
-          this.value = of(Coding(it.system, it.code, it.display))
+          this.value =
+            of(SearchManagerImpl.createCodingType(Coding(it.system, it.code, it.display)))
         }
         apply
       }
@@ -179,7 +183,8 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
     val inCodes =
       valueSet.map {
         val apply: TokenParamFilterCriterion.() -> Unit = {
-          this.value = of(Coding(it.system, it.code, it.display))
+          this.value =
+            of(SearchManagerImpl.createCodingType(Coding(it.system, it.code, it.display)))
         }
         apply
       }
@@ -208,13 +213,17 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
           { value = "urn:oid:$contextValue" }
         )
       } else {
-        search.applyFilterParam(ann, "$contextValue")
+        search.applyFilterParam(ann, "$contextValue", SearchManagerImpl)
       }
     } else {
       // Tries to identify the right param class by type
       when (contextValue) {
         is String -> search.filter(StringClientParam(contextPath), { value = contextValue })
-        is DateTimeType -> search.filter(DateClientParam(contextPath), { value = of(contextValue) })
+        is DateTimeType ->
+          search.filter(
+            DateClientParam(contextPath),
+            { value = of(SearchManagerImpl.createDateTimeType(contextValue)) }
+          )
         is BigDecimal -> search.filter(NumberClientParam(contextPath), { value = contextValue })
         else ->
           throw UnsupportedOperationException(
@@ -232,7 +241,7 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
     id: String
   ): IAnyResource? {
     return try {
-      fhirEngine.get(ResourceType.fromCode(type.name), id)
+      fhirEngine.get(type.name, id)
     } catch (e: ResourceNotFoundException) {
       null
     }

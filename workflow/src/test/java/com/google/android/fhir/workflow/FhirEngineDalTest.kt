@@ -19,12 +19,14 @@ package com.google.android.fhir.workflow
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.search.search
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.ResourceType
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -65,7 +67,7 @@ class FhirEngineDalTest {
       }
 
     fhirEngineDal.create(patient)
-    val result = fhirEngine.get(ResourceType.Patient, "2") as Patient
+    val result = fhirEngine.get(ResourceType.Patient.name, "2") as Patient
 
     assertThat(result.nameFirstRep.givenAsSingleString)
       .isEqualTo(patient.nameFirstRep.givenAsSingleString)
@@ -90,7 +92,8 @@ class FhirEngineDalTest {
     assertThat(result).isEmpty()
   }
 
-  @After fun fhirEngine() = runBlocking { fhirEngine.delete(ResourceType.Patient, "Patient/1") }
+  @After
+  fun fhirEngine() = runBlocking { fhirEngine.delete(ResourceType.Patient.name, "Patient/1") }
 
   companion object {
     val testPatient =

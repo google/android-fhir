@@ -29,8 +29,6 @@ import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.resource.ResourceIndexerManagerForR4Test
-import com.google.android.fhir.resource.SearchManagerForR4Test
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.Order
@@ -38,6 +36,8 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
+import com.google.android.fhir.testing.ResourceIndexerManagerForR4Test
+import com.google.android.fhir.testing.SearchManagerForR4Test
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
