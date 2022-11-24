@@ -85,11 +85,24 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     textInputEditText.removeTextChangedListener(textWatcher)
     val text = getText(questionnaireItemViewItem.answers.singleOrNull())
     if (isTextUpdatesRequired(text, textInputEditText.text.toString())) {
-      textInputEditText.setText(getText(questionnaireItemViewItem.answers.singleOrNull()))
+      textInputEditText.setText("")
+      textInputEditText.append(getText(questionnaireItemViewItem.answers.singleOrNull()))
     }
 
     textWatcher =
-      textInputEditText.doAfterTextChanged { editable: Editable? -> updateAnswer(editable) }
+      textInputEditText.doAfterTextChanged { editable: Editable? ->
+        updateAnswer(editable)
+
+        // Prevents to do further operations everytime the empty setText() is triggered
+        if (editable.toString().isEmpty()) {
+          return@doAfterTextChanged
+        }
+
+        if (isTextExceedLimit(editable)) {
+          textInputEditText.setText("")
+          textInputEditText.append(getTextDefaultLimit())
+        }
+      }
   }
 
   private fun updateAnswer(editable: Editable?) {
@@ -102,6 +115,10 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   }
 
   open fun isTextUpdatesRequired(answerText: String, inputText: String) = (answerText != inputText)
+
+  open fun isTextExceedLimit(editable: Editable?) = false
+
+  open fun getTextDefaultLimit() = ""
 
   override fun displayValidationResult(validationResult: ValidationResult) {
     textInputLayout.error =
