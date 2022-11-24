@@ -21,7 +21,6 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.index.ResourceIndexerManager
 import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
 import org.hl7.fhir.instance.model.api.IAnyResource
@@ -29,7 +28,6 @@ import org.hl7.fhir.instance.model.api.IAnyResource
 /** The interface for the FHIR resource database. */
 internal interface Database {
 
-  val resourceIndexerManager: ResourceIndexerManager
   /**
    * Inserts a list of local `resources` into the FHIR resource database. If any of the resources
    * already exists, it will be overwritten.

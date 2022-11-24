@@ -48,7 +48,7 @@ internal class DatabaseImpl(
   context: Context,
   private val iParser: IParser,
   databaseConfig: DatabaseConfig,
-  override val resourceIndexerManager: ResourceIndexerManager
+  private val resourceIndexerManager: ResourceIndexerManager
 ) : com.google.android.fhir.db.Database {
 
   val db: ResourceDatabase
