@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.SyncDownloadContext
+import com.google.android.fhir.resource.ResourceParamsBasedDownloadWorkManager
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
 import com.google.common.truth.Truth.assertThat
@@ -100,7 +101,7 @@ class DownloaderImplTest {
             TODO("Not yet implemented")
           }
         },
-        com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(
+        ResourceParamsBasedDownloadWorkManager(
           mapOf(
             ResourceType.Patient.name to mapOf("param" to "patient-page1"),
             ResourceType.Observation.name to mapOf("param" to "observation-page1")
@@ -162,7 +163,7 @@ class DownloaderImplTest {
               TODO("Upload not tested in this path")
             }
           },
-          com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(
+          ResourceParamsBasedDownloadWorkManager(
             mapOf(
               ResourceType.Patient.name to mapOf("param" to "patient-page1"),
               ResourceType.Observation.name to mapOf("param" to "observation-page1")
@@ -228,7 +229,7 @@ class DownloaderImplTest {
               TODO("Not yet implemented")
             }
           },
-          com.google.android.fhir.demo.data.ResourceParamsBasedDownloadWorkManager(
+          ResourceParamsBasedDownloadWorkManager(
             mapOf(
               ResourceType.Patient.name to mapOf("param" to "patient-page1"),
               ResourceType.Observation.name to mapOf("param" to "observation-page1")

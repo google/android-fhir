@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.demo.data
+package com.google.android.fhir.resource
 
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DownloadWorkManager
@@ -28,7 +28,6 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
 
 typealias ResourceSearchParams = Map<String, ParamMap>
-
 /**
  * [DownloadWorkManager] implementation based on the provided [ResourceSearchParams] to generate
  * [Resource] search queries and parse [Bundle.BundleType.SEARCHSET] type [Bundle]. This
