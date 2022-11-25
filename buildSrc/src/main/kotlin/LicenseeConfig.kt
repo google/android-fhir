@@ -22,7 +22,6 @@ fun Project.configureLicensee() {
   apply(plugin = "app.cash.licensee")
   configure<app.cash.licensee.LicenseeExtension> {
     allow("Apache-2.0")
-    allow("BSD-2-Clause")
     allow("MIT")
 
     // Occasionally, dependencies may add their licenses via a direct URL instead of an SPDX id.
@@ -153,22 +152,22 @@ fun Project.configureLicensee() {
 
     // Glide
     allowDependency("com.github.bumptech.glide", "glide", "4.14.2") {
-      because("BSD Clause. https://github.com/bumptech/glide#license")
+      because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
     }
 
     // Glide Annotations
     allowDependency("com.github.bumptech.glide", "annotations", "4.14.2") {
-      because("BSD Clause. https://github.com/bumptech/glide#license")
+      because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
     }
 
     // Glide Disk LRU Cache
     allowDependency("com.github.bumptech.glide", "disklrucache", "4.14.2") {
-      because("BSD Clause. https://github.com/bumptech/glide#license")
+      because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
     }
 
     // Glide GIF Decoder
     allowDependency("com.github.bumptech.glide", "gifdecoder", "4.14.2") {
-      because("BSD Clause. https://github.com/bumptech/glide#license")
+      because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
     }
   }
 }
