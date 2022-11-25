@@ -104,3 +104,92 @@ internal fun IBaseMetaType.hasTag(): Boolean {
   for (item in this.tag) if (!item.isEmpty) return true
   return false
 }
+
+// Type aliases
+typealias R4Base = org.hl7.fhir.r4.model.Base
+
+typealias R4Resource = org.hl7.fhir.r4.model.Resource
+
+typealias R4Bundle = org.hl7.fhir.r4.model.Bundle
+
+typealias R4BundleType = org.hl7.fhir.r4.model.Bundle.BundleType
+
+typealias R4DateTimeType = org.hl7.fhir.r4.model.DateTimeType
+
+typealias R4DateType = org.hl7.fhir.r4.model.DateType
+
+typealias R4InstantType = org.hl7.fhir.r4.model.InstantType
+
+typealias R4Period = org.hl7.fhir.r4.model.Period
+
+typealias R4Timing = org.hl7.fhir.r4.model.Timing
+
+typealias R4StringType = org.hl7.fhir.r4.model.StringType
+
+typealias R4HumanName = org.hl7.fhir.r4.model.HumanName
+
+typealias R4Address = org.hl7.fhir.r4.model.Address
+
+typealias R4Identifier = org.hl7.fhir.r4.model.Identifier
+
+typealias R4CodeableConcept = org.hl7.fhir.r4.model.CodeableConcept
+
+typealias R4ICoding = org.hl7.fhir.r4.model.ICoding
+
+typealias R4Reference = org.hl7.fhir.r4.model.Reference
+
+typealias R4CanonicalType = org.hl7.fhir.r4.model.CanonicalType
+
+typealias R4UriType = org.hl7.fhir.r4.model.UriType
+
+typealias R4Money = org.hl7.fhir.r4.model.Money
+
+typealias R4Quantity = org.hl7.fhir.r4.model.Quantity
+
+typealias R4LocationPositionComponent = org.hl7.fhir.r4.model.Location.LocationPositionComponent
+
+typealias R4OperationOutcome = org.hl7.fhir.r4.model.OperationOutcome
+
+typealias R5Base = org.hl7.fhir.r5.model.Base
+
+typealias R5Resource = org.hl7.fhir.r5.model.Resource
+
+typealias R5Bundle = org.hl7.fhir.r5.model.Bundle
+
+typealias R5BundleType = org.hl7.fhir.r5.model.Bundle.BundleType
+
+typealias R5DateTimeType = org.hl7.fhir.r5.model.DateTimeType
+
+typealias R5DateType = org.hl7.fhir.r5.model.DateType
+
+typealias R5InstantType = org.hl7.fhir.r5.model.InstantType
+
+typealias R5Period = org.hl7.fhir.r5.model.Period
+
+typealias R5Timing = org.hl7.fhir.r5.model.Timing
+
+typealias R5StringType = org.hl7.fhir.r5.model.StringType
+
+typealias R5HumanName = org.hl7.fhir.r5.model.HumanName
+
+typealias R5Address = org.hl7.fhir.r5.model.Address
+
+typealias R5Identifier = org.hl7.fhir.r5.model.Identifier
+
+typealias R5CodeableConcept = org.hl7.fhir.r5.model.CodeableConcept
+
+typealias R5ICoding = org.hl7.fhir.r5.model.ICoding
+
+typealias R5Reference = org.hl7.fhir.r5.model.Reference
+
+typealias R5CanonicalType = org.hl7.fhir.r5.model.CanonicalType
+
+typealias R5UriType = org.hl7.fhir.r5.model.UriType
+
+typealias R5Money = org.hl7.fhir.r5.model.Money
+
+typealias R5Quantity = org.hl7.fhir.r5.model.Quantity
+
+typealias R5LocationPositionComponent = org.hl7.fhir.r5.model.Location.LocationPositionComponent
+
+typealias R5OperationOutcome = org.hl7.fhir.r5.model.OperationOutcome

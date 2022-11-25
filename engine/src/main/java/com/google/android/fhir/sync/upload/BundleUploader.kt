@@ -18,6 +18,12 @@ package com.google.android.fhir.sync.upload
 
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.R4Bundle
+import com.google.android.fhir.R4BundleType
+import com.google.android.fhir.R4OperationOutcome
+import com.google.android.fhir.R5Bundle
+import com.google.android.fhir.R5BundleType
+import com.google.android.fhir.R5OperationOutcome
 import com.google.android.fhir.ResourceType
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.resourceType
@@ -29,8 +35,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.instance.model.api.IAnyResource
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.OperationOutcome
 
 /** [Uploader] implementation to work with Fhir [Bundle]. */
 internal class BundleUploader(
@@ -58,10 +62,10 @@ internal class BundleUploader(
     when (fhirVersionEnum) {
       FhirVersionEnum.R4 -> {
         when {
-          response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
+          response is R4Bundle && response.type == R4BundleType.TRANSACTIONRESPONSE -> {
             UploadResult.Success(LocalChangeToken(localChangeTokens.flatMap { it.ids }), response)
           }
-          response is OperationOutcome && response.issue.isNotEmpty() -> {
+          response is R4OperationOutcome && response.issue.isNotEmpty() -> {
             UploadResult.Failure(
               ResourceSyncException(
                 ResourceType.Bundle,
@@ -81,11 +85,10 @@ internal class BundleUploader(
       }
       FhirVersionEnum.R5 -> {
         when {
-          response is org.hl7.fhir.r5.model.Bundle &&
-            response.type == org.hl7.fhir.r5.model.Bundle.BundleType.TRANSACTIONRESPONSE -> {
+          response is R5Bundle && response.type == R5BundleType.TRANSACTIONRESPONSE -> {
             UploadResult.Success(LocalChangeToken(localChangeTokens.flatMap { it.ids }), response)
           }
-          response is org.hl7.fhir.r5.model.OperationOutcome && response.issue.isNotEmpty() -> {
+          response is R5OperationOutcome && response.issue.isNotEmpty() -> {
             UploadResult.Failure(
               ResourceSyncException(
                 ResourceType.Bundle,

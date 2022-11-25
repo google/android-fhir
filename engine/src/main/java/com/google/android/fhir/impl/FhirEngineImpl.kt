@@ -20,6 +20,10 @@ import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.R4Bundle
+import com.google.android.fhir.R4BundleType
+import com.google.android.fhir.R5Bundle
+import com.google.android.fhir.R5BundleType
 import com.google.android.fhir.ResourceType
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
@@ -154,8 +158,8 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       upload(localChanges.map { it.toLocalChange() }).collect {
         database.deleteUpdates(it.first)
         when (it.second) {
-          is Bundle -> updateVersionIdAndLastUpdatedForBundle(it.second as Bundle)
-          is org.hl7.fhir.r5.model.Bundle ->
+          is R4Bundle -> updateVersionIdAndLastUpdatedForBundle(it.second as Bundle)
+          is R5Bundle ->
             updateVersionIdAndLastUpdatedForBundle(it.second as org.hl7.fhir.r5.model.Bundle)
           else -> updateVersionIdAndLastUpdated(it.second)
         }
@@ -165,9 +169,9 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   private suspend fun updateVersionIdAndLastUpdatedForBundle(bundle: IBaseBundle) {
     when (bundle) {
-      is Bundle ->
+      is R4Bundle ->
         when (bundle.type) {
-          Bundle.BundleType.TRANSACTIONRESPONSE -> {
+          R4BundleType.TRANSACTIONRESPONSE -> {
             bundle.entry.forEach {
               when {
                 it.hasResource() -> updateVersionIdAndLastUpdated(it.resource)
@@ -180,9 +184,9 @@ internal class FhirEngineImpl(private val database: Database, private val contex
             Timber.i("Received request to update meta values for ${bundle.type}")
           }
         }
-      is org.hl7.fhir.r5.model.Bundle ->
+      is R5Bundle ->
         when (bundle.type) {
-          org.hl7.fhir.r5.model.Bundle.BundleType.TRANSACTIONRESPONSE -> {
+          R5BundleType.TRANSACTIONRESPONSE -> {
             bundle.entry.forEach {
               when {
                 it.hasResource() -> updateVersionIdAndLastUpdated(it.resource)

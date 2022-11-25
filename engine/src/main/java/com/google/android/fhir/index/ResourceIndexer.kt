@@ -21,6 +21,44 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import com.google.android.fhir.ConverterException
+import com.google.android.fhir.R4Address
+import com.google.android.fhir.R4Base
+import com.google.android.fhir.R4CanonicalType
+import com.google.android.fhir.R4CodeableConcept
+import com.google.android.fhir.R4DateTimeType
+import com.google.android.fhir.R4DateType
+import com.google.android.fhir.R4HumanName
+import com.google.android.fhir.R4ICoding
+import com.google.android.fhir.R4Identifier
+import com.google.android.fhir.R4InstantType
+import com.google.android.fhir.R4LocationPositionComponent
+import com.google.android.fhir.R4Money
+import com.google.android.fhir.R4Period
+import com.google.android.fhir.R4Quantity
+import com.google.android.fhir.R4Reference
+import com.google.android.fhir.R4Resource
+import com.google.android.fhir.R4StringType
+import com.google.android.fhir.R4Timing
+import com.google.android.fhir.R4UriType
+import com.google.android.fhir.R5Address
+import com.google.android.fhir.R5Base
+import com.google.android.fhir.R5CanonicalType
+import com.google.android.fhir.R5CodeableConcept
+import com.google.android.fhir.R5DateTimeType
+import com.google.android.fhir.R5DateType
+import com.google.android.fhir.R5HumanName
+import com.google.android.fhir.R5ICoding
+import com.google.android.fhir.R5Identifier
+import com.google.android.fhir.R5InstantType
+import com.google.android.fhir.R5LocationPositionComponent
+import com.google.android.fhir.R5Money
+import com.google.android.fhir.R5Period
+import com.google.android.fhir.R5Quantity
+import com.google.android.fhir.R5Reference
+import com.google.android.fhir.R5Resource
+import com.google.android.fhir.R5StringType
+import com.google.android.fhir.R5Timing
+import com.google.android.fhir.R5UriType
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.epochDay
@@ -48,27 +86,7 @@ import org.hl7.fhir.instance.model.api.IBase
 import org.hl7.fhir.instance.model.api.IBaseDecimalDatatype
 import org.hl7.fhir.instance.model.api.IBaseIntegerDatatype
 import org.hl7.fhir.r4.context.SimpleWorkerContext
-import org.hl7.fhir.r4.model.Address
-import org.hl7.fhir.r4.model.Base
-import org.hl7.fhir.r4.model.CanonicalType
-import org.hl7.fhir.r4.model.CodeableConcept
-import org.hl7.fhir.r4.model.DateTimeType
-import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.HumanName
-import org.hl7.fhir.r4.model.ICoding
-import org.hl7.fhir.r4.model.Identifier
-import org.hl7.fhir.r4.model.InstantType
-import org.hl7.fhir.r4.model.Location
-import org.hl7.fhir.r4.model.Money
-import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.Period
-import org.hl7.fhir.r4.model.Quantity
-import org.hl7.fhir.r4.model.Reference
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.SearchParameter
-import org.hl7.fhir.r4.model.StringType
-import org.hl7.fhir.r4.model.Timing
-import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r5.hapi.ctx.HapiWorkerContext
 
@@ -95,8 +113,8 @@ internal object ResourceIndexer {
     getSearchParamList(resource.resourceType)
       .map {
         when (resource) {
-          is Resource -> it to fhirPathEngineR4.evaluate(resource, it.path)
-          is org.hl7.fhir.r5.model.Resource -> it to fhirPathEngineR5.evaluate(resource, it.path)
+          is R4Resource -> it to fhirPathEngineR4.evaluate(resource, it.path)
+          is R5Resource -> it to fhirPathEngineR5.evaluate(resource, it.path)
           else -> {
             return indexBuilder.build()
           }
@@ -212,9 +230,8 @@ internal object ResourceIndexer {
   private fun dateIndex(searchParam: SearchParamDefinition, value: IBase): DateIndex {
     val date =
       when (value) {
-        is DateType -> com.google.android.fhir.index.DateType(value.value, value.precision)
-        is org.hl7.fhir.r5.model.DateType ->
-          com.google.android.fhir.index.DateType(value.value, value.precision)
+        is R4DateType -> DateType(value.value, value.precision)
+        is R5DateType -> DateType(value.value, value.precision)
         else -> throw FHIRException("Unsupported FHIR Version")
       }
     return DateIndex(
@@ -230,10 +247,8 @@ internal object ResourceIndexer {
       "dateTime" -> {
         val dateTime =
           when (value) {
-            is DateTimeType ->
-              com.google.android.fhir.index.DateTimeType(value.value, value.precision)
-            is org.hl7.fhir.r5.model.DateTimeType ->
-              com.google.android.fhir.index.DateTimeType(value.value, value.precision)
+            is R4DateTimeType -> DateTimeType(value.value, value.precision)
+            is R5DateTimeType -> DateTimeType(value.value, value.precision)
             else -> throw FHIRException("Unsupported FHIR Version")
           }
         dateTime.value?.let {
@@ -249,9 +264,8 @@ internal object ResourceIndexer {
       "instant" -> {
         val instant =
           when (value) {
-            is InstantType -> com.google.android.fhir.index.InstantType(value.value)
-            is org.hl7.fhir.r5.model.InstantType ->
-              com.google.android.fhir.index.InstantType(value.value)
+            is R4InstantType -> InstantType(value.value)
+            is R5InstantType -> InstantType(value.value)
             else -> throw FHIRException("Unsupported FHIR Version")
           }
         DateTimeIndex(searchParam.name, searchParam.path, instant.value.time, instant.value.time)
@@ -259,26 +273,20 @@ internal object ResourceIndexer {
       "Period" -> {
         val period =
           when (value) {
-            is Period ->
+            is R4Period ->
               Period(
                 value.hasStart(),
                 value.hasEnd(),
                 value.start,
-                com.google.android.fhir.index.DateTimeType(
-                  value.endElement.value,
-                  value.endElement.precision
-                ),
+                DateTimeType(value.endElement.value, value.endElement.precision),
                 value.end
               )
-            is org.hl7.fhir.r5.model.Period ->
+            is R5Period ->
               Period(
                 value.hasStart(),
                 value.hasEnd(),
                 value.start,
-                com.google.android.fhir.index.DateTimeType(
-                  value.endElement.value,
-                  value.endElement.precision
-                ),
+                DateTimeType(value.endElement.value, value.endElement.precision),
                 value.end
               )
             else -> throw FHIRException("Unsupported FHIR Version")
@@ -294,20 +302,10 @@ internal object ResourceIndexer {
       "Timing" -> {
         val timing =
           when (value) {
-            is Timing ->
-              Timing(
-                value.hasEvent(),
-                value.event.map {
-                  com.google.android.fhir.index.DateTimeType(it.value, it.precision)
-                }
-              )
-            is org.hl7.fhir.r5.model.Timing ->
-              Timing(
-                value.hasEvent(),
-                value.event.map {
-                  com.google.android.fhir.index.DateTimeType(it.value, it.precision)
-                }
-              )
+            is R4Timing ->
+              Timing(value.hasEvent(), value.event.map { DateTimeType(it.value, it.precision) })
+            is R5Timing ->
+              Timing(value.hasEvent(), value.event.map { DateTimeType(it.value, it.precision) })
             else -> throw FHIRException("Unsupported FHIR Version")
           }
         // Skip for now if its is repeating.
@@ -327,15 +325,15 @@ internal object ResourceIndexer {
         try {
           val dateTime =
             when (value) {
-              is StringType ->
-                com.google.android.fhir.index.DateTimeType(
-                  DateTimeType(value.value).value,
-                  DateTimeType(value.value).precision
+              is R4StringType ->
+                DateTimeType(
+                  R4DateTimeType(value.value).value,
+                  R4DateTimeType(value.value).precision
                 )
-              is org.hl7.fhir.r5.model.StringType ->
-                com.google.android.fhir.index.DateTimeType(
-                  org.hl7.fhir.r5.model.DateTimeType(value.value).value,
-                  org.hl7.fhir.r5.model.DateTimeType(value.value).precision
+              is R5StringType ->
+                DateTimeType(
+                  R5DateTimeType(value.value).value,
+                  R5DateTimeType(value.value).precision
                 )
               else -> throw FHIRException("Unsupported FHIR Version")
             }
@@ -358,7 +356,7 @@ internal object ResourceIndexer {
    * Extension to expresses [HumanName] as a separated string using [separator]. See
    * https://www.hl7.org/fhir/patient.html#search
    */
-  private fun HumanName.asString(separator: CharSequence = " "): String {
+  private fun R4HumanName.asString(separator: CharSequence = " "): String {
     return (prefix.filterNotNull().map { it.value } +
         given.filterNotNull().map { it.value } +
         family +
@@ -369,7 +367,7 @@ internal object ResourceIndexer {
       .joinToString(separator)
   }
 
-  private fun org.hl7.fhir.r5.model.HumanName.asString(separator: CharSequence = " "): String {
+  private fun R5HumanName.asString(separator: CharSequence = " "): String {
     return (prefix.filterNotNull().map { it.value } +
         given.filterNotNull().map { it.value } +
         family +
@@ -383,7 +381,7 @@ internal object ResourceIndexer {
    * Extension to expresses [Address] as a string using [separator]. See
    * https://www.hl7.org/fhir/patient.html#search
    */
-  private fun Address.asString(separator: CharSequence = ", "): String {
+  private fun R4Address.asString(separator: CharSequence = ", "): String {
     return (line.filterNotNull().map { it.value } +
         city +
         district +
@@ -396,7 +394,7 @@ internal object ResourceIndexer {
       .joinToString(separator)
   }
 
-  private fun org.hl7.fhir.r5.model.Address.asString(separator: CharSequence = ", "): String {
+  private fun R5Address.asString(separator: CharSequence = ", "): String {
     return (line.filterNotNull().map { it.value } +
         city +
         district +
@@ -415,10 +413,10 @@ internal object ResourceIndexer {
         searchParam.path,
         value =
           when (value) {
-            is HumanName -> value.asString()
-            is org.hl7.fhir.r5.model.HumanName -> value.asString()
-            is Address -> value.asString()
-            is org.hl7.fhir.r5.model.Address -> value.asString()
+            is R4HumanName -> value.asString()
+            is R5HumanName -> value.asString()
+            is R4Address -> value.asString()
+            is R5Address -> value.asString()
             else -> value.toString()
           }
       )
@@ -431,8 +429,8 @@ internal object ResourceIndexer {
       "boolean" -> {
         val primitiveValue =
           when (value) {
-            is Base -> value.primitiveValue()
-            is org.hl7.fhir.r5.model.Base -> value.primitiveValue()
+            is R4Base -> value.primitiveValue()
+            is R5Base -> value.primitiveValue()
             else -> throw FHIRException("Unsupported FHIR Version")
           }
         listOf(TokenIndex(searchParam.name, searchParam.path, system = null, primitiveValue))
@@ -440,8 +438,8 @@ internal object ResourceIndexer {
       "Identifier" -> {
         val identifier =
           when (value) {
-            is Identifier -> Identifier(value.system, value.value)
-            is org.hl7.fhir.r5.model.Identifier -> Identifier(value.system, value.value)
+            is R4Identifier -> Identifier(value.system, value.value)
+            is R5Identifier -> Identifier(value.system, value.value)
             else -> throw FHIRException("Unsupported FHIR Version")
           }
         if (identifier.value != null) {
@@ -455,11 +453,11 @@ internal object ResourceIndexer {
       "CodeableConcept" -> {
         val codeableConcept =
           when (value) {
-            is CodeableConcept ->
+            is R4CodeableConcept ->
               CodeableConcept(
                 value.coding.map { r4Coding -> Coding(r4Coding.system, r4Coding.code) }
               )
-            is org.hl7.fhir.r5.model.CodeableConcept ->
+            is R5CodeableConcept ->
               CodeableConcept(
                 value.coding.map { r5Coding -> Coding(r5Coding.system, r5Coding.code) }
               )
@@ -473,8 +471,8 @@ internal object ResourceIndexer {
       "Coding" -> {
         val coding =
           when (value) {
-            is ICoding -> Coding(value.system, value.code)
-            is org.hl7.fhir.r5.model.ICoding -> Coding(value.system, value.code)
+            is R4ICoding -> Coding(value.system, value.code)
+            is R5ICoding -> Coding(value.system, value.code)
             else -> throw FHIRException("Unsupported FHIR Version")
           }
         listOf(TokenIndex(searchParam.name, searchParam.path, coding.system ?: "", coding.code!!))
@@ -484,12 +482,12 @@ internal object ResourceIndexer {
 
   private fun referenceIndex(searchParam: SearchParamDefinition, value: IBase): ReferenceIndex? {
     return when (value) {
-      is Reference -> value.reference
-      is org.hl7.fhir.r5.model.Reference -> value.reference
-      is CanonicalType -> value.value
-      is org.hl7.fhir.r5.model.CanonicalType -> value.value
-      is UriType -> value.value
-      is org.hl7.fhir.r5.model.UriType -> value.value
+      is R4Reference -> value.reference
+      is R5Reference -> value.reference
+      is R4CanonicalType -> value.value
+      is R5CanonicalType -> value.value
+      is R4UriType -> value.value
+      is R5UriType -> value.value
       else -> throw UnsupportedOperationException("Value $value is not readable by SDK")
     }?.let { ReferenceIndex(searchParam.name, searchParam.path, it) }
   }
@@ -499,8 +497,8 @@ internal object ResourceIndexer {
       "Money" -> {
         val money =
           when (value) {
-            is Money -> Money(value.currency, value.value)
-            is org.hl7.fhir.r5.model.Money -> Money(value.currency, value.value)
+            is R4Money -> Money(value.currency, value.value)
+            is R5Money -> Money(value.currency, value.value)
             else -> throw FHIRException("Unsupported FHIR Version")
           }
         listOf(
@@ -516,9 +514,8 @@ internal object ResourceIndexer {
       "Quantity" -> {
         val quantity =
           when (value) {
-            is Quantity -> Quantity(value.unit, value.code, value.system, value.value)
-            is org.hl7.fhir.r5.model.Quantity ->
-              Quantity(value.unit, value.code, value.system, value.value)
+            is R4Quantity -> Quantity(value.unit, value.code, value.system, value.value)
+            is R5Quantity -> Quantity(value.unit, value.code, value.system, value.value)
             else -> throw FHIRException("Unsupported FHIR Version")
           }
         val quantityIndices = mutableListOf<QuantityIndex>()
@@ -559,8 +556,8 @@ internal object ResourceIndexer {
   private fun uriIndex(searchParam: SearchParamDefinition, value: IBase?): UriIndex? {
     val url =
       when (value) {
-        is UriType -> value.value
-        is org.hl7.fhir.r5.model.UriType -> value.value
+        is R4UriType -> value.value
+        is R5UriType -> value.value
         else -> throw FHIRException("Unsupported FHIR Version")
       }
     return if (url.isNotEmpty()) {
@@ -573,9 +570,9 @@ internal object ResourceIndexer {
   private fun specialIndex(value: IBase?): PositionIndex? {
     val locationPositionComponent =
       when (value) {
-        is Location.LocationPositionComponent ->
+        is R4LocationPositionComponent ->
           LocationPositionComponent(value.latitude.toDouble(), value.longitude.toDouble())
-        is org.hl7.fhir.r5.model.Location.LocationPositionComponent ->
+        is R5LocationPositionComponent ->
           LocationPositionComponent(value.latitude.toDouble(), value.longitude.toDouble())
         else -> null
       }
@@ -610,10 +607,7 @@ data class Quantity(
   val value: BigDecimal
 )
 
-data class Timing(
-  val hasEvent: Boolean,
-  val event: List<com.google.android.fhir.index.DateTimeType>
-)
+data class Timing(val hasEvent: Boolean, val event: List<DateTimeType>)
 
 data class Coding(val system: String?, val code: String?)
 
@@ -629,6 +623,6 @@ data class Period(
   val hasStart: Boolean,
   val hasEnd: Boolean,
   val start: Date?,
-  val endElement: com.google.android.fhir.index.DateTimeType,
+  val endElement: DateTimeType,
   val end: Date?
 )
