@@ -16,19 +16,38 @@
 
 package com.google.android.fhir.datacapture.views.attachment
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemAttachmentViewHolderFactory
+import timber.log.Timber
 
 class CameraLauncherFragment : DialogFragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val uri = arguments?.get(QuestionnaireItemAttachmentViewHolderFactory.SAVED_PHOTO_URI) as Uri
+
+    if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) ==
+        PackageManager.PERMISSION_DENIED
+    ) {
+      registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+          if (isGranted) {
+            Timber.d("Camera permission granted")
+          } else {
+            Timber.d("Camera permission not granted")
+          }
+        }
+        .launch(Manifest.permission.CAMERA)
+      dismiss()
+      return
+    }
 
     registerForActivityResult(ActivityResultContracts.TakePicture()) { isSaved ->
         setFragmentResult(RESULT_REQUEST_KEY, bundleOf(RESULT_REQUEST_KEY to isSaved))
