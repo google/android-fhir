@@ -76,8 +76,8 @@ dependencies {
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)
   implementation(Dependencies.Androidx.coreKtx)
-  implementation(Dependencies.Glide.glide)
   implementation(Dependencies.Androidx.fragmentKtx)
+  implementation(Dependencies.Glide.glide)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
