@@ -90,41 +90,6 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
     assertThat(holder.textView.text).isEqualTo("• First Name")
   }
 
-  @Test
-  fun `createCustomView with a valid questionnaire response validation result`() {
-    val questionnaire =
-      Questionnaire().apply {
-        url = "questionnaire-1"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "name-id"
-            text = "First Name"
-            type = Questionnaire.QuestionnaireItemType.STRING
-          }
-        )
-      }
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        this.questionnaire = "questionnaire-1"
-        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("name-id")))
-      }
-
-    val scenario =
-      launchFragmentInContainer<QuestionnaireValidationErrorMessageDialogFragment>(
-        initialState = Lifecycle.State.CREATED,
-        factory = createDialogFragmentFactoryForTests(questionnaire, questionnaireResponse)
-      )
-
-    val result = scenario.withFragment { onCreateCustomView() }
-
-    assertThat(result.findViewById<TextView>(R.id.dialog_title).text)
-      .isEqualTo("Complete all required fields")
-    assertThat(result.findViewById<TextView>(R.id.dialog_subtitle).text)
-      .isEqualTo("Fields that need to be completed:")
-    assertThat(result.findViewById<RecyclerView>(R.id.recycler_view).adapter!!.itemCount)
-      .isEqualTo(0)
-  }
-
   private fun createTestValidationErrorViewModel(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse
@@ -147,7 +112,7 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
     val fragmentFactory: FragmentFactory = mock()
     val factory =
       object : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
           return createTestValidationErrorViewModel(questionnaire, questionnaireResponse) as T
         }
       }

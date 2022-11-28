@@ -78,10 +78,7 @@ open class QuestionnaireFragment : Fragment() {
     paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
     view.findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
       viewModel.validateQuestionnaireAndUpdateUI().let { validationMap ->
-        if (validationMap
-            .filter { (_, validations) -> validations.filterIsInstance<Invalid>().isNotEmpty() }
-            .isEmpty()
-        ) {
+        if (validationMap.values.flatten().filterIsInstance<Invalid>().isEmpty()) {
           setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
         } else {
           val errorViewModel: QuestionnaireValidationErrorViewModel by activityViewModels()
@@ -178,6 +175,10 @@ open class QuestionnaireFragment : Fragment() {
         submitButton.visibility = if (state.pagination.showSubmitButton) View.VISIBLE else View.GONE
       }
     }
+    requireActivity().supportFragmentManager.setFragmentResultListener(
+      QuestionnaireValidationErrorMessageDialogFragment.RESULT_CALLBACK,
+      viewLifecycleOwner
+    ) { _, _ -> setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY) }
   }
 
   /** Calculates the progress percentage from given [count] and [totalCount] values. */

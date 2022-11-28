@@ -44,15 +44,15 @@
     <string name="not_answered">"Not Answered"</string>
     <string name="help">Help</string>
     <string name="space_asterisk">\u0020\u002a</string>
-    <string
-        name="questionnaire_validation_error_supporting_text"
-    >Fields that need to be completed:</string>
+    <string name="group_header_add_item_button">Add item</string>
+    <!-- Questionnaire validation popup texts-->
     <string
         name="questionnaire_validation_error_headline"
     >Complete all required fields</string>
     <string
+        name="questionnaire_validation_error_supporting_text"
+    >Fields that need to be completed:</string>
+    <string
         name="questionnaire_validation_error_item_text_with_bullet"
     >• %s</string>
-    <string name="group_header_add_item_button">Add item</string>
-
 </resources>

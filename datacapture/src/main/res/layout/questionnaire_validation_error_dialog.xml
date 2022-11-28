@@ -47,16 +47,4 @@
         android:layout_weight="1"
         tools:listitem="@layout/questionnaire_validation_dialog_item"
     />
-
-    <com.google.android.material.button.MaterialButton
-        android:layout_marginTop="@dimen/padding_modal_card"
-        android:layout_gravity="right"
-        android:id="@+id/positive_button"
-        style="?attr/questionnaireValidationDialogButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/padding_half_size"
-        android:text="@android:string/ok"
-    />
-
 </LinearLayout>

@@ -101,7 +101,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private var isPaginationButtonPressed = false
 
   /** Forces response validation each time [getQuestionnaireItemViewItems] is called. */
-  private var forceValidate = false
+  private var hasPressedSubmitButton = false
 
   init {
     when {
@@ -312,8 +312,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * Validates questionnaire and return the validation results. As a side effect, it triggers the UI
-   * update to show errors in case there are any validation errors.
+   * Validates entire questionnaire and return the validation results. As a side effect, it triggers
+   * the UI update to show errors in case there are any validation errors.
    */
   internal fun validateQuestionnaireAndUpdateUI(): Map<String, List<ValidationResult>> =
     QuestionnaireResponseValidator.validateQuestionnaireResponse(
@@ -323,7 +323,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       )
       .also { result ->
         if (result.values.flatten().filterIsInstance<Invalid>().isNotEmpty()) {
-          forceValidate = true
+          hasPressedSubmitButton = true
           modificationCount.update { it + 1 }
         }
       }
@@ -624,7 +624,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val validationResult =
       if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
           isPaginationButtonPressed ||
-          forceValidate
+          hasPressedSubmitButton
       ) {
         QuestionnaireResponseItemValidator.validate(
           questionnaireItem,

@@ -11,7 +11,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<com.google.android.material.textview.MaterialTextView
+<TextView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/text_view"

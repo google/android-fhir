@@ -27,6 +27,7 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
@@ -53,7 +54,14 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     isCancelable = false
-    return MaterialAlertDialogBuilder(requireContext()).setView(onCreateCustomView()).create()
+    return MaterialAlertDialogBuilder(requireContext())
+      .setView(onCreateCustomView())
+      .setPositiveButton(android.R.string.ok) { dialog, _ -> dialog?.dismiss() }
+      .setNegativeButton(R.string.submit_button_text) { dialog, _ ->
+        setFragmentResult(RESULT_CALLBACK, Bundle.EMPTY)
+        dialog?.dismiss()
+      }
+      .create()
   }
 
   @VisibleForTesting
@@ -84,7 +92,6 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
           adapter =
             ErrorAdapter().apply { submitList(viewModel.getItemsTextWithValidationErrors()) }
         }
-        findViewById<View>(R.id.positive_button).setOnClickListener { dialog?.dismiss() }
       }
   }
 
@@ -115,6 +122,7 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
 
   companion object {
     const val TAG = "QuestionnaireValidationErrorMessageDialogFragment"
+    const val RESULT_CALLBACK = "QuestionnaireValidationResultCallback"
   }
 }
 
@@ -161,4 +169,13 @@ internal class QuestionnaireValidationErrorViewModel : ViewModel() {
   }
 }
 
-data class ValidationErrorDataModel(val linkId: String, val questionnaireItemText: String)
+/**
+ * Data model for showing validation error of a particular [QuestionnaireItemComponent] in the
+ * Dialog.
+ */
+data class ValidationErrorDataModel(
+  /** Id of the [QuestionnaireItemComponent] with error */
+  val linkId: String,
+  /** Text of the [QuestionnaireItemComponent] with error */
+  val questionnaireItemText: String
+)
