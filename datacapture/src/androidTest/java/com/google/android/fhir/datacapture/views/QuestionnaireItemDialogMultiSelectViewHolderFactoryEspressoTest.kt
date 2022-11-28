@@ -24,8 +24,10 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
@@ -43,6 +45,7 @@ import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.StringSubject
 import com.google.common.truth.Truth.assertThat
+import org.hamcrest.Matchers.not
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
@@ -346,6 +349,23 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnTextInDialog("Other")
     onView(withId(R.id.add_another)).perform(click())
     onView(withId(R.id.add_another)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+  }
+
+  @Test
+  fun `errorTextviewInHeader_shouldHide`() {
+    val questionnaireItem = answerOptions(true, "Coding 1")
+    questionnaireItem.addExtension(openChoiceType)
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        questionnaireItem,
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+
+    onView(withId(R.id.error_text_at_header)).check(matches(not(isDisplayed())))
   }
 
   /** Method to run code snippet on UI/main thread */
