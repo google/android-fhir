@@ -29,10 +29,7 @@ class FhirEngineProviderTestRule : TestRule {
     return object : Statement() {
       override fun evaluate() {
         FhirEngineProvider.init(
-          FhirEngineConfiguration(
-            testMode = true,
-            resourceIndexerManager = ResourceIndexerManagerForR4Test
-          )
+          FhirEngineConfiguration(testMode = true, fhirConverter = FhirConverterForR4Test)
         )
         try {
           base.evaluate()

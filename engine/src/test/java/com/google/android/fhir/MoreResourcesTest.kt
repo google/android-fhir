@@ -39,12 +39,6 @@ class MoreResourcesTest {
   }
 
   @Test
-  fun `getResourceClass() by name should return resource class r5`() {
-    assertThat(getResourceClass<org.hl7.fhir.r5.model.Resource>("Patient"))
-      .isEqualTo(org.hl7.fhir.r5.model.Patient::class.java)
-  }
-
-  @Test
   fun `getResourceClass() by resource type should return resource class`() {
     assertThat(getResourceClass<Resource>("Patient")).isEqualTo(Patient::class.java)
   }

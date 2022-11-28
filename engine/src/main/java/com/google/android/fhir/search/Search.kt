@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.search
 
+import com.google.android.fhir.FhirConverter
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.resourceType
 import com.google.android.fhir.search.query.XFhirQueryTranslator.translate
@@ -39,7 +40,7 @@ suspend inline fun <reified R : IAnyResource> FhirEngine.count(
 
 suspend fun FhirEngine.search(
   xFhirQuery: String,
-  searchManager: SearchManager
+  fhirConverter: FhirConverter
 ): List<IAnyResource> {
-  return this.search(translate(xFhirQuery, searchManager))
+  return this.search(translate(xFhirQuery, fhirConverter))
 }

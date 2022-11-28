@@ -14,21 +14,32 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.index
+package com.google.android.fhir
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import java.math.BigDecimal
 import java.util.Date
 import org.hl7.fhir.instance.model.api.IBase
 import org.hl7.fhir.instance.model.api.IBaseMetaType
+import org.hl7.fhir.instance.model.api.ICompositeType
+import org.hl7.fhir.instance.model.api.IPrimitiveType
 
-interface ResourceIndexerManager {
+interface FhirConverter {
 
   fun evaluateFunction(resource: IBase, path: String): List<IBase>
 
   fun createDateType(value: IBase): DateType
+  fun createDateType(value: String): DateType
 
   fun createDateTimeType(value: IBase): DateTimeType
+  fun createDateTimeType(value: String): DateTimeType
+
+  fun createContactPointType(value: ICompositeType): ContactPoint
+
+  fun createCodeType(value: IPrimitiveType<String>): CodeType
+
+  fun createUriType(value: IPrimitiveType<String>): UriType
+
   fun createInstantType(value: IBase): InstantType
   fun createPeriodType(value: IBase): Period
 
@@ -50,6 +61,8 @@ interface ResourceIndexerManager {
   fun getLastUpdatedElement(meta: IBaseMetaType?): Long
   fun hasProfile(meta: IBaseMetaType?): Boolean
   fun hasTag(meta: IBaseMetaType?): Boolean
+
+  fun validateResourceType(resourceType: String)
 }
 
 data class DateType(val value: Date, val precision: TemporalPrecisionEnum)

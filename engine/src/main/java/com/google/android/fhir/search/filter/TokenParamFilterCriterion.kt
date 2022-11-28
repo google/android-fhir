@@ -17,12 +17,12 @@
 package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.TokenClientParam
-import com.google.android.fhir.index.CodeType
-import com.google.android.fhir.index.CodeableConcept
-import com.google.android.fhir.index.Coding
-import com.google.android.fhir.index.ContactPoint
-import com.google.android.fhir.index.Identifier
-import com.google.android.fhir.index.UriType
+import com.google.android.fhir.CodeType
+import com.google.android.fhir.CodeableConcept
+import com.google.android.fhir.Coding
+import com.google.android.fhir.ContactPoint
+import com.google.android.fhir.Identifier
+import com.google.android.fhir.UriType
 import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker

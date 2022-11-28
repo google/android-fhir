@@ -31,8 +31,8 @@ import com.google.android.fhir.search.search
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.launch
-import org.hl7.fhir.r5.model.Patient
-import org.hl7.fhir.r5.model.RiskAssessment
+import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.RiskAssessment
 
 /**
  * The ViewModel helper class for PatientItemRecyclerViewAdapter, that is responsible for preparing
@@ -82,7 +82,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
           }
         )
       }
-      // filterCity(this)
+      filterCity(this)
     }
   }
 
@@ -99,7 +99,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
             }
           )
         }
-        // filterCity(this)
+        filterCity(this)
         sort(Patient.GIVEN, Order.ASCENDING)
         count = 100
         from = 0

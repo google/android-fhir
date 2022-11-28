@@ -22,12 +22,12 @@ import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.ConverterException
 import com.google.android.fhir.DateProvider
+import com.google.android.fhir.DateTimeType
+import com.google.android.fhir.DateType
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.epochDay
-import com.google.android.fhir.index.DateTimeType
-import com.google.android.fhir.index.DateType
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import java.util.Date

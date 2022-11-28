@@ -19,7 +19,6 @@ package com.google.android.fhir
 import android.content.Context
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
-import com.google.android.fhir.index.ResourceIndexerManager
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.remote.HttpLogger
@@ -70,7 +69,7 @@ object FhirEngineProvider {
             if (configuration.enableEncryptionIfSupported) enableEncryptionIfSupported()
             setDatabaseErrorStrategy(configuration.databaseErrorStrategy)
             setFhirVersion(configuration.fhirVersionEnum)
-            configuration.resourceIndexerManager?.let { setResourceIndexerManager(it) }
+            configuration.fhirConverter?.let { setFhirConverter(it) }
             configuration.serverConfiguration?.let { setServerConfiguration(it) }
             if (configuration.testMode) {
               inMemory()
@@ -110,7 +109,7 @@ data class FhirEngineConfiguration(
   val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
   val fhirVersionEnum: FhirVersionEnum = FhirVersionEnum.R4,
   val serverConfiguration: ServerConfiguration? = null,
-  val resourceIndexerManager: ResourceIndexerManager? = null,
+  val fhirConverter: FhirConverter? = null,
   val testMode: Boolean = false
 )
 

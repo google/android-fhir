@@ -18,7 +18,7 @@ package com.google.android.fhir
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.fhir.testing.ResourceIndexerManagerForR4Test
+import com.google.android.fhir.testing.FhirConverterForR4Test
 import com.google.common.truth.Truth.assertThat
 import java.lang.IllegalStateException
 import org.junit.After
@@ -38,7 +38,7 @@ class FhirEngineProviderTest {
 
   @Test
   fun build_twiceWithAppContext_shouldReturnSameFhirEngine() {
-    provider.init(FhirEngineConfiguration(resourceIndexerManager = ResourceIndexerManagerForR4Test))
+    provider.init(FhirEngineConfiguration(fhirConverter = FhirConverterForR4Test))
     val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
     val engineTwo = provider.getInstance(ApplicationProvider.getApplicationContext())
     assertThat(engineOne).isSameInstanceAs(engineTwo)
@@ -46,7 +46,7 @@ class FhirEngineProviderTest {
 
   @Test
   fun build_withAppAndActivityContext_shouldReturnSameFhirEngine() {
-    provider.init(FhirEngineConfiguration(resourceIndexerManager = ResourceIndexerManagerForR4Test))
+    provider.init(FhirEngineConfiguration(fhirConverter = FhirConverterForR4Test))
     val engineAppContext = provider.getInstance(ApplicationProvider.getApplicationContext())
     val engineActivityContext =
       provider.getInstance(InstrumentationRegistry.getInstrumentation().context)
@@ -55,27 +55,17 @@ class FhirEngineProviderTest {
 
   @Test
   fun build_twiceWithAppContext_afterCleanup_shouldReturnDifferentInstances() {
-    provider.init(
-      FhirEngineConfiguration(
-        testMode = true,
-        resourceIndexerManager = ResourceIndexerManagerForR4Test
-      )
-    )
+    provider.init(FhirEngineConfiguration(testMode = true, fhirConverter = FhirConverterForR4Test))
     val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
     provider.cleanup()
-    provider.init(FhirEngineConfiguration(resourceIndexerManager = ResourceIndexerManagerForR4Test))
+    provider.init(FhirEngineConfiguration(fhirConverter = FhirConverterForR4Test))
     val engineTwo = provider.getInstance(ApplicationProvider.getApplicationContext())
     assertThat(engineOne).isNotSameInstanceAs(engineTwo)
   }
 
   @Test
   fun cleanup_not_in_test_mode_fails() {
-    provider.init(
-      FhirEngineConfiguration(
-        testMode = false,
-        resourceIndexerManager = ResourceIndexerManagerForR4Test
-      )
-    )
+    provider.init(FhirEngineConfiguration(testMode = false, fhirConverter = FhirConverterForR4Test))
 
     provider.getInstance(ApplicationProvider.getApplicationContext())
 

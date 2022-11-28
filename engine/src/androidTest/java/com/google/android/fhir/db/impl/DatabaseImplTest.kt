@@ -36,8 +36,7 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
-import com.google.android.fhir.testing.ResourceIndexerManagerForR4Test
-import com.google.android.fhir.testing.SearchManagerForR4Test
+import com.google.android.fhir.testing.FhirConverterForR4Test
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
@@ -89,13 +88,13 @@ class DatabaseImplTest {
   private val context: Context = ApplicationProvider.getApplicationContext()
   private val services =
     FhirServices.builder(context)
-      .setResourceIndexerManager(ResourceIndexerManagerForR4Test)
+      .setFhirConverter(FhirConverterForR4Test)
       .inMemory()
       .apply { if (encrypted) enableEncryptionIfSupported() }
       .build()
   private val testingUtils = TestingUtils(services.parser)
   private val database = services.database
-  private val searchManager = SearchManagerForR4Test
+  private val fhirConverter = FhirConverterForR4Test
 
   @Before fun setUp(): Unit = runBlocking { database.insert(TEST_PATIENT_1) }
 
@@ -1379,7 +1378,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.APPROXIMATE
               }
             )
@@ -1405,7 +1404,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2020-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2020-03-14")))
                 prefix = ParamPrefixEnum.APPROXIMATE
               }
             )
@@ -1431,7 +1430,7 @@ class DatabaseImplTest {
             filter(
               Patient.BIRTHDATE,
               {
-                value = of(searchManager.createDateType(DateType("2013-03-14")))
+                value = of(fhirConverter.createDateType(DateType("2013-03-14")))
                 prefix = ParamPrefixEnum.APPROXIMATE
               }
             )
@@ -1457,7 +1456,7 @@ class DatabaseImplTest {
             filter(
               Patient.BIRTHDATE,
               {
-                value = of(searchManager.createDateType(DateType("2020-03-14")))
+                value = of(fhirConverter.createDateType(DateType("2020-03-14")))
                 prefix = ParamPrefixEnum.APPROXIMATE
               }
             )
@@ -1482,7 +1481,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.STARTS_AFTER
               }
             )
@@ -1507,7 +1506,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.STARTS_AFTER
               }
             )
@@ -1532,7 +1531,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.ENDS_BEFORE
               }
             )
@@ -1557,7 +1556,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.ENDS_BEFORE
               }
             )
@@ -1582,7 +1581,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.NOT_EQUAL
               }
             )
@@ -1607,7 +1606,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.NOT_EQUAL
               }
             )
@@ -1632,7 +1631,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.EQUAL
               }
             )
@@ -1657,7 +1656,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.EQUAL
               }
             )
@@ -1682,7 +1681,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.GREATERTHAN
               }
             )
@@ -1707,7 +1706,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.GREATERTHAN
               }
             )
@@ -1732,7 +1731,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
               }
             )
@@ -1757,7 +1756,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
               }
             )
@@ -1782,7 +1781,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.LESSTHAN
               }
             )
@@ -1807,7 +1806,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.LESSTHAN
               }
             )
@@ -1832,7 +1831,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
                 prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
               }
             )
@@ -1858,7 +1857,7 @@ class DatabaseImplTest {
               Patient.DEATH_DATE,
               {
                 value =
-                  of(searchManager.createDateTimeType(DateTimeType("2013-03-14T00:00:00-00:00")))
+                  of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14T00:00:00-00:00")))
                 prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
               }
             )
@@ -2398,7 +2397,7 @@ class DatabaseImplTest {
                 {
                   value =
                     of(
-                      searchManager.createCodingType(
+                      fhirConverter.createCodingType(
                         Coding(
                           "http://hl7.org/fhir/sid/cvx",
                           "140",
@@ -2415,7 +2414,7 @@ class DatabaseImplTest {
                 {
                   value =
                     of(
-                      searchManager.createCodingType(
+                      fhirConverter.createCodingType(
                         Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")
                       )
                     )
@@ -2467,7 +2466,7 @@ class DatabaseImplTest {
                 {
                   value =
                     of(
-                      searchManager.createCodingType(
+                      fhirConverter.createCodingType(
                         Coding(
                           "http://snomed.info/sct",
                           "698360004",
@@ -2553,7 +2552,7 @@ class DatabaseImplTest {
                   {
                     value =
                       of(
-                        searchManager.createCodingType(
+                        fhirConverter.createCodingType(
                           Coding("http://snomed.info/sct", "44054006", "Diabetes")
                         )
                       )
@@ -2568,7 +2567,7 @@ class DatabaseImplTest {
                   {
                     value =
                       of(
-                        searchManager.createCodingType(
+                        fhirConverter.createCodingType(
                           Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")
                         )
                       )
@@ -2698,7 +2697,7 @@ class DatabaseImplTest {
               {
                 value =
                   of(
-                    searchManager.createCodingType(
+                    fhirConverter.createCodingType(
                       Coding(
                         "http://id.who.int/icd11/mms",
                         "XM1NL1",
@@ -2710,7 +2709,7 @@ class DatabaseImplTest {
               {
                 value =
                   of(
-                    searchManager.createCodingType(
+                    fhirConverter.createCodingType(
                       Coding(
                         "http://id.who.int/icd11/mms",
                         "XM5DF6",
@@ -2787,7 +2786,7 @@ class DatabaseImplTest {
               {
                 value =
                   of(
-                    searchManager.createCodingType(
+                    fhirConverter.createCodingType(
                       Coding("http://id.who.int/icd11/mms", "XM1NL1", "")
                     )
                   )
@@ -2799,7 +2798,7 @@ class DatabaseImplTest {
               {
                 value =
                   of(
-                    searchManager.createCodingType(
+                    fhirConverter.createCodingType(
                       Coding("http://id.who.int/icd11/mms", "XM5DF6", "")
                     )
                   )

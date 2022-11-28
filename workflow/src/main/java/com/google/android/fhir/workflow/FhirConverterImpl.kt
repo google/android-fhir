@@ -14,23 +14,28 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.testing
+package com.google.android.fhir.workflow
 
-import com.google.android.fhir.index.CodeableConcept
-import com.google.android.fhir.index.Coding
-import com.google.android.fhir.index.DateTimeType
-import com.google.android.fhir.index.DateType
-import com.google.android.fhir.index.Identifier
-import com.google.android.fhir.index.InstantType
-import com.google.android.fhir.index.LocationPositionComponent
-import com.google.android.fhir.index.Money
-import com.google.android.fhir.index.Period
-import com.google.android.fhir.index.Quantity
-import com.google.android.fhir.index.ResourceIndexerManager
-import com.google.android.fhir.index.Timing
+import com.google.android.fhir.CodeType
+import com.google.android.fhir.CodeableConcept
+import com.google.android.fhir.Coding
+import com.google.android.fhir.ContactPoint
+import com.google.android.fhir.DateTimeType
+import com.google.android.fhir.DateType
+import com.google.android.fhir.FhirConverter
+import com.google.android.fhir.Identifier
+import com.google.android.fhir.InstantType
+import com.google.android.fhir.LocationPositionComponent
+import com.google.android.fhir.Money
+import com.google.android.fhir.Period
+import com.google.android.fhir.Quantity
+import com.google.android.fhir.Timing
+import com.google.android.fhir.UriType
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.instance.model.api.IBase
 import org.hl7.fhir.instance.model.api.IBaseMetaType
+import org.hl7.fhir.instance.model.api.ICompositeType
+import org.hl7.fhir.instance.model.api.IPrimitiveType
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Base
@@ -40,17 +45,22 @@ import org.hl7.fhir.r4.model.ICoding
 import org.hl7.fhir.r4.model.Location
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.StringType
-import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 
-object ResourceIndexerManagerForR4Test : ResourceIndexerManager {
+object FhirConverterImpl : FhirConverter {
   override fun evaluateFunction(resource: IBase, path: String): List<IBase> {
     return FHIRPathEngine(SimpleWorkerContext()).evaluate(resource as Base, path)
   }
 
   override fun createDateType(value: IBase): DateType =
     DateType((value as org.hl7.fhir.r4.model.DateType).value, value.precision)
+
+  override fun createDateType(value: String): DateType {
+    val date = org.hl7.fhir.r4.model.DateType(value)
+    return DateType(date.value, date.precision)
+  }
 
   override fun createDateTimeType(value: IBase): DateTimeType =
     when (value) {
@@ -62,6 +72,28 @@ object ResourceIndexerManagerForR4Test : ResourceIndexerManager {
         )
       else -> throw FHIRException("Invalid conversion to DateTimeType")
     }
+
+  override fun createDateTimeType(value: String): DateTimeType {
+    val dateTime = org.hl7.fhir.r4.model.DateTimeType(value)
+    return DateTimeType(dateTime.value, dateTime.precision)
+  }
+
+  override fun createContactPointType(value: ICompositeType): ContactPoint {
+    val contactPoint = value as org.hl7.fhir.r4.model.ContactPoint
+    return ContactPoint(
+      contactPoint.system.toCode(),
+      contactPoint.value,
+      contactPoint.use?.toCode()
+    )
+  }
+
+  override fun createCodeType(value: IPrimitiveType<String>): CodeType {
+    return CodeType(value.value)
+  }
+
+  override fun createUriType(value: IPrimitiveType<String>): UriType {
+    return UriType(value.value)
+  }
 
   override fun createInstantType(value: IBase): InstantType =
     InstantType((value as org.hl7.fhir.r4.model.InstantType).value)
@@ -92,7 +124,7 @@ object ResourceIndexerManagerForR4Test : ResourceIndexerManager {
     when (value) {
       is Reference -> value.reference
       is CanonicalType -> value.value
-      is UriType -> value.value
+      is org.hl7.fhir.r4.model.UriType -> value.value
       else -> throw UnsupportedOperationException("Value $value is not readable by SDK")
     }
 
@@ -128,6 +160,10 @@ object ResourceIndexerManagerForR4Test : ResourceIndexerManager {
   override fun hasProfile(meta: IBaseMetaType?): Boolean = (meta as Meta).hasProfile()
 
   override fun hasTag(meta: IBaseMetaType?): Boolean = (meta as Meta).hasTag()
+  @Throws(FHIRException::class)
+  override fun validateResourceType(resourceType: String) {
+    ResourceType.fromCode(resourceType)
+  }
 }
 
 /**

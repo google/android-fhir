@@ -55,7 +55,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
             syncConstraints = Constraints.Builder().build(),
             repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
           ),
-          FhirVersionEnum.R5
+          FhirVersionEnum.R4
         )
         .collect { _pollState.emit(it) }
     }
@@ -63,7 +63,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
   fun triggerOneTimeSync() {
     viewModelScope.launch {
-      Sync.oneTimeSync<FhirSyncWorker>(getApplication(), fhirVersionEnum = FhirVersionEnum.R5)
+      Sync.oneTimeSync<FhirSyncWorker>(getApplication(), fhirVersionEnum = FhirVersionEnum.R4)
         .collect { _pollState.emit(it) }
     }
   }

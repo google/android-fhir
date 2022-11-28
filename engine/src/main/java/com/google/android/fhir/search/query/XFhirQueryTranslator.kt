@@ -23,15 +23,15 @@ import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.gclient.UriClientParam
-import com.google.android.fhir.index.Coding
-import com.google.android.fhir.index.Quantity
+import com.google.android.fhir.Coding
+import com.google.android.fhir.FhirConverter
+import com.google.android.fhir.Quantity
 import com.google.android.fhir.index.SearchParamDefinition
 import com.google.android.fhir.index.SearchParamType
 import com.google.android.fhir.index.getSearchParamList
 import com.google.android.fhir.isValidDateOnly
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
-import com.google.android.fhir.search.SearchManager
 import com.google.android.fhir.search.filter.TokenFilterValue
 import com.google.android.fhir.search.filter.TokenParamFilterValueInstance
 import java.math.BigDecimal
@@ -55,11 +55,11 @@ object XFhirQueryTranslator {
    * Complex queries including fhirpath expressions, global common search params, modifiers,
    * prefixes, chained parameters are not supported.
    */
-  internal fun translate(xFhirQuery: String, searchManager: SearchManager): Search {
+  internal fun translate(xFhirQuery: String, fhirConverter: FhirConverter): Search {
     val (resourceType, queryStringPairs) =
       xFhirQuery.split("?").let { it.first() to it.elementAtOrNull(1)?.split("&") }
 
-    searchManager.validateResourceType(resourceType)
+    fhirConverter.validateResourceType(resourceType)
     val queryParams =
       queryStringPairs?.mapNotNull {
         // skip missing values like active=[missing]
@@ -97,7 +97,7 @@ object XFhirQueryTranslator {
     return Search(resourceType, count).apply {
       querySearchParameters?.forEach {
         val (param, filterValue) = it
-        this.applyFilterParam(param, filterValue, searchManager)
+        this.applyFilterParam(param, filterValue, fhirConverter)
       }
 
       sort?.forEach { sortParam ->
@@ -111,7 +111,7 @@ object XFhirQueryTranslator {
   fun Search.applyFilterParam(
     param: SearchParamDefinition,
     filterValue: String,
-    searchManager: SearchManager
+    fhirConverter: FhirConverter
   ) =
     when (param.type) {
       SearchParamType.NUMBER -> {
@@ -121,12 +121,12 @@ object XFhirQueryTranslator {
         if (!isValidDateOnly(filterValue))
           this.filter(
             DateClientParam(param.name),
-            { value = of(searchManager.createDateTimeType(filterValue)) }
+            { value = of(fhirConverter.createDateTimeType(filterValue)) }
           )
         else
           this.filter(
             DateClientParam(param.name),
-            { value = of(searchManager.createDateType(filterValue)) },
+            { value = of(fhirConverter.createDateType(filterValue)) },
           )
       }
       SearchParamType.QUANTITY -> {

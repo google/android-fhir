@@ -18,8 +18,8 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
-import com.google.android.fhir.index.DateTimeType
-import com.google.android.fhir.index.DateType
+import com.google.android.fhir.DateTimeType
+import com.google.android.fhir.DateType
 import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker

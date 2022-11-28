@@ -17,6 +17,7 @@
 package com.google.android.fhir.index
 
 import com.google.android.fhir.ConverterException
+import com.google.android.fhir.FhirConverter
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.epochDay
@@ -44,20 +45,17 @@ import org.hl7.fhir.instance.model.api.IBaseIntegerDatatype
  */
 internal object ResourceIndexer {
 
-  private lateinit var resourceIndexerManager: ResourceIndexerManager
+  private lateinit var fhirConverter: FhirConverter
 
-  fun <R : IAnyResource> index(
-    resource: R,
-    resourceIndexerManager: ResourceIndexerManager
-  ): ResourceIndices {
-    this.resourceIndexerManager = resourceIndexerManager
+  fun <R : IAnyResource> index(resource: R, fhirConverter: FhirConverter): ResourceIndices {
+    this.fhirConverter = fhirConverter
     return extractIndexValues(resource)
   }
 
   private fun <R : IAnyResource> extractIndexValues(resource: R): ResourceIndices {
     val indexBuilder = ResourceIndices.Builder(resource.resourceType, resource.logicalId)
     getSearchParamList(resource.resourceType)
-      .map { it to resourceIndexerManager.evaluateFunction(resource, it.path) }
+      .map { it to fhirConverter.evaluateFunction(resource, it.path) }
       .flatMap { pair -> pair.second.map { pair.first to it } }
       .forEach { pair ->
         val (searchParam, value) = pair
@@ -110,8 +108,8 @@ internal object ResourceIndexer {
       )
     )
     // Add 'lastUpdated' index to all resources.
-    if (resourceIndexerManager.hasLastUpdated(resource.meta)) {
-      val lastUpdatedElement = resourceIndexerManager.getLastUpdatedElement(resource.meta)
+    if (fhirConverter.hasLastUpdated(resource.meta)) {
+      val lastUpdatedElement = fhirConverter.getLastUpdatedElement(resource.meta)
       indexBuilder.addDateTimeIndex(
         DateTimeIndex(
           name = "_lastUpdated",
@@ -122,7 +120,7 @@ internal object ResourceIndexer {
       )
     }
 
-    if (resourceIndexerManager.hasProfile(resource.meta)) {
+    if (fhirConverter.hasProfile(resource.meta)) {
       resource.meta.profile
         .filter { it.value != null && it.value.isNotEmpty() }
         .forEach {
@@ -136,7 +134,7 @@ internal object ResourceIndexer {
         }
     }
 
-    if (resourceIndexerManager.hasTag(resource.meta)) {
+    if (fhirConverter.hasTag(resource.meta)) {
       resource.meta.tag
         .filter { it.code != null && it.code!!.isNotEmpty() }
         .forEach {
@@ -166,7 +164,7 @@ internal object ResourceIndexer {
     }
 
   private fun dateIndex(searchParam: SearchParamDefinition, value: IBase): DateIndex {
-    val date = resourceIndexerManager.createDateType(value)
+    val date = fhirConverter.createDateType(value)
     return DateIndex(
       searchParam.name,
       searchParam.path,
@@ -178,7 +176,7 @@ internal object ResourceIndexer {
   private fun dateTimeIndex(searchParam: SearchParamDefinition, value: IBase): DateTimeIndex? =
     when (value.fhirType()) {
       "dateTime" -> {
-        val dateTime = resourceIndexerManager.createDateTimeType(value)
+        val dateTime = fhirConverter.createDateTimeType(value)
         DateTimeIndex(
           searchParam.name,
           searchParam.path,
@@ -188,11 +186,11 @@ internal object ResourceIndexer {
       }
       // No need to add precision because an instant is meant to have zero width
       "instant" -> {
-        val instant = resourceIndexerManager.createInstantType(value)
+        val instant = fhirConverter.createInstantType(value)
         DateTimeIndex(searchParam.name, searchParam.path, instant.value.time, instant.value.time)
       }
       "Period" -> {
-        val period = resourceIndexerManager.createPeriodType(value)
+        val period = fhirConverter.createPeriodType(value)
         DateTimeIndex(
           searchParam.name,
           searchParam.path,
@@ -202,7 +200,7 @@ internal object ResourceIndexer {
         )
       }
       "Timing" -> {
-        val timing = resourceIndexerManager.createTimingType(value)
+        val timing = fhirConverter.createTimingType(value)
         // Skip for now if its is repeating.
         if (timing.hasEvent) {
           DateTimeIndex(
@@ -218,7 +216,7 @@ internal object ResourceIndexer {
         // https://www.hl7.org/fhir/careplan-example-f001-heart.json.html)
         // OR 'daily' (see https://www.hl7.org/fhir/careplan-example-f201-renal.json.html)
         try {
-          val dateTime = resourceIndexerManager.createDateTimeType(value)
+          val dateTime = fhirConverter.createDateTimeType(value)
           DateTimeIndex(
             searchParam.name,
             searchParam.path,
@@ -234,11 +232,7 @@ internal object ResourceIndexer {
 
   private fun stringIndex(searchParam: SearchParamDefinition, value: IBase): StringIndex? =
     if (!value.isEmpty) {
-      StringIndex(
-        searchParam.name,
-        searchParam.path,
-        value = resourceIndexerManager.createStringType(value)
-      )
+      StringIndex(searchParam.name, searchParam.path, value = fhirConverter.createStringType(value))
     } else {
       null
     }
@@ -251,11 +245,11 @@ internal object ResourceIndexer {
             searchParam.name,
             searchParam.path,
             system = null,
-            resourceIndexerManager.getPrimitiveValue(value)
+            fhirConverter.getPrimitiveValue(value)
           )
         )
       "Identifier" -> {
-        val identifier = resourceIndexerManager.createIdentifierType(value)
+        val identifier = fhirConverter.createIdentifierType(value)
         if (identifier.value != null) {
           listOf(
             TokenIndex(searchParam.name, searchParam.path, identifier.system, identifier.value)
@@ -265,28 +259,28 @@ internal object ResourceIndexer {
         }
       }
       "CodeableConcept" -> {
-        val codeableConcept = resourceIndexerManager.createCodeableConceptType(value)
+        val codeableConcept = fhirConverter.createCodeableConceptType(value)
         codeableConcept.coding
           .filter { !it.code.isNullOrEmpty() }
           .map { TokenIndex(searchParam.name, searchParam.path, it.system ?: "", it.code!!) }
       }
       "code",
       "Coding", -> {
-        val coding = resourceIndexerManager.createCodingType(value)
+        val coding = fhirConverter.createCodingType(value)
         listOf(TokenIndex(searchParam.name, searchParam.path, coding.system ?: "", coding.code!!))
       }
       else -> listOf()
     }
 
   private fun referenceIndex(searchParam: SearchParamDefinition, value: IBase): ReferenceIndex? =
-    resourceIndexerManager.createReferenceType(value)?.let {
+    fhirConverter.createReferenceType(value)?.let {
       ReferenceIndex(searchParam.name, searchParam.path, it)
     }
 
   private fun quantityIndex(searchParam: SearchParamDefinition, value: IBase): List<QuantityIndex> =
     when (value.fhirType()) {
       "Money" -> {
-        val money = resourceIndexerManager.createMoneyType(value)
+        val money = fhirConverter.createMoneyType(value)
         listOf(
           QuantityIndex(
             searchParam.name,
@@ -298,7 +292,7 @@ internal object ResourceIndexer {
         )
       }
       "Quantity" -> {
-        val quantity = resourceIndexerManager.createQuantityType(value)
+        val quantity = fhirConverter.createQuantityType(value)
         val quantityIndices = mutableListOf<QuantityIndex>()
 
         // Add quantity indexing record for the human readable unit
@@ -336,7 +330,7 @@ internal object ResourceIndexer {
     }
 
   private fun uriIndex(searchParam: SearchParamDefinition, value: IBase?): UriIndex? {
-    val uri = value?.let { resourceIndexerManager.createReferenceType(it) }
+    val uri = value?.let { fhirConverter.createReferenceType(it) }
     return if (uri.isNullOrEmpty()) {
       null
     } else {
@@ -347,7 +341,7 @@ internal object ResourceIndexer {
   private fun specialIndex(value: IBase?): PositionIndex? {
     return when (value?.fhirType()) {
       "Location.position" -> {
-        val location = resourceIndexerManager.createLocationPositionComponentType(value)
+        val location = fhirConverter.createLocationPositionComponentType(value)
         PositionIndex(location.latitude, location.longitude)
       }
       else -> null

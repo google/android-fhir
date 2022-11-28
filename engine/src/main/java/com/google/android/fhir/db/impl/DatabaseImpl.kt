@@ -23,6 +23,7 @@ import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.DatabaseErrorStrategy
+import com.google.android.fhir.FhirConverter
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
@@ -31,7 +32,6 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.index.ResourceIndexerManager
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resourceType
 import com.google.android.fhir.search.SearchQuery
@@ -48,7 +48,7 @@ internal class DatabaseImpl(
   context: Context,
   private val iParser: IParser,
   databaseConfig: DatabaseConfig,
-  private val resourceIndexerManager: ResourceIndexerManager
+  private val fhirConverter: FhirConverter
 ) : com.google.android.fhir.db.Database {
 
   val db: ResourceDatabase
@@ -105,21 +105,21 @@ internal class DatabaseImpl(
   override suspend fun <R : IAnyResource> insert(vararg resource: R): List<String> {
     val logicalIds = mutableListOf<String>()
     db.withTransaction {
-      logicalIds.addAll(resourceDao.insertAll(resource.toList(), resourceIndexerManager))
+      logicalIds.addAll(resourceDao.insertAll(resource.toList(), fhirConverter))
       localChangeDao.addInsertAll(resource.toList())
     }
     return logicalIds
   }
 
   override suspend fun <R : IAnyResource> insertRemote(vararg resource: R) {
-    db.withTransaction { resourceDao.insertAll(resource.toList(), resourceIndexerManager) }
+    db.withTransaction { resourceDao.insertAll(resource.toList(), fhirConverter) }
   }
 
   override suspend fun update(vararg resources: IAnyResource) {
     db.withTransaction {
       resources.forEach {
         val oldResourceEntity = selectEntity(it.resourceType, it.logicalId)
-        resourceDao.update(it, resourceIndexerManager)
+        resourceDao.update(it, fhirConverter)
         localChangeDao.addUpdate(oldResourceEntity, it)
       }
     }

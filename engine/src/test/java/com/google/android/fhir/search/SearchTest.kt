@@ -20,8 +20,9 @@ import android.os.Build
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
+import com.google.android.fhir.FhirConverter
 import com.google.android.fhir.epochDay
-import com.google.android.fhir.testing.SearchManagerForR4Test
+import com.google.android.fhir.testing.FhirConverterForR4Test
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
@@ -54,7 +55,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class SearchTest {
 
-  private val searchManager: SearchManager = com.google.android.fhir.testing.SearchManagerForR4Test
+  private val fhirConverter: FhirConverter = FhirConverterForR4Test
 
   @Test
   fun search() = runBlocking {
@@ -127,9 +128,9 @@ class SearchTest {
   @Test
   fun search_filter_date_approximate() {
     val mockDateType =
-      searchManager.createDateType(DateType(Date(mockEpochTimeStamp), TemporalPrecisionEnum.DAY))
+      fhirConverter.createDateType(DateType(Date(mockEpochTimeStamp), TemporalPrecisionEnum.DAY))
     DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
-    val value = searchManager.createDateType(DateType("2013-03-14"))
+    val value = fhirConverter.createDateType(DateType("2013-03-14"))
     val query =
       Search(ResourceType.Patient.name)
         .apply {
@@ -189,7 +190,7 @@ class SearchTest {
             Patient.BIRTHDATE,
             {
               prefix = ParamPrefixEnum.STARTS_AFTER
-              value = of(searchManager.createDateType(DateType("2013-03-14")))
+              value = of(fhirConverter.createDateType(DateType("2013-03-14")))
             }
           )
         }
@@ -227,7 +228,7 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(searchManager.createDateType(DateType("2013-03-14")))
+              value = of(fhirConverter.createDateType(DateType("2013-03-14")))
               prefix = ParamPrefixEnum.ENDS_BEFORE
             }
           )
@@ -266,7 +267,7 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(searchManager.createDateType(DateType("2013-03-14")))
+              value = of(fhirConverter.createDateType(DateType("2013-03-14")))
               prefix = ParamPrefixEnum.NOT_EQUAL
             }
           )
@@ -307,7 +308,7 @@ class SearchTest {
         .apply {
           filter(
             Patient.BIRTHDATE,
-            { value = of(searchManager.createDateType(DateType("2013-03-14"))) }
+            { value = of(fhirConverter.createDateType(DateType("2013-03-14"))) }
           )
         }
         .getQuery()
@@ -347,7 +348,7 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(searchManager.createDateType(DateType("2013-03-14")))
+              value = of(fhirConverter.createDateType(DateType("2013-03-14")))
               prefix = ParamPrefixEnum.GREATERTHAN
             }
           )
@@ -386,7 +387,7 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(searchManager.createDateType(DateType("2013-03-14")))
+              value = of(fhirConverter.createDateType(DateType("2013-03-14")))
               prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
             }
           )
@@ -425,7 +426,7 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(searchManager.createDateType(DateType("2013-03-14")))
+              value = of(fhirConverter.createDateType(DateType("2013-03-14")))
               prefix = ParamPrefixEnum.LESSTHAN
             }
           )
@@ -464,7 +465,7 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(searchManager.createDateType(DateType("2013-03-14")))
+              value = of(fhirConverter.createDateType(DateType("2013-03-14")))
               prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
             }
           )
@@ -498,11 +499,11 @@ class SearchTest {
   @Test
   fun search_filter_dateTime_approximate() {
     val mockDateTimeType =
-      searchManager.createDateTimeType(
+      fhirConverter.createDateTimeType(
         DateTimeType(Date.from(Instant.ofEpochMilli(mockEpochTimeStamp)), TemporalPrecisionEnum.DAY)
       )
     DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
-    val value = searchManager.createDateTimeType(DateTimeType("2013-03-14"))
+    val value = fhirConverter.createDateTimeType(DateTimeType("2013-03-14"))
 
     val query =
       Search(ResourceType.Patient.name)
@@ -563,7 +564,7 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+              value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
               prefix = ParamPrefixEnum.STARTS_AFTER
             }
           )
@@ -602,7 +603,7 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+              value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
               prefix = ParamPrefixEnum.ENDS_BEFORE
             }
           )
@@ -641,7 +642,7 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+              value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
               prefix = ParamPrefixEnum.NOT_EQUAL
             }
           )
@@ -683,7 +684,7 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+              value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
               prefix = ParamPrefixEnum.EQUAL
             }
           )
@@ -725,7 +726,7 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+              value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
               prefix = ParamPrefixEnum.GREATERTHAN
             }
           )
@@ -764,7 +765,7 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+              value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
               prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
             }
           )
@@ -803,7 +804,7 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+              value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
               prefix = ParamPrefixEnum.LESSTHAN
             }
           )
@@ -842,7 +843,7 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(searchManager.createDateTimeType(DateTimeType("2013-03-14")))
+              value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
               prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
             }
           )
@@ -983,7 +984,7 @@ class SearchTest {
             {
               value =
                 of(
-                  searchManager.createCodingType(
+                  fhirConverter.createCodingType(
                     Coding("http://hl7.org/fhir/ValueSet/administrative-gender", "male", "Male")
                   )
                 )
@@ -1026,7 +1027,7 @@ class SearchTest {
             {
               value =
                 of(
-                  searchManager.createCodeableConceptType(
+                  fhirConverter.createCodeableConceptType(
                     CodeableConcept(Coding("http://snomed.info/sct", "260385009", "Allergy X"))
                   )
                 )
@@ -1068,7 +1069,7 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient.name)
         .apply {
-          filter(Patient.IDENTIFIER, { value = of(searchManager.createIdentifierType(identifier)) })
+          filter(Patient.IDENTIFIER, { value = of(fhirConverter.createIdentifierType(identifier)) })
         }
         .getQuery()
     assertThat(query.query)
@@ -1105,7 +1106,7 @@ class SearchTest {
             {
               value =
                 of(
-                  searchManager.createContactPointType(
+                  fhirConverter.createContactPointType(
                     ContactPoint().apply {
                       system = ContactPoint.ContactPointSystem.EMAIL
                       use = ContactPoint.ContactPointUse.HOME
@@ -1151,7 +1152,7 @@ class SearchTest {
             {
               value =
                 of(
-                  searchManager.createContactPointType(
+                  fhirConverter.createContactPointType(
                     ContactPoint().apply {
                       system = ContactPoint.ContactPointSystem.EMAIL
                       value = "test@gmail.com"
@@ -1190,7 +1191,7 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient.name)
         .apply {
-          filter(Patient.GENDER, { value = of(searchManager.createCodeType(CodeType("male"))) })
+          filter(Patient.GENDER, { value = of(fhirConverter.createCodeType(CodeType("male"))) })
         }
         .getQuery()
     assertThat(query.query)
@@ -1255,7 +1256,7 @@ class SearchTest {
             Patient.IDENTIFIER,
             {
               value =
-                of(searchManager.createUriType(UriType("16009886-bd57-11eb-8529-0242ac130003")))
+                of(fhirConverter.createUriType(UriType("16009886-bd57-11eb-8529-0242ac130003")))
             }
           )
         }
@@ -1801,7 +1802,7 @@ class SearchTest {
               {
                 value =
                   of(
-                    searchManager.createCodingType(
+                    fhirConverter.createCodingType(
                       Coding("http://snomed.info/sct", "44054006", "Diabetes")
                     )
                   )
@@ -1858,7 +1859,7 @@ class SearchTest {
               {
                 value =
                   of(
-                    searchManager.createCodingType(
+                    fhirConverter.createCodingType(
                       Coding(
                         "http://hl7.org/fhir/sid/cvx",
                         "140",
@@ -1874,7 +1875,7 @@ class SearchTest {
               {
                 value =
                   of(
-                    searchManager.createCodingType(
+                    fhirConverter.createCodingType(
                       Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")
                     )
                   )
@@ -1954,7 +1955,7 @@ class SearchTest {
               {
                 value =
                   of(
-                    searchManager.createCodingType(
+                    fhirConverter.createCodingType(
                       Coding("http://snomed.info/sct", "44054006", "Diabetes")
                     )
                   )
@@ -1967,7 +1968,7 @@ class SearchTest {
               {
                 value =
                   of(
-                    searchManager.createCodingType(
+                    fhirConverter.createCodingType(
                       Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")
                     )
                   )
@@ -2194,7 +2195,7 @@ class SearchTest {
         .apply {
           filter(
             Condition.CLINICAL_STATUS,
-            { value = of(searchManager.createCodingType(Coding().apply { code = "test-code" })) }
+            { value = of(fhirConverter.createCodingType(Coding().apply { code = "test-code" })) }
           )
         }
         .getQuery()
@@ -2226,7 +2227,7 @@ class SearchTest {
             {
               value =
                 of(
-                  searchManager.createCodingType(
+                  fhirConverter.createCodingType(
                     Coding().apply {
                       code = "test-code"
                       system = "http://my-code-system.org"

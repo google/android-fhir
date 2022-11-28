@@ -28,7 +28,6 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
 import com.google.android.fhir.get
 import kotlinx.coroutines.launch
-import org.hl7.fhir.convertors.factory.VersionConvertorFactory_40_50
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -87,7 +86,7 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
           patient.telecom[0].value != null
       ) {
         patient.id = patientId
-        fhirEngine.update(VersionConvertorFactory_40_50.convertResource(patient))
+        fhirEngine.update(patient)
         isPatientSaved.value = true
         return@launch
       }

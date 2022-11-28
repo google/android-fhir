@@ -28,8 +28,7 @@ import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
-import com.google.android.fhir.testing.ResourceIndexerManagerForR4Test
-import com.google.android.fhir.testing.SearchManagerForR4Test
+import com.google.android.fhir.testing.FhirConverterForR4Test
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
@@ -55,7 +54,7 @@ class FhirEngineImplTest {
   private val services =
     builder(ApplicationProvider.getApplicationContext())
       .inMemory()
-      .setResourceIndexerManager(com.google.android.fhir.testing.ResourceIndexerManagerForR4Test)
+      .setFhirConverter(FhirConverterForR4Test)
       .build()
   private val fhirEngine = services.fhirEngine
   private val testingUtils = TestingUtils(services.parser)
@@ -180,26 +179,23 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun `search() by x-fhir-query should return female patients for gender param`() = runBlocking {
-    val patients =
-      listOf(
-        buildPatient("3", "C", Enumerations.AdministrativeGender.FEMALE),
-        buildPatient("2", "B", Enumerations.AdministrativeGender.FEMALE),
-        buildPatient("1", "A", Enumerations.AdministrativeGender.MALE)
-      )
+  fun `searchsearch() by x-fhir-query should return female patients for gender param`() =
+    runBlocking {
+      val patients =
+        listOf(
+          buildPatient("3", "C", Enumerations.AdministrativeGender.FEMALE),
+          buildPatient("2", "B", Enumerations.AdministrativeGender.FEMALE),
+          buildPatient("1", "A", Enumerations.AdministrativeGender.MALE)
+        )
 
-    fhirEngine.create(*patients.toTypedArray())
+      fhirEngine.create(*patients.toTypedArray())
 
-    val result =
-      fhirEngine.search(
-        "Patient?gender=female",
-        searchManager = com.google.android.fhir.testing.SearchManagerForR4Test
-      )
+      val result = fhirEngine.search("Patient?gender=female", FhirConverterForR4Test)
 
-    assertThat(result.size).isEqualTo(2)
-    assertThat(result.all { (it as Patient).gender == Enumerations.AdministrativeGender.FEMALE })
-      .isTrue()
-  }
+      assertThat(result.size).isEqualTo(2)
+      assertThat(result.all { (it as Patient).gender == Enumerations.AdministrativeGender.FEMALE })
+        .isTrue()
+    }
 
   @Test
   fun `search() by x-fhir-query should return sorted patients for sort param`() = runBlocking {
@@ -213,12 +209,7 @@ class FhirEngineImplTest {
     fhirEngine.create(*patients.toTypedArray())
 
     val result =
-      fhirEngine
-        .search(
-          "Patient?_sort=-name",
-          searchManager = com.google.android.fhir.testing.SearchManagerForR4Test
-        )
-        .map { it as Patient }
+      fhirEngine.search("Patient?_sort=-name", FhirConverterForR4Test).map { it as Patient }
 
     assertThat(result.mapNotNull { it.nameFirstRep.given.firstOrNull()?.value })
       .isEqualTo(listOf("C", "B", "A"))
@@ -235,24 +226,14 @@ class FhirEngineImplTest {
 
     fhirEngine.create(*patients.toTypedArray())
 
-    val result =
-      fhirEngine
-        .search(
-          "Patient?_count=1",
-          searchManager = com.google.android.fhir.testing.SearchManagerForR4Test
-        )
-        .map { it as Patient }
+    val result = fhirEngine.search("Patient?_count=1", FhirConverterForR4Test).map { it as Patient }
 
     assertThat(result.size).isEqualTo(1)
   }
 
   @Test
   fun `search() by x-fhir-query should return all patients for empty params`() = runBlocking {
-    val result =
-      fhirEngine.search(
-        "Patient",
-        searchManager = com.google.android.fhir.testing.SearchManagerForR4Test
-      )
+    val result = fhirEngine.search("Patient", FhirConverterForR4Test)
 
     assertThat(result.size).isEqualTo(1)
   }
@@ -264,7 +245,7 @@ class FhirEngineImplTest {
         runBlocking {
           fhirEngine.search(
             "CustomResource?active=true&gender=male&_sort=name&_count=2",
-            searchManager = com.google.android.fhir.testing.SearchManagerForR4Test
+            FhirConverterForR4Test
           )
         }
       }
@@ -278,7 +259,7 @@ class FhirEngineImplTest {
         runBlocking {
           fhirEngine.search(
             "Patient?customParam=true&gender=male&_sort=name",
-            searchManager = com.google.android.fhir.testing.SearchManagerForR4Test
+            FhirConverterForR4Test
           )
         }
       }

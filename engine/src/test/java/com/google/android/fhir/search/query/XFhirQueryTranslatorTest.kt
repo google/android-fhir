@@ -24,7 +24,7 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.query.XFhirQueryTranslator.applyFilterParam
 import com.google.android.fhir.search.query.XFhirQueryTranslator.applySortParam
 import com.google.android.fhir.search.query.XFhirQueryTranslator.translate
-import com.google.android.fhir.testing.SearchManagerForR4Test
+import com.google.android.fhir.testing.FhirConverterForR4Test
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
@@ -41,11 +41,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `translate() should add descending sort for sort param with hyphen`() {
-    val search =
-      translate(
-        "Patient?_sort=-name",
-        searchManager = com.google.android.fhir.testing.SearchManagerForR4Test
-      )
+    val search = translate("Patient?_sort=-name", FhirConverterForR4Test)
 
     assertThat(search.sort!!.paramName).isEqualTo("name")
     assertThat(search.order!!).isEqualTo(Order.DESCENDING)
@@ -53,11 +49,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `translate() should add ascending sort for sort param`() {
-    val search =
-      translate(
-        "Patient?_sort=address-country",
-        searchManager = com.google.android.fhir.testing.SearchManagerForR4Test
-      )
+    val search = translate("Patient?_sort=address-country", FhirConverterForR4Test)
 
     assertThat(search.sort!!.paramName).isEqualTo("address-country")
     assertThat(search.order!!).isEqualTo(Order.ASCENDING)
@@ -65,11 +57,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `translate() should not add sort for missing value for sort param`() {
-    val search =
-      translate(
-        "Patient?_sort=",
-        searchManager = com.google.android.fhir.testing.SearchManagerForR4Test
-      )
+    val search = translate("Patient?_sort=", FhirConverterForR4Test)
 
     assertThat(search.sort).isNull()
     assertThat(search.order).isNull()
@@ -77,8 +65,7 @@ class XFhirQueryTranslatorTest {
 
   @Test
   fun `translate() should not add sort for missing sort param`() {
-    val search =
-      translate("Patient", searchManager = com.google.android.fhir.testing.SearchManagerForR4Test)
+    val search = translate("Patient", FhirConverterForR4Test)
 
     assertThat(search.sort).isNull()
     assertThat(search.order).isNull()
@@ -88,40 +75,28 @@ class XFhirQueryTranslatorTest {
   fun `translate() should throw IllegalArgumentException for unrecognized sort param`() {
     val exception =
       assertThrows(IllegalArgumentException::class.java) {
-        translate(
-          "Patient?_sort=customParam",
-          searchManager = com.google.android.fhir.testing.SearchManagerForR4Test
-        )
+        translate("Patient?_sort=customParam", FhirConverterForR4Test)
       }
     assertThat(exception.message).isEqualTo("customParam not found in Patient")
   }
 
   @Test
   fun `translate() should add limit for count param`() {
-    val search =
-      translate(
-        "Patient?_count=10",
-        searchManager = com.google.android.fhir.testing.SearchManagerForR4Test
-      )
+    val search = translate("Patient?_count=10", FhirConverterForR4Test)
 
     assertThat(search.count).isEqualTo(10)
   }
 
   @Test
   fun `translate() should not add limit for missing value for count param`() {
-    val search =
-      translate(
-        "Patient?_count=",
-        searchManager = com.google.android.fhir.testing.SearchManagerForR4Test
-      )
+    val search = translate("Patient?_count=", FhirConverterForR4Test)
 
     assertThat(search.count).isNull()
   }
 
   @Test
   fun `translate() should not add limit for missing count param`() {
-    val search =
-      translate("Patient", searchManager = com.google.android.fhir.testing.SearchManagerForR4Test)
+    val search = translate("Patient", FhirConverterForR4Test)
 
     assertThat(search.count).isNull()
   }
@@ -131,7 +106,7 @@ class XFhirQueryTranslatorTest {
     val search =
       translate(
         "Patient?gender=male&name=John&birthdate=2012-01-11&general-practitioner=12345",
-        searchManager = com.google.android.fhir.testing.SearchManagerForR4Test
+        FhirConverterForR4Test
       )
 
     search.stringFilterCriteria.first().run {
@@ -158,10 +133,7 @@ class XFhirQueryTranslatorTest {
   fun `translate() should throw IllegalArgumentException for unrecognized filter param`() {
     val exception =
       assertThrows(IllegalArgumentException::class.java) {
-        translate(
-          "Patient?customParam=Abc",
-          searchManager = com.google.android.fhir.testing.SearchManagerForR4Test
-        )
+        translate("Patient?customParam=Abc", FhirConverterForR4Test)
       }
     assertThat(exception.message).isEqualTo("customParam not found in Patient")
   }
@@ -169,10 +141,7 @@ class XFhirQueryTranslatorTest {
   @Test
   fun `translate() should not add filters for missing value for filter param`() {
     val search =
-      translate(
-        "Patient?gender=&name=&birthdate=&general-practitioner=",
-        searchManager = com.google.android.fhir.testing.SearchManagerForR4Test
-      )
+      translate("Patient?gender=&name=&birthdate=&general-practitioner=", FhirConverterForR4Test)
 
     assertThat(search.stringFilterCriteria).isEmpty()
 
@@ -246,7 +215,7 @@ class XFhirQueryTranslatorTest {
         "RiskAssessment.prediction.probability"
       ),
       "12",
-      com.google.android.fhir.testing.SearchManagerForR4Test
+      FhirConverterForR4Test
     )
 
     val applyFilterParam = search.numberFilterCriteria.first().filters.first()
@@ -261,7 +230,7 @@ class XFhirQueryTranslatorTest {
     search.applyFilterParam(
       SearchParamDefinition("birthdate", SearchParamType.DATE, "Patient.birthDate"),
       "2022-01-21",
-      searchManager = com.google.android.fhir.testing.SearchManagerForR4Test
+      FhirConverterForR4Test
     )
 
     val applyFilterParam = search.dateTimeFilterCriteria.first().filters.first()
@@ -277,7 +246,7 @@ class XFhirQueryTranslatorTest {
     search.applyFilterParam(
       SearchParamDefinition("birthdate", SearchParamType.DATE, "Patient.birthDate"),
       "2022-01-21T12:21:59",
-      com.google.android.fhir.testing.SearchManagerForR4Test
+      FhirConverterForR4Test
     )
 
     val applyFilterParam = search.dateTimeFilterCriteria.first().filters.first()
@@ -293,7 +262,7 @@ class XFhirQueryTranslatorTest {
     search.applyFilterParam(
       SearchParamDefinition("length", SearchParamType.QUANTITY, "Encounter.length"),
       "3|http://unitsofmeasure.org|months",
-      com.google.android.fhir.testing.SearchManagerForR4Test
+      FhirConverterForR4Test
     )
 
     val applyFilterParam = search.quantityFilterCriteria.first().filters.first()
@@ -310,7 +279,7 @@ class XFhirQueryTranslatorTest {
     search.applyFilterParam(
       SearchParamDefinition("address-country", SearchParamType.STRING, "Patient.address.country"),
       "Karachi",
-      com.google.android.fhir.testing.SearchManagerForR4Test
+      FhirConverterForR4Test
     )
 
     val applyFilterParam = search.stringFilterCriteria.first().filters.first()
@@ -325,7 +294,7 @@ class XFhirQueryTranslatorTest {
     search.applyFilterParam(
       SearchParamDefinition("identifier", SearchParamType.TOKEN, "Patient.identifier"),
       "http://snomed.org|001122",
-      com.google.android.fhir.testing.SearchManagerForR4Test
+      FhirConverterForR4Test
     )
 
     val applyFilterParam = search.tokenFilterCriteria.first().filters.first()
@@ -345,7 +314,7 @@ class XFhirQueryTranslatorTest {
         "Patient.generalPractitioner"
       ),
       "Practitioner/111",
-      com.google.android.fhir.testing.SearchManagerForR4Test
+      FhirConverterForR4Test
     )
 
     val applyFilterParam = search.referenceFilterCriteria.first().filters.first()
@@ -360,7 +329,7 @@ class XFhirQueryTranslatorTest {
     search.applyFilterParam(
       SearchParamDefinition("url", SearchParamType.URI, "Measure.url"),
       "http://fhir.org/Measure/meaure-1",
-      com.google.android.fhir.testing.SearchManagerForR4Test
+      FhirConverterForR4Test
     )
 
     val applyFilterParam = search.uriFilterCriteria.first().filters.first()
@@ -377,7 +346,7 @@ class XFhirQueryTranslatorTest {
         search.applyFilterParam(
           SearchParamDefinition("near", SearchParamType.SPECIAL, "Location.position"),
           "20.000839 30.378273",
-          com.google.android.fhir.testing.SearchManagerForR4Test
+          FhirConverterForR4Test
         )
       }
     assertThat(exception.message).isEqualTo("SPECIAL type not supported in x-fhir-query")

@@ -29,7 +29,6 @@ import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import java.util.UUID
 import kotlinx.coroutines.launch
-import org.hl7.fhir.convertors.factory.VersionConvertorFactory_40_50
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -44,8 +43,8 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
 
   private val questionnaireResource: Questionnaire
     get() =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire)
-        as Questionnaire
+      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire) as
+        Questionnaire
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
   private var questionnaireJson: String? = null
 
@@ -75,14 +74,14 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
       }
       val patient = entry.resource as Patient
       patient.id = generateUuid()
-      fhirEngine.create(VersionConvertorFactory_40_50.convertResource(patient))
+      fhirEngine.create(patient)
       isPatientSaved.value = true
     }
   }
 
   private fun getQuestionnaireJson(): String {
     questionnaireJson?.let {
-      return it
+      return it!!
     }
     questionnaireJson = readFileFromAssets(state[AddPatientFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
     return questionnaireJson!!

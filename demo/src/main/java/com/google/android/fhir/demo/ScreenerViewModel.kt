@@ -28,7 +28,6 @@ import com.google.android.fhir.datacapture.mapping.ResourceMapper
 import java.math.BigDecimal
 import java.util.UUID
 import kotlinx.coroutines.launch
-import org.hl7.fhir.convertors.factory.VersionConvertorFactory_40_50
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -126,7 +125,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   }
 
   private suspend fun saveResourceToDatabase(resource: Resource) {
-    fhirEngine.create(VersionConvertorFactory_40_50.convertResource(resource))
+    fhirEngine.create(resource)
   }
 
   private fun getQuestionnaireJson(): String {

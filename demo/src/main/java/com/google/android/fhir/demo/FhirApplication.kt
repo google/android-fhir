@@ -24,8 +24,8 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.ServerConfiguration
+import com.google.android.fhir.demo.data.FhirConverterForR4
 import com.google.android.fhir.demo.data.FhirSyncWorker
-import com.google.android.fhir.demo.data.ResourceIndexerManagerForR4
 import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.remote.HttpLogger
 import timber.log.Timber
@@ -43,9 +43,9 @@ class FhirApplication : Application() {
       FhirEngineConfiguration(
         enableEncryptionIfSupported = true,
         RECREATE_AT_OPEN,
-        FhirVersionEnum.R5,
+        FhirVersionEnum.R4,
         ServerConfiguration(
-          "https://hapi.fhir.org/baseR5/",
+          "https://hapi.fhir.org/baseR4/",
           httpLogger =
             HttpLogger(
               HttpLogger.Configuration(
@@ -53,10 +53,10 @@ class FhirApplication : Application() {
               )
             ) { Timber.tag("App-HttpLog").d(it) }
         ),
-        resourceIndexerManager = ResourceIndexerManagerForR4
+        fhirConverter = FhirConverterForR4
       )
     )
-    Sync.oneTimeSync<FhirSyncWorker>(this, fhirVersionEnum = FhirVersionEnum.R5)
+    Sync.oneTimeSync<FhirSyncWorker>(this, fhirVersionEnum = FhirVersionEnum.R4)
   }
 
   private fun constructFhirEngine(): FhirEngine {
