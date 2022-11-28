@@ -57,19 +57,19 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         cleanupOldState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
-        val answerOptionString =
+        val answerOptionList =
           this.questionnaireItemViewItem.answerOption
-            .map { it.displayString to it.itemAnswerOptionImage(context) }
+            .map { DropDownAnswerOption(it.displayString, it.itemAnswerOptionImage(context)) }
             .toMutableList()
-        answerOptionString.add(
-          0,
-          context.getString(R.string.hyphen) to null
-        ) // TODO PAllavi Check after second time selection not working as expected
+        answerOptionList.add(0, DropDownAnswerOption(context.getString(R.string.hyphen), null))
+        autoCompleteTextView.setText(
+          questionnaireItemViewItem.answers.singleOrNull()?.displayString(header.context) ?: ""
+        )
         val adapter =
           AnswerOptionDropDownArrayAdapter(
             context,
             R.layout.questionnaire_item_drop_down_list,
-            answerOptionString
+            answerOptionList
           )
         autoCompleteTextView.setText(
           questionnaireItemViewItem.answers.singleOrNull()?.displayString(header.context) ?: ""
@@ -77,6 +77,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.onItemClickListener =
           AdapterView.OnItemClickListener { _, _, position, _ ->
+            autoCompleteTextView.setText(adapter.getItem(position)?.answerOptionString, false)
             if (position == 0) {
               questionnaireItemViewItem.clearAnswer()
             } else {
@@ -107,25 +108,30 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
     }
 }
 
-class AnswerOptionDropDownArrayAdapter(
+internal class AnswerOptionDropDownArrayAdapter(
   context: Context,
   private val layoutResourceId: Int,
-  answerOption: List<Pair<String, Drawable?>>
-) : ArrayAdapter<Pair<String, Drawable?>>(context, layoutResourceId, answerOption) {
+  answerOption: List<DropDownAnswerOption>
+) : ArrayAdapter<DropDownAnswerOption>(context, layoutResourceId, answerOption) {
   override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
     var convertView = convertView
     if (convertView == null) {
       convertView = LayoutInflater.from(parent.context).inflate(layoutResourceId, parent, false)
     }
     try {
-      val answerOption: Pair<String, Drawable?>? = getItem(position)
+      val answerOption: DropDownAnswerOption? = getItem(position)
       val answerOptionTextView =
         convertView?.findViewById<View>(R.id.answer_option_textview) as TextView
-      answerOptionTextView.text = answerOption?.first
-      answerOptionTextView.setCompoundDrawables(answerOption?.second, null, null, null)
+      answerOptionTextView.text = answerOption?.answerOptionString
+      answerOptionTextView.setCompoundDrawables(answerOption?.answerOptionImage, null, null, null)
     } catch (e: Exception) {
       e.printStackTrace()
     }
     return convertView!!
   }
 }
+
+internal data class DropDownAnswerOption(
+  val answerOptionString: String,
+  val answerOptionImage: Drawable?
+)
