@@ -28,6 +28,7 @@ import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_READ_ONLY
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
@@ -1780,7 +1781,7 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire)
       val state = viewModel.questionnaireStateFlow.first()
-      assertThat(state.pagination)
+      assertThat((state.displayMode as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -1841,7 +1842,7 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -1894,7 +1895,7 @@ class QuestionnaireViewModelTest {
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       viewModel.goToPreviousPage()
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -1965,7 +1966,7 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2032,7 +2033,7 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2100,7 +2101,7 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2160,7 +2161,7 @@ class QuestionnaireViewModelTest {
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2217,7 +2218,7 @@ class QuestionnaireViewModelTest {
       viewModel.goToPreviousPage()
 
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2271,7 +2272,7 @@ class QuestionnaireViewModelTest {
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
 
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2505,7 +2506,7 @@ class QuestionnaireViewModelTest {
       viewModel.goToNextPage()
 
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2559,7 +2560,7 @@ class QuestionnaireViewModelTest {
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
 
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2615,7 +2616,7 @@ class QuestionnaireViewModelTest {
       viewModel.goToNextPage()
       viewModel.goToPreviousPage()
 
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2955,7 +2956,11 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire)
       viewModel.setShowSubmitButtonFlag(false)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showSubmitButton).isFalse()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showSubmitButton
+        )
+        .isFalse()
     }
   }
 
@@ -2974,14 +2979,18 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire)
       viewModel.setShowSubmitButtonFlag(true)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showSubmitButton).isTrue()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showSubmitButton
+        )
+        .isTrue()
     }
   }
 
   // Test cases for review mode
 
   @Test
-  fun `state has review feature and submit button to true should show submit button when moved to review page`() {
+  fun `state has review feature and submit button to true should move to review page`() {
     runBlocking {
       val questionnaire =
         Questionnaire().apply {
@@ -2996,7 +3005,8 @@ class QuestionnaireViewModelTest {
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
       viewModel.setShowSubmitButtonFlag(true)
       viewModel.setReviewMode(true)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showSubmitButton).isTrue()
+      assertThat(viewModel.questionnaireStateFlow.first().displayMode)
+        .isInstanceOf(DisplayMode.ReviewMode::class.java)
     }
   }
 
@@ -3014,7 +3024,11 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isFalse()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isFalse()
     }
   }
 
@@ -3032,12 +3046,16 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isTrue()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isTrue()
     }
   }
 
   @Test
-  fun `state has review feature and show review page first should not show review button`() {
+  fun `state has review feature and show review page first should be in review mode`() {
     runBlocking {
       val questionnaire =
         Questionnaire().apply {
@@ -3055,7 +3073,12 @@ class QuestionnaireViewModelTest {
           enableReviewPage = true,
           showReviewPageFirst = true
         )
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isFalse()
+
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.ReviewMode)
+            .showEditButton
+        )
+        .isTrue()
     }
   }
 
@@ -3078,7 +3101,11 @@ class QuestionnaireViewModelTest {
           enableReviewPage = false,
           showReviewPageFirst = true
         )
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isFalse()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isFalse()
     }
   }
 
@@ -3121,7 +3148,11 @@ class QuestionnaireViewModelTest {
       viewModel.runViewModelBlocking {
         viewModel.goToNextPage()
 
-        assertThat(viewModel.questionnaireStateFlow.value.pagination.showReviewButton).isFalse()
+        assertThat(
+            (viewModel.questionnaireStateFlow.value as DisplayMode.EditMode)
+              .pagination.showReviewButton
+          )
+          .isFalse()
       }
     }
 
@@ -3163,7 +3194,11 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
 
-      assertThat(viewModel.questionnaireStateFlow.value.pagination.showReviewButton).isFalse()
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isFalse()
     }
 
   @Test
@@ -3205,7 +3240,11 @@ class QuestionnaireViewModelTest {
       viewModel.runViewModelBlocking {
         viewModel.goToNextPage()
 
-        assertThat(viewModel.questionnaireStateFlow.value.pagination.showReviewButton).isTrue()
+        assertThat(
+            (viewModel.questionnaireStateFlow.value as DisplayMode.EditMode)
+              .pagination.showReviewButton
+          )
+          .isTrue()
       }
     }
 
@@ -3247,7 +3286,11 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
 
-      assertThat(viewModel.questionnaireStateFlow.value.pagination.showReviewButton).isTrue()
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isTrue()
     }
 
   @Test
@@ -3265,12 +3308,16 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
       viewModel.setReviewMode(false)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isTrue()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isTrue()
     }
   }
 
   @Test
-  fun `toggle review mode to true should not show review button`() {
+  fun `toggle review mode to true should not show edit button`() {
     runBlocking {
       val questionnaire =
         Questionnaire().apply {
@@ -3284,9 +3331,41 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
       viewModel.setReviewMode(true)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isFalse()
+
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.ReviewMode)
+            .showEditButton
+        )
+        .isTrue()
     }
   }
+
+  // Read-only mode
+
+  @Test
+  fun `read-only mode should not show edit button`() {
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-link-id"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            }
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire, readOnlyMode = true)
+
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.ReviewMode)
+            .showEditButton
+        )
+        .isFalse()
+    }
+  }
+
+  // Other test cases
 
   @Test
   fun `should calculate value on start for questionnaire item with calculated expression extension`() =
@@ -3602,6 +3681,7 @@ class QuestionnaireViewModelTest {
     questionnaireResponse: QuestionnaireResponse? = null,
     enableReviewPage: Boolean = false,
     showReviewPageFirst: Boolean = false,
+    readOnlyMode: Boolean = false,
   ): QuestionnaireViewModel {
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
@@ -3613,6 +3693,7 @@ class QuestionnaireViewModelTest {
     }
     enableReviewPage.let { state.set(EXTRA_ENABLE_REVIEW_PAGE, it) }
     showReviewPageFirst.let { state.set(EXTRA_SHOW_REVIEW_PAGE_FIRST, it) }
+    readOnlyMode.let { state.set(EXTRA_READ_ONLY, it) }
     return QuestionnaireViewModel(context, state)
   }
 
