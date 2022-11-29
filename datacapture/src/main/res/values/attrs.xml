@@ -33,6 +33,9 @@
     <!--   Style for answer text. -->
     <attr name="questionnaireAnswerTextStyle" format="reference" />
 
+    <!--   Style for question text in review mode -->
+    <attr name="questionnaireReviewModeQuestionTextStyle" format="reference" />
+
     <!--   Style for radio buttons. -->
     <attr name="questionnaireRadioButtonStyle" format="reference" />
     <!--   Style for checkbox buttons. -->

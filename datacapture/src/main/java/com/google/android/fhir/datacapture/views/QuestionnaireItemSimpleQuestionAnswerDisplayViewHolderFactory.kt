@@ -34,7 +34,7 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_simple_question_answer_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var header: QuestionnaireItemHeaderView
+      private lateinit var header: QuestionnaireItemHeaderViewInReviewMode
       private lateinit var flyOverTextView: TextView
       private lateinit var answerTextView: TextView
       private lateinit var divider: MaterialDivider

@@ -43,7 +43,11 @@
       <item
             name="questionnaireQuestionTextStyle"
         >@style/TextAppearance.Material3.TitleMedium</item>
-        <item
+
+      <item
+            name="questionnaireReviewModeQuestionTextStyle"
+        >@style/TextAppearance.Material3.TitleMedium</item>
+      <item
             name="questionnaireSubtitleTextStyle"
         >@style/TextAppearance.Material3.BodyMedium</item>
       <item

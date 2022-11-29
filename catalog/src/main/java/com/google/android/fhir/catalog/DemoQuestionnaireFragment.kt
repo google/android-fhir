@@ -40,6 +40,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.BUNDLE_ERROR_KEY
 import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.REQUEST_ERROR_KEY
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.SUBMIT_REQUEST_KEY
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
@@ -152,7 +153,8 @@ class DemoQuestionnaireFragment : Fragment() {
             args =
               bundleOf(
                 QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to
-                  viewModel.getQuestionnaireJson()
+                  viewModel.getQuestionnaireJson(),
+                EXTRA_ENABLE_REVIEW_PAGE to true
               )
           )
         }
