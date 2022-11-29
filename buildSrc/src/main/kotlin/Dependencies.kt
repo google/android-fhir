@@ -185,9 +185,9 @@ object Dependencies {
 
     object Cql {
       const val antlr = "4.10.1"
-      const val engine = "2.1.0"
-      const val evaluator = "2.1.0"
-      const val translator = "2.2.0"
+      const val engine = "2.3.0"
+      const val evaluator = "2.3.0"
+      const val translator = "2.4.0"
     }
 
     object Kotlin {
@@ -203,7 +203,7 @@ object Dependencies {
     const val guava = "28.2-android"
     const val hapiFhir = "6.0.1"
     const val http = "4.9.1"
-    const val jackson = "2.12.2"
+    const val jackson = "2.13.2"
     const val jsonToolsPatch = "1.13"
     const val jsonAssert = "1.5.1"
     const val kotlinPoet = "1.9.0"
