@@ -21,8 +21,9 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.io.File
 
+
 @Entity(indices = [Index(value = ["name", "version"], unique = true)])
-data class ImplementationGuideEntity(
+internal data class ImplementationGuideEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val name: String,
   val version: String,

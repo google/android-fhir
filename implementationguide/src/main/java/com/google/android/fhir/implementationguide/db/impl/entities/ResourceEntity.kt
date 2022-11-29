@@ -18,11 +18,13 @@ package com.google.android.fhir.implementationguide.db.impl.entities
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.ForeignKey.CASCADE
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.io.File
 import org.hl7.fhir.r4.model.ResourceType
 
+/** A DB entity holding the FHIR Resource metadata for `implementationguide` module. */
 @Entity(
   indices =
     [
@@ -34,11 +36,12 @@ import org.hl7.fhir.r4.model.ResourceType
       ForeignKey(
         entity = ImplementationGuideEntity::class,
         parentColumns = ["id"],
-        childColumns = ["implementationGuideId"]
+        childColumns = ["implementationGuideId"],
+        onDelete = CASCADE
       )
     ]
 )
-data class ResourceEntity(
+internal data class ResourceEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceType: ResourceType,
   val resourceId: String,

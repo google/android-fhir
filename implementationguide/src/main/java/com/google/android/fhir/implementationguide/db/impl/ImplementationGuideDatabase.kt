@@ -23,6 +23,7 @@ import com.google.android.fhir.implementationguide.db.impl.dao.ImplementationGui
 import com.google.android.fhir.implementationguide.db.impl.entities.ImplementationGuideEntity
 import com.google.android.fhir.implementationguide.db.impl.entities.ResourceEntity
 
+/** Holds metadata for implementation guides and their containing FHIR Resources. */
 @Database(
   entities = [ImplementationGuideEntity::class, ResourceEntity::class],
   version = 1,

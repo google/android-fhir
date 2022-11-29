@@ -21,7 +21,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import com.google.android.fhir.implementationguide.db.impl.entities.ImplementationGuideEntity
 import com.google.android.fhir.implementationguide.db.impl.entities.ResourceEntity
 import org.hl7.fhir.r4.model.ResourceType
@@ -94,16 +93,14 @@ abstract class ImplementationGuideDao {
   @Query("DELETE FROM ResourceEntity WHERE  implementationGuideId = :igId")
   internal abstract suspend fun deleteResources(igId: Long)
 
-  @Transaction
   open suspend fun deleteImplementationGuide(name: String, version: String) {
     val igEntity = getImplementationGuide(name, version)
-    deleteResources(igEntity.id)
     deleteImplementationGuide(igEntity)
   }
 
   @Insert(onConflict = OnConflictStrategy.IGNORE)
-  abstract suspend fun insert(resourceEntity: ResourceEntity): Long
+  internal abstract suspend fun insert(resourceEntity: ResourceEntity): Long
 
   @Insert(onConflict = OnConflictStrategy.IGNORE)
-  abstract suspend fun insert(ig: ImplementationGuideEntity): Long
+  internal abstract suspend fun insert(ig: ImplementationGuideEntity): Long
 }
