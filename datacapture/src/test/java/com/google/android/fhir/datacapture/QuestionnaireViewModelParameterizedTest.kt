@@ -32,7 +32,6 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.io.File
-import kotlin.test.assertFailsWith
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -68,18 +67,6 @@ class QuestionnaireViewModelParameterizedTest(
         is DataCaptureConfig.Provider
     ) { "Few tests require a custom application class that implements DataCaptureConfig.Provider" }
     ReflectionHelpers.setStaticField(DataCapture::class.java, "configuration", null)
-  }
-
-  @Test
-  fun `init should throw an exception if no questionnaire is provided`() {
-    val errorMessage =
-      assertFailsWith<IllegalStateException> { QuestionnaireViewModel(context, state) }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo(
-        "Neither EXTRA_QUESTIONNAIRE_JSON_URI nor EXTRA_QUESTIONNAIRE_JSON_STRING is supplied."
-      )
   }
 
   @Test
