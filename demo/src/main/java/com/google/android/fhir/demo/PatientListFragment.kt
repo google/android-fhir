@@ -94,9 +94,9 @@ class PatientListFragment : Fragment() {
       adapter.submitList(it)
     }
 
-    patientListViewModel.patientCount.observe(
-      viewLifecycleOwner
-    ) { binding.patientListContainer.patientCount.text = "$it Patient(s)" }
+    patientListViewModel.patientCount.observe(viewLifecycleOwner) {
+      binding.patientListContainer.patientCount.text = "$it Patient(s)"
+    }
 
     searchView = binding.search
     topBanner = binding.syncStatusContainer.linearLayoutSyncStatus
