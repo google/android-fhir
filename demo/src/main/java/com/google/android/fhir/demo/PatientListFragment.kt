@@ -95,9 +95,9 @@ class PatientListFragment : Fragment() {
     }
 
     patientListViewModel.patientCount.observe(
-      viewLifecycleOwner,
-      { binding.patientListContainer.patientCount.text = "$it Patient(s)" }
-    )
+      viewLifecycleOwner
+    ) { binding.patientListContainer.patientCount.text = "$it Patient(s)" }
+
     searchView = binding.search
     topBanner = binding.syncStatusContainer.linearLayoutSyncStatus
     syncStatus = binding.syncStatusContainer.tvSyncingStatus
