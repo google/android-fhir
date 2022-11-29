@@ -71,15 +71,11 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         answersChangedCallback = { _, _, _ -> },
       )
     )
+    val selectedItem =
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).adapter.getItem(1)
+        as DropDownAnswerOption
 
-    assertThat(
-        viewHolder.itemView
-          .findViewById<AutoCompleteTextView>(R.id.auto_complete)
-          .adapter
-          .getItem(1)
-          .toString()
-      )
-      .isEqualTo("Test Code")
+    assertThat(selectedItem.answerOptionString).isEqualTo("Test Code")
   }
 
   @Test
@@ -100,15 +96,11 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         answersChangedCallback = { _, _, _ -> },
       )
     )
+    val selectedItem =
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).adapter.getItem(1)
+        as DropDownAnswerOption
 
-    assertThat(
-        viewHolder.itemView
-          .findViewById<AutoCompleteTextView>(R.id.auto_complete)
-          .adapter
-          .getItem(1)
-          .toString()
-      )
-      .isEqualTo("John Doe")
+    assertThat(selectedItem.answerOptionString).isEqualTo("John Doe")
   }
 
   @Test
@@ -125,15 +117,11 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         answersChangedCallback = { _, _, _ -> },
       )
     )
+    val selectedItem =
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).adapter.getItem(1)
+        as DropDownAnswerOption
 
-    assertThat(
-        viewHolder.itemView
-          .findViewById<AutoCompleteTextView>(R.id.auto_complete)
-          .adapter
-          .getItem(1)
-          .toString()
-      )
-      .isEqualTo("Patient/123")
+    assertThat(selectedItem.answerOptionString).isEqualTo("Patient/123")
   }
 
   @Test
@@ -150,15 +138,10 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         answersChangedCallback = { _, _, _ -> },
       )
     )
-
-    assertThat(
-        viewHolder.itemView
-          .findViewById<AutoCompleteTextView>(R.id.auto_complete)
-          .adapter
-          .getItem(1)
-          .toString()
-      )
-      .isEqualTo("test-code")
+    val selectedItem =
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).adapter.getItem(1)
+        as DropDownAnswerOption
+    assertThat(selectedItem.answerOptionString).isEqualTo("test-code")
   }
 
   @Test
