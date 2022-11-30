@@ -500,7 +500,7 @@ object ResourceMapper {
       // Do nothing
     }
 
-    //     Example considered is
+    //     Example is
     //     "id" : "Patient.extension:birthPlace",
     //      "path" : "Patient.extension",
     //      "definition":
