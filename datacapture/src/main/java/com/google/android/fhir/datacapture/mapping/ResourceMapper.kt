@@ -136,9 +136,10 @@ object ResourceMapper {
                 return null
               }
 
-              if (structureDefinitionMap.containsKey(url.toString())) {
-                return structureDefinitionMap[url.toString()]
+              structureDefinitionMap[url.toString()]?.also {
+                return it
               }
+
               return profileLoader.loadProfile(url).also {
                 structureDefinitionMap[url.toString()] = it
               }
@@ -164,7 +165,7 @@ object ResourceMapper {
   private fun extractByDefinition(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    profileLoader: ProfileLoader?
+    profileLoader: ProfileLoader
   ): Bundle {
     val rootResource: Resource? = questionnaire.createResource()
     val extractedResources = mutableListOf<Resource>()
@@ -311,7 +312,7 @@ object ResourceMapper {
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     extractionContext: Base?,
     extractionResult: MutableList<Resource>,
-    profileLoader: ProfileLoader?
+    profileLoader: ProfileLoader
   ) {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
@@ -352,7 +353,7 @@ object ResourceMapper {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     extractionContext: Base?,
     extractionResult: MutableList<Resource>,
-    profileLoader: ProfileLoader?
+    profileLoader: ProfileLoader
   ) {
     when (questionnaireItem.type) {
       Questionnaire.QuestionnaireItemType.GROUP ->
@@ -420,7 +421,7 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     extractionResult: MutableList<Resource>,
-    profileLoader: ProfileLoader?
+    profileLoader: ProfileLoader
   ) {
     val resource = questionnaireItem.createResource() as Resource
     extractByDefinition(
@@ -443,7 +444,7 @@ object ResourceMapper {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     base: Base,
     extractionResult: MutableList<Resource>,
-    profileLoader: ProfileLoader?
+    profileLoader: ProfileLoader
   ) {
     val fieldName = getFieldNameByDefinition(questionnaireItem.definition)
     val value =
@@ -472,7 +473,7 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     base: Base,
-    profileLoader: ProfileLoader?
+    profileLoader: ProfileLoader
   ) {
     if (questionnaireResponseItem.answer.isEmpty()) return
 
@@ -499,48 +500,45 @@ object ResourceMapper {
       // Do nothing
     }
 
-    /* Examples considered here is element having id and path as below
-     "id" : "Patient.extension:birthPlace",
-      "path" : "Patient.extension",
-      "definition": "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.birthPlace"
-      OR
-     "id": "Patient.address.extension:address-preferred",
-     "path": "Patient.address.extension",
-     "definition": "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.address.address-preferred"
-    */
+    //     Example considered is
+    //     "id" : "Patient.extension:birthPlace",
+    //      "path" : "Patient.extension",
+    //      "definition":
+    // "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.birthPlace"
+    //      OR
+    //     "id": "Patient.address.extension:address-preferred",
+    //     "path": "Patient.address.extension",
+    //     "definition":
+    // "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.address.address-preferred"
+    //
     if (base.javaClass.getFieldOrNull(fieldName) == null) {
-      // Whether the field is defined as an extension in the profile
-      var isExtensionSupported = false
       // base url from definition
       val canonicalUrl =
         questionnaireItem.definition.substring(0, questionnaireItem.definition.lastIndexOf("#"))
-      // if existing map contains structureDefinition
-      val structureDefinition: StructureDefinition? =
-        profileLoader?.loadProfile(CanonicalType(canonicalUrl))
-      // Here Consideration is - even there are multiple profile available for Resource, here ony
-      // one java resource object is extracted
-      structureDefinition?.let {
-        /* eg for "definition": "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.address.address-preferred"
-        extensionForType is "Patient.address" */
+      // one FHIR resource object is extracted even for multiple conforming profile available for
+      // Resource
+      profileLoader.loadProfile(CanonicalType(canonicalUrl))?.let {
+        //         Example "definition":
+        // "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.address.address-preferred"
+        //        extensionForType is "Patient.address"
         val extensionForType =
           questionnaireItem.definition.substring(
             questionnaireItem.definition.lastIndexOf("#") + 1,
             questionnaireItem.definition.lastIndexOf(".")
           )
-        isExtensionSupported =
-          isExtensionSupportedByProfile(
+        if (isExtensionSupportedByProfile(
             structureDefinition = it,
             extendedResource = extensionForType,
             fieldName = fieldName
           )
-      }
-      if (isExtensionSupported) {
-        addDefinitionBasedCustomExtension(questionnaireItem, questionnaireResponseItem, base)
-        return
-      } else {
-        Timber.w(
-          "Extension for field '$fieldName' is not defined in StructureDefinition of ${base.fhirType()}, so field is ignored"
-        )
+        ) {
+          addDefinitionBasedCustomExtension(questionnaireItem, questionnaireResponseItem, base)
+          return
+        } else {
+          Timber.w(
+            "Extension for field '$fieldName' is not defined in StructureDefinition of ${base.fhirType()}, so field is ignored"
+          )
+        }
       }
     }
   }
@@ -554,7 +552,7 @@ private fun isExtensionSupportedByProfile(
   val listOfElementDefinition =
     structureDefinition.snapshot.element.filter {
       it.path.equals(extendedResource + ".extension") // eg "path": "Patient.address.extension",
-    } // it.id.contains(extensionForType+".extension:")
+    }
   listOfElementDefinition.forEach {
     if (it.id.substringAfterLast(":").equals(fieldName)) {
       return true
