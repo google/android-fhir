@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,36 +93,41 @@ class PatientDetailsViewModel(
     val observations = getPatientObservations()
     val conditions = getPatientConditions()
 
-    patient.let {
-      data.add(PatientDetailOverview(it, firstInGroup = true))
+    patient.let { patientItem ->
+      data.add(PatientDetailOverview(patientItem, firstInGroup = true))
       data.add(
         PatientDetailProperty(
-          PatientProperty(getString(R.string.patient_property_mobile), it.phone)
+          PatientProperty(getString(R.string.patient_property_mobile), patientItem.phone)
         )
       )
       data.add(
         PatientDetailProperty(
-          PatientProperty(getString(R.string.patient_property_id), it.resourceId)
+          PatientProperty(getString(R.string.patient_property_id), patientItem.resourceId)
         )
       )
       data.add(
         PatientDetailProperty(
           PatientProperty(
             getString(R.string.patient_property_address),
-            "${it.city}, ${it.country} "
+            "${patientItem.city}, ${patientItem.country} "
           )
         )
       )
       data.add(
         PatientDetailProperty(
-          PatientProperty(getString(R.string.patient_property_dob), it.dob?.localizedString ?: "")
+          PatientProperty(
+            getString(R.string.patient_property_dob),
+            patientItem.dob?.localizedString ?: ""
+          )
         )
       )
       data.add(
         PatientDetailProperty(
           PatientProperty(
             getString(R.string.patient_property_gender),
-            it.gender.capitalize(Locale.ROOT)
+            patientItem.gender.replaceFirstChar {
+              if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
+            }
           ),
           lastInGroup = true
         )
