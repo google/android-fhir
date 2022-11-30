@@ -136,7 +136,7 @@
     <style
         name="Questionnaire.AnswerStyle"
         parent="TextAppearance.Material3.BodyMedium"
-    ></style>
+    />
 
     <style
         name="Questionnaire.ErrorStyle"
