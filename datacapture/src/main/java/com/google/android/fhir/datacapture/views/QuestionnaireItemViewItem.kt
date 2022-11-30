@@ -150,6 +150,9 @@ data class QuestionnaireItemViewItem(
     return questionnaireResponseItem.answer.joinToString { it.displayString(context) }
   }
 
+  internal val hasAnswerString: Boolean
+    get() = questionnaireResponseItem.hasAnswer()
+
   fun isAnswerOptionSelected(
     answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent
   ): Boolean {

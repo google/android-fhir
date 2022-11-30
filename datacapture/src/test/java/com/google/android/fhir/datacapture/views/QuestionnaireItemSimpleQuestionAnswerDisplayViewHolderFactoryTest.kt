@@ -288,4 +288,45 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
     assertThat(viewHolder.itemView.findViewById<MaterialDivider>(R.id.text_divider).visibility)
       .isEqualTo(View.VISIBLE)
   }
+
+  @Test
+  fun `shows error icon if answer is not present`() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = Valid,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<View>(R.id.error_icon_in_review_mode).visibility)
+      .isEqualTo(View.VISIBLE)
+  }
+
+  @Test
+  fun `does not show error icon if answer is present`() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = BooleanType(true)
+            }
+          ),
+        validationResult = Valid,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<View>(R.id.error_icon_in_review_mode).visibility)
+      .isEqualTo(View.GONE)
+  }
 }

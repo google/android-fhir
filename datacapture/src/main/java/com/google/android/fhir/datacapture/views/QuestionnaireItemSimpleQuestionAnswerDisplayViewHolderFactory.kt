@@ -16,10 +16,14 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.content.res.Resources
+import android.util.TypedValue
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.TextView
+import androidx.annotation.AttrRes
+import androidx.core.graphics.ColorUtils
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -37,6 +41,7 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
       private lateinit var header: QuestionnaireItemHeaderViewInReviewMode
       private lateinit var flyOverTextView: TextView
       private lateinit var answerTextView: TextView
+      private lateinit var errorIcon: View
       private lateinit var divider: MaterialDivider
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
@@ -45,6 +50,7 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
         flyOverTextView = itemView.findViewById(R.id.flyover_text_view)
         answerTextView = itemView.findViewById(R.id.answer_text_view)
         divider = itemView.findViewById(R.id.text_divider)
+        errorIcon = itemView.findViewById(R.id.error_icon_in_review_mode)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -69,7 +75,23 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
               else -> VISIBLE
             }
           text = questionnaireItemViewItem.answerString(context)
+          setTextColorAsPerAnswer()
         }
+
+        errorIcon.visibility =
+          when (questionnaireItemViewItem.questionnaireItem.type) {
+            Questionnaire.QuestionnaireItemType.GROUP,
+            Questionnaire.QuestionnaireItemType.DISPLAY -> {
+              GONE
+            }
+            else -> {
+              if (questionnaireItemViewItem.hasAnswerString) {
+                GONE
+              } else {
+                VISIBLE
+              }
+            }
+          }
 
         divider.visibility =
           if (header.visibility == VISIBLE ||
@@ -85,5 +107,26 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {}
 
       override fun setReadOnly(isReadOnly: Boolean) {}
+
+      private fun TextView.setTextColorAsPerAnswer() =
+        if (questionnaireItemViewItem.hasAnswerString) {
+          val color = context.theme.getColorIntFromMaterialAttribute(android.R.attr.textColor)
+          setTextColor(ColorUtils.setAlphaComponent(color, TEXT_COLOR_ALPHA))
+        } else {
+          val color = context.theme.getColorIntFromMaterialAttribute(android.R.attr.colorError)
+          setTextColor(color)
+        }
     }
+}
+
+private const val TEXT_COLOR_ALPHA = 0x80
+
+/**
+ * Reads @ColorInt value from android resource attribute. e.g [resId] value is
+ * [android.R.attr.colorError] to get the colorInt.
+ */
+internal fun Resources.Theme.getColorIntFromMaterialAttribute(@AttrRes resId: Int): Int {
+  val value = TypedValue()
+  resolveAttribute(resId, value, true)
+  return value.data
 }

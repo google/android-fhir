@@ -136,9 +136,7 @@
     <style
         name="Questionnaire.AnswerStyle"
         parent="TextAppearance.Material3.BodyMedium"
-    >
-        <item name="android:alpha">0.5</item>
-    </style>
+    ></style>
 
     <style
         name="Questionnaire.ErrorStyle"
