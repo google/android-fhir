@@ -21,16 +21,11 @@ import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.ConverterException
-import com.google.android.fhir.DateProvider
-import com.google.android.fhir.DateTimeType
-import com.google.android.fhir.DateType
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
-import com.google.android.fhir.epochDay
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
-import java.util.Date
 import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
 import org.hl7.fhir.instance.model.api.IAnyResource
@@ -191,95 +186,6 @@ private val Order?.sqlString: String
       null -> ""
     }
 
-internal fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): ConditionParam<Long> {
-  val start = value.rangeEpochDays.first
-  val end = value.rangeEpochDays.last
-  return when (prefix) {
-    // see https://www.hl7.org/fhir/search.html#prefix
-    ParamPrefixEnum.APPROXIMATE -> {
-      val currentDateType = DateType(Date.from(DateProvider().instant()), value.precision)
-      val (diffStart, diffEnd) =
-        getApproximateDateRange(value.rangeEpochDays, currentDateType.rangeEpochDays)
-
-      ConditionParam(
-        "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
-        diffStart,
-        diffEnd,
-        diffStart,
-        diffEnd
-      )
-    }
-    ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
-    ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
-    ParamPrefixEnum.NOT_EQUAL ->
-      ConditionParam(
-        "index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?",
-        start,
-        end,
-        start,
-        end
-      )
-    ParamPrefixEnum.EQUAL ->
-      ConditionParam(
-        "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
-        start,
-        end,
-        start,
-        end
-      )
-    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to > ?", end)
-    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_to >= ?", start)
-    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_from < ?", start)
-    ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ConditionParam("index_from <= ?", end)
-  }
-}
-
-internal fun getConditionParamPair(
-  prefix: ParamPrefixEnum,
-  value: DateTimeType
-): ConditionParam<Long> {
-  val start = value.rangeEpochMillis.first
-  val end = value.rangeEpochMillis.last
-  return when (prefix) {
-    // see https://www.hl7.org/fhir/search.html#prefix
-    ParamPrefixEnum.APPROXIMATE -> {
-      val currentDateTime = DateTimeType(Date.from(DateProvider().instant()), value.precision)
-      val (diffStart, diffEnd) =
-        getApproximateDateRange(value.rangeEpochMillis, currentDateTime.rangeEpochMillis)
-
-      ConditionParam(
-        "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
-        diffStart,
-        diffEnd,
-        diffStart,
-        diffEnd
-      )
-    }
-    ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
-    ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
-    ParamPrefixEnum.NOT_EQUAL ->
-      ConditionParam(
-        "index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?",
-        start,
-        end,
-        start,
-        end
-      )
-    ParamPrefixEnum.EQUAL ->
-      ConditionParam(
-        "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
-        start,
-        end,
-        start,
-        end
-      )
-    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to > ?", end)
-    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_to >= ?", start)
-    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_from < ?", start)
-    ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ConditionParam("index_from <= ?", end)
-  }
-}
-
 /**
  * Returns the condition and list of params required in NumberFilter.query see
  * https://www.hl7.org/fhir/search.html#number.
@@ -399,22 +305,6 @@ private fun BigDecimal.getRange(): BigDecimal {
   }
 }
 
-internal val DateType.rangeEpochDays: LongRange
-  get() {
-    return LongRange(value.epochDay, precision.add(value, 1).epochDay - 1)
-  }
-
-/**
- * The range of the range of the Date's epoch Timestamp. The value is related to the precision of
- * the DateTimeType
- *
- * For example 2001-01-01 includes all values on the given day and thus this functions will return
- * 978307200 (epoch timestamp of 2001-01-01) and 978393599 ( which is one second less than the epoch
- * of 2001-01-02)
- */
-internal val DateTimeType.rangeEpochMillis
-  get() = LongRange(value!!.time, precision.add(value, 1).time - 1)
-
 data class ConditionParam<T>(val condition: String, val params: List<T>) {
   constructor(condition: String, vararg params: T) : this(condition, params.asList())
 }
@@ -426,7 +316,7 @@ private enum class SortTableInfo(val tableName: String, val columnName: String) 
   DATE_TIME_SORT_TABLE_INFO("DateTimeIndexEntity", "index_from")
 }
 
-private fun getApproximateDateRange(
+fun getApproximateDateRange(
   valueRange: LongRange,
   currentRange: LongRange,
   approximationCoefficient: Double = APPROXIMATION_COEFFICIENT
@@ -441,4 +331,4 @@ private fun getApproximateDateRange(
   )
 }
 
-private data class ApproximateDateRange(val start: Long, val end: Long)
+data class ApproximateDateRange(val start: Long, val end: Long)

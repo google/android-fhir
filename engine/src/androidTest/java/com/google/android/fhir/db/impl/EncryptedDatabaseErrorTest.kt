@@ -26,10 +26,10 @@ import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.DATABASE_PASSPHRASE_NAME
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.ENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
+import com.google.android.fhir.r4.r4FhirAdapter
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.getQuery
-import com.google.android.fhir.testing.FhirConverterForR4Test
 import com.google.common.truth.Truth.assertThat
 import java.security.KeyStore
 import kotlinx.coroutines.runBlocking
@@ -67,7 +67,7 @@ class EncryptedDatabaseErrorTest {
               enableEncryption = false,
               databaseErrorStrategy = UNSPECIFIED
             ),
-            FhirConverterForR4Test
+            r4FhirAdapter
           )
           .let {
             it.insert(TEST_PATIENT_1)
@@ -84,7 +84,7 @@ class EncryptedDatabaseErrorTest {
               enableEncryption = true,
               databaseErrorStrategy = UNSPECIFIED
             ),
-            FhirConverterForR4Test
+            r4FhirAdapter
           )
           .let {
             it.search<Patient>(
@@ -114,7 +114,7 @@ class EncryptedDatabaseErrorTest {
               enableEncryption = true,
               databaseErrorStrategy = UNSPECIFIED
             ),
-            FhirConverterForR4Test
+            r4FhirAdapter
           )
           .let {
             it.insert(TEST_PATIENT_1)
@@ -137,7 +137,7 @@ class EncryptedDatabaseErrorTest {
               enableEncryption = true,
               databaseErrorStrategy = UNSPECIFIED
             ),
-            FhirConverterForR4Test
+            r4FhirAdapter
           )
           .let {
             it.search<Patient>(
@@ -166,7 +166,7 @@ class EncryptedDatabaseErrorTest {
             enableEncryption = true,
             databaseErrorStrategy = UNSPECIFIED
           ),
-          FhirConverterForR4Test
+          r4FhirAdapter
         )
         .let {
           it.insert(TEST_PATIENT_1)
@@ -189,7 +189,7 @@ class EncryptedDatabaseErrorTest {
             enableEncryption = true,
             databaseErrorStrategy = RECREATE_AT_OPEN
           ),
-          FhirConverterForR4Test
+          r4FhirAdapter
         )
         .let {
           assertThat(
@@ -221,7 +221,7 @@ class EncryptedDatabaseErrorTest {
               enableEncryption = true,
               databaseErrorStrategy = UNSPECIFIED
             ),
-            FhirConverterForR4Test
+            r4FhirAdapter
           )
           .let {
             it.insert(TEST_PATIENT_1)
@@ -238,7 +238,7 @@ class EncryptedDatabaseErrorTest {
               enableEncryption = false,
               databaseErrorStrategy = UNSPECIFIED
             ),
-            FhirConverterForR4Test
+            r4FhirAdapter
           )
           .let {
             assertThat(

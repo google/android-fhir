@@ -18,7 +18,6 @@ package com.google.android.fhir
 
 import android.content.Context
 import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.DatabaseConfig
@@ -39,9 +38,8 @@ internal data class FhirServices(
     private var inMemory: Boolean = false
     private var enableEncryption: Boolean = false
     private var databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
-    private var fhirVersion: FhirVersionEnum = FhirVersionEnum.R4
     private var serverConfiguration: ServerConfiguration? = null
-    private var fhirConverter: FhirConverter? = null
+    private var fhirAdapter: FhirAdapter? = null
 
     internal fun inMemory() = apply { inMemory = true }
 
@@ -61,31 +59,26 @@ internal data class FhirServices(
       this.serverConfiguration = serverConfiguration
     }
 
-    internal fun setFhirConverter(fhirConverter: FhirConverter) = apply {
-      this.fhirConverter = fhirConverter
-    }
-
-    internal fun setFhirVersion(fhirVersionEnum: FhirVersionEnum) = apply {
-      when (fhirVersionEnum) {
-        FhirVersionEnum.R5 -> this.fhirVersion = fhirVersionEnum
-        FhirVersionEnum.R4 -> this.fhirVersion = fhirVersionEnum
-        else -> throw Exception("FHIR Version: $fhirVersionEnum is not supported.")
-      }
-    }
+    internal fun setFhirAdapter(fhirAdapter: FhirAdapter) = apply { this.fhirAdapter = fhirAdapter }
 
     fun build(): FhirServices {
-      val parser = FhirContext.forCached(fhirVersion).newJsonParser()
+      checkNotNull(fhirAdapter)
+      val parser = FhirContext.forCached(fhirAdapter!!.fhirVersionEnum).newJsonParser()
       val db =
         DatabaseImpl(
           context = context,
           iParser = parser,
           DatabaseConfig(inMemory, enableEncryption, databaseErrorStrategy),
-          fhirConverter!!
+          fhirAdapter!!
         )
       val engine = FhirEngineImpl(database = db, context = context)
       val remoteDataSource =
         serverConfiguration?.let {
-          RemoteFhirService.builder(it.baseUrl, it.networkConfiguration, fhirVersion)
+          RemoteFhirService.builder(
+              it.baseUrl,
+              it.networkConfiguration,
+              fhirAdapter!!.fhirVersionEnum
+            )
             .setAuthenticator(it.authenticator)
             .setHttpLogger(it.httpLogger)
             .build()

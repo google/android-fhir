@@ -18,6 +18,7 @@ package com.google.android.fhir.testing
 
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.r4.r4FhirAdapter
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
@@ -29,7 +30,7 @@ class FhirEngineProviderTestRule : TestRule {
     return object : Statement() {
       override fun evaluate() {
         FhirEngineProvider.init(
-          FhirEngineConfiguration(testMode = true, fhirConverter = FhirConverterForR4Test)
+          FhirEngineConfiguration(testMode = true, fhirAdapter = r4FhirAdapter)
         )
         try {
           base.evaluate()

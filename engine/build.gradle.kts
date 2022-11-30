@@ -86,14 +86,13 @@ configurations {
 }
 
 dependencies {
-  testImplementation(project(mapOf("path" to ":demo")))
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
-  androidTestImplementation(project(":testing"))
+  androidTestImplementation(project(":r4"))
 
   api(Dependencies.HapiFhir.coreLibrary) { exclude(module = "junit") }
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
@@ -125,7 +124,7 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
-  testImplementation(project(":testing"))
+  testImplementation(project(":r4"))
 }
 
 configureDokka(Releases.Engine.artifactId, Releases.Engine.version)

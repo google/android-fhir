@@ -46,3 +46,5 @@ include(":workflow")
 include(":workflow-testing")
 
 include(":testing")
+
+include(":r4")

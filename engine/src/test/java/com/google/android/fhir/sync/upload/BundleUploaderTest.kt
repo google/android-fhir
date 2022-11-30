@@ -21,7 +21,7 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
-import com.google.android.fhir.demo.data.TransactionBundleGenerator
+import com.google.android.fhir.r4.TransactionBundleGenerator
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.sync.UploadResult
 import com.google.common.truth.Truth.assertThat

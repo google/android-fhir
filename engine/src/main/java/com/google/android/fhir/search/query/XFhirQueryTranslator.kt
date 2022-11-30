@@ -23,18 +23,16 @@ import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.gclient.UriClientParam
-import com.google.android.fhir.Coding
-import com.google.android.fhir.FhirConverter
-import com.google.android.fhir.Quantity
+import com.google.android.fhir.FhirAdapter
 import com.google.android.fhir.index.SearchParamDefinition
 import com.google.android.fhir.index.SearchParamType
 import com.google.android.fhir.index.getSearchParamList
 import com.google.android.fhir.isValidDateOnly
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
+import com.google.android.fhir.search.filter.DateFilterValues
 import com.google.android.fhir.search.filter.TokenFilterValue
 import com.google.android.fhir.search.filter.TokenParamFilterValueInstance
-import java.math.BigDecimal
 
 /**
  * Supports translation of x-fhir-query defined in
@@ -55,11 +53,11 @@ object XFhirQueryTranslator {
    * Complex queries including fhirpath expressions, global common search params, modifiers,
    * prefixes, chained parameters are not supported.
    */
-  internal fun translate(xFhirQuery: String, fhirConverter: FhirConverter): Search {
+  internal fun translate(xFhirQuery: String, fhirAdapter: FhirAdapter): Search {
     val (resourceType, queryStringPairs) =
       xFhirQuery.split("?").let { it.first() to it.elementAtOrNull(1)?.split("&") }
 
-    fhirConverter.validateResourceType(resourceType)
+    fhirAdapter.validateResourceType(resourceType)
     val queryParams =
       queryStringPairs?.mapNotNull {
         // skip missing values like active=[missing]
@@ -97,7 +95,7 @@ object XFhirQueryTranslator {
     return Search(resourceType, count).apply {
       querySearchParameters?.forEach {
         val (param, filterValue) = it
-        this.applyFilterParam(param, filterValue, fhirConverter)
+        this.applyFilterParam(param, filterValue, fhirAdapter)
       }
 
       sort?.forEach { sortParam ->
@@ -111,7 +109,7 @@ object XFhirQueryTranslator {
   fun Search.applyFilterParam(
     param: SearchParamDefinition,
     filterValue: String,
-    fhirConverter: FhirConverter
+    fhirAdapter: FhirAdapter
   ) =
     when (param.type) {
       SearchParamType.NUMBER -> {
@@ -121,22 +119,37 @@ object XFhirQueryTranslator {
         if (!isValidDateOnly(filterValue))
           this.filter(
             DateClientParam(param.name),
-            { value = of(fhirConverter.createDateTimeType(filterValue)) }
+            {
+              value =
+                DateFilterValues().apply {
+                  this.dateTime = fhirAdapter.toDateTime(filterValue)
+                  this.getConditionParamPairForDateTimeType =
+                    fhirAdapter.toGetConditionParamPairForDateTimeType
+                }
+            }
           )
         else
           this.filter(
             DateClientParam(param.name),
-            { value = of(fhirConverter.createDateType(filterValue)) },
+            {
+              value =
+                DateFilterValues().apply {
+                  this.date = fhirAdapter.toDate(filterValue)
+                  this.getConditionParamPairForDateType =
+                    fhirAdapter.toGetConditionParamPairForDateType
+                }
+            }
           )
       }
       SearchParamType.QUANTITY -> {
-        filterValue.toQuantity().let {
+        val quantity = fhirAdapter.toQuantity(filterValue)
+        quantity.let {
           this.filter(
             QuantityClientParam(param.name),
             {
-              value = it.value
-              system = it.system
-              unit = it.unit
+              value = it.first
+              system = it.second
+              unit = it.third
             }
           )
         }
@@ -145,13 +158,14 @@ object XFhirQueryTranslator {
         this.filter(StringClientParam(param.name), { value = filterValue })
       }
       SearchParamType.TOKEN -> {
-        filterValue.toCoding().let {
+        val coding = fhirAdapter.toCoding(filterValue)
+        coding.let {
           this.filter(
             TokenClientParam(param.name),
             {
               value =
                 TokenFilterValue().apply {
-                  tokenFilters.add(TokenParamFilterValueInstance(uri = it.system, code = it.code!!))
+                  tokenFilters.add(TokenParamFilterValueInstance(uri = it.first, code = it.second))
                 }
             }
           )
@@ -199,45 +213,4 @@ object XFhirQueryTranslator {
   private fun String.toSearchParamDefinition(resourceType: String) =
     resourceType.resourceSearchParameters.find { it.name == this }
       ?: throw IllegalArgumentException("$this not found in $resourceType")
-
-  /**
-   * Parse quantity string as defined in specs https://hl7.org/fhir/search.html#quantity The
-   *
-   * Components: value|system|unit OR value|unit OR value
-   *
-   * Examples: 5.4|http://unitsofmeasure.org|mg OR 5.4|mg OR 5.4
-   */
-  private fun String.toQuantity() =
-    this.split("|").let { parts ->
-      Quantity(
-        code = null,
-        value = BigDecimal.valueOf(parts.first().toDouble()),
-        system =
-          if (parts.size == 3) // system exists at index 1 only if all 3 components are specified
-           parts.elementAt(1)
-          else null,
-        unit =
-          if (parts.size > 1) parts.last()
-          else null // unit exists as last element only for two or more components
-      )
-    }
-
-  /**
-   * Parse coding string as defined in specs https://hl7.org/fhir/search.html#token
-   *
-   * Components: system|code OR code
-   *
-   * Examples: http://snomed.org|112233 OR 112233
-   */
-  private fun String.toCoding() =
-    this.split("|").let { parts ->
-      Coding(
-        system =
-          if (parts.size == 2
-          ) // system exists as first element only if both components are specified
-           parts.first()
-          else null,
-        code = parts.last() // code would always be specified and would exists as last element
-      )
-    }
 }

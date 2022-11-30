@@ -29,14 +29,15 @@ import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.r4.r4FhirAdapter
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
+import com.google.android.fhir.search.filter.DateFilterValues
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
-import com.google.android.fhir.testing.FhirConverterForR4Test
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
@@ -88,13 +89,13 @@ class DatabaseImplTest {
   private val context: Context = ApplicationProvider.getApplicationContext()
   private val services =
     FhirServices.builder(context)
-      .setFhirConverter(FhirConverterForR4Test)
+      .setFhirAdapter(r4FhirAdapter)
       .inMemory()
       .apply { if (encrypted) enableEncryptionIfSupported() }
       .build()
   private val testingUtils = TestingUtils(services.parser)
   private val database = services.database
-  private val fhirConverter = FhirConverterForR4Test
+  private val fhirAdapter = r4FhirAdapter
 
   @Before fun setUp(): Unit = runBlocking { database.insert(TEST_PATIENT_1) }
 
@@ -1378,7 +1379,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.APPROXIMATE
               }
             )
@@ -1404,7 +1410,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2020-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2020-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.APPROXIMATE
               }
             )
@@ -1430,7 +1441,12 @@ class DatabaseImplTest {
             filter(
               Patient.BIRTHDATE,
               {
-                value = of(fhirConverter.createDateType(DateType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.date = DateType("2013-03-14")
+                    this.getConditionParamPairForDateType =
+                      fhirAdapter.toGetConditionParamPairForDateType
+                  }
                 prefix = ParamPrefixEnum.APPROXIMATE
               }
             )
@@ -1456,7 +1472,12 @@ class DatabaseImplTest {
             filter(
               Patient.BIRTHDATE,
               {
-                value = of(fhirConverter.createDateType(DateType("2020-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.date = DateType("2020-03-14")
+                    this.getConditionParamPairForDateType =
+                      fhirAdapter.toGetConditionParamPairForDateType
+                  }
                 prefix = ParamPrefixEnum.APPROXIMATE
               }
             )
@@ -1481,7 +1502,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.STARTS_AFTER
               }
             )
@@ -1506,7 +1532,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.STARTS_AFTER
               }
             )
@@ -1531,7 +1562,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.ENDS_BEFORE
               }
             )
@@ -1556,7 +1592,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.ENDS_BEFORE
               }
             )
@@ -1581,7 +1622,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.NOT_EQUAL
               }
             )
@@ -1606,7 +1652,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.NOT_EQUAL
               }
             )
@@ -1631,7 +1682,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.EQUAL
               }
             )
@@ -1656,7 +1712,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.EQUAL
               }
             )
@@ -1681,7 +1742,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.GREATERTHAN
               }
             )
@@ -1706,7 +1772,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.GREATERTHAN
               }
             )
@@ -1731,7 +1802,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
               }
             )
@@ -1756,7 +1832,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
               }
             )
@@ -1781,7 +1862,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.LESSTHAN
               }
             )
@@ -1806,7 +1892,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.LESSTHAN
               }
             )
@@ -1831,7 +1922,12 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+                value =
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
               }
             )
@@ -1857,7 +1953,11 @@ class DatabaseImplTest {
               Patient.DEATH_DATE,
               {
                 value =
-                  of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14T00:00:00-00:00")))
+                  DateFilterValues().apply {
+                    this.dateTime = DateTimeType("2013-03-14T00:00:00-00:00")
+                    this.getConditionParamPairForDateTimeType =
+                      fhirAdapter.toGetConditionParamPairForDateTimeType
+                  }
                 prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
               }
             )
@@ -2396,13 +2496,11 @@ class DatabaseImplTest {
                 Immunization.VACCINE_CODE,
                 {
                   value =
-                    of(
-                      fhirConverter.createCodingType(
-                        Coding(
-                          "http://hl7.org/fhir/sid/cvx",
-                          "140",
-                          "Influenza, seasonal, injectable, preservative free"
-                        )
+                    fhirAdapter.toTokenFilterValue(
+                      Coding(
+                        "http://hl7.org/fhir/sid/cvx",
+                        "140",
+                        "Influenza, seasonal, injectable, preservative free"
                       )
                     )
                 }
@@ -2413,10 +2511,8 @@ class DatabaseImplTest {
                 Immunization.STATUS,
                 {
                   value =
-                    of(
-                      fhirConverter.createCodingType(
-                        Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")
-                      )
+                    fhirAdapter.toTokenFilterValue(
+                      Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")
                     )
                 }
               )
@@ -2465,14 +2561,8 @@ class DatabaseImplTest {
                 CarePlan.CATEGORY,
                 {
                   value =
-                    of(
-                      fhirConverter.createCodingType(
-                        Coding(
-                          "http://snomed.info/sct",
-                          "698360004",
-                          "Diabetes self management plan"
-                        )
-                      )
+                    fhirAdapter.toTokenFilterValue(
+                      Coding("http://snomed.info/sct", "698360004", "Diabetes self management plan")
                     )
                 }
               )
@@ -2551,10 +2641,8 @@ class DatabaseImplTest {
                   Condition.CODE,
                   {
                     value =
-                      of(
-                        fhirConverter.createCodingType(
-                          Coding("http://snomed.info/sct", "44054006", "Diabetes")
-                        )
+                      fhirAdapter.toTokenFilterValue(
+                        Coding("http://snomed.info/sct", "44054006", "Diabetes")
                       )
                   }
                 )
@@ -2566,10 +2654,8 @@ class DatabaseImplTest {
                   Condition.CODE,
                   {
                     value =
-                      of(
-                        fhirConverter.createCodingType(
-                          Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")
-                        )
+                      fhirAdapter.toTokenFilterValue(
+                        Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")
                       )
                   }
                 )
@@ -2696,25 +2782,21 @@ class DatabaseImplTest {
               Immunization.VACCINE_CODE,
               {
                 value =
-                  of(
-                    fhirConverter.createCodingType(
-                      Coding(
-                        "http://id.who.int/icd11/mms",
-                        "XM1NL1",
-                        "COVID-19 vaccine, inactivated virus"
-                      )
+                  fhirAdapter.toTokenFilterValue(
+                    Coding(
+                      "http://id.who.int/icd11/mms",
+                      "XM1NL1",
+                      "COVID-19 vaccine, inactivated virus"
                     )
                   )
               },
               {
                 value =
-                  of(
-                    fhirConverter.createCodingType(
-                      Coding(
-                        "http://id.who.int/icd11/mms",
-                        "XM5DF6",
-                        "COVID-19 vaccine, inactivated virus"
-                      )
+                  fhirAdapter.toTokenFilterValue(
+                    Coding(
+                      "http://id.who.int/icd11/mms",
+                      "XM5DF6",
+                      "COVID-19 vaccine, inactivated virus"
                     )
                   )
               },
@@ -2785,10 +2867,8 @@ class DatabaseImplTest {
               Immunization.VACCINE_CODE,
               {
                 value =
-                  of(
-                    fhirConverter.createCodingType(
-                      Coding("http://id.who.int/icd11/mms", "XM1NL1", "")
-                    )
+                  fhirAdapter.toTokenFilterValue(
+                    Coding("http://id.who.int/icd11/mms", "XM1NL1", "")
                   )
               }
             )
@@ -2797,10 +2877,8 @@ class DatabaseImplTest {
               Immunization.VACCINE_CODE,
               {
                 value =
-                  of(
-                    fhirConverter.createCodingType(
-                      Coding("http://id.who.int/icd11/mms", "XM5DF6", "")
-                    )
+                  fhirAdapter.toTokenFilterValue(
+                    Coding("http://id.who.int/icd11/mms", "XM5DF6", "")
                   )
               }
             )

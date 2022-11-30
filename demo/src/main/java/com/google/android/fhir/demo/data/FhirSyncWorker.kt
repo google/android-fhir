@@ -19,6 +19,8 @@ package com.google.android.fhir.demo.data
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.google.android.fhir.demo.FhirApplication
+import com.google.android.fhir.r4.DownloadWorkManagerImpl
+import com.google.android.fhir.r4.TransactionBundleGenerator
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker

@@ -68,8 +68,7 @@ object FhirEngineProvider {
           .apply {
             if (configuration.enableEncryptionIfSupported) enableEncryptionIfSupported()
             setDatabaseErrorStrategy(configuration.databaseErrorStrategy)
-            setFhirVersion(configuration.fhirVersionEnum)
-            configuration.fhirConverter?.let { setFhirConverter(it) }
+            setFhirAdapter(configuration.fhirAdapter)
             configuration.serverConfiguration?.let { setServerConfiguration(it) }
             if (configuration.testMode) {
               inMemory()
@@ -107,9 +106,8 @@ object FhirEngineProvider {
 data class FhirEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
   val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
-  val fhirVersionEnum: FhirVersionEnum = FhirVersionEnum.R4,
   val serverConfiguration: ServerConfiguration? = null,
-  val fhirConverter: FhirConverter? = null,
+  val fhirAdapter: FhirAdapter = FhirAdapter.builder(FhirVersionEnum.R4).build(),
   val testMode: Boolean = false
 )
 

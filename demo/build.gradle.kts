@@ -64,6 +64,7 @@ dependencies {
     exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
   }
   implementation(project(":engine"))
+  implementation(project(":r4"))
 
   testImplementation(Dependencies.junit)
 }

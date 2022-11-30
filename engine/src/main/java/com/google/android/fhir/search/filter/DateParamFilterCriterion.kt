@@ -18,13 +18,12 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
-import com.google.android.fhir.DateTimeType
-import com.google.android.fhir.DateType
 import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.SearchQuery
-import com.google.android.fhir.search.getConditionParamPair
+import java.util.Date
+import org.hl7.fhir.instance.model.api.IPrimitiveType
 
 /**
  * Represents a criterion for filtering [DateClientParam]. e.g. filter(Patient.BIRTHDATE, { value
@@ -36,17 +35,16 @@ data class DateParamFilterCriterion(
   var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
   var value: DateFilterValues? = null
 ) : FilterCriterion {
-  /** Returns [DateFilterValues] from [DateType]. */
-  fun of(date: DateType) = DateFilterValues().apply { this.date = date }
-
-  /** Returns [DateFilterValues] from [DateTimeType]. */
-  fun of(dateTime: DateTimeType) = DateFilterValues().apply { this.dateTime = dateTime }
 
   override fun getConditionalParams(): List<ConditionParam<Long>> {
     checkNotNull(value) { "DateClientParamFilter.value can't be null." }
     return when {
-      value!!.date != null -> listOf(getConditionParamPair(prefix, value!!.date!!))
-      value!!.dateTime != null -> listOf(getConditionParamPair(prefix, value!!.dateTime!!))
+      value!!.date != null ->
+        listOf(value!!.getConditionParamPairForDateType?.let { it(prefix, value!!.date!!) }!!)
+      value!!.dateTime != null ->
+        listOf(
+          value!!.getConditionParamPairForDateTimeType?.let { it(prefix, value!!.dateTime!!) }!!
+        )
       else -> {
         throw IllegalStateException(
           "DateClientParamFilter.value should have either DateType or DateTimeType."
@@ -57,9 +55,15 @@ data class DateParamFilterCriterion(
 }
 
 @SearchDslMarker
-class DateFilterValues internal constructor() {
-  var date: DateType? = null
-  var dateTime: DateTimeType? = null
+class DateFilterValues() {
+  var date: IPrimitiveType<Date>? = null
+  var dateTime: IPrimitiveType<Date>? = null
+  var getConditionParamPairForDateType:
+    ((ParamPrefixEnum, IPrimitiveType<Date>) -> ConditionParam<Long>?)? =
+    null
+  var getConditionParamPairForDateTimeType:
+    ((ParamPrefixEnum, IPrimitiveType<Date>) -> ConditionParam<Long>)? =
+    null
 }
 
 /**

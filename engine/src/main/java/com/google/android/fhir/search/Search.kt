@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.search
 
-import com.google.android.fhir.FhirConverter
+import com.google.android.fhir.FhirAdapter
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.resourceType
 import com.google.android.fhir.search.query.XFhirQueryTranslator.translate
@@ -38,9 +38,6 @@ suspend inline fun <reified R : IAnyResource> FhirEngine.count(
   return this.count(search)
 }
 
-suspend fun FhirEngine.search(
-  xFhirQuery: String,
-  fhirConverter: FhirConverter
-): List<IAnyResource> {
-  return this.search(translate(xFhirQuery, fhirConverter))
+suspend fun FhirEngine.search(xFhirQuery: String, fhirAdapter: FhirAdapter): List<IAnyResource> {
+  return this.search(translate(xFhirQuery, fhirAdapter))
 }

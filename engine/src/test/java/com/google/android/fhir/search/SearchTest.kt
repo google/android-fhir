@@ -20,9 +20,11 @@ import android.os.Build
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
-import com.google.android.fhir.FhirConverter
 import com.google.android.fhir.epochDay
-import com.google.android.fhir.testing.FhirConverterForR4Test
+import com.google.android.fhir.r4.r4FhirAdapter
+import com.google.android.fhir.r4.rangeEpochDays
+import com.google.android.fhir.r4.rangeEpochMillis
+import com.google.android.fhir.search.filter.DateFilterValues
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
@@ -55,7 +57,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class SearchTest {
 
-  private val fhirConverter: FhirConverter = FhirConverterForR4Test
+  private val fhirAdapter = r4FhirAdapter
 
   @Test
   fun search() = runBlocking {
@@ -127,17 +129,21 @@ class SearchTest {
 
   @Test
   fun search_filter_date_approximate() {
-    val mockDateType =
-      fhirConverter.createDateType(DateType(Date(mockEpochTimeStamp), TemporalPrecisionEnum.DAY))
+    val mockDateType = DateType(Date(mockEpochTimeStamp), TemporalPrecisionEnum.DAY)
     DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
-    val value = fhirConverter.createDateType(DateType("2013-03-14"))
+    val value = DateType("2013-03-14")
     val query =
       Search(ResourceType.Patient.name)
         .apply {
           filter(
             Patient.BIRTHDATE,
             {
-              this.value = of(value)
+              this.value =
+                DateFilterValues().apply {
+                  this.date = value
+                  this.getConditionParamPairForDateType =
+                    fhirAdapter.toGetConditionParamPairForDateType
+                }
               prefix = ParamPrefixEnum.APPROXIMATE
             }
           )
@@ -190,7 +196,12 @@ class SearchTest {
             Patient.BIRTHDATE,
             {
               prefix = ParamPrefixEnum.STARTS_AFTER
-              value = of(fhirConverter.createDateType(DateType("2013-03-14")))
+              value =
+                DateFilterValues().apply {
+                  this.date = DateType("2013-03-14")
+                  this.getConditionParamPairForDateType =
+                    fhirAdapter.toGetConditionParamPairForDateType
+                }
             }
           )
         }
@@ -228,7 +239,12 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(fhirConverter.createDateType(DateType("2013-03-14")))
+              value =
+                DateFilterValues().apply {
+                  this.date = DateType("2013-03-14")
+                  this.getConditionParamPairForDateType =
+                    fhirAdapter.toGetConditionParamPairForDateType
+                }
               prefix = ParamPrefixEnum.ENDS_BEFORE
             }
           )
@@ -267,7 +283,12 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(fhirConverter.createDateType(DateType("2013-03-14")))
+              value =
+                DateFilterValues().apply {
+                  this.date = DateType("2013-03-14")
+                  this.getConditionParamPairForDateType =
+                    fhirAdapter.toGetConditionParamPairForDateType
+                }
               prefix = ParamPrefixEnum.NOT_EQUAL
             }
           )
@@ -308,7 +329,14 @@ class SearchTest {
         .apply {
           filter(
             Patient.BIRTHDATE,
-            { value = of(fhirConverter.createDateType(DateType("2013-03-14"))) }
+            {
+              value =
+                DateFilterValues().apply {
+                  this.date = DateType("2013-03-14")
+                  this.getConditionParamPairForDateType =
+                    fhirAdapter.toGetConditionParamPairForDateType
+                }
+            }
           )
         }
         .getQuery()
@@ -348,7 +376,12 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(fhirConverter.createDateType(DateType("2013-03-14")))
+              value =
+                DateFilterValues().apply {
+                  this.date = DateType("2013-03-14")
+                  this.getConditionParamPairForDateType =
+                    fhirAdapter.toGetConditionParamPairForDateType
+                }
               prefix = ParamPrefixEnum.GREATERTHAN
             }
           )
@@ -387,7 +420,12 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(fhirConverter.createDateType(DateType("2013-03-14")))
+              value =
+                DateFilterValues().apply {
+                  this.date = DateType("2013-03-14")
+                  this.getConditionParamPairForDateType =
+                    fhirAdapter.toGetConditionParamPairForDateType
+                }
               prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
             }
           )
@@ -426,7 +464,12 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(fhirConverter.createDateType(DateType("2013-03-14")))
+              value =
+                DateFilterValues().apply {
+                  this.date = DateType("2013-03-14")
+                  this.getConditionParamPairForDateType =
+                    fhirAdapter.toGetConditionParamPairForDateType
+                }
               prefix = ParamPrefixEnum.LESSTHAN
             }
           )
@@ -465,7 +508,12 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(fhirConverter.createDateType(DateType("2013-03-14")))
+              value =
+                DateFilterValues().apply {
+                  this.date = DateType("2013-03-14")
+                  this.getConditionParamPairForDateType =
+                    fhirAdapter.toGetConditionParamPairForDateType
+                }
               prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
             }
           )
@@ -499,11 +547,9 @@ class SearchTest {
   @Test
   fun search_filter_dateTime_approximate() {
     val mockDateTimeType =
-      fhirConverter.createDateTimeType(
-        DateTimeType(Date.from(Instant.ofEpochMilli(mockEpochTimeStamp)), TemporalPrecisionEnum.DAY)
-      )
+      DateTimeType(Date.from(Instant.ofEpochMilli(mockEpochTimeStamp)), TemporalPrecisionEnum.DAY)
     DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
-    val value = fhirConverter.createDateTimeType(DateTimeType("2013-03-14"))
+    val value = DateTimeType("2013-03-14")
 
     val query =
       Search(ResourceType.Patient.name)
@@ -511,7 +557,12 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              this.value = of(value)
+              this.value =
+                DateFilterValues().apply {
+                  this.dateTime = value
+                  this.getConditionParamPairForDateTimeType =
+                    fhirAdapter.toGetConditionParamPairForDateTimeType
+                }
               prefix = ParamPrefixEnum.APPROXIMATE
             }
           )
@@ -564,7 +615,12 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+              value =
+                DateFilterValues().apply {
+                  this.dateTime = DateTimeType("2013-03-14")
+                  this.getConditionParamPairForDateTimeType =
+                    fhirAdapter.toGetConditionParamPairForDateTimeType
+                }
               prefix = ParamPrefixEnum.STARTS_AFTER
             }
           )
@@ -603,7 +659,12 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+              value =
+                DateFilterValues().apply {
+                  this.dateTime = DateTimeType("2013-03-14")
+                  this.getConditionParamPairForDateTimeType =
+                    fhirAdapter.toGetConditionParamPairForDateTimeType
+                }
               prefix = ParamPrefixEnum.ENDS_BEFORE
             }
           )
@@ -642,7 +703,12 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+              value =
+                DateFilterValues().apply {
+                  this.dateTime = DateTimeType("2013-03-14")
+                  this.getConditionParamPairForDateTimeType =
+                    fhirAdapter.toGetConditionParamPairForDateTimeType
+                }
               prefix = ParamPrefixEnum.NOT_EQUAL
             }
           )
@@ -684,7 +750,12 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+              value =
+                DateFilterValues().apply {
+                  this.dateTime = DateTimeType("2013-03-14")
+                  this.getConditionParamPairForDateTimeType =
+                    fhirAdapter.toGetConditionParamPairForDateTimeType
+                }
               prefix = ParamPrefixEnum.EQUAL
             }
           )
@@ -726,7 +797,12 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+              value =
+                DateFilterValues().apply {
+                  this.dateTime = DateTimeType("2013-03-14")
+                  this.getConditionParamPairForDateTimeType =
+                    fhirAdapter.toGetConditionParamPairForDateTimeType
+                }
               prefix = ParamPrefixEnum.GREATERTHAN
             }
           )
@@ -765,7 +841,12 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+              value =
+                DateFilterValues().apply {
+                  this.dateTime = DateTimeType("2013-03-14")
+                  this.getConditionParamPairForDateTimeType =
+                    fhirAdapter.toGetConditionParamPairForDateTimeType
+                }
               prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
             }
           )
@@ -804,7 +885,12 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+              value =
+                DateFilterValues().apply {
+                  this.dateTime = DateTimeType("2013-03-14")
+                  this.getConditionParamPairForDateTimeType =
+                    fhirAdapter.toGetConditionParamPairForDateTimeType
+                }
               prefix = ParamPrefixEnum.LESSTHAN
             }
           )
@@ -843,7 +929,12 @@ class SearchTest {
           filter(
             Patient.BIRTHDATE,
             {
-              value = of(fhirConverter.createDateTimeType(DateTimeType("2013-03-14")))
+              value =
+                DateFilterValues().apply {
+                  this.dateTime = DateTimeType("2013-03-14")
+                  this.getConditionParamPairForDateTimeType =
+                    fhirAdapter.toGetConditionParamPairForDateTimeType
+                }
               prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
             }
           )
@@ -983,10 +1074,8 @@ class SearchTest {
             Patient.GENDER,
             {
               value =
-                of(
-                  fhirConverter.createCodingType(
-                    Coding("http://hl7.org/fhir/ValueSet/administrative-gender", "male", "Male")
-                  )
+                fhirAdapter.toTokenFilterValue(
+                  Coding("http://hl7.org/fhir/ValueSet/administrative-gender", "male", "Male")
                 )
             }
           )
@@ -1026,10 +1115,8 @@ class SearchTest {
             Immunization.VACCINE_CODE,
             {
               value =
-                of(
-                  fhirConverter.createCodeableConceptType(
-                    CodeableConcept(Coding("http://snomed.info/sct", "260385009", "Allergy X"))
-                  )
+                fhirAdapter.toTokenFilterValue(
+                  CodeableConcept(Coding("http://snomed.info/sct", "260385009", "Allergy X"))
                 )
             }
           )
@@ -1069,7 +1156,7 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient.name)
         .apply {
-          filter(Patient.IDENTIFIER, { value = of(fhirConverter.createIdentifierType(identifier)) })
+          filter(Patient.IDENTIFIER, { value = fhirAdapter.toTokenFilterValue(identifier) })
         }
         .getQuery()
     assertThat(query.query)
@@ -1105,14 +1192,12 @@ class SearchTest {
             Patient.TELECOM,
             {
               value =
-                of(
-                  fhirConverter.createContactPointType(
-                    ContactPoint().apply {
-                      system = ContactPoint.ContactPointSystem.EMAIL
-                      use = ContactPoint.ContactPointUse.HOME
-                      value = "test@gmail.com"
-                    }
-                  )
+                fhirAdapter.toTokenFilterValue(
+                  ContactPoint().apply {
+                    system = ContactPoint.ContactPointSystem.EMAIL
+                    use = ContactPoint.ContactPointUse.HOME
+                    value = "test@gmail.com"
+                  }
                 )
             }
           )
@@ -1151,13 +1236,11 @@ class SearchTest {
             Patient.TELECOM,
             {
               value =
-                of(
-                  fhirConverter.createContactPointType(
-                    ContactPoint().apply {
-                      system = ContactPoint.ContactPointSystem.EMAIL
-                      value = "test@gmail.com"
-                    }
-                  )
+                fhirAdapter.toTokenFilterValue(
+                  ContactPoint().apply {
+                    system = ContactPoint.ContactPointSystem.EMAIL
+                    value = "test@gmail.com"
+                  }
                 )
             }
           )
@@ -1191,7 +1274,7 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient.name)
         .apply {
-          filter(Patient.GENDER, { value = of(fhirConverter.createCodeType(CodeType("male"))) })
+          filter(Patient.GENDER, { value = fhirAdapter.toTokenFilterValue(CodeType("male")) })
         }
         .getQuery()
     assertThat(query.query)
@@ -1256,7 +1339,7 @@ class SearchTest {
             Patient.IDENTIFIER,
             {
               value =
-                of(fhirConverter.createUriType(UriType("16009886-bd57-11eb-8529-0242ac130003")))
+                fhirAdapter.toTokenFilterValue(UriType("16009886-bd57-11eb-8529-0242ac130003"))
             }
           )
         }
@@ -1801,10 +1884,8 @@ class SearchTest {
               Condition.CODE,
               {
                 value =
-                  of(
-                    fhirConverter.createCodingType(
-                      Coding("http://snomed.info/sct", "44054006", "Diabetes")
-                    )
+                  fhirAdapter.toTokenFilterValue(
+                    Coding("http://snomed.info/sct", "44054006", "Diabetes")
                   )
               }
             )
@@ -1858,13 +1939,11 @@ class SearchTest {
               Immunization.VACCINE_CODE,
               {
                 value =
-                  of(
-                    fhirConverter.createCodingType(
-                      Coding(
-                        "http://hl7.org/fhir/sid/cvx",
-                        "140",
-                        "Influenza, seasonal, injectable, preservative free"
-                      )
+                  fhirAdapter.toTokenFilterValue(
+                    Coding(
+                      "http://hl7.org/fhir/sid/cvx",
+                      "140",
+                      "Influenza, seasonal, injectable, preservative free"
                     )
                   )
               }
@@ -1874,10 +1953,8 @@ class SearchTest {
               Immunization.STATUS,
               {
                 value =
-                  of(
-                    fhirConverter.createCodingType(
-                      Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")
-                    )
+                  fhirAdapter.toTokenFilterValue(
+                    Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")
                   )
               }
             )
@@ -1954,10 +2031,8 @@ class SearchTest {
               Condition.CODE,
               {
                 value =
-                  of(
-                    fhirConverter.createCodingType(
-                      Coding("http://snomed.info/sct", "44054006", "Diabetes")
-                    )
+                  fhirAdapter.toTokenFilterValue(
+                    Coding("http://snomed.info/sct", "44054006", "Diabetes")
                   )
               }
             )
@@ -1967,10 +2042,8 @@ class SearchTest {
               Condition.CODE,
               {
                 value =
-                  of(
-                    fhirConverter.createCodingType(
-                      Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")
-                    )
+                  fhirAdapter.toTokenFilterValue(
+                    Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")
                   )
               }
             )
@@ -2195,7 +2268,7 @@ class SearchTest {
         .apply {
           filter(
             Condition.CLINICAL_STATUS,
-            { value = of(fhirConverter.createCodingType(Coding().apply { code = "test-code" })) }
+            { value = fhirAdapter.toTokenFilterValue(Coding().apply { code = "test-code" }) }
           )
         }
         .getQuery()
@@ -2226,13 +2299,11 @@ class SearchTest {
             Condition.CLINICAL_STATUS,
             {
               value =
-                of(
-                  fhirConverter.createCodingType(
-                    Coding().apply {
-                      code = "test-code"
-                      system = "http://my-code-system.org"
-                    }
-                  )
+                fhirAdapter.toTokenFilterValue(
+                  Coding().apply {
+                    code = "test-code"
+                    system = "http://my-code-system.org"
+                  }
                 )
             }
           )

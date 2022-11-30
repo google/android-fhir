@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.demo.data
+package com.google.android.fhir.r4
 
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DownloadWorkManager

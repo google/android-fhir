@@ -23,7 +23,7 @@ import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.DatabaseErrorStrategy
-import com.google.android.fhir.FhirConverter
+import com.google.android.fhir.FhirAdapter
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
@@ -48,7 +48,7 @@ internal class DatabaseImpl(
   context: Context,
   private val iParser: IParser,
   databaseConfig: DatabaseConfig,
-  private val fhirConverter: FhirConverter
+  private val fhirAdapter: FhirAdapter
 ) : com.google.android.fhir.db.Database {
 
   val db: ResourceDatabase
@@ -105,21 +105,21 @@ internal class DatabaseImpl(
   override suspend fun <R : IAnyResource> insert(vararg resource: R): List<String> {
     val logicalIds = mutableListOf<String>()
     db.withTransaction {
-      logicalIds.addAll(resourceDao.insertAll(resource.toList(), fhirConverter))
+      logicalIds.addAll(resourceDao.insertAll(resource.toList(), fhirAdapter))
       localChangeDao.addInsertAll(resource.toList())
     }
     return logicalIds
   }
 
   override suspend fun <R : IAnyResource> insertRemote(vararg resource: R) {
-    db.withTransaction { resourceDao.insertAll(resource.toList(), fhirConverter) }
+    db.withTransaction { resourceDao.insertAll(resource.toList(), fhirAdapter) }
   }
 
   override suspend fun update(vararg resources: IAnyResource) {
     db.withTransaction {
       resources.forEach {
         val oldResourceEntity = selectEntity(it.resourceType, it.logicalId)
-        resourceDao.update(it, fhirConverter)
+        resourceDao.update(it, fhirAdapter)
         localChangeDao.addUpdate(oldResourceEntity, it)
       }
     }

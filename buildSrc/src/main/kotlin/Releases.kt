@@ -64,6 +64,11 @@ object Releases {
     override val name = "Android FHIR Workflow Library"
   }
 
+  object R4 : LibraryArtifact {
+    override val artifactId = "r4"
+    override val version = "0.1.0-alpha01"
+    override val name = "Android FHIR Library - R4 Extensions"
+  }
   object Contrib {
     object Barcode : LibraryArtifact {
       override val artifactId = "contrib-barcode"

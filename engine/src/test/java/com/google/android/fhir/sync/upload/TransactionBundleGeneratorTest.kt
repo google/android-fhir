@@ -23,7 +23,7 @@ import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
-import com.google.android.fhir.demo.data.TransactionBundleGenerator
+import com.google.android.fhir.r4.TransactionBundleGenerator
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
@@ -39,7 +39,7 @@ class TransactionBundleGeneratorTest {
 
   @Test
   fun `generate() should return empty list if there are no local changes`() = runBlocking {
-    val generator = TransactionBundleGenerator.Factory.getDefault()
+    val generator = TransactionBundleGenerator.getDefault()
     val result = generator.generate(listOf(listOf(), listOf()))
     assertThat(result).isEmpty()
   }
@@ -121,7 +121,7 @@ class TransactionBundleGeneratorTest {
           .toLocalChange()
           .apply { LocalChangeToken(listOf(3)) }
       )
-    val generator = TransactionBundleGenerator.Factory.getDefault()
+    val generator = TransactionBundleGenerator.getDefault()
     val result = generator.generate(listOf(changes))
 
     assertThat(result).hasSize(1)
@@ -211,7 +211,7 @@ class TransactionBundleGeneratorTest {
           .toLocalChange()
           .apply { LocalChangeToken(listOf(3)) }
       )
-    val generator = TransactionBundleGenerator.Factory.getDefault()
+    val generator = TransactionBundleGenerator.getDefault()
     val result = generator.generate(changes.chunked(1))
 
     // Exactly 3 Bundles are generated

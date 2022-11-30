@@ -25,7 +25,9 @@ import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.index.SearchParamType
+import com.google.android.fhir.r4.r4FhirAdapter
 import com.google.android.fhir.search.Search
+import com.google.android.fhir.search.filter.DateFilterValues
 import com.google.android.fhir.search.filter.TokenParamFilterCriterion
 import com.google.android.fhir.search.query.XFhirQueryTranslator.applyFilterParam
 import java.math.BigDecimal
@@ -104,7 +106,12 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
           prefix =
             if (dateRange.lowClosed) ParamPrefixEnum.GREATERTHAN_OR_EQUALS
             else ParamPrefixEnum.GREATERTHAN
-          value = of(FhirConverterImpl.createDateTimeType(DateTimeType(convertDate(dateRange.low))))
+          value =
+            DateFilterValues().apply {
+              this.dateTime = DateTimeType(convertDate(dateRange.low))
+              this.getConditionParamPairForDateTimeType =
+                r4FhirAdapter.toGetConditionParamPairForDateTimeType
+            }
         }
       )
     }
@@ -117,7 +124,11 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
             if (dateRange.highClosed) ParamPrefixEnum.LESSTHAN_OR_EQUALS
             else ParamPrefixEnum.LESSTHAN
           value =
-            of(FhirConverterImpl.createDateTimeType(DateTimeType(convertDate(dateRange.high))))
+            DateFilterValues().apply {
+              this.dateTime = DateTimeType(convertDate(dateRange.high))
+              this.getConditionParamPairForDateTimeType =
+                r4FhirAdapter.toGetConditionParamPairForDateTimeType
+            }
         }
       )
     }
@@ -129,7 +140,12 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
           prefix =
             if (dateRange.lowClosed) ParamPrefixEnum.GREATERTHAN_OR_EQUALS
             else ParamPrefixEnum.GREATERTHAN
-          value = of(FhirConverterImpl.createDateTimeType(DateTimeType(convertDate(dateRange.low))))
+          value =
+            DateFilterValues().apply {
+              this.dateTime = DateTimeType(convertDate(dateRange.low))
+              this.getConditionParamPairForDateTimeType =
+                r4FhirAdapter.toGetConditionParamPairForDateTimeType
+            }
         }
       )
     }
@@ -142,7 +158,11 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
             if (dateRange.highClosed) ParamPrefixEnum.LESSTHAN_OR_EQUALS
             else ParamPrefixEnum.LESSTHAN
           value =
-            of(FhirConverterImpl.createDateTimeType(DateTimeType(convertDate(dateRange.high))))
+            DateFilterValues().apply {
+              this.dateTime = DateTimeType(convertDate(dateRange.high))
+              this.getConditionParamPairForDateTimeType =
+                r4FhirAdapter.toGetConditionParamPairForDateTimeType
+            }
         }
       )
     }
@@ -166,8 +186,7 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
     val inCodes =
       codes.map {
         val apply: TokenParamFilterCriterion.() -> Unit = {
-          this.value =
-            of(FhirConverterImpl.createCodingType(Coding(it.system, it.code, it.display)))
+          this.value = r4FhirAdapter.toTokenFilterValue(Coding(it.system, it.code, it.display))
         }
         apply
       }
@@ -183,8 +202,7 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
     val inCodes =
       valueSet.map {
         val apply: TokenParamFilterCriterion.() -> Unit = {
-          this.value =
-            of(FhirConverterImpl.createCodingType(Coding(it.system, it.code, it.display)))
+          this.value = r4FhirAdapter.toTokenFilterValue(Coding(it.system, it.code, it.display))
         }
         apply
       }
@@ -213,7 +231,7 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
           { value = "urn:oid:$contextValue" }
         )
       } else {
-        search.applyFilterParam(ann, "$contextValue", FhirConverterImpl)
+        search.applyFilterParam(ann, "$contextValue", r4FhirAdapter)
       }
     } else {
       // Tries to identify the right param class by type
@@ -222,7 +240,14 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
         is DateTimeType ->
           search.filter(
             DateClientParam(contextPath),
-            { value = of(FhirConverterImpl.createDateTimeType(contextValue)) }
+            {
+              value =
+                DateFilterValues().apply {
+                  this.dateTime = contextValue
+                  this.getConditionParamPairForDateTimeType =
+                    r4FhirAdapter.toGetConditionParamPairForDateTimeType
+                }
+            }
           )
         is BigDecimal -> search.filter(NumberClientParam(contextPath), { value = contextValue })
         else ->

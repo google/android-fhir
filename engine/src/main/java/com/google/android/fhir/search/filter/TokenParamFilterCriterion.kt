@@ -17,12 +17,6 @@
 package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.TokenClientParam
-import com.google.android.fhir.CodeType
-import com.google.android.fhir.CodeableConcept
-import com.google.android.fhir.Coding
-import com.google.android.fhir.ContactPoint
-import com.google.android.fhir.Identifier
-import com.google.android.fhir.UriType
 import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
@@ -45,48 +39,6 @@ data class TokenParamFilterCriterion(var parameter: TokenClientParam) : FilterCr
   fun of(string: String) =
     TokenFilterValue().apply { tokenFilters.add(TokenParamFilterValueInstance(code = string)) }
 
-  /** Returns [TokenFilterValue] from [UriType]. */
-  fun of(uriType: UriType) =
-    TokenFilterValue().apply {
-      tokenFilters.add(TokenParamFilterValueInstance(code = uriType.value))
-    }
-
-  /** Returns [TokenFilterValue] from [CodeType]. */
-  fun of(codeType: CodeType) =
-    TokenFilterValue().apply {
-      tokenFilters.add(TokenParamFilterValueInstance(code = codeType.value))
-    }
-
-  /** Returns [TokenFilterValue] from [Coding]. */
-  fun of(coding: Coding) =
-    TokenFilterValue().apply {
-      tokenFilters.add(TokenParamFilterValueInstance(uri = coding.system, code = coding.code!!))
-    }
-
-  /** Returns [TokenFilterValue] from [CodeableConcept]. */
-  fun of(codeableConcept: CodeableConcept) =
-    TokenFilterValue().apply {
-      codeableConcept.coding.forEach {
-        tokenFilters.add(TokenParamFilterValueInstance(uri = it.system, code = it.code!!))
-      }
-    }
-
-  /** Returns [TokenFilterValue] from [Identifier]. */
-  fun of(identifier: Identifier) =
-    TokenFilterValue().apply {
-      tokenFilters.add(
-        TokenParamFilterValueInstance(uri = identifier.system, code = identifier.value!!)
-      )
-    }
-
-  /** Returns [TokenFilterValue] from [ContactPoint]. */
-  fun of(contactPoint: ContactPoint) =
-    TokenFilterValue().apply {
-      tokenFilters.add(
-        TokenParamFilterValueInstance(uri = contactPoint.use, code = contactPoint.value)
-      )
-    }
-
   override fun getConditionalParams() =
     value!!.tokenFilters.map {
       ConditionParam(
@@ -97,8 +49,8 @@ data class TokenParamFilterCriterion(var parameter: TokenClientParam) : FilterCr
 }
 
 @SearchDslMarker
-class TokenFilterValue internal constructor() {
-  internal val tokenFilters = mutableListOf<TokenParamFilterValueInstance>()
+class TokenFilterValue {
+  val tokenFilters = mutableListOf<TokenParamFilterValueInstance>()
 }
 
 /**
@@ -106,7 +58,7 @@ class TokenFilterValue internal constructor() {
  * filter value. We use [TokenParamFilterValueInstance] to represent individual filter value.
  */
 @SearchDslMarker
-internal data class TokenParamFilterValueInstance(var uri: String? = null, var code: String)
+data class TokenParamFilterValueInstance(var uri: String? = null, var code: String)
 
 internal data class TokenParamFilterCriteria(
   var parameter: TokenClientParam,
