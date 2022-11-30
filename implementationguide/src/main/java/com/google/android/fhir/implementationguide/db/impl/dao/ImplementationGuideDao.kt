@@ -22,7 +22,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.google.android.fhir.implementationguide.db.impl.entities.ImplementationGuideEntity
-import com.google.android.fhir.implementationguide.db.impl.entities.ResourceEntity
+import com.google.android.fhir.implementationguide.db.impl.entities.ResourceMetadataEntity
 import org.hl7.fhir.r4.model.ResourceType
 
 @Dao
@@ -37,60 +37,60 @@ abstract class ImplementationGuideDao {
     version: String,
   ): ImplementationGuideEntity
 
-  @Query("SELECT * from ResourceEntity WHERE implementationGuideId IN (:igId)")
+  @Query("SELECT * from ResourceMetadataEntity WHERE implementationGuideId IN (:igId)")
   internal abstract suspend fun getResources(
     igId: List<Long>,
-  ): List<ResourceEntity>
+  ): List<ResourceMetadataEntity>
 
   @Query(
-    "SELECT * from ResourceEntity WHERE implementationGuideId IN (:igId) AND resourceType = :resourceType"
+    "SELECT * from ResourceMetadataEntity WHERE implementationGuideId IN (:igId) AND resourceType = :resourceType"
   )
   internal abstract suspend fun getResources(
     resourceType: ResourceType,
     igId: List<Long>,
-  ): List<ResourceEntity>
+  ): List<ResourceMetadataEntity>
 
   @Query(
-    "SELECT * from ResourceEntity WHERE implementationGuideId IN (:igId) AND resourceType = :resourceType AND resourceId = :resourceId"
+    "SELECT * from ResourceMetadataEntity WHERE implementationGuideId IN (:igId) AND resourceType = :resourceType AND resourceId = :resourceId"
   )
   internal abstract suspend fun getResourcesWithResourceId(
     resourceType: ResourceType,
     resourceId: String,
     igId: List<Long>,
-  ): List<ResourceEntity>
+  ): List<ResourceMetadataEntity>
 
   @Query(
-    "SELECT * from ResourceEntity WHERE implementationGuideId IN (:igId) AND resourceType = :resourceType AND url = :url"
+    "SELECT * from ResourceMetadataEntity WHERE implementationGuideId IN (:igId) AND resourceType = :resourceType AND url = :url"
   )
   internal abstract suspend fun getResourcesWithUrl(
     resourceType: ResourceType,
     url: String,
     igId: List<Long>,
-  ): List<ResourceEntity>
+  ): List<ResourceMetadataEntity>
 
   @Query(
-    "SELECT * from ResourceEntity WHERE implementationGuideId IN (:igId) AND resourceType = :resourceType AND name = :name"
+    "SELECT * from ResourceMetadataEntity WHERE implementationGuideId IN (:igId) AND resourceType = :resourceType AND name = :name"
   )
   internal abstract suspend fun getResourcesWithName(
     resourceType: ResourceType,
     name: String,
     igId: List<Long>,
-  ): List<ResourceEntity>
+  ): List<ResourceMetadataEntity>
 
   @Query(
-    "SELECT * from ResourceEntity WHERE implementationGuideId IN (:igId) AND resourceType = :resourceType AND name = :name AND version = :version"
+    "SELECT * from ResourceMetadataEntity WHERE implementationGuideId IN (:igId) AND resourceType = :resourceType AND name = :name AND version = :version"
   )
   internal abstract suspend fun getResourcesWithNameAndVersion(
     resourceType: ResourceType,
     name: String,
     version: String,
     igId: List<Long>,
-  ): List<ResourceEntity>
+  ): List<ResourceMetadataEntity>
 
   @Delete
   internal abstract suspend fun deleteImplementationGuide(igEntity: ImplementationGuideEntity)
 
-  @Query("DELETE FROM ResourceEntity WHERE  implementationGuideId = :igId")
+  @Query("DELETE FROM ResourceMetadataEntity WHERE  implementationGuideId = :igId")
   internal abstract suspend fun deleteResources(igId: Long)
 
   open suspend fun deleteImplementationGuide(name: String, version: String) {
@@ -99,7 +99,7 @@ abstract class ImplementationGuideDao {
   }
 
   @Insert(onConflict = OnConflictStrategy.IGNORE)
-  internal abstract suspend fun insert(resourceEntity: ResourceEntity): Long
+  internal abstract suspend fun insert(resource: ResourceMetadataEntity): Long
 
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   internal abstract suspend fun insert(ig: ImplementationGuideEntity): Long

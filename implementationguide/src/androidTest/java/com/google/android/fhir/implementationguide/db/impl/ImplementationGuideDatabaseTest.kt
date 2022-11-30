@@ -21,7 +21,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.implementationguide.db.impl.entities.ImplementationGuideEntity
-import com.google.android.fhir.implementationguide.db.impl.entities.ResourceEntity
+import com.google.android.fhir.implementationguide.db.impl.entities.ResourceMetadataEntity
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlinx.coroutines.runBlocking
@@ -52,8 +52,8 @@ internal class ImplementationGuideDatabaseTest {
   @Test
   fun resourcesInserted() = runBlocking {
     val igId = igDao.insert(IG_ENTITY)
-    val resourceEntity =
-      ResourceEntity(
+    val resource =
+      ResourceMetadataEntity(
         0L,
         ResourceType.ValueSet,
         RES_ID_1,
@@ -64,7 +64,7 @@ internal class ImplementationGuideDatabaseTest {
         igId
       )
 
-    igDao.insert(resourceEntity)
+    igDao.insert(resource)
 
     assertThat(igDao.getResources(ResourceType.ValueSet, listOf(igId)).map { it.resourceId })
       .containsExactly(RES_ID_1)
@@ -75,8 +75,8 @@ internal class ImplementationGuideDatabaseTest {
   @Test
   fun resourcesDeleted() = runBlocking {
     val igId = igDao.insert(IG_ENTITY)
-    val resourceEntity =
-      ResourceEntity(
+    val resource =
+      ResourceMetadataEntity(
         0L,
         ResourceType.ValueSet,
         RES_ID_1,
@@ -86,7 +86,7 @@ internal class ImplementationGuideDatabaseTest {
         File("resId"),
         igId
       )
-    igDao.insert(resourceEntity)
+    igDao.insert(resource)
 
     igDao.deleteImplementationGuide(IG_NAME, IG_VERSION)
 
