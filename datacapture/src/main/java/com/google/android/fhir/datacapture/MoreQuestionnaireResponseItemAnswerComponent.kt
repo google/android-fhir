@@ -31,6 +31,7 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.Type
@@ -67,6 +68,7 @@ internal fun QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.disp
     is DecimalType -> valueDecimalType.valueAsString ?: context.getString(R.string.not_answered)
     is IntegerType -> valueIntegerType.valueAsString ?: context.getString(R.string.not_answered)
     is Quantity -> valueQuantity.value.toString()
+    is Reference -> valueReference.display ?: context.getString(R.string.not_answered)
     is StringType -> valueStringType.getLocalizedText()
         ?: valueStringType.valueAsString ?: context.getString(R.string.not_answered)
     is TimeType -> valueTimeType.valueAsString ?: context.getString(R.string.not_answered)

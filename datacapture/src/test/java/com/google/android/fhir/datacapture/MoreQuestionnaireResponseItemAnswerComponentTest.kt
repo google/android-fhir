@@ -34,6 +34,7 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.UriType
@@ -46,6 +47,23 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class MoreQuestionnaireResponseItemAnswerComponentTest {
   private val context = ApplicationProvider.getApplicationContext<Application>()
+
+  @Test
+  fun `displayString() should return name value for reference`() {
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        .setValue(Reference().setDisplay("Newton"))
+
+    assertThat(answer.displayString(context)).isEqualTo("Newton")
+  }
+
+  @Test
+  fun `displayString() should return not answered for null reference`() {
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(Reference())
+
+    assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.not_answered))
+  }
 
   @Test
   fun `displayString() should return url value for attachment`() {
