@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture
 
 import android.app.Application
-import android.net.Uri
 import android.os.Build
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -28,9 +27,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
@@ -40,7 +37,6 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
-import java.io.File
 import java.util.Calendar
 import java.util.Date
 import java.util.UUID
@@ -71,18 +67,13 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.ParameterizedRobolectricTestRunner
-import org.robolectric.ParameterizedRobolectricTestRunner.Parameters
-import org.robolectric.Shadows.shadowOf
+import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.util.ReflectionHelpers
 
-@RunWith(ParameterizedRobolectricTestRunner::class)
+@RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
-class QuestionnaireViewModelTest(
-  private val questionnaireSource: QuestionnaireSource,
-  private val questionnaireResponseSource: QuestionnaireResponseSource,
-) {
+class QuestionnaireViewModelTest {
   @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
 
   private lateinit var fhirEngine: FhirEngine
@@ -3612,35 +3603,13 @@ class QuestionnaireViewModelTest(
     enableReviewPage: Boolean = false,
     showReviewPageFirst: Boolean = false,
   ): QuestionnaireViewModel {
-    if (questionnaireSource == QuestionnaireSource.STRING) {
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-    } else if (questionnaireSource == QuestionnaireSource.URI) {
-      val questionnaireFile = File(context.cacheDir, "test_questionnaire")
-      questionnaireFile.outputStream().bufferedWriter().use {
-        printer.encodeResourceToWriter(questionnaire, it)
-      }
-      val questionnaireUri = Uri.fromFile(questionnaireFile)
-      state.set(EXTRA_QUESTIONNAIRE_JSON_URI, questionnaireUri)
-      shadowOf(context.contentResolver)
-        .registerInputStream(questionnaireUri, questionnaireFile.inputStream())
-    }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
     questionnaireResponse?.let {
-      if (questionnaireResponseSource == QuestionnaireResponseSource.STRING) {
-        state.set(
-          EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
-          printer.encodeResourceToString(questionnaireResponse)
-        )
-      } else if (questionnaireResponseSource == QuestionnaireResponseSource.URI) {
-        val questionnaireResponseFile = File(context.cacheDir, "test_questionnaire_response")
-        questionnaireResponseFile.outputStream().bufferedWriter().use {
-          printer.encodeResourceToWriter(questionnaireResponse, it)
-        }
-        val questionnaireResponseUri = Uri.fromFile(questionnaireResponseFile)
-        state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI, questionnaireResponseUri)
-        shadowOf(context.contentResolver)
-          .registerInputStream(questionnaireResponseUri, questionnaireResponseFile.inputStream())
-      }
+      state.set(
+        EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
+        printer.encodeResourceToString(questionnaireResponse)
+      )
     }
     enableReviewPage.let { state.set(EXTRA_ENABLE_REVIEW_PAGE, it) }
     showReviewPageFirst.let { state.set(EXTRA_SHOW_REVIEW_PAGE_FIRST, it) }
@@ -3684,16 +3653,6 @@ class QuestionnaireViewModelTest(
       assertThat(printer.encodeResourceToString(actual))
         .isEqualTo(printer.encodeResourceToString(expected))
     }
-
-    @JvmStatic
-    @Parameters
-    fun parameters() =
-      listOf(
-        arrayOf(QuestionnaireSource.URI, QuestionnaireResponseSource.URI),
-        arrayOf(QuestionnaireSource.URI, QuestionnaireResponseSource.STRING),
-        arrayOf(QuestionnaireSource.STRING, QuestionnaireResponseSource.URI),
-        arrayOf(QuestionnaireSource.STRING, QuestionnaireResponseSource.STRING)
-      )
   }
 }
 
@@ -3715,16 +3674,4 @@ private inline fun QuestionnaireViewModel.runViewModelBlocking(
     }
   }
   throwable?.let { throw it }
-}
-
-/** The source of questionnaire. */
-enum class QuestionnaireSource {
-  STRING,
-  URI
-}
-
-/** The source of questionnaire-response. */
-enum class QuestionnaireResponseSource {
-  STRING,
-  URI
 }
