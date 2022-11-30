@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync.download
+package com.google.android.fhir.r4
 
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.resource.ResourceParamsBasedDownloadWorkManager
 import com.google.android.fhir.sync.SyncDataParams
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runBlockingTest
@@ -43,8 +42,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
           ResourceType.Patient.name to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"),
           ResourceType.Immunization.name to emptyMap(),
           ResourceType.Observation.name to emptyMap(),
-        ),
-        listOf()
+        )
       )
 
     val urlsToDownload = mutableListOf<String>()
@@ -72,8 +70,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
   fun getNextRequestUrl_shouldReturnResourceAndPageUrlsAsNextUrls() = runBlockingTest {
     val downloadManager =
       ResourceParamsBasedDownloadWorkManager(
-        mapOf(ResourceType.Patient.name to emptyMap(), ResourceType.Observation.name to emptyMap()),
-        listOf()
+        mapOf(ResourceType.Patient.name to emptyMap(), ResourceType.Observation.name to emptyMap())
       )
 
     val urlsToDownload = mutableListOf<String>()
@@ -120,10 +117,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
   fun getNextRequestUrl_withLastUpdatedTimeProvidedInContext_ShouldAppendGtPrefixToLastUpdatedSearchParam() =
     runBlockingTest {
       val downloadManager =
-        ResourceParamsBasedDownloadWorkManager(
-          mapOf(ResourceType.Patient.name to emptyMap()),
-          listOf()
-        )
+        ResourceParamsBasedDownloadWorkManager(mapOf(ResourceType.Patient.name to emptyMap()))
       val url =
         downloadManager.getNextRequestUrl(
           object : SyncDownloadContext {
@@ -144,8 +138,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
                 SyncDataParams.LAST_UPDATED_KEY to "2022-06-28",
                 SyncDataParams.SORT_KEY to "status"
               )
-          ),
-          listOf()
+          )
         )
       val url =
         downloadManager.getNextRequestUrl(
@@ -163,8 +156,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
         ResourceParamsBasedDownloadWorkManager(
           mapOf(
             ResourceType.Patient.name to mapOf(SyncDataParams.LAST_UPDATED_KEY to "gt2022-06-28")
-          ),
-          listOf()
+          )
         )
       val url =
         downloadManager.getNextRequestUrl(
@@ -180,8 +172,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
     runBlockingTest {
       val downloadManager =
         ResourceParamsBasedDownloadWorkManager(
-          mapOf(ResourceType.Patient.name to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI")),
-          listOf()
+          mapOf(ResourceType.Patient.name to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"))
         )
       val actual =
         downloadManager.getNextRequestUrl(
@@ -197,8 +188,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
     runBlockingTest {
       val downloadManager =
         ResourceParamsBasedDownloadWorkManager(
-          mapOf(ResourceType.Patient.name to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI")),
-          listOf()
+          mapOf(ResourceType.Patient.name to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"))
         )
       val actual =
         downloadManager.getNextRequestUrl(
@@ -211,7 +201,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
   @Test
   fun processResponse_withBundleTypeSearchSet_shouldReturnPatient() = runBlockingTest {
-    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap(), listOf())
+    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
     val response =
       Bundle().apply {
         type = Bundle.BundleType.SEARCHSET
@@ -232,7 +222,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
   @Test
   fun processResponse_withTransactionResponseBundle_shouldReturnEmptyList() = runBlockingTest {
-    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap(), listOf())
+    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
     val response =
       Bundle().apply {
         type = Bundle.BundleType.TRANSACTIONRESPONSE
@@ -254,7 +244,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
   @Test
   fun processResponse_withOperationOutcome_shouldThrowException() {
-    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap(), listOf())
+    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
     val response =
       OperationOutcome().apply {
         addIssue(

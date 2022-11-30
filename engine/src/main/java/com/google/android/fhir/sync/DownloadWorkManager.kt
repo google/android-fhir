@@ -27,7 +27,7 @@ import org.hl7.fhir.instance.model.api.IAnyResource
  */
 interface DownloadWorkManager {
 
-  val resourceTypeList: Collection<String>
+  suspend fun getResourceTypeList(): Collection<String>
 
   /**
    * Returns the URL for the next download request, or `null` if there is no more download request

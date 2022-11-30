@@ -40,7 +40,6 @@ import org.hl7.fhir.instance.model.api.IBaseBundle
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.ResourceType
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -105,9 +104,9 @@ class TestingUtils constructor(private val iParser: IParser) {
 
   open class TestDownloadManagerImpl(
     queries: List<String> = listOf("Patient?address-city=NAIROBI"),
-    override val resourceTypeList: Collection<String> = ResourceType.values().map { it.name }
   ) : DownloadWorkManager {
     private val urls = LinkedList(queries)
+    override suspend fun getResourceTypeList(): Collection<String> = listOf("Patient", "Encounter")
 
     override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? = urls.poll()
 
@@ -116,10 +115,6 @@ class TestingUtils constructor(private val iParser: IParser) {
       return listOf(patient)
     }
   }
-
-  class TestDownloadManagerImplWithQueue(
-    queries: List<String> = listOf("Patient/bob", "Encounter/doc")
-  ) : TestDownloadManagerImpl(queries)
 
   object TestFhirEngineImpl : FhirEngine {
     override suspend fun create(vararg resource: IAnyResource) = emptyList<String>()

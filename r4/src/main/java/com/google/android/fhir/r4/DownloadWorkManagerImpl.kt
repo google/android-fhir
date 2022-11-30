@@ -28,12 +28,17 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
 
 class DownloadWorkManagerImpl : DownloadWorkManager {
-  override val resourceTypeList = ResourceType.values().map { it.name }
+
   private val urls = LinkedList(listOf("Patient?address-city=NAIROBI"))
+  override suspend fun getResourceTypeList(): Collection<String> {
+    return ResourceType.values().map { it.name }
+  }
+
   override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? {
     var url = urls.poll() ?: return null
 
-    val resourceTypeToDownload = url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second
+    val resourceTypeToDownload =
+      getResourceTypeList()?.let { url.findAnyOf(it, ignoreCase = true) }!!.second
     context.getLatestTimestampFor(resourceTypeToDownload)?.let {
       url = affixLastUpdatedTimestamp(url!!, it)
     }

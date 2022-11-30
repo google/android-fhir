@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.resource
+package com.google.android.fhir.r4
 
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DownloadWorkManager
@@ -26,20 +26,24 @@ import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.instance.model.api.IAnyResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
+import org.hl7.fhir.r4.model.ResourceType
 
 typealias ResourceSearchParams = Map<String, ParamMap>
+
 /**
  * [DownloadWorkManager] implementation based on the provided [ResourceSearchParams] to generate
  * [Resource] search queries and parse [Bundle.BundleType.SEARCHSET] type [Bundle]. This
  * implementation takes a DFS approach and downloads all available resources for a particular
  * [ResourceType] before moving on to the next [ResourceType].
  */
-class ResourceParamsBasedDownloadWorkManager(
-  syncParams: ResourceSearchParams,
-  override val resourceTypeList: Collection<String>
-) : DownloadWorkManager {
+class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
+  DownloadWorkManager {
   private val resourcesToDownloadWithSearchParams = LinkedList(syncParams.entries)
   private val urlOfTheNextPagesToDownloadForAResource = LinkedList<String>()
+
+  override suspend fun getResourceTypeList(): Collection<String> {
+    return ResourceType.values().map { it.name }
+  }
 
   override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? {
     if (urlOfTheNextPagesToDownloadForAResource.isNotEmpty())

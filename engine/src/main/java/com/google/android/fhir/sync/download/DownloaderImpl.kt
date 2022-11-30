@@ -43,9 +43,12 @@ internal class DownloaderImpl(
     while (url != null) {
       try {
         resourceTypeToDownload =
-          url.findAnyOf(downloadWorkManager.resourceTypeList, ignoreCase = true)!!.second
+          downloadWorkManager
+            .getResourceTypeList()
+            ?.let { url!!.findAnyOf(it, ignoreCase = true) }!!
+            .second
         val processedResponse =
-          downloadWorkManager.processResponse(dataSource.download(url!!)).toList()
+          downloadWorkManager.processResponse(dataSource.download(url)).toList()
 
         emit(DownloadState.Success(processedResponse))
       } catch (exception: Exception) {

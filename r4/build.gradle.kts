@@ -58,9 +58,14 @@ configurations {
 
 dependencies {
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
   implementation(project(":engine"))
-  implementation(project(":common"))
+  implementation(Dependencies.androidFhirCommon) { exclude(module = "hapi-fhir-structures-r4") }
+  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
+  testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.robolectric)
+  testImplementation(Dependencies.truth)
 }
 
 configureDokka(Releases.R4.artifactId, Releases.R4.version)

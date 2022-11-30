@@ -61,8 +61,5 @@ val IAnyResource.logicalId: String
     return this.idElement?.idPart.orEmpty()
   }
 
-// internal val IAnyResource.versionId
-//   get() = meta.versionId
-
 internal val IAnyResource.lastUpdated
   get() = if (this.meta != null && !this.meta.isEmpty) meta.lastUpdated?.toInstant() else null
