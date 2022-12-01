@@ -264,7 +264,7 @@ open class QuestionnaireFragment : Fragment() {
     const val EXTRA_ENABLE_REVIEW_PAGE = "enable-review-page"
 
     /**
-     * An [Boolean] extra to control if the review page is to be opened first. This has no effect if
+     * A [Boolean] extra to control if the review page is to be opened first. This has no effect if
      * review page is not enabled.
      */
     const val EXTRA_SHOW_REVIEW_PAGE_FIRST = "show-review-page-first"

@@ -3317,7 +3317,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `toggle review mode to true should not show edit button`() {
+  fun `toggle review mode to true should show edit button only`() {
     runBlocking {
       val questionnaire =
         Questionnaire().apply {

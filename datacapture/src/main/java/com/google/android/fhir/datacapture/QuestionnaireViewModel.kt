@@ -362,7 +362,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: StateFlow<QuestionnaireState> =
-    combine(modificationCount, currentPageIndexFlow, isInReviewModeFlow) { _, _, reviewMode ->
+    combine(modificationCount, currentPageIndexFlow, isInReviewModeFlow) { _, _, _ ->
         getQuestionnaireState()
       }
       .stateIn(
@@ -450,7 +450,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return options
   }
 
-  // TODO persist previous answers incase options are changing and new list does not have selected
+  // TODO persist previous answers in case options are changing and new list does not have selected
   // answer and FHIRPath in x-fhir-query
   // https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
   @PublishedApi
@@ -807,9 +807,7 @@ typealias ItemToParentMap =
 
 /** Questionnaire state for the Fragment to consume. */
 internal data class QuestionnaireState(
-  /** The items that should be currently-rendered into the Fragment. */
   val items: List<QuestionnaireItemViewItem>,
-  /** Tracks reviewMode in order to update the UI. */
   val displayMode: DisplayMode,
 )
 
