@@ -45,32 +45,25 @@ class G_CqlEvaluatorBenchmark {
   @Test
   fun evaluatesLibrary() = runBlocking {
     benchmarkRule.measureRepeated {
-      val fhirContext = runWithTimingDisabled { FhirContext.forCached(FhirVersionEnum.R4) }
-      val jsonParser = runWithTimingDisabled { fhirContext.newJsonParser() }
-      val patientImmunizationHistory = runWithTimingDisabled {
-        jsonParser.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
-      }
+      val fhirOperator = runWithTimingDisabled {
+        val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
+        val jsonParser = fhirContext.newJsonParser()
 
-      val fhirEngine = runWithTimingDisabled {
+        val patientImmunizationHistory =
+          jsonParser.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
+        val fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+
         runBlocking {
-          val fhirEngine =
-            FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
           for (entry in patientImmunizationHistory.entry) {
             fhirEngine.create(entry.resource)
           }
-          fhirEngine
         }
+
+        val lib = jsonParser.parseResource(open("/immunity-check/ImmunityCheck.json")) as Bundle
+
+        FhirOperator(fhirContext, fhirEngine).also { it.loadLibs(lib) }
       }
 
-      val lib = runWithTimingDisabled {
-        jsonParser.parseResource(open("/immunity-check/ImmunityCheck.json")) as Bundle
-      }
-
-      val fhirOperator = runWithTimingDisabled {
-        val fhirOperator = FhirOperator(fhirContext, fhirEngine)
-        fhirOperator.loadLibs(lib)
-        fhirOperator
-      }
       val results =
         fhirOperator.evaluateLibrary(
           "http://localhost/Library/ImmunityCheck|1.0.0",
