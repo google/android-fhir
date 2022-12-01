@@ -1,6 +1,7 @@
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
+  id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
 }
@@ -51,6 +52,7 @@ android {
         "META-INF/NOTICE.md",
         "META-INF/notice.txt",
         "META-INF/LGPL-3.0.txt",
+        "META-INF/sun-jaxb.episode",
       )
     )
   }
@@ -60,6 +62,30 @@ android {
   configureJacocoTestOptions()
 }
 
-dependencies { coreLibraryDesugaring(Dependencies.desugarJdkLibs) }
+configurations {
+  all {
+    exclude(module = "xpp3")
+    exclude(module = "xpp3_min")
+  }
+}
+
+dependencies {
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  kapt(Dependencies.Room.compiler)
+
+  androidTestImplementation(Dependencies.AndroidxTest.core)
+  androidTestImplementation(Dependencies.AndroidxTest.runner)
+  androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
+  androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
+  androidTestImplementation(Dependencies.junit)
+  androidTestImplementation(Dependencies.truth)
+
+  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+
+  implementation(Dependencies.Kotlin.stdlib)
+  implementation(Dependencies.Room.ktx)
+  implementation(Dependencies.Room.runtime)
+  implementation(Dependencies.timber)
+}
 
 configureDokka(Releases.ImplmentationGuide.artifactId, Releases.ImplmentationGuide.version)
