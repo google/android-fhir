@@ -116,13 +116,7 @@ class ResourceMapperInstrumentedTest {
         )
         .value as DateTimeType
     val expectedDateTimeType = DateTimeType("2022-02-07T13:28:17-05:00")
-    assertThat(dateTimeType.year).isEqualTo(expectedDateTimeType.year)
-    assertThat(dateTimeType.month).isEqualTo(expectedDateTimeType.month)
-    assertThat(dateTimeType.day).isEqualTo(expectedDateTimeType.day)
-    assertThat(dateTimeType.hour).isEqualTo(expectedDateTimeType.hour)
-    assertThat(dateTimeType.minute).isEqualTo(expectedDateTimeType.minute)
-    assertThat(dateTimeType.second).isEqualTo(expectedDateTimeType.second)
-    assertThat(dateTimeType.timeZone).isEqualTo(expectedDateTimeType.timeZone)
+    assertThat(dateTimeType.value).isEqualTo(expectedDateTimeType.value)
   }
 
   @Test

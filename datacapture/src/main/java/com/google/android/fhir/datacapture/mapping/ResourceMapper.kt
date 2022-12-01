@@ -121,10 +121,10 @@ object ResourceMapper {
           questionnaire,
           questionnaireResponse,
           object : ProfileLoader {
-            /**
-             * mutable map of key-canonical url as string for profile and value- StructureDefinition
-             * of Resource claims to conforms to.
-             */
+
+            //            Mutable map of key-canonical url as string for profile and value-
+            // StructureDefinition
+            //             of Resource claims to conforms to.
             val structureDefinitionMap: MutableMap<String, StructureDefinition?> = hashMapOf()
 
             override fun loadProfile(url: CanonicalType): StructureDefinition? {
@@ -500,12 +500,8 @@ object ResourceMapper {
       // Do nothing
     }
 
-    // "definition":
-    // "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.birthPlace"
-    //      OR
-    // "definition":
+    // Handle fields not present in base Java class but defined as extensions in profile e.g.
     // "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.address.address-preferred"
-    //
     if (base.javaClass.getFieldOrNull(fieldName) == null) {
       // base url from definition
       val canonicalUrl =
