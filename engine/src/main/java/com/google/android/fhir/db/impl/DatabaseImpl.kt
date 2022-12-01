@@ -40,6 +40,7 @@ import java.time.Instant
 import java.util.UUID
 import org.hl7.fhir.r4.model.Appointment
 import org.hl7.fhir.r4.model.Condition
+import org.hl7.fhir.r4.model.DocumentReference
 import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.Media
@@ -234,6 +235,12 @@ internal class DatabaseImpl(
             ResourceType.Media ->
               SyncedResourceEntityPatientCentric(
                 (it as Media).subject.reference,
+                it.meta.lastUpdatedElement.valueAsString,
+                it.resourceType
+              )
+            ResourceType.DocumentReference ->
+              SyncedResourceEntityPatientCentric(
+                (it as DocumentReference).subject.reference,
                 it.meta.lastUpdatedElement.valueAsString,
                 it.resourceType
               )
