@@ -31,7 +31,8 @@
     <string name="component_name_dropdown">Dropdown</string>
     <string name="component_name_image">Image</string>
     <string name="component_name_auto_complete">Auto Complete</string>
-    <string name="layout_name_default_text">Default</string>
+    <string name="component_name_repeated_group">Repeated Group</string>
+  <string name="layout_name_default_text">Default</string>
     <string name="layout_name_paginated">Paginated</string>
     <string name="layout_name_review">Review</string>
     <string name="layout_name_read_only">Read only</string>

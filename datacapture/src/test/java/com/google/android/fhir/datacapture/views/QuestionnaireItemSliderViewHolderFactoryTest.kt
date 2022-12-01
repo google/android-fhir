@@ -24,6 +24,8 @@ import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.material.slider.Slider
 import com.google.common.truth.Truth.assertThat
+import java.lang.IllegalStateException
+import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -104,6 +106,95 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).stepSize).isEqualTo(1)
+  }
+
+  @Test
+  fun `slider valueTo should come from the maxValue extension`() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            setValue(IntegerType("200"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).valueTo).isEqualTo(200)
+  }
+
+  @Test
+  fun `slider valueTo should be set to default value if maxValue extension is not present`() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).valueTo).isEqualTo(100.0F)
+  }
+
+  @Test
+  fun `slider valueFrom should come from the maxValue extension`() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue(IntegerType("50"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).valueFrom).isEqualTo(50)
+  }
+
+  @Test
+  fun `slider valueFrom should be set to default value if minValue extension is not present`() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).valueFrom).isEqualTo(0.0F)
+  }
+
+  @Test
+  fun `throws exception if minValue is greater than maxvalue`() {
+    assertFailsWith<IllegalStateException> {
+      viewHolder.bind(
+        QuestionnaireItemViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            addExtension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/minValue"
+              setValue(IntegerType("100"))
+            }
+            addExtension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+              setValue(IntegerType("50"))
+            }
+          },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _ -> },
+        )
+      )
+    }
   }
 
   @Test

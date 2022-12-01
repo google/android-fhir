@@ -8,6 +8,10 @@
         android:icon="@drawable/ic_icon"
         android:title="@string/error"
         app:showAsAction="always"
-    >
-  </item>
+    />
+  <item
+        android:id="@+id/submit_questionnaire"
+        android:title="@string/submit"
+        app:showAsAction="never"
+    />
 </menu>
