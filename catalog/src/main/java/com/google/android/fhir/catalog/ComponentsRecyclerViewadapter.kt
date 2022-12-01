@@ -26,20 +26,20 @@ import com.google.android.fhir.catalog.databinding.LandingPageItemBinding
 
 class ComponentsRecyclerViewAdapter(
   private val onItemClick: (ComponentListViewModel.Component) -> Unit
-) : ListAdapter<ComponentListViewModel.Component, RecyclerView.ViewHolder>(ComponentDiffUtil()) {
+) : ListAdapter<ComponentListViewModel.ViewItem, RecyclerView.ViewHolder>(ComponentDiffUtil()) {
 
-  enum class ViewType {
-    HEADER_TYPE,
-    ITEM_TYPE
+  enum class ViewType(val spanCount: Int) {
+    HEADER(2),
+    ITEM(1)
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
     return when (viewType) {
-      ViewType.HEADER_TYPE.ordinal ->
+      ViewType.HEADER.ordinal ->
         ComponentHeaderViewHolder(
           ComponentHeaderLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
-      ViewType.ITEM_TYPE.ordinal ->
+      ViewType.ITEM.ordinal ->
         ComponentListViewHolder(
           LandingPageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
           onItemClick
@@ -55,44 +55,47 @@ class ComponentsRecyclerViewAdapter(
   }
 
   override fun getItemViewType(position: Int): Int {
-    return when (getItem(position).viewType) {
-      ViewType.HEADER_TYPE -> ViewType.HEADER_TYPE.ordinal
-      ViewType.ITEM_TYPE -> ViewType.ITEM_TYPE.ordinal
+    return when (getItem(position)) {
+      is ComponentListViewModel.ViewItem.HeaderItem -> ViewType.HEADER.ordinal
+      is ComponentListViewModel.ViewItem.ComponentItem -> ViewType.ITEM.ordinal
     }
   }
 }
 
 interface ComponentViewHolder {
-  fun bind(component: ComponentListViewModel.Component)
+  fun bind(component: ComponentListViewModel.ViewItem)
 }
 
 class ComponentListViewHolder(
   private val binding: LandingPageItemBinding,
   private val onItemClick: (ComponentListViewModel.Component) -> Unit
 ) : RecyclerView.ViewHolder(binding.root), ComponentViewHolder {
-  override fun bind(component: ComponentListViewModel.Component) {
-    binding.componentLayoutIconImageview.setImageResource(component.iconId)
+  override fun bind(component: ComponentListViewModel.ViewItem) {
+    val componentItem = component as ComponentListViewModel.ViewItem.ComponentItem
+    binding.componentLayoutIconImageview.setImageResource(componentItem.component.iconId)
     binding.componentLayoutTextView.text =
-      binding.componentLayoutTextView.context.getString(component.textId)
-    binding.root.setOnClickListener { onItemClick(component) }
+      binding.componentLayoutTextView.context.getString(componentItem.component.textId)
+    binding.root.setOnClickListener { onItemClick(component.component) }
   }
 }
 
 class ComponentHeaderViewHolder(private val binding: ComponentHeaderLayoutBinding) :
   RecyclerView.ViewHolder(binding.root), ComponentViewHolder {
-  override fun bind(component: ComponentListViewModel.Component) {
-    binding.tvComponentHeader.text = binding.tvComponentHeader.context.getString(component.textId)
+  override fun bind(viewItem: ComponentListViewModel.ViewItem) {
+    val headerItem = viewItem as ComponentListViewModel.ViewItem.HeaderItem
+    binding.tvComponentHeader.text =
+      binding.tvComponentHeader.context.getString(headerItem.header.textId)
   }
 }
 
-class ComponentDiffUtil : DiffUtil.ItemCallback<ComponentListViewModel.Component>() {
+class ComponentDiffUtil : DiffUtil.ItemCallback<ComponentListViewModel.ViewItem>() {
   override fun areItemsTheSame(
-    oldComponent: ComponentListViewModel.Component,
-    newComponent: ComponentListViewModel.Component
+    oldComponent: ComponentListViewModel.ViewItem,
+    newComponent: ComponentListViewModel.ViewItem
   ) = oldComponent === newComponent
 
   override fun areContentsTheSame(
-    oldComponent: ComponentListViewModel.Component,
-    newComponent: ComponentListViewModel.Component
+    oldComponent: ComponentListViewModel.ViewItem,
+    newComponent: ComponentListViewModel.ViewItem
   ) = oldComponent == newComponent
 }

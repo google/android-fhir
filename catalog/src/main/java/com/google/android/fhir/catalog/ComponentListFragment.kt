@@ -54,24 +54,23 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
 
   private fun setUpComponentsRecyclerView() {
     val adapter =
-      ComponentsRecyclerViewAdapter(::onItemClick).apply {
-        submitList(viewModel.getComponentList())
-      }
+      ComponentsRecyclerViewAdapter(::onItemClick).apply { submitList(viewModel.viewItemList) }
     with(requireView().findViewById<RecyclerView>(R.id.componentsRecyclerView)) {
       this.adapter = adapter
       layoutManager =
-        GridLayoutManager(requireContext(), 2).apply {
-          spanSizeLookup =
-            object : GridLayoutManager.SpanSizeLookup() {
-              override fun getSpanSize(position: Int): Int {
-                return if (adapter.getItemViewType(position) ==
-                    ComponentsRecyclerViewAdapter.ViewType.HEADER_TYPE.ordinal
-                )
-                  2
-                else 1
+        GridLayoutManager(requireContext(), ComponentsRecyclerViewAdapter.ViewType.HEADER.spanCount)
+          .apply {
+            spanSizeLookup =
+              object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                  return if (adapter.getItemViewType(position) ==
+                      ComponentsRecyclerViewAdapter.ViewType.HEADER.ordinal
+                  )
+                    ComponentsRecyclerViewAdapter.ViewType.HEADER.spanCount
+                  else ComponentsRecyclerViewAdapter.ViewType.ITEM.spanCount
+                }
               }
-            }
-        }
+          }
     }
   }
 
