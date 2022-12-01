@@ -89,7 +89,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         CoroutineScope(Dispatchers.IO).launch {
           flow.collect {
             // now send Progress to work manager so caller app can listen
-            setProgress(buildWorkData(it))
+            kotlin.runCatching { setProgress(buildWorkData(it)) }.onFailure(Timber::i)
 
             if (it is SyncJobStatus.Finished || it is SyncJobStatus.Failed) {
               this@launch.cancel()
