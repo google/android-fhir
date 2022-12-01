@@ -18,7 +18,6 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.content.Context
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
@@ -56,7 +55,7 @@ class FhirApplication : Application() {
         fhirAdapter = r4FhirAdapter
       )
     )
-    Sync.oneTimeSync<FhirSyncWorker>(this, fhirVersionEnum = FhirVersionEnum.R4)
+    Sync.oneTimeSync<FhirSyncWorker>(this)
   }
 
   private fun constructFhirEngine(): FhirEngine {

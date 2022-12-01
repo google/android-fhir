@@ -31,8 +31,6 @@ typealias ParamMap = Map<String, String>
 /** Constant for the max number of retries in case of sync failure */
 @PublishedApi internal const val MAX_RETRIES_ALLOWED = "max_retires"
 
-@PublishedApi internal const val FHIR_VERSION = "version"
-
 /** Constant for the Greater Than Search Prefix */
 @PublishedApi internal const val GREATER_THAN_PREFIX = "gt"
 
