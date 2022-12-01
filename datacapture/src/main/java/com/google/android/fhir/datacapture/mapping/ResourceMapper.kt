@@ -538,16 +538,11 @@ private fun isExtensionSupportedByProfile(
   extensionForType: String,
   fieldName: String
 ): Boolean {
-  // Example: Partial ElementDefinition from StructureDefinition
-  //  "id" : "Patient.extension:birthPlace",
-  //  "path" : "Patient.extension",
-  //   OR
+  // Partial ElementDefinition from StructureDefinition to check extension is
   //  "id": "Patient.address.extension:address-preferred",
   //  "path": "Patient.address.extension",
   val listOfElementDefinition =
-    structureDefinition.snapshot.element.filter {
-      it.path.equals(extensionForType + ".extension") // eg "path": "Patient.address.extension",
-    }
+    structureDefinition.snapshot.element.filter { it.path.equals("$extensionForType.extension") }
   listOfElementDefinition.forEach {
     if (it.id.substringAfterLast(":").equals(fieldName)) {
       return true
