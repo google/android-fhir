@@ -23,7 +23,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.ServerConfiguration
-import com.google.android.fhir.demo.data.FhirPeriodicSyncWorker
+import com.google.android.fhir.demo.data.FhirSyncWorker
 import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.remote.HttpLogger
 import timber.log.Timber
@@ -52,7 +52,7 @@ class FhirApplication : Application() {
         )
       )
     )
-    Sync.oneTimeSync<FhirPeriodicSyncWorker>(this)
+    Sync.oneTimeSync<FhirSyncWorker>(this)
   }
 
   private fun constructFhirEngine(): FhirEngine {

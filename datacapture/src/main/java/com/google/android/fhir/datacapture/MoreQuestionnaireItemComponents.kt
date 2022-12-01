@@ -532,5 +532,5 @@ fun List<Questionnaire.QuestionnaireItemComponent>.flattened():
  * The hierarchy and order of child items will be retained as specified in the standard. See
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
-private inline fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
+fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
   item.map { it.createQuestionnaireResponseItem() }
