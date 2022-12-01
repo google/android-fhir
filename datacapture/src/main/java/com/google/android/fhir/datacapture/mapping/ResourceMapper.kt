@@ -126,7 +126,6 @@ object ResourceMapper {
             val structureDefinitionMap: MutableMap<String, StructureDefinition?> = hashMapOf()
 
             override fun loadProfile(url: CanonicalType): StructureDefinition? {
-
               if (profileLoader == null) {
                 Timber.w(
                   "ProfileLoader implementation required to load StructureDefinition that this resource claims to conform to"
