@@ -500,27 +500,20 @@ object ResourceMapper {
       // Do nothing
     }
 
-    //     Example is
-    //     "id" : "Patient.extension:birthPlace",
-    //      "path" : "Patient.extension",
-    //      "definition":
+    // "definition":
     // "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.birthPlace"
     //      OR
-    //     "id": "Patient.address.extension:address-preferred",
-    //     "path": "Patient.address.extension",
-    //     "definition":
+    // "definition":
     // "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.address.address-preferred"
     //
     if (base.javaClass.getFieldOrNull(fieldName) == null) {
       // base url from definition
       val canonicalUrl =
         questionnaireItem.definition.substring(0, questionnaireItem.definition.lastIndexOf("#"))
-      // one FHIR resource object is extracted even for multiple conforming profile available for
-      // Resource
       profileLoader.loadProfile(CanonicalType(canonicalUrl))?.let {
-        //         Example "definition":
+        // Example "definition":
         // "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.address.address-preferred"
-        //        extensionForType is "Patient.address"
+        //  extensionForType is "Patient.address"
         val extensionForType =
           questionnaireItem.definition.substring(
             questionnaireItem.definition.lastIndexOf("#") + 1,
@@ -528,7 +521,7 @@ object ResourceMapper {
           )
         if (isExtensionSupportedByProfile(
             structureDefinition = it,
-            extendedResource = extensionForType,
+            extensionForType = extensionForType,
             fieldName = fieldName
           )
         ) {
@@ -546,12 +539,18 @@ object ResourceMapper {
 
 private fun isExtensionSupportedByProfile(
   structureDefinition: StructureDefinition,
-  extendedResource: String,
+  extensionForType: String,
   fieldName: String
 ): Boolean {
+  // Example: Partial ElementDefinition from StructureDefinition
+  //  "id" : "Patient.extension:birthPlace",
+  //  "path" : "Patient.extension",
+  //   OR
+  //  "id": "Patient.address.extension:address-preferred",
+  //  "path": "Patient.address.extension",
   val listOfElementDefinition =
     structureDefinition.snapshot.element.filter {
-      it.path.equals(extendedResource + ".extension") // eg "path": "Patient.address.extension",
+      it.path.equals(extensionForType + ".extension") // eg "path": "Patient.address.extension",
     }
   listOfElementDefinition.forEach {
     if (it.id.substringAfterLast(":").equals(fieldName)) {

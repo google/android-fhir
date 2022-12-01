@@ -25,7 +25,8 @@ interface ProfileLoader {
    * @param url the canonical URL for the [StructureDefinition] to be loaded. This may come from
    * `resource.meta.profile` or as part of `questionnaire.item.definition` to inform extraction of
    * values into fields defined in the profile.
-   * @return a [StructureDefinition] with the specified canonical `url`
+   * @return a [StructureDefinition] with the specified canonical `url` or `null` if it cannot be
+   * found
    */
   fun loadProfile(url: CanonicalType): StructureDefinition?
 }
