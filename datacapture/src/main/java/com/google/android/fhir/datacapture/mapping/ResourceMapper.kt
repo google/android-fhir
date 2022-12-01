@@ -578,12 +578,21 @@ private fun setFieldElementValue(base: Base, field: Field, answerValue: Base) {
 }
 
 private fun addAnswerToListField(base: Base, field: Field, answerValue: List<Base>) {
-  base.javaClass
-    .getMethod(
-      "add${field.name.capitalize(Locale.ROOT)}",
+  val answerClass =
+    try {
       answerValue.first().primitiveValue().javaClass
-    )
-    .let { method -> answerValue.forEach { method.invoke(base, it.primitiveValue()) } }
+    } catch (e: NullPointerException) {
+      answerValue.first().javaClass
+    }
+  val answerVal =
+    try {
+      answerValue.first().primitiveValue()
+    } catch (e: NullPointerException) {
+      answerValue.first()
+    }
+  base.javaClass.getMethod("add${field.name.capitalize(Locale.ROOT)}", answerClass).let { method ->
+    answerValue.forEach { method.invoke(base, answerVal) }
+  }
 }
 
 private fun updateListFieldWithAnswer(base: Base, field: Field, answerValue: List<Base>) {
