@@ -121,7 +121,6 @@ object ResourceMapper {
           questionnaire,
           questionnaireResponse,
           object : ProfileLoader {
-
             // Mutable map of key-canonical url as string for profile and
             // value-StructureDefinition of resource claims to conforms to.
             val structureDefinitionMap: MutableMap<String, StructureDefinition?> = hashMapOf()
