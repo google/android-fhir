@@ -171,7 +171,7 @@ class ResourceMapperInstrumentedTest {
 
             // This JSON file is available at
             // https://build.fhir.org/ig/WorldHealthOrganization/smart-anc/branches/master/StructureDefinition-who-patient.profile.json.html
-            // in WHO IG can be downloaded as raw json file
+            // in WHO IG can be downloaded as raw JSON file
             getStructureDefinition("structure_definition_who_patient.json", context)
           }
           else -> null
