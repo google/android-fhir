@@ -17,9 +17,7 @@
 package com.google.android.fhir.datacapture
 
 import android.app.Dialog
-import android.app.DialogFragment
 import android.os.Bundle
-import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
