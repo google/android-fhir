@@ -41,6 +41,7 @@
     />
 
     <TextView
+        android:layout_marginTop="@dimen/item_margin_vertical"
         android:id="@+id/body"
         style="?attr/questionnaireValidationDialogBodyStyle"
         android:layout_width="wrap_content"
