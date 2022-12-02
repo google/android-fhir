@@ -88,4 +88,16 @@ class PlanDefinitionProcessorJavaTest {
       .withLibrary("/plan-definition/rule-filters/RuleFilters-1.0.0-bundle.json")
       .apply()
       .isEqualsTo("/plan-definition/rule-filters/ReportableCarePlan.json")
+
+  @Test
+  fun testAncVisitContainedActivityDefinition() =
+    PlanDefinition.Assert.that(
+      "MedRequest-Example",
+      "Patient/Patient-Example"
+    )
+      .withData("/plan-definition/med-request/med_request_patient.json")
+      .withLibrary("/plan-definition/med-request/med_request_plan_definition.json")
+      .apply()
+      .isEqualsTo("/plan-definition/med-request/med_request_careplan.json")
+
 }
