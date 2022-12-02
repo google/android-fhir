@@ -20,7 +20,6 @@ import ca.uhn.fhir.rest.gclient.UriClientParam
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.getResourceType
 import com.google.android.fhir.search.Search
-import com.google.android.fhir.search.search
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.instance.model.api.IIdType
