@@ -40,13 +40,19 @@
         tools:visibility="visible"
     />
 
-    <TextView
-        android:layout_marginTop="@dimen/item_margin_vertical"
-        android:id="@+id/body"
-        style="?attr/questionnaireValidationDialogBodyStyle"
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_marginVertical="@dimen/item_margin_vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:text="Missing field."
-        tools:visibility="visible"
-    />
+    >
+        <TextView
+            android:id="@+id/body"
+            style="?attr/questionnaireValidationDialogBodyStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Missing field."
+            tools:visibility="visible"
+        />
+    </ScrollView>
+
 </LinearLayout>
