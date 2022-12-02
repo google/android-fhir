@@ -139,6 +139,8 @@ object Dependencies {
   // Dependencies for testing go here
   object AndroidxTest {
     const val archCore = "androidx.arch.core:core-testing:${Versions.AndroidxTest.archCore}"
+    const val benchmarkJunit =
+      "androidx.benchmark:benchmark-junit4:${Versions.AndroidxTest.benchmarkJUnit}"
     const val core = "androidx.test:core:${Versions.AndroidxTest.core}"
     const val extJunit = "androidx.test.ext:junit:${Versions.AndroidxTest.extJunit}"
     const val extJunitKtx = "androidx.test.ext:junit-ktx:${Versions.AndroidxTest.extJunit}"
@@ -155,6 +157,7 @@ object Dependencies {
     const val espressoContrib = "androidx.test.espresso:espresso-contrib:${Versions.espresso}"
   }
 
+  const val androidBenchmarkRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
   // Makes Json assertions where the order of elements, tabs/whitespaces are not important.
   const val jsonAssert = "org.skyscreamer:jsonassert:${Versions.jsonAssert}"
@@ -220,6 +223,7 @@ object Dependencies {
     // Test dependencies
 
     object AndroidxTest {
+      const val benchmarkJUnit = "1.1.0"
       const val core = "1.4.0"
       const val archCore = "2.1.0"
       const val extJunit = "1.1.3"

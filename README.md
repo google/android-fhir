@@ -30,7 +30,7 @@ This repository also contains the following demo apps:
 
 ## Contributing
 
-The development of the SDK began as a collaborative effort between Google, [The World Health Organization](https://www.who.int/), and [ONA](https://ona.io/). Since then, a consortium of application developers have been contributing to the project.
+The development of the SDK began as a collaborative effort between Google, [The World Health Organization](https://www.who.int/), and [Ona](https://ona.io/). Since then, a consortium of application developers have been contributing to the project.
 
 To contribute to the project, please see [Contributing](https://github.com/google/android-fhir/wiki/Contributing) to get started.
 
