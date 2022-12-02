@@ -241,7 +241,11 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     return generateCarePlan(planDefinitionId, patientId, encounterId = null)
   }
 
-  fun generateCarePlan(planDefinitionId: String, patientId: String, encounterId: String?): CarePlan {
+  fun generateCarePlan(
+    planDefinitionId: String,
+    patientId: String,
+    encounterId: String?
+  ): CarePlan {
     return planDefinitionProcessor.apply(
       IdType("PlanDefinition", planDefinitionId),
       patientId,
