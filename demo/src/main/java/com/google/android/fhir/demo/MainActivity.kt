@@ -79,10 +79,10 @@ class MainActivity : AppCompatActivity() {
     when (item.itemId) {
       R.id.menu_sync -> {
         viewModel.triggerOneTimeSync()
+        binding.drawer.closeDrawer(GravityCompat.START)
         return true
       }
     }
-    binding.drawer.closeDrawer(GravityCompat.START)
     return false
   }
 
