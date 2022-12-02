@@ -156,8 +156,12 @@ private fun SpannableStringBuilder.appendWithSpan(value: String, @ColorInt color
   setSpan(ForegroundColorSpan(color), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 }
 
+/**
+ * Reads @ColorInt value from android resource attribute. e.g [attrColor] value is
+ * [R.attr.colorError] to get the colorInt.
+ */
 @ColorInt
-private fun Context.getColorFromAttr(@AttrRes attrColor: Int): Int {
+internal fun Context.getColorFromAttr(@AttrRes attrColor: Int): Int {
   val typedValue = TypedValue()
   theme.resolveAttribute(attrColor, typedValue, true)
   return typedValue.data
