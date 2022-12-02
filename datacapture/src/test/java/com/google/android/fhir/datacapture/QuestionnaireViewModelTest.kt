@@ -2894,13 +2894,13 @@ class QuestionnaireViewModelTest {
   fun `resolveAnswerExpression() should return questionnaire item answer options for answer expression and choice column`() =
     runBlocking {
       val practitioner =
-        Practitioner()
-          .apply {
-            id = UUID.randomUUID().toString()
-            active = true
-            addName(HumanName().apply { this.family = "John" })
-          }
-          .also { fhirEngine.create(it) }
+        Practitioner().apply {
+          id = UUID.randomUUID().toString()
+          active = true
+          addName(HumanName().apply { this.family = "John" })
+        }
+      ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+        .dataCaptureConfiguration = DataCaptureConfig(xFhirQueryResolver = { listOf(practitioner) })
 
       val questionnaire =
         Questionnaire().apply {
@@ -2939,6 +2939,47 @@ class QuestionnaireViewModelTest {
         .isEqualTo("Practitioner/${practitioner.logicalId}")
     }
 
+  @Test
+  fun `resolveAnswerExpression() should throw exception when XFhirQueryResolver is not provided`() {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a"
+            text = "answer expression question text"
+            type = Questionnaire.QuestionnaireItemType.REFERENCE
+            extension =
+              listOf(
+                Extension(
+                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                  Expression().apply {
+                    this.expression = "Practitioner?active=true"
+                    this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                  }
+                ),
+                Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
+                  )
+                  .apply {
+                    this.addExtension(Extension("path", StringType("id")))
+                    this.addExtension(Extension("label", StringType("name")))
+                    this.addExtension(Extension("forDisplay", BooleanType(true)))
+                  }
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    val viewModel = QuestionnaireViewModel(context, state)
+    val exception =
+      Assert.assertThrows(null, IllegalStateException::class.java) {
+        runBlocking { viewModel.resolveAnswerExpression(questionnaire.itemFirstRep) }
+      }
+    assertThat(exception.message)
+      .isEqualTo(
+        "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig"
+      )
+  }
   // Test cases for submit button
 
   @Test

@@ -25,7 +25,6 @@ import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
@@ -35,7 +34,6 @@ import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemV
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import com.google.android.fhir.search.search
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -54,7 +52,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   AndroidViewModel(application) {
 
   private val parser: IParser by lazy { FhirContext.forCached(FhirVersionEnum.R4).newJsonParser() }
-  private val fhirEngine by lazy { FhirEngineProvider.getInstance(application) }
+  private val xFhirQueryResolver: XFhirQueryResolver? by lazy {
+    DataCapture.getConfiguration(application).xFhirQueryResolver
+  }
 
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
@@ -476,13 +476,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     expression: Expression,
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     val data =
-      if (expression.isXFhirQuery) fhirEngine.search(expression.expression)
-      else if (expression.isFhirPath)
+      if (expression.isXFhirQuery) {
+        checkNotNull(xFhirQueryResolver) {
+          "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig"
+        }
+        xFhirQueryResolver!!.resolve(expression.expression)
+      } else if (expression.isFhirPath) {
         fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
-      else
+      } else {
         throw UnsupportedOperationException(
           "${expression.language} not supported for answer-expression yet"
         )
+      }
 
     return item.extractAnswerOptions(data)
   }

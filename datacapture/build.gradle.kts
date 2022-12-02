@@ -70,8 +70,6 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  debugImplementation(project(":engine"))
-
   implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)

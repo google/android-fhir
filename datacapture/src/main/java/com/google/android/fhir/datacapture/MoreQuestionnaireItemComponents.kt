@@ -21,7 +21,6 @@ import androidx.core.text.HtmlCompat
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.utilities.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
-import com.google.android.fhir.logicalId
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
@@ -534,3 +533,8 @@ fun List<Questionnaire.QuestionnaireItemComponent>.flattened():
  */
 fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
   item.map { it.createQuestionnaireResponseItem() }
+
+val Resource.logicalId: String
+  get() {
+    return this.idElement?.idPart.orEmpty()
+  }
