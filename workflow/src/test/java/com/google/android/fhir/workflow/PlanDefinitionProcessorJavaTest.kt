@@ -91,13 +91,9 @@ class PlanDefinitionProcessorJavaTest {
 
   @Test
   fun testAncVisitContainedActivityDefinition() =
-    PlanDefinition.Assert.that(
-      "MedRequest-Example",
-      "Patient/Patient-Example"
-    )
+    PlanDefinition.Assert.that("MedRequest-Example", "Patient/Patient-Example")
       .withData("/plan-definition/med-request/med_request_patient.json")
       .withLibrary("/plan-definition/med-request/med_request_plan_definition.json")
       .apply()
       .isEqualsTo("/plan-definition/med-request/med_request_careplan.json")
-
 }

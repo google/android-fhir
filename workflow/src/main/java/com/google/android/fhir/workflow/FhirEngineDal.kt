@@ -25,8 +25,6 @@ import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.instance.model.api.IIdType
 import org.hl7.fhir.r4.model.Library
-import org.hl7.fhir.r4.model.Measure
-import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.opencds.cqf.cql.evaluator.fhir.dal.FhirDal

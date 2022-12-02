@@ -157,8 +157,7 @@ object PlanDefinition : Loadable() {
     fun that(planDefinitionID: String, patientID: String, encounterID: String?) =
       Apply(planDefinitionID, patientID, encounterID)
 
-    fun that(planDefinitionID: String, patientID: String) =
-      Apply(planDefinitionID, patientID, null)
+    fun that(planDefinitionID: String, patientID: String) = Apply(planDefinitionID, patientID, null)
   }
 
   class Apply(
