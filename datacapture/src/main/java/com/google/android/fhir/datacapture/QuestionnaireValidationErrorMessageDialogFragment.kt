@@ -17,7 +17,9 @@
 package com.google.android.fhir.datacapture
 
 import android.app.Dialog
+import android.app.DialogFragment
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
@@ -50,8 +52,10 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
     isCancelable = false
     return MaterialAlertDialogBuilder(requireContext())
       .setView(onCreateCustomView())
-      .setPositiveButton(android.R.string.ok) { dialog, _ -> dialog?.dismiss() }
-      .setNegativeButton(R.string.submit_button_text) { dialog, _ ->
+      .setPositiveButton(R.string.questionnaire_validation_error_fix_button_text) { dialog, _ ->
+        dialog?.dismiss()
+      }
+      .setNegativeButton(R.string.questionnaire_validation_error_submit_button_text) { dialog, _ ->
         setFragmentResult(RESULT_CALLBACK, Bundle.EMPTY)
         dialog?.dismiss()
       }
