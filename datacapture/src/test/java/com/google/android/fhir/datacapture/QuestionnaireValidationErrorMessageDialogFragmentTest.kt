@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture
 
-import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.testing.launchFragmentInContainer
@@ -24,7 +23,6 @@ import androidx.fragment.app.testing.withFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
@@ -66,28 +64,13 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
         factory = createDialogFragmentFactoryForTests(questionnaire, questionnaireResponse)
       )
 
-    val result =
-      scenario.withFragment {
-        onCreateCustomView().also {
-          // The following code is required for the recycler view to actually draw. Otherwise,
-          // findViewHolderForLayoutPosition would just return null as recycler view is not drawn.
-          it.findViewById<RecyclerView>(R.id.recycler_view).let { recyclerView ->
-            recyclerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-            recyclerView.layout(0, 0, 1000, 1000)
-          }
-        }
-      }
+    val result = scenario.withFragment { onCreateCustomView() }
 
     assertThat(result.findViewById<TextView>(R.id.dialog_title).text)
       .isEqualTo("Complete all required fields")
     assertThat(result.findViewById<TextView>(R.id.dialog_subtitle).text)
       .isEqualTo("Fields that need to be completed:")
-    assertThat(result.findViewById<RecyclerView>(R.id.recycler_view).adapter!!.itemCount)
-      .isEqualTo(1)
-    val holder =
-      result.findViewById<RecyclerView>(R.id.recycler_view).findViewHolderForLayoutPosition(0)
-        as QuestionnaireValidationErrorMessageDialogFragment.ErrorViewHolder
-    assertThat(holder.textView.text).isEqualTo("• First Name")
+    assertThat(result.findViewById<TextView>(R.id.body).text).isEqualTo("• First Name")
   }
 
   private fun createTestValidationErrorViewModel(

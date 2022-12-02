@@ -20,7 +20,6 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.view.ContextThemeWrapper
@@ -30,13 +29,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.views.MarginItemDecoration
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.hl7.fhir.r4.model.Questionnaire
 
@@ -78,46 +72,17 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
 
     return layoutInflater
       .cloneInContext(ContextThemeWrapper(layoutInflater.context, themeId))
-      .inflate(R.layout.questionnaire_validation_error_dialog, null)
+      .inflate(R.layout.questionnaire_validation_dialog, null)
       .apply {
-        findViewById<RecyclerView>(R.id.recycler_view).apply {
-          layoutManager = LinearLayoutManager(context)
-          addItemDecoration(
-            MarginItemDecoration(
-              context.resources.getDimensionPixelOffset(R.dimen.instructions_top_margin)
-            )
-          )
+        findViewById<TextView>(R.id.body).apply {
           val viewModel: QuestionnaireValidationErrorViewModel by
             activityViewModels(factoryProducer)
-          adapter =
-            ErrorAdapter().apply { submitList(viewModel.getItemsTextWithValidationErrors()) }
+          text =
+            viewModel.getItemsTextWithValidationErrors().joinToString(separator = "\n") {
+              context.getString(R.string.questionnaire_validation_error_item_text_with_bullet, it)
+            }
         }
       }
-  }
-
-  class ErrorAdapter :
-    ListAdapter<ValidationErrorDataModel, ErrorViewHolder>(ValidationDiffCallback) {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-      ErrorViewHolder(parent, R.layout.questionnaire_validation_dialog_item)
-
-    override fun onBindViewHolder(holder: ErrorViewHolder, position: Int) {
-      holder.bind(getItem(position))
-    }
-  }
-
-  class ErrorViewHolder(parent: ViewGroup, layout: Int) :
-    RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(layout, parent, false)) {
-
-    val textView: TextView = itemView.findViewById(R.id.text_view)
-
-    fun bind(data: ValidationErrorDataModel) {
-      textView.text =
-        itemView.context.getString(
-          R.string.questionnaire_validation_error_item_text_with_bullet,
-          data.questionnaireItemText
-        )
-    }
   }
 
   companion object {
@@ -125,19 +90,6 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
     const val RESULT_CALLBACK = "QuestionnaireValidationResultCallback"
   }
 }
-
-private val ValidationDiffCallback =
-  object : DiffUtil.ItemCallback<ValidationErrorDataModel>() {
-    override fun areItemsTheSame(
-      oldItem: ValidationErrorDataModel,
-      newItem: ValidationErrorDataModel
-    ) = oldItem.linkId == newItem.linkId
-
-    override fun areContentsTheSame(
-      oldItem: ValidationErrorDataModel,
-      newItem: ValidationErrorDataModel
-    ) = oldItem.questionnaireItemText == newItem.questionnaireItemText
-  }
 
 internal class QuestionnaireValidationErrorViewModel : ViewModel() {
   private var questionnaire: Questionnaire? = null
@@ -152,30 +104,14 @@ internal class QuestionnaireValidationErrorViewModel : ViewModel() {
   }
 
   /** @return Texts associated with the failing [Questionnaire.QuestionnaireItemComponent]s. */
-  fun getItemsTextWithValidationErrors(): List<ValidationErrorDataModel> {
+  fun getItemsTextWithValidationErrors(): List<String> {
     val invalidFields =
       validation?.filterValues { it.filterIsInstance<Invalid>().isNotEmpty() } ?: emptyMap()
     return questionnaire
       ?.item
       ?.flattened()
       ?.filter { invalidFields.contains(it.linkId) }
-      ?.map {
-        ValidationErrorDataModel(
-          it.linkId,
-          if (it.text.isNullOrEmpty()) it.localizedFlyoverSpanned.toString() else it.text
-        )
-      }
+      ?.map { if (it.text.isNullOrEmpty()) it.localizedFlyoverSpanned.toString() else it.text }
       ?: emptyList()
   }
 }
-
-/**
- * Data model for showing validation error of a particular [QuestionnaireItemComponent] in the
- * Dialog.
- */
-data class ValidationErrorDataModel(
-  /** Id of the [QuestionnaireItemComponent] with error */
-  val linkId: String,
-  /** Text of the [QuestionnaireItemComponent] with error */
-  val questionnaireItemText: String
-)
