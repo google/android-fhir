@@ -66,8 +66,7 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
 
     val result = scenario.withFragment { onCreateCustomView() }
 
-    assertThat(result.findViewById<TextView>(R.id.dialog_title).text)
-      .isEqualTo("Errors found")
+    assertThat(result.findViewById<TextView>(R.id.dialog_title).text).isEqualTo("Errors found")
     assertThat(result.findViewById<TextView>(R.id.dialog_subtitle).text)
       .isEqualTo("Fix the following questions:")
     assertThat(result.findViewById<TextView>(R.id.body).text).isEqualTo("• First Name")
