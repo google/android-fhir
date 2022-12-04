@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
       R.id.menu_sync -> {
         viewModel.triggerOneTimeSync()
         binding.drawer.closeDrawer(GravityCompat.START)
-        return true
+        return false
       }
     }
     return false
