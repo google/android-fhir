@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,43 +21,81 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.catalog.databinding.ComponentHeaderLayoutBinding
 import com.google.android.fhir.catalog.databinding.LandingPageItemBinding
 
 class ComponentsRecyclerViewAdapter(
   private val onItemClick: (ComponentListViewModel.Component) -> Unit
-) : ListAdapter<ComponentListViewModel.Component, ComponentListViewHolder>(ComponentDiffUtil()) {
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComponentListViewHolder {
-    return ComponentListViewHolder(
-      LandingPageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-      onItemClick
-    )
+) : ListAdapter<ComponentListViewModel.ViewItem, RecyclerView.ViewHolder>(ComponentDiffUtil()) {
+
+  enum class ViewType(val spanCount: Int) {
+    HEADER(2),
+    ITEM(1)
   }
 
-  override fun onBindViewHolder(holder: ComponentListViewHolder, position: Int) {
-    holder.bind(getItem(position))
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    return when (viewType) {
+      ViewType.HEADER.ordinal ->
+        ComponentHeaderViewHolder(
+          ComponentHeaderLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
+      ViewType.ITEM.ordinal ->
+        ComponentListViewHolder(
+          LandingPageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+          onItemClick
+        )
+      else -> throw IllegalArgumentException("$viewType must be ViewType.")
+    }
   }
+
+  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    if (holder is ComponentViewHolder) {
+      holder.bind(getItem(position))
+    }
+  }
+
+  override fun getItemViewType(position: Int): Int {
+    return when (getItem(position)) {
+      is ComponentListViewModel.ViewItem.HeaderItem -> ViewType.HEADER.ordinal
+      is ComponentListViewModel.ViewItem.ComponentItem -> ViewType.ITEM.ordinal
+    }
+  }
+}
+
+interface ComponentViewHolder {
+  fun bind(component: ComponentListViewModel.ViewItem)
 }
 
 class ComponentListViewHolder(
   private val binding: LandingPageItemBinding,
   private val onItemClick: (ComponentListViewModel.Component) -> Unit
-) : RecyclerView.ViewHolder(binding.root) {
-  fun bind(component: ComponentListViewModel.Component) {
-    binding.componentLayoutIconImageview.setImageResource(component.iconId)
+) : RecyclerView.ViewHolder(binding.root), ComponentViewHolder {
+  override fun bind(component: ComponentListViewModel.ViewItem) {
+    val componentItem = component as ComponentListViewModel.ViewItem.ComponentItem
+    binding.componentLayoutIconImageview.setImageResource(componentItem.component.iconId)
     binding.componentLayoutTextView.text =
-      binding.componentLayoutTextView.context.getString(component.textId)
-    binding.root.setOnClickListener { onItemClick(component) }
+      binding.componentLayoutTextView.context.getString(componentItem.component.textId)
+    binding.root.setOnClickListener { onItemClick(component.component) }
   }
 }
 
-class ComponentDiffUtil : DiffUtil.ItemCallback<ComponentListViewModel.Component>() {
+class ComponentHeaderViewHolder(private val binding: ComponentHeaderLayoutBinding) :
+  RecyclerView.ViewHolder(binding.root), ComponentViewHolder {
+  override fun bind(viewItem: ComponentListViewModel.ViewItem) {
+    val headerItem = viewItem as ComponentListViewModel.ViewItem.HeaderItem
+    binding.tvComponentHeader.text =
+      binding.tvComponentHeader.context.getString(headerItem.header.textId)
+  }
+}
+
+class ComponentDiffUtil : DiffUtil.ItemCallback<ComponentListViewModel.ViewItem>() {
   override fun areItemsTheSame(
-    oldComponent: ComponentListViewModel.Component,
-    newComponent: ComponentListViewModel.Component
+    oldComponent: ComponentListViewModel.ViewItem,
+    newComponent: ComponentListViewModel.ViewItem
   ) = oldComponent === newComponent
 
   override fun areContentsTheSame(
-    oldComponent: ComponentListViewModel.Component,
-    newComponent: ComponentListViewModel.Component
+    oldComponent: ComponentListViewModel.ViewItem,
+    newComponent: ComponentListViewModel.ViewItem
   ) = oldComponent == newComponent
 }

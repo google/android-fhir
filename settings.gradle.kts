@@ -27,6 +27,8 @@ if (kokoroRun == true) {
   }
 }
 
+include(":benchmark")
+
 include(":catalog")
 
 include(":common")
