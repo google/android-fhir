@@ -111,8 +111,7 @@ class FhirOperatorTest {
         end = "2021-12-31",
         reportType = MeasureEvalType.POPULATION.toCode(),
         subject = null,
-        practitioner = null,
-        lastReceivedOn = null
+        practitioner = null
       )
 
     measureReport.date = null
@@ -147,8 +146,7 @@ class FhirOperatorTest {
         end = "2022-12-31",
         reportType = MeasureEvalType.POPULATION.toCode(),
         subject = null,
-        practitioner = null,
-        lastReceivedOn = null
+        practitioner = null
       )
 
     measureReport.date = null
@@ -176,8 +174,7 @@ class FhirOperatorTest {
         end = "2020-01-31",
         reportType = MeasureEvalType.SUBJECT.toCode(),
         subject = "charity-otala-1",
-        practitioner = "jane",
-        lastReceivedOn = null
+        practitioner = "jane"
       )
 
     measureReport.date = null
