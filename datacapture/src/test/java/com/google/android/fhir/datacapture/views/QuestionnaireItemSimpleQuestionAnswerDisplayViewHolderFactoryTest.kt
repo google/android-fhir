@@ -25,7 +25,6 @@ import com.google.android.fhir.datacapture.DisplayItemControlType
 import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_URL
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.material.divider.MaterialDivider
 import com.google.common.truth.Truth.assertThat
@@ -288,21 +287,6 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
 
     assertThat(viewHolder.itemView.findViewById<MaterialDivider>(R.id.text_divider).visibility)
       .isEqualTo(View.VISIBLE)
-  }
-
-  @Test
-  fun `hides error textview in the header`() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
-      )
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
-      .isEqualTo(View.GONE)
   }
 
   @Test
