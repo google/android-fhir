@@ -54,10 +54,6 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
   private var hint: TextView = findViewById(R.id.hint)
   private var errorTextView: TextView = findViewById(R.id.error_text_at_header)
 
-  /**
-   * Shows error in the header,and widgets could either use this, or use another view (i.e.
-   * TextInputLayout's error field) to display error.
-   */
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
     updateQuestionText(question, questionnaireItem)
@@ -68,6 +64,10 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
     visibility = getViewGroupVisibility(prefix, question, hint)
   }
 
+  /**
+   * Shows an error in the header,and widgets could either use this or use another view (i.e.
+   * TextInputLayout's error field) to display error.
+   */
   fun showErrorText(errorText: String? = null, isErrorTextVisible: Boolean = true) {
     errorTextView.visibility =
       when (isErrorTextVisible) {
