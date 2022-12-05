@@ -17,11 +17,16 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
+import android.graphics.drawable.Drawable
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.common.datatype.displayString
+import com.google.android.fhir.datacapture.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -52,13 +57,22 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         cleanupOldState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
-        val answerOptionString =
+        val answerOptionList =
           this.questionnaireItemViewItem.answerOption
-            .map { it.value.displayString(context) }
+            .map {
+              DropDownAnswerOption(
+                it.value.displayString(context),
+                it.itemAnswerOptionImage(context)
+              )
+            }
             .toMutableList()
-        answerOptionString.add(0, context.getString(R.string.hyphen))
+        answerOptionList.add(0, DropDownAnswerOption(context.getString(R.string.hyphen), null))
         val adapter =
-          ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
+          AnswerOptionDropDownArrayAdapter(
+            context,
+            R.layout.questionnaire_item_drop_down_list,
+            answerOptionList
+          )
         questionnaireItemViewItem.answers
           .singleOrNull()
           ?.value
@@ -70,6 +84,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.onItemClickListener =
           AdapterView.OnItemClickListener { _, _, position, _ ->
+            autoCompleteTextView.setText(adapter.getItem(position)?.answerOptionString, false)
             val selectedAnswer =
               questionnaireItemViewItem.answerOption
                 .firstOrNull {
@@ -107,3 +122,31 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
       }
     }
 }
+
+internal class AnswerOptionDropDownArrayAdapter(
+  context: Context,
+  private val layoutResourceId: Int,
+  answerOption: List<DropDownAnswerOption>
+) : ArrayAdapter<DropDownAnswerOption>(context, layoutResourceId, answerOption) {
+  override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+    var convertView = convertView
+    if (convertView == null) {
+      convertView = LayoutInflater.from(parent.context).inflate(layoutResourceId, parent, false)
+    }
+    try {
+      val answerOption: DropDownAnswerOption? = getItem(position)
+      val answerOptionTextView =
+        convertView?.findViewById<View>(R.id.answer_option_textview) as TextView
+      answerOptionTextView.text = answerOption?.answerOptionString
+      answerOptionTextView.setCompoundDrawables(answerOption?.answerOptionImage, null, null, null)
+    } catch (e: Exception) {
+      e.printStackTrace()
+    }
+    return convertView!!
+  }
+}
+
+internal data class DropDownAnswerOption(
+  val answerOptionString: String,
+  val answerOptionImage: Drawable?
+)
