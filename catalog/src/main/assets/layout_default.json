@@ -10,6 +10,7 @@
     {
       "linkId": "2",
       "type": "string",
+      "required": true,
       "item": [
         {
           "linkId": "2.1",
