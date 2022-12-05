@@ -50,7 +50,7 @@ internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString:
 
 internal fun QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.displayString(
   context: Context
-) = displayForQuestionnaireResponseItemAnswerComponent(context, value)
+) = displayStringQuestionnaireResponseItemAnswerComponent(context, value)
 
 private fun displayStringQuestionnaireItemAnswerOptionComponent(value: Type?): String =
   when (value) {
@@ -74,7 +74,7 @@ private fun displayStringQuestionnaireItemAnswerOptionComponent(value: Type?): S
  * Text value for response item answer option
  * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] depending on the type
  */
-private fun displayForQuestionnaireResponseItemAnswerComponent(
+private fun displayStringQuestionnaireResponseItemAnswerComponent(
   context: Context,
   value: Type?
 ): String =
