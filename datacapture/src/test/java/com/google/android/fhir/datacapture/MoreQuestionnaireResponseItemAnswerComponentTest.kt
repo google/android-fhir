@@ -58,11 +58,44 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   }
 
   @Test
+  fun `displayString() should return name field when both display and reference set`() {
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        .setValue(Reference().setDisplay("Newton").setReference("obs/apple"))
+
+    assertThat(answer.displayString(context)).isEqualTo("Newton")
+  }
+
+  @Test
   fun `displayString() should return not answered for null reference`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(Reference())
-
     assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.not_answered))
+  }
+
+  @Test
+  fun `displayString() should return not answered for empty display field`() {
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        .setValue(Reference().setDisplay(""))
+    assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.not_answered))
+  }
+
+  @Test
+  fun `displayString() should return not answered for empty reference field`() {
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        .setValue(Reference().setReference(""))
+    assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.not_answered))
+  }
+
+  @Test
+  fun `displayString() should return reference field for no display but reference set`() {
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        .setValue(Reference().setReference("obs/apple"))
+
+    assertThat(answer.displayString(context)).isEqualTo("obs/apple")
   }
 
   @Test
