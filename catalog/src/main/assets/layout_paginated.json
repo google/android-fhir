@@ -29,6 +29,7 @@
         {
           "linkId": "1.2",
           "type": "string",
+          "required": true,
           "item": [
             {
               "linkId": "1.2.1",
@@ -183,7 +184,8 @@
           "linkId": "2.1",
           "type": "date",
           "text": "Date of birth",
-          "prefix": "2."
+          "prefix": "2.",
+          "required": true
         },
         {
           "linkId": "2.2",
@@ -347,6 +349,7 @@
         {
           "linkId": "3.6",
           "type": "string",
+          "required": true,
           "item": [
             {
               "linkId": "14.1",
@@ -420,6 +423,7 @@
         {
           "linkId": "4.2",
           "type": "string",
+          "required": true,
           "item": [
             {
               "linkId": "16.1",
@@ -446,6 +450,7 @@
         {
           "linkId": "4.3",
           "type": "choice",
+          "required": true,
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -847,7 +852,8 @@
           "linkId": "10.1",
           "type": "dateTime",
           "text": "What was the date and time of the ultrasound?",
-          "prefix": "10."
+          "prefix": "10.",
+          "required": true
         }
       ]
     }
