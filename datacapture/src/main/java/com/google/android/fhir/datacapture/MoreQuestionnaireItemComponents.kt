@@ -181,10 +181,9 @@ internal const val EXTENSION_MIME_TYPE = "http://hl7.org/fhir/StructureDefinitio
 internal val Questionnaire.QuestionnaireItemComponent.mimeTypes: List<String>
   get() {
     return extension
-      .filter {
-        it.url == EXTENSION_MIME_TYPE && !(it.value as CodeType).valueAsString.isNullOrEmpty()
-      }
+      .filter { it.url == EXTENSION_MIME_TYPE }
       .map { (it.value as CodeType).valueAsString }
+      .filter { !it.isNullOrEmpty() }
   }
 
 /** UI controls relevant to rendering questionnaire items. */
