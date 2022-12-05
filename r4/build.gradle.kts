@@ -58,9 +58,9 @@ configurations {
 
 dependencies {
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+  api(project(":engine"))
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
-  implementation(project(":engine"))
   implementation(Dependencies.androidFhirCommon) { exclude(module = "hapi-fhir-structures-r4") }
   testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   testImplementation(Dependencies.junit)
