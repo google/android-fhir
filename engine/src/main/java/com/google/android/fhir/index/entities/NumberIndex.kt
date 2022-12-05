@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import java.math.BigDecimal
  *
  * See https://hl7.org/FHIR/search.html#number.
  */
-internal data class NumberIndex(
+data class NumberIndex(
   /** The name of the number index, e.g. "probability". */
   val name: String,
   /** The path of the number index, e.g. "RiskAssessment.prediction.probability". */

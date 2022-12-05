@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ package com.google.android.fhir.index.entities
  *
  * See https://hl7.org/FHIR/search.html#string.
  */
-internal data class StringIndex(
+data class StringIndex(
   /** The name of the string index, e.g. "given". */
   val name: String,
   /** The path of the string index, e.g. "Patient.name.given". */

@@ -54,6 +54,7 @@ object Dependencies {
   }
 
   object HapiFhir {
+    const val coreLibrary = "ca.uhn.hapi.fhir:hapi-fhir-base:${Versions.hapiFhir}"
     const val structuresR4 = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhir}"
     const val validation = "ca.uhn.hapi.fhir:hapi-fhir-validation:${Versions.hapiFhir}"
 

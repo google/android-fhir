@@ -97,8 +97,8 @@ data class TokenParamFilterCriterion(var parameter: TokenClientParam) : FilterCr
 }
 
 @SearchDslMarker
-class TokenFilterValue internal constructor() {
-  internal val tokenFilters = mutableListOf<TokenParamFilterValueInstance>()
+class TokenFilterValue() {
+  val tokenFilters = mutableListOf<TokenParamFilterValueInstance>()
 }
 
 /**
@@ -106,7 +106,7 @@ class TokenFilterValue internal constructor() {
  * filter value. We use [TokenParamFilterValueInstance] to represent individual filter value.
  */
 @SearchDslMarker
-internal data class TokenParamFilterValueInstance(var uri: String? = null, var code: String)
+data class TokenParamFilterValueInstance(var uri: String? = null, var code: String)
 
 internal data class TokenParamFilterCriteria(
   var parameter: TokenClientParam,

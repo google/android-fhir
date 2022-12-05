@@ -41,6 +41,8 @@ include(":engine")
 
 include(":implementationguide")
 
+include(":r4")
+
 include(":workflow")
 
 include(":workflow-testing")

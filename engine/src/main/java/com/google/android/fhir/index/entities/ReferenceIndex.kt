@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ package com.google.android.fhir.index.entities
  *
  * See https://hl7.org/FHIR/search.html#reference.
  */
-internal data class ReferenceIndex(
+data class ReferenceIndex(
   /** The name of the reference index, e.g. "subject". */
   val name: String,
   /** The path of the reference index, e.g. "Observation.subject". */

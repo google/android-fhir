@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ package com.google.android.fhir.index.entities
  *
  * See https://hl7.org/FHIR/search.html#date.
  */
-internal data class DateIndex(
+data class DateIndex(
   /** The name of the date index, e.g. "birthdate". */
   val name: String,
   /** The path of the date index, e.g. "Patient.birthdate". */
