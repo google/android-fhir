@@ -352,7 +352,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun `errorTextviewInHeader_shouldHide`() {
+  fun `shouldHideErrorTextviewInHeader`() {
     val questionnaireItem = answerOptions(true, "Coding 1")
     questionnaireItem.addExtension(openChoiceType)
     val questionnaireItemViewItem =
