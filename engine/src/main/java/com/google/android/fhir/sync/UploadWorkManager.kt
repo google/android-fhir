@@ -37,11 +37,14 @@ interface UploadWorkManager {
   fun getUploadResult(
     response: IAnyResource,
     localChangeTokens: List<LocalChangeToken>
-  ): Pair<LocalChangeToken, List<ResourceToSave>>
+  ): Pair<LocalChangeToken, List<ResourceMetadataToUpdate>>
 }
 
-/** Resource for database to save after upload results are retrieved from a remote server */
-data class ResourceToSave(
+/**
+ * Properties in this class for database to update after upload results are retrieved from a remote
+ * server
+ */
+data class ResourceMetadataToUpdate(
   val id: String,
   val resourceType: String,
   val versionId: String,
