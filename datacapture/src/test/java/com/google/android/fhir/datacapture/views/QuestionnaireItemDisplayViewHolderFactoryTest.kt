@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
@@ -49,5 +50,20 @@ class QuestionnaireItemDisplayViewHolderFactoryTest {
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Display")
+  }
+
+  @Test
+  fun `hides error textview in the header`() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
+      .isEqualTo(View.GONE)
   }
 }

@@ -21,13 +21,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -37,7 +37,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: QuestionnaireItemHeaderView
       private lateinit var textInputLayout: TextInputLayout
-      private lateinit var autoCompleteTextView: AutoCompleteTextView
+      private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private lateinit var context: Context
 
@@ -72,18 +72,24 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
             R.layout.questionnaire_item_drop_down_list,
             answerOptionString
           )
-        autoCompleteTextView.setText(
-          questionnaireItemViewItem.answers.singleOrNull()?.displayString(header.context) ?: ""
-        )
+        questionnaireItemViewItem.answers.singleOrNull()?.displayString(header.context)?.let {
+          autoCompleteTextView.setText(it)
+          autoCompleteTextView.setSelection(it.length)
+        }
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.onItemClickListener =
           AdapterView.OnItemClickListener { _, _, position, _ ->
-            if (position == 0) {
+            val selectedAnswer =
+              questionnaireItemViewItem.answerOption
+                .firstOrNull { it.displayString == autoCompleteTextView.adapter.getItem(position) }
+                ?.value
+
+            if (selectedAnswer == null) {
               questionnaireItemViewItem.clearAnswer()
             } else {
               questionnaireItemViewItem.setAnswer(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(questionnaireItemViewItem.answerOption[position - 1].value)
+                  .setValue(selectedAnswer)
               )
             }
           }
