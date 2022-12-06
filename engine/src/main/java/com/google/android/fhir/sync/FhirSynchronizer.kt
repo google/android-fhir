@@ -100,6 +100,7 @@ internal class FhirSynchronizer(
               setSyncState(SyncJobStatus.InProgress(it.type))
             }
             is DownloadState.Success -> {
+              setSyncState(SyncJobStatus.Finished())
               emit(it.resources)
             }
             is DownloadState.Failure -> {

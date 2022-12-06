@@ -59,7 +59,7 @@ object Sync {
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
         W::class.java.name,
-        ExistingWorkPolicy.KEEP,
+        ExistingWorkPolicy.REPLACE,
         createOneTimeWorkRequest(retryConfiguration, W::class.java)
       )
     return flow
@@ -84,7 +84,7 @@ object Sync {
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
         W::class.java.name,
-        ExistingPeriodicWorkPolicy.KEEP,
+        ExistingPeriodicWorkPolicy.REPLACE,
         createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java)
       )
     return flow
