@@ -109,6 +109,15 @@
             name="questionnaireAddAnotherAnswerButtonStyle"
         >@style/Widget.Material3.Button
         </item>
+        <item name="questionnaireValidationDialogTitleStyle">
+            @style/TextAppearance.Material3.HeadlineSmall
+        </item>
+        <item name="questionnaireValidationDialogBodyStyle">
+            @style/TextAppearance.Material3.BodyMedium
+        </item>
+        <item name="questionnaireValidationDialogButtonStyle">
+            @style/Widget.Material3.Button.TextButton.Dialog
+        </item>
         <item
             name="questionnaireLinearProgressIndicatorStyle"
         >@style/Widget.Material3.LinearProgressIndicator
@@ -249,7 +258,7 @@
     >
         <item name="android:text">@string/submit_questionnaire</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:visibility">gone</item>
+        <item name="android:visibility">visible</item>
     </style>
 
 </resources>

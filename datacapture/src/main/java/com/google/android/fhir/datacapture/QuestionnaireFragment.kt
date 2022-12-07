@@ -24,18 +24,20 @@ import android.widget.Button
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import org.hl7.fhir.r4.model.Questionnaire
 
 /**
  * A [Fragment] for displaying FHIR Questionnaires and getting user responses as FHIR
- * QuestionnareResponses.
+ * QuestionnaireResponses.
  *
  * For more information, see the
  * [QuestionnaireFragment](https://github.com/google/android-fhir/wiki/SDCL%3A-Use-QuestionnaireFragment)
@@ -74,8 +76,20 @@ open class QuestionnaireFragment : Fragment() {
     paginationPreviousButton.setOnClickListener { viewModel.goToPreviousPage() }
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
-    requireView().findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
-      setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
+    view.findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
+      viewModel.validateQuestionnaireAndUpdateUI().let { validationMap ->
+        if (validationMap.values.flatten().filterIsInstance<Invalid>().isEmpty()) {
+          setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
+        } else {
+          val errorViewModel: QuestionnaireValidationErrorViewModel by activityViewModels()
+          errorViewModel.setQuestionnaireAndValidation(viewModel.questionnaire, validationMap)
+          QuestionnaireValidationErrorMessageDialogFragment()
+            .show(
+              requireActivity().supportFragmentManager,
+              QuestionnaireValidationErrorMessageDialogFragment.TAG
+            )
+        }
+      }
     }
     val questionnaireProgressIndicator: LinearProgressIndicator =
       view.findViewById(R.id.questionnaire_progress_indicator)
@@ -107,60 +121,86 @@ open class QuestionnaireFragment : Fragment() {
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.questionnaireStateFlow.collect { state ->
-        if (state.reviewMode) {
-          questionnaireItemReviewAdapter.submitList(state.items)
-          questionnaireReviewRecyclerView.visibility = View.VISIBLE
-          questionnaireEditRecyclerView.visibility = View.GONE
-          reviewModeEditButton.visibility = View.VISIBLE
-          questionnaireProgressIndicator.visibility = View.GONE
-        } else {
-          questionnaireItemEditAdapter.submitList(state.items)
-          questionnaireEditRecyclerView.visibility = View.VISIBLE
-          questionnaireReviewRecyclerView.visibility = View.GONE
-          reviewModeEditButton.visibility = View.GONE
-          questionnaireProgressIndicator.visibility = View.VISIBLE
-        }
+        when (val displayMode = state.displayMode) {
+          is DisplayMode.ReviewMode -> {
+            // Set items
+            questionnaireEditRecyclerView.visibility = View.GONE
+            questionnaireItemReviewAdapter.submitList(state.items)
+            questionnaireReviewRecyclerView.visibility = View.VISIBLE
 
-        if (state.pagination.isPaginated && !state.reviewMode) {
-          paginationPreviousButton.visibility = View.VISIBLE
-          paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage
-          paginationNextButton.visibility = View.VISIBLE
-          paginationNextButton.isEnabled = state.pagination.hasNextPage
-          questionnaireProgressIndicator.updateProgressIndicator(
-            calculateProgressPercentage(
-              count =
-                (state.pagination.currentPageIndex +
-                  1), // incremented by 1 due to initialPageIndex starts with 0.
-              totalCount = state.pagination.pages.size
-            )
-          )
-        } else {
-          paginationPreviousButton.visibility = View.GONE
-          paginationNextButton.visibility = View.GONE
-
-          questionnaireEditRecyclerView.addOnScrollListener(
-            object : RecyclerView.OnScrollListener() {
-              override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                questionnaireProgressIndicator.updateProgressIndicator(
-                  calculateProgressPercentage(
-                    count =
-                      (linearLayoutManager.findLastVisibleItemPosition() +
-                        1), // incremented by 1 due to findLastVisiblePosition() starts with 0.
-                    totalCount = linearLayoutManager.itemCount
-                  )
-                )
+            // Set button visibility
+            submitButton.visibility = View.GONE
+            reviewModeButton.visibility = View.GONE
+            reviewModeEditButton.visibility =
+              if (displayMode.showEditButton) {
+                View.VISIBLE
+              } else {
+                View.GONE
               }
+            paginationPreviousButton.visibility = View.GONE
+            paginationNextButton.visibility = View.GONE
+
+            // Hide progress indicator
+            questionnaireProgressIndicator.visibility = View.GONE
+          }
+          is DisplayMode.EditMode -> {
+            // Set items
+            questionnaireReviewRecyclerView.visibility = View.GONE
+            questionnaireItemEditAdapter.submitList(state.items)
+            questionnaireEditRecyclerView.visibility = View.VISIBLE
+
+            // Set button visibility
+            submitButton.visibility =
+              if (displayMode.pagination.showSubmitButton) View.VISIBLE else View.GONE
+            reviewModeButton.visibility =
+              if (displayMode.pagination.showReviewButton) View.VISIBLE else View.GONE
+            reviewModeEditButton.visibility = View.GONE
+            if (displayMode.pagination.isPaginated) {
+              paginationPreviousButton.visibility = View.VISIBLE
+              paginationPreviousButton.isEnabled = displayMode.pagination.hasPreviousPage
+              paginationNextButton.visibility = View.VISIBLE
+              paginationNextButton.isEnabled = displayMode.pagination.hasNextPage
+            } else {
+              paginationPreviousButton.visibility = View.GONE
+              paginationNextButton.visibility = View.GONE
             }
-          )
+
+            // Set progress indicator
+            questionnaireProgressIndicator.visibility = View.VISIBLE
+            if (displayMode.pagination.isPaginated) {
+              questionnaireProgressIndicator.updateProgressIndicator(
+                calculateProgressPercentage(
+                  count =
+                    (displayMode.pagination.currentPageIndex +
+                      1), // incremented by 1 due to initialPageIndex starts with 0.
+                  totalCount = displayMode.pagination.pages.size
+                )
+              )
+            } else {
+              questionnaireEditRecyclerView.addOnScrollListener(
+                object : RecyclerView.OnScrollListener() {
+                  override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    questionnaireProgressIndicator.updateProgressIndicator(
+                      calculateProgressPercentage(
+                        count =
+                          (linearLayoutManager.findLastVisibleItemPosition() +
+                            1), // incremented by 1 due to findLastVisiblePosition() starts with 0.
+                        totalCount = linearLayoutManager.itemCount
+                      )
+                    )
+                  }
+                }
+              )
+            }
+          }
         }
-
-        reviewModeButton.visibility =
-          if (state.pagination.showReviewButton) View.VISIBLE else View.GONE
-
-        submitButton.visibility = if (state.pagination.showSubmitButton) View.VISIBLE else View.GONE
       }
     }
+    requireActivity().supportFragmentManager.setFragmentResultListener(
+      QuestionnaireValidationErrorMessageDialogFragment.RESULT_CALLBACK,
+      viewLifecycleOwner
+    ) { _, _ -> setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY) }
   }
 
   /** Calculates the progress percentage from given [count] and [totalCount] values. */
@@ -242,10 +282,16 @@ open class QuestionnaireFragment : Fragment() {
     const val EXTRA_ENABLE_REVIEW_PAGE = "enable-review-page"
 
     /**
-     * An [Boolean] extra to control if the review page is to be opened first. This has no effect if
+     * A [Boolean] extra to control if the review page is to be opened first. This has no effect if
      * review page is not enabled.
      */
     const val EXTRA_SHOW_REVIEW_PAGE_FIRST = "show-review-page-first"
+
+    /**
+     * An [Boolean] extra to control if the questionnaire is read-only. If review page and read-only
+     * are both enabled, read-only will take precedence.
+     */
+    const val EXTRA_READ_ONLY = "read-only"
 
     const val SUBMIT_REQUEST_KEY = "submit-request-key"
   }
