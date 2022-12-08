@@ -1,0 +1,30 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "resource": {
+        "resourceType" : "ActivityDefinition",
+        "id" : "MedicationRequest-1",
+        "url" : "http://localhost/ActivityDefinition/MedicationRequest-1",
+        "status": "active",
+        "kind" : "MedicationRequest",
+        "productCodeableConcept" : {
+          "text" : "Medication 1"
+        }
+      }
+    },{
+      "resource": {
+        "resourceType" : "PlanDefinition",
+        "id" : "MedRequest-Example",
+        "title" : "This example illustrates a medication request",
+        "status" : "active",
+        "action" : [{
+          "id" : "medication-action-1",
+          "title" : "Administer Medication 1",
+          "definitionCanonical" : "http://localhost/ActivityDefinition/MedicationRequest-1"
+        }]
+      }
+    }
+  ]
+}

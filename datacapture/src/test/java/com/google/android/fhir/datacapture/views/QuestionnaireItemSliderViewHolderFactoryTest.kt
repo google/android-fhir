@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.EXTENSION_SLIDER_STEP_VALUE_URL
@@ -296,6 +297,21 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.toString())
       .isEqualTo("Minimum value allowed is:50")
+  }
+
+  @Test
+  fun `hides error textview in the header`() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
+      .isEqualTo(View.GONE)
   }
 
   @Test
