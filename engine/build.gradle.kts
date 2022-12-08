@@ -142,8 +142,9 @@ tasks.dokkaHtml.configure {
       noAndroidSdkLink.set(false)
       sourceLink {
         localDirectory.set(file("src/main/java"))
-        remoteUrl.set(URL(
-          "https://github.com/google/android-fhir/tree/master/engine/src/main/java"))
+        remoteUrl.set(
+          URL("https://github.com/google/android-fhir/tree/master/engine/src/main/java")
+        )
         remoteLineSuffix.set("#L")
       }
       externalDocumentationLink {
