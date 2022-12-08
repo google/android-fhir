@@ -1,8 +1,11 @@
+import java.net.URL
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
+  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
 }
 
 publishArtifact(Releases.Workflow)
@@ -136,4 +139,26 @@ dependencies {
   testImplementation(project(":workflow-testing"))
 }
 
-configureDokka(Releases.Workflow.artifactId, Releases.Workflow.version)
+tasks.dokkaHtml.configure {
+  outputDirectory.set(file("../docs/${Releases.Workflow.artifactId}"))
+  suppressInheritedMembers.set(true)
+  dokkaSourceSets {
+    named("main") {
+      moduleName.set(Releases.Workflow.artifactId)
+      moduleVersion.set(Releases.Workflow.version)
+      noAndroidSdkLink.set(false)
+      externalDocumentationLink {
+        url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
+        packageListUrl.set(
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+        )
+      }
+      externalDocumentationLink {
+        url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-base/"))
+        packageListUrl.set(
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-base/element-list")
+        )
+      }
+    }
+  }
+}
