@@ -268,8 +268,7 @@ class QuestionnaireItemHeaderViewTest {
   fun `shows * though question text is missing`() {
     view.bind(Questionnaire.QuestionnaireItemComponent().apply { required = true })
 
-    assertThat(view.findViewById<TextView>(R.id.question).text.toString())
-      .isEqualTo(view.context.applicationContext.resources.getString(R.string.space_asterisk))
+    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEmpty()
   }
 
   @Test

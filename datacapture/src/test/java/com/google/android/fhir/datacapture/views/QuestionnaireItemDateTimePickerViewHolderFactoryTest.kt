@@ -19,6 +19,9 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import com.google.android.fhir.datacapture.DisplayItemControlType
+import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_SYSTEM
+import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_URL
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -26,7 +29,10 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import java.util.Locale
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
@@ -323,6 +329,129 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
 
     assertThat(viewHolder.dateInputView.text.toString()).isEmpty()
     assertThat(viewHolder.timeInputView.text.toString()).isEmpty()
+  }
+
+  @Test
+  fun `shows asterisk at the end of the flyover text`() {
+    val displayItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DISPLAY
+        text = "Choice"
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(DisplayItemControlType.FLYOVER.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
+            )
+        )
+      }
+
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "link-id"
+          required = true
+          item = listOf(displayItem)
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    val flyoverText =
+      viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).hint.toString()
+    val timeFlyoverText =
+      viewHolder.itemView.findViewById<TextInputLayout>(R.id.time_input_layout).hint.toString()
+    assertThat(flyoverText[flyoverText.lastIndex].toString()).isEqualTo("*")
+    assertThat(timeFlyoverText[timeFlyoverText.lastIndex]).isNotEqualTo("*")
+  }
+
+  @Test
+  fun `does not show asterisk at the end of the flyover text if question text is present and questionnaire item is required`() {
+    val displayItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DISPLAY
+        text = "Choice"
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(DisplayItemControlType.FLYOVER.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
+            )
+        )
+      }
+
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "link-id"
+          required = true
+          text = "Question text"
+          item = listOf(displayItem)
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    val flyoverText =
+      viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).hint.toString()
+    val timeFlyoverText =
+      viewHolder.itemView.findViewById<TextInputLayout>(R.id.time_input_layout).hint.toString()
+    assertThat(flyoverText[flyoverText.lastIndex]).isNotEqualTo("*")
+    assertThat(timeFlyoverText[timeFlyoverText.lastIndex]).isNotEqualTo("*")
+  }
+
+  @Test
+  fun `does not show asterisk at the end of the flyover text if question text is present and questionnaire item is not required`() {
+    val displayItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DISPLAY
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(DisplayItemControlType.FLYOVER.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
+            )
+        )
+      }
+
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "link-id"
+          text = "Question text"
+          item = listOf(displayItem)
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    val flyoverText =
+      viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).hint.toString()
+    val timeFlyoverText =
+      viewHolder.itemView.findViewById<TextInputLayout>(R.id.time_input_layout).hint.toString()
+    assertThat(flyoverText[flyoverText.lastIndex]).isNotEqualTo("*")
+    assertThat(timeFlyoverText[timeFlyoverText.lastIndex]).isNotEqualTo("*")
   }
 
   private val QuestionnaireItemViewHolder.dateInputView: TextView

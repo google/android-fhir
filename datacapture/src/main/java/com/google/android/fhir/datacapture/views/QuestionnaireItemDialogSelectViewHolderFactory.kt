@@ -60,6 +60,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
         cleanupOldState()
         holder.summaryHolder.hint =
           questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
+        holder.summaryHolder.showAsteriskInFlyoverText(questionnaireItemViewItem.questionnaireItem)
         val activity =
           requireNotNull(holder.header.context.tryUnwrapContext()) {
             "Can only use dialog select in an AppCompatActivity context"

@@ -132,19 +132,22 @@ internal fun initHelpButton(
  * Updates textview [R.id.question] with
  * [Questionnaire.QuestionnaireItemComponent.localizedTextSpanned] text and `*` if
  * [Questionnaire.QuestionnaireItemComponent.required] is true. And applies [R.attr.colorError] to
- * `*`.
+ * `*`. If question text is blank, it does not show an asterisk in the question text.
  */
 internal fun updateQuestionText(
   questionTextView: TextView,
   questionnaireItem: Questionnaire.QuestionnaireItemComponent,
 ) {
   val builder = SpannableStringBuilder()
-  questionnaireItem.localizedTextSpanned?.let { builder.append(it) }
-  if (questionnaireItem.required) {
-    builder.appendWithSpan(
-      questionTextView.context.applicationContext.getString(R.string.space_asterisk),
-      questionTextView.context.getColorFromAttr(R.attr.colorError)
-    )
+  questionnaireItem.localizedTextSpanned?.let {
+    builder.append(it)
+    if (questionnaireItem.required && questionnaireItem.localizedTextSpanned.toString().isNotEmpty()
+    ) {
+      builder.appendWithSpan(
+        questionTextView.context.applicationContext.getString(R.string.space_asterisk),
+        questionTextView.context.getColorFromAttr(R.attr.colorError)
+      )
+    }
   }
   questionTextView.updateTextAndVisibility(builder)
 }

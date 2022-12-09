@@ -52,6 +52,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         cleanupOldState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
+        textInputLayout.showAsteriskInFlyoverText(questionnaireItemViewItem.questionnaireItem)
         val answerOptionString =
           this.questionnaireItemViewItem.answerOption.map { it.displayString }.toMutableList()
         answerOptionString.add(0, context.getString(R.string.hyphen))
