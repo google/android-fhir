@@ -139,36 +139,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
-  /**
-   * The pre-order traversal trace of the items in the [QuestionnaireResponse]. This essentially
-   * represents the order in which all items are displayed in the UI.
-   */
-  private val questionnaireResponseItemPreOrderList =
-    mutableListOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
-
-  init {
-    /**
-     * Adds all items in the [QuestionnaireResponse] to the pre-order list. Note that each
-     * questionnaire response item may either have child items (in the case of a group type
-     * question) or have answer items with nested questions.
-     */
-    fun buildPreOrderList(item: QuestionnaireResponse.QuestionnaireResponseItemComponent) {
-      questionnaireResponseItemPreOrderList.add(item)
-      for (child in item.item) {
-        buildPreOrderList(child)
-      }
-      for (answer in item.answer) {
-        for (answerItem in answer.item) {
-          buildPreOrderList(answerItem)
-        }
-      }
-    }
-
-    for (item in questionnaireResponse.item) {
-      buildPreOrderList(item)
-    }
-  }
-
   /** The map from each item in the [Questionnaire] to its parent. */
   private var questionnaireItemParentMap:
     Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>
@@ -189,27 +159,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       for (item in questionnaire.item) {
         buildParentList(item, this)
       }
-    }
-  }
-
-  /** The map from each item in the [QuestionnaireResponse] to its parent. */
-  private val questionnaireResponseItemParentMap =
-    mutableMapOf<
-      QuestionnaireResponse.QuestionnaireResponseItemComponent,
-      QuestionnaireResponse.QuestionnaireResponseItemComponent
-    >()
-
-  init {
-    /** Adds each child-parent pair in the [QuestionnaireResponse] to the parent map. */
-    fun buildParentList(item: QuestionnaireResponse.QuestionnaireResponseItemComponent) {
-      for (child in item.item) {
-        questionnaireResponseItemParentMap[child] = item
-        buildParentList(child)
-      }
-    }
-
-    for (item in questionnaireResponse.item) {
-      buildParentList(item)
     }
   }
 
@@ -412,7 +361,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       )
       .forEach { (questionnaireItem, calculatedAnswers) ->
         // update all response item with updated values
-        questionnaireResponseItemPreOrderList
+        questionnaireResponse.descendant
           // Item answer should not be modified and touched by user;
           // https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-calculatedExpression.html
           .filter {
@@ -610,11 +559,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   ): List<QuestionnaireItemViewItem> {
     // Disabled/hidden questions should not get QuestionnaireItemViewItem instances
     val enabled =
-      EnablementEvaluator.evaluate(
-        questionnaireItem,
-        questionnaireResponseItem,
-        questionnaireResponse
-      ) { item, linkId -> findEnableWhenQuestionnaireResponseItem(item, linkId) }
+      EnablementEvaluator(questionnaire, questionnaireResponse)
+        .evaluate(questionnaireItem, questionnaireResponseItem)
     if (!enabled || questionnaireItem.isHidden) {
       return emptyList()
     }
@@ -676,19 +622,17 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
   ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+    val enablementEvaluator = EnablementEvaluator(questionnaire, questionnaireResponse)
     val responseItemKeys = questionnaireResponseItemList.map { it.linkId }
     return questionnaireItemList
       .asSequence()
       .filter { responseItemKeys.contains(it.linkId) }
       .zip(questionnaireResponseItemList.asSequence())
       .filter { (questionnaireItem, questionnaireResponseItem) ->
-        EnablementEvaluator.evaluate(
+        enablementEvaluator.evaluate(
           questionnaireItem,
           questionnaireResponseItem,
-          questionnaireResponse
-        ) { item, linkId ->
-          findEnableWhenQuestionnaireResponseItem(item, linkId) ?: return@evaluate null
-        }
+        )
       }
       .flatMap { (questionnaireItem, questionnaireResponseItem) ->
         val isRepeatedGroup =
@@ -761,67 +705,22 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
 
   /** Gets a list of [QuestionnairePage]s for a paginated questionnaire. */
-  private fun getQuestionnairePages() =
+  private fun getQuestionnairePages(): List<QuestionnairePage>? {
+    val enablementEvaluator = EnablementEvaluator(questionnaire, questionnaireResponse)
     if (questionnaire.isPaginated) {
-      questionnaire.item.zip(questionnaireResponse.item).mapIndexed {
+      return questionnaire.item.zip(questionnaireResponse.item).mapIndexed {
         index,
         (questionnaireItem, questionnaireResponseItem) ->
         QuestionnairePage(
           index,
-          EnablementEvaluator.evaluate(
+          enablementEvaluator.evaluate(
             questionnaireItem,
             questionnaireResponseItem,
-            questionnaireResponse
-          ) { item, linkId -> findEnableWhenQuestionnaireResponseItem(item, linkId) },
+          ),
           questionnaireItem.isHidden
         )
       }
-    } else {
-      null
     }
-
-  /**
-   * Find a questionnaire response item in [QuestionnaireResponse] with the given `linkId` starting
-   * from the `origin`.
-   *
-   * This is used by the enableWhen logic to evaluate if a question should be enabled/displayed.
-   *
-   * If multiple questionnaire response items are present for the same question (same linkId),
-   * either as a result of repeated group or nested question under repeated answers, this returns
-   * the nearest question occurrence reachable by tracing first the "ancestor" axis and then the
-   * "preceding" axis and then the "following" axis.
-   *
-   * See
-   * https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableWhen.question.
-   */
-  private fun findEnableWhenQuestionnaireResponseItem(
-    origin: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-    linkId: String,
-  ): QuestionnaireResponse.QuestionnaireResponseItemComponent? {
-    // Find the nearest ancestor with the linkId
-    var parent = questionnaireResponseItemParentMap[origin]
-    while (parent != null) {
-      if (parent.linkId == linkId) {
-        return parent
-      }
-      parent = questionnaireResponseItemParentMap[parent]
-    }
-
-    // Find the nearest item preceding the origin
-    val itemIndex = questionnaireResponseItemPreOrderList.indexOf(origin)
-    for (index in itemIndex - 1 downTo 0) {
-      if (questionnaireResponseItemPreOrderList[index].linkId == linkId) {
-        return questionnaireResponseItemPreOrderList[index]
-      }
-    }
-
-    // Find the nearest item succeeding the origin
-    for (index in itemIndex + 1 until questionnaireResponseItemPreOrderList.size) {
-      if (questionnaireResponseItemPreOrderList[index].linkId == linkId) {
-        return questionnaireResponseItemPreOrderList[index]
-      }
-    }
-
     return null
   }
 }
@@ -864,3 +763,15 @@ internal val QuestionnairePagination.hasPreviousPage: Boolean
 
 internal val QuestionnairePagination.hasNextPage: Boolean
   get() = pages.any { it.index > currentPageIndex && it.enabled }
+
+private val QuestionnaireResponse.descendant:
+  List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+  get() = item.flatMap { it.descendant }
+
+private val QuestionnaireResponse.QuestionnaireResponseItemComponent.descendant:
+  List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+  get() {
+    return listOf(this) +
+      this.item.flatMap { it.descendant } +
+      this.answer.flatMap { it.item.flatMap { it.descendant } }
+  }
