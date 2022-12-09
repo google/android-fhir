@@ -677,14 +677,14 @@ private fun addAnswerToListField(base: Base, field: Field, answerValue: List<Bas
     } catch (e: NullPointerException) {
       answerValue.first().javaClass
     }
-  val answerVal =
-    try {
-      answerValue.first().primitiveValue()
-    } catch (e: NullPointerException) {
-      answerValue.first()
-    }
   base.javaClass.getMethod("add${field.name.capitalize(Locale.ROOT)}", answerClass).let { method ->
-    answerValue.forEach { method.invoke(base, answerVal) }
+    answerValue.forEach {
+      try {
+        method.invoke(base, it)
+      } catch (e: IllegalArgumentException) {
+        method.invoke(base, it.primitiveValue())
+      }
+    }
   }
 }
 
