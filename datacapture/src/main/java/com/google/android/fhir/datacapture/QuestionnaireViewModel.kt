@@ -542,7 +542,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     if (isReadOnly || isInReviewModeFlow.value) {
       return QuestionnaireState(
         items = questionnaireItemViewItems,
-        displayMode = DisplayMode.ReviewMode(showEditButton = !isReadOnly,showSubmitButton = shouldShowSubmitButton)
+        displayMode =
+          DisplayMode.ReviewMode(
+            showEditButton = !isReadOnly,
+            showSubmitButton = shouldShowSubmitButton
+          )
       )
     }
 
