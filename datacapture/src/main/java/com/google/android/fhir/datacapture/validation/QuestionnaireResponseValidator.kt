@@ -70,7 +70,7 @@ object QuestionnaireResponseValidator {
       questionnaire.item,
       questionnaireResponse.item,
       context,
-      EnablementEvaluator(questionnaire, questionnaireResponse),
+      EnablementEvaluator(questionnaireResponse),
       linkIdToValidationResultMap,
     )
 

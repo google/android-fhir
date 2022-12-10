@@ -58,10 +58,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * [Questionnaire.item.enableBehavior](https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableBehavior)
  * .
  */
-internal class EnablementEvaluator(
-  val questionnaire: Questionnaire,
-  val questionnaireResponse: QuestionnaireResponse
-) {
+internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireResponse) {
   /**
    * The pre-order traversal trace of the items in the [QuestionnaireResponse]. This essentially
    * represents the order in which all items are displayed in the UI.

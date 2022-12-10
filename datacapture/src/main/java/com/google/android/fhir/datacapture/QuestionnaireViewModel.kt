@@ -559,7 +559,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   ): List<QuestionnaireItemViewItem> {
     // Disabled/hidden questions should not get QuestionnaireItemViewItem instances
     val enabled =
-      EnablementEvaluator(questionnaire, questionnaireResponse)
+      EnablementEvaluator(questionnaireResponse)
         .evaluate(questionnaireItem, questionnaireResponseItem)
     if (!enabled || questionnaireItem.isHidden) {
       return emptyList()
@@ -622,7 +622,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
   ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
-    val enablementEvaluator = EnablementEvaluator(questionnaire, questionnaireResponse)
+    val enablementEvaluator = EnablementEvaluator(questionnaireResponse)
     val responseItemKeys = questionnaireResponseItemList.map { it.linkId }
     return questionnaireItemList
       .asSequence()
@@ -706,7 +706,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** Gets a list of [QuestionnairePage]s for a paginated questionnaire. */
   private fun getQuestionnairePages(): List<QuestionnairePage>? {
-    val enablementEvaluator = EnablementEvaluator(questionnaire, questionnaireResponse)
+    val enablementEvaluator = EnablementEvaluator(questionnaireResponse)
     if (questionnaire.isPaginated) {
       return questionnaire.item.zip(questionnaireResponse.item).mapIndexed {
         index,
