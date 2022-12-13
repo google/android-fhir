@@ -46,70 +46,61 @@ internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
  * option is [IntegerType], [StringType], [Coding], or [Reference] type.
  */
 internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
-  get() = displayStringQuestionnaireItemAnswerOptionComponent(value)
+  get() = displayString(null, value)
 
 internal fun QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.displayString(
   context: Context
-) = displayStringQuestionnaireResponseItemAnswerComponent(context, value)
-
-private fun displayStringQuestionnaireItemAnswerOptionComponent(value: Type?): String =
-  when (value) {
-    is IntegerType,
-    is DateType,
-    is TimeType -> value.primitiveValue()
-    is StringType -> value.getLocalizedText() ?: value.toString()
-    is Reference -> value.display ?: value.reference
-    is Coding -> {
-      val display = value.displayElement.getLocalizedText() ?: value.display
-      if (display.isNullOrEmpty()) {
-        value.code
-      } else {
-        display
-      }
-    }
-    else -> throw IllegalArgumentException("$value is not supported.")
-  }
+) = displayString(context, value)
 
 /**
  * Text value for response item answer option
- * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] depending on the type
+ * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] or
+ * [Questionnaire.QuestionnaireItemAnswerOptionComponent] depending on the type
  */
-private fun displayStringQuestionnaireResponseItemAnswerComponent(
-  context: Context,
-  value: Type?
-): String =
+private fun displayString(context: Context?, value: Type?): String =
   when (value) {
-    is Attachment -> value.url ?: context.getString(R.string.not_answered)
+    is Attachment -> value.url
+        ?: (context?.getString(R.string.not_answered) ?: value.primitiveValue())
     is BooleanType -> {
       when (value.value) {
-        true -> context.getString(R.string.yes)
-        false -> context.getString(R.string.no)
-        null -> context.getString(R.string.not_answered)
+        true -> context?.getString(R.string.yes) ?: value.booleanValue().toString()
+        false -> context?.getString(R.string.no) ?: value.booleanValue().toString()
+        null -> context?.getString(R.string.not_answered) ?: value.booleanValue().toString()
       }
     }
     is Coding -> {
       val display = value.displayElement.getLocalizedText() ?: value.display
       if (display.isNullOrEmpty()) {
-        value.code ?: context.getString(R.string.not_answered)
+        value.code ?: context?.getString(R.string.not_answered) ?: value.primitiveValue()
       } else display
     }
-    is DateType -> value.localDate?.localizedString ?: context.getString(R.string.not_answered)
+    is DateType -> value.localDate?.localizedString
+        ?: context?.getString(R.string.not_answered) ?: value.primitiveValue()
     is DateTimeType ->
-      "${value.localDate.localizedString} ${context.let { value.localTime.toLocalizedString(it) }}"
-    is DecimalType -> value.valueAsString ?: context.getString(R.string.not_answered)
-    is IntegerType -> value.valueAsString ?: context.getString(R.string.not_answered)
+      if (context != null) {
+        "${value.localDate.localizedString} ${context.let { value.localTime.toLocalizedString(it) }}"
+      } else {
+        value.primitiveValue()
+      }
+    is DecimalType -> value.valueAsString
+        ?: context?.getString(R.string.not_answered) ?: value.primitiveValue()
+    is IntegerType -> value.valueAsString
+        ?: context?.getString(R.string.not_answered) ?: value.primitiveValue()
     is Quantity -> value.value.toString()
     is Reference -> {
       val display = value.display
       if (display.isNullOrEmpty()) {
-        value.reference ?: context.getString(R.string.not_answered)
+        value.reference ?: context?.getString(R.string.not_answered) ?: value.primitiveValue()
       } else display
     }
     is StringType -> value.getLocalizedText()
-        ?: value.valueAsString ?: context.getString(R.string.not_answered)
-    is TimeType -> value.valueAsString ?: context.getString(R.string.not_answered)
-    is UriType -> value.valueAsString ?: context.getString(R.string.not_answered)
-    else -> context.getString(R.string.not_answered)
+        ?: value.valueAsString ?: context?.getString(R.string.not_answered) ?: value.toString()
+    is TimeType -> value.valueAsString
+        ?: context?.getString(R.string.not_answered) ?: value.primitiveValue()
+    is UriType -> value.valueAsString
+        ?: context?.getString(R.string.not_answered) ?: value.primitiveValue()
+    else -> context?.getString(R.string.not_answered)
+        ?: throw IllegalArgumentException("$value is not supported.")
   }
 
 /** Indicates that if this answerOption is selected, no other possible answers may be selected. */

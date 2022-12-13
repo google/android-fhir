@@ -177,7 +177,7 @@ class MoreAnswerOptionsTest {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(DateType("2022-06-23"))
 
-    assertThat(answerOption.displayString).isEqualTo("2022-06-23")
+    assertThat(answerOption.displayString).isEqualTo("6/23/22")
   }
 
   @Test
