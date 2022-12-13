@@ -16,21 +16,41 @@
 
 package com.google.android.fhir.index
 
-enum class SearchParamType {
+enum class SearchParamType(
+  val code: String?,
+  val system: String?,
+  val definition: String?,
+  val display: String?
+) {
   /** Search parameter SHALL be a number (a whole number, or a decimal). */
-  NUMBER,
+  NUMBER(
+    "number",
+    "http://hl7.org/fhir/search-param-type",
+    "Search parameter SHALL be a number (a whole number, or a decimal).",
+    "Number"
+  ),
 
   /**
    * Search parameter is on a date/time. The date format is the standard XML format, though other
    * formats may be supported.
    */
-  DATE,
+  DATE(
+    "date",
+    "http://hl7.org/fhir/search-param-type",
+    "Search parameter is on a date/time. The date format is the standard XML format, though other formats may be supported.",
+    "Date/DateTime"
+  ),
 
   /**
    * Search parameter is a simple string, like a name part. Search is case-insensitive and
    * accent-insensitive. May match just the start of a string. String parameters may contain spaces.
    */
-  STRING,
+  STRING(
+    "string",
+    "http://hl7.org/fhir/search-param-type",
+    "Search parameter is a simple string, like a name part. Search is case-insensitive and accent-insensitive. May match just the start of a string. String parameters may contain spaces.",
+    "String"
+  ),
 
   /**
    * Search parameter on a coded element or identifier. May be used to search through the text,
@@ -38,104 +58,59 @@ enum class SearchParamType {
    * value is either a string or a pair of namespace and value, separated by a "|", depending on the
    * modifier used.
    */
-  TOKEN,
+  TOKEN(
+    "token",
+    "http://hl7.org/fhir/search-param-type",
+    "Search parameter on a coded element or identifier. May be used to search through the text, display, code and code/codesystem (for codes) and label, system and key (for identifier). Its value is either a string or a pair of namespace and value, separated by a \"|\", depending on the modifier used.",
+    "Token"
+  ),
 
   /** A reference to another resource (Reference or canonical). */
-  REFERENCE,
+  REFERENCE(
+    "reference",
+    "http://hl7.org/fhir/search-param-type",
+    "A reference to another resource (Reference or canonical).",
+    "Reference"
+  ),
 
   /** A composite search parameter that combines a search on two values together. */
-  COMPOSITE,
+  COMPOSITE(
+    "composite",
+    "http://hl7.org/fhir/search-param-type",
+    "A composite search parameter that combines a search on two values together.",
+    "Composite"
+  ),
 
   /** A search parameter that searches on a quantity. */
-  QUANTITY,
+  QUANTITY(
+    "quantity",
+    "http://hl7.org/fhir/search-param-type",
+    "A search parameter that searches on a quantity.",
+    "Quantity"
+  ),
 
   /** A search parameter that searches on a URI (RFC 3986). */
-  URI,
+  URI(
+    "uri",
+    "http://hl7.org/fhir/search-param-type",
+    "A search parameter that searches on a URI (RFC 3986).",
+    "URI"
+  ),
 
   /** Special logic applies to this parameter per the description of the search parameter. */
-  SPECIAL,
+  SPECIAL(
+    "special",
+    "http://hl7.org/fhir/search-param-type",
+    "Special logic applies to this parameter per the description of the search parameter.",
+    "Special"
+  ),
 
   /** added to help the parsers */
-  NULL;
-
-  fun toCode(): String? {
-    return when (this) {
-      NUMBER -> "number"
-      DATE -> "date"
-      STRING -> "string"
-      TOKEN -> "token"
-      REFERENCE -> "reference"
-      COMPOSITE -> "composite"
-      QUANTITY -> "quantity"
-      URI -> "uri"
-      SPECIAL -> "special"
-      NULL -> null
-    }
-  }
-
-  val system: String?
-    get() =
-      when (this) {
-        NUMBER -> "http://hl7.org/fhir/search-param-type"
-        DATE -> "http://hl7.org/fhir/search-param-type"
-        STRING -> "http://hl7.org/fhir/search-param-type"
-        TOKEN -> "http://hl7.org/fhir/search-param-type"
-        REFERENCE -> "http://hl7.org/fhir/search-param-type"
-        COMPOSITE -> "http://hl7.org/fhir/search-param-type"
-        QUANTITY -> "http://hl7.org/fhir/search-param-type"
-        URI -> "http://hl7.org/fhir/search-param-type"
-        SPECIAL -> "http://hl7.org/fhir/search-param-type"
-        NULL -> null
-      }
-  val definition: String?
-    get() {
-      return when (this) {
-        NUMBER -> "Search parameter SHALL be a number (a whole number, or a decimal)."
-        DATE ->
-          "Search parameter is on a date/time. The date format is the standard XML format, though other formats may be supported."
-        STRING ->
-          "Search parameter is a simple string, like a name part. Search is case-insensitive and accent-insensitive. May match just the start of a string. String parameters may contain spaces."
-        TOKEN ->
-          "Search parameter on a coded element or identifier. May be used to search through the text, display, code and code/codesystem (for codes) and label, system and key (for identifier). Its value is either a string or a pair of namespace and value, separated by a \"|\", depending on the modifier used."
-        REFERENCE -> "A reference to another resource (Reference or canonical)."
-        COMPOSITE -> "A composite search parameter that combines a search on two values together."
-        QUANTITY -> "A search parameter that searches on a quantity."
-        URI -> "A search parameter that searches on a URI (RFC 3986)."
-        SPECIAL ->
-          "Special logic applies to this parameter per the description of the search parameter."
-        NULL -> null
-      }
-    }
-  val display: String?
-    get() {
-      return when (this) {
-        NUMBER -> "Number"
-        DATE -> "Date/DateTime"
-        STRING -> "String"
-        TOKEN -> "Token"
-        REFERENCE -> "Reference"
-        COMPOSITE -> "Composite"
-        QUANTITY -> "Quantity"
-        URI -> "URI"
-        SPECIAL -> "Special"
-        NULL -> null
-      }
-    }
+  NULL(null, null, null, null);
 
   companion object {
-    @Throws(Exception::class)
-    fun fromCode(codeString: String?): SearchParamType? {
-      if (codeString.isNullOrBlank()) return null
-      if ("number" == codeString) return NUMBER
-      if ("date" == codeString) return DATE
-      if ("string" == codeString) return STRING
-      if ("token" == codeString) return TOKEN
-      if ("reference" == codeString) return REFERENCE
-      if ("composite" == codeString) return COMPOSITE
-      if ("quantity" == codeString) return QUANTITY
-      if ("uri" == codeString) return URI
-      if ("special" == codeString) return SPECIAL
-      throw Exception("Unknown SearchParamType code '$codeString'")
-    }
+    private val codeMapping = SearchParamType.values().associateBy { it.code }
+    fun fromCode(codeString: String?) =
+      codeMapping[codeString] ?: throw Exception("Unknown SearchParamType code '$codeString'")
   }
 }
