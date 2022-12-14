@@ -25,7 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.requiredFlyoverTextWhenQuestionTextIsMissing
 import com.google.android.fhir.datacapture.utilities.isAndroidIcuSupported
 import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -101,11 +101,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = localeDatePattern
-        if (questionnaireItemViewItem.questionnaireItem.required &&
-            questionnaireItemViewItem.questionnaireItem.localizedTextSpanned.isNullOrBlank()
-        ) {
-          textInputLayout.showAsteriskInFlyoverText(localeDatePattern)
-        }
+        questionnaireItemViewItem.questionnaireItem.requiredFlyoverTextWhenQuestionTextIsMissing
+          ?.let { textInputLayout.showAsteriskInFlyoverText(localeDatePattern) }
         textInputEditText.removeTextChangedListener(textWatcher)
 
         if (isTextUpdateRequired(

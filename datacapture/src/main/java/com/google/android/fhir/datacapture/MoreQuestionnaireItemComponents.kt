@@ -266,7 +266,7 @@ internal val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpann
  * A nested questionnaire item of type display with code [DisplayItemControlType.FLYOVER] (if
  * present) is used as the fly-over text of the parent question.
  */
-val Questionnaire.QuestionnaireItemComponent.localizedFlyoverSpanned: Spanned?
+internal val Questionnaire.QuestionnaireItemComponent.localizedFlyoverSpanned: Spanned?
   get() =
     item
       .firstOrNull { questionnaireItem ->

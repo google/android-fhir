@@ -25,7 +25,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.requiredFlyoverTextWhenQuestionTextIsMissing
 import com.google.android.fhir.datacapture.utilities.localizedDateString
 import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.utilities.toLocalizedString
@@ -132,14 +132,13 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         clearPreviousState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
         dateInputLayout.hint = localeDatePattern
-        if (questionnaireItemViewItem.questionnaireItem.required &&
-            questionnaireItemViewItem.questionnaireItem.localizedTextSpanned.isNullOrBlank()
-        ) {
-          dateInputLayout.showAsteriskInFlyoverText(localeDatePattern)
-          timeInputLayout.showAsteriskInFlyoverText(
-            timeInputLayout.context.resources.getString(R.string.time)
-          )
-        }
+        questionnaireItemViewItem.questionnaireItem.requiredFlyoverTextWhenQuestionTextIsMissing
+          ?.let {
+            dateInputLayout.showAsteriskInFlyoverText(localeDatePattern)
+            timeInputLayout.showAsteriskInFlyoverText(
+              timeInputLayout.context.resources.getString(R.string.time)
+            )
+          }
         dateInputEditText.removeTextChangedListener(textWatcher)
         val dateTime = questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType
         updateDateTimeInput(
