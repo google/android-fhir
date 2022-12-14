@@ -229,6 +229,21 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryTest {
   }
 
   @Test
+  fun `hides error textview in the header`() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
+      .isEqualTo(View.GONE)
+  }
+
+  @Test
   fun bind_readOnly_shouldDisableView() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
