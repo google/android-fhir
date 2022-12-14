@@ -47,12 +47,14 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireItemEditAdapter = QuestionnaireItemEditAdapter()
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent()
-            .setType(Questionnaire.QuestionnaireItemType.GROUP),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent()
+              .setType(Questionnaire.QuestionnaireItemType.GROUP),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -66,12 +68,14 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireItemEditAdapter = QuestionnaireItemEditAdapter()
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent()
-            .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent()
+              .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -85,12 +89,14 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireItemEditAdapter = QuestionnaireItemEditAdapter()
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent()
-            .setType(Questionnaire.QuestionnaireItemType.DATE),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent()
+              .setType(Questionnaire.QuestionnaireItemType.DATE),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -110,11 +116,13 @@ class QuestionnaireItemEditAdapterTest {
       }
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          questionnaireItemComponent,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            questionnaireItemComponent,
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -128,12 +136,14 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireItemEditAdapter = QuestionnaireItemEditAdapter()
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent()
-            .setType(Questionnaire.QuestionnaireItemType.DATETIME),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent()
+              .setType(Questionnaire.QuestionnaireItemType.DATETIME),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -147,12 +157,14 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireItemEditAdapter = QuestionnaireItemEditAdapter()
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent()
-            .setType(Questionnaire.QuestionnaireItemType.STRING),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent()
+              .setType(Questionnaire.QuestionnaireItemType.STRING),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -180,11 +192,13 @@ class QuestionnaireItemEditAdapterTest {
     )
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          questionnaireItem,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -204,11 +218,13 @@ class QuestionnaireItemEditAdapterTest {
       }
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          questionnaireItemComponent,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            questionnaireItemComponent,
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -222,12 +238,14 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireItemEditAdapter = QuestionnaireItemEditAdapter()
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent()
-            .setType(Questionnaire.QuestionnaireItemType.TEXT),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent()
+              .setType(Questionnaire.QuestionnaireItemType.TEXT),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -241,12 +259,14 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireItemEditAdapter = QuestionnaireItemEditAdapter()
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent()
-            .setType(Questionnaire.QuestionnaireItemType.INTEGER),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent()
+              .setType(Questionnaire.QuestionnaireItemType.INTEGER),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -276,11 +296,13 @@ class QuestionnaireItemEditAdapterTest {
     )
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          questionnaireItem,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -300,11 +322,13 @@ class QuestionnaireItemEditAdapterTest {
       }
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          questionnaireItemComponent,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            questionnaireItemComponent,
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -318,12 +342,14 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireItemEditAdapter = QuestionnaireItemEditAdapter()
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent()
-            .setType(Questionnaire.QuestionnaireItemType.DECIMAL),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent()
+              .setType(Questionnaire.QuestionnaireItemType.DECIMAL),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -337,12 +363,14 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireItemEditAdapter = QuestionnaireItemEditAdapter()
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent()
-            .setType(Questionnaire.QuestionnaireItemType.CHOICE),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent()
+              .setType(Questionnaire.QuestionnaireItemType.CHOICE),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -361,13 +389,15 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireItemEditAdapter = QuestionnaireItemEditAdapter()
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent()
-            .setType(Questionnaire.QuestionnaireItemType.CHOICE)
-            .setAnswerOption(answerOptions),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent()
+              .setType(Questionnaire.QuestionnaireItemType.CHOICE)
+              .setAnswerOption(answerOptions),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -403,11 +433,13 @@ class QuestionnaireItemEditAdapterTest {
     )
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          questionnaireItem,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -436,11 +468,13 @@ class QuestionnaireItemEditAdapterTest {
     )
     questionnaireItemEditAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          questionnaireItem,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -459,18 +493,22 @@ class QuestionnaireItemEditAdapterTest {
 
     assertThat(
         DiffCallback.areItemsTheSame(
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            questionnaireResponseItem,
-            validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> },
+            )
           ),
-          QuestionnaireItemViewItem(
-            otherQuestionnaireItem,
-            questionnaireResponseItem,
-            validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
-          )
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+              otherQuestionnaireItem,
+              questionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> },
+            )
+          ),
         )
       )
       .isFalse()
@@ -483,18 +521,22 @@ class QuestionnaireItemEditAdapterTest {
 
     assertThat(
         DiffCallback.areItemsTheSame(
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            questionnaireResponseItem,
-            validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> },
+            )
           ),
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            otherQuestionnaireResponseItem,
-            validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
-          )
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              otherQuestionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> },
+            )
+          ),
         )
       )
       .isFalse()
@@ -506,18 +548,22 @@ class QuestionnaireItemEditAdapterTest {
 
     assertThat(
         DiffCallback.areItemsTheSame(
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            questionnaireResponseItem,
-            validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> },
+            )
           ),
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            questionnaireResponseItem,
-            validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
-          )
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> },
+            )
+          ),
         )
       )
       .isTrue()
@@ -531,18 +577,22 @@ class QuestionnaireItemEditAdapterTest {
 
     assertThat(
         DiffCallback.areContentsTheSame(
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            questionnaireResponseItem,
-            validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> },
+            )
           ),
-          QuestionnaireItemViewItem(
-            otherQuestionnaireItem,
-            questionnaireResponseItem,
-            validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
-          )
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+              otherQuestionnaireItem,
+              questionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> },
+            )
+          ),
         )
       )
       .isFalse()
@@ -555,18 +605,22 @@ class QuestionnaireItemEditAdapterTest {
 
     assertThat(
         DiffCallback.areContentsTheSame(
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            questionnaireResponseItem,
-            validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> },
+            )
           ),
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            otherQuestionnaireResponseItem,
-            validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
-          )
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              otherQuestionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> },
+            )
+          ),
         )
       )
       .isFalse()
@@ -578,25 +632,29 @@ class QuestionnaireItemEditAdapterTest {
 
     assertThat(
         DiffCallback.areContentsTheSame(
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            questionnaireResponseItem,
-            validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
-          ),
-          QuestionnaireItemViewItem(
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
               questionnaireItem,
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _ -> },
             )
-            .apply {
-              addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = StringType("answer")
-                }
+          ),
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+                questionnaireItem,
+                questionnaireResponseItem,
+                validationResult = NotValidated,
+                answersChangedCallback = { _, _, _ -> },
               )
-            }
+              .apply {
+                addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = StringType("answer")
+                  }
+                )
+              }
+          ),
         )
       )
       .isFalse()
@@ -608,18 +666,22 @@ class QuestionnaireItemEditAdapterTest {
 
     assertThat(
         DiffCallback.areContentsTheSame(
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            questionnaireResponseItem,
-            validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> },
+            )
           ),
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            questionnaireResponseItem,
-            validationResult = Invalid(listOf()),
-            answersChangedCallback = { _, _, _ -> },
-          )
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              validationResult = Invalid(listOf()),
+              answersChangedCallback = { _, _, _ -> },
+            )
+          ),
         )
       )
       .isFalse()
@@ -631,18 +693,22 @@ class QuestionnaireItemEditAdapterTest {
 
     assertThat(
         DiffCallback.areContentsTheSame(
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            questionnaireResponseItem,
-            validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> },
+            )
           ),
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            questionnaireResponseItem,
-            validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
-          )
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> },
+            )
+          ),
         )
       )
       .isTrue()
@@ -654,18 +720,22 @@ class QuestionnaireItemEditAdapterTest {
 
     assertThat(
         DiffCallback.areContentsTheSame(
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            questionnaireResponseItem,
-            validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> },
+            )
           ),
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            questionnaireResponseItem,
-            validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
-          )
+          QuestionnaireAdapterItem.Question(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _ -> },
+            )
+          ),
         )
       )
       .isTrue()
@@ -713,7 +783,7 @@ class QuestionnaireItemEditAdapterTest {
     assertThat(expectedItemViewType)
       .isEqualTo(
         QuestionnaireItemEditAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
-          .getItemViewTypeMapping(questionnaireItemViewItem)
+          .getItemViewTypeForQuestion(questionnaireItemViewItem)
       )
   }
 

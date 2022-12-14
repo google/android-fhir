@@ -20,16 +20,20 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.google.android.fhir.datacapture.views.QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 
 /** List Adapter used to bind answers to [QuestionnaireItemViewHolder] in review mode. */
 internal class QuestionnaireItemReviewAdapter :
-  ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
+  ListAdapter<QuestionnaireAdapterItem, QuestionnaireItemViewHolder>(DiffCallback) {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
     return QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory.create(parent)
   }
 
   override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
-    holder.bind(getItem(position))
+    val item = getItem(position)
+    item as? QuestionnaireAdapterItem.Question
+      ?: error(
+        "QuestionnaireItemReviewAdapter only supports QuestionnaireAdapterItem.Questions, but was passed a ${item::class.java.name}"
+      )
+    holder.bind(item.item)
   }
 }
