@@ -83,6 +83,7 @@ internal class FhirSynchronizer(
       .flatMap { it.exceptions }
       .let {
         if (it.isEmpty()) {
+          setSyncState(SyncJobStatus.Finished())
           setSyncState(SyncResult.Success())
         } else {
           setSyncState(SyncResult.Error(it))
@@ -100,7 +101,6 @@ internal class FhirSynchronizer(
               setSyncState(SyncJobStatus.InProgress(it.type))
             }
             is DownloadState.Success -> {
-              setSyncState(SyncJobStatus.Finished())
               emit(it.resources)
             }
             is DownloadState.Failure -> {
