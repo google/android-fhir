@@ -276,6 +276,18 @@ val Questionnaire.QuestionnaireItemComponent.localizedFlyoverSpanned: Spanned?
       ?.localizedTextSpanned
 
 /**
+ * Flyover text when [Questionnaire.QuestionnaireItemComponent.required] is true and question text
+ * [localizedTextSpanned] is not null and blank, else value is null.
+ */
+val Questionnaire.QuestionnaireItemComponent.requiredFlyoverTextWhenQuestionTextIsMissing: String?
+  get() =
+    if (required && localizedTextSpanned.isNullOrBlank()) {
+      localizedFlyoverSpanned.toString()
+    } else {
+      null
+    }
+
+/**
  * A nested questionnaire item of type display with displayCategory extension with [INSTRUCTIONS]
  * code is used as the instructions of the parent question.
  */

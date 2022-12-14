@@ -23,6 +23,7 @@ import android.widget.ArrayAdapter
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.requiredFlyoverTextWhenQuestionTextIsMissing
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -52,7 +53,9 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         cleanupOldState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
-        textInputLayout.showAsteriskInFlyoverText(questionnaireItemViewItem.questionnaireItem)
+        questionnaireItemViewItem.questionnaireItem.requiredFlyoverTextWhenQuestionTextIsMissing
+          ?.let { textInputLayout.showAsteriskInFlyoverText(it) }
+
         val answerOptionString =
           this.questionnaireItemViewItem.answerOption.map { it.displayString }.toMutableList()
         answerOptionString.add(0, context.getString(R.string.hyphen))

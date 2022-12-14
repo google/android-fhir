@@ -30,6 +30,7 @@ import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.itemControl
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.requiredFlyoverTextWhenQuestionTextIsMissing
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -60,7 +61,8 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
         cleanupOldState()
         holder.summaryHolder.hint =
           questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
-        holder.summaryHolder.showAsteriskInFlyoverText(questionnaireItemViewItem.questionnaireItem)
+        questionnaireItemViewItem.questionnaireItem.requiredFlyoverTextWhenQuestionTextIsMissing
+          ?.let { holder.summaryHolder.showAsteriskInFlyoverText(it) }
         val activity =
           requireNotNull(holder.header.context.tryUnwrapContext()) {
             "Can only use dialog select in an AppCompatActivity context"

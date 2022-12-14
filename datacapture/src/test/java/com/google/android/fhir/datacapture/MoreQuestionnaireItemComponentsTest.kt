@@ -915,6 +915,92 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun `returns flyover text if item component is required and question text is missing`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "parent-question"
+        required = true
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              text = "flyover text"
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+              addExtension(
+                EXTENSION_ITEM_CONTROL_URL,
+                CodeableConcept().apply {
+                  addCoding().apply {
+                    system = EXTENSION_ITEM_CONTROL_SYSTEM
+                    code = "flyover"
+                  }
+                }
+              )
+            }
+          )
+      }
+
+    assertThat(questionnaireItem.requiredFlyoverTextWhenQuestionTextIsMissing.toString())
+      .isEqualTo("flyover text")
+  }
+
+  @Test
+  fun `returns null if item component is not required`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "parent-question"
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              text = "flyover text"
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+              addExtension(
+                EXTENSION_ITEM_CONTROL_URL,
+                CodeableConcept().apply {
+                  addCoding().apply {
+                    system = EXTENSION_ITEM_CONTROL_SYSTEM
+                    code = "flyover"
+                  }
+                }
+              )
+            }
+          )
+      }
+
+    assertThat(questionnaireItem.requiredFlyoverTextWhenQuestionTextIsMissing).isNull()
+  }
+
+  @Test
+  fun `returns null if item component is required and question text is present`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "parent-question"
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              text = "flyover text"
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+              addExtension(
+                EXTENSION_ITEM_CONTROL_URL,
+                CodeableConcept().apply {
+                  addCoding().apply {
+                    system = EXTENSION_ITEM_CONTROL_SYSTEM
+                    code = "flyover"
+                  }
+                }
+              )
+            }
+          )
+      }
+
+    assertThat(questionnaireItem.requiredFlyoverTextWhenQuestionTextIsMissing).isNull()
+  }
+
+  @Test
   fun `localizedHelpSpanned should return null if no help code`() {
     val questionItemList =
       listOf(

@@ -17,27 +17,12 @@
 package com.google.android.fhir.datacapture.views
 
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedFlyoverSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.material.textfield.TextInputLayout
-import org.hl7.fhir.r4.model.Questionnaire
 
 /**
- * Appends asterisk to the flyover text if question text
- * [Questionnaire.QuestionnaireItemComponent.localizedTextSpanned] is null or blank and
- * questionnaire item is must be answered.
+ * Appends asterisk to the flyover text and then value is updated as hint [TextInputLayout.hint].
  */
-inline fun TextInputLayout.showAsteriskInFlyoverText(
-  questionnaireItem: Questionnaire.QuestionnaireItemComponent
-) {
-  if (!questionnaireItem.required || !questionnaireItem.localizedTextSpanned.isNullOrBlank()) {
-    return
-  }
-  showAsteriskInFlyoverText(questionnaireItem.localizedFlyoverSpanned.toString())
-}
-
-/** Appends asterisk to the argument [flyoverText]. */
-inline fun TextInputLayout.showAsteriskInFlyoverText(flyoverText: String) {
+internal fun TextInputLayout.showAsteriskInFlyoverText(flyoverText: String) {
   val asterisk = context.applicationContext.getString(R.string.space_asterisk)
   hint = flyoverText.plus(asterisk)
   helperText = context.applicationContext.getString(R.string.required)
