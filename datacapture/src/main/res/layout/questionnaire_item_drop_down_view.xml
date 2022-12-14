@@ -34,12 +34,11 @@
         android:layout_height="wrap_content"
     >
 
-        <AutoCompleteTextView
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
             style="?attr/questionnaireDropDownSelectedTextStyle"
             android:id="@+id/auto_complete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="none"
         />
 
     </com.google.android.material.textfield.TextInputLayout>

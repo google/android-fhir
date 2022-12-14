@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture
 
 import android.app.Application
-import android.net.Uri
 import android.os.Build
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -28,9 +27,8 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_READ_ONLY
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
@@ -40,7 +38,6 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
-import java.io.File
 import java.util.Calendar
 import java.util.Date
 import java.util.UUID
@@ -71,18 +68,13 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.ParameterizedRobolectricTestRunner
-import org.robolectric.ParameterizedRobolectricTestRunner.Parameters
-import org.robolectric.Shadows.shadowOf
+import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.util.ReflectionHelpers
 
-@RunWith(ParameterizedRobolectricTestRunner::class)
+@RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
-class QuestionnaireViewModelTest(
-  private val questionnaireSource: QuestionnaireSource,
-  private val questionnaireResponseSource: QuestionnaireResponseSource,
-) {
+class QuestionnaireViewModelTest {
   @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
 
   private lateinit var fhirEngine: FhirEngine
@@ -1391,10 +1383,7 @@ class QuestionnaireViewModelTest(
             linkId = "a-boolean-item-1"
             text = "a question"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addExtension().apply {
-              url = EXTENSION_HIDDEN_URL
-              setValue(BooleanType(true))
-            }
+            addExtension(hiddenExtension)
           }
         )
       }
@@ -1792,11 +1781,15 @@ class QuestionnaireViewModelTest(
         }
       val viewModel = createQuestionnaireViewModel(questionnaire)
       val state = viewModel.questionnaireStateFlow.first()
-      assertThat(state.pagination)
+      assertThat((state.displayMode as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
-            pages = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true)),
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = false)
+              ),
             currentPageIndex = 0
           )
         )
@@ -1849,11 +1842,15 @@ class QuestionnaireViewModelTest(
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
-            pages = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true)),
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = false)
+              ),
             currentPageIndex = 1
           )
         )
@@ -1898,11 +1895,15 @@ class QuestionnaireViewModelTest(
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       viewModel.goToPreviousPage()
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
-            pages = listOf(QuestionnairePage(0, true), QuestionnairePage(1, true)),
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = false)
+              ),
             currentPageIndex = 0
           )
         )
@@ -1965,15 +1966,150 @@ class QuestionnaireViewModelTest(
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
             pages =
               listOf(
-                QuestionnairePage(0, true),
-                QuestionnairePage(1, false),
-                QuestionnairePage(2, true)
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = false, hidden = false),
+                QuestionnairePage(2, enabled = true, hidden = false),
+              ),
+            currentPageIndex = 2
+          )
+        )
+    }
+  }
+
+  @Test
+  fun `should skip first page if it is hidden in a paginated questionnaire`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addExtension(hiddenExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 1"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 2"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page3"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page3-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 3"
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = true),
+                QuestionnairePage(1, enabled = true, hidden = false),
+                QuestionnairePage(2, enabled = true, hidden = false)
+              ),
+            currentPageIndex = 2
+          )
+        )
+    }
+  }
+
+  @Test
+  fun `should skip hidden page in a paginated questionnaire`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 1"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addExtension(hiddenExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 2"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page3"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page3-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 3"
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = true),
+                QuestionnairePage(2, enabled = true, hidden = false)
               ),
             currentPageIndex = 2
           )
@@ -2025,7 +2161,7 @@ class QuestionnaireViewModelTest(
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2082,7 +2218,7 @@ class QuestionnaireViewModelTest(
       viewModel.goToPreviousPage()
 
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2136,7 +2272,7 @@ class QuestionnaireViewModelTest(
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
 
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2370,7 +2506,7 @@ class QuestionnaireViewModelTest(
       viewModel.goToNextPage()
 
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2424,7 +2560,7 @@ class QuestionnaireViewModelTest(
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
 
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2480,7 +2616,7 @@ class QuestionnaireViewModelTest(
       viewModel.goToNextPage()
       viewModel.goToPreviousPage()
 
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2820,7 +2956,11 @@ class QuestionnaireViewModelTest(
         }
       val viewModel = createQuestionnaireViewModel(questionnaire)
       viewModel.setShowSubmitButtonFlag(false)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showSubmitButton).isFalse()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showSubmitButton
+        )
+        .isFalse()
     }
   }
 
@@ -2839,14 +2979,18 @@ class QuestionnaireViewModelTest(
         }
       val viewModel = createQuestionnaireViewModel(questionnaire)
       viewModel.setShowSubmitButtonFlag(true)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showSubmitButton).isTrue()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showSubmitButton
+        )
+        .isTrue()
     }
   }
 
   // Test cases for review mode
 
   @Test
-  fun `state has review feature and submit button to true should show submit button when moved to review page`() {
+  fun `state has review feature and submit button to true should move to review page`() {
     runBlocking {
       val questionnaire =
         Questionnaire().apply {
@@ -2861,7 +3005,8 @@ class QuestionnaireViewModelTest(
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
       viewModel.setShowSubmitButtonFlag(true)
       viewModel.setReviewMode(true)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showSubmitButton).isTrue()
+      assertThat(viewModel.questionnaireStateFlow.first().displayMode)
+        .isInstanceOf(DisplayMode.ReviewMode::class.java)
     }
   }
 
@@ -2879,7 +3024,11 @@ class QuestionnaireViewModelTest(
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isFalse()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isFalse()
     }
   }
 
@@ -2897,12 +3046,16 @@ class QuestionnaireViewModelTest(
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isTrue()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isTrue()
     }
   }
 
   @Test
-  fun `state has review feature and show review page first should not show review button`() {
+  fun `state has review feature and show review page first should be in review mode`() {
     runBlocking {
       val questionnaire =
         Questionnaire().apply {
@@ -2920,7 +3073,12 @@ class QuestionnaireViewModelTest(
           enableReviewPage = true,
           showReviewPageFirst = true
         )
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isFalse()
+
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.ReviewMode)
+            .showEditButton
+        )
+        .isTrue()
     }
   }
 
@@ -2943,7 +3101,11 @@ class QuestionnaireViewModelTest(
           enableReviewPage = false,
           showReviewPageFirst = true
         )
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isFalse()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isFalse()
     }
   }
 
@@ -2986,8 +3148,57 @@ class QuestionnaireViewModelTest(
       viewModel.runViewModelBlocking {
         viewModel.goToNextPage()
 
-        assertThat(viewModel.questionnaireStateFlow.value.pagination.showReviewButton).isFalse()
+        assertThat(
+            (viewModel.questionnaireStateFlow.value as DisplayMode.EditMode)
+              .pagination.showReviewButton
+          )
+          .isFalse()
       }
+    }
+
+  @Test
+  fun `paginated questionnaire with no review feature should not show review button when last page is hidden`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "page1"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              addExtension(paginationExtension)
+              addExtension(hiddenExtension)
+              addItem(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "page1-1"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  text = "Question on page 1"
+                }
+              )
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "page2"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              addExtension(paginationExtension)
+              addItem(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "page2-1"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  text = "Question on page 2"
+                }
+              )
+            }
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
+
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isFalse()
     }
 
   @Test
@@ -3029,8 +3240,57 @@ class QuestionnaireViewModelTest(
       viewModel.runViewModelBlocking {
         viewModel.goToNextPage()
 
-        assertThat(viewModel.questionnaireStateFlow.value.pagination.showReviewButton).isTrue()
+        assertThat(
+            (viewModel.questionnaireStateFlow.value as DisplayMode.EditMode)
+              .pagination.showReviewButton
+          )
+          .isTrue()
       }
+    }
+
+  @Test
+  fun `paginated questionnaire with review feature should show review button when last page is hidden`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "page1"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              addExtension(paginationExtension)
+              addExtension(hiddenExtension)
+              addItem(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "page1-1"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  text = "Question on page 1"
+                }
+              )
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "page2"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              addExtension(paginationExtension)
+              addItem(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "page2-1"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  text = "Question on page 2"
+                }
+              )
+            }
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
+
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isTrue()
     }
 
   @Test
@@ -3048,12 +3308,16 @@ class QuestionnaireViewModelTest(
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
       viewModel.setReviewMode(false)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isTrue()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isTrue()
     }
   }
 
   @Test
-  fun `toggle review mode to true should not show review button`() {
+  fun `toggle review mode to true should show edit button only`() {
     runBlocking {
       val questionnaire =
         Questionnaire().apply {
@@ -3067,9 +3331,41 @@ class QuestionnaireViewModelTest(
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
       viewModel.setReviewMode(true)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isFalse()
+
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.ReviewMode)
+            .showEditButton
+        )
+        .isTrue()
     }
   }
+
+  // Read-only mode
+
+  @Test
+  fun `read-only mode should not show edit button`() {
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-link-id"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            }
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire, readOnlyMode = true)
+
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.ReviewMode)
+            .showEditButton
+        )
+        .isFalse()
+    }
+  }
+
+  // Other test cases
 
   @Test
   fun `should calculate value on start for questionnaire item with calculated expression extension`() =
@@ -3385,39 +3681,19 @@ class QuestionnaireViewModelTest(
     questionnaireResponse: QuestionnaireResponse? = null,
     enableReviewPage: Boolean = false,
     showReviewPageFirst: Boolean = false,
+    readOnlyMode: Boolean = false,
   ): QuestionnaireViewModel {
-    if (questionnaireSource == QuestionnaireSource.STRING) {
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-    } else if (questionnaireSource == QuestionnaireSource.URI) {
-      val questionnaireFile = File(context.cacheDir, "test_questionnaire")
-      questionnaireFile.outputStream().bufferedWriter().use {
-        printer.encodeResourceToWriter(questionnaire, it)
-      }
-      val questionnaireUri = Uri.fromFile(questionnaireFile)
-      state.set(EXTRA_QUESTIONNAIRE_JSON_URI, questionnaireUri)
-      shadowOf(context.contentResolver)
-        .registerInputStream(questionnaireUri, questionnaireFile.inputStream())
-    }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
     questionnaireResponse?.let {
-      if (questionnaireResponseSource == QuestionnaireResponseSource.STRING) {
-        state.set(
-          EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
-          printer.encodeResourceToString(questionnaireResponse)
-        )
-      } else if (questionnaireResponseSource == QuestionnaireResponseSource.URI) {
-        val questionnaireResponseFile = File(context.cacheDir, "test_questionnaire_response")
-        questionnaireResponseFile.outputStream().bufferedWriter().use {
-          printer.encodeResourceToWriter(questionnaireResponse, it)
-        }
-        val questionnaireResponseUri = Uri.fromFile(questionnaireResponseFile)
-        state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI, questionnaireResponseUri)
-        shadowOf(context.contentResolver)
-          .registerInputStream(questionnaireResponseUri, questionnaireResponseFile.inputStream())
-      }
+      state.set(
+        EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
+        printer.encodeResourceToString(questionnaireResponse)
+      )
     }
     enableReviewPage.let { state.set(EXTRA_ENABLE_REVIEW_PAGE, it) }
     showReviewPageFirst.let { state.set(EXTRA_SHOW_REVIEW_PAGE_FIRST, it) }
+    readOnlyMode.let { state.set(EXTRA_READ_ONLY, it) }
     return QuestionnaireViewModel(context, state)
   }
 
@@ -3446,22 +3722,18 @@ class QuestionnaireViewModelTest(
         )
       }
 
+    private val hiddenExtension =
+      Extension().apply {
+        url = EXTENSION_HIDDEN_URL
+        setValue(BooleanType(true))
+      }
+
     val printer: IParser = FhirContext.forR4().newJsonParser()
 
     fun <T : IBaseResource> assertResourceEquals(actual: T, expected: T) {
       assertThat(printer.encodeResourceToString(actual))
         .isEqualTo(printer.encodeResourceToString(expected))
     }
-
-    @JvmStatic
-    @Parameters
-    fun parameters() =
-      listOf(
-        arrayOf(QuestionnaireSource.URI, QuestionnaireResponseSource.URI),
-        arrayOf(QuestionnaireSource.URI, QuestionnaireResponseSource.STRING),
-        arrayOf(QuestionnaireSource.STRING, QuestionnaireResponseSource.URI),
-        arrayOf(QuestionnaireSource.STRING, QuestionnaireResponseSource.STRING)
-      )
   }
 }
 
@@ -3483,16 +3755,4 @@ private inline fun QuestionnaireViewModel.runViewModelBlocking(
     }
   }
   throwable?.let { throw it }
-}
-
-/** The source of questionnaire. */
-enum class QuestionnaireSource {
-  STRING,
-  URI
-}
-
-/** The source of questionnaire-response. */
-enum class QuestionnaireResponseSource {
-  STRING,
-  URI
 }

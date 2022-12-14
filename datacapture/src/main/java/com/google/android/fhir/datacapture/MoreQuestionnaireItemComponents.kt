@@ -175,6 +175,17 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceO
     return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
   }
 
+internal const val EXTENSION_MIME_TYPE = "http://hl7.org/fhir/StructureDefinition/mimeType"
+
+/** Identifies the kinds of attachment allowed to be sent for an element. */
+internal val Questionnaire.QuestionnaireItemComponent.mimeTypes: List<String>
+  get() {
+    return extension
+      .filter { it.url == EXTENSION_MIME_TYPE }
+      .map { (it.value as CodeType).valueAsString }
+      .filter { !it.isNullOrEmpty() }
+  }
+
 /** UI controls relevant to rendering questionnaire items. */
 internal enum class DisplayItemControlType(val extensionCode: String) {
   FLYOVER("flyover"),
