@@ -167,7 +167,12 @@ class PatientListFragment : Fragment() {
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
-          else -> Timber.i("Sync: Unknown state.")
+          else -> {
+            Timber.i("Sync: Unknown state.")
+            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+            mainActivityViewModel.updateLastSyncTimestamp()
+            fadeOutTopBanner(it)
+          }
         }
       }
     }
