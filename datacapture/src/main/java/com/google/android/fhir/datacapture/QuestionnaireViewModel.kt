@@ -361,7 +361,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       )
       .forEach { (questionnaireItem, calculatedAnswers) ->
         // update all response item with updated values
-        questionnaireResponse.descendant
+        questionnaireResponse.allItems
           // Item answer should not be modified and touched by user;
           // https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-calculatedExpression.html
           .filter {
@@ -763,15 +763,3 @@ internal val QuestionnairePagination.hasPreviousPage: Boolean
 
 internal val QuestionnairePagination.hasNextPage: Boolean
   get() = pages.any { it.index > currentPageIndex && it.enabled }
-
-private val QuestionnaireResponse.descendant:
-  List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-  get() = item.flatMap { it.descendant }
-
-private val QuestionnaireResponse.QuestionnaireResponseItemComponent.descendant:
-  List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-  get() {
-    return listOf(this) +
-      this.item.flatMap { it.descendant } +
-      this.answer.flatMap { it.item.flatMap { it.descendant } }
-  }

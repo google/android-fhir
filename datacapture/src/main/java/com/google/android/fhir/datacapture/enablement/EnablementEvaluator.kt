@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.enablement
 
 import com.google.android.fhir.compareTo
+import com.google.android.fhir.datacapture.allItems
 import com.google.android.fhir.datacapture.enableWhenExpression
 import com.google.android.fhir.datacapture.utilities.fhirPathEngine
 import com.google.android.fhir.equals
@@ -63,31 +64,7 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
    * The pre-order traversal trace of the items in the [QuestionnaireResponse]. This essentially
    * represents the order in which all items are displayed in the UI.
    */
-  private val questionnaireResponseItemPreOrderList =
-    mutableListOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
-
-  init {
-    /**
-     * Adds all items in the [QuestionnaireResponse] to the pre-order list. Note that each
-     * questionnaire response item may either have child items (in the case of a group type
-     * question) or have answer items with nested questions.
-     */
-    fun buildPreOrderList(item: QuestionnaireResponse.QuestionnaireResponseItemComponent) {
-      questionnaireResponseItemPreOrderList.add(item)
-      for (child in item.item) {
-        buildPreOrderList(child)
-      }
-      for (answer in item.answer) {
-        for (answerItem in answer.item) {
-          buildPreOrderList(answerItem)
-        }
-      }
-    }
-
-    for (item in questionnaireResponse.item) {
-      buildPreOrderList(item)
-    }
-  }
+  private val questionnaireResponseItemPreOrderList = questionnaireResponse.allItems
 
   /** The map from each item in the [QuestionnaireResponse] to its parent. */
   private val questionnaireResponseItemParentMap =
@@ -113,10 +90,7 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
   /**
    * Returns whether [questionnaireItem] should be enabled.
    *
-   * @param questionnaireResponseItemRetriever function that returns the
-   * [QuestionnaireResponse.Item] with the `linkId`, or null if there isn't one.
-   *
-   * For example, the questionnaireItem might be
+   * @param questionnaireResponseItem the corresponding questionnaire response item.
    */
   fun evaluate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -158,25 +132,24 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
   }
 
   /**
-   * Returns whether the `enableWhen` constraint is satisfied.
-   *
-   * @param questionnaireResponseItemRetriever function that returns the
-   * [QuestionnaireResponse.Item] with the `linkId`, or null if there isn't one.
+   * Returns whether the `enableWhen` constraint is satisfied for the `questionnaireResponseItem`.
    */
   private fun evaluateEnableWhen(
     enableWhen: Questionnaire.QuestionnaireItemEnableWhenComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   ): Boolean {
-    val target =
+    val targetQuestionnaireResponseItem =
       findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, enableWhen.question)
     return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
-      (target == null || target.answer.isEmpty()) != enableWhen.answerBooleanType.booleanValue()
+      (targetQuestionnaireResponseItem == null ||
+        targetQuestionnaireResponseItem.answer.isEmpty()) !=
+        enableWhen.answerBooleanType.booleanValue()
     } else {
       // The `enableWhen` constraint evaluates to true if at least one answer has a value that
       // satisfies the `enableWhen` operator and answer, with the exception of the `Exists`
       // operator.
       // See https://www.hl7.org/fhir/valueset-questionnaire-enable-operator.html.
-      target?.answer?.any { enableWhen.predicate(it) } ?: false
+      targetQuestionnaireResponseItem?.answer?.any { enableWhen.predicate(it) } ?: false
     }
   }
 
