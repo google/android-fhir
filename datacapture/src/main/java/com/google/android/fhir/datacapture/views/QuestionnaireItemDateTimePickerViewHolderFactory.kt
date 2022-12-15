@@ -274,26 +274,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           .build()
       }
 
-      private fun createMaterialTimePicker(context: Context, inputMode: Int): MaterialTimePicker {
-        val selectedTime =
-          questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType?.localTime
-            ?: LocalTime.now()
-
-        return MaterialTimePicker.Builder()
-          .apply {
-            setTitleText(R.string.select_time)
-            setHour(selectedTime.hour)
-            setMinute(selectedTime.minute)
-            if (DateFormat.is24HourFormat(context)) {
-              setTimeFormat(TimeFormat.CLOCK_24H)
-            } else {
-              setTimeFormat(TimeFormat.CLOCK_12H)
-            }
-            setInputMode(inputMode)
-          }
-          .build()
-      }
-
       private fun clearPreviousState() {
         localDate = null
         localTime = null
