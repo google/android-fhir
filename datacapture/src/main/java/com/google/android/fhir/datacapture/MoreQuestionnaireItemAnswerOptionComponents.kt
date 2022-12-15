@@ -16,23 +16,11 @@
 
 package com.google.android.fhir.datacapture
 
-import com.google.android.fhir.datacapture.utilities.displayString
 import org.hl7.fhir.r4.model.BooleanType
-import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.Reference
-import org.hl7.fhir.r4.model.StringType
 
 internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive"
-
-/**
- * Text value for answer option [Questionnaire.QuestionnaireItemAnswerOptionComponent] if answer
- * option is [IntegerType], [StringType], [Coding], or [Reference] type.
- */
-internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
-  get() = displayString(null, value)
 
 /** Indicates that if this answerOption is selected, no other possible answers may be selected. */
 internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.optionExclusive: Boolean

@@ -16,13 +16,8 @@
 
 package com.google.android.fhir.datacapture
 
-import android.content.Context
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
-
-internal fun QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.displayString(
-  context: Context
-) = com.google.android.fhir.datacapture.utilities.displayString(context, value)
 
 internal fun List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
   .hasDifferentAnswerSet(answers: List<Type>) =
