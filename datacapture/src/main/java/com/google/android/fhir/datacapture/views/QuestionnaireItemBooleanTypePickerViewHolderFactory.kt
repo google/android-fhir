@@ -65,23 +65,26 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
             }
             ChoiceOrientationTypes.VERTICAL -> {
               setOrientation(Flow.VERTICAL)
-              flow.setWrapMode(Flow.WRAP_NONE)
+              setWrapMode(Flow.WRAP_NONE)
             }
           }
         }
 
-        yesRadioButton.setLayoutParamsByOrientation()
-        noRadioButton.setLayoutParamsByOrientation()
-
-        yesRadioButton.isChecked = false
-        noRadioButton.isChecked = false
+        yesRadioButton.setLayoutParamsByOrientation(choiceOrientation)
+        noRadioButton.setLayoutParamsByOrientation(choiceOrientation)
 
         when (questionnaireItemViewItem.answers.singleOrNull()?.valueBooleanType?.value) {
           true -> {
             yesRadioButton.isChecked = true
+            noRadioButton.isChecked = false
           }
           false -> {
             noRadioButton.isChecked = true
+            yesRadioButton.isChecked = false
+          }
+          null -> {
+            yesRadioButton.isChecked = false
+            noRadioButton.isChecked = false
           }
         }
 
@@ -133,10 +136,9 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
         }
       }
 
-      private fun RadioButton.setLayoutParamsByOrientation() {
-        val choiceOrientation =
-          questionnaireItemViewItem.questionnaireItem.choiceOrientation
-            ?: ChoiceOrientationTypes.VERTICAL
+      private fun RadioButton.setLayoutParamsByOrientation(
+        choiceOrientation: ChoiceOrientationTypes
+      ) {
         layoutParams =
           ViewGroup.LayoutParams(
             when (choiceOrientation) {
