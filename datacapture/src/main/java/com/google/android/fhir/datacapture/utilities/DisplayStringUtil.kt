@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture
+package com.google.android.fhir.datacapture.utilities
 
 import android.content.Context
-import com.google.android.fhir.datacapture.utilities.localizedString
-import com.google.android.fhir.datacapture.utilities.toLocalizedString
+import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.localDate
 import com.google.android.fhir.datacapture.views.localTime
 import com.google.android.fhir.getLocalizedText
@@ -38,26 +37,12 @@ import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
-internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
-  "http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive"
-
-/**
- * Text value for answer option [Questionnaire.QuestionnaireItemAnswerOptionComponent] if answer
- * option is [IntegerType], [StringType], [Coding], or [Reference] type.
- */
-internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
-  get() = displayString(null, value)
-
-internal fun QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.displayString(
-  context: Context
-) = displayString(context, value)
-
 /**
  * Text value for response item answer option
  * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] or
  * [Questionnaire.QuestionnaireItemAnswerOptionComponent] depending on the type
  */
-private fun displayString(context: Context?, value: Type?): String =
+internal fun displayString(context: Context?, value: Type?): String =
   when (value) {
     is Attachment -> value.url
         ?: (context?.getString(R.string.not_answered) ?: value.primitiveValue())
@@ -101,16 +86,4 @@ private fun displayString(context: Context?, value: Type?): String =
         ?: context?.getString(R.string.not_answered) ?: value.primitiveValue()
     else -> context?.getString(R.string.not_answered)
         ?: throw IllegalArgumentException("$value is not supported.")
-  }
-
-/** Indicates that if this answerOption is selected, no other possible answers may be selected. */
-internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.optionExclusive: Boolean
-  get() {
-    val extension =
-      this.extension.singleOrNull { it.url == EXTENSION_OPTION_EXCLUSIVE_URL } ?: return false
-    val value = extension.value
-    if (value is BooleanType) {
-      return value.booleanValue()
-    }
-    return false
   }

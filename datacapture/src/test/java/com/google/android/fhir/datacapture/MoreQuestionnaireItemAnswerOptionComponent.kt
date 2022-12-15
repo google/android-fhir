@@ -38,7 +38,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class MoreAnswerOptionsTest {
+class MoreQuestionnaireItemAnswerOptionComponent {
 
   @Test
   fun getDisplayString_choiceItemType_answerOptionShouldReturnValueCodingDisplayValue() {
