@@ -2,103 +2,102 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>BackoffCriteria</title>
-<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
-const savedDarkMode = storage ? JSON.parse(storage) : false
-if(savedDarkMode === true){
-    document.getElementsByTagName("html")[0].classList.add("theme-dark")
-}</script>
-<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><link href="../../../styles/prism.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script><script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>  </head>
+<link href="../../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script><script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" async="async"></script>  </head>
   <body>
-    <div class="navigation-wrapper" id="navigation-wrapper">
-      <div id="leftToggler"><span class="icon-toggler"></span></div>
-      <div class="library-name"><a href="../../../index.html">engine</a></div>
-      <div>0.1.0-beta01</div>
-      <div class="pull-right d-flex"><button id="theme-toggle-button"><span id="theme-toggle"></span></button>
-        <div id="searchBar"></div>
-      </div>
-    </div>
     <div id="container">
-      <div id="leftColumn">
+      <div id="leftColumn"><a href="../../../index.html">
+          <div id="logo"></div>
+        </a>
+        <div id="paneSearch"></div>
         <div id="sideMenu"></div>
       </div>
       <div id="main">
-        <div class="main-content" id="content" pageIds="engine::com.google.android.fhir.sync/BackoffCriteria///PointingToDeclaration//1317381881">
-          <div class="breadcrumbs"><a href="../../../index.html">engine</a>/<a href="../index.html">com.google.android.fhir.sync</a>/<a href="index.html">BackoffCriteria</a></div>
+        <div id="leftToggler"><span class="icon-toggler"></span></div>
+<script type="text/javascript" src="../../../scripts/main.js"></script>        <div class="main-content" id="content" pageIds="engine::com.google.android.fhir.sync/BackoffCriteria///PointingToDeclaration//-1683276876">
+          <div class="navigation-wrapper" id="navigation-wrapper">
+            <div class="breadcrumbs"><a href="../../../index.html">engine</a>/<a href="../index.html">com.google.android.fhir.sync</a>/<a href="index.html">BackoffCriteria</a></div>
+            <div class="pull-right d-flex">
+              <div id="searchBar"></div>
+            </div>
+          </div>
           <div class="cover ">
-            <h1 class="cover"><span>Backoff</span><wbr></wbr><span><span>Criteria</span></span></h1>
-            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">BackoffCriteria</a><span class="token punctuation">(</span>backoffPolicy<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token punctuation">, </span>backoffDelay<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span>timeUnit<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/util/concurrent/TimeUnit.html">TimeUnit</a><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">The criteria for <a href="../-fhir-sync-worker/index.html">FhirSyncWorker</a> failure retry based on androidx.work.WorkRequest.Builder.setBackoffCriteria</p></div></div>
+            <h1 class="cover"><span>Backoff</span><wbr></wbr><span>Criteria</span></h1>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">data class <a href="index.html">BackoffCriteria</a>(backoffPolicy: <a href="https://developer.android.com/reference/kotlin/androidx/work/BackoffPolicy.html">BackoffPolicy</a>, backoffDelay: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a>, timeUnit: <a href="https://developer.android.com/reference/kotlin/java/util/concurrent/TimeUnit.html">TimeUnit</a>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">The criteria for <a href="../-fhir-sync-worker/index.html">FhirSyncWorker</a> failure retry based on <a href="https://developer.android.com/reference/kotlin/androidx/work/WorkRequest.Builder.html#setbackoffcriteria">androidx.work.WorkRequest.Builder.setBackoffCriteria</a></p></div></div>
           </div>
           <div class="tabbedcontent">
-            <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+            <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Properties">Properties</button><button class="section-tab" data-togglable="Sources">Sources</button></div>
             <div class="tabs-section-body">
               <h2 class="tabbedcontent">Constructors</h2>
-              <div class="table" data-togglable="Constructors"><a data-name="-249065529%2FConstructors%2F1317381881" anchor-label="BackoffCriteria" id="-249065529%2FConstructors%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
+              <div class="table" data-togglable="Constructors"><a data-name="27565951%2FConstructors%2F-1683276876" anchor-label="BackoffCriteria" id="27565951%2FConstructors%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
                   <div class="main-subrow keyValue TabbedContent">
-                    <div class=""><span class="inline-flex">
-                        <div><a href="-backoff-criteria.html"><span>Backoff</span><wbr></wbr><span><span>Criteria</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-249065529%2FConstructors%2F1317381881"></span>
+                    <div class=""><span class="inline-flex"><a href="-backoff-criteria.html">BackoffCriteria</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="27565951%2FConstructors%2F-1683276876"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
                       <div class="title">
-                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-backoff-criteria.html"><span class="token function">BackoffCriteria</span></a><span class="token punctuation">(</span>backoffPolicy<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token punctuation">, </span>backoffDelay<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span>timeUnit<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/util/concurrent/TimeUnit.html">TimeUnit</a><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">fun <a href="-backoff-criteria.html">BackoffCriteria</a>(backoffPolicy: <a href="https://developer.android.com/reference/kotlin/androidx/work/BackoffPolicy.html">BackoffPolicy</a>, backoffDelay: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a>, timeUnit: <a href="https://developer.android.com/reference/kotlin/java/util/concurrent/TimeUnit.html">TimeUnit</a>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
               <h2 class="">Properties</h2>
-              <div class="table" data-togglable="Properties"><a data-name="1936442146%2FProperties%2F1317381881" anchor-label="backoffDelay" id="1936442146%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
+              <div class="table" data-togglable="Properties"><a data-name="1936442146%2FProperties%2F-1683276876" anchor-label="backoffDelay" id="1936442146%2FProperties%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex">
-                        <div><a href="backoff-delay.html">backoffDelay</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1936442146%2FProperties%2F1317381881"></span>
+                    <div class=""><span class="inline-flex"><a href="backoff-delay.html">backoffDelay</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1936442146%2FProperties%2F-1683276876"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
                       <div class="title">
-                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><a data-name="1936442146%2FProperties%2F1317381881" anchor-label="backoffDelay" id="1936442146%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="backoff-delay.html">backoffDelay</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="1936442146%2FProperties%2F1317381881" anchor-label="backoffDelay" id="1936442146%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a><p class="paragraph">Backoff delay for each retry attempt. Check androidx.work.PeriodicWorkRequest.MIN_BACKOFF_MILLIS and androidx.work.PeriodicWorkRequest.MAX_BACKOFF_MILLIS for the min-max supported values</p></div></div></div>
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><a data-name="1936442146%2FProperties%2F-1683276876" anchor-label="backoffDelay" id="1936442146%2FProperties%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a><div class="symbol monospace">val <a href="backoff-delay.html">backoffDelay</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="1936442146%2FProperties%2F-1683276876" anchor-label="backoffDelay" id="1936442146%2FProperties%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>Backoff delay for each retry attempt.</div></div></div>
                       </div>
                     </div>
                   </div>
                 </div>
-<a data-name="-38233021%2FProperties%2F1317381881" anchor-label="backoffPolicy" id="-38233021%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
+<a data-name="-38233021%2FProperties%2F-1683276876" anchor-label="backoffPolicy" id="-38233021%2FProperties%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex">
-                        <div><a href="backoff-policy.html">backoffPolicy</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-38233021%2FProperties%2F1317381881"></span>
+                    <div class=""><span class="inline-flex"><a href="backoff-policy.html">backoffPolicy</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-38233021%2FProperties%2F-1683276876"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
                       <div class="title">
-                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><a data-name="-38233021%2FProperties%2F1317381881" anchor-label="backoffPolicy" id="-38233021%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="backoff-policy.html">backoffPolicy</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-38233021%2FProperties%2F1317381881" anchor-label="backoffPolicy" id="-38233021%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a><p class="paragraph">Backoff policy androidx.work.BackoffPolicy</p></div></div></div>
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><a data-name="-38233021%2FProperties%2F-1683276876" anchor-label="backoffPolicy" id="-38233021%2FProperties%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a><div class="symbol monospace">val <a href="backoff-policy.html">backoffPolicy</a>: <a href="https://developer.android.com/reference/kotlin/androidx/work/BackoffPolicy.html">BackoffPolicy</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-38233021%2FProperties%2F-1683276876" anchor-label="backoffPolicy" id="-38233021%2FProperties%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>Backoff policy <a href="https://developer.android.com/reference/kotlin/androidx/work/BackoffPolicy.html">androidx.work.BackoffPolicy</a></div></div></div>
                       </div>
                     </div>
                   </div>
                 </div>
-<a data-name="-1872420564%2FProperties%2F1317381881" anchor-label="timeUnit" id="-1872420564%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
+<a data-name="-1872420564%2FProperties%2F-1683276876" anchor-label="timeUnit" id="-1872420564%2FProperties%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex">
-                        <div><a href="time-unit.html">timeUnit</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1872420564%2FProperties%2F1317381881"></span>
+                    <div class=""><span class="inline-flex"><a href="time-unit.html">timeUnit</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1872420564%2FProperties%2F-1683276876"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
                       <div class="title">
-                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><a data-name="-1872420564%2FProperties%2F1317381881" anchor-label="timeUnit" id="-1872420564%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="time-unit.html">timeUnit</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/util/concurrent/TimeUnit.html">TimeUnit</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-1872420564%2FProperties%2F1317381881" anchor-label="timeUnit" id="-1872420564%2FProperties%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a><p class="paragraph">The time unit for <a href="backoff-delay.html">backoffDelay</a></p></div></div></div>
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><a data-name="-1872420564%2FProperties%2F-1683276876" anchor-label="timeUnit" id="-1872420564%2FProperties%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a><div class="symbol monospace">val <a href="time-unit.html">timeUnit</a>: <a href="https://developer.android.com/reference/kotlin/java/util/concurrent/TimeUnit.html">TimeUnit</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-1872420564%2FProperties%2F-1683276876" anchor-label="timeUnit" id="-1872420564%2FProperties%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>The time unit for <a href="backoff-delay.html">backoffDelay</a></div></div></div>
                       </div>
                     </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Sources</h2>
+              <div class="table" data-togglable="Sources"><a data-name="-1212965694%2FSource%2F-2001932064" anchor-label="https://github.com/google/android-fhir/tree/master/engine/src/main/java/com/google/android/fhir/sync/Config.kt#L92" id="-1212965694%2FSource%2F-2001932064" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="https://github.com/google/android-fhir/tree/master/engine/src/main/java/com/google/android/fhir/sync/Config.kt#L92">androidJvm source</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1212965694%2FSource%2F-2001932064"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div></div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
       </div>
     </div>
   </body>
