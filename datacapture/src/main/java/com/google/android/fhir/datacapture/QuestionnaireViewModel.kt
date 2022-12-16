@@ -705,24 +705,24 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
 
   /** Gets a list of [QuestionnairePage]s for a paginated questionnaire. */
-  private fun getQuestionnairePages(): List<QuestionnairePage>? {
-    val enablementEvaluator = EnablementEvaluator(questionnaireResponse)
+  private fun getQuestionnairePages(): List<QuestionnairePage>? =
     if (questionnaire.isPaginated) {
-      return questionnaire.item.zip(questionnaireResponse.item).mapIndexed {
+      questionnaire.item.zip(questionnaireResponse.item).mapIndexed {
         index,
         (questionnaireItem, questionnaireResponseItem) ->
         QuestionnairePage(
           index,
-          enablementEvaluator.evaluate(
-            questionnaireItem,
-            questionnaireResponseItem,
-          ),
+          EnablementEvaluator(questionnaireResponse)
+            .evaluate(
+              questionnaireItem,
+              questionnaireResponseItem,
+            ),
           questionnaireItem.isHidden
         )
       }
+    } else {
+      null
     }
-    return null
-  }
 }
 
 typealias ItemToParentMap =

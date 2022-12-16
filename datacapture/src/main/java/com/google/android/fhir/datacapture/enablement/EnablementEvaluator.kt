@@ -141,9 +141,11 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
     val targetQuestionnaireResponseItem =
       findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, enableWhen.question)
     return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
-      (targetQuestionnaireResponseItem == null ||
-        targetQuestionnaireResponseItem.answer.isEmpty()) !=
-        enableWhen.answerBooleanType.booleanValue()
+      // True iff the answer value of the enable when is equal to whether an answer exists in the
+      // target questionnaire response item
+      enableWhen.answerBooleanType.booleanValue() ==
+        !(targetQuestionnaireResponseItem == null ||
+          targetQuestionnaireResponseItem.answer.isEmpty())
     } else {
       // The `enableWhen` constraint evaluates to true if at least one answer has a value that
       // satisfies the `enableWhen` operator and answer, with the exception of the `Exists`
