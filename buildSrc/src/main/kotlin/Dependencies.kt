@@ -188,8 +188,8 @@ object Dependencies {
 
     object Cql {
       const val antlr = "4.10.1"
-      const val engine = "2.3.0"
-      const val evaluator = "2.3.0"
+      const val engine = "2.4.0"
+      const val evaluator = "2.4.0"
       const val translator = "2.4.0"
     }
 
