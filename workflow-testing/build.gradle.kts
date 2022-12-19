@@ -28,6 +28,16 @@ dependencies {
   compileOnly(Dependencies.Cql.translatorElm)
   compileOnly(Dependencies.Cql.translatorModel)
 
+  // Forces the most recent version of jackson, ignoring what dependencies use.
+  // Remove these lines when HAPI 6.4 becomes available. 
+  compileOnly(Dependencies.Jackson.annotations)
+  compileOnly(Dependencies.Jackson.bom)
+  compileOnly(Dependencies.Jackson.core)
+  compileOnly(Dependencies.Jackson.databind)
+  compileOnly(Dependencies.Jackson.dataformatXml)
+  compileOnly(Dependencies.Jackson.jaxbAnnotations)
+  compileOnly(Dependencies.Jackson.jsr310)
+
   compileOnly(Dependencies.junit)
   compileOnly(Dependencies.jsonAssert)
   compileOnly(Dependencies.woodstox)
