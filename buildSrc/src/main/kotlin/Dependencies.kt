@@ -60,9 +60,19 @@ object Dependencies {
   }
 
   object Jackson {
-    const val annotations = "com.fasterxml.jackson.core:jackson-annotations:${Versions.jackson}"
-    const val core = "com.fasterxml.jackson.core:jackson-core:${Versions.jackson}"
-    const val databind = "com.fasterxml.jackson.core:jackson-databind:${Versions.jackson}"
+    const val mainGroup = "com.fasterxml.jackson"
+    const val coreGroup = "$mainGroup.core"
+    const val dataformatGroup = "$mainGroup.dataformat"
+    const val datatypeGroup = "$mainGroup.datatype"
+    const val moduleGroup = "$mainGroup.module"
+
+    const val annotations = "$coreGroup:jackson-annotations:${Versions.jackson}"
+    const val bom = "$mainGroup:jackson-bom:${Versions.jackson}"
+    const val core = "$coreGroup:jackson-core:${Versions.jackson}"
+    const val databind = "$coreGroup:jackson-databind:${Versions.jackson}"
+    const val dataformatXml = "$dataformatGroup:jackson-dataformat-xml:${Versions.jackson}"
+    const val jaxbAnnotations = "$moduleGroup:jackson-module-jaxb-annotations:${Versions.jackson}"
+    const val jsr310 = "$datatypeGroup:jackson-datatype-jsr310:${Versions.jackson}"
   }
 
   object Kotlin {
@@ -202,7 +212,7 @@ object Dependencies {
     const val guava = "28.2-android"
     const val hapiFhir = "6.0.1"
     const val http = "4.9.1"
-    const val jackson = "2.13.2"
+    const val jackson = "2.14.1"
     const val jsonToolsPatch = "1.13"
     const val jsonAssert = "1.5.1"
     const val kotlinPoet = "1.9.0"
