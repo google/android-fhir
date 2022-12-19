@@ -73,9 +73,6 @@ configurations {
     exclude(module = "javax.json")
     exclude(module = "jcl-over-slf4j")
     exclude(group = "org.apache.httpcomponents")
-    // Remove this after this issue has been fixed:
-    // https://github.com/cqframework/clinical_quality_language/issues/799
-    exclude(module = "antlr4")
   }
 }
 

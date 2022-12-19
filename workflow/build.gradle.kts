@@ -79,9 +79,6 @@ configurations {
     exclude(module = "javax.json")
     exclude(module = "jcl-over-slf4j")
     exclude(group = "org.apache.httpcomponents")
-    // Remove this after this issue has been fixed:
-    // https://github.com/cqframework/clinical_quality_language/issues/799
-    exclude(module = "antlr4")
   }
 }
 
@@ -101,10 +98,6 @@ dependencies {
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
   implementation(Dependencies.Androidx.coreKtx)
-
-  // Remove this after this issue has been fixed:
-  // https://github.com/cqframework/clinical_quality_language/issues/799
-  implementation(Dependencies.Cql.antlr4Runtime)
 
   implementation(Dependencies.Cql.engine)
   implementation(Dependencies.Cql.engineJackson) // Necessary to import Executable XML/JSON CQL libs

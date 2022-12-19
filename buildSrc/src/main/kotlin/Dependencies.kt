@@ -34,10 +34,6 @@ object Dependencies {
     const val openCdsGroup = "org.opencds.cqf.cql"
     const val translatorGroup = "info.cqframework"
 
-    // Remove this after this issue has been fixed:
-    // https://github.com/cqframework/clinical_quality_language/issues/799
-    const val antlr4Runtime = "org.antlr:antlr4-runtime:${Versions.Cql.antlr}"
-
     const val engine = "$openCdsGroup:engine:${Versions.Cql.engine}"
     const val engineJackson = "$openCdsGroup:engine.jackson:${Versions.Cql.engine}"
 
