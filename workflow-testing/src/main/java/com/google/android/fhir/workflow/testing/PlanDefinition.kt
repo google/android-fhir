@@ -228,6 +228,9 @@ object PlanDefinition : Loadable() {
       } catch (e: JSONException) {
         e.printStackTrace()
         fail("Unable to compare Jsons: " + e.message)
+      } catch (e: AssertionError) {
+        println("Actual: " + jsonParser.encodeResourceToString(carePlan))
+        throw e
       }
     }
   }
