@@ -48,8 +48,11 @@ data class DataCaptureConfig(
    */
   var npmPackage: NpmPackage? = null,
 
-  /** A [XFhirQueryResolver] may be set by the client to resolve xFhir queries for the library.*/
-  var xFhirQueryResolver: XFhirQueryResolver? = null
+  /**
+   * A [XFhirQueryResolver] may be set by the client to resolve x-fhir-query for the library. See
+   * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirquery for more details.
+   */
+  var xFhirQueryResolver: XFhirQueryResolver? = null,
 ) {
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {

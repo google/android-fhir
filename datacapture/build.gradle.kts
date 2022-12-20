@@ -90,8 +90,6 @@ dependencies {
   implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.timber)
 
-  releaseImplementation(Dependencies.androidFhirEngine)
-
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)
   testImplementation(Dependencies.Kotlin.kotlinTestJunit)

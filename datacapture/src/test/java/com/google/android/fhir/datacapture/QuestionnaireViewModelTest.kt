@@ -62,7 +62,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.ValueSet
 import org.hl7.fhir.r4.utils.ToolingExtensions
-import org.junit.Assert
+import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
@@ -2972,12 +2972,12 @@ class QuestionnaireViewModelTest {
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
     val viewModel = QuestionnaireViewModel(context, state)
     val exception =
-      Assert.assertThrows(null, IllegalStateException::class.java) {
+      assertThrows(null, IllegalStateException::class.java) {
         runBlocking { viewModel.resolveAnswerExpression(questionnaire.itemFirstRep) }
       }
     assertThat(exception.message)
       .isEqualTo(
-        "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig"
+        "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
       )
   }
   // Test cases for submit button
@@ -3643,7 +3643,7 @@ class QuestionnaireViewModelTest {
         }
 
       val exception =
-        Assert.assertThrows(null, IllegalStateException::class.java) {
+        assertThrows(null, IllegalStateException::class.java) {
           createQuestionnaireViewModel(questionnaire)
         }
       assertThat(exception.message)
@@ -3708,7 +3708,7 @@ class QuestionnaireViewModelTest {
         }
 
       val exception =
-        Assert.assertThrows(null, IllegalStateException::class.java) {
+        assertThrows(null, IllegalStateException::class.java) {
           createQuestionnaireViewModel(questionnaire)
         }
       assertThat(exception.message)

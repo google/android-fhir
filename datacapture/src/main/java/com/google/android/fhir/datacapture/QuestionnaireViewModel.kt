@@ -450,7 +450,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val data =
       if (expression.isXFhirQuery) {
         checkNotNull(xFhirQueryResolver) {
-          "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig"
+          "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
         }
         xFhirQueryResolver!!.resolve(expression.expression)
       } else if (expression.isFhirPath) {
