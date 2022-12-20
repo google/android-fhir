@@ -79,6 +79,10 @@ configurations {
     exclude(module = "javax.json")
     exclude(module = "jcl-over-slf4j")
     exclude(group = "org.apache.httpcomponents")
+
+    // Removes newer versions of caffeine and manually imports 2.9
+    // (newer versions don't work on Android)
+    resolutionStrategy { force(Dependencies.HapiFhir.caffeine) }
   }
 }
 
