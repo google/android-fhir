@@ -90,7 +90,6 @@ configurations {
       force(Dependencies.HapiFhir.structuresDstu2)
       force(Dependencies.HapiFhir.structuresDstu3)
       force(Dependencies.HapiFhir.structuresR4)
-      //force(Dependencies.HapiFhir.structuresR4b)
       force(Dependencies.HapiFhir.structuresR5)
       force(Dependencies.HapiFhir.validation)
       force(Dependencies.HapiFhir.validationDstu3)
