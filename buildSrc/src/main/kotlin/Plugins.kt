@@ -21,7 +21,6 @@ object Plugins {
     const val application = "com.android.application"
     const val benchmark = "androidx.benchmark"
     const val jetbrainsKotlinAndroid = "org.jetbrains.kotlin.android"
-    // Use Dokka 1.6.10 until https://github.com/Kotlin/dokka/issues/2452 is resolved.
     const val dokka = "org.jetbrains.dokka"
     const val kotlin = "kotlin"
     const val kotlinAndroid = "kotlin-android"
@@ -45,7 +44,7 @@ object Plugins {
   object Versions {
     const val androidGradlePlugin = "7.2.1"
     const val benchmarkPlugin = "1.1.0"
-    // Use Dokka 1.6.10 until https://github.com/Kotlin/dokka/issues/2472 is resolved.
+    // Change dokka to 1.7.20 once androidGradlePlugin upgrades to 7.3+
     const val dokka = "1.6.10"
   }
 }
