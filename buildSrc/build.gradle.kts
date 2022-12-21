@@ -20,5 +20,4 @@ dependencies {
   implementation("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.0.1")
   implementation("com.squareup:kotlinpoet:1.9.0")
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.21")
-  implementation("org.jetbrains.dokka:dokka-gradle-plugin:1.6.10")
 }
