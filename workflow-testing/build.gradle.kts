@@ -18,6 +18,43 @@ android {
   kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
 }
 
+configurations {
+  all {
+    exclude(module = "xpp3")
+    exclude(module = "xpp3_min")
+    exclude(module = "xmlpull")
+    exclude(module = "javax.json")
+    exclude(module = "jcl-over-slf4j")
+    exclude(group = "org.apache.httpcomponents")
+
+    // Removes newer versions of caffeine and manually imports 2.9
+    // Removes newer versions of hapi and keeps on 6.0.1
+    // (newer versions don't work on Android)
+    resolutionStrategy {
+      force(Dependencies.HapiFhir.caffeine)
+      force(Dependencies.HapiFhir.fhirBase)
+      force(Dependencies.HapiFhir.fhirClient)
+      force(Dependencies.HapiFhir.structuresDstu2)
+      force(Dependencies.HapiFhir.structuresDstu3)
+      force(Dependencies.HapiFhir.structuresR4)
+      force(Dependencies.HapiFhir.structuresR5)
+      force(Dependencies.HapiFhir.validation)
+      force(Dependencies.HapiFhir.validationDstu3)
+      force(Dependencies.HapiFhir.validationR4)
+      force(Dependencies.HapiFhir.validationR5)
+
+      force(Dependencies.HapiFhir.fhirCoreDstu2)
+      force(Dependencies.HapiFhir.fhirCoreDstu2016)
+      force(Dependencies.HapiFhir.fhirCoreDstu3)
+      force(Dependencies.HapiFhir.fhirCoreR4)
+      force(Dependencies.HapiFhir.fhirCoreR4b)
+      force(Dependencies.HapiFhir.fhirCoreR5)
+      force(Dependencies.HapiFhir.fhirCoreUtils)
+      force(Dependencies.HapiFhir.fhirCoreConvertors)
+    }
+  }
+}
+
 dependencies {
   compileOnly(Dependencies.Cql.engine)
   compileOnly(Dependencies.Cql.evaluator)
