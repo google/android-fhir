@@ -24,6 +24,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.ResourceType
 
+/** Accessing resources from provided Implementation Guides. */
 class IgResourceRetriever
 internal constructor(
   private val igDao: ImplementationGuideDao,
@@ -49,16 +50,6 @@ internal constructor(
       }
 
     return resourceEntities.firstOrNull()?.let { loadResource(it) } as Library?
-  }
-
-  suspend fun loadResourceById(
-    resourceType: String,
-    id: String,
-  ): IBaseResource? {
-    val resourceEntities =
-      igDao.getResourcesWithResourceId(ResourceType.fromCode(resourceType), id, igIds)
-
-    return resourceEntities.firstOrNull()?.let { loadResource(it) }
   }
 
   suspend fun loadResources(

@@ -16,6 +16,12 @@
 
 package com.google.android.fhir.implementationguide
 
+/**
+ * Contains a list of implementation guides that needs to taken into account. Used for:
+ * - defining dependencies [IgManager] will download
+ * - limiting resources [IgResourceRetriever] will access (will only access resources from specific
+ * IGs).
+ */
 class IgContext(internal val dependencies: List<Dependency>) {
   data class Dependency(val packageId: String, val version: String, val uri: String? = null)
 }

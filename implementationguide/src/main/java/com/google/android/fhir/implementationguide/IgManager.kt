@@ -27,13 +27,31 @@ import org.hl7.fhir.r4.model.MetadataResource
 import org.hl7.fhir.r4.model.Resource
 import timber.log.Timber
 
+/** Responsible for downloading, accessing and deleting Implementation Guides. */
 class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
 
   private val igDao = igDatabase.implementationGuideDao()
-  private val fhirContext = FhirContext.forR4()
-  private val jsonParser = fhirContext.newJsonParser()
+  private val jsonParser = FhirContext.forR4().newJsonParser()
 
-  suspend fun createResourceRetriever(igContext: IgContext): IgResourceRetriever {
+  /**
+   * Ensures that IG dependencies from provided [IgContext] are downloaded, downloading if they are
+   * missing.
+   */
+  suspend fun ensureDownload(igContext: IgContext): IgResourceRetriever {
+    TODO("not implemented yet")
+  }
+
+  /** Deletes Implementation Guide, cleans up files. */
+  suspend fun delete(igContext: IgContext) {
+    igContext.dependencies.forEach { igDependency ->
+      val igEntity = igDao.getImplementationGuide(igDependency.packageId, igDependency.version)
+      igDao.deleteImplementationGuide(igEntity)
+      igEntity.rootDirectory.deleteRecursively()
+    }
+  }
+
+  /** An object for accessing Ig resources from provided dependencies. */
+  internal suspend fun createResourceRetriever(igContext: IgContext): IgResourceRetriever {
     val igIds =
       igContext.dependencies
         .map { igDao.getImplementationGuide(it.packageId, it.version) }
@@ -41,13 +59,8 @@ class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
     return IgResourceRetriever(igDao, jsonParser, igIds)
   }
 
-  suspend fun delete(igDependency: IgContext.Dependency) {
-    val igEntity = igDao.getImplementationGuide(igDependency.packageId, igDependency.version)
-    igDao.deleteImplementationGuide(igEntity)
-    igEntity.rootDirectory.deleteRecursively()
-  }
-
-  suspend fun import(
+  /** Imports Implementation Guide from local files. */
+  internal suspend fun import(
     igDependency: IgContext.Dependency,
     rootDirectory: File,
     files: Iterable<File>,

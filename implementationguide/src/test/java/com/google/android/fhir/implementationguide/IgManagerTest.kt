@@ -67,7 +67,7 @@ internal class IgManagerTest {
 
   @Test
   fun `deleting IG deletes files and DB entries`() = runBlocking {
-    igManager.delete(igDependency)
+    igManager.delete(IgContext(listOf(igDependency)))
 
     assertThat(igDb.implementationGuideDao().getImplementationGuides()).isEmpty()
     assertThat(igRoot.exists()).isFalse()
