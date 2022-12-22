@@ -29,7 +29,7 @@ import org.hl7.fhir.r4.model.ResourceType
   indices =
     [
       Index(value = ["implementationGuideId"], unique = false),
-      Index(value = ["resourceType", "resourceId", "implementationGuideId"], unique = true)
+      Index(value = ["resourceType", "url", "implementationGuideId"], unique = true)
     ],
   foreignKeys =
     [
@@ -43,11 +43,10 @@ import org.hl7.fhir.r4.model.ResourceType
 )
 internal data class ResourceMetadataEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
+  val implementationGuideId: Long,
   val resourceType: ResourceType,
-  val resourceId: String,
   val url: String?,
   val name: String?,
   val version: String?,
   val fileUri: File,
-  val implementationGuideId: Long,
 )

@@ -55,19 +55,18 @@ internal class ImplementationGuideDatabaseTest {
     val resource =
       ResourceMetadataEntity(
         0L,
+        igId,
         ResourceType.ValueSet,
-        RES_ID_1,
-        "http://url.com/ValueSet/Name/1.0.0",
+        RES_URL,
         RES_NAME,
-        "1.0.0",
-        File("resId"),
-        igId
+        RES_VERSION,
+        File("resId")
       )
 
     igDao.insert(resource)
 
-    assertThat(igDao.getResources(ResourceType.ValueSet, listOf(igId)).map { it.resourceId })
-      .containsExactly(RES_ID_1)
+    assertThat(igDao.getResources(ResourceType.ValueSet, listOf(igId)).map { it.url })
+      .containsExactly(RES_URL)
     assertThat(igDao.getResources(ResourceType.Account, listOf(igId))).isEmpty()
     assertThat(igDao.getResources(listOf(-1L))).isEmpty()
   }
@@ -78,13 +77,12 @@ internal class ImplementationGuideDatabaseTest {
     val resource =
       ResourceMetadataEntity(
         0L,
+        igId,
         ResourceType.ValueSet,
-        RES_ID_1,
-        "http://url.com/ValueSet/Name/1.0.0",
+        RES_URL,
         RES_NAME,
-        "1.0.0",
-        File("resId"),
-        igId
+        RES_VERSION,
+        File("resId")
       )
     igDao.insert(resource)
 
@@ -97,8 +95,15 @@ internal class ImplementationGuideDatabaseTest {
   private companion object {
     const val IG_NAME = "test.ig"
     const val IG_VERSION = "1.0.0"
-    const val RES_ID_1 = "res-id-1"
     const val RES_NAME = "res-name-1"
-    val IG_ENTITY = ImplementationGuideEntity(0L, IG_NAME, IG_VERSION, File("test"))
+    const val RES_VERSION = "1.0.0"
+    const val RES_URL = "http://url.com/ValueSet/$RES_NAME/$RES_VERSION"
+    val IG_ENTITY =
+      ImplementationGuideEntity(
+        id = 0L,
+        name = IG_NAME,
+        version = IG_VERSION,
+        rootDirectory = File("test")
+      )
   }
 }

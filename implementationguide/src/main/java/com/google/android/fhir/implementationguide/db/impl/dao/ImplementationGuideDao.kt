@@ -51,15 +51,6 @@ abstract class ImplementationGuideDao {
   ): List<ResourceMetadataEntity>
 
   @Query(
-    "SELECT * from ResourceMetadataEntity WHERE implementationGuideId IN (:igId) AND resourceType = :resourceType AND resourceId = :resourceId"
-  )
-  internal abstract suspend fun getResourcesWithResourceId(
-    resourceType: ResourceType,
-    resourceId: String,
-    igId: List<Long>,
-  ): List<ResourceMetadataEntity>
-
-  @Query(
     "SELECT * from ResourceMetadataEntity WHERE implementationGuideId IN (:igId) AND resourceType = :resourceType AND url = :url"
   )
   internal abstract suspend fun getResourcesWithUrl(

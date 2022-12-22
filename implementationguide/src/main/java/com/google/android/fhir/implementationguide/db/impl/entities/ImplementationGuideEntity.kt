@@ -25,6 +25,7 @@ import java.io.File
 internal data class ImplementationGuideEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val name: String,
-  val version: String,
+  val version: String? = null,
+  val canonicalUrl: String? = null,
   val rootDirectory: File
 )
