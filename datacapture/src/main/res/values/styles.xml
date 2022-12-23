@@ -242,6 +242,10 @@
             name="android:background"
         >@drawable/questionnaire_item_checkbox_background</item>
         <item name="android:padding">@dimen/padding_default</item>
+        <item
+            name="android:paddingStart"
+        >@dimen/padding_between_text_and_icon</item>
+        <item name="android:paddingEnd">@dimen/padding_after_text</item>
     </style>
 
     <style
