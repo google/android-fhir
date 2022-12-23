@@ -40,6 +40,7 @@
     <dimen name="help_header_margin_bottom">4dp</dimen>
     <dimen name="help_margin_bottom">16dp</dimen>
     <dimen name="icon_inset">16dp</dimen>
+    <!--  dimens for padding between text and icon in the radio button  -->
     <dimen name="padding_between_text_and_icon">16dp</dimen>
     <dimen name="padding_after_text">24dp</dimen>
 </resources>
