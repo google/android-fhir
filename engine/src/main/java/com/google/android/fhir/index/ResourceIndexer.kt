@@ -68,11 +68,17 @@ internal object ResourceIndexer {
   // https://github.com/google/android-fhir/issues/768
   private val fhirPathEngine = FHIRPathEngine(SimpleWorkerContext())
 
-  fun <R : Resource> index(resource: R) = extractIndexValues(resource)
+  fun <R : Resource> index(
+    resource: R,
+    customSearchParams: (R) -> List<SearchParamDefinition> = { emptyList() }
+  ) = extractIndexValues(resource, customSearchParams)
 
-  private fun <R : Resource> extractIndexValues(resource: R): ResourceIndices {
+  private fun <R : Resource> extractIndexValues(
+    resource: R,
+    customSearchParams: (R) -> List<SearchParamDefinition>
+  ): ResourceIndices {
     val indexBuilder = ResourceIndices.Builder(resource.resourceType, resource.logicalId)
-    getSearchParamList(resource)
+    (customSearchParams(resource) + getSearchParamList(resource))
       .map { it to fhirPathEngine.evaluate(resource, it.path) }
       .flatMap { pair -> pair.second.map { pair.first to it } }
       .forEach { pair ->

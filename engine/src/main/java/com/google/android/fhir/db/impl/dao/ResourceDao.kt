@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.ResourceIndices
+import com.google.android.fhir.index.SearchParamDefinition
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.versionId
@@ -49,6 +50,7 @@ internal abstract class ResourceDao {
   // this is ugly but there is no way to inject these right now in Room as it is the one creating
   // the dao
   lateinit var iParser: IParser
+  lateinit var customSearchParamDefinitions: Map<String, List<SearchParamDefinition>>
 
   open suspend fun update(resource: Resource) {
     updateResource(
@@ -67,7 +69,10 @@ internal abstract class ResourceDao {
           versionId = it.versionId,
           lastUpdatedRemote = it.lastUpdatedRemote
         )
-      val index = ResourceIndexer.index(resource)
+      val index =
+        ResourceIndexer.index(resource) {
+          customSearchParamDefinitions.getOrDefault(resource.fhirType(), listOf())
+        }
       updateIndicesForResource(index, entity, it.resourceUuid)
     }
       ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
@@ -191,7 +196,10 @@ internal abstract class ResourceDao {
         lastUpdatedRemote = resource.lastUpdated
       )
     insertResource(entity)
-    val index = ResourceIndexer.index(resource)
+    val index =
+      ResourceIndexer.index(resource) {
+        customSearchParamDefinitions.getOrDefault(resource.fhirType(), listOf())
+      }
     updateIndicesForResource(index, entity, resourceUuid)
 
     return resource.id

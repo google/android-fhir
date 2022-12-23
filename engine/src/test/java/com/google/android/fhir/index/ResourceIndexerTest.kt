@@ -45,6 +45,7 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Device
 import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.InstantType
@@ -1618,6 +1619,70 @@ class ResourceIndexerTest {
           code = "",
           value = BigDecimal.valueOf(110)
         )
+      )
+  }
+
+  @Test
+  fun index_custom_search_param() {
+    val patient =
+      Patient().apply {
+        addIdentifier(
+          Identifier().apply {
+            system = "https://custom-identifier-namespace"
+            value = "OfficialIdentifier_DarcySmith_0001"
+          }
+        )
+        addName(
+          HumanName().apply {
+            use = HumanName.NameUse.OFFICIAL
+            family = "Smith"
+            addGiven("Darcy")
+            gender = Enumerations.AdministrativeGender.FEMALE
+            birthDateElement = DateType("1970-01-01")
+          }
+        )
+        addExtension(
+          Extension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName"
+            setValue(StringType("Marca"))
+          }
+        )
+      }
+
+    val resourceIndices =
+      ResourceIndexer.index(patient) {
+        listOf(
+          SearchParamDefinition(
+            name = "mothers-maiden-name",
+            type = Enumerations.SearchParamType.STRING,
+            path =
+              "Patient.extension('http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName').value.as(String)"
+          ),
+          SearchParamDefinition(
+            name = "identifierPartial",
+            type = Enumerations.SearchParamType.STRING,
+            path = "Patient.identifier.value"
+          )
+        )
+      }
+
+    assertThat(resourceIndices.stringIndices)
+      .containsExactly(
+        StringIndex(
+          name = "mothers-maiden-name",
+          path =
+            "Patient.extension('http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName').value.as(String)",
+          value = "Marca"
+        ),
+        StringIndex(
+          name = "identifierPartial",
+          path = "Patient.identifier.value",
+          value = "OfficialIdentifier_DarcySmith_0001"
+        ),
+        StringIndex(name = "family", path = "Patient.name.family", value = "Smith"),
+        StringIndex(name = "name", path = "Patient.name", value = "Darcy Smith"),
+        StringIndex(name = "phonetic", path = "Patient.name", value = "Darcy Smith"),
+        StringIndex(name = "given", path = "Patient.name.given", value = "Darcy")
       )
   }
 
