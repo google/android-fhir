@@ -14,6 +14,25 @@
  * limitations under the License.
  */
 
+import org.gradle.api.artifacts.Configuration
+import org.gradle.kotlin.dsl.exclude
+
+/*
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 object Dependencies {
 
   object Androidx {
@@ -234,8 +253,15 @@ object Dependencies {
     const val caffeine = "2.9.1"
     const val fhirUcum = "1.0.3"
     const val guava = "28.2-android"
+
+    // Hapi FHIR and HL7 Core Components are interlinked.
+    // Newer versions of HapiFhir don't work on Android due to the use of Caffeine 3+
+    // Wait for this to release (6.3): https://github.com/hapifhir/hapi-fhir/pull/4196
     const val hapiFhir = "6.0.1"
+    // Newer versions don't work on Android due to Apache Commons Codec:
+    // Wait for this fix: https://github.com/hapifhir/org.hl7.fhir.core/issues/1046
     const val hapiFhirCore = "5.6.36"
+
     const val http = "4.9.1"
     const val jackson = "2.14.1"
     const val jsonToolsPatch = "1.13"
@@ -274,6 +300,47 @@ object Dependencies {
       const val barcodeScanning = "16.1.1"
       const val objectDetection = "16.2.3"
       const val objectDetectionCustom = "16.3.1"
+    }
+  }
+
+  fun Configuration.removeIncompatibleDependencies() {
+    exclude(module = "xpp3")
+    exclude(module = "xpp3_min")
+    exclude(module = "xmlpull")
+    exclude(module = "javax.json")
+    exclude(module = "jcl-over-slf4j")
+    exclude(group = "org.apache.httpcomponents")
+  }
+
+  fun Configuration.forceHapiVersion() {
+    // Removes newer versions of caffeine and manually imports 2.9
+    // Removes newer versions of hapi and keeps on 6.0.1
+    // Removes newer versions of HL7 core and keeps it on 5.6.36
+    // (newer versions don't work on Android)
+    resolutionStrategy {
+      force(HapiFhir.caffeine)
+
+      force(HapiFhir.fhirBase)
+      force(HapiFhir.fhirClient)
+      force(HapiFhir.fhirCoreConvertors)
+
+      force(HapiFhir.fhirCoreDstu2)
+      force(HapiFhir.fhirCoreDstu2016)
+      force(HapiFhir.fhirCoreDstu3)
+      force(HapiFhir.fhirCoreR4)
+      force(HapiFhir.fhirCoreR4b)
+      force(HapiFhir.fhirCoreR5)
+      force(HapiFhir.fhirCoreUtils)
+
+      force(HapiFhir.structuresDstu2)
+      force(HapiFhir.structuresDstu3)
+      force(HapiFhir.structuresR4)
+      force(HapiFhir.structuresR5)
+
+      force(HapiFhir.validation)
+      force(HapiFhir.validationDstu3)
+      force(HapiFhir.validationR4)
+      force(HapiFhir.validationR5)
     }
   }
 }
