@@ -35,7 +35,6 @@ import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import com.google.android.fhir.logicalId
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
@@ -62,7 +61,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.ValueSet
 import org.hl7.fhir.r4.utils.ToolingExtensions
-import org.junit.Assert
+import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
@@ -2894,13 +2893,13 @@ class QuestionnaireViewModelTest {
   fun `resolveAnswerExpression() should return questionnaire item answer options for answer expression and choice column`() =
     runBlocking {
       val practitioner =
-        Practitioner()
-          .apply {
-            id = UUID.randomUUID().toString()
-            active = true
-            addName(HumanName().apply { this.family = "John" })
-          }
-          .also { fhirEngine.create(it) }
+        Practitioner().apply {
+          id = UUID.randomUUID().toString()
+          active = true
+          addName(HumanName().apply { this.family = "John" })
+        }
+      ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+        .dataCaptureConfiguration = DataCaptureConfig(xFhirQueryResolver = { listOf(practitioner) })
 
       val questionnaire =
         Questionnaire().apply {
@@ -2939,6 +2938,47 @@ class QuestionnaireViewModelTest {
         .isEqualTo("Practitioner/${practitioner.logicalId}")
     }
 
+  @Test
+  fun `resolveAnswerExpression() should throw exception when XFhirQueryResolver is not provided`() {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a"
+            text = "answer expression question text"
+            type = Questionnaire.QuestionnaireItemType.REFERENCE
+            extension =
+              listOf(
+                Extension(
+                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                  Expression().apply {
+                    this.expression = "Practitioner?active=true"
+                    this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                  }
+                ),
+                Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
+                  )
+                  .apply {
+                    this.addExtension(Extension("path", StringType("id")))
+                    this.addExtension(Extension("label", StringType("name")))
+                    this.addExtension(Extension("forDisplay", BooleanType(true)))
+                  }
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    val viewModel = QuestionnaireViewModel(context, state)
+    val exception =
+      assertThrows(null, IllegalStateException::class.java) {
+        runBlocking { viewModel.resolveAnswerExpression(questionnaire.itemFirstRep) }
+      }
+    assertThat(exception.message)
+      .isEqualTo(
+        "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
+      )
+  }
   // Test cases for submit button
 
   @Test
@@ -3602,7 +3642,7 @@ class QuestionnaireViewModelTest {
         }
 
       val exception =
-        Assert.assertThrows(null, IllegalStateException::class.java) {
+        assertThrows(null, IllegalStateException::class.java) {
           createQuestionnaireViewModel(questionnaire)
         }
       assertThat(exception.message)
@@ -3667,7 +3707,7 @@ class QuestionnaireViewModelTest {
         }
 
       val exception =
-        Assert.assertThrows(null, IllegalStateException::class.java) {
+        assertThrows(null, IllegalStateException::class.java) {
           createQuestionnaireViewModel(questionnaire)
         }
       assertThat(exception.message)
