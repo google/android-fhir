@@ -102,7 +102,9 @@ dependencies {
 }
 
 tasks.dokkaHtml.configure {
-  outputDirectory.set(file("../docs/${Releases.DataCapture.artifactId}"))
+  outputDirectory.set(
+    file("../docs/${Releases.DataCapture.artifactId}/${Releases.DataCapture.version}")
+  )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
