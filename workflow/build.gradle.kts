@@ -141,7 +141,7 @@ dependencies {
 }
 
 tasks.dokkaHtml.configure {
-  outputDirectory.set(file("../docs/${Releases.Workflow.artifactId}"))
+  outputDirectory.set(file("../docs/${Releases.Workflow.artifactId}/${Releases.Workflow.version}"))
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
