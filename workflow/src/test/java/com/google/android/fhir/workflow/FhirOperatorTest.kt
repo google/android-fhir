@@ -21,28 +21,24 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
+import com.google.android.fhir.workflow.testing.CqlBuilder
 import com.google.common.truth.Truth.assertThat
-import java.util.Base64
-import java.util.Date
+import java.io.InputStream
+import java.util.TimeZone
 import kotlinx.coroutines.runBlocking
-import org.cqframework.cql.cql2elm.CqlTranslator
-import org.cqframework.cql.cql2elm.CqlTranslatorOptions
-import org.cqframework.cql.cql2elm.FhirLibrarySourceProvider
-import org.cqframework.cql.cql2elm.LibraryManager
-import org.cqframework.cql.cql2elm.ModelManager
+import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Measure
-import org.hl7.fhir.r4.model.MeasureReport
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.opencds.cqf.cql.evaluator.measure.common.MeasureEvalType
 import org.robolectric.RobolectricTestRunner
+import org.skyscreamer.jsonassert.JSONAssert
 
 @RunWith(RobolectricTestRunner::class)
 class FhirOperatorTest {
@@ -57,13 +53,13 @@ class FhirOperatorTest {
     private val jsonParser = fhirContext.newJsonParser()
     private val xmlParser = fhirContext.newXmlParser()
 
-    private fun parseJson(path: String): Bundle =
-      jsonParser.parseResource(jsonParser.javaClass.getResourceAsStream(path)) as Bundle
+    private fun open(path: String) = FhirOperatorTest::class.java.getResourceAsStream(path)!!
 
-    private fun readResourceAsString(path: String) =
-      FhirOperatorTest::class.java.getResourceAsStream(path)!!.readBytes().decodeToString()
+    private fun parseJson(path: String): Bundle = jsonParser.parseResource(open(path)) as Bundle
 
-    private fun <T> parseResource(path: String) =
+    private fun readResourceAsString(path: String) = open(path).readBytes().decodeToString()
+
+    private fun <T : IBaseResource> parseResource(path: String) =
       jsonParser.parseResource(readResourceAsString(path)) as T
   }
 
@@ -71,16 +67,16 @@ class FhirOperatorTest {
   fun setUp() = runBlocking {
     fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
     fhirOperator = FhirOperator(fhirContext, fhirEngine)
+    TimeZone.setDefault(TimeZone.getTimeZone("GMT"))
   }
 
   @Test
-  @Ignore("Refactor the API to accommodate local end points")
   fun generateCarePlan() = runBlocking {
     loadBundle(libraryBundle)
     fhirEngine.run {
-      loadBundle(parseJson("/RuleFilters-1.0.0-bundle.json"))
-      loadBundle(parseJson("/tests-Reportable-bundle.json"))
-      loadBundle(parseJson("/tests-NotReportable-bundle.json"))
+      loadBundle(parseJson("/plan-definition/rule-filters/RuleFilters-1.0.0-bundle.json"))
+      loadBundle(parseJson("/plan-definition/rule-filters/tests-Reportable-bundle.json"))
+      loadBundle(parseJson("/plan-definition/rule-filters/tests-NotReportable-bundle.json"))
 
       loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
       loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
@@ -99,6 +95,26 @@ class FhirOperatorTest {
   }
 
   @Test
+  fun generateCarePlanWithoutEncounter() = runBlocking {
+    loadBundle(parseJson("/plan-definition/med-request/med_request_patient.json"))
+    loadBundle(parseJson("/plan-definition/med-request/med_request_plan_definition.json"))
+
+    val carePlan =
+      fhirOperator.generateCarePlan(
+        planDefinitionId = "MedRequest-Example",
+        patientId = "Patient/Patient-Example"
+      )
+
+    println(jsonParser.encodeResourceToString(carePlan))
+
+    JSONAssert.assertEquals(
+      readResourceAsString("/plan-definition/med-request/med_request_careplan.json"),
+      jsonParser.encodeResourceToString(carePlan),
+      true
+    )
+  }
+
+  @Test
   fun evaluatePopulationMeasure() = runBlocking {
     loadBundle(libraryBundle)
     fhirEngine.run {
@@ -113,218 +129,55 @@ class FhirOperatorTest {
         measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
         start = "2019-01-01",
         end = "2021-12-31",
-        reportType = "population",
-        subject = null,
-        practitioner = "jane",
-        lastReceivedOn = null
-      )
-    val measureReportJSON = jsonParser.encodeResourceToString(measureReport)
-
-    assertThat(MeasureReport.MeasureReportStatus.COMPLETE).isEqualTo(measureReport.status)
-    assertThat(MeasureReport.MeasureReportType.SUMMARY).isEqualTo(measureReport.type)
-    assertThat(DateType(measureReport.period.start).toLocalDate.toString()).isEqualTo("2019-01-01")
-    assertThat(DateType(measureReport.period.end).toLocalDate.toString()).isEqualTo("2021-12-31")
-    assertThat(DateType(Date()).toLocalDate).isEqualTo(DateType(measureReport.date).toLocalDate)
-
-    assertThat(measureReportJSON).isNotNull()
-
-    assertThat(measureReport.extension[0].value.toString())
-      .isEqualTo(
-        "Percentage of pregnant women with first ANC contact in the first trimester (before 12 weeks of gestation)"
-      )
-    assertThat(measureReport.extension[0].url)
-      .isEqualTo(
-        "http://hl7.org/fhir/5.0/StructureDefinition/extension-MeasureReport.population.description"
-      )
-
-    assertThat(measureReport.measure.toString())
-      .isEqualTo("http://fhir.org/guides/who/anc-cds/Measure/ANCIND01")
-    assertThat(measureReport.improvementNotation.coding[0].system)
-      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-improvement-notation")
-    assertThat(measureReport.improvementNotation.coding[0].code.toString()).isEqualTo("increase")
-
-    val population = measureReport.group[0].population
-
-    assertThat(population[0].id).isEqualTo("initial-population")
-    assertThat(population[0].code.coding[0].code.toString()).isEqualTo("initial-population")
-    assertThat(population[0].code.coding[0].system)
-      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
-
-    assertThat(population[1].id).isEqualTo("denominator")
-    assertThat(population[1].code.coding[0].code.toString()).isEqualTo("denominator")
-    assertThat(population[1].code.coding[0].system)
-      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
-
-    assertThat(population[2].id).isEqualTo("numerator")
-    assertThat(population[2].code.coding[0].code.toString()).isEqualTo("numerator")
-    assertThat(population[2].code.coding[0].system)
-      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
-
-    assertThat(measureReport.type.display).isEqualTo("Summary")
-  }
-
-  @Test
-  fun evaluateGroupPopulationMeasure() = runBlocking {
-    val resourceBundle = Bundle()
-
-    val resourceDir = "/group-measure"
-    val cqlElm = toJsonElm(readResourceAsString("$resourceDir/cql.txt"))
-
-    resourceBundle.addEntry().apply {
-      this.resource =
-        jsonParser.parseResource(
-          readResourceAsString("$resourceDir/library.json")
-            .replace("#library-elm.json", cqlElm.readStringToBase64Encoded())
-        ) as
-          Library
-    }
-
-    resourceBundle.addEntry().apply {
-      this.resource = parseResource<Library>("/lib-fhir-helper.json")
-    }
-    resourceBundle.addEntry().apply {
-      this.resource = parseResource<Measure>("$resourceDir/measure.json")
-    }
-
-    loadBundle(resourceBundle)
-    loadBundle(parseJson("$resourceDir/groups-bundle.json"))
-    loadBundle(parseJson("$resourceDir/patients-bundle.json"))
-
-    val measureReport =
-      fhirOperator.evaluateMeasure(
-        measureUrl = "Measure/group-measure",
-        start = "2019-01-01",
-        end = "2022-12-31",
-        reportType = "population",
+        reportType = MeasureEvalType.POPULATION.toCode(),
         subject = null,
         practitioner = null,
         lastReceivedOn = null
       )
 
-    with(measureReport.group[0]) {
-      assertThat(id).isEqualTo("groups")
-      assertThat(population[0].id).isEqualTo("initial-population")
-      assertThat(population[0].count).isEqualTo(17)
-      assertThat(population[1].id).isEqualTo("denominator")
-      assertThat(population[1].count).isEqualTo(17)
-      assertThat(population[2].id).isEqualTo("numerator")
-      assertThat(population[2].count).isEqualTo(17)
-      assertThat(measureScore.value.toPlainString()).isEqualTo("1.0")
-      assertThat(stratifierFirstRep.id).isNull()
-      assertThat(stratifierFirstRep.stratum).isEmpty()
-    }
-    with(measureReport.group[1]) {
-      assertThat(id).isEqualTo("males")
-      assertThat(population[0].id).isEqualTo("initial-population")
-      assertThat(population[0].count).isEqualTo(17)
-      assertThat(population[1].id).isEqualTo("denominator")
-      assertThat(population[1].count).isEqualTo(17)
-      assertThat(population[2].id).isEqualTo("numerator")
-      assertThat(population[2].count).isEqualTo(7)
-      assertThat(measureScore.value.toPlainString()).isEqualTo("0.4117647058823529")
-      assertThat(stratifierFirstRep.id).isEqualTo("by-age")
-      with(stratifierFirstRep.stratum[0]) {
-        assertThat(value.text).isEqualTo("P0Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(1)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(1)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(1)
+    measureReport.date = null
+
+    JSONAssert.assertEquals(
+      readResourceAsString("/first-contact/04-results/population-report.json"),
+      jsonParser.setPrettyPrint(true).encodeResourceToString(measureReport),
+      true
+    )
+  }
+
+  @Test
+  fun evaluateGroupPopulationMeasure() = runBlocking {
+    val resourceBundle =
+      Bundle().apply {
+        addEntry().apply {
+          resource = toFhirLibrary(open("/group-measure/PatientGroups-1.0.0.cql"))
+        }
+        addEntry().apply {
+          resource = parseResource<Measure>("/group-measure/PatientGroupsMeasure.json")
+        }
       }
-      with(stratifierFirstRep.stratum[1]) {
-        assertThat(value.text).isEqualTo("P50Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(1)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(1)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(0)
-      }
-      with(stratifierFirstRep.stratum[2]) {
-        assertThat(value.text).isEqualTo("P15-49Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(2)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(2)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(1)
-      }
-      with(stratifierFirstRep.stratum[3]) {
-        assertThat(value.text).isEqualTo("P6-14Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(2)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(2)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(0)
-      }
-      with(stratifierFirstRep.stratum[4]) {
-        assertThat(value.text).isEqualTo("P1-5Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(11)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(11)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(5)
-      }
-    }
-    with(measureReport.group[2]) {
-      assertThat(id).isEqualTo("females")
-      assertThat(population[0].id).isEqualTo("initial-population")
-      assertThat(population[0].count).isEqualTo(17)
-      assertThat(population[1].id).isEqualTo("denominator")
-      assertThat(population[1].count).isEqualTo(17)
-      assertThat(population[2].id).isEqualTo("numerator")
-      assertThat(population[2].count).isEqualTo(10)
-      assertThat(measureScore.value.toPlainString()).isEqualTo("0.5882352941176471")
-      assertThat(stratifierFirstRep.id).isEqualTo("by-age")
-      with(stratifierFirstRep.stratum[0]) {
-        assertThat(value.text).isEqualTo("P0Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(1)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(1)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(0)
-      }
-      with(stratifierFirstRep.stratum[1]) {
-        assertThat(value.text).isEqualTo("P50Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(1)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(1)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(1)
-      }
-      with(stratifierFirstRep.stratum[2]) {
-        assertThat(value.text).isEqualTo("P15-49Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(2)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(2)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(1)
-      }
-      with(stratifierFirstRep.stratum[3]) {
-        assertThat(value.text).isEqualTo("P6-14Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(2)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(2)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(2)
-      }
-      with(stratifierFirstRep.stratum[4]) {
-        assertThat(value.text).isEqualTo("P1-5Y")
-        assertThat(population[0].id).isEqualTo("initial-population")
-        assertThat(population[0].count).isEqualTo(11)
-        assertThat(population[1].id).isEqualTo("denominator")
-        assertThat(population[1].count).isEqualTo(11)
-        assertThat(population[2].id).isEqualTo("numerator")
-        assertThat(population[2].count).isEqualTo(6)
-      }
-    }
+
+    loadBundle(resourceBundle)
+    loadBundle(parseJson("/group-measure/Data-Patients-bundle.json"))
+    loadBundle(parseJson("/group-measure/Data-Groups-bundle.json"))
+
+    val measureReport =
+      fhirOperator.evaluateMeasure(
+        measureUrl = "Measure/PatientGroupsMeasure",
+        start = "2019-01-01",
+        end = "2022-12-31",
+        reportType = MeasureEvalType.POPULATION.toCode(),
+        subject = null,
+        practitioner = null,
+        lastReceivedOn = null
+      )
+
+    measureReport.date = null
+
+    JSONAssert.assertEquals(
+      readResourceAsString("/group-measure/Results-Measure-report.json"),
+      jsonParser.setPrettyPrint(true).encodeResourceToString(measureReport),
+      true
+    )
   }
 
   @Test
@@ -341,91 +194,27 @@ class FhirOperatorTest {
         measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
         start = "2020-01-01",
         end = "2020-01-31",
-        reportType = "subject",
+        reportType = MeasureEvalType.SUBJECT.toCode(),
         subject = "charity-otala-1",
         practitioner = "jane",
         lastReceivedOn = null
       )
-    val measureReportJSON = jsonParser.encodeResourceToString(measureReport)
-    assertThat(MeasureReport.MeasureReportStatus.COMPLETE).isEqualTo(measureReport.status)
-    assertThat(MeasureReport.MeasureReportType.INDIVIDUAL).isEqualTo(measureReport.type)
-    assertThat(DateType(Date()).toLocalDate).isEqualTo(DateType(measureReport.date).toLocalDate)
-    assertThat("2020-01-01").isEqualTo(DateType(measureReport.period.start).toLocalDate.toString())
-    assertThat("2020-01-31").isEqualTo(DateType(measureReport.period.end).toLocalDate.toString())
-    assertThat("Patient/charity-otala-1").isEqualTo(measureReport.subject.reference)
-    assertThat(measureReportJSON).isNotNull()
-    assertThat(measureReport).isNotNull()
 
-    assertThat(measureReport.extension[0].value.toString())
-      .isEqualTo(
-        "Percentage of pregnant women with first ANC contact in the first trimester (before 12 weeks of gestation)"
-      )
-    assertThat(measureReport.extension[0].url)
-      .isEqualTo(
-        "http://hl7.org/fhir/5.0/StructureDefinition/extension-MeasureReport.population.description"
-      )
+    measureReport.date = null
 
-    assertThat(measureReport.measure.toString())
-      .isEqualTo("http://fhir.org/guides/who/anc-cds/Measure/ANCIND01")
-    assertThat(measureReport.improvementNotation.coding[0].system)
-      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-improvement-notation")
-    assertThat(measureReport.improvementNotation.coding[0].code.toString()).isEqualTo("increase")
-
-    val evaluatedResource = measureReport.evaluatedResource
-
-    assertThat(evaluatedResource[0].reference).isEqualTo("Encounter/anc-encounter-charity-otala-1")
-    assertThat(evaluatedResource[0].extension[0].url)
-      .isEqualTo(
-        "http://hl7.org/fhir/us/davinci-deqm/StructureDefinition/extension-populationReference"
-      )
-    assertThat(evaluatedResource[0].extension[0].value.toString()).isEqualTo("denominator")
-
-    assertThat(evaluatedResource[1].reference)
-      .isEqualTo("EpisodeOfCare/charity-otala-1-pregnancy-episode")
-    assertThat(evaluatedResource[1].extension[0].url)
-      .isEqualTo(
-        "http://hl7.org/fhir/us/davinci-deqm/StructureDefinition/extension-populationReference"
-      )
-    assertThat(evaluatedResource[1].extension[0].value.toString()).isEqualTo("initial-population")
-
-    assertThat(evaluatedResource[2].reference).isEqualTo("Patient/charity-otala-1")
-    assertThat(evaluatedResource[2].extension[0].url)
-      .isEqualTo(
-        "http://hl7.org/fhir/us/davinci-deqm/StructureDefinition/extension-populationReference"
-      )
-    assertThat(evaluatedResource[2].extension[0].value.toString()).isEqualTo("initial-population")
-    assertThat(evaluatedResource[2].extension[1].url)
-      .isEqualTo(
-        "http://hl7.org/fhir/us/davinci-deqm/StructureDefinition/extension-populationReference"
-      )
-    assertThat(evaluatedResource[2].extension[1].value.toString()).isEqualTo("denominator")
-
-    val population = measureReport.group[0].population
-
-    assertThat(population[0].id).isEqualTo("initial-population")
-    assertThat(population[0].code.coding[0].code.toString()).isEqualTo("initial-population")
-    assertThat(population[0].code.coding[0].system)
-      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
-
-    assertThat(population[1].id).isEqualTo("denominator")
-    assertThat(population[1].code.coding[0].code.toString()).isEqualTo("denominator")
-    assertThat(population[1].code.coding[0].system)
-      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
-
-    assertThat(population[2].id).isEqualTo("numerator")
-    assertThat(population[2].code.coding[0].code.toString()).isEqualTo("numerator")
-    assertThat(population[2].code.coding[0].system)
-      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
-
-    assertThat(measureReport.type.display).isEqualTo("Individual")
+    JSONAssert.assertEquals(
+      readResourceAsString("/first-contact/04-results/subject-report.json"),
+      jsonParser.setPrettyPrint(true).encodeResourceToString(measureReport),
+      true
+    )
   }
 
   private suspend fun loadFile(path: String) {
     if (path.endsWith(suffix = ".xml")) {
-      val resource = xmlParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
+      val resource = xmlParser.parseResource(open(path)) as Resource
       fhirEngine.create(resource)
     } else if (path.endsWith(".json")) {
-      val resource = jsonParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
+      val resource = jsonParser.parseResource(open(path)) as Resource
       fhirEngine.create(resource)
     }
   }
@@ -440,22 +229,7 @@ class FhirOperatorTest {
     }
   }
 
-  private fun toJsonElm(cql: String): String {
-    val libraryManager = LibraryManager(ModelManager())
-    libraryManager.librarySourceLoader.registerProvider(FhirLibrarySourceProvider())
-
-    val translator: CqlTranslator =
-      CqlTranslator.fromText(
-        cql,
-        libraryManager.modelManager,
-        libraryManager,
-        *CqlTranslatorOptions.defaultOptions().options.toTypedArray()
-      )
-
-    return translator.toJxson()
-  }
-
-  private fun String.readStringToBase64Encoded(): String {
-    return Base64.getEncoder().encodeToString(this.toByteArray())
+  private fun toFhirLibrary(cql: InputStream): Library {
+    return CqlBuilder.compileAndBuild(cql)
   }
 }

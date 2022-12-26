@@ -19,13 +19,10 @@ package com.google.android.fhir.datacapture.views
 import android.content.Context
 import android.view.View
 import android.widget.FrameLayout
-import android.widget.TextView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.RootMatchers.isDialog
-import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -39,6 +36,7 @@ import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.Valid
+import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
 import java.util.Date
@@ -72,35 +70,14 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun validDateTextInput_updateCalenderDialogView() {
-    activityScenarioRule.scenario.onActivity { activity -> setLocale(Locale.US, activity) }
-    val questionnaireItemView =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
-      )
-
-    runOnUI {
-      viewHolder.bind(questionnaireItemView)
-      viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text = "11/19/20"
-    }
-
-    onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
-    onView(allOf(withText("Nov 19, 2020")))
-      .inRoot(RootMatchers.isDialog())
-      .check(matches(ViewMatchers.isDisplayed()))
-  }
-
-  @Test
   fun shouldSetDateInput() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemView =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -113,12 +90,12 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
 
     val today = DateTimeType.today().valueAsString
 
-    assertThat(questionnaireItemView.answers.singleOrNull()?.valueDateType?.valueAsString)
-      .isEqualTo(today)
+    assertThat(answerHolder!!.single().valueDateType?.valueAsString).isEqualTo(today)
   }
 
   @Test
   fun shouldSetDateInput_withinRange() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemView =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -135,7 +112,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -154,13 +131,88 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         viewHolder.itemView.context
       )
 
-    assertThat(questionnaireItemView.answers.singleOrNull()?.valueDateType?.valueAsString)
-      .isEqualTo(today)
+    assertThat(answerHolder!!.single().valueDateType?.valueAsString).isEqualTo(today)
     assertThat(validationResult).isEqualTo(Valid)
   }
 
   @Test
+  fun shouldSetDateInput_invalid_date_entry_invalid_month_day_year() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    onView(withId(R.id.text_input_layout)).perform(ViewActions.click())
+    onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("40/0/-9992"))
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isEqualTo("Date format needs to be M/d/yy")
+  }
+
+  @Test
+  fun shouldSetDateInput_invalid_date_entry_invalid_day() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    onView(withId(R.id.text_input_layout)).perform(ViewActions.click())
+    onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("1/100/2"))
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isEqualTo("Date format needs to be M/d/yy")
+  }
+
+  @Test
+  fun shouldSetDateInput_invalid_date_entry_invalid_month() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    onView(withId(R.id.text_input_layout)).perform(ViewActions.click())
+    onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("40/1/2"))
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isEqualTo("Date format needs to be M/d/yy")
+  }
+
+  @Test
+  fun shouldSetDateInput_invalid_date_entry_invalid_year() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    onView(withId(R.id.text_input_layout)).perform(ViewActions.click())
+    onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("1/1/22222"))
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isEqualTo("Date format needs to be M/d/yy")
+  }
+  @Test
   fun shouldNotSetDateInput_outsideMaxRange() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val maxDate = DateType(Date()).apply { add(Calendar.YEAR, -2) }
     val questionnaireItemView =
       QuestionnaireItemViewItem(
@@ -177,7 +229,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -192,7 +244,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
     val validationResult =
       QuestionnaireResponseItemValidator.validate(
         questionnaireItemView.questionnaireItem,
-        questionnaireItemView.answers,
+        answerHolder!!,
         viewHolder.itemView.context
       )
 
@@ -202,6 +254,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
 
   @Test
   fun shouldNotSetDateInput_outsideMinRange() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val minDate = DateType(Date()).apply { add(Calendar.YEAR, 1) }
     val questionnaireItemView =
       QuestionnaireItemViewItem(
@@ -218,7 +271,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -233,7 +286,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
     val validationResult =
       QuestionnaireResponseItemValidator.validate(
         questionnaireItemView.questionnaireItem,
-        questionnaireItemView.answers,
+        answerHolder!!,
         viewHolder.itemView.context
       )
 

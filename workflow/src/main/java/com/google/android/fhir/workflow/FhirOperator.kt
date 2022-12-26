@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import java.util.function.Supplier
-import org.cqframework.cql.cql2elm.CqlTranslatorOptions
 import org.hl7.fhir.instance.model.api.IBaseParameters
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CarePlan
@@ -33,6 +32,7 @@ import org.hl7.fhir.r4.model.Parameters
 import org.opencds.cqf.cql.engine.data.CompositeDataProvider
 import org.opencds.cqf.cql.engine.fhir.converter.FhirTypeConverterFactory
 import org.opencds.cqf.cql.engine.fhir.model.R4FhirModelResolver
+import org.opencds.cqf.cql.evaluator.CqlOptions
 import org.opencds.cqf.cql.evaluator.activitydefinition.r4.ActivityDefinitionProcessor
 import org.opencds.cqf.cql.evaluator.builder.Constants
 import org.opencds.cqf.cql.evaluator.builder.CqlEvaluatorBuilder
@@ -41,7 +41,8 @@ import org.opencds.cqf.cql.evaluator.builder.ModelResolverFactory
 import org.opencds.cqf.cql.evaluator.builder.data.DataProviderFactory
 import org.opencds.cqf.cql.evaluator.builder.data.FhirModelResolverFactory
 import org.opencds.cqf.cql.evaluator.builder.data.TypedRetrieveProviderFactory
-import org.opencds.cqf.cql.evaluator.builder.library.TypedLibraryContentProviderFactory
+import org.opencds.cqf.cql.evaluator.builder.library.LibrarySourceProviderFactory
+import org.opencds.cqf.cql.evaluator.builder.library.TypedLibrarySourceProviderFactory
 import org.opencds.cqf.cql.evaluator.builder.terminology.TerminologyProviderFactory
 import org.opencds.cqf.cql.evaluator.builder.terminology.TypedTerminologyProviderFactory
 import org.opencds.cqf.cql.evaluator.cql2elm.util.LibraryVersionSelector
@@ -62,7 +63,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   private val fhirTypeConverter = FhirTypeConverterFactory().create(FhirVersionEnum.R4)
   private val fhirEngineRetrieveProvider =
     FhirEngineRetrieveProvider(fhirEngine).apply {
-      terminologyProvider = terminologyProvider
+      terminologyProvider = fhirEngineTerminologyProvider
       isExpandValueSets = true
     }
   private val dataProvider =
@@ -84,11 +85,11 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   private val cqlFhirParameterConverter =
     CqlFhirParametersConverter(fhirContext, adapterFactory, fhirTypeConverter)
   private val libraryContentProviderFactory =
-    org.opencds.cqf.cql.evaluator.builder.library.LibraryContentProviderFactory(
+    LibrarySourceProviderFactory(
       fhirContext,
       adapterFactory,
-      hashSetOf<TypedLibraryContentProviderFactory>(
-        object : TypedLibraryContentProviderFactory {
+      hashSetOf<TypedLibrarySourceProviderFactory>(
+        object : TypedLibrarySourceProviderFactory {
           override fun getType() = Constants.HL7_FHIR_FILES
           override fun create(url: String?, headers: MutableList<String>?) = libraryContentProvider
         }
@@ -124,8 +125,8 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
 
   private val evaluatorBuilderSupplier = Supplier {
     CqlEvaluatorBuilder()
-      .withLibraryContentProvider(libraryContentProvider)
-      .withCqlTranslatorOptions(CqlTranslatorOptions.defaultOptions())
+      .withLibrarySourceProvider(libraryContentProvider)
+      .withCqlOptions(CqlOptions.defaultOptions())
       .withTerminologyProvider(fhirEngineTerminologyProvider)
   }
 
@@ -236,7 +237,15 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     )
   }
 
-  fun generateCarePlan(planDefinitionId: String, patientId: String, encounterId: String): CarePlan {
+  fun generateCarePlan(planDefinitionId: String, patientId: String): CarePlan {
+    return generateCarePlan(planDefinitionId, patientId, encounterId = null)
+  }
+
+  fun generateCarePlan(
+    planDefinitionId: String,
+    patientId: String,
+    encounterId: String?
+  ): CarePlan {
     return planDefinitionProcessor.apply(
       IdType("PlanDefinition", planDefinitionId),
       patientId,

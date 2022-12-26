@@ -245,6 +245,49 @@ class QuestionnaireItemHeaderViewTest {
     assertThat(view.visibility).isEqualTo(View.GONE)
   }
 
+  @Test
+  fun `shows * at the end of question text`() {
+    view.bind(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        text = "Question?"
+        required = true
+      }
+    )
+
+    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question? *")
+  }
+
+  @Test
+  fun `does not show * at the end of question text`() {
+    view.bind(Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" })
+
+    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question?")
+  }
+
+  @Test
+  fun `shows * though question text is missing`() {
+    view.bind(Questionnaire.QuestionnaireItemComponent().apply { required = true })
+
+    assertThat(view.findViewById<TextView>(R.id.question).text.toString())
+      .isEqualTo(view.context.applicationContext.resources.getString(R.string.space_asterisk))
+  }
+
+  @Test
+  fun `shows error text`() {
+    view.showErrorText("missing answer for required field")
+    assertThat(view.findViewById<TextView>(R.id.error_text_at_header).text.toString())
+      .isEqualTo("missing answer for required field")
+    assertThat(view.findViewById<TextView>(R.id.error_text_at_header).visibility)
+      .isEqualTo(View.VISIBLE)
+  }
+
+  @Test
+  fun `hides error text`() {
+    view.showErrorText(isErrorTextVisible = false)
+    assertThat(view.findViewById<TextView>(R.id.error_text_at_header).visibility)
+      .isEqualTo(View.GONE)
+  }
+
   private val displayCategoryExtensionWithInstructionsCode =
     Extension().apply {
       url = EXTENSION_DISPLAY_CATEGORY_URL

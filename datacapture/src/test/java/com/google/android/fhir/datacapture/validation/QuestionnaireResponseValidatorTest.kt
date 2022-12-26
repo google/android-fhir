@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
+import com.google.android.fhir.datacapture.EXTENSION_HIDDEN_URL
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Attachment
@@ -191,6 +192,56 @@ class QuestionnaireResponseValidatorTest {
   }
 
   @Test
+  fun `validation passes if question is required but not enabled`() {
+    val questionnaire =
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "q1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "q2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            required = true
+            addEnableWhen(
+              Questionnaire.QuestionnaireItemEnableWhenComponent()
+                .setQuestion("q1")
+                .setOperator(Questionnaire.QuestionnaireItemOperator.EXISTS)
+                .setAnswer(BooleanType(true))
+            )
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        this.questionnaire = "questionnaire-1"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "q1"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+      }
+
+    val result =
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        questionnaireResponse,
+        context
+      )
+    assertThat(result.keys).containsExactly("q1")
+    assertThat(result["q1"]).containsExactly(Valid)
+  }
+
+  @Test
   fun validateQuestionnaireResponse_questionnaireResponseHasFewerItems_shouldReturnValidResult() {
     val questionnaire =
       Questionnaire().apply {
@@ -269,18 +320,6 @@ class QuestionnaireResponseValidatorTest {
       Questionnaire().apply { url = "questionnaire-1" },
       QuestionnaireResponse(),
       context
-    )
-  }
-
-  @Test
-  fun `check passes if questionnaire response matches questionnaire`() {
-    QuestionnaireResponseValidator.checkQuestionnaireResponse(
-      Questionnaire().apply {
-        url = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
-      },
-      QuestionnaireResponse().apply {
-        questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
-      }
     )
   }
 
@@ -376,6 +415,91 @@ class QuestionnaireResponseValidatorTest {
   }
 
   @Test
+  fun `validation passes for required questionnaire item with hidden extension when no value specified`() {
+    val questionnaire =
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+              StringType("valid-hidden-item"),
+              Enumeration(
+                Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                Questionnaire.QuestionnaireItemType.INTEGER
+              )
+            )
+            .apply {
+              this.required = true
+              addExtension().apply {
+                url = EXTENSION_HIDDEN_URL
+                setValue(BooleanType(true))
+              }
+            }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        this.questionnaire = "questionnaire-1"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("valid-hidden-item"))
+        )
+      }
+
+    val result =
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        questionnaireResponse,
+        context
+      )
+
+    assertThat(result.entries.first().key).isEqualTo("valid-hidden-item")
+    assertThat(result.entries.first().value.first()).isEqualTo(NotValidated)
+  }
+
+  @Test
+  fun `validation fails for required questionnaire item with hidden extension set to false when no value specified`() {
+    val questionnaire =
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+              StringType("valid-hidden-item"),
+              Enumeration(
+                Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                Questionnaire.QuestionnaireItemType.INTEGER
+              )
+            )
+            .apply {
+              this.required = true
+              addExtension().apply {
+                url = EXTENSION_HIDDEN_URL
+                setValue(BooleanType(false))
+              }
+            }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        this.questionnaire = "questionnaire-1"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("valid-hidden-item"))
+        )
+      }
+
+    val result =
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context
+        )
+        .entries.first()
+
+    assertThat(result.key).isEqualTo("valid-hidden-item")
+    assertThat(result.value.first()).isInstanceOf(Invalid::class.java)
+    assertThat((result.value.first() as Invalid).getSingleStringValidationMessage())
+      .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
   fun `validate recursively for questionnaire item type GROUP`() {
     assertException_validateQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
@@ -439,6 +563,18 @@ class QuestionnaireResponseValidatorTest {
       },
       "Multiple answers for non-repeat questionnaire item question-1",
       context
+    )
+  }
+
+  @Test
+  fun `check passes if questionnaire response matches questionnaire`() {
+    QuestionnaireResponseValidator.checkQuestionnaireResponse(
+      Questionnaire().apply {
+        url = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
+      },
+      QuestionnaireResponse().apply {
+        questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
+      }
     )
   }
 

@@ -16,12 +16,10 @@
 
 package com.google.android.fhir.sync.remote
 
-import com.google.android.fhir.BuildConfig
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.progress.ProgressCallback
-import com.google.android.fhir.sync.progress.ProgressInterceptor
 import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -30,10 +28,8 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Tag
 import retrofit2.http.Url
 
 /** Interface to make http requests to the FHIR server. */
@@ -42,34 +38,31 @@ internal interface RemoteFhirService : DataSource {
   @GET override suspend fun download(@Url path: String): Resource
 
   @POST(".")
-  override suspend fun upload(
-    @Body bundle: Bundle,
-    @Tag progressCallback: ProgressCallback?
-  ): Resource
+  override suspend fun upload(bundle: Bundle, progressCallback: ProgressCallback?): Resource
 
   class Builder(
     private val baseUrl: String,
     private val networkConfiguration: NetworkConfiguration
   ) {
     private var authenticator: Authenticator? = null
+    private var httpLoggingInterceptor: HttpLoggingInterceptor? = null
 
-    fun setAuthenticator(authenticator: Authenticator?) {
+    fun setAuthenticator(authenticator: Authenticator?) = apply {
       this.authenticator = authenticator
     }
 
+    fun setHttpLogger(httpLogger: HttpLogger) = apply {
+      httpLoggingInterceptor = httpLogger.toOkHttpLoggingInterceptor()
+    }
+
     fun build(): RemoteFhirService {
-      val logger = HttpLoggingInterceptor()
-      logger.level =
-        if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
-        else HttpLoggingInterceptor.Level.BASIC
       val client =
         OkHttpClient.Builder()
+          .connectTimeout(networkConfiguration.connectionTimeOut, TimeUnit.SECONDS)
+          .readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
+          .writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
           .apply {
-            connectTimeout(networkConfiguration.connectionTimeOut, TimeUnit.SECONDS)
-            readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
-            writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
-            addInterceptor(logger)
-            addNetworkInterceptor(ProgressInterceptor())
+            httpLoggingInterceptor?.let { addInterceptor(it) }
             authenticator?.let {
               addInterceptor(
                 Interceptor { chain: Interceptor.Chain ->

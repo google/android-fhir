@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
@@ -99,6 +100,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
 
   @Test
   fun `parse date text input in US locale`() {
+    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val itemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -108,13 +110,13 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
               .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, result -> answers = result },
       )
     viewHolder.bind(itemViewItem)
 
     viewHolder.dateInputView.text = "11/19/2020"
 
-    val answer = itemViewItem.answers.singleOrNull()?.value as DateTimeType
+    val answer = answers!!.single().value as DateTimeType
     assertThat(answer.day).isEqualTo(19)
     assertThat(answer.month).isEqualTo(10)
     assertThat(answer.year).isEqualTo(2020)
@@ -123,6 +125,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
   @Test
   fun `parse date text input in Japan locale`() {
     Locale.setDefault(Locale.JAPAN)
+    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val itemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -132,13 +135,13 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
               .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, result -> answers = result },
       )
     viewHolder.bind(itemViewItem)
 
     viewHolder.dateInputView.text = "2020/11/19"
 
-    val answer = itemViewItem.answers.singleOrNull()?.value as DateTimeType
+    val answer = answers!!.single().value as DateTimeType
     assertThat(answer.day).isEqualTo(19)
     assertThat(answer.month).isEqualTo(10)
     assertThat(answer.year).isEqualTo(2020)
@@ -146,6 +149,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
 
   @Test
   fun `if date input is invalid then clear the answer`() {
+    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val itemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -155,12 +159,12 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
               .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, result -> answers = result },
       )
     viewHolder.bind(itemViewItem)
     viewHolder.dateInputView.text = "2020/11/"
 
-    assertThat(itemViewItem.answers.singleOrNull()).isNull()
+    assertThat(answers!!).isEmpty()
   }
 
   @Test
@@ -241,6 +245,21 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
       .isNull()
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.time_input_layout).error)
       .isNull()
+  }
+
+  @Test
+  fun `hides error textview in the header`() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
+      .isEqualTo(View.GONE)
   }
 
   @Test

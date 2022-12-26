@@ -27,6 +27,7 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
 import org.hl7.fhir.r4.model.Type
 import org.intellij.lang.annotations.Language
 import org.junit.Test
@@ -39,29 +40,30 @@ import org.robolectric.annotation.Config
 class EnablementEvaluatorTest {
   @Test
   fun evaluate_noEnableWhen_shouldReturnTrue() {
-    evaluateEnableWhen().isTrue()
+    assertEnableWhen().isTrue()
   }
 
   @Test
-  fun evaluate_missingResponse_shouldReturnFalse() {
-    val questionnaire =
+  fun evaluate_missingResponseItem_shouldReturnFalse() {
+    val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "q1"
         type = Questionnaire.QuestionnaireItemType.BOOLEAN
-        addEnableWhen(Questionnaire.QuestionnaireItemEnableWhenComponent().setQuestion("q1"))
+        addEnableWhen(Questionnaire.QuestionnaireItemEnableWhenComponent().setQuestion("q2"))
       }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "q1" }
+    val questionnaireResponse = QuestionnaireResponse().apply { addItem(questionnaireResponseItem) }
     assertThat(
-        EnablementEvaluator.evaluate(
-          questionnaire,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          QuestionnaireResponse()
-        ) { _, _ -> null }
+        EnablementEvaluator(questionnaireResponse)
+          .evaluate(questionnaireItem, questionnaireResponseItem)
       )
       .isFalse()
   }
 
   @Test
   fun evaluate_expectAnswerExists_answerExists_shouldReturnTrue() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
@@ -74,7 +76,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_expectAnswerExists_answerDoesNotExist_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
@@ -87,7 +89,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_expectAnswerDoesNotExist_answerExists_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
@@ -162,20 +164,20 @@ class EnablementEvaluatorTest {
     val questionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
-    var questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent =
+    var questionnaireItem: Questionnaire.QuestionnaireItemComponent =
       Questionnaire.QuestionnaireItemComponent()
-    questionnaire.item.forEach { item -> if (item.linkId == "2") questionnaireItemComponent = item }
+    questionnaire.item.forEach { item -> if (item.linkId == "2") questionnaireItem = item }
 
     val questionnaireResponse =
-      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
-        QuestionnaireResponse
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+        as QuestionnaireResponse
 
     assertThat(
-        EnablementEvaluator.evaluate(
-          questionnaireItemComponent,
-          questionnaireResponse.item[1],
-          questionnaireResponse
-        ) { _, _ -> null }
+        EnablementEvaluator(questionnaireResponse)
+          .evaluate(
+            questionnaireItem,
+            questionnaireResponse.item[1],
+          )
       )
       .isTrue()
   }
@@ -248,22 +250,22 @@ class EnablementEvaluatorTest {
       Questionnaire.QuestionnaireItemComponent()
     questionnaire.item.forEach { item -> if (item.linkId == "2") questionnaireItemComponent = item }
     val questionnaireResponse =
-      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
-        QuestionnaireResponse
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+        as QuestionnaireResponse
 
     assertThat(
-        EnablementEvaluator.evaluate(
-          questionnaireItemComponent,
-          questionnaireResponse.item[1],
-          questionnaireResponse
-        ) { _, _ -> null }
+        EnablementEvaluator(questionnaireResponse)
+          .evaluate(
+            questionnaireItemComponent,
+            questionnaireResponse.item[1],
+          )
       )
       .isFalse()
   }
 
   @Test
   fun evaluate_expectAnswerDoesNotExist_answerDoesNotExist_shouldReturnTrue() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
@@ -276,7 +278,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_expectAnswerEqualToValue_noAnswer_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
@@ -289,7 +291,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_expectAnswerEqualToValue_someAnswerEqualToValue_shouldReturnTrue() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
@@ -302,7 +304,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_expectAnswerEqualToValue_noAnswerEqualToValue_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
@@ -315,7 +317,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_expectAnswerNotEqualToValue_noAnswer_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
@@ -328,7 +330,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_expectAnswerNotEqualToValue_someAnswerNotEqualToValue_shouldReturnTrue() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
@@ -341,7 +343,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_expectAnswerNotEqualToValue_noAnswerNotEqualToValue_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
@@ -354,7 +356,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_expectAnswerGreaterThanValue_someAnswerGreaterThanValue_shouldReturnTrue() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.GREATER_THAN,
@@ -367,7 +369,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_expectAnswerGreaterThanValue_noAnswerGreaterThanValue_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.GREATER_THAN,
@@ -380,7 +382,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_expectAnswerGreaterThanOrEqualToValue_someAnswerGreaterThanOrEqualToValue_shouldReturnTrue() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL,
@@ -393,7 +395,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_expectAnswerGreaterThanOrEqualToValue_noAnswerGreaterThanOrEqualToValue_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL,
@@ -406,7 +408,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_expectAnswerLessThanValue_someAnswerLessThanValue_shouldReturnTrue() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.LESS_THAN,
@@ -419,7 +421,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_expectAnswerLessThanValue_noAnswerLessThanValue_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.LESS_THAN,
@@ -432,7 +434,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_expectAnswerLessThanOrEqualToValue_someAnswerLessThanOrEqualToValue_shouldReturnTrue() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL,
@@ -445,7 +447,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_expectAnswerLessThanOrEqualToValue_noAnswerLessThanOrEqualToValue_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL,
@@ -458,7 +460,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_multipleEnableWhens_behaviorAny_noneSatisfied_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = Questionnaire.EnableWhenBehavior.ANY,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
@@ -476,7 +478,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_multipleEnableWhens_behaviorAny_someSatisfied_shouldReturnTrue() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = Questionnaire.EnableWhenBehavior.ANY,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
@@ -494,7 +496,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_multipleEnableWhens_behaviorAll_someSatisfied_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = Questionnaire.EnableWhenBehavior.ALL,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
@@ -512,7 +514,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_multipleEnableWhens_behaviorAll_allSatisfied_shouldReturnTrue() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = Questionnaire.EnableWhenBehavior.ALL,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
@@ -530,7 +532,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_primitiveType_equal_shouldReturnTrue() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
@@ -543,7 +545,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_primitiveType_equal_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
@@ -556,7 +558,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_primitiveType_notEqual_shouldReturnTrue() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
@@ -569,7 +571,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_primitiveType_notEqual_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
@@ -582,7 +584,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_codingType_equal_differentSystem_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
@@ -595,7 +597,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_codingType_equal_differentCode_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
@@ -608,7 +610,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_codingType_equal_differentDisplay_shouldReturnTrue() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
@@ -621,7 +623,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_codingType_notEqual_differentSystem_shouldReturnTrue() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
@@ -634,7 +636,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_codingType_notEqual_differentCode_shouldReturnTrue() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
@@ -647,7 +649,7 @@ class EnablementEvaluatorTest {
 
   @Test
   fun evaluate_codingType_notEqual_differentDisplay_shouldReturnFalse() {
-    evaluateEnableWhen(
+    assertEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
@@ -663,7 +665,7 @@ class EnablementEvaluatorTest {
    *
    * See https://www.hl7.org/fhir/valueset-questionnaire-enable-behavior.html.
    */
-  private fun evaluateEnableWhen(
+  private fun assertEnableWhen(
     behavior: Questionnaire.EnableWhenBehavior? = null,
     vararg enableWhen: EnableWhen
   ): BooleanSubject {
@@ -680,24 +682,25 @@ class EnablementEvaluatorTest {
         behavior?.let { enableBehavior = it }
         type = Questionnaire.QuestionnaireItemType.BOOLEAN
       }
-    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    return assertThat(
-      EnablementEvaluator.evaluate(
-        questionnaireItem,
-        questionnaireResponseItem,
-        QuestionnaireResponse()
-      ) { origin, linkId ->
-        if (origin === questionnaireResponseItem) {
-          return@evaluate QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            enableWhen[linkId.toInt()].actual.forEach {
-              addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(it)
-              )
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        enableWhen.forEachIndexed { index, enableWhen ->
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "$index"
+              enableWhen.actual.forEach {
+                addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = it })
+              }
             }
-          }
+          )
         }
-        return@evaluate null
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "target" }
+        )
       }
+    return assertThat(
+      EnablementEvaluator(questionnaireResponse)
+        .evaluate(questionnaireItem, questionnaireResponse.item.last())
     )
   }
 

@@ -199,6 +199,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
 
   @Test
   fun click_shouldSetQuestionnaireResponseItemAnswer() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -210,7 +211,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView
@@ -218,7 +219,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
       .getChildAt(1)
       .performClick()
 
-    assertThat(questionnaireItemViewItem.answers.single().valueCoding.display).isEqualTo("Coding 1")
+    assertThat(answerHolder!!.single().valueCoding.display).isEqualTo("Coding 1")
   }
 
   @Test
@@ -378,7 +379,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).text)
       .isEqualTo("Missing answer for required field.")
   }
 
@@ -406,7 +407,8 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.isEmpty()).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).text.isEmpty())
+      .isTrue()
   }
 
   @Test

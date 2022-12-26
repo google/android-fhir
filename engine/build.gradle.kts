@@ -1,4 +1,5 @@
 import codegen.GenerateSourcesTask
+import java.net.URL
 
 plugins {
   id(Plugins.BuildPlugins.androidLib)
@@ -6,6 +7,7 @@ plugins {
   id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
+  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
 }
 
 publishArtifact(Releases.Engine)
@@ -35,9 +37,6 @@ android {
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
-    // Required when setting minSdkVersion to 20 or lower
-    // See https://developer.android.com/studio/write/java8-support
-    multiDexEnabled = true
   }
 
   sourceSets {
@@ -63,18 +62,15 @@ android {
     // Flag to enable support for the new language APIs
     // See https = //developer.android.com/studio/write/java8-support
     isCoreLibraryDesugaringEnabled = true
-    // Sets Java compatibility to Java 8
-    // See https = //developer.android.com/studio/write/java8-support
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = Java.sourceCompatibility
+    targetCompatibility = Java.targetCompatibility
   }
 
   packagingOptions {
     resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
   }
 
-  // See https = //developer.android.com/studio/write/java8-support
-  kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
+  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
 
   configureJacocoTestOptions()
 }
@@ -136,4 +132,27 @@ dependencies {
   testImplementation(Dependencies.truth)
 }
 
-configureDokka(Releases.Engine.artifactId, Releases.Engine.version)
+tasks.dokkaHtml.configure {
+  outputDirectory.set(file("../docs/${Releases.Engine.artifactId}/${Releases.Engine.version}"))
+  suppressInheritedMembers.set(true)
+  dokkaSourceSets {
+    named("main") {
+      moduleName.set(Releases.Engine.artifactId)
+      moduleVersion.set(Releases.Engine.version)
+      noAndroidSdkLink.set(false)
+      sourceLink {
+        localDirectory.set(file("src/main/java"))
+        remoteUrl.set(
+          URL("https://github.com/google/android-fhir/tree/master/engine/src/main/java")
+        )
+        remoteLineSuffix.set("#L")
+      }
+      externalDocumentationLink {
+        url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
+        packageListUrl.set(
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+        )
+      }
+    }
+  }
+}

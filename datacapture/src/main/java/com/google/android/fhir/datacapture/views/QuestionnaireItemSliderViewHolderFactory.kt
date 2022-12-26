@@ -19,12 +19,16 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.sliderStepValue
 import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.MaxValueConstraintValidator
+import com.google.android.fhir.datacapture.validation.MinValueConstraintValidator
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.slider.Slider
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemSliderViewHolderFactory :
@@ -46,25 +50,36 @@ internal object QuestionnaireItemSliderViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         header.bind(questionnaireItemViewItem.questionnaireItem)
         val answer = questionnaireItemViewItem.answers.singleOrNull()
-        slider.valueFrom = 0.0F
-        slider.valueTo = 100.0F
-        slider.stepSize = 10.0F
-        val sliderValue = answer?.valueIntegerType?.value?.toString() ?: "0.0"
-        slider.value = sliderValue.toFloat()
+        val minValue = getMinValue(questionnaireItemViewItem.questionnaireItem)
+        val maxValue = getMaxValue(questionnaireItemViewItem.questionnaireItem)
+        if (minValue >= maxValue) {
+          throw IllegalStateException("minValue $minValue must be smaller than maxValue $maxValue")
+        }
 
-        slider.addOnChangeListener { _, newValue, _ ->
-          // Responds to when slider's value is changed
-          questionnaireItemViewItem.setAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(IntegerType(newValue.toInt()))
-          )
+        with(slider) {
+          valueFrom = minValue
+          valueTo = maxValue
+          stepSize =
+            (questionnaireItemViewItem.questionnaireItem?.sliderStepValue
+                ?: SLIDER_DEFAULT_STEP_SIZE)
+              .toFloat()
+          value = answer?.valueIntegerType?.value?.toFloat() ?: slider.valueFrom
+
+          addOnChangeListener { _, newValue, _ ->
+            // Responds to when slider's value is changed
+            questionnaireItemViewItem.setAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .setValue(IntegerType(newValue.toInt()))
+            )
+          }
         }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         error.text =
           when (validationResult) {
-            is NotValidated, Valid -> null
+            is NotValidated,
+            Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
       }
@@ -74,3 +89,21 @@ internal object QuestionnaireItemSliderViewHolderFactory :
       }
     }
 }
+
+private const val SLIDER_DEFAULT_STEP_SIZE = 1
+private const val SLIDER_DEFAULT_VALUE_FROM = 0.0F
+private const val SLIDER_DEFAULT_VALUE_TO = 100.0F
+
+private fun getMinValue(questionnaireItem: Questionnaire.QuestionnaireItemComponent) =
+  when (val minValue = MinValueConstraintValidator.getMinValue(questionnaireItem)) {
+    is IntegerType -> minValue.value.toFloat()
+    null -> SLIDER_DEFAULT_VALUE_FROM
+    else -> throw IllegalArgumentException("Cannot support data type: ${minValue.fhirType()}}")
+  }
+
+private fun getMaxValue(questionnaireItem: Questionnaire.QuestionnaireItemComponent) =
+  when (val maxValue = MaxValueConstraintValidator.getMaxValue(questionnaireItem)) {
+    is IntegerType -> maxValue.value.toFloat()
+    null -> SLIDER_DEFAULT_VALUE_TO
+    else -> throw IllegalArgumentException("Cannot support data type: ${maxValue.fhirType()}}")
+  }

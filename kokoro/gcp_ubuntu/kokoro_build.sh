@@ -63,7 +63,9 @@ function zip_artifacts() {
 function setup() {
   sudo npm cache clean -f
   sudo npm install -g n
-  sudo n stable
+  sudo n 16.18.0
+
+  gcloud components update --quiet
 
   wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip \
     -O ${HOME}/android_sdk.zip -q
@@ -100,7 +102,7 @@ function build_only() {
 # for documentation on the gsutil command used in this function
 function device_tests() {
   ./gradlew packageDebugAndroidTest --scan --stacktrace
-  local lib_names=("datacapture" "engine" "workflow")
+  local lib_names=("datacapture" "engine")
   firebase_pids=()
   for lib_name in "${lib_names[@]}"; do
    gcloud firebase test android run --type instrumentation \
@@ -108,6 +110,24 @@ function device_tests() {
       --test $lib_name/build/outputs/apk/androidTest/debug/$lib_name-debug-androidTest.apk \
       --timeout 30m \
       --device model=Nexus6P,version=24,locale=en_US \
+      --device model=Nexus6P,version=27,locale=en_US \
+      --device model=Pixel2,version=30,locale=en_US \
+      --environment-variables coverage=true,coverageFile="/sdcard/Download/coverage.ec" \
+      --directories-to-pull /sdcard/Download  \
+      --results-bucket=$GCS_BUCKET \
+      --results-dir=$KOKORO_BUILD_ARTIFACTS_SUBDIR/firebase/$lib_name \
+      --project=android-fhir-instrumeted-tests \
+      --num-flaky-test-attempts 3 \
+      --no-use-orchestrator &
+      firebase_pids+=("$!")
+  done
+
+  local lib_names_min_sdk_26=("workflow")
+  for lib_name in "${lib_names_min_sdk_26[@]}"; do
+   gcloud firebase test android run --type instrumentation \
+      --app demo/build/outputs/apk/androidTest/debug/demo-debug-androidTest.apk \
+      --test $lib_name/build/outputs/apk/androidTest/debug/$lib_name-debug-androidTest.apk \
+      --timeout 30m \
       --device model=Nexus6P,version=27,locale=en_US \
       --device model=Pixel2,version=30,locale=en_US \
       --environment-variables coverage=true,coverageFile="/sdcard/Download/coverage.ec" \

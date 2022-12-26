@@ -37,17 +37,15 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK
+import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_KEYBOARD
 import com.google.android.material.timepicker.TimeFormat
 import java.text.ParseException
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.chrono.IsoChronology
-import java.time.format.DateTimeFormatterBuilder
-import java.time.format.FormatStyle
 import java.util.Date
-import java.util.Locale
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -64,13 +62,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       private var localDate: LocalDate? = null
       private var localTime: LocalTime? = null
       private var textWatcher: TextWatcher? = null
-      private val localeDatePattern =
-        DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-          FormatStyle.SHORT,
-          null,
-          IsoChronology.INSTANCE,
-          Locale.getDefault()
-        )
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
@@ -119,21 +110,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           // necessary to access the base context twice to retrieve the application object
           // from the view's context.
           val context = itemView.context.tryUnwrapContext()!!
-          createMaterialTimePicker(context)
-            .apply {
-              addOnPositiveButtonClickListener {
-                with(LocalTime.of(this.hour, this.minute, 0)) {
-                  localTime = this
-                  timeInputEditText.setText(this.toLocalizedString(context))
-                  generateLocalDateTime(localDate, this)?.let {
-                    updateDateTimeInput(it)
-                    updateDateTimeAnswer(it)
-                  }
-                  timeInputEditText.clearFocus()
-                }
-              }
-            }
-            .show(context.supportFragmentManager, TAG_TIME_PICKER)
+          showMaterialTimePicker(context, INPUT_MODE_CLOCK)
+        }
+        timeInputEditText.setOnClickListener {
+          showMaterialTimePicker(itemView.context, INPUT_MODE_KEYBOARD)
         }
       }
 
@@ -154,6 +134,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         )
         textWatcher =
           dateInputEditText.doAfterTextChanged { text ->
+            if (text == null || text.isNullOrEmpty()) {
+              questionnaireItemViewItem.clearAnswer()
+              return@doAfterTextChanged
+            }
             try {
               localDate = parseDate(text.toString(), dateInputEditText.context.applicationContext)
               enableOrDisableTimePicker(enableIt = true)
@@ -162,24 +146,54 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 updateDateTimeAnswer(this)
               }
             } catch (e: ParseException) {
-              this.questionnaireItemViewItem.clearAnswer()
+              displayDateValidationError(
+                Invalid(
+                  listOf(
+                    dateInputEditText.context.getString(
+                      R.string.date_format_validation_error_msg,
+                      localeDatePattern
+                    )
+                  )
+                )
+              )
+              if (!timeInputLayout.isEnabled) {
+                displayTimeValidationError(Valid)
+              }
+              if (questionnaireItemViewItem.answers.isNotEmpty()) {
+                questionnaireItemViewItem.clearAnswer()
+              }
               localDate = null
               enableOrDisableTimePicker(enableIt = false)
             }
           }
       }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {
+      fun displayDateValidationError(validationResult: ValidationResult) {
         dateInputLayout.error =
           when (validationResult) {
-            is NotValidated, Valid -> null
+            is NotValidated,
+            Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
+      }
+
+      fun displayTimeValidationError(validationResult: ValidationResult) {
         timeInputLayout.error =
           when (validationResult) {
-            is NotValidated, Valid -> null
-            is Invalid -> validationResult.getSingleStringValidationMessage()
+            is NotValidated,
+            Valid -> null
+            is Invalid ->
+              if (timeInputLayout.isEnabled) {
+                validationResult.getSingleStringValidationMessage()
+              } else {
+                null
+              }
           }
+      }
+
+      override fun displayValidationResult(validationResult: ValidationResult) {
+        displayDateValidationError(validationResult)
+        displayTimeValidationError(validationResult)
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
@@ -260,25 +274,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           .build()
       }
 
-      private fun createMaterialTimePicker(context: Context): MaterialTimePicker {
-        val selectedTime =
-          questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType?.localTime
-            ?: LocalTime.now()
-
-        return MaterialTimePicker.Builder()
-          .apply {
-            setTitleText(R.string.select_time)
-            setHour(selectedTime.hour)
-            setMinute(selectedTime.minute)
-            if (DateFormat.is24HourFormat(context)) {
-              setTimeFormat(TimeFormat.CLOCK_24H)
-            } else {
-              setTimeFormat(TimeFormat.CLOCK_12H)
-            }
-          }
-          .build()
-      }
-
       private fun clearPreviousState() {
         localDate = null
         localTime = null
@@ -286,7 +281,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       private fun enableOrDisableTimePicker(enableIt: Boolean) {
-        timeInputLayout.isEnabled = enableIt
         timeInputLayout.isEnabled = enableIt
       }
 
@@ -303,6 +297,39 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           }
         if (answer == null || inputDate == null) return true
         return answer.toLocalDate() != inputDate.toLocalDate()
+      }
+
+      private fun showMaterialTimePicker(context: Context, inputMode: Int) {
+        val selectedTime =
+          questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType?.localTime
+            ?: LocalTime.now()
+        val timeFormat =
+          if (DateFormat.is24HourFormat(context)) {
+            TimeFormat.CLOCK_24H
+          } else {
+            TimeFormat.CLOCK_12H
+          }
+        MaterialTimePicker.Builder()
+          .setTitleText(R.string.select_time)
+          .setHour(selectedTime.hour)
+          .setMinute(selectedTime.minute)
+          .setTimeFormat(timeFormat)
+          .setInputMode(inputMode)
+          .build()
+          .apply {
+            addOnPositiveButtonClickListener {
+              with(LocalTime.of(this.hour, this.minute, 0)) {
+                localTime = this
+                timeInputEditText.setText(this.toLocalizedString(context))
+                generateLocalDateTime(localDate, this)?.let {
+                  updateDateTimeInput(it)
+                  updateDateTimeAnswer(it)
+                }
+                timeInputEditText.clearFocus()
+              }
+            }
+          }
+          .show(context.tryUnwrapContext()!!.supportFragmentManager, TAG_TIME_PICKER)
       }
     }
 }

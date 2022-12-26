@@ -57,9 +57,8 @@ internal class QuestionnaireItemEditAdapter(
 
     // Map custom widget viewTypes to their corresponding widget factories
     if (viewType >= numOfCanonicalWidgets)
-      return questionnaireItemViewHolderMatchers[viewType - numOfCanonicalWidgets].factory.create(
-        parent
-      )
+      return questionnaireItemViewHolderMatchers[viewType - numOfCanonicalWidgets]
+        .factory.create(parent)
 
     val viewHolderFactory =
       when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
@@ -136,6 +135,7 @@ internal class QuestionnaireItemEditAdapter(
       QuestionnaireItemType.CHOICE -> getChoiceViewHolderType(questionnaireItemViewItem)
       QuestionnaireItemType.DISPLAY -> QuestionnaireItemViewHolderType.DISPLAY
       QuestionnaireItemType.QUANTITY -> QuestionnaireItemViewHolderType.QUANTITY
+      QuestionnaireItemType.REFERENCE -> getChoiceViewHolderType(questionnaireItemViewItem)
       else -> throw NotImplementedError("Question type $type not supported.")
     }.value
   }

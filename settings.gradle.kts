@@ -27,6 +27,8 @@ if (kokoroRun == true) {
   }
 }
 
+include(":benchmark")
+
 include(":catalog")
 
 include(":common")
@@ -39,6 +41,10 @@ include(":demo")
 
 include(":engine")
 
+include(":implementationguide")
+
 include(":workflow")
+
+include(":workflow-testing")
 
 include(":testing")

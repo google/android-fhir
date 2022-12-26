@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.view.View
 import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -28,6 +29,7 @@ import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -79,6 +81,60 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
           .toString()
       )
       .isEqualTo("Test Code")
+  }
+
+  @Test
+  fun `should populate dropdown with display for reference value type`() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value =
+          Reference().apply {
+            reference = "Patient/123"
+            display = "John Doe"
+          }
+      }
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<AutoCompleteTextView>(R.id.auto_complete)
+          .adapter
+          .getItem(1)
+          .toString()
+      )
+      .isEqualTo("John Doe")
+  }
+
+  @Test
+  fun `should populate dropdown with type and id for reference value type if missing display`() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value = Reference().apply { reference = "Patient/123" }
+      }
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<AutoCompleteTextView>(R.id.auto_complete)
+          .adapter
+          .getItem(1)
+          .toString()
+      )
+      .isEqualTo("Patient/123")
   }
 
   @Test
@@ -211,6 +267,21 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isNull()
+  }
+
+  @Test
+  fun `hides error textview in the header`() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
+      .isEqualTo(View.GONE)
   }
 
   @Test

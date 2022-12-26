@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
 
 package com.google.android.fhir.workflow
 
+import ca.uhn.fhir.rest.gclient.UriClientParam
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.getResourceType
-import com.google.android.fhir.search.search
+import com.google.android.fhir.search.Search
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.instance.model.api.IIdType
 import org.hl7.fhir.r4.model.Library
-import org.hl7.fhir.r4.model.Measure
-import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 import org.opencds.cqf.cql.evaluator.fhir.dal.FhirDal
 
 class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
@@ -50,20 +50,23 @@ class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
   }
 
   override fun search(resourceType: String): Iterable<IBaseResource> = runBlocking {
+    val search = Search(type = ResourceType.fromCode(resourceType))
     when (resourceType) {
-      "Patient" -> fhirEngine.search<Patient> {}.toMutableList()
-      else -> throw NotImplementedError("Not yet implemented")
-    }
+      "Library" -> libs.values.plus(fhirEngine.search(search))
+      else -> fhirEngine.search(search)
+    }.toMutableList()
   }
 
   override fun searchByUrl(resourceType: String, url: String): Iterable<IBaseResource> =
-      runBlocking {
-    when (resourceType) {
-      "Measure" -> fhirEngine.search<Measure> { filter(Measure.URL, { value = url }) }
-      "Library" -> listOf(libs[url] as Library)
-      else -> listOf()
-    }.toMutableList()
-  }
+    runBlocking {
+      val search = Search(type = ResourceType.fromCode(resourceType))
+      search.filter(UriClientParam("url"), { value = url })
+
+      when (resourceType) {
+        "Library" -> listOfNotNull(libs[url]).plus(fhirEngine.search(search))
+        else -> fhirEngine.search(search)
+      }.toMutableList()
+    }
 
   @Suppress("UNCHECKED_CAST")
   private fun IIdType.getResourceClass(): Class<Resource> {

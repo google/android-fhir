@@ -32,34 +32,11 @@ enum class SyncOperation {
   UPLOAD
 }
 
-sealed class Result {
+private sealed class SyncResult {
   val timestamp: OffsetDateTime = OffsetDateTime.now()
 
-  class Success : Result()
-  data class Error(val exceptions: List<ResourceSyncException>) : Result()
-}
-
-sealed class State {
-  object Started : State()
-
-  /** A new sub process of type [SyncOperation] was started during the process. */
-  data class Spawned(
-    val syncOperation: SyncOperation,
-    val total: Number,
-    val details: Map<String, Number>
-  ) : State()
-
-  /** The progress stats of current sub process [SyncOperation] */
-  data class InProgress(
-    val syncOperation: SyncOperation,
-    val percentCompleted: Double,
-    val details: Progress?
-  ) : State()
-
-  data class Glitch(val exceptions: List<ResourceSyncException>) : State()
-
-  data class Finished(val result: Result.Success) : State()
-  data class Failed(val result: Result.Error) : State()
+  class Success : SyncResult()
+  data class Error(val exceptions: List<ResourceSyncException>) : SyncResult()
 }
 
 data class ResourceSyncException(val resourceType: ResourceType, val exception: Exception)
@@ -72,14 +49,14 @@ internal class FhirSynchronizer(
   private val downloader: Downloader,
   private val conflictResolver: ConflictResolver
 ) {
-  private var syncState: MutableSharedFlow<State>? = null
+  private var syncState: MutableSharedFlow<SyncJobStatus>? = null
   private val datastoreUtil = DatastoreUtil(context)
 
   private fun isSubscribed(): Boolean {
     return syncState != null
   }
 
-  fun subscribe(flow: MutableSharedFlow<State>) {
+  fun subscribe(flow: MutableSharedFlow<SyncJobStatus>) {
     if (isSubscribed()) {
       throw IllegalStateException("Already subscribed to a flow")
     }
@@ -87,37 +64,40 @@ internal class FhirSynchronizer(
     this.syncState = flow
   }
 
-  private suspend fun setSyncState(state: State) {
+  private suspend fun setSyncState(state: SyncJobStatus) {
     syncState?.emit(state)
   }
 
-  private suspend fun setSyncState(result: Result): Result {
+  private suspend fun setSyncState(result: SyncResult): SyncJobStatus {
+    // todo: emit this properly instead of using datastore?
     datastoreUtil.writeLastSyncTimestamp(result.timestamp)
 
-    when (result) {
-      is Result.Success -> setSyncState(State.Finished(result))
-      is Result.Error -> setSyncState(State.Failed(result))
-    }
+    val state =
+      when (result) {
+        is SyncResult.Success -> SyncJobStatus.Finished()
+        is SyncResult.Error -> SyncJobStatus.Failed(result.exceptions)
+      }
 
-    return result
+    setSyncState(state)
+    return state
   }
 
-  suspend fun synchronize(): Result {
-    setSyncState(State.Started)
+  suspend fun synchronize(): SyncJobStatus {
+    setSyncState(SyncJobStatus.Started())
 
     return listOf(download(), upload())
-      .filterIsInstance<Result.Error>()
+      .filterIsInstance<SyncResult.Error>()
       .flatMap { it.exceptions }
       .let {
         if (it.isEmpty()) {
-          setSyncState(Result.Success())
+          setSyncState(SyncResult.Success())
         } else {
-          setSyncState(Result.Error(it))
+          setSyncState(SyncResult.Error(it))
         }
       }
   }
 
-  private suspend fun download(): Result {
+  private suspend fun download(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
     fhirEngine.syncDownload(conflictResolver) {
       flow {
@@ -134,14 +114,14 @@ internal class FhirSynchronizer(
       }
     }
     return if (exceptions.isEmpty()) {
-      Result.Success()
+      SyncResult.Success()
     } else {
-      setSyncState(State.Glitch(exceptions))
-      Result.Error(exceptions)
+      setSyncState(SyncJobStatus.Glitch(exceptions))
+      SyncResult.Error(exceptions)
     }
   }
 
-  private suspend fun upload(): Result {
+  private suspend fun upload(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
     fhirEngine.syncUpload { list ->
       flow {
@@ -154,21 +134,21 @@ internal class FhirSynchronizer(
       }
     }
     return if (exceptions.isEmpty()) {
-      Result.Success()
+      SyncResult.Success()
     } else {
-      setSyncState(State.Glitch(exceptions))
-      Result.Error(exceptions)
+      setSyncState(SyncJobStatus.Glitch(exceptions))
+      SyncResult.Error(exceptions)
     }
   }
 
   private fun progressCallback(syncOperation: SyncOperation) =
     object : ProgressCallback {
       override suspend fun onStart(totalRecords: Int, details: Map<String, Number>) {
-        setSyncState(State.Spawned(syncOperation, totalRecords, details))
+        setSyncState(SyncJobStatus.Spawned(syncOperation, totalRecords, details))
       }
 
       override suspend fun onProgress(percentCompleted: Double, details: Progress?) {
-        setSyncState(State.InProgress(syncOperation, percentCompleted, details))
+        setSyncState(SyncJobStatus.InProgress(syncOperation, percentCompleted, details))
       }
     }
 }

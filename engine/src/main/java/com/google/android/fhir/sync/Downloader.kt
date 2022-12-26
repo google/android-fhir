@@ -20,6 +20,7 @@ import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.progress.ProgressCallback
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 
 /** Module for downloading the resources from the server. */
 internal interface Downloader {
@@ -34,6 +35,9 @@ internal interface Downloader {
 }
 
 internal sealed class DownloadState {
+
+  data class Started(val type: ResourceType) : DownloadState()
+
   data class Success(val resources: List<Resource>) : DownloadState()
 
   data class Failure(val syncError: ResourceSyncException) : DownloadState()

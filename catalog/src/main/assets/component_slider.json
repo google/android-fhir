@@ -2,6 +2,9 @@
   "resourceType": "Questionnaire",
   "item": [
     {
+      "linkId": "1",
+      "text": "How many children does the client have?",
+      "type": "integer",
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -14,29 +17,10 @@
               }
             ]
           }
-        }
-      ],
-      "linkId": "1",
-      "text": "How many times have you been pregnant?",
-      "type": "integer",
-      "item": [
+        },
         {
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
-              "valueCodeableConcept": {
-                "coding": [
-                  {
-                    "system": "http://hl7.org/fhir/questionnaire-display-category",
-                    "code": "instructions"
-                  }
-                ]
-              }
-            }
-          ],
-          "linkId": "1-select-one",
-          "text": "Including this pregnancy",
-          "type": "display"
+          "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+          "valueInteger": 15
         }
       ]
     }

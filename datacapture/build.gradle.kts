@@ -1,8 +1,11 @@
+import java.net.URL
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
+  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
 }
 
 publishArtifact(Releases.DataCapture)
@@ -32,16 +35,21 @@ android {
     // Flag to enable support for the new language APIs
     // See https://developer.android.com/studio/write/java8-support
     isCoreLibraryDesugaringEnabled = true
-    // Sets Java compatibility to Java 8
-    // See https://developer.android.com/studio/write/java8-support
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+
+    sourceCompatibility = Java.sourceCompatibility
+    targetCompatibility = Java.targetCompatibility
   }
-  kotlinOptions {
-    // See https://developer.android.com/studio/write/java8-support
-    jvmTarget = JavaVersion.VERSION_1_8.toString()
+
+  packagingOptions {
+    resources.excludes.addAll(
+      listOf("META-INF/ASL2.0", "META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")
+    )
   }
+
+  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
   configureJacocoTestOptions()
+
+  sourceSets { getByName("androidTest").apply { resources.setSrcDirs(listOf("sampledata")) } }
 
   testOptions { animationsDisabled = true }
 }
@@ -56,7 +64,11 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
-
+  androidTestImplementation(Dependencies.Espresso.espressoCore)
+  androidTestImplementation(Dependencies.Espresso.espressoContrib) {
+    // build fails with error "Duplicate class found" (org.checkerframework.checker.*)
+    exclude(group = "org.checkerframework", module = "checker")
+  }
   api(Dependencies.HapiFhir.structuresR4)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
@@ -86,7 +98,32 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
-  androidTestImplementation(Dependencies.Espresso.espressoCore)
+  testImplementation(project(":testing"))
 }
 
-configureDokka(Releases.DataCapture.artifactId, Releases.DataCapture.version)
+tasks.dokkaHtml.configure {
+  outputDirectory.set(
+    file("../docs/${Releases.DataCapture.artifactId}/${Releases.DataCapture.version}")
+  )
+  suppressInheritedMembers.set(true)
+  dokkaSourceSets {
+    named("main") {
+      moduleName.set(Releases.DataCapture.artifactId)
+      moduleVersion.set(Releases.DataCapture.version)
+      noAndroidSdkLink.set(false)
+      sourceLink {
+        localDirectory.set(file("src/main/java"))
+        remoteUrl.set(
+          URL("https://github.com/google/android-fhir/tree/master/datacapture/src/main/java")
+        )
+        remoteLineSuffix.set("#L")
+      }
+      externalDocumentationLink {
+        url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
+        packageListUrl.set(
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+        )
+      }
+    }
+  }
+}

@@ -49,6 +49,9 @@ internal class DownloaderImpl(
     progressCallback: ProgressCallback?
   ): Flow<DownloadState> = flow {
     var resourceTypeToDownload: ResourceType = ResourceType.Bundle
+    emit(
+      DownloadState.Started(resourceTypeToDownload)
+    ) // TODO do need it????????????????????????????????
 
     // download count summary of all resources for progress i.e. <type, total, completed>
     val progressSummary =
@@ -75,7 +78,6 @@ internal class DownloaderImpl(
 
     var url =
       downloadWorkManager.getNextRequestUrl(context).also { progressCallback?.onProgress(0.0) }
-
     while (url != null) {
       try {
         resourceTypeToDownload =

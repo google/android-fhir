@@ -21,6 +21,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isPlatformPopup
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -32,6 +33,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.utilities.showDropDown
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -77,12 +79,13 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
 
   @Test
   fun shouldSetDropDownValueToAutoCompleteTextView() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -93,18 +96,18 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
       .perform(click())
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
       .isEqualTo("Coding 3")
-    assertThat((questionnaireItemViewItem.answers.single().value as Coding).display)
-      .isEqualTo("Coding 3")
+    assertThat((answerHolder!!.single().value as Coding).display).isEqualTo("Coding 3")
   }
 
   @Test
   fun shouldSetDropDownValueStringToAutoCompleteTextView() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptionsValueString("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseValueStringOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -115,8 +118,68 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
       .perform(click())
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
       .isEqualTo("Coding 1")
-    assertThat((questionnaireItemViewItem.answers.single().value as StringType).valueAsString)
-      .isEqualTo("Coding 1")
+    assertThat((answerHolder!!.single().value as StringType).valueAsString).isEqualTo("Coding 1")
+  }
+
+  @Test
+  fun shouldReturnNonFilteredDropDownMenuItems() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        answerOptionsValueString("Coding 1", "Coding 2", "Coding 3", "Add", "Subtract"),
+        responseValueStringOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+
+    onView(withId(R.id.auto_complete)).perform(showDropDown())
+    assertThat(
+        viewHolder.itemView
+          .findViewById<MaterialAutoCompleteTextView>(R.id.auto_complete)
+          .adapter.count
+      )
+      .isEqualTo(6) // +1 cause of '-' menu item
+  }
+  @Test
+  fun shouldReturnFilteredDropDownMenuItems() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        answerOptionsValueString("Coding 1", "Coding 2", "Coding 3", "Add", "Subtract"),
+        responseValueStringOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+
+    onView(withId(R.id.auto_complete)).perform(showDropDown())
+    onView(withId(R.id.auto_complete)).perform(typeText("Coding"))
+    assertThat(
+        viewHolder.itemView
+          .findViewById<MaterialAutoCompleteTextView>(R.id.auto_complete)
+          .adapter.count
+      )
+      .isEqualTo(3)
+  }
+
+  @Test
+  fun shouldReturnFilteredWithNoResultsDropDownMenuItems() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        answerOptionsValueString("Coding 1", "Coding 2", "Coding 3", "Add", "Subtract"),
+        responseValueStringOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+
+    onView(withId(R.id.auto_complete)).perform(showDropDown())
+    onView(withId(R.id.auto_complete)).perform(typeText("Division"))
+    assertThat(
+        viewHolder.itemView
+          .findViewById<MaterialAutoCompleteTextView>(R.id.auto_complete)
+          .adapter.count
+      )
+      .isEqualTo(0)
   }
 
   /** Method to run code snippet on UI/main thread */

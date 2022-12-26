@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
@@ -134,7 +135,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
 
     val answer = questionnaireItemViewItem.answers
     assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueQuantity!!.value!!.toString()).isEqualTo("10.0")
+    assertThat(answer[0].valueQuantity!!.value!!.toString()).isEqualTo("10")
   }
 
   @Test
@@ -206,6 +207,21 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isNull()
+  }
+
+  @Test
+  fun `hides error textview in the header`() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
+      .isEqualTo(View.GONE)
   }
 
   @Test
