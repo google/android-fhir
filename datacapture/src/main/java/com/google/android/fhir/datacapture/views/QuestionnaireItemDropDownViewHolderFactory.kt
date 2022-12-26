@@ -95,6 +95,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
 
       private fun cleanupOldState() {
         autoCompleteTextView.setAdapter(null)
+        autoCompleteTextView.text = null
       }
     }
 }
