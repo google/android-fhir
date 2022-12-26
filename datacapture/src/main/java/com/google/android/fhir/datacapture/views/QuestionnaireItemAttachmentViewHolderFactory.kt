@@ -22,11 +22,11 @@ import android.provider.OpenableColumns
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import com.bumptech.glide.Glide
@@ -62,7 +62,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
       private lateinit var selectFile: Button
       private lateinit var delete: Button
       private lateinit var photoPreview: ImageView
-      private lateinit var filePreview: ConstraintLayout
+      private lateinit var filePreview: LinearLayout
       private lateinit var iconFilePreview: ImageView
       private lateinit var titleFilePreview: TextView
       private lateinit var context: AppCompatActivity

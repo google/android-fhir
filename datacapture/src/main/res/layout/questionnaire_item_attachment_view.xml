@@ -68,40 +68,35 @@
         android:layout_marginTop="@dimen/padding_default"
     />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/file_preview"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_default"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
     >
 
         <ImageView
             android:id="@+id/icon_file_preview"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:tint="?attr/colorPrimary"
         />
 
         <TextView
             android:id="@+id/title_file_preview"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/padding_half_size"
             android:ellipsize="middle"
             android:maxLines="1"
             android:singleLine="true"
             android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/icon_file_preview"
-            app:layout_constraintTop_toTopOf="parent"
         />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
     <Button
         android:id="@+id/delete"
