@@ -87,6 +87,7 @@
                 android:hint="@string/time"
                 android:inputType="none"
                 android:singleLine="true"
+                android:focusableInTouchMode="false"
             />
 
         </com.google.android.material.textfield.TextInputLayout>
