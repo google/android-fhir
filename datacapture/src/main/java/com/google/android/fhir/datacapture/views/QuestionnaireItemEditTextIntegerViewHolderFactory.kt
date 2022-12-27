@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.text.Editable
 import android.text.InputType
 import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.IntegerType
@@ -34,14 +33,8 @@ internal object QuestionnaireItemEditTextIntegerViewHolderFactory :
       override fun getValue(
         text: String
       ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
-        return text.toBigIntegerOrNull()?.let {
-          if (it > Int.MAX_VALUE.toBigInteger()) {
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(IntegerType(Int.MAX_VALUE))
-          } else {
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(IntegerType(it.toInt()))
-          }
+        return text.toIntOrNull()?.let {
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(IntegerType(it))
         }
       }
 
@@ -49,14 +42,6 @@ internal object QuestionnaireItemEditTextIntegerViewHolderFactory :
         answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
       ): String {
         return answer?.valueIntegerType?.value?.toString() ?: ""
-      }
-
-      override fun isTextExceedLimit(editable: Editable?): Boolean {
-        return editable.toString().toBigInteger() > Int.MAX_VALUE.toBigInteger()
-      }
-
-      override fun getTextDefaultLimit(): String {
-        return Int.MAX_VALUE.toString()
       }
     }
 }
