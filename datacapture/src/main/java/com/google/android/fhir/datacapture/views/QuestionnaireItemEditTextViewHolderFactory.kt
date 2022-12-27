@@ -89,19 +89,31 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     }
 
     textWatcher =
-      textInputEditText.doAfterTextChanged { editable: Editable? -> updateAnswer(editable) }
+      textInputEditText.doAfterTextChanged { editable: Editable? ->
+        updateAnswer(editable)
+
+        if (hasTextUpperLimit()) {
+          validateTextUpperLimit(editable)
+        }
+      }
   }
 
   private fun updateAnswer(editable: Editable?) {
     val input = getValue(editable.toString())
     if (input != null) {
-      questionnaireItemViewItem.setAnswer(input)
+      if (input.hasValue()) {
+        questionnaireItemViewItem.setAnswer(input)
+      }
     } else {
       questionnaireItemViewItem.clearAnswer()
     }
   }
 
   open fun isTextUpdatesRequired(answerText: String, inputText: String) = (answerText != inputText)
+
+  open fun hasTextUpperLimit() = false
+
+  open fun validateTextUpperLimit(editable: Editable?) {}
 
   override fun displayValidationResult(validationResult: ValidationResult) {
     textInputLayout.error =

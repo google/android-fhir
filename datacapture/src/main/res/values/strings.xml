@@ -45,5 +45,8 @@
     <string name="help">Help</string>
     <string name="space_asterisk">\u0020\u002a</string>
     <string name="group_header_add_item_button">Add item</string>
+    <string
+        name="integer_field_upper_limit_validation_error_msg"
+    >Number must be smaller than 2.147.483.648</string>
 
 </resources>
