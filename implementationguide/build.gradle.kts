@@ -1,8 +1,12 @@
+import java.net.URL
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
+  id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
+  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
 }
 
 publishArtifact(Releases.ImplmentationGuide)
@@ -51,6 +55,7 @@ android {
         "META-INF/NOTICE.md",
         "META-INF/notice.txt",
         "META-INF/LGPL-3.0.txt",
+        "META-INF/sun-jaxb.episode",
       )
     )
   }
@@ -60,6 +65,48 @@ android {
   configureJacocoTestOptions()
 }
 
-dependencies { coreLibraryDesugaring(Dependencies.desugarJdkLibs) }
+configurations {
+  all {
+    exclude(module = "xpp3")
+    exclude(module = "xpp3_min")
+  }
+}
 
-configureDokka(Releases.ImplmentationGuide.artifactId, Releases.ImplmentationGuide.version)
+dependencies {
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  kapt(Dependencies.Room.compiler)
+
+  androidTestImplementation(Dependencies.AndroidxTest.core)
+  androidTestImplementation(Dependencies.AndroidxTest.runner)
+  androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
+  androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
+  androidTestImplementation(Dependencies.junit)
+  androidTestImplementation(Dependencies.truth)
+
+  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+
+  implementation(Dependencies.Kotlin.stdlib)
+  implementation(Dependencies.Room.ktx)
+  implementation(Dependencies.Room.runtime)
+  implementation(Dependencies.timber)
+}
+
+tasks.dokkaHtml.configure {
+  outputDirectory.set(
+    file("../docs/${Releases.ImplmentationGuide.artifactId}/${Releases.ImplmentationGuide.version}")
+  )
+  suppressInheritedMembers.set(true)
+  dokkaSourceSets {
+    named("main") {
+      moduleName.set(Releases.ImplmentationGuide.artifactId)
+      moduleVersion.set(Releases.ImplmentationGuide.version)
+      noAndroidSdkLink.set(false)
+      externalDocumentationLink {
+        url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
+        packageListUrl.set(
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+        )
+      }
+    }
+  }
+}

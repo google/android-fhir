@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
+import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
@@ -56,19 +57,21 @@ object QuestionnaireResponseValidator {
     questionnaireResponse: QuestionnaireResponse,
     context: Context
   ): Map<String, List<ValidationResult>> {
-    val linkIdToValidationResultMap = mutableMapOf<String, MutableList<ValidationResult>>()
-
     require(
       questionnaireResponse.questionnaire == null ||
         questionnaire.url == questionnaireResponse.questionnaire
     ) {
       "Mismatching Questionnaire ${questionnaire.url} and QuestionnaireResponse (for Questionnaire ${questionnaireResponse.questionnaire})"
     }
+
+    val linkIdToValidationResultMap = mutableMapOf<String, MutableList<ValidationResult>>()
+
     validateQuestionnaireResponseItems(
       questionnaire.item,
       questionnaireResponse.item,
       context,
-      linkIdToValidationResultMap
+      EnablementEvaluator(questionnaireResponse),
+      linkIdToValidationResultMap,
     )
 
     return linkIdToValidationResultMap
@@ -78,7 +81,8 @@ object QuestionnaireResponseValidator {
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     context: Context,
-    linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>
+    enablementEvaluator: EnablementEvaluator,
+    linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>,
   ): Map<String, List<ValidationResult>> {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
@@ -93,12 +97,17 @@ object QuestionnaireResponseValidator {
         questionnaireItem = questionnaireItemListIterator.next()
       } while (questionnaireItem!!.linkId != questionnaireResponseItem.linkId)
 
-      validateQuestionnaireResponseItem(
-        questionnaireItem,
-        questionnaireResponseItem,
-        context,
-        linkIdToValidationResultMap
-      )
+      val enabled = enablementEvaluator.evaluate(questionnaireItem, questionnaireResponseItem)
+
+      if (enabled) {
+        validateQuestionnaireResponseItem(
+          questionnaireItem,
+          questionnaireResponseItem,
+          context,
+          enablementEvaluator,
+          linkIdToValidationResultMap,
+        )
+      }
     }
     return linkIdToValidationResultMap
   }
@@ -107,6 +116,7 @@ object QuestionnaireResponseValidator {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     context: Context,
+    enablementEvaluator: EnablementEvaluator,
     linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>
   ): Map<String, List<ValidationResult>> {
 
@@ -120,7 +130,8 @@ object QuestionnaireResponseValidator {
           questionnaireItem.item,
           questionnaireResponseItem.item,
           context,
-          linkIdToValidationResultMap
+          enablementEvaluator,
+          linkIdToValidationResultMap,
         )
       else -> {
         require(questionnaireItem.repeats || questionnaireResponseItem.answer.size <= 1) {
@@ -132,7 +143,8 @@ object QuestionnaireResponseValidator {
             questionnaireItem.item,
             it.item,
             context,
-            linkIdToValidationResultMap
+            enablementEvaluator,
+            linkIdToValidationResultMap,
           )
         }
 

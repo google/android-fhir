@@ -43,8 +43,8 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
 
   private val questionnaireResource: Questionnaire
     get() =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire) as
-        Questionnaire
+      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire)
+        as Questionnaire
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
   private var questionnaireJson: String? = null
 
@@ -81,7 +81,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
 
   private fun getQuestionnaireJson(): String {
     questionnaireJson?.let {
-      return it!!
+      return it
     }
     questionnaireJson = readFileFromAssets(state[AddPatientFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
     return questionnaireJson!!
