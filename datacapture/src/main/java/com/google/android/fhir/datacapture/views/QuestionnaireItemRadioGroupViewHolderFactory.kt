@@ -105,7 +105,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
           radioButtonItem.findViewById<RadioButton>(R.id.radio_button).apply {
             id = viewId
             text = answerOption.value.displayString(header.context)
-            setCompoundDrawables(
+            setCompoundDrawablesRelative(
               answerOption.itemAnswerOptionImage(radioGroup.context),
               null,
               null,

@@ -106,7 +106,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           checkboxLayout.findViewById<CheckBox>(R.id.check_box).apply {
             id = viewId
             text = answerOption.value.displayString(header.context)
-            setCompoundDrawables(
+            setCompoundDrawablesRelative(
               answerOption.itemAnswerOptionImage(checkboxGroup.context),
               null,
               null,

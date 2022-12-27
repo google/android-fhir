@@ -198,7 +198,7 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
             (holder as OptionSelectViewHolder.OptionSingle).radioButton
           }
         compoundButton.text = item.option.displayString
-        compoundButton.setCompoundDrawables(
+        compoundButton.setCompoundDrawablesRelative(
           item.option.item.itemAnswerOptionImage(compoundButton.context),
           null,
           null,

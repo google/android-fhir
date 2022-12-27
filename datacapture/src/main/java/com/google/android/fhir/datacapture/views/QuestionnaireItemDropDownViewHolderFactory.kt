@@ -138,7 +138,14 @@ internal class AnswerOptionDropDownArrayAdapter(
       val answerOptionTextView =
         convertView?.findViewById<View>(R.id.answer_option_textview) as TextView
       answerOptionTextView.text = answerOption?.answerOptionString
-      answerOptionTextView.setCompoundDrawables(answerOption?.answerOptionImage, null, null, null)
+      // answerOptionTextView.setCompoundDrawables(answerOption?.answerOptionImage, null, null,
+      // null)
+      answerOptionTextView.setCompoundDrawablesRelative(
+        answerOption?.answerOptionImage,
+        null,
+        null,
+        null
+      )
     } catch (e: Exception) {
       e.printStackTrace()
     }
