@@ -25,44 +25,44 @@
         {
           "valueCoding": {
             "code": "option-1",
-            "display": "Option 1"
+            "display": "State A"
           }
         },
         {
           "valueCoding": {
             "code": "option-2",
-            "display": "Option 2"
+            "display": "State B"
           }
         },
         {
           "valueCoding": {
             "code": "option-3",
-            "display": "Option 3"
+            "display": "State C"
           }
         },
         {
           "valueCoding": {
             "code": "mother",
-            "display": "Mother"
+            "display": "State D"
           }
         },
         {
           "valueCoding": {
             "code": "sibling",
-            "display": "Sibling"
+            "display": "State E"
           }
         },
         {
           "valueCoding": {
             "code": "other",
-            "display": "Other"
+            "display": "State F"
           }
         }
       ],
       "item": [
         {
           "linkId": "1-relationship",
-          "text": "Relationship",
+          "text": "State",
           "type": "display",
           "extension": [
             {
