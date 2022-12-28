@@ -101,14 +101,12 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_date_time_picker.json",
       "component_date_time_picker_with_validation.json"
     ),
-
-    // TODO https://github.com/google/android-fhir/issues/1260
-    //    SLIDER(
-    //      R.drawable.ic_slider,
-    //      R.string.component_name_slider,
-    //      "component_slider.json",
-    //      "component_slider_with_validation.json"
-    //    ),
+    SLIDER(
+      R.drawable.ic_slider,
+      R.string.component_name_slider,
+      "component_slider.json",
+      "component_slider_with_validation.json"
+    ),
     IMAGE(R.drawable.ic_image, R.string.component_name_image, "", ""),
     AUTO_COMPLETE(
       R.drawable.ic_autocomplete,
@@ -136,6 +134,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       ViewItem.ComponentItem(Component.TEXT_FIELD),
       ViewItem.ComponentItem(Component.DATE_PICKER),
       ViewItem.ComponentItem(Component.DATE_TIME_PICKER),
+      ViewItem.ComponentItem(Component.SLIDER),
       ViewItem.ComponentItem(Component.IMAGE),
       ViewItem.ComponentItem(Component.AUTO_COMPLETE),
       ViewItem.ComponentItem(Component.REPEATED_GROUP),
