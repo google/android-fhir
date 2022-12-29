@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.views
 
 import android.widget.FrameLayout
 import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -306,7 +305,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).text)
       .isEqualTo("Missing answer for required field.")
   }
 
@@ -327,7 +326,8 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text).isEqualTo("")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).text)
+      .isEqualTo("")
   }
 
   @Test
@@ -349,12 +349,9 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _ -> },
       )
     )
-
-    assertThat(
-        (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0)
-            as RadioButton)
-          .isEnabled
-      )
+    assertThat((viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).isEnabled))
+      .isFalse()
+    assertThat((viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).isEnabled))
       .isFalse()
   }
 }

@@ -143,6 +143,50 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
       .isNotEmpty()
   }
 
+  @Test
+  fun showsTimePickerInInputMode() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+    onView(withId(R.id.date_input_layout)).perform(clickIcon(true))
+    onView(allOf(withText("OK")))
+      .inRoot(isDialog())
+      .check(matches(isDisplayed()))
+      .perform(ViewActions.click())
+    onView(withId(R.id.time_input_edit_text)).perform(ViewActions.click())
+    // R.id.material_textinput_timepicker is the id for the text input in the time picker.
+    onView(allOf(withId(R.id.material_textinput_timepicker)))
+      .inRoot(isDialog())
+      .check(matches(isDisplayed()))
+  }
+
+  @Test
+  fun showsTimePickerInClockMode() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+    onView(withId(R.id.date_input_layout)).perform(clickIcon(true))
+    onView(allOf(withText("OK")))
+      .inRoot(isDialog())
+      .check(matches(isDisplayed()))
+      .perform(ViewActions.click())
+    onView(withId(R.id.time_input_layout)).perform(clickIcon(true))
+    // R.id.material_clock_face is the id for the clock input in the time picker.
+    onView(allOf(withId(R.id.material_clock_face))).inRoot(isDialog()).check(matches(isDisplayed()))
+  }
+
   /** Method to run code snippet on UI/main thread */
   private fun runOnUI(action: () -> Unit) {
     activityScenarioRule.getScenario().onActivity { activity -> action() }

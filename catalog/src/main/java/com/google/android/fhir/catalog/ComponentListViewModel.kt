@@ -25,8 +25,14 @@ import androidx.lifecycle.SavedStateHandle
 class ComponentListViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
 
-  fun getComponentList(): List<Component> {
-    return Component.values().toList()
+  sealed class ViewItem {
+    data class HeaderItem(val header: Header) : ViewItem()
+    data class ComponentItem(val component: Component) : ViewItem()
+  }
+
+  enum class Header(@StringRes val textId: Int) {
+    WIDGETS(R.string.widgets),
+    MISC_COMPONENTS(R.string.misc_components)
   }
 
   enum class Component(
@@ -95,13 +101,12 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_date_time_picker.json",
       "component_date_time_picker_with_validation.json"
     ),
-    // TODO https://github.com/google/android-fhir/issues/1260
-    //    SLIDER(
-    //      R.drawable.ic_slider,
-    //      R.string.component_name_slider,
-    //      "component_slider.json",
-    //      "component_slider_with_validation.json"
-    //    ),
+    SLIDER(
+      R.drawable.ic_slider,
+      R.string.component_name_slider,
+      "component_slider.json",
+      "component_slider_with_validation.json"
+    ),
     IMAGE(R.drawable.ic_image, R.string.component_name_image, "", ""),
     AUTO_COMPLETE(
       R.drawable.ic_autocomplete,
@@ -109,5 +114,31 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_auto_complete.json",
       "component_auto_complete_with_validation.json"
     ),
+    REPEATED_GROUP(
+      R.drawable.ic_textfield,
+      R.string.component_name_repeated_group,
+      "component_repeated_group.json",
+    ),
+    HELP(R.drawable.ic_help, R.string.component_name_help, "component_help.json")
   }
+
+  val viewItemList =
+    listOf(
+      ViewItem.HeaderItem(Header.WIDGETS),
+      ViewItem.ComponentItem(Component.BOOLEAN_CHOICE),
+      ViewItem.ComponentItem(Component.SINGLE_CHOICE),
+      ViewItem.ComponentItem(Component.MULTIPLE_CHOICE),
+      ViewItem.ComponentItem(Component.DROPDOWN),
+      ViewItem.ComponentItem(Component.MODAL),
+      ViewItem.ComponentItem(Component.OPEN_CHOICE),
+      ViewItem.ComponentItem(Component.TEXT_FIELD),
+      ViewItem.ComponentItem(Component.DATE_PICKER),
+      ViewItem.ComponentItem(Component.DATE_TIME_PICKER),
+      ViewItem.ComponentItem(Component.SLIDER),
+      ViewItem.ComponentItem(Component.IMAGE),
+      ViewItem.ComponentItem(Component.AUTO_COMPLETE),
+      ViewItem.ComponentItem(Component.REPEATED_GROUP),
+      ViewItem.HeaderItem(Header.MISC_COMPONENTS),
+      ViewItem.ComponentItem(Component.HELP),
+    )
 }

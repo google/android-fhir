@@ -31,6 +31,8 @@
     <string name="component_name_dropdown">Dropdown</string>
     <string name="component_name_image">Image</string>
     <string name="component_name_auto_complete">Auto Complete</string>
+    <string name="component_name_help">Help</string>
+    <string name="component_name_repeated_group">Repeated Group</string>
     <string name="layout_name_default_text">Default</string>
     <string name="layout_name_paginated">Paginated</string>
     <string name="layout_name_review">Review</string>
@@ -39,6 +41,9 @@
     <string
         name="behavior_name_skip_logic_info"
     >If Yes is selected, a follow-up question is displayed. If No is selected, no follow-up questions are displayed.</string>
+    <string
+        name="behavior_name_calculated_expression_info"
+    >Input age to automatically calculate birthdate until birthdate is updated manually.</string>
     <string
         name="behavior_name_calculated_expression"
     >Calculated Expression</string>
@@ -56,4 +61,6 @@
     <string name="hide_error_state">Hide error state</string>
     <string name="options">Options</string>
     <string name="error">Error</string>
+    <string name="widgets">Widgets</string>
+    <string name="misc_components">Miscellaneous components</string>
 </resources>
