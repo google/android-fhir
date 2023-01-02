@@ -215,7 +215,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         }
 
         CameraLauncherFragment()
-          .apply { arguments = bundleOf(SAVED_PHOTO_URI to uri) }
+          .apply { arguments = bundleOf(EXTRA_SAVED_PHOTO_URI_KEY to uri) }
           .show(
             context.supportFragmentManager,
             QuestionnaireItemAttachmentViewHolderFactory.javaClass.simpleName
@@ -371,7 +371,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
     }
 
   const val MIME_TYPE = "mime_type"
-  const val SAVED_PHOTO_URI = "saved_photo_uri"
+  const val EXTRA_SAVED_PHOTO_URI_KEY = "saved_photo_uri"
 }
 
 private fun String.getGeneralMimeType(): String {
