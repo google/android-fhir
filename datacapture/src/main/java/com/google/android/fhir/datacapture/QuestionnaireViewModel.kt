@@ -247,6 +247,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
 
   /**
+   * The candidate expression referencing an x-fhir-query has its evaluated data cached to avoid
+   * reloading resources unnecessarily. The value is updated each time an item with candidate
+   * expression is evaluating the latest candidate options.
+   */
+  private val candidateExpressionMap =
+    mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
+
+  /**
    * Returns current [QuestionnaireResponse] captured by the UI which includes answers of enabled
    * questions.
    */
@@ -464,6 +472,26 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return item.extractAnswerOptions(data)
   }
 
+  @PublishedApi
+  internal suspend fun resolveCandidateExpression(
+    item: Questionnaire.QuestionnaireItemComponent,
+  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+    // Check cache first for database queries
+    val candidateExpression = item.candidateExpression ?: return emptyList()
+    if (candidateExpression.isXFhirQuery &&
+        candidateExpressionMap.contains(candidateExpression.expression)
+    ) {
+      return candidateExpressionMap[candidateExpression.expression]!!
+    }
+
+    val options = loadAnswerExpressionOptions(item, candidateExpression)
+
+    if (candidateExpression.isXFhirQuery)
+      candidateExpressionMap[candidateExpression.expression] = options
+
+    return options
+  }
+
   /**
    * Traverses through the list of questionnaire items, the list of questionnaire response items and
    * the list of items in the questionnaire response answer list and populates
@@ -593,7 +621,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           validationResult = validationResult,
           answersChangedCallback = answersChangedCallback,
           resolveAnswerValueSet = { resolveAnswerValueSet(it) },
-          resolveAnswerExpression = { resolveAnswerExpression(it) }
+          resolveAnswerExpression = { resolveAnswerExpression(it) },
+          resolveCandidateExpression = { resolveCandidateExpression(it) }
         )
       )
       val nestedResponses: List<List<QuestionnaireResponse.QuestionnaireResponseItemComponent>> =

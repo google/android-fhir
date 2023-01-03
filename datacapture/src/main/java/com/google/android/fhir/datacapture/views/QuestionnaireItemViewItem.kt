@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.answerExpression
+import com.google.android.fhir.datacapture.candidateExpression
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -71,6 +72,12 @@ data class QuestionnaireItemViewItem(
       emptyList()
     },
   private val resolveAnswerExpression:
+    suspend (Questionnaire.QuestionnaireItemComponent) -> List<
+        Questionnaire.QuestionnaireItemAnswerOptionComponent> =
+    {
+      emptyList()
+    },
+  private val resolveCandidateExpression:
     suspend (Questionnaire.QuestionnaireItemComponent) -> List<
         Questionnaire.QuestionnaireItemAnswerOptionComponent> =
     {
@@ -177,6 +184,8 @@ data class QuestionnaireItemViewItem(
           questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
           !questionnaireItem.answerValueSet.isNullOrEmpty() ->
             resolveAnswerValueSet(questionnaireItem.answerValueSet)
+          questionnaireItem.candidateExpression != null ->
+            resolveCandidateExpression(questionnaireItem)
           questionnaireItem.answerExpression != null -> resolveAnswerExpression(questionnaireItem)
           else -> emptyList()
         }

@@ -38,6 +38,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupView
 import com.google.android.fhir.datacapture.views.QuestionnaireItemSliderViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
 internal class QuestionnaireItemEditAdapter(
@@ -120,7 +121,7 @@ internal class QuestionnaireItemEditAdapter(
     }
 
     if (questionnaireItemViewItem.answerOption.isNotEmpty()) {
-      return getChoiceViewHolderType(questionnaireItemViewItem).value
+      return getChoiceViewHolderType(questionnaireItemViewItem, questionnaireItem).value
     }
 
     return when (val type = questionnaireItem.type) {
@@ -132,16 +133,19 @@ internal class QuestionnaireItemEditAdapter(
       QuestionnaireItemType.TEXT -> QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE
       QuestionnaireItemType.INTEGER -> getIntegerViewHolderType(questionnaireItemViewItem)
       QuestionnaireItemType.DECIMAL -> QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
-      QuestionnaireItemType.CHOICE -> getChoiceViewHolderType(questionnaireItemViewItem)
+      QuestionnaireItemType.CHOICE ->
+        getChoiceViewHolderType(questionnaireItemViewItem, questionnaireItem)
       QuestionnaireItemType.DISPLAY -> QuestionnaireItemViewHolderType.DISPLAY
       QuestionnaireItemType.QUANTITY -> QuestionnaireItemViewHolderType.QUANTITY
-      QuestionnaireItemType.REFERENCE -> getChoiceViewHolderType(questionnaireItemViewItem)
+      QuestionnaireItemType.REFERENCE ->
+        getChoiceViewHolderType(questionnaireItemViewItem, questionnaireItem)
       else -> throw NotImplementedError("Question type $type not supported.")
     }.value
   }
 
   private fun getChoiceViewHolderType(
-    questionnaireItemViewItem: QuestionnaireItemViewItem
+    questionnaireItemViewItem: QuestionnaireItemViewItem,
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent
   ): QuestionnaireItemViewHolderType {
     val questionnaireItem = questionnaireItemViewItem.questionnaireItem
 
@@ -149,21 +153,25 @@ internal class QuestionnaireItemEditAdapter(
     return questionnaireItem.itemControl?.viewHolderType
     // Otherwise, choose a sensible UI element automatically
     ?: run {
-        val numOptions = questionnaireItemViewItem.answerOption.size
-        when {
-          // Always use a dialog for questions with a large number of options
-          numOptions >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG ->
-            QuestionnaireItemViewHolderType.DIALOG_SELECT
+        if (questionnaireItem.candidateExpression != null) {
+          QuestionnaireItemViewHolderType.DROP_DOWN
+        } else {
+          val numOptions = questionnaireItemViewItem.answerOption.size
+          when {
+            // Always use a dialog for questions with a large number of options
+            numOptions >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG ->
+              QuestionnaireItemViewHolderType.DIALOG_SELECT
 
-          // Use a check box group if repeated answers are permitted
-          questionnaireItem.repeats -> QuestionnaireItemViewHolderType.CHECK_BOX_GROUP
+            // Use a check box group if repeated answers are permitted
+            questionnaireItem.repeats -> QuestionnaireItemViewHolderType.CHECK_BOX_GROUP
 
-          // Use a dropdown if there are a medium number of options
-          numOptions >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN ->
-            QuestionnaireItemViewHolderType.DROP_DOWN
+            // Use a dropdown if there are a medium number of options
+            numOptions >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN ->
+              QuestionnaireItemViewHolderType.DROP_DOWN
 
-          // Use a radio group only if there are a small number of options
-          else -> QuestionnaireItemViewHolderType.RADIO_GROUP
+            // Use a radio group only if there are a small number of options
+            else -> QuestionnaireItemViewHolderType.RADIO_GROUP
+          }
         }
       }
   }

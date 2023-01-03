@@ -2979,6 +2979,98 @@ class QuestionnaireViewModelTest {
         "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
       )
   }
+
+  @Test
+  fun `resolveCandidateExpression() should return questionnaire item answer options for candidate expression and choice column`() =
+    runBlocking {
+      val practitioner =
+        Practitioner().apply {
+          id = UUID.randomUUID().toString()
+          active = true
+          addName(HumanName().apply { this.family = "John" })
+        }
+      ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+        .dataCaptureConfiguration = DataCaptureConfig(xFhirQueryResolver = { listOf(practitioner) })
+
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              text = "candidate expression question text"
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              extension =
+                listOf(
+                  Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression",
+                    Expression().apply {
+                      this.expression = "Practitioner?active=true"
+                      this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                    }
+                  ),
+                  Extension(
+                      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
+                    )
+                    .apply {
+                      this.addExtension(Extension("path", StringType("id")))
+                      this.addExtension(Extension("label", StringType("name")))
+                      this.addExtension(Extension("forDisplay", BooleanType(true)))
+                    }
+                )
+            }
+          )
+        }
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+      val viewModel = QuestionnaireViewModel(context, state)
+      val answerOptions = viewModel.resolveCandidateExpression(questionnaire.itemFirstRep)
+
+      assertThat(answerOptions.first().valueReference.reference)
+        .isEqualTo("Practitioner/${practitioner.logicalId}")
+    }
+
+  @Test
+  fun `resolveCandidateExpression() should throw exception when XFhirQueryResolver is not provided`() {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a"
+            text = "candidate expression question text"
+            type = Questionnaire.QuestionnaireItemType.REFERENCE
+            extension =
+              listOf(
+                Extension(
+                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression",
+                  Expression().apply {
+                    this.expression = "Practitioner?active=true"
+                    this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                  }
+                ),
+                Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
+                  )
+                  .apply {
+                    this.addExtension(Extension("path", StringType("id")))
+                    this.addExtension(Extension("label", StringType("name")))
+                    this.addExtension(Extension("forDisplay", BooleanType(true)))
+                  }
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    val viewModel = QuestionnaireViewModel(context, state)
+    val exception =
+      assertThrows(null, IllegalStateException::class.java) {
+        runBlocking { viewModel.resolveCandidateExpression(questionnaire.itemFirstRep) }
+      }
+    assertThat(exception.message)
+      .isEqualTo(
+        "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
+      )
+  }
+
   // Test cases for submit button
 
   @Test

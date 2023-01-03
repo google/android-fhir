@@ -1522,6 +1522,55 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun `candidateExpression should return expression`() {
+    val questionItem =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  EXTENSION_CANDIDATE_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "%resource.item.where(linkId='diseases').value"
+                  }
+                )
+              )
+          }
+        )
+
+    assertThat(questionItem.itemFirstRep.candidateExpression!!.expression)
+      .isEqualTo("%resource.item.where(linkId='diseases').value")
+  }
+
+  @Test
+  fun `candidateExpression should return null for missing extension`() {
+    val questionItem =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "today()"
+                  }
+                )
+              )
+          }
+        )
+
+    assertThat(questionItem.itemFirstRep.candidateExpression).isNull()
+  }
+
+  @Test
   fun `choiceColumn should return choice columns list`() {
     val questionItem =
       Questionnaire()
