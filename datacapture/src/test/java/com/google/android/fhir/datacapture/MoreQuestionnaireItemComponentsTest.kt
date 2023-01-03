@@ -488,6 +488,51 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun mimeType_size_shouldReturnNumberOfSupportedMimeTypes() {
+    assertThat(MimeType.values().size).isEqualTo(4)
+  }
+
+  @Test
+  fun hasMimeType_shouldReturnTrue() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MIME_TYPE, CodeType("image/jpg"))
+        addExtension(EXTENSION_MIME_TYPE, CodeType("application/pdf"))
+      }
+    assertThat(questionnaire.hasMimeType(MimeType.IMAGE.value)).isTrue()
+  }
+
+  @Test
+  fun hasMimeType_shouldReturnFalse() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MIME_TYPE, CodeType("image/jpg"))
+        addExtension(EXTENSION_MIME_TYPE, CodeType("application/pdf"))
+      }
+    assertThat(questionnaire.hasMimeType(MimeType.VIDEO.value)).isFalse()
+  }
+
+  @Test
+  fun hasMimeTypeOnly_shouldReturnTrue() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MIME_TYPE, CodeType("image/jpg"))
+        addExtension(EXTENSION_MIME_TYPE, CodeType("image/png"))
+      }
+    assertThat(questionnaire.hasMimeTypeOnly(MimeType.IMAGE.value)).isTrue()
+  }
+
+  @Test
+  fun hasMimeTypeOnly_shouldReturnFalse() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MIME_TYPE, CodeType("image/jpg"))
+        addExtension(EXTENSION_MIME_TYPE, CodeType("application/pdf"))
+      }
+    assertThat(questionnaire.hasMimeTypeOnly(MimeType.IMAGE.value)).isFalse()
+  }
+
+  @Test
   fun localizedTextSpanned_noText_shouldReturnNull() {
     assertThat(Questionnaire.QuestionnaireItemComponent().localizedTextSpanned).isNull()
   }
