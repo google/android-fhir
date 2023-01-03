@@ -41,10 +41,7 @@
             android:id="@+id/take_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/camera"
-            android:drawableTint="?attr/colorPrimary"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:text="@string/take_photo"
+            style="?attr/questionnaireAttachmentTakePhotoButtonStyle"
             android:layout_marginEnd="@dimen/padding_half_size"
             android:paddingHorizontal="@dimen/padding_default"
         />
@@ -53,9 +50,8 @@
             android:id="@+id/select_file"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableTint="?attr/colorPrimary"
             android:layout_marginEnd="@dimen/padding_half_size"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="?attr/questionnaireAttachmentSelectFileButtonStyle"
             android:paddingHorizontal="@dimen/padding_default"
         />
 
@@ -82,6 +78,7 @@
             android:id="@+id/icon_file_preview"
             android:layout_width="32dp"
             android:layout_height="32dp"
+            style="?attr/questionnaireAttachmentPreviewTextStyle"
             app:tint="?attr/colorPrimary"
         />
 
@@ -93,7 +90,7 @@
             android:ellipsize="middle"
             android:maxLines="1"
             android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+            style="?attr/questionnaireAttachmentPreviewTextStyle"
         />
 
     </LinearLayout>
@@ -103,10 +100,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/padding_default"
-        android:drawableLeft="@drawable/delete"
-        android:drawableTint="?attr/colorError"
-        style="@style/Widget.Material3.Button.OutlinedButton"
-        android:textColor="?attr/colorError"
+        style="?attr/questionnaireAttachmentDeleteButtonStyle"
         android:paddingHorizontal="@dimen/padding_default"
         android:visibility="gone"
     />

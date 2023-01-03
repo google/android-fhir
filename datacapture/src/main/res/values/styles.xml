@@ -113,6 +113,26 @@
             name="questionnaireLinearProgressIndicatorStyle"
         >@style/Widget.Material3.LinearProgressIndicator
         </item>
+        <item
+            name="questionnaireAttachmentTakePhotoButtonStyle"
+        >@style/Questionnaire.AttachmentTakePhotoButtonStyle
+        </item>
+        <item
+            name="questionnaireAttachmentSelectFileButtonStyle"
+        >@style/Questionnaire.AttachmentSelectFileButtonStyle
+        </item>
+        <item
+            name="questionnaireAttachmentDeleteButtonStyle"
+        >@style/Questionnaire.AttachmentDeleteButtonStyle
+        </item>
+        <item
+            name="questionnaireAttachmentPreviewIconStyle"
+        >@style/Questionnaire.AttachmentPreviewIconStyle
+        </item>
+        <item
+            name="questionnaireAttachmentPreviewTextStyle"
+        >@style/TextAppearance.Material3.BodySmall
+        </item>
     </style>
 
     <style
@@ -250,6 +270,38 @@
         <item name="android:text">@string/submit_questionnaire</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:visibility">gone</item>
+    </style>
+
+    <style
+        name="Questionnaire.AttachmentTakePhotoButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
+        <item name="android:drawableLeft">@drawable/camera</item>
+        <item name="android:drawableTint">?attr/colorPrimary</item>
+        <item name="android:text">@string/take_photo</item>
+    </style>
+
+    <style
+        name="Questionnaire.AttachmentSelectFileButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
+        <item name="android:drawableTint">?attr/colorPrimary</item>
+    </style>
+
+    <style
+        name="Questionnaire.AttachmentPreviewIconStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
+        <item name="android:tint">?attr/colorPrimary</item>
+    </style>
+
+    <style
+        name="Questionnaire.AttachmentDeleteButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
+        <item name="android:drawableLeft">@drawable/delete</item>
+        <item name="android:drawableTint">?attr/colorError</item>
+        <item name="android:textColor">?attr/colorError</item>
     </style>
 
 </resources>
