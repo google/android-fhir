@@ -492,6 +492,128 @@ class ResourceMapperTest {
   }
 
   @Test
+  fun `extract() should extract list of non primitive values`() = runBlocking {
+    @Language("JSON")
+    val questionnaireJson =
+      """
+      {
+        "resourceType": "Questionnaire",
+        "item": [
+          {
+            "linkId": "9",
+            "type": "group",
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+                "valueExpression": {
+                  "expression": "Observation"
+                }
+              }
+            ],
+            "item": [
+              {
+                "linkId": "9.1",
+                "type": "group",
+                "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept",
+                "item": [
+                  {
+                    "linkId": "9.1.1",
+                    "type": "choice",
+                    "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept.coding"
+                  }
+                ]
+              },
+              {
+                "linkId": "9.1.3",
+                "type": "choice",
+                "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                    "valueBoolean": true
+                  }
+                ],
+                "initial": [
+                  {
+                    "valueCoding": {
+                      "code": "8888",
+                      "display": "dummy",
+                      "system": "dummy"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+      """.trimIndent()
+
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "9",
+              "item": [
+                {
+                  "linkId": "9.1",
+                  "item": [
+                    {
+                      "linkId": "9.1.1",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "system": "test-coding-system",
+                            "code": "test-coding-code",
+                            "display": "Test Coding Display"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "9.1.3",
+                  "answer": [
+                    {
+                      "valueCoding": {
+                        "system": "dummy",
+                        "code": "8888",
+                        "display": "dummy"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+
+    val uriTestQuestionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+
+    val uriTestQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+        as QuestionnaireResponse
+
+    val observation =
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse)
+        .entry
+        .single()
+        .resource as Observation
+
+    observation.value
+
+    assertThat(observation.valueCodeableConcept.coding[0].code).isEqualTo("test-coding-code")
+  }
+
+  @Test
   fun `extract() should extract choice value fields`() = runBlocking {
     // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
     @Language("JSON")

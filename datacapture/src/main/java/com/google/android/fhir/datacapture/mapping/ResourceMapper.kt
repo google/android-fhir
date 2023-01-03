@@ -671,12 +671,18 @@ private fun setFieldElementValue(base: Base, field: Field, answerValue: Base) {
 }
 
 private fun addAnswerToListField(base: Base, field: Field, answerValue: List<Base>) {
-  base.javaClass
-    .getMethod(
-      "add${field.name.capitalize(Locale.ROOT)}",
-      answerValue.first().primitiveValue().javaClass
-    )
-    .let { method -> answerValue.forEach { method.invoke(base, it.primitiveValue()) } }
+  if (answerValue.first().isPrimitive) {
+    base.javaClass
+      .getMethod(
+        "add${field.name.capitalize(Locale.ROOT)}",
+        answerValue.first().primitiveValue().javaClass
+      )
+      .let { method -> answerValue.forEach { method.invoke(base, it.primitiveValue()) } }
+  } else {
+    base.javaClass
+      .getMethod("add${field.name.capitalize(Locale.ROOT)}", answerValue.first().javaClass)
+      .let { method -> answerValue.forEach { method.invoke(base, it) } }
+  }
 }
 
 private fun updateListFieldWithAnswer(base: Base, field: Field, answerValue: List<Base>) {
