@@ -131,6 +131,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
   val viewItemList =
     listOf(
       ViewItem.HeaderItem(Header.WIDGETS),
+      ViewItem.ComponentItem(Component.ATTACHMENT),
       ViewItem.ComponentItem(Component.BOOLEAN_CHOICE),
       ViewItem.ComponentItem(Component.SINGLE_CHOICE),
       ViewItem.ComponentItem(Component.MULTIPLE_CHOICE),
