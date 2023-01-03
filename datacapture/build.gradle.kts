@@ -1,8 +1,11 @@
+import java.net.URL
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
+  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
 }
 
 publishArtifact(Releases.DataCapture)
@@ -70,8 +73,6 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  debugImplementation(project(":engine"))
-
   implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)
@@ -90,8 +91,6 @@ dependencies {
   implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.timber)
 
-  releaseImplementation(Dependencies.androidFhirEngine)
-
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)
   testImplementation(Dependencies.Kotlin.kotlinTestJunit)
@@ -103,4 +102,29 @@ dependencies {
   testImplementation(project(":testing"))
 }
 
-configureDokka(Releases.DataCapture.artifactId, Releases.DataCapture.version)
+tasks.dokkaHtml.configure {
+  outputDirectory.set(
+    file("../docs/${Releases.DataCapture.artifactId}/${Releases.DataCapture.version}")
+  )
+  suppressInheritedMembers.set(true)
+  dokkaSourceSets {
+    named("main") {
+      moduleName.set(Releases.DataCapture.artifactId)
+      moduleVersion.set(Releases.DataCapture.version)
+      noAndroidSdkLink.set(false)
+      sourceLink {
+        localDirectory.set(file("src/main/java"))
+        remoteUrl.set(
+          URL("https://github.com/google/android-fhir/tree/master/datacapture/src/main/java")
+        )
+        remoteLineSuffix.set("#L")
+      }
+      externalDocumentationLink {
+        url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
+        packageListUrl.set(
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+        )
+      }
+    }
+  }
+}
