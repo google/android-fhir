@@ -73,8 +73,6 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  debugImplementation(project(":engine"))
-
   implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)
@@ -92,8 +90,6 @@ dependencies {
   implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.timber)
 
-  releaseImplementation(Dependencies.androidFhirEngine)
-
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)
   testImplementation(Dependencies.Kotlin.kotlinTestJunit)
@@ -106,7 +102,9 @@ dependencies {
 }
 
 tasks.dokkaHtml.configure {
-  outputDirectory.set(file("../docs/${Releases.DataCapture.artifactId}"))
+  outputDirectory.set(
+    file("../docs/${Releases.DataCapture.artifactId}/${Releases.DataCapture.version}")
+  )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
