@@ -32,7 +32,8 @@ class CameraLauncherFragment : DialogFragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    val uri = arguments?.get(QuestionnaireItemAttachmentViewHolderFactory.EXTRA_SAVED_PHOTO_URI_KEY) as Uri
+    val uri =
+      arguments?.get(QuestionnaireItemAttachmentViewHolderFactory.EXTRA_SAVED_PHOTO_URI_KEY) as Uri
 
     if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) ==
         PackageManager.PERMISSION_DENIED
