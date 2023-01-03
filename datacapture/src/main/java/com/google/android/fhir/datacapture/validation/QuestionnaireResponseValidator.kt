@@ -120,7 +120,10 @@ object QuestionnaireResponseValidator {
     linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>
   ): Map<String, List<ValidationResult>> {
 
-    when (checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }) {
+    when (checkNotNull(questionnaireItem.type) {
+        "Questionnaire item must have type ${questionnaireItem.linkId}"
+      }
+    ) {
       Questionnaire.QuestionnaireItemType.DISPLAY,
       Questionnaire.QuestionnaireItemType.NULL -> Unit
       Questionnaire.QuestionnaireItemType.GROUP ->

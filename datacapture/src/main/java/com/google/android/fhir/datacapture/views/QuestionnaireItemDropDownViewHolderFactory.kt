@@ -72,8 +72,13 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
             R.layout.questionnaire_item_drop_down_list,
             answerOptionString
           )
-        autoCompleteTextView.setText(questionnaireItemViewItem.answers.singleOrNull()?.displayString(header.context) ?: "")
-        autoCompleteTextView.setSelection(questionnaireItemViewItem.answers.singleOrNull()?.displayString(header.context)?.length ?: 0)
+        autoCompleteTextView.setText(
+          questionnaireItemViewItem.answers.singleOrNull()?.displayString(header.context) ?: ""
+        )
+        autoCompleteTextView.setSelection(
+          questionnaireItemViewItem.answers.singleOrNull()?.displayString(header.context)?.length
+            ?: 0
+        )
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.onItemClickListener =
           AdapterView.OnItemClickListener { _, _, position, _ ->
