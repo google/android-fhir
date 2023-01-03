@@ -30,10 +30,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import com.bumptech.glide.Glide
-import com.google.android.fhir.datacapture.GeneralMimeTypes
+import com.google.android.fhir.datacapture.MimeType
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.hasGeneralMimeType
-import com.google.android.fhir.datacapture.hasGeneralMimeTypeOnly
+import com.google.android.fhir.datacapture.hasMimeType
+import com.google.android.fhir.datacapture.hasMimeTypeOnly
 import com.google.android.fhir.datacapture.isMaxSizeOverLimit
 import com.google.android.fhir.datacapture.maxSizeInMB
 import com.google.android.fhir.datacapture.mimeTypes
@@ -127,23 +127,23 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
       private fun displayInitialAttachmentPreview() {
         questionnaireItemViewItem.answers.firstOrNull()?.valueAttachment?.let { attachment ->
-          when (attachment.contentType.getGeneralMimeType()) {
-            GeneralMimeTypes.IMAGE.value -> {
+          when (attachment.contentType.type) {
+            MimeType.IMAGE.value -> {
               loadPhotoPreviewInBytes(attachment.data)
               clearFilePreview()
               loadDeleteButton(R.string.delete_image)
             }
-            GeneralMimeTypes.DOCUMENT.value -> {
+            MimeType.DOCUMENT.value -> {
               loadFilePreview(R.drawable.file, attachment.title)
               clearPhotoPreview()
               loadDeleteButton(R.string.delete_file)
             }
-            GeneralMimeTypes.VIDEO.value -> {
+            MimeType.VIDEO.value -> {
               loadFilePreview(R.drawable.video_file, attachment.title)
               clearPhotoPreview()
               loadDeleteButton(R.string.delete_file)
             }
-            GeneralMimeTypes.AUDIO.value -> {
+            MimeType.AUDIO.value -> {
               loadFilePreview(R.drawable.audio_file, attachment.title)
               clearPhotoPreview()
               loadDeleteButton(R.string.delete_file)
@@ -153,10 +153,10 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
       }
 
       private fun displayActionButtons(questionnaireItem: QuestionnaireItemComponent) {
-        if (questionnaireItem.hasGeneralMimeTypeOnly(GeneralMimeTypes.IMAGE.value)) {
+        if (questionnaireItem.hasMimeTypeOnly(MimeType.IMAGE.value)) {
           takePhoto.visibility = View.VISIBLE
           loadUploadButton(R.drawable.image_file, R.string.upload_photo)
-        } else if (questionnaireItem.hasGeneralMimeType(GeneralMimeTypes.IMAGE.value)) {
+        } else if (questionnaireItem.hasMimeType(MimeType.IMAGE.value)) {
           takePhoto.visibility = View.VISIBLE
           loadUploadButton(R.drawable.file, R.string.select_file)
         } else {
@@ -187,7 +187,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           }
 
           val mimeType = context.getMimeTypeFromUri(uri)
-          if (!questionnaireItem.hasGeneralMimeType(mimeType.getGeneralMimeType())) {
+          if (!questionnaireItem.hasMimeType(mimeType.type)) {
             displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
             displaySnackbar(takePhoto, R.string.upload_failed)
             file.delete()
@@ -243,7 +243,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           }
 
           val mimeType = context.getMimeTypeFromUri(uri)
-          if (!questionnaireItem.hasGeneralMimeType(mimeType.getGeneralMimeType())) {
+          if (!questionnaireItem.hasMimeType(mimeType.type)) {
             displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
             displaySnackbar(selectFile, R.string.upload_failed)
             return@setFragmentResultListener
@@ -262,23 +262,23 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             }
           questionnaireItemViewItem.setAnswer(answer)
 
-          when (mimeType.getGeneralMimeType()) {
-            GeneralMimeTypes.IMAGE.value -> {
+          when (mimeType.type) {
+            MimeType.IMAGE.value -> {
               loadPhotoPreviewInUri(uri)
               clearFilePreview()
               loadDeleteButton(R.string.delete_image)
             }
-            GeneralMimeTypes.DOCUMENT.value -> {
+            MimeType.DOCUMENT.value -> {
               loadFilePreview(R.drawable.file, fileName)
               clearPhotoPreview()
               loadDeleteButton(R.string.delete_file)
             }
-            GeneralMimeTypes.VIDEO.value -> {
+            MimeType.VIDEO.value -> {
               loadFilePreview(R.drawable.video_file, fileName)
               clearPhotoPreview()
               loadDeleteButton(R.string.delete_file)
             }
-            GeneralMimeTypes.AUDIO.value -> {
+            MimeType.AUDIO.value -> {
               loadFilePreview(R.drawable.audio_file, fileName)
               clearPhotoPreview()
               loadDeleteButton(R.string.delete_file)
@@ -374,9 +374,9 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
   const val EXTRA_SAVED_PHOTO_URI_KEY = "saved_photo_uri"
 }
 
-private fun String.getGeneralMimeType(): String {
-  return substringBefore("/")
-}
+/** Only usable for a String known as mime type. */
+private val String.type: String
+  get() = this.substringBefore("/")
 
 private fun Context.readBytesFromUri(uri: Uri): ByteArray {
   return contentResolver.openInputStream(uri)?.use { it.buffered().readBytes() } ?: ByteArray(0)

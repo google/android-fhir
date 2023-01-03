@@ -187,23 +187,19 @@ internal val Questionnaire.QuestionnaireItemComponent.mimeTypes: List<String>
       .filter { !it.isNullOrEmpty() }
   }
 
-internal enum class GeneralMimeTypes(val value: String) {
+internal enum class MimeType(val value: String) {
   AUDIO("audio"),
   DOCUMENT("application"),
   IMAGE("image"),
   VIDEO("video")
 }
 
-internal fun Questionnaire.QuestionnaireItemComponent.hasGeneralMimeType(
-  generalMimeType: String
-): Boolean {
-  return mimeTypes.any { it.substringBefore("/") == generalMimeType }
+internal fun Questionnaire.QuestionnaireItemComponent.hasMimeType(type: String): Boolean {
+  return mimeTypes.any { it.substringBefore("/") == type }
 }
 
-internal fun Questionnaire.QuestionnaireItemComponent.hasGeneralMimeTypeOnly(
-  generalMimeType: String
-): Boolean {
-  return mimeTypes.all { it.substringBefore("/") == generalMimeType }
+internal fun Questionnaire.QuestionnaireItemComponent.hasMimeTypeOnly(type: String): Boolean {
+  return mimeTypes.all { it.substringBefore("/") == type }
 }
 
 internal const val EXTENSION_MAX_SIZE = "http://hl7.org/fhir/StructureDefinition/maxSize"
