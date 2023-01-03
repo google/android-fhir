@@ -16,7 +16,10 @@
 
 package com.google.android.fhir.datacapture
 
+import android.app.Application
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
+import com.google.android.fhir.datacapture.common.datatype.displayString
 import com.google.common.truth.Truth.assertThat
 import java.util.Locale
 import kotlin.test.assertFailsWith
@@ -38,7 +41,9 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class MoreAnswerOptionsTest {
+class MoreQuestionnaireItemAnswerOptionComponent {
+
+  private val context = ApplicationProvider.getApplicationContext<Application>()
 
   @Test
   fun getDisplayString_choiceItemType_answerOptionShouldReturnValueCodingDisplayValue() {
@@ -46,7 +51,7 @@ class MoreAnswerOptionsTest {
       Questionnaire.QuestionnaireItemAnswerOptionComponent()
         .setValue(Coding().setCode("test-code").setDisplay("Test Code"))
 
-    assertThat(answerOption.displayString).isEqualTo("Test Code")
+    assertThat(answerOption.value.displayString(context)).isEqualTo("Test Code")
   }
 
   @Test
@@ -54,14 +59,14 @@ class MoreAnswerOptionsTest {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(Coding().setCode("test-code"))
 
-    assertThat(answerOption.displayString).isEqualTo("test-code")
+    assertThat(answerOption.value.displayString(context)).isEqualTo("test-code")
   }
 
   @Test
   fun getDisplayString_choiceItemType_shouldThrowExceptionForIllegalAnswerOptionValueX() {
     val answerOption = Questionnaire.QuestionnaireItemAnswerOptionComponent()
 
-    assertFailsWith<IllegalArgumentException> { answerOption.displayString }
+    assertFailsWith<NullPointerException> { answerOption.value.displayString(context) }
   }
 
   @Test
@@ -70,7 +75,7 @@ class MoreAnswerOptionsTest {
       Questionnaire.QuestionnaireItemAnswerOptionComponent()
         .setValue(Reference().setReference("Patient/123").setDisplay("John Doe"))
 
-    assertThat(answerOption.displayString).isEqualTo("John Doe")
+    assertThat(answerOption.value.displayString(context)).isEqualTo("John Doe")
   }
 
   @Test
@@ -79,7 +84,7 @@ class MoreAnswerOptionsTest {
       Questionnaire.QuestionnaireItemAnswerOptionComponent()
         .setValue(Reference().setReference("Patient/123"))
 
-    assertThat(answerOption.displayString).isEqualTo("Patient/123")
+    assertThat(answerOption.value.displayString(context)).isEqualTo("Patient/123")
   }
 
   @Test
@@ -87,7 +92,7 @@ class MoreAnswerOptionsTest {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(IntegerType().setValue(1))
 
-    assertThat(answerOption.displayString).isEqualTo("1")
+    assertThat(answerOption.value.displayString(context)).isEqualTo("1")
   }
 
   @Test
@@ -96,7 +101,7 @@ class MoreAnswerOptionsTest {
       Questionnaire.QuestionnaireItemAnswerOptionComponent()
         .setValue(StringType().setValue("string type value"))
 
-    assertThat(answerOption.displayString).isEqualTo("string type value")
+    assertThat(answerOption.value.displayString(context)).isEqualTo("string type value")
   }
 
   @Test
@@ -119,7 +124,7 @@ class MoreAnswerOptionsTest {
       }
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
-    assertThat(answerOption.displayString).isEqualTo("Thí nghiệm")
+    assertThat(answerOption.value.displayString(context)).isEqualTo("Thí nghiệm")
   }
 
   @Test
@@ -141,7 +146,7 @@ class MoreAnswerOptionsTest {
       }
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
-    assertThat(answerOption.displayString).isEqualTo("Test Code")
+    assertThat(answerOption.value.displayString(context)).isEqualTo("Test Code")
   }
 
   @Test
@@ -161,7 +166,7 @@ class MoreAnswerOptionsTest {
       }
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
-    assertThat(answerOption.displayString).isEqualTo("Thí nghiệm")
+    assertThat(answerOption.value.displayString(context)).isEqualTo("Thí nghiệm")
   }
 
   @Test
@@ -169,7 +174,7 @@ class MoreAnswerOptionsTest {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(TimeType("16:25:00"))
 
-    assertThat(answerOption.displayString).isEqualTo("16:25:00")
+    assertThat(answerOption.value.displayString(context)).isEqualTo("16:25:00")
   }
 
   @Test
@@ -177,7 +182,7 @@ class MoreAnswerOptionsTest {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(DateType("2022-06-23"))
 
-    assertThat(answerOption.displayString).isEqualTo("2022-06-23")
+    assertThat(answerOption.value.displayString(context)).isEqualTo("6/23/22")
   }
 
   @Test
