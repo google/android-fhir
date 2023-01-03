@@ -192,10 +192,10 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
     val radioButton =
       viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1)
         as RadioButton
-    assertThat(radioButton.compoundDrawables[0]).isNotNull()
-    assertThat(radioButton.compoundDrawables[1]).isNull()
-    assertThat(radioButton.compoundDrawables[2]).isNull()
-    assertThat(radioButton.compoundDrawables[3]).isNull()
+    assertThat(radioButton.compoundDrawablesRelative[0]).isNotNull()
+    assertThat(radioButton.compoundDrawablesRelative[1]).isNull()
+    assertThat(radioButton.compoundDrawablesRelative[2]).isNull()
+    assertThat(radioButton.compoundDrawablesRelative[3]).isNull()
   }
 
   @Test

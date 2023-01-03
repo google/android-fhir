@@ -199,10 +199,10 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
 
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
-    assertThat(checkBox.compoundDrawables[0]).isNotNull()
-    assertThat(checkBox.compoundDrawables[1]).isNull()
-    assertThat(checkBox.compoundDrawables[2]).isNull()
-    assertThat(checkBox.compoundDrawables[3]).isNull()
+    assertThat(checkBox.compoundDrawablesRelative[0]).isNotNull()
+    assertThat(checkBox.compoundDrawablesRelative[1]).isNull()
+    assertThat(checkBox.compoundDrawablesRelative[2]).isNull()
+    assertThat(checkBox.compoundDrawablesRelative[3]).isNull()
   }
 
   @Test
