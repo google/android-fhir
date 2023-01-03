@@ -21,7 +21,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.view.get
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.common.datatype.displayString
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -81,7 +81,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
                 questionnaireItem.answerOption
-                  .first { it.displayString == "Test1 Code" }
+                  .first { it.value.displayString(parent.context) == "Test1 Code" }
                   .valueCoding
             }
           )
@@ -115,13 +115,15 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = answers.first { it.displayString == "Test1 Code" }.valueCoding
+              value =
+                answers.first { it.value.displayString(parent.context) == "Test1 Code" }.valueCoding
             }
           )
 
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = answers.first { it.displayString == "Test2 Code" }.valueCoding
+              value =
+                answers.first { it.value.displayString(parent.context) == "Test2 Code" }.valueCoding
             }
           )
         },
@@ -159,7 +161,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = answers.first { it.displayString == "Test1 Code" }.valueCoding
+              value =
+                answers.first { it.value.displayString(parent.context) == "Test1 Code" }.valueCoding
             }
           )
         },
@@ -261,7 +264,9 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
-                questionnaireItem.answerOption.first { it.displayString == "readOnly" }.valueCoding
+                questionnaireItem.answerOption
+                  .first { it.value.displayString(parent.context) == "readOnly" }
+                  .valueCoding
             }
           )
         },

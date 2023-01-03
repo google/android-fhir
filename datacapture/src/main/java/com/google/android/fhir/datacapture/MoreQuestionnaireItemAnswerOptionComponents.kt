@@ -16,42 +16,11 @@
 
 package com.google.android.fhir.datacapture
 
-import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.BooleanType
-import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.Reference
-import org.hl7.fhir.r4.model.StringType
-import org.hl7.fhir.r4.model.TimeType
 
 internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive"
-
-/**
- * Text value for answer option [Questionnaire.QuestionnaireItemAnswerOptionComponent] if answer
- * option is [IntegerType], [StringType], [Coding], or [Reference] type.
- */
-internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
-  get() {
-    return when (value) {
-      is IntegerType,
-      is DateType,
-      is TimeType -> value.primitiveValue()
-      is StringType -> (value as StringType).getLocalizedText() ?: value.toString()
-      is Reference -> valueReference.display ?: valueReference.reference
-      is Coding -> {
-        val display = valueCoding.displayElement.getLocalizedText() ?: valueCoding.display
-        if (display.isNullOrEmpty()) {
-          valueCoding.code
-        } else {
-          display
-        }
-      }
-      else -> throw IllegalArgumentException("$value is not supported.")
-    }
-  }
 
 /** Indicates that if this answerOption is selected, no other possible answers may be selected. */
 internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.optionExclusive: Boolean
