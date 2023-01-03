@@ -75,8 +75,9 @@ fun Type.displayString(context: Context): String =
     is DateType -> this.localDate?.localizedString ?: context.getString(R.string.not_answered)
     is DateTimeType ->
       "${this.localDate.localizedString} ${this.localTime.toLocalizedString(context)}"
-    is DecimalType -> this.valueAsString ?: context.getString(R.string.not_answered)
-    is IntegerType -> this.valueAsString ?: context.getString(R.string.not_answered)
+    is DecimalType,
+    is IntegerType -> (this as PrimitiveType<*>).valueAsString
+        ?: context.getString(R.string.not_answered)
     is Quantity -> this.value.toString()
     is Reference -> {
       val display = this.display
@@ -86,7 +87,8 @@ fun Type.displayString(context: Context): String =
     }
     is StringType -> this.getLocalizedText()
         ?: this.valueAsString ?: context.getString(R.string.not_answered)
-    is TimeType -> this.valueAsString ?: context.getString(R.string.not_answered)
-    is UriType -> this.valueAsString ?: context.getString(R.string.not_answered)
+    is TimeType,
+    is UriType -> (this as PrimitiveType<*>).valueAsString
+        ?: context.getString(R.string.not_answered)
     else -> context.getString(R.string.not_answered)
   }
