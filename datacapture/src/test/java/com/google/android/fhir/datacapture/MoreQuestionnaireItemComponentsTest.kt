@@ -495,9 +495,21 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun maxSize_missingExtension_shouldReturnNull() {
+  fun maxSizeInByte_missingExtension_shouldReturnNull() {
     val questionnaire = Questionnaire.QuestionnaireItemComponent()
     assertThat(questionnaire.maxSizeInByte).isNull()
+  }
+
+  @Test
+  fun maxSizeInKiB_missingExtension_shouldReturnNull() {
+    val questionnaire = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaire.maxSizeInKiB).isNull()
+  }
+
+  @Test
+  fun maxSizeInMiB_missingExtension_shouldReturnNull() {
+    val questionnaire = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaire.maxSizeInMiB).isNull()
   }
 
   @Test
