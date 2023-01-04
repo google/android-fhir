@@ -25,6 +25,7 @@ import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -530,6 +531,51 @@ class MoreQuestionnaireItemComponentsTest {
         addExtension(EXTENSION_MIME_TYPE, CodeType("application/pdf"))
       }
     assertThat(questionnaire.hasMimeTypeOnly(MimeType.IMAGE.value)).isFalse()
+  }
+
+  @Test
+  fun maxSize_shouldReturnBytes() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
+      }
+    assertThat(questionnaire.maxSizeInByte).isEqualTo(BigDecimal(5242880))
+  }
+
+  @Test
+  fun maxSize_shouldReturnKibibytes() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
+      }
+    assertThat(questionnaire.maxSizeInKiB).isEqualTo(BigDecimal(5120))
+  }
+
+  @Test
+  fun maxSize_shouldReturnMebibytes() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
+      }
+    assertThat(questionnaire.maxSizeInMiB).isEqualTo(BigDecimal(5))
+  }
+
+  @Test
+  fun maxSizeInByte_missingExtension_shouldReturnNull() {
+    val questionnaire = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaire.maxSizeInByte).isNull()
+  }
+
+  @Test
+  fun maxSizeInKiB_missingExtension_shouldReturnNull() {
+    val questionnaire = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaire.maxSizeInKiB).isNull()
+  }
+
+  @Test
+  fun maxSizeInMiB_missingExtension_shouldReturnNull() {
+    val questionnaire = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaire.maxSizeInMiB).isNull()
   }
 
   @Test
