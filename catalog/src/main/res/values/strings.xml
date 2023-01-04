@@ -29,7 +29,6 @@
     <string name="component_name_modal">Modal</string>
     <string name="component_name_slider">Slider</string>
     <string name="component_name_dropdown">Dropdown</string>
-    <string name="component_name_image">Image</string>
     <string name="component_name_auto_complete">Auto Complete</string>
     <string name="component_name_help">Help</string>
     <string name="component_name_repeated_group">Repeated Group</string>

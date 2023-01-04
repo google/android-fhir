@@ -113,7 +113,6 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_slider.json",
       "component_slider_with_validation.json"
     ),
-    IMAGE(R.drawable.ic_image, R.string.component_name_image, "", ""),
     AUTO_COMPLETE(
       R.drawable.ic_autocomplete,
       R.string.component_name_auto_complete,
@@ -142,7 +141,6 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       ViewItem.ComponentItem(Component.DATE_PICKER),
       ViewItem.ComponentItem(Component.DATE_TIME_PICKER),
       ViewItem.ComponentItem(Component.SLIDER),
-      ViewItem.ComponentItem(Component.IMAGE),
       ViewItem.ComponentItem(Component.AUTO_COMPLETE),
       ViewItem.ComponentItem(Component.REPEATED_GROUP),
       ViewItem.HeaderItem(Header.MISC_COMPONENTS),
