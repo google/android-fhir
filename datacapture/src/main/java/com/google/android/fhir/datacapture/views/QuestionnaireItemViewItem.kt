@@ -20,7 +20,7 @@ import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.answerExpression
-import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.common.datatype.displayString
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -147,7 +147,7 @@ data class QuestionnaireItemViewItem(
 
   internal fun answerString(context: Context): String {
     if (!questionnaireResponseItem.hasAnswer()) return context.getString(R.string.not_answered)
-    return questionnaireResponseItem.answer.joinToString { it.displayString(context) }
+    return questionnaireResponseItem.answer.joinToString { it.value.displayString(context) }
   }
 
   internal val hasAnswerString: Boolean

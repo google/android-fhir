@@ -21,7 +21,6 @@ import androidx.core.text.HtmlCompat
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.utilities.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
-import com.google.android.fhir.logicalId
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
@@ -173,6 +172,17 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceO
           as CodeType?)
         ?.valueAsString
     return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
+  }
+
+internal const val EXTENSION_MIME_TYPE = "http://hl7.org/fhir/StructureDefinition/mimeType"
+
+/** Identifies the kinds of attachment allowed to be sent for an element. */
+internal val Questionnaire.QuestionnaireItemComponent.mimeTypes: List<String>
+  get() {
+    return extension
+      .filter { it.url == EXTENSION_MIME_TYPE }
+      .map { (it.value as CodeType).valueAsString }
+      .filter { !it.isNullOrEmpty() }
   }
 
 /** UI controls relevant to rendering questionnaire items. */
@@ -534,3 +544,8 @@ fun List<Questionnaire.QuestionnaireItemComponent>.flattened():
  */
 fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
   item.map { it.createQuestionnaireResponseItem() }
+
+val Resource.logicalId: String
+  get() {
+    return this.idElement?.idPart.orEmpty()
+  }

@@ -156,6 +156,8 @@ object PlanDefinition : Loadable() {
   object Assert {
     fun that(planDefinitionID: String, patientID: String, encounterID: String?) =
       Apply(planDefinitionID, patientID, encounterID)
+
+    fun that(planDefinitionID: String, patientID: String) = Apply(planDefinitionID, patientID, null)
   }
 
   class Apply(
