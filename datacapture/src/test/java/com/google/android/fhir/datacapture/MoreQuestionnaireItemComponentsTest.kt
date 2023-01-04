@@ -473,7 +473,7 @@ class MoreQuestionnaireItemComponentsTest {
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
       }
-    assertThat(questionnaire.maxSizeInB).isEqualTo(BigDecimal(5242880))
+    assertThat(questionnaire.maxSizeInByte).isEqualTo(BigDecimal(5242880))
   }
 
   @Test
@@ -516,13 +516,13 @@ class MoreQuestionnaireItemComponentsTest {
         }
 
     assertThat(answers.first().valueAttachment.size)
-      .isGreaterThan(questionnaireItemViewItem.questionnaireItem.maxSizeInB?.toInt())
+      .isGreaterThan(questionnaireItemViewItem.questionnaireItem.maxSizeInByte?.toInt())
   }
 
   @Test
   fun maxSize_missingExtension_shouldReturnNull() {
     val questionnaire = Questionnaire.QuestionnaireItemComponent()
-    assertThat(questionnaire.maxSizeInB).isNull()
+    assertThat(questionnaire.maxSizeInByte).isNull()
   }
 
   @Test
