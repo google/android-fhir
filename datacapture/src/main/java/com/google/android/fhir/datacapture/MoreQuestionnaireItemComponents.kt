@@ -189,7 +189,7 @@ internal val Questionnaire.QuestionnaireItemComponent.maxSizeInB: BigDecimal?
 
 private val BYTES_PER_KIB = BigDecimal(1024)
 
-/** Maximum size an attachment can be. Unit in Kibibytes. */
+/** The maximum size of an attachment in Kibibytes. */
 internal val Questionnaire.QuestionnaireItemComponent.maxSizeInKiB: BigDecimal?
   get() {
     return maxSizeInB?.div(BYTES_PER_KIB)
@@ -197,7 +197,7 @@ internal val Questionnaire.QuestionnaireItemComponent.maxSizeInKiB: BigDecimal?
 
 private val BYTES_PER_MIB = BigDecimal(1048576)
 
-/** Maximum size an attachment can be. Unit in Mebibytes. */
+/** The maximum size of an attachment in Mebibytes. */
 internal val Questionnaire.QuestionnaireItemComponent.maxSizeInMiB: BigDecimal?
   get() {
     return maxSizeInB?.div(BYTES_PER_MIB)
