@@ -35,7 +35,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.hasMimeType
 import com.google.android.fhir.datacapture.hasMimeTypeOnly
 import com.google.android.fhir.datacapture.isMaxSizeOverLimit
-import com.google.android.fhir.datacapture.maxSizeInMB
+import com.google.android.fhir.datacapture.maxSizeInMiB
 import com.google.android.fhir.datacapture.mimeTypes
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -179,7 +179,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           if (questionnaireItem.isMaxSizeOverLimit(file.length().toBigDecimal())) {
             displayError(
               R.string.max_size_image_above_limit_validation_error_msg,
-              questionnaireItem.maxSizeInMB
+              questionnaireItem.maxSizeInMiB
             )
             displaySnackbar(takePhoto, R.string.upload_failed)
             file.delete()
@@ -236,7 +236,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           if (questionnaireItem.isMaxSizeOverLimit(bytes.size.toBigDecimal())) {
             displayError(
               R.string.max_size_file_above_limit_validation_error_msg,
-              questionnaireItem.maxSizeInMB
+              questionnaireItem.maxSizeInMiB
             )
             displaySnackbar(selectFile, R.string.upload_failed)
             return@setFragmentResultListener
@@ -289,7 +289,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         }
 
         SelectFileLauncherFragment()
-          .apply { arguments = bundleOf(MIME_TYPE to questionnaireItem.mimeTypes.toTypedArray()) }
+          .apply { arguments = bundleOf(EXTRA_MIME_TYPE_KEY to questionnaireItem.mimeTypes.toTypedArray()) }
           .show(
             context.supportFragmentManager,
             QuestionnaireItemAttachmentViewHolderFactory.javaClass.simpleName
@@ -370,7 +370,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
       }
     }
 
-  const val MIME_TYPE = "mime_type"
+  const val EXTRA_MIME_TYPE_KEY = "mime_type"
   const val EXTRA_SAVED_PHOTO_URI_KEY = "saved_photo_uri"
 }
 
