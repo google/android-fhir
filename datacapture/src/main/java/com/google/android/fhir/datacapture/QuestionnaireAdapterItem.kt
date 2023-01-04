@@ -18,6 +18,8 @@ package com.google.android.fhir.datacapture
 
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 
-sealed interface QuestionnaireAdapterItem {
+/** Various types of rows that can be used in a Questionnaire RecyclerView. */
+internal sealed interface QuestionnaireAdapterItem {
+  /** A row for a quesion in a Questionnaire RecyclerView. */
   data class Question(val item: QuestionnaireItemViewItem) : QuestionnaireAdapterItem
 }

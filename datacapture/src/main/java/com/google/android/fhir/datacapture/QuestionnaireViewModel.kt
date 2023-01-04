@@ -700,7 +700,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
-  /** Gets a list of [QuestionnairePage]s for a paginated questionnaire. */
+  /**
+   * Gets a list of [QuestionnairePage]s for a paginated questionnaire, or `null` if the
+   * questionnaire is not paginated.
+   */
   private fun getQuestionnairePages(): List<QuestionnairePage>? =
     if (questionnaire.isPaginated) {
       questionnaire.item.zip(questionnaireResponse.item).mapIndexed {

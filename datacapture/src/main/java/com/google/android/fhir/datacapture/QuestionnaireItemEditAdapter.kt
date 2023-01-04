@@ -44,7 +44,7 @@ internal class QuestionnaireItemEditAdapter(
   private val questionnaireItemViewHolderMatchers:
     List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> =
     emptyList(),
-) : ListAdapter<QuestionnaireAdapterItem, QuestionnaireItemViewHolder>(DiffCallback) {
+) : ListAdapter<QuestionnaireAdapterItem, QuestionnaireItemViewHolder>(DiffCallbacks.ITEMS) {
   /**
    * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
    * [QuestionnaireItemViewItem].
@@ -56,9 +56,10 @@ internal class QuestionnaireItemEditAdapter(
       ViewType.Type.QUESTION -> onCreateViewHolderQuestion(parent = parent, subtype = subtype)
     }
   }
+
   private fun onCreateViewHolderQuestion(
     parent: ViewGroup,
-    subtype: Int
+    subtype: Int,
   ): QuestionnaireItemViewHolder {
     val numOfCanonicalWidgets = QuestionnaireItemViewHolderType.values().size
     check(subtype < numOfCanonicalWidgets + questionnaireItemViewHolderMatchers.size) {
@@ -151,6 +152,7 @@ internal class QuestionnaireItemEditAdapter(
 
       fun from(type: Type, subtype: Int): ViewType = ViewType((type.ordinal shl 24) or subtype)
     }
+
     enum class Type {
       QUESTION,
     }
@@ -251,33 +253,52 @@ internal class QuestionnaireItemEditAdapter(
   }
 }
 
-internal object DiffCallback : DiffUtil.ItemCallback<QuestionnaireAdapterItem>() {
-  /**
-   * [QuestionnaireItemViewItem] is a transient object for the UI only. Whenever the user makes any
-   * change via the UI, a new list of [QuestionnaireItemViewItem]s will be created, each holding
-   * references to the underlying [QuestionnaireItem] and [QuestionnaireResponseItem], both of which
-   * should be read-only, and the current answers. To help recycler view handle update and/or
-   * animations, we consider two [QuestionnaireItemViewItem]s to be the same if they have the same
-   * underlying [QuestionnaireItem] and [QuestionnaireResponseItem].
-   */
-  override fun areItemsTheSame(
-    oldItem: QuestionnaireAdapterItem,
-    newItem: QuestionnaireAdapterItem,
-  ): Boolean =
-    when (oldItem) {
-      is QuestionnaireAdapterItem.Question -> {
-        newItem is QuestionnaireAdapterItem.Question && oldItem.item.hasTheSameItem(newItem.item)
-      }
+internal object DiffCallbacks {
+  val ITEMS =
+    object : DiffUtil.ItemCallback<QuestionnaireAdapterItem>() {
+      override fun areItemsTheSame(
+        oldItem: QuestionnaireAdapterItem,
+        newItem: QuestionnaireAdapterItem,
+      ): Boolean =
+        when (oldItem) {
+          is QuestionnaireAdapterItem.Question -> {
+            newItem is QuestionnaireAdapterItem.Question &&
+              QUESTIONS.areItemsTheSame(oldItem, newItem)
+          }
+        }
+
+      override fun areContentsTheSame(
+        oldItem: QuestionnaireAdapterItem,
+        newItem: QuestionnaireAdapterItem,
+      ): Boolean =
+        when (oldItem) {
+          is QuestionnaireAdapterItem.Question -> {
+            newItem is QuestionnaireAdapterItem.Question &&
+              QUESTIONS.areContentsTheSame(oldItem, newItem)
+          }
+        }
     }
 
-  override fun areContentsTheSame(
-    oldItem: QuestionnaireAdapterItem,
-    newItem: QuestionnaireAdapterItem,
-  ): Boolean =
-    when (oldItem) {
-      is QuestionnaireAdapterItem.Question -> {
-        newItem is QuestionnaireAdapterItem.Question &&
-          oldItem.item.hasTheSameItem(newItem.item) &&
+  val QUESTIONS =
+    object : DiffUtil.ItemCallback<QuestionnaireAdapterItem.Question>() {
+      /**
+       * [QuestionnaireItemViewItem] is a transient object for the UI only. Whenever the user makes
+       * any change via the UI, a new list of [QuestionnaireItemViewItem]s will be created, each
+       * holding references to the underlying [QuestionnaireItem] and [QuestionnaireResponseItem],
+       * both of which should be read-only, and the current answers. To help recycler view handle
+       * update and/or animations, we consider two [QuestionnaireItemViewItem]s to be the same if
+       * they have the same underlying [QuestionnaireItem] and [QuestionnaireResponseItem].
+       */
+      override fun areItemsTheSame(
+        oldItem: QuestionnaireAdapterItem.Question,
+        newItem: QuestionnaireAdapterItem.Question,
+      ) = oldItem.item.hasTheSameItem(newItem.item)
+
+      override fun areContentsTheSame(
+        oldItem: QuestionnaireAdapterItem.Question,
+        newItem: QuestionnaireAdapterItem.Question,
+      ): Boolean {
+        return oldItem.item.hasTheSameItem(newItem.item) &&
           oldItem.item.hasTheSameAnswer(newItem.item) &&
           oldItem.item.hasTheSameValidationResult(newItem.item)
       }

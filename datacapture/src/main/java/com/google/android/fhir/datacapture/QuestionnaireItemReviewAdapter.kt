@@ -23,17 +23,14 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 
 /** List Adapter used to bind answers to [QuestionnaireItemViewHolder] in review mode. */
 internal class QuestionnaireItemReviewAdapter :
-  ListAdapter<QuestionnaireAdapterItem, QuestionnaireItemViewHolder>(DiffCallback) {
+  ListAdapter<QuestionnaireAdapterItem.Question, QuestionnaireItemViewHolder>(
+    DiffCallbacks.QUESTIONS
+  ) {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
     return QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory.create(parent)
   }
 
   override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
-    val item = getItem(position)
-    item as? QuestionnaireAdapterItem.Question
-      ?: error(
-        "QuestionnaireItemReviewAdapter only supports QuestionnaireAdapterItem.Questions, but was passed a ${item::class.java.name}"
-      )
-    holder.bind(item.item)
+    holder.bind(getItem(position).item)
   }
 }
