@@ -19,8 +19,6 @@ package com.google.android.fhir.datacapture.views
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
@@ -45,7 +43,12 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
     updateQuestionText(question, questionnaireItem)
     hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
-    initHelpButton(this, questionnaireItem)
+    initHelpButton(
+      findViewById(R.id.helpButton),
+      findViewById(R.id.helpCardView),
+      findViewById(R.id.helpText),
+      questionnaireItem
+    )
     //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
     visibility = getViewGroupVisibility(prefix, question, hint)

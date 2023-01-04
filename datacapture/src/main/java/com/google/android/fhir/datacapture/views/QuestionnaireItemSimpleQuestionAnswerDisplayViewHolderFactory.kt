@@ -20,9 +20,12 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.ColorUtils
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.localizedInstructionsSpanned
+import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.divider.MaterialDivider
 import org.hl7.fhir.r4.model.Questionnaire
@@ -36,11 +39,14 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_simple_question_answer_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var header: QuestionnaireItemHeaderViewInReviewMode
       private lateinit var flyOverTextView: TextView
       private lateinit var answerTextView: TextView
       private lateinit var errorIcon: View
       private lateinit var divider: MaterialDivider
+      private lateinit var prefix: TextView
+      private lateinit var question: TextView
+      private lateinit var hint: TextView
+      private lateinit var header: ConstraintLayout
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
@@ -49,10 +55,21 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
         answerTextView = itemView.findViewById(R.id.answer_text_view)
         divider = itemView.findViewById(R.id.text_divider)
         errorIcon = itemView.findViewById(R.id.error_icon_in_review_mode)
+        prefix = itemView.findViewById(R.id.prefix)
+        question = itemView.findViewById(R.id.question)
+        hint = itemView.findViewById(R.id.hint)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        header.bind(questionnaireItemViewItem.questionnaireItem)
+        prefix.updateTextAndVisibility(
+          questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
+        )
+        updateQuestionText(question, questionnaireItemViewItem.questionnaireItem)
+        hint.updateTextAndVisibility(
+          questionnaireItemViewItem.questionnaireItem.localizedInstructionsSpanned
+        )
+        header.visibility = getViewGroupVisibility(prefix, question, hint)
+
         val localizedFlyoverSpanned =
           questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
         flyOverTextView.apply {

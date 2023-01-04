@@ -103,6 +103,31 @@ internal fun initHelpButton(
     .updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
 }
 
+internal fun initHelpButton(
+  helpButton: Button,
+  helpCardView: MaterialCardView,
+  helpText: TextView,
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent
+) {
+  helpButton.visibility =
+    if (questionnaireItem.hasHelpButton) {
+      VISIBLE
+    } else {
+      GONE
+    }
+  var isHelpCardViewVisible = false
+  helpButton.setOnClickListener {
+    if (isHelpCardViewVisible) {
+      isHelpCardViewVisible = false
+      helpCardView.visibility = GONE
+    } else {
+      isHelpCardViewVisible = true
+      helpCardView.visibility = VISIBLE
+    }
+  }
+  helpText.updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
+}
+
 private fun SpannableStringBuilder.appendWithSpan(value: String, @ColorInt color: Int) {
   val start = length
   append(value)
