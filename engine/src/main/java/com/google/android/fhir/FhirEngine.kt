@@ -137,10 +137,3 @@ suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
 interface SyncDownloadContext {
   suspend fun getLatestTimestampFor(type: ResourceType): String?
 }
-
-interface SyncDownloadContextModified {
-  suspend fun getLatestTimestampForPatientResource(
-    patientId: String,
-    resourceType: ResourceType
-  ): String?
-}

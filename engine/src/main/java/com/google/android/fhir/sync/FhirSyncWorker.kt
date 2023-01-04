@@ -43,7 +43,6 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDownloadWorkManager(): DownloadWorkManager
-  abstract fun getDownloadWorkManagerModified(): DownloadWorkManagerModified
   private val mutex = Mutex()
   abstract fun getConflictResolver(): ConflictResolver
 
@@ -81,7 +80,6 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
           getFhirEngine(),
           dataSource,
           getDownloadWorkManager(),
-          getDownloadWorkManagerModified(),
           conflictResolver = getConflictResolver()
         )
 

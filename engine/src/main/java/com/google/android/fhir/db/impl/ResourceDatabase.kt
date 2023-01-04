@@ -24,7 +24,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.android.fhir.db.impl.dao.LocalChangeDao
 import com.google.android.fhir.db.impl.dao.ResourceDao
 import com.google.android.fhir.db.impl.dao.SyncedResourceDao
-import com.google.android.fhir.db.impl.dao.SyncedResourceEntityPatientCentricDao
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -35,7 +34,6 @@ import com.google.android.fhir.db.impl.entities.ReferenceIndexEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.StringIndexEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.db.impl.entities.SyncedResourceEntityPatientCentric
 import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
 
@@ -52,18 +50,16 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
       DateTimeIndexEntity::class,
       NumberIndexEntity::class,
       SyncedResourceEntity::class,
-      SyncedResourceEntityPatientCentric::class,
       LocalChangeEntity::class,
       PositionIndexEntity::class
     ],
-  version = 2,
+  version = 1,
   exportSchema = false
 )
 @TypeConverters(DbTypeConverters::class)
 internal abstract class ResourceDatabase : RoomDatabase() {
   abstract fun resourceDao(): ResourceDao
   abstract fun syncedResourceDao(): SyncedResourceDao
-  abstract fun syncedResourceEntityPatientCentricDao(): SyncedResourceEntityPatientCentricDao
   abstract fun localChangeDao(): LocalChangeDao
 }
 
@@ -76,5 +72,12 @@ val MIGRATION_1_2 =
       database.execSQL(
         "CREATE INDEX IF NOT EXISTS `index_SyncedResourceEntityPatientCentric_patientId_resourceType` ON `SyncedResourceEntityPatientCentric` (`patientId`, `resourceType`)"
       )
+    }
+  }
+
+val MIGRATION_2_1 =
+  object : Migration(2, 1) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.execSQL("DROP TABLE IF EXISTS `SyncedResourceEntityPatientCentric`")
     }
   }

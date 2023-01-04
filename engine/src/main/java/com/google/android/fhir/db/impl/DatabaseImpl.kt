@@ -32,22 +32,10 @@ import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ReferenceIndexEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.db.impl.entities.SyncedResourceEntityPatientCentric
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
-import java.lang.IllegalStateException
 import java.time.Instant
 import java.util.UUID
-import org.hl7.fhir.r4.model.Appointment
-import org.hl7.fhir.r4.model.Condition
-import org.hl7.fhir.r4.model.DocumentReference
-import org.hl7.fhir.r4.model.Encounter
-import org.hl7.fhir.r4.model.Immunization
-import org.hl7.fhir.r4.model.Media
-import org.hl7.fhir.r4.model.Observation
-import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.Procedure
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -90,13 +78,13 @@ internal class DatabaseImpl(
       when {
           databaseConfig.inMemory ->
             Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
-              .addMigrations(MIGRATION_1_2)
+              .addMigrations(MIGRATION_2_1)
           enableEncryption ->
             Room.databaseBuilder(context, ResourceDatabase::class.java, ENCRYPTED_DATABASE_NAME)
-              .addMigrations(MIGRATION_1_2)
+              .addMigrations(MIGRATION_2_1)
           else ->
             Room.databaseBuilder(context, ResourceDatabase::class.java, UNENCRYPTED_DATABASE_NAME)
-              .addMigrations(MIGRATION_1_2)
+              .addMigrations(MIGRATION_2_1)
         }
         .apply {
           // Provide the SupportSQLiteOpenHelper which enables the encryption.
@@ -114,7 +102,6 @@ internal class DatabaseImpl(
 
   private val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
   private val syncedResourceDao = db.syncedResourceDao()
-  private val syncedResourceEntityPatientCentricDao = db.syncedResourceEntityPatientCentricDao()
   private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 
   override suspend fun <R : Resource> insert(vararg resource: R): List<String> {
@@ -169,91 +156,13 @@ internal class DatabaseImpl(
     return db.withTransaction { syncedResourceDao.getLastUpdate(resourceType) }
   }
 
-  suspend fun lastUpdatePatientCentric(patientId: String, resourceType: ResourceType): String? {
-    return db.withTransaction {
-      syncedResourceEntityPatientCentricDao.getLastUpdateResource(patientId, resourceType)
-    }
-  }
-
   override suspend fun insertSyncedResources(
     syncedResources: List<SyncedResourceEntity>,
     resources: List<Resource>,
     updateSyncedResourceTable: Boolean
   ) {
-    val syncedResourceEntityPatients =
-      resources
-        .map {
-          when (it.resourceType) {
-            ResourceType.Patient ->
-              SyncedResourceEntityPatientCentric(
-                "Patient/${ (it as Patient).idElement.idPart }",
-                it.meta.lastUpdatedElement.valueAsString,
-                it.resourceType
-              )
-            ResourceType.QuestionnaireResponse ->
-              SyncedResourceEntityPatientCentric(
-                (it as QuestionnaireResponse).subject.reference,
-                it.meta.lastUpdatedElement.valueAsString,
-                it.resourceType
-              )
-            ResourceType.Encounter ->
-              SyncedResourceEntityPatientCentric(
-                (it as Encounter).subject.reference,
-                it.meta.lastUpdatedElement.valueAsString,
-                it.resourceType
-              )
-            ResourceType.Observation ->
-              SyncedResourceEntityPatientCentric(
-                (it as Observation).subject.reference,
-                it.meta.lastUpdatedElement.valueAsString,
-                it.resourceType
-              )
-            ResourceType.Condition ->
-              SyncedResourceEntityPatientCentric(
-                (it as Condition).subject.reference,
-                it.meta.lastUpdatedElement.valueAsString,
-                it.resourceType
-              )
-            ResourceType.Procedure ->
-              SyncedResourceEntityPatientCentric(
-                (it as Procedure).subject.reference,
-                it.meta.lastUpdatedElement.valueAsString,
-                it.resourceType
-              )
-            ResourceType.Immunization ->
-              SyncedResourceEntityPatientCentric(
-                (it as Immunization).patient.reference,
-                it.meta.lastUpdatedElement.valueAsString,
-                it.resourceType
-              )
-            ResourceType.Appointment ->
-              SyncedResourceEntityPatientCentric(
-                (it as Appointment).participant[0].actor.reference,
-                it.meta.lastUpdatedElement.valueAsString,
-                it.resourceType
-              )
-            ResourceType.Media ->
-              SyncedResourceEntityPatientCentric(
-                (it as Media).subject.reference,
-                it.meta.lastUpdatedElement.valueAsString,
-                it.resourceType
-              )
-            ResourceType.DocumentReference ->
-              SyncedResourceEntityPatientCentric(
-                (it as DocumentReference).subject.reference,
-                it.meta.lastUpdatedElement.valueAsString,
-                it.resourceType
-              )
-            else -> {
-              null
-            }
-          }
-        }
-        .filterNotNull()
-
     db.withTransaction {
       syncedResourceDao.insertAll(syncedResources)
-      syncedResourceEntityPatientCentricDao.insertAll(syncedResourceEntityPatients)
       insertRemote(*resources.toTypedArray())
     }
   }

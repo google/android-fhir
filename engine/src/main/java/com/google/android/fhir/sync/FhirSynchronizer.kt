@@ -19,7 +19,6 @@ package com.google.android.fhir.sync
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.impl.FhirEngineImpl
 import com.google.android.fhir.sync.download.DownloaderImpl
 import com.google.android.fhir.sync.upload.BundleUploader
 import com.google.android.fhir.sync.upload.LocalChangesPaginator
@@ -45,15 +44,13 @@ internal class FhirSynchronizer(
   private val fhirEngine: FhirEngine,
   private val dataSource: DataSource,
   private val downloadManager: DownloadWorkManager,
-  private val downloadWorkManagerModified: DownloadWorkManagerModified,
   private val uploader: Uploader =
     BundleUploader(
       dataSource,
       TransactionBundleGenerator.getDefault(),
       LocalChangesPaginator.DEFAULT
     ),
-  private val downloader: Downloader =
-    DownloaderImpl(dataSource, downloadManager, downloadWorkManagerModified),
+  private val downloader: Downloader = DownloaderImpl(dataSource, downloadManager),
   private val conflictResolver: ConflictResolver
 ) {
   private var syncState: MutableSharedFlow<SyncJobStatus>? = null
@@ -115,7 +112,7 @@ internal class FhirSynchronizer(
             }
           }
       SyncWorkType.DOWNLOAD ->
-        listOf(downloadModified())
+        listOf(download())
           .filterIsInstance<SyncResult.Error>()
           .flatMap { it.exceptions }
           .let {
@@ -133,36 +130,6 @@ internal class FhirSynchronizer(
     fhirEngine.syncDownload(conflictResolver) {
       flow {
         downloader.download(it).collect {
-          when (it) {
-            is DownloadState.Started -> {
-              setSyncState(SyncJobStatus.InProgress(it.type))
-            }
-            is DownloadState.Success -> {
-              emit(it.resources)
-            }
-            is DownloadState.Failure -> {
-              exceptions.add(it.syncError)
-            }
-          }
-        }
-      }
-    }
-    return if (exceptions.isEmpty()) {
-      SyncResult.Success()
-    } else {
-      setSyncState(SyncJobStatus.Glitch(exceptions))
-      SyncResult.Error(exceptions)
-    }
-  }
-
-  private suspend fun downloadModified(): SyncResult {
-    val exceptions = mutableListOf<ResourceSyncException>()
-    (fhirEngine as FhirEngineImpl).syncDownloadModified(
-      conflictResolver,
-      downloadWorkManagerModified.updateSyncedResourceEntity
-    ) {
-      flow {
-        (downloader as DownloaderImpl).downloadModified(it).collect {
           when (it) {
             is DownloadState.Started -> {
               setSyncState(SyncJobStatus.InProgress(it.type))

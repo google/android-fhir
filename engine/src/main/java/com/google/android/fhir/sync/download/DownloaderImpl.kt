@@ -17,11 +17,9 @@
 package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.SyncDownloadContext
-import com.google.android.fhir.SyncDownloadContextModified
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
-import com.google.android.fhir.sync.DownloadWorkManagerModified
 import com.google.android.fhir.sync.Downloader
 import com.google.android.fhir.sync.ResourceSyncException
 import kotlinx.coroutines.flow.Flow
@@ -37,7 +35,6 @@ import org.hl7.fhir.r4.model.ResourceType
 internal class DownloaderImpl(
   private val dataSource: DataSource,
   private val downloadWorkManager: DownloadWorkManager,
-  private val downloadWorkManagerModified: DownloadWorkManagerModified
 ) : Downloader {
 
   private val resourceTypeList = ResourceType.values().map { it.name }
@@ -58,25 +55,6 @@ internal class DownloaderImpl(
       }
 
       url = downloadWorkManager.getNextRequestUrl(context)
-    }
-  }
-
-  suspend fun downloadModified(context: SyncDownloadContextModified): Flow<DownloadState> = flow {
-    var resourceTypeToDownload: ResourceType = ResourceType.Bundle
-    emit(DownloadState.Started(resourceTypeToDownload))
-    var url = downloadWorkManagerModified.getNextRequestUrl(context)
-    while (url != null) {
-      try {
-        resourceTypeToDownload =
-          ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
-
-        val response = dataSource.download(url)
-        emit(DownloadState.Success(downloadWorkManagerModified.processResponse(response).toList()))
-      } catch (exception: Exception) {
-        emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
-      }
-
-      url = downloadWorkManagerModified.getNextRequestUrl(context)
     }
   }
 }
