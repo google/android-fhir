@@ -179,8 +179,6 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceO
 
 internal const val EXTENSION_MAX_SIZE = "http://hl7.org/fhir/StructureDefinition/maxSize"
 
-private val SIZE_UNIT_DIVIDER = BigDecimal(1024)
-
 /** Maximum size an attachment can be. Unit in Bytes. */
 internal val Questionnaire.QuestionnaireItemComponent.maxSizeInB: BigDecimal?
   get() {
@@ -189,16 +187,20 @@ internal val Questionnaire.QuestionnaireItemComponent.maxSizeInB: BigDecimal?
       ?.value
   }
 
+private val BYTES_PER_KIB = BigDecimal(1024)
+
 /** Maximum size an attachment can be. Unit in Kibibytes. */
 internal val Questionnaire.QuestionnaireItemComponent.maxSizeInKiB: BigDecimal?
   get() {
-    return maxSizeInB?.div(SIZE_UNIT_DIVIDER)
+    return maxSizeInB?.div(BYTES_PER_KIB)
   }
+
+private val BYTES_PER_MIB = BigDecimal(1048576)
 
 /** Maximum size an attachment can be. Unit in Mebibytes. */
 internal val Questionnaire.QuestionnaireItemComponent.maxSizeInMiB: BigDecimal?
   get() {
-    return maxSizeInKiB?.div(SIZE_UNIT_DIVIDER)
+    return maxSizeInB?.div(BYTES_PER_MIB)
   }
 
 /** UI controls relevant to rendering questionnaire items. */
