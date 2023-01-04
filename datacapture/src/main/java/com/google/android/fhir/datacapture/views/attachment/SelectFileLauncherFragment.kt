@@ -28,7 +28,7 @@ class SelectFileLauncherFragment : DialogFragment() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val mimeTypes =
-      arguments?.getStringArray(QuestionnaireItemAttachmentViewHolderFactory.MIME_TYPE)
+      arguments?.getStringArray(QuestionnaireItemAttachmentViewHolderFactory.EXTRA_MIME_TYPE_KEY)
 
     registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         setFragmentResult(RESULT_REQUEST_KEY, bundleOf(RESULT_REQUEST_KEY to uri))
