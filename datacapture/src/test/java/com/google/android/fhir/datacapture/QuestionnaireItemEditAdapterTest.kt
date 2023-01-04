@@ -492,7 +492,7 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
 
     assertThat(
-        DiffCallback.areItemsTheSame(
+        DiffCallbacks.ITEMS.areItemsTheSame(
           QuestionnaireAdapterItem.Question(
             QuestionnaireItemViewItem(
               questionnaireItem,
@@ -520,7 +520,7 @@ class QuestionnaireItemEditAdapterTest {
     val otherQuestionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
 
     assertThat(
-        DiffCallback.areItemsTheSame(
+        DiffCallbacks.ITEMS.areItemsTheSame(
           QuestionnaireAdapterItem.Question(
             QuestionnaireItemViewItem(
               questionnaireItem,
@@ -547,7 +547,7 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
 
     assertThat(
-        DiffCallback.areItemsTheSame(
+        DiffCallbacks.ITEMS.areItemsTheSame(
           QuestionnaireAdapterItem.Question(
             QuestionnaireItemViewItem(
               questionnaireItem,
@@ -576,7 +576,7 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
 
     assertThat(
-        DiffCallback.areContentsTheSame(
+        DiffCallbacks.ITEMS.areContentsTheSame(
           QuestionnaireAdapterItem.Question(
             QuestionnaireItemViewItem(
               questionnaireItem,
@@ -604,7 +604,7 @@ class QuestionnaireItemEditAdapterTest {
     val otherQuestionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
 
     assertThat(
-        DiffCallback.areContentsTheSame(
+        DiffCallbacks.ITEMS.areContentsTheSame(
           QuestionnaireAdapterItem.Question(
             QuestionnaireItemViewItem(
               questionnaireItem,
@@ -631,7 +631,7 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
 
     assertThat(
-        DiffCallback.areContentsTheSame(
+        DiffCallbacks.ITEMS.areContentsTheSame(
           QuestionnaireAdapterItem.Question(
             QuestionnaireItemViewItem(
               questionnaireItem,
@@ -665,7 +665,7 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
 
     assertThat(
-        DiffCallback.areContentsTheSame(
+        DiffCallbacks.ITEMS.areContentsTheSame(
           QuestionnaireAdapterItem.Question(
             QuestionnaireItemViewItem(
               questionnaireItem,
@@ -692,7 +692,7 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
 
     assertThat(
-        DiffCallback.areContentsTheSame(
+        DiffCallbacks.ITEMS.areContentsTheSame(
           QuestionnaireAdapterItem.Question(
             QuestionnaireItemViewItem(
               questionnaireItem,
@@ -719,7 +719,7 @@ class QuestionnaireItemEditAdapterTest {
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
 
     assertThat(
-        DiffCallback.areContentsTheSame(
+        DiffCallbacks.ITEMS.areContentsTheSame(
           QuestionnaireAdapterItem.Question(
             QuestionnaireItemViewItem(
               questionnaireItem,
