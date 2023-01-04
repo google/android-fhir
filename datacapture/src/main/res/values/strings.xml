@@ -47,7 +47,7 @@
     <string name="group_header_add_item_button">Add item</string>
     <string
         name="integer_field_upper_limit_validation_error_msg"
-    >Number must be smaller than 2.147.483.648</string>
+    >Number must be smaller than 2,147,483,648</string>
 
     <!-- Questionnaire validation popup texts-->
     <string name="questionnaire_validation_error_headline">Errors found</string>
