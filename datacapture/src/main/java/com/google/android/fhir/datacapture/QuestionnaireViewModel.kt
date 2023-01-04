@@ -566,7 +566,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val enabled =
       EnablementEvaluator(questionnaireResponse)
         .evaluate(questionnaireItem, questionnaireResponseItem)
-    if (!enabled || questionnaireItem.isHidden) {
+    if (questionnaireItem.isHidden) return emptyList()
+    if (!enabled) {
+      // If the item is not enabled, clear the answers that it may have from the previous enabled
+      // state. This will also prevent any questionnaire item that depends on the answer of this
+      // questionnaire item to be wrongly evaluated as well.
+      if (questionnaireResponseItem.hasAnswer()) questionnaireResponseItem.answer = listOf()
       return emptyList()
     }
 
