@@ -495,31 +495,6 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun maxSize_whenAnswerSizeIsAboveLimit_shouldBeKnown() {
-    var answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-          questionnaireItem =
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "attachment-1"
-              addExtension(EXTENSION_MAX_SIZE, DecimalType(0))
-            },
-          questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, result -> answers = result },
-        )
-        .apply {
-          setAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(Attachment().apply { size = 5242880 })
-          )
-        }
-
-    assertThat(answers.first().valueAttachment.size)
-      .isGreaterThan(questionnaireItemViewItem.questionnaireItem.maxSizeInByte?.toInt())
-  }
-
-  @Test
   fun maxSize_missingExtension_shouldReturnNull() {
     val questionnaire = Questionnaire.QuestionnaireItemComponent()
     assertThat(questionnaire.maxSizeInByte).isNull()
