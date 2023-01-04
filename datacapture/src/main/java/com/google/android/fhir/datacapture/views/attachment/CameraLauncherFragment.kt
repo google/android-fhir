@@ -28,6 +28,7 @@ import androidx.fragment.app.setFragmentResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemAttachmentViewHolderFactory
 import timber.log.Timber
 
+/** Used for launching camera activity */
 class CameraLauncherFragment : DialogFragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {

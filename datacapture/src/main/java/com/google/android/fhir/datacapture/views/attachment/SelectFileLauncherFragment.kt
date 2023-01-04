@@ -23,6 +23,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemAttachmentViewHolderFactory
 
+/** Used for launching open document activity */
 class SelectFileLauncherFragment : DialogFragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
