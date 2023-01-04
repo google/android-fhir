@@ -607,9 +607,6 @@ class ResourceMapperTest {
         .entry
         .single()
         .resource as Observation
-
-    observation.value
-
     assertThat(observation.valueCodeableConcept.coding[0].code).isEqualTo("test-coding-code")
   }
 
