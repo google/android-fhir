@@ -42,7 +42,6 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.concurrent.atomic.AtomicInteger
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 internal class OptionSelectDialogFragment(

@@ -20,14 +20,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
-import android.widget.TextView
 import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
-import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.common.datatype.displayString
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -42,14 +41,12 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       private lateinit var header: QuestionnaireItemHeaderView
       private lateinit var radioGroup: ConstraintLayout
       private lateinit var flow: Flow
-      private lateinit var error: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         radioGroup = itemView.findViewById(R.id.radio_group)
         flow = itemView.findViewById(R.id.flow)
-        error = itemView.findViewById(R.id.error)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -79,10 +76,9 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
           is NotValidated,
-          Valid -> error.visibility = View.GONE
+          Valid -> header.showErrorText(isErrorTextVisible = false)
           is Invalid -> {
-            error.text = validationResult.getSingleStringValidationMessage()
-            error.visibility = View.VISIBLE
+            header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
           }
         }
       }
@@ -107,7 +103,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         val radioButton =
           radioButtonItem.findViewById<RadioButton>(R.id.radio_button).apply {
             id = viewId
-            text = answerOption.displayString
+            text = answerOption.value.displayString(header.context)
             layoutParams =
               ViewGroup.LayoutParams(
                 when (choiceOrientation) {

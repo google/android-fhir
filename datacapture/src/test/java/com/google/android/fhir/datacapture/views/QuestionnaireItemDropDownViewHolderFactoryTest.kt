@@ -16,11 +16,12 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.view.View
 import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.common.datatype.displayString
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.material.textfield.TextInputLayout
@@ -223,7 +224,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
     assertThat(
         viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).text.toString()
       )
-      .isEqualTo(answerOption.displayString)
+      .isEqualTo(answerOption.value.displayString(parent.context))
   }
 
   @Test
@@ -266,6 +267,21 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isNull()
+  }
+
+  @Test
+  fun `hides error textview in the header`() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
+      .isEqualTo(View.GONE)
   }
 
   @Test
