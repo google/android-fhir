@@ -100,6 +100,31 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
   }
 
   @Test
+  fun shouldClearAutoCompleteTextViewOnRebindingView() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        answerOptions("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+      )
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+
+    onView(withId(R.id.auto_complete)).perform(showDropDown())
+    onView(withText("Coding 3"))
+      .inRoot(isPlatformPopup())
+      .check(matches(isDisplayed()))
+      .perform(click())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
+      .isEqualTo("Coding 3")
+
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
+      .isEqualTo("")
+  }
+
+  @Test
   fun shouldSetDropDownValueStringToAutoCompleteTextView() {
     var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
