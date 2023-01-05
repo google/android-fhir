@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,29 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     val filters = mutableListOf<StringParamFilterCriterion>()
     init.forEach { StringParamFilterCriterion(stringParameter).apply(it).also(filters::add) }
     stringFilterCriteria.add(StringParamFilterCriteria(stringParameter, filters, operation))
+  }
+
+  /**
+   * Converts query string to array of StringParamFilterCriterion.() -> Unit to change it to
+   * multiple StringFilterCriterion
+   */
+  fun String.toStringParamFilterCriterion(
+    modifier: StringFilterModifier
+  ): Array<StringParamFilterCriterion.() -> Unit> {
+    return this.trim()
+      .split(" ")
+      .map { nameQueryPart -> createStringParamFilterCriterion(nameQueryPart, modifier) }
+      .toTypedArray()
+  }
+
+  private fun createStringParamFilterCriterion(
+    nameQueryPart: String,
+    modifier: StringFilterModifier
+  ): StringParamFilterCriterion.() -> Unit {
+    return {
+      this.modifier = modifier
+      value = nameQueryPart
+    }
   }
 
   fun filter(
@@ -152,6 +175,7 @@ enum class Order {
 enum class StringFilterModifier {
   STARTS_WITH,
   MATCHES_EXACTLY,
+  MATCHES_FTS,
   CONTAINS
 }
 
@@ -159,4 +183,9 @@ enum class StringFilterModifier {
 enum class Operation(val logicalOperator: String) {
   OR("OR"),
   AND("AND"),
+}
+
+enum class SetOperation(val setOperationValue: String) {
+  UNION("UNION"),
+  INTERSECT("INTERSECT")
 }

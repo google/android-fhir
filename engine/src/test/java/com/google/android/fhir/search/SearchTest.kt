@@ -927,6 +927,42 @@ class SearchTest {
   }
 
   @Test
+  fun `search filter string with matches fts modifier`() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.NAME,
+            {
+              modifier = StringFilterModifier.MATCHES_FTS
+              value = "someValue"
+            }
+          )
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM StringIndexEntity c JOIN FullTextStringIndexEntity d ON c.id = d.docid
+        WHERE resourceType = ? AND d.index_name = ? AND d.index_value MATCH '*' || ? || '*'
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .containsExactly(
+        ResourceType.Patient.name,
+        ResourceType.Patient.name,
+        Patient.NAME.paramName,
+        "someValue"
+      )
+  }
+
+  @Test
   fun search_filter_string_contains() {
     val query =
       Search(ResourceType.Patient)

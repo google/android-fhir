@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
@@ -77,7 +78,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
         filter(
           Patient.NAME,
           {
-            modifier = StringFilterModifier.CONTAINS
+            modifier = StringFilterModifier.MATCHES_FTS
             value = nameQuery
           }
         )
@@ -93,10 +94,8 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
         if (nameQuery.isNotEmpty()) {
           filter(
             Patient.NAME,
-            {
-              modifier = StringFilterModifier.CONTAINS
-              value = nameQuery
-            }
+            *nameQuery.toStringParamFilterCriterion(StringFilterModifier.MATCHES_FTS),
+            operation = Operation.OR
           )
         }
         filterCity(this)
@@ -121,14 +120,15 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   }
 
   private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {
-    return fhirEngine.search<RiskAssessment> {}.groupBy { it.subject.reference }.mapValues { entry
-      ->
-      entry
-        .value
-        .filter { it.hasOccurrence() }
-        .sortedByDescending { it.occurrenceDateTimeType.value }
-        .firstOrNull()
-    }
+    return fhirEngine
+      .search<RiskAssessment> {}
+      .groupBy { it.subject.reference }
+      .mapValues { entry ->
+        entry.value
+          .filter { it.hasOccurrence() }
+          .sortedByDescending { it.occurrenceDateTimeType.value }
+          .firstOrNull()
+      }
   }
 
   /** The Patient's details for display purposes. */
