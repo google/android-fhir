@@ -125,7 +125,9 @@ open class QuestionnaireFragment : Fragment() {
           is DisplayMode.ReviewMode -> {
             // Set items
             questionnaireEditRecyclerView.visibility = View.GONE
-            questionnaireItemReviewAdapter.submitList(state.items)
+            questionnaireItemReviewAdapter.submitList(
+              state.items.filterIsInstance<QuestionnaireAdapterItem.Question>()
+            )
             questionnaireReviewRecyclerView.visibility = View.VISIBLE
 
             // Set button visibility
