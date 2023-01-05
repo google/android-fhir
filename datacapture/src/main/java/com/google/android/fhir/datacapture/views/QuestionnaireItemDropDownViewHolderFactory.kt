@@ -21,7 +21,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.common.datatype.displayString
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -53,20 +53,28 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
         val answerOptionString =
-          this.questionnaireItemViewItem.answerOption.map { it.displayString }.toMutableList()
+          this.questionnaireItemViewItem.answerOption
+            .map { it.value.displayString(context) }
+            .toMutableList()
         answerOptionString.add(0, context.getString(R.string.hyphen))
         val adapter =
           ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
-        questionnaireItemViewItem.answers.singleOrNull()?.displayString(header.context)?.let {
-          autoCompleteTextView.setText(it)
-          autoCompleteTextView.setSelection(it.length)
-        }
+        questionnaireItemViewItem.answers
+          .singleOrNull()
+          ?.value
+          ?.displayString(header.context)
+          ?.let {
+            autoCompleteTextView.setText(it)
+            autoCompleteTextView.setSelection(it.length)
+          }
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.onItemClickListener =
           AdapterView.OnItemClickListener { _, _, position, _ ->
             val selectedAnswer =
               questionnaireItemViewItem.answerOption
-                .firstOrNull { it.displayString == autoCompleteTextView.adapter.getItem(position) }
+                .firstOrNull {
+                  it.value.displayString(context) == autoCompleteTextView.adapter.getItem(position)
+                }
                 ?.value
 
             if (selectedAnswer == null) {
