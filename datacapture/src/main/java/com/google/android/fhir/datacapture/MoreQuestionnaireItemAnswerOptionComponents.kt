@@ -53,9 +53,9 @@ fun Questionnaire.QuestionnaireItemAnswerOptionComponent.itemAnswerOptionImage(
         "image/jpg",
         "image/png" -> {
           val bitmap = BitmapFactory.decodeByteArray(it.data, 0, it.data.size)
-          val px = context.resources.getDimensionPixelOffset(R.dimen.choice_button_image)
+          val imageSize = context.resources.getDimensionPixelOffset(R.dimen.choice_button_image)
           val drawable: Drawable = BitmapDrawable(context.resources, bitmap)
-          drawable.setBounds(0, 0, px, px)
+          drawable.setBounds(0, 0, imageSize, imageSize)
           return drawable
         }
         // return null as for now only mime type image is supported with binary data

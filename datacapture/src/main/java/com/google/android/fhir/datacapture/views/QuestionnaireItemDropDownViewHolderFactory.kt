@@ -35,6 +35,7 @@ import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import timber.log.Timber
 
 internal object QuestionnaireItemDropDownViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_drop_down_view) {
@@ -70,7 +71,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         val adapter =
           AnswerOptionDropDownArrayAdapter(
             context,
-            R.layout.questionnaire_item_drop_down_list,
+            R.layout.questionnaire_item_drop_down_list_item,
             answerOptionList
           )
         questionnaireItemViewItem.answers
@@ -129,17 +130,12 @@ internal class AnswerOptionDropDownArrayAdapter(
   answerOption: List<DropDownAnswerOption>
 ) : ArrayAdapter<DropDownAnswerOption>(context, layoutResourceId, answerOption) {
   override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-    var convertView = convertView
-    if (convertView == null) {
-      convertView = LayoutInflater.from(parent.context).inflate(layoutResourceId, parent, false)
-    }
+    val listItemView = convertView ?: LayoutInflater.from(parent.context).inflate(layoutResourceId, parent, false)
     try {
       val answerOption: DropDownAnswerOption? = getItem(position)
       val answerOptionTextView =
-        convertView?.findViewById<View>(R.id.answer_option_textview) as TextView
+        listItemView?.findViewById<View>(R.id.answer_option_textview) as TextView
       answerOptionTextView.text = answerOption?.answerOptionString
-      // answerOptionTextView.setCompoundDrawables(answerOption?.answerOptionImage, null, null,
-      // null)
       answerOptionTextView.setCompoundDrawablesRelative(
         answerOption?.answerOptionImage,
         null,
@@ -147,9 +143,9 @@ internal class AnswerOptionDropDownArrayAdapter(
         null
       )
     } catch (e: Exception) {
-      e.printStackTrace()
+      Timber.w("Could not set data to dropdown UI", e)
     }
-    return convertView!!
+    return listItemView
   }
 }
 
