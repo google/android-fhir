@@ -22,11 +22,16 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
+import com.google.android.fhir.workflow.testing.CqlBuilder
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
+import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Parameters
+import org.hl7.fhir.r4.model.StringType
+import org.intellij.lang.annotations.Language
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -112,5 +117,55 @@ class FhirOperatorLibraryEvaluateJavaTest {
       ) as Parameters
 
     assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
+  }
+
+  @Test
+  fun evaluateCQL() = runBlocking {
+    @Language("CQL")
+    val cql =
+      """
+      library TestGetName version '1.0.0'
+      
+      define GetName: 'MyName'
+      """.trimIndent()
+
+    val library = CqlBuilder.assembleFhirLib(cql, null, null, "TestGetName", "1.0.0")
+
+    fhirOperator.loadLib(library)
+
+    // Evaluates expression without any extra data
+    val results = fhirOperator.evaluateLibrary(library.url, setOf("GetName")) as Parameters
+
+    assertThat((results.parameterFirstRep.value as StringType).value).isEqualTo("MyName")
+  }
+
+  @Test
+  fun evaluateCQLWithParameters() = runBlocking {
+    @Language("CQL")
+    val cql =
+      """
+      library TestSumWithParams version '1.0.0'
+      
+      parameter "MyNumber" Decimal
+      
+      define SumOne: MyNumber + 1
+      """.trimIndent()
+
+    val library = CqlBuilder.assembleFhirLib(cql, null, null, "TestSumWithParams", "1.0.0")
+
+    fhirOperator.loadLib(library)
+
+    val params =
+      Parameters().apply {
+        addParameter().apply {
+          name = "MyNumber"
+          value = DecimalType(1)
+        }
+      }
+
+    // Evaluates the library with a parameter
+    val results = fhirOperator.evaluateLibrary(library.url, params, setOf("SumOne")) as Parameters
+
+    assertThat((results.parameterFirstRep.value as DecimalType).value).isEqualTo(BigDecimal(2))
   }
 }
