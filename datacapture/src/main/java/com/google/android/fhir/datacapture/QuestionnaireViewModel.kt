@@ -628,10 +628,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               answersChangedCallback = answersChangedCallback,
               resolveAnswerValueSet = { resolveAnswerValueSet(it) },
               resolveAnswerExpression = { resolveAnswerExpression(it) },
-          resolveCandidateExpression = { resolveCandidateExpression(it) }
+              resolveCandidateExpression = { resolveCandidateExpression(it) }
+            )
+          )
         )
-      )
-      )
         val nestedResponses: List<List<QuestionnaireResponse.QuestionnaireResponseItemComponent>> =
           when {
             // Repeated questions have one answer item per response instance, which we must display
