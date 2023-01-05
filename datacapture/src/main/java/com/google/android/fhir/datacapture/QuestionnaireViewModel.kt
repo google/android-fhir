@@ -247,14 +247,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
 
   /**
-   * The candidate expression referencing an x-fhir-query has its evaluated data cached to avoid
-   * reloading resources unnecessarily. The value is updated each time an item with candidate
-   * expression is evaluating the latest candidate options.
-   */
-  private val candidateExpressionMap =
-    mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
-
-  /**
    * Returns current [QuestionnaireResponse] captured by the UI which includes answers of enabled
    * questions.
    */
