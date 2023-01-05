@@ -3068,7 +3068,7 @@ class QuestionnaireViewModelTest {
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
       val viewModel = QuestionnaireViewModel(context, state)
-      val answerOptions = viewModel.resolveCandidateExpression(questionnaire.itemFirstRep)
+      val answerOptions = viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
 
       assertThat(answerOptions.first().valueReference.reference)
         .isEqualTo("Practitioner/${practitioner.logicalId}")
@@ -3108,7 +3108,7 @@ class QuestionnaireViewModelTest {
     val viewModel = QuestionnaireViewModel(context, state)
     val exception =
       assertThrows(null, IllegalStateException::class.java) {
-        runBlocking { viewModel.resolveCandidateExpression(questionnaire.itemFirstRep) }
+        runBlocking { viewModel.resolveAnswerExpression(questionnaire.itemFirstRep) }
       }
     assertThat(exception.message)
       .isEqualTo(

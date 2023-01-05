@@ -76,12 +76,6 @@ data class QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemAnswerOptionComponent> =
     {
       emptyList()
-    },
-  private val resolveCandidateExpression:
-    suspend (Questionnaire.QuestionnaireItemComponent) -> List<
-        Questionnaire.QuestionnaireItemAnswerOptionComponent> =
-    {
-      emptyList()
     }
 ) {
 
@@ -184,9 +178,9 @@ data class QuestionnaireItemViewItem(
           questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
           !questionnaireItem.answerValueSet.isNullOrEmpty() ->
             resolveAnswerValueSet(questionnaireItem.answerValueSet)
-          questionnaireItem.candidateExpression != null ->
-            resolveCandidateExpression(questionnaireItem)
-          questionnaireItem.answerExpression != null -> resolveAnswerExpression(questionnaireItem)
+          (questionnaireItem.answerExpression != null ||
+            questionnaireItem.candidateExpression != null) ->
+            resolveAnswerExpression(questionnaireItem)
           else -> emptyList()
         }
       }

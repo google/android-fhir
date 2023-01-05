@@ -442,7 +442,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     item: Questionnaire.QuestionnaireItemComponent,
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     // Check cache first for database queries
-    val answerExpression = item.answerExpression ?: return emptyList()
+    val answerExpression = item.answerExpression ?: item.candidateExpression ?: return emptyList()
     if (answerExpression.isXFhirQuery && answerExpressionMap.contains(answerExpression.expression)
     ) {
       return answerExpressionMap[answerExpression.expression]!!
@@ -474,26 +474,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
 
     return item.extractAnswerOptions(data)
-  }
-
-  @PublishedApi
-  internal suspend fun resolveCandidateExpression(
-    item: Questionnaire.QuestionnaireItemComponent,
-  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-    // Check cache first for database queries
-    val candidateExpression = item.candidateExpression ?: return emptyList()
-    if (candidateExpression.isXFhirQuery &&
-        candidateExpressionMap.contains(candidateExpression.expression)
-    ) {
-      return candidateExpressionMap[candidateExpression.expression]!!
-    }
-
-    val options = loadAnswerExpressionOptions(item, candidateExpression)
-
-    if (candidateExpression.isXFhirQuery)
-      candidateExpressionMap[candidateExpression.expression] = options
-
-    return options
   }
 
   /**
@@ -627,8 +607,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               validationResult = validationResult,
               answersChangedCallback = answersChangedCallback,
               resolveAnswerValueSet = { resolveAnswerValueSet(it) },
-              resolveAnswerExpression = { resolveAnswerExpression(it) },
-              resolveCandidateExpression = { resolveCandidateExpression(it) }
+              resolveAnswerExpression = { resolveAnswerExpression(it) }
             )
           )
         )
