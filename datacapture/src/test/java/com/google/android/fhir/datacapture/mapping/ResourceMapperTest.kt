@@ -20,7 +20,6 @@ import android.app.Application
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.views.localDate
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -63,6 +62,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class ResourceMapperTest {
   private val context = ApplicationProvider.getApplicationContext<Application>()
+  private val iParser = FhirContext.forR4().newJsonParser()
 
   @Test
   fun `extract() should perform definition-based extraction`() = runBlocking {
@@ -467,8 +467,6 @@ class ResourceMapperTest {
         }
       """.trimIndent()
 
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
-
     val uriTestQuestionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
@@ -593,8 +591,6 @@ class ResourceMapperTest {
         }
       """.trimIndent()
 
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
-
     val uriTestQuestionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
@@ -696,8 +692,6 @@ class ResourceMapperTest {
               ]
             }
       """.trimIndent()
-
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
 
     val uriTestQuestionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
@@ -966,8 +960,6 @@ class ResourceMapperTest {
         }
         """.trimIndent()
 
-      val iParser: IParser = FhirContext.forR4().newJsonParser()
-
       val uriTestQuestionnaire =
         iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
@@ -1068,8 +1060,6 @@ class ResourceMapperTest {
           ]
         }
         """.trimIndent()
-
-      val iParser: IParser = FhirContext.forR4().newJsonParser()
 
       val pulseOximetryQuestionnaire =
         iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
@@ -1277,8 +1267,6 @@ class ResourceMapperTest {
           ]
         }
         """.trimIndent()
-
-      val iParser: IParser = FhirContext.forR4().newJsonParser()
 
       val uriTestQuestionnaire =
         iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson)
@@ -1871,8 +1859,6 @@ class ResourceMapperTest {
              };
         }"""
 
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
-
     val uriTestQuestionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
@@ -1959,8 +1945,6 @@ class ResourceMapperTest {
         group ExtractImmunization(source src : QuestionnaireResponse, target tgt : Immunization) {
              src -> tgt.reaction = create('Immunization_Reaction') "rule_z1";
         }"""
-
-      val iParser: IParser = FhirContext.forR4().newJsonParser()
 
       val uriTestQuestionnaire =
         iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
@@ -2153,7 +2137,6 @@ class ResourceMapperTest {
           ]
         }
       """.trimIndent()
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
     val temperatureQuestionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
     val temperatureQuestionnaireResponse =
@@ -2250,8 +2233,6 @@ class ResourceMapperTest {
           ]
         }
       """.trimIndent()
-
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
     val questionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
     val response =
@@ -2431,8 +2412,6 @@ class ResourceMapperTest {
           ]
         }
       """.trimIndent()
-
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
     val questionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
     val response =
@@ -2567,7 +2546,6 @@ class ResourceMapperTest {
           ]
         }
       """.trimIndent()
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
     val questionnaireObj =
       iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
     val temperatureQuestionnaireResponse =
