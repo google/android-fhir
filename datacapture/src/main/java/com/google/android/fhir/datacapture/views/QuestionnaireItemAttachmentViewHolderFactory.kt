@@ -227,7 +227,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             }
           questionnaireItemViewItem.setAnswer(answer)
 
-          loadPhotoPreviewInUri(uri)
+          loadPhotoPreview(attachmentUri)
           clearFilePreview()
           displayDeleteButton()
           displaySnackbar(takePhotoButton, R.string.image_uploaded)
@@ -336,12 +336,12 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         titleFilePreview.text = ""
       }
 
-      private fun loadPhotoPreviewInBytes(photoBytes: ByteArray) {
-        Glide.with(context).load(photoBytes).into(photoPreview)
+      private fun loadPhotoPreview(byteArray: ByteArray) {
+        Glide.with(context).load(byteArray).into(photoPreview)
         photoPreview.visibility = View.VISIBLE
       }
 
-      private fun loadPhotoPreviewInUri(uri: Uri) {
+      private fun loadPhotoPreview(uri: Uri) {
         Glide.with(context).load(uri).into(photoPreview)
         photoPreview.visibility = View.VISIBLE
       }
