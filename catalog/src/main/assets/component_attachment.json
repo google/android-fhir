@@ -25,7 +25,7 @@
         }
       ],
       "linkId": "1",
-      "text": "Select an image to upload",
+      "text": "Select an image or file to upload",
       "type": "attachment",
       "item": [
         {
@@ -43,7 +43,7 @@
             }
           ],
           "linkId": "1-media-types-supported",
-          "text": "Media types supported: jpg, png, .mp3, .mp4, pdf",
+          "text": "Media types supported: .jpg, .png, .mp3, .mp4, .pdf",
           "type": "display"
         }
       ]
