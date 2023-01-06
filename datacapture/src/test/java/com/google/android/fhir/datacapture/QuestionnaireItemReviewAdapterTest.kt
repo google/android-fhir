@@ -43,12 +43,14 @@ class QuestionnaireItemReviewAdapterTest {
     val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
     questionnaireItemReviewAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent()
-            .setType(Questionnaire.QuestionnaireItemType.GROUP),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = Valid,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent()
+              .setType(Questionnaire.QuestionnaireItemType.GROUP),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = Valid,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
     )
@@ -61,20 +63,24 @@ class QuestionnaireItemReviewAdapterTest {
     val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
     questionnaireItemReviewAdapter.submitList(
       listOf(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent()
-            .setType(Questionnaire.QuestionnaireItemType.GROUP),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = Valid,
-          answersChangedCallback = { _, _, _ -> },
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent()
+              .setType(Questionnaire.QuestionnaireItemType.GROUP),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = Valid,
+            answersChangedCallback = { _, _, _ -> },
+          )
         ),
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent()
-            .setType(Questionnaire.QuestionnaireItemType.DISPLAY),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = Valid,
-          answersChangedCallback = { _, _, _ -> },
-        )
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent()
+              .setType(Questionnaire.QuestionnaireItemType.DISPLAY),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = Valid,
+            answersChangedCallback = { _, _, _ -> },
+          )
+        ),
       )
     )
 
