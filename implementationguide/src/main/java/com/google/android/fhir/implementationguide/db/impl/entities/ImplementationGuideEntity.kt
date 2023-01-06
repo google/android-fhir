@@ -19,7 +19,7 @@ package com.google.android.fhir.implementationguide.db.impl.entities
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.google.android.fhir.implementationguide.IgContext
+import com.google.android.fhir.implementationguide.IgDependency
 import java.io.File
 
 /**
@@ -46,6 +46,6 @@ internal data class ImplementationGuideEntity(
   val rootDirectory: File,
 )
 
-internal fun IgContext.Dependency.toEntity(rootFolder: File): ImplementationGuideEntity {
+internal fun IgDependency.toEntity(rootFolder: File): ImplementationGuideEntity {
   return ImplementationGuideEntity(0L, packageId, version, rootFolder)
 }

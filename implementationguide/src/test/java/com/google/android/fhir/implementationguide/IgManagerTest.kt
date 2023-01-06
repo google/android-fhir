@@ -35,7 +35,7 @@ internal class IgManagerTest {
   private val igDb =
     Room.inMemoryDatabaseBuilder(context, ImplementationGuideDatabase::class.java).build()
   private val igManager = IgManager(igDb)
-  private val igDependency = IgContext.Dependency("anc-cds", "0.3.0")
+  private val igDependency = IgDependency("anc-cds", "0.3.0")
   private lateinit var igRoot: File
 
   @Before
@@ -45,7 +45,7 @@ internal class IgManagerTest {
     igRoot.deleteOnExit()
     dataFolder.copyRecursively(igRoot)
 
-    igManager.import(igDependency, igRoot, igRoot.listFiles()!!.asIterable())
+    igManager.install(igDependency, igRoot)
   }
 
   @After
@@ -67,9 +67,50 @@ internal class IgManagerTest {
 
   @Test
   fun `deleting IG deletes files and DB entries`() = runBlocking {
-    igManager.delete(IgContext(listOf(igDependency)))
+    igManager.delete(igDependency)
 
     assertThat(igDb.implementationGuideDao().getImplementationGuides()).isEmpty()
     assertThat(igRoot.exists()).isFalse()
+  }
+
+
+  @Test
+  fun `imported entries are readable`() = runBlocking {
+    assertThat(
+      igManager.loadResources(
+        igDependencies = arrayOf(igDependency),
+        resourceType = "Library",
+        name = "WHOCommon"
+      )
+    )
+      .isNotNull()
+    assertThat(
+      igManager.loadResources(
+        igDependencies = arrayOf(igDependency),
+        resourceType = "Library",
+        url = "FHIRCommon"
+      )
+    )
+      .isNotNull()
+    assertThat(
+      igManager.loadResources(igDependencies = arrayOf(igDependency), resourceType = "Measure")
+    )
+      .hasSize(1)
+    assertThat(
+      igManager.loadResources(
+        igDependencies = arrayOf(igDependency),
+        resourceType = "Measure",
+        url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01"
+      )
+    )
+      .isNotEmpty()
+    assertThat(
+      igManager.loadResources(
+        igDependencies = arrayOf(igDependency),
+        resourceType = "Measure",
+        url = "Measure/ANCIND01"
+      )
+    )
+      .isNotNull()
   }
 }
