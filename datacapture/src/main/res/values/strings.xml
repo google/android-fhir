@@ -46,6 +46,8 @@
     <string name="space_asterisk">\u0020\u002a</string>
     <string name="group_header_add_item_button">Add item</string>
     <string name="take_photo">Take Photo</string>
+    <string name="cd_photo_preview">Photo Preview</string>
+    <string name="cd_icon_file_preview">Icon File Preview</string>
     <string name="upload_photo">Upload Photo</string>
     <string name="upload_audio">Upload Audio</string>
     <string name="upload_video">Upload Video</string>

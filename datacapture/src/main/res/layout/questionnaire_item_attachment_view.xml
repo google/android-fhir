@@ -116,6 +116,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_default"
         android:adjustViewBounds="true"
+        android:contentDescription="@string/cd_photo_preview"
         android:maxWidth="@dimen/attachment_photo_preview_max_width"
         android:maxHeight="@dimen/attachment_photo_preview_max_height"
     />
@@ -135,6 +136,7 @@
             style="?attr/questionnaireAttachmentPreviewTextStyle"
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:contentDescription="@string/cd_icon_file_preview"
             app:tint="?attr/colorPrimary"
         />
 
