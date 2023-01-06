@@ -18,7 +18,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/item_margin_horizontal"
     android:layout_marginTop="@dimen/padding_default"
     android:orientation="vertical"
 >
@@ -27,13 +26,22 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
     />
 
-    <include android:id="@+id/error" layout="@layout/input_error_text_view" />
+    <include
+        android:id="@+id/error"
+        layout="@layout/input_error_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+        android:layout_marginTop="@dimen/attachment_error_margin_top"
+    />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
         android:layout_marginTop="@dimen/padding_default"
         android:orientation="horizontal"
     >
@@ -114,6 +122,7 @@
         android:id="@+id/photo_preview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
         android:layout_marginTop="@dimen/padding_default"
         android:adjustViewBounds="true"
         android:contentDescription="@string/cd_photo_preview"
@@ -126,6 +135,7 @@
         android:id="@+id/file_preview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
         android:layout_marginTop="@dimen/padding_default"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -158,6 +168,7 @@
         style="?attr/questionnaireAttachmentDeleteButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
         android:layout_marginVertical="@dimen/padding_default"
         android:paddingHorizontal="@dimen/padding_default"
         android:text="@string/delete"
