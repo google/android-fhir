@@ -187,7 +187,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
       private fun onTakePhotoClicked(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
         val file = File.createTempFile("IMG_", ".jpeg", context.cacheDir)
-        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+        val attachmentUri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
 
         context.supportFragmentManager.setFragmentResultListener(
           CameraLauncherFragment.CAMERA_RESULT_KEY,
@@ -206,21 +206,21 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             return@setFragmentResultListener
           }
 
-          val mimeType = context.getMimeTypeFromUri(uri)
-          if (!questionnaireItem.hasMimeType(mimeType.type)) {
+          val attachmentMimeType = context.getMimeTypeFromUri(attachmentUri)
+          if (!questionnaireItem.hasMimeType(attachmentMimeType.type)) {
             displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
             displaySnackbar(takePhotoButton, R.string.upload_failed)
             file.delete()
             return@setFragmentResultListener
           }
 
-          val bytes = context.readBytesFromUri(uri)
+          val attachmentByteArray = context.readBytesFromUri(attachmentUri)
           val answer =
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
                 Attachment().apply {
-                  contentType = mimeType
-                  data = bytes
+                  contentType = attachmentMimeType
+                  data = attachmentByteArray
                   title = file.name
                   creation = Date()
                 }
@@ -235,7 +235,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         }
 
         CameraLauncherFragment()
-          .apply { arguments = bundleOf(EXTRA_SAVED_PHOTO_URI_KEY to uri) }
+          .apply { arguments = bundleOf(EXTRA_SAVED_PHOTO_URI_KEY to attachmentUri) }
           .show(
             context.supportFragmentManager,
             QuestionnaireItemAttachmentViewHolderFactory.javaClass.simpleName
@@ -247,13 +247,13 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           SelectFileLauncherFragment.SELECT_FILE_RESULT_KEY,
           context
         ) { _, result ->
-          val uri =
+          val attachmentUri =
             (result.get(SelectFileLauncherFragment.SELECT_FILE_RESULT_KEY)
               ?: return@setFragmentResultListener)
               as Uri
 
-          val bytes = context.readBytesFromUri(uri)
-          if (questionnaireItem.isMaxSizeOverLimit(bytes.size.toBigDecimal())) {
+          val attachmentByteArray = context.readBytesFromUri(attachmentUri)
+          if (questionnaireItem.isMaxSizeOverLimit(attachmentByteArray.size.toBigDecimal())) {
             displayError(
               R.string.max_size_file_above_limit_validation_error_msg,
               questionnaireItem.maxSizeInMiB
@@ -262,21 +262,21 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             return@setFragmentResultListener
           }
 
-          val mimeType = context.getMimeTypeFromUri(uri)
-          if (!questionnaireItem.hasMimeType(mimeType.type)) {
+          val attachmentMimeType = context.getMimeTypeFromUri(attachmentUri)
+          if (!questionnaireItem.hasMimeType(attachmentMimeType.type)) {
             displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
             displaySnackbar(uploadDocumentButton, R.string.upload_failed)
             return@setFragmentResultListener
           }
 
-          val fileName = getFileName(uri)
+          val attachmentTitle = getFileName(attachmentUri)
           val answer =
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
                 Attachment().apply {
-                  contentType = mimeType
-                  data = bytes
-                  title = fileName
+                  contentType = attachmentMimeType
+                  data = attachmentByteArray
+                  title = attachmentTitle
                   creation = Date()
                 }
             }
