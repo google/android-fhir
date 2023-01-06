@@ -92,7 +92,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         header.bind(questionnaireItem)
-        displayInitialAttachmentPreview()
+        displayInitialPreview()
         displayTakePhotoButton(questionnaireItem)
         displayActionButton(questionnaireItem)
         takePhotoButton.setOnClickListener { onTakePhotoClicked(questionnaireItem) }
@@ -149,7 +149,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         }
       }
 
-      private fun displayInitialAttachmentPreview() {
+      private fun displayInitialPreview() {
         questionnaireItemViewItem.answers.firstOrNull()?.valueAttachment?.let { attachment ->
           displayPreview(
             attachmentType = attachment.contentType.type,
