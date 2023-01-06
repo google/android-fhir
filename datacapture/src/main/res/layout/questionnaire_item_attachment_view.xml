@@ -134,8 +134,8 @@
         <ImageView
             android:id="@+id/icon_file_preview"
             style="?attr/questionnaireAttachmentPreviewTextStyle"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="@dimen/attachment_icon_file_preview_width"
+            android:layout_height="@dimen/attachment_icon_file_preview_height"
             android:contentDescription="@string/cd_icon_file_preview"
             app:tint="?attr/colorPrimary"
         />
