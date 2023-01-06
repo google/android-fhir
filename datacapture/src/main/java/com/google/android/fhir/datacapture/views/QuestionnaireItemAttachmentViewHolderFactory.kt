@@ -97,12 +97,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         displayActionButton(questionnaireItem)
         takePhotoButton.setOnClickListener { onTakePhotoClicked(questionnaireItem) }
         uploadDocumentButton.setOnClickListener { onSelectFileClicked(questionnaireItem) }
-        deleteButton.setOnClickListener {
-          questionnaireItemViewItem.clearAnswer()
-          clearDeleteButton()
-          clearPhotoPreview()
-          clearFilePreview()
-        }
+        deleteButton.setOnClickListener { onDeleteClicked() }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
@@ -369,6 +364,13 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
       private fun clearDeleteButton() {
         deleteButton.visibility = View.GONE
         deleteButton.text = ""
+      }
+
+      private fun onDeleteClicked() {
+        questionnaireItemViewItem.clearAnswer()
+        clearDeleteButton()
+        clearPhotoPreview()
+        clearFilePreview()
       }
 
       private fun displaySnackbar(anchorView: Button, @StringRes textResource: Int) {
