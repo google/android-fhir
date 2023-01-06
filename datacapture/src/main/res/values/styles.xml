@@ -127,8 +127,8 @@
         >@style/Questionnaire.AttachmentTakePhotoButtonStyle
         </item>
         <item
-            name="questionnaireAttachmentActionButtonStyle"
-        >@style/Questionnaire.AttachmentActionButtonStyle
+            name="questionnaireAttachmentUploadButtonStyle"
+        >@style/Questionnaire.AttachmentUploadButtonStyle
         </item>
         <item
             name="questionnaireAttachmentDeleteButtonStyle"
@@ -295,7 +295,7 @@
     </style>
 
     <style
-        name="Questionnaire.AttachmentActionButtonStyle"
+        name="Questionnaire.AttachmentUploadButtonStyle"
         parent="Widget.Material3.Button.OutlinedButton"
     >
         <item name="android:drawableTint">?attr/colorPrimary</item>

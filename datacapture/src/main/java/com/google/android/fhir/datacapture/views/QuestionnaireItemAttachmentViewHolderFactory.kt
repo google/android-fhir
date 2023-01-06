@@ -93,7 +93,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         header.bind(questionnaireItem)
         displayInitialPreview()
         displayTakePhotoButton(questionnaireItem)
-        displayActionButton(questionnaireItem)
+        displayUploadButton(questionnaireItem)
         takePhotoButton.setOnClickListener { onTakePhotoClicked(questionnaireItem) }
         uploadPhotoButton.setOnClickListener { view -> onUploadClicked(view, questionnaireItem) }
         uploadAudioButton.setOnClickListener { view -> onUploadClicked(view, questionnaireItem) }
@@ -164,7 +164,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         }
       }
 
-      private fun displayActionButton(questionnaireItem: QuestionnaireItemComponent) {
+      private fun displayUploadButton(questionnaireItem: QuestionnaireItemComponent) {
         when {
           questionnaireItem.hasMimeTypeOnly(MimeType.IMAGE.value) -> {
             uploadPhotoButton.visibility = View.VISIBLE
