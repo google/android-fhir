@@ -57,14 +57,14 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private lateinit var header: QuestionnaireItemHeaderView
-      private lateinit var error: TextView
-      private lateinit var takePhoto: Button
-      private lateinit var uploadPhoto: Button
-      private lateinit var uploadAudio: Button
-      private lateinit var uploadVideo: Button
-      private lateinit var uploadDocument: Button
-      private lateinit var uploadFile: Button
-      private lateinit var delete: Button
+      private lateinit var errorTextView: TextView
+      private lateinit var takePhotoButton: Button
+      private lateinit var uploadPhotoButton: Button
+      private lateinit var uploadAudioButton: Button
+      private lateinit var uploadVideoButton: Button
+      private lateinit var uploadDocumentButton: Button
+      private lateinit var uploadFileButton: Button
+      private lateinit var deleteButton: Button
       private lateinit var photoPreview: ImageView
       private lateinit var filePreview: LinearLayout
       private lateinit var iconFilePreview: ImageView
@@ -73,14 +73,14 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
-        error = itemView.findViewById(R.id.error)
-        takePhoto = itemView.findViewById(R.id.take_photo)
-        uploadPhoto = itemView.findViewById(R.id.upload_photo)
-        uploadAudio = itemView.findViewById(R.id.upload_audio)
-        uploadVideo = itemView.findViewById(R.id.upload_video)
-        uploadDocument = itemView.findViewById(R.id.upload_document)
-        uploadFile = itemView.findViewById(R.id.upload_file)
-        delete = itemView.findViewById(R.id.delete)
+        errorTextView = itemView.findViewById(R.id.error)
+        takePhotoButton = itemView.findViewById(R.id.take_photo)
+        uploadPhotoButton = itemView.findViewById(R.id.upload_photo)
+        uploadAudioButton = itemView.findViewById(R.id.upload_audio)
+        uploadVideoButton = itemView.findViewById(R.id.upload_video)
+        uploadDocumentButton = itemView.findViewById(R.id.upload_document)
+        uploadFileButton = itemView.findViewById(R.id.upload_file)
+        deleteButton = itemView.findViewById(R.id.delete)
         photoPreview = itemView.findViewById(R.id.photo_preview)
         filePreview = itemView.findViewById(R.id.file_preview)
         iconFilePreview = itemView.findViewById(R.id.icon_file_preview)
@@ -95,9 +95,9 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         displayInitialAttachmentPreview()
         displayTakePhotoButton(questionnaireItem)
         displayActionButton(questionnaireItem)
-        takePhoto.setOnClickListener { onTakePhotoClicked(questionnaireItem) }
-        uploadDocument.setOnClickListener { onSelectFileClicked(questionnaireItem) }
-        delete.setOnClickListener {
+        takePhotoButton.setOnClickListener { onTakePhotoClicked(questionnaireItem) }
+        uploadDocumentButton.setOnClickListener { onSelectFileClicked(questionnaireItem) }
+        deleteButton.setOnClickListener {
           questionnaireItemViewItem.clearAnswer()
           clearDeleteButton()
           clearPhotoPreview()
@@ -108,45 +108,45 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
           is NotValidated,
-          Valid -> error.visibility = View.GONE
+          Valid -> errorTextView.visibility = View.GONE
           is Invalid -> {
-            error.text = validationResult.getSingleStringValidationMessage()
-            error.visibility = View.VISIBLE
+            errorTextView.text = validationResult.getSingleStringValidationMessage()
+            errorTextView.visibility = View.VISIBLE
           }
         }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
         if (isReadOnly) {
-          takePhoto.isClickable = false
-          takePhoto.alpha = 0.6F
-          uploadPhoto.isClickable = false
-          uploadPhoto.alpha = 0.6F
-          uploadAudio.isClickable = false
-          uploadAudio.alpha = 0.6F
-          uploadVideo.isClickable = false
-          uploadVideo.alpha = 0.6F
-          uploadDocument.isClickable = false
-          uploadDocument.alpha = 0.6F
-          uploadFile.isClickable = false
-          uploadFile.alpha = 0.6F
-          delete.isClickable = false
-          delete.alpha = 0.6F
+          takePhotoButton.isClickable = false
+          takePhotoButton.alpha = 0.6F
+          uploadPhotoButton.isClickable = false
+          uploadPhotoButton.alpha = 0.6F
+          uploadAudioButton.isClickable = false
+          uploadAudioButton.alpha = 0.6F
+          uploadVideoButton.isClickable = false
+          uploadVideoButton.alpha = 0.6F
+          uploadDocumentButton.isClickable = false
+          uploadDocumentButton.alpha = 0.6F
+          uploadFileButton.isClickable = false
+          uploadFileButton.alpha = 0.6F
+          deleteButton.isClickable = false
+          deleteButton.alpha = 0.6F
         } else {
-          takePhoto.isClickable = true
-          takePhoto.alpha = 1F
-          uploadPhoto.isClickable = true
-          uploadPhoto.alpha = 1F
-          uploadAudio.isClickable = true
-          uploadAudio.alpha = 1F
-          uploadVideo.isClickable = true
-          uploadVideo.alpha = 1F
-          uploadDocument.isClickable = true
-          uploadDocument.alpha = 1F
-          uploadFile.isClickable = true
-          uploadFile.alpha = 1F
-          delete.isClickable = true
-          delete.alpha = 1F
+          takePhotoButton.isClickable = true
+          takePhotoButton.alpha = 1F
+          uploadPhotoButton.isClickable = true
+          uploadPhotoButton.alpha = 1F
+          uploadAudioButton.isClickable = true
+          uploadAudioButton.alpha = 1F
+          uploadVideoButton.isClickable = true
+          uploadVideoButton.alpha = 1F
+          uploadDocumentButton.isClickable = true
+          uploadDocumentButton.alpha = 1F
+          uploadFileButton.isClickable = true
+          uploadFileButton.alpha = 1F
+          deleteButton.isClickable = true
+          deleteButton.alpha = 1F
         }
       }
 
@@ -179,26 +179,26 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
       private fun displayTakePhotoButton(questionnaireItem: QuestionnaireItemComponent) {
         if (questionnaireItem.hasMimeType(MimeType.IMAGE.value)) {
-          takePhoto.visibility = View.VISIBLE
+          takePhotoButton.visibility = View.VISIBLE
         }
       }
 
       private fun displayActionButton(questionnaireItem: QuestionnaireItemComponent) {
         when {
           questionnaireItem.hasMimeTypeOnly(MimeType.IMAGE.value) -> {
-            uploadPhoto.visibility = View.VISIBLE
+            uploadPhotoButton.visibility = View.VISIBLE
           }
           questionnaireItem.hasMimeTypeOnly(MimeType.AUDIO.value) -> {
-            uploadAudio.visibility =  View.VISIBLE
+            uploadAudioButton.visibility =  View.VISIBLE
           }
           questionnaireItem.hasMimeTypeOnly(MimeType.VIDEO.value) -> {
-            uploadVideo.visibility =  View.VISIBLE
+            uploadVideoButton.visibility =  View.VISIBLE
           }
           questionnaireItem.hasMimeTypeOnly(MimeType.DOCUMENT.value) -> {
-            uploadDocument.visibility =  View.VISIBLE
+            uploadDocumentButton.visibility =  View.VISIBLE
           }
           else -> {
-            uploadFile.visibility =  View.VISIBLE
+            uploadFileButton.visibility =  View.VISIBLE
           }
         }
       }
@@ -219,7 +219,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
               R.string.max_size_image_above_limit_validation_error_msg,
               questionnaireItem.maxSizeInMiB
             )
-            displaySnackbar(takePhoto, R.string.upload_failed)
+            displaySnackbar(takePhotoButton, R.string.upload_failed)
             file.delete()
             return@setFragmentResultListener
           }
@@ -227,7 +227,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           val mimeType = context.getMimeTypeFromUri(uri)
           if (!questionnaireItem.hasMimeType(mimeType.type)) {
             displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
-            displaySnackbar(takePhoto, R.string.upload_failed)
+            displaySnackbar(takePhotoButton, R.string.upload_failed)
             file.delete()
             return@setFragmentResultListener
           }
@@ -248,7 +248,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           loadPhotoPreviewInUri(uri)
           clearFilePreview()
           loadDeleteButton(R.string.delete_image)
-          displaySnackbar(takePhoto, R.string.image_uploaded)
+          displaySnackbar(takePhotoButton, R.string.image_uploaded)
           file.delete()
         }
 
@@ -276,14 +276,14 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
               R.string.max_size_file_above_limit_validation_error_msg,
               questionnaireItem.maxSizeInMiB
             )
-            displaySnackbar(uploadDocument, R.string.upload_failed)
+            displaySnackbar(uploadDocumentButton, R.string.upload_failed)
             return@setFragmentResultListener
           }
 
           val mimeType = context.getMimeTypeFromUri(uri)
           if (!questionnaireItem.hasMimeType(mimeType.type)) {
             displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
-            displaySnackbar(uploadDocument, R.string.upload_failed)
+            displaySnackbar(uploadDocumentButton, R.string.upload_failed)
             return@setFragmentResultListener
           }
 
@@ -323,7 +323,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             }
           }
 
-          displaySnackbar(uploadDocument, R.string.file_uploaded)
+          displaySnackbar(uploadDocumentButton, R.string.file_uploaded)
         }
 
         SelectFileLauncherFragment()
@@ -362,13 +362,13 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
       }
 
       private fun loadDeleteButton(@StringRes textResource: Int) {
-        delete.visibility = View.VISIBLE
-        delete.text = context.getString(textResource)
+        deleteButton.visibility = View.VISIBLE
+        deleteButton.text = context.getString(textResource)
       }
 
       private fun clearDeleteButton() {
-        delete.visibility = View.GONE
-        delete.text = ""
+        deleteButton.visibility = View.GONE
+        deleteButton.text = ""
       }
 
       private fun displaySnackbar(anchorView: Button, @StringRes textResource: Int) {
