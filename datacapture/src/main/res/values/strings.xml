@@ -51,8 +51,7 @@
     <string name="upload_video">Upload Video</string>
     <string name="upload_document">Upload Document</string>
     <string name="upload_file">Upload File</string>
-    <string name="delete_image">Delete image</string>
-    <string name="delete_file">Delete file</string>
+    <string name="delete">Delete</string>
     <string
         name="max_size_image_above_limit_validation_error_msg"
     >Error: Image size is larger than %1$s MB</string>

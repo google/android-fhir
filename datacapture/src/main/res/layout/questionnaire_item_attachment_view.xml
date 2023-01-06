@@ -142,6 +142,7 @@
         style="?attr/questionnaireAttachmentDeleteButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/delete"
         android:layout_marginVertical="@dimen/padding_default"
         android:paddingHorizontal="@dimen/padding_default"
         android:visibility="gone" />

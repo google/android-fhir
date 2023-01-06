@@ -246,7 +246,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
           loadPhotoPreviewInUri(uri)
           clearFilePreview()
-          loadDeleteButton(R.string.delete_image)
+          displayDeleteButton()
           displaySnackbar(takePhotoButton, R.string.image_uploaded)
           file.delete()
         }
@@ -360,19 +360,17 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         Glide.with(context).clear(photoPreview)
       }
 
-      private fun loadDeleteButton(@StringRes textResource: Int) {
+      private fun displayDeleteButton() {
         deleteButton.visibility = View.VISIBLE
-        deleteButton.text = context.getString(textResource)
       }
 
-      private fun clearDeleteButton() {
+      private fun hideDeleteButton() {
         deleteButton.visibility = View.GONE
-        deleteButton.text = ""
       }
 
       private fun onDeleteClicked() {
         questionnaireItemViewItem.clearAnswer()
-        clearDeleteButton()
+        hideDeleteButton()
         clearPhotoPreview()
         clearFilePreview()
       }
