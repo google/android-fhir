@@ -24,7 +24,7 @@ import androidx.fragment.app.setFragmentResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemAttachmentViewHolderFactory
 
 /** Used for launching open document activity */
-class SelectFileLauncherFragment : DialogFragment() {
+class OpenDocumentLauncherFragment : DialogFragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -32,13 +32,13 @@ class SelectFileLauncherFragment : DialogFragment() {
       arguments?.getStringArray(QuestionnaireItemAttachmentViewHolderFactory.EXTRA_MIME_TYPE_KEY)
 
     registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        setFragmentResult(SELECT_FILE_RESULT_KEY, bundleOf(SELECT_FILE_RESULT_KEY to uri))
+        setFragmentResult(OPEN_DOCUMENT_RESULT_KEY, bundleOf(OPEN_DOCUMENT_RESULT_KEY to uri))
         dismiss()
       }
       .launch(mimeTypes)
   }
 
   companion object {
-    const val SELECT_FILE_RESULT_KEY = "result"
+    const val OPEN_DOCUMENT_RESULT_KEY = "open_document_result"
   }
 }

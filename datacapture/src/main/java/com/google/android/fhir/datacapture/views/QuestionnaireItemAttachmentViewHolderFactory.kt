@@ -42,7 +42,7 @@ import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.attachment.CameraLauncherFragment
-import com.google.android.fhir.datacapture.views.attachment.SelectFileLauncherFragment
+import com.google.android.fhir.datacapture.views.attachment.OpenDocumentLauncherFragment
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.util.Date
@@ -244,11 +244,11 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
       private fun onUploadClicked(view: View, questionnaireItem: QuestionnaireItemComponent) {
         context.supportFragmentManager.setFragmentResultListener(
-          SelectFileLauncherFragment.SELECT_FILE_RESULT_KEY,
+          OpenDocumentLauncherFragment.OPEN_DOCUMENT_RESULT_KEY,
           context
         ) { _, result ->
           val attachmentUri =
-            (result.get(SelectFileLauncherFragment.SELECT_FILE_RESULT_KEY)
+            (result.get(OpenDocumentLauncherFragment.OPEN_DOCUMENT_RESULT_KEY)
               ?: return@setFragmentResultListener)
               as Uri
 
@@ -290,7 +290,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           displaySnackbar(view, R.string.file_uploaded)
         }
 
-        SelectFileLauncherFragment()
+        OpenDocumentLauncherFragment()
           .apply {
             arguments = bundleOf(EXTRA_MIME_TYPE_KEY to questionnaireItem.mimeTypes.toTypedArray())
           }
