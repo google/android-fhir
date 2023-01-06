@@ -151,28 +151,11 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
       private fun displayInitialAttachmentPreview() {
         questionnaireItemViewItem.answers.firstOrNull()?.valueAttachment?.let { attachment ->
-          when (attachment.contentType.type) {
-            MimeType.IMAGE.value -> {
-              loadPhotoPreviewInBytes(attachment.data)
-              clearFilePreview()
-              loadDeleteButton(R.string.delete_image)
-            }
-            MimeType.DOCUMENT.value -> {
-              loadFilePreview(R.drawable.ic_document_file, attachment.title)
-              clearPhotoPreview()
-              loadDeleteButton(R.string.delete_file)
-            }
-            MimeType.VIDEO.value -> {
-              loadFilePreview(R.drawable.ic_video_file, attachment.title)
-              clearPhotoPreview()
-              loadDeleteButton(R.string.delete_file)
-            }
-            MimeType.AUDIO.value -> {
-              loadFilePreview(R.drawable.ic_audio_file, attachment.title)
-              clearPhotoPreview()
-              loadDeleteButton(R.string.delete_file)
-            }
-          }
+          displayPreview(
+            attachmentType = attachment.contentType.type,
+            attachmentTitle = attachment.title,
+            attachmentByteArray = attachment.data
+          )
         }
       }
 
@@ -299,30 +282,12 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             }
           questionnaireItemViewItem.setAnswer(answer)
 
-          when (mimeType.type) {
-            MimeType.IMAGE.value -> {
-              loadPhotoPreviewInUri(uri)
-              clearFilePreview()
-              loadDeleteButton(R.string.delete_image)
-            }
-            MimeType.DOCUMENT.value -> {
-              loadFilePreview(R.drawable.ic_document_file, fileName)
-              clearPhotoPreview()
-              loadDeleteButton(R.string.delete_file)
-            }
-            MimeType.VIDEO.value -> {
-              loadFilePreview(R.drawable.ic_video_file, fileName)
-              clearPhotoPreview()
-              loadDeleteButton(R.string.delete_file)
-            }
-            MimeType.AUDIO.value -> {
-              loadFilePreview(R.drawable.ic_audio_file, fileName)
-              clearPhotoPreview()
-              loadDeleteButton(R.string.delete_file)
-            }
-          }
-
-          displaySnackbar(uploadDocumentButton, R.string.file_uploaded)
+          displayPreview(
+            attachmentType = attachmentMimeType.type,
+            attachmentTitle = attachmentTitle,
+            attachmentUri = attachmentUri
+          )
+          displaySnackbar(view, R.string.file_uploaded)
         }
 
         SelectFileLauncherFragment()
@@ -331,6 +296,32 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             context.supportFragmentManager,
             QuestionnaireItemAttachmentViewHolderFactory.javaClass.simpleName
           )
+      }
+
+      private fun displayPreview(attachmentType: String, attachmentTitle: String, attachmentByteArray: ByteArray? = null, attachmentUri: Uri? = null) {
+        when (attachmentType) {
+          MimeType.IMAGE.value -> {
+            if (attachmentByteArray != null) {
+              loadPhotoPreview(attachmentByteArray)
+            } else if (attachmentUri != null) {
+              loadPhotoPreview(attachmentUri)
+            }
+            clearFilePreview()
+          }
+          MimeType.DOCUMENT.value -> {
+            loadFilePreview(R.drawable.ic_document_file, attachmentTitle)
+            clearPhotoPreview()
+          }
+          MimeType.VIDEO.value -> {
+            loadFilePreview(R.drawable.ic_video_file, attachmentTitle)
+            clearPhotoPreview()
+          }
+          MimeType.AUDIO.value -> {
+            loadFilePreview(R.drawable.ic_audio_file, attachmentTitle)
+            clearPhotoPreview()
+          }
+        }
+        displayDeleteButton()
       }
 
       private fun loadFilePreview(@DrawableRes iconResource: Int, title: String) {
