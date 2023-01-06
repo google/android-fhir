@@ -59,7 +59,11 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
       private lateinit var header: QuestionnaireItemHeaderView
       private lateinit var error: TextView
       private lateinit var takePhoto: Button
-      private lateinit var selectFile: Button
+      private lateinit var uploadPhoto: Button
+      private lateinit var uploadAudio: Button
+      private lateinit var uploadVideo: Button
+      private lateinit var uploadDocument: Button
+      private lateinit var uploadFile: Button
       private lateinit var delete: Button
       private lateinit var photoPreview: ImageView
       private lateinit var filePreview: LinearLayout
@@ -71,7 +75,11 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         header = itemView.findViewById(R.id.header)
         error = itemView.findViewById(R.id.error)
         takePhoto = itemView.findViewById(R.id.take_photo)
-        selectFile = itemView.findViewById(R.id.select_file)
+        uploadPhoto = itemView.findViewById(R.id.upload_photo)
+        uploadAudio = itemView.findViewById(R.id.upload_audio)
+        uploadVideo = itemView.findViewById(R.id.upload_video)
+        uploadDocument = itemView.findViewById(R.id.upload_document)
+        uploadFile = itemView.findViewById(R.id.upload_file)
         delete = itemView.findViewById(R.id.delete)
         photoPreview = itemView.findViewById(R.id.photo_preview)
         filePreview = itemView.findViewById(R.id.file_preview)
@@ -85,9 +93,10 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         header.bind(questionnaireItem)
         displayInitialAttachmentPreview()
-        displayActionButtons(questionnaireItem)
+        displayTakePhotoButton(questionnaireItem)
+        displayActionButton(questionnaireItem)
         takePhoto.setOnClickListener { onTakePhotoClicked(questionnaireItem) }
-        selectFile.setOnClickListener { onSelectFileClicked(questionnaireItem) }
+        uploadDocument.setOnClickListener { onSelectFileClicked(questionnaireItem) }
         delete.setOnClickListener {
           questionnaireItemViewItem.clearAnswer()
           clearDeleteButton()
@@ -111,15 +120,31 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         if (isReadOnly) {
           takePhoto.isClickable = false
           takePhoto.alpha = 0.6F
-          selectFile.isClickable = false
-          selectFile.alpha = 0.6F
+          uploadPhoto.isClickable = false
+          uploadPhoto.alpha = 0.6F
+          uploadAudio.isClickable = false
+          uploadAudio.alpha = 0.6F
+          uploadVideo.isClickable = false
+          uploadVideo.alpha = 0.6F
+          uploadDocument.isClickable = false
+          uploadDocument.alpha = 0.6F
+          uploadFile.isClickable = false
+          uploadFile.alpha = 0.6F
           delete.isClickable = false
           delete.alpha = 0.6F
         } else {
           takePhoto.isClickable = true
           takePhoto.alpha = 1F
-          selectFile.isClickable = true
-          selectFile.alpha = 1F
+          uploadPhoto.isClickable = true
+          uploadPhoto.alpha = 1F
+          uploadAudio.isClickable = true
+          uploadAudio.alpha = 1F
+          uploadVideo.isClickable = true
+          uploadVideo.alpha = 1F
+          uploadDocument.isClickable = true
+          uploadDocument.alpha = 1F
+          uploadFile.isClickable = true
+          uploadFile.alpha = 1F
           delete.isClickable = true
           delete.alpha = 1F
         }
@@ -134,17 +159,17 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
               loadDeleteButton(R.string.delete_image)
             }
             MimeType.DOCUMENT.value -> {
-              loadFilePreview(R.drawable.file, attachment.title)
+              loadFilePreview(R.drawable.ic_document_file, attachment.title)
               clearPhotoPreview()
               loadDeleteButton(R.string.delete_file)
             }
             MimeType.VIDEO.value -> {
-              loadFilePreview(R.drawable.video_file, attachment.title)
+              loadFilePreview(R.drawable.ic_video_file, attachment.title)
               clearPhotoPreview()
               loadDeleteButton(R.string.delete_file)
             }
             MimeType.AUDIO.value -> {
-              loadFilePreview(R.drawable.audio_file, attachment.title)
+              loadFilePreview(R.drawable.ic_audio_file, attachment.title)
               clearPhotoPreview()
               loadDeleteButton(R.string.delete_file)
             }
@@ -152,16 +177,29 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         }
       }
 
-      private fun displayActionButtons(questionnaireItem: QuestionnaireItemComponent) {
-        if (questionnaireItem.hasMimeTypeOnly(MimeType.IMAGE.value)) {
+      private fun displayTakePhotoButton(questionnaireItem: QuestionnaireItemComponent) {
+        if (questionnaireItem.hasMimeType(MimeType.IMAGE.value)) {
           takePhoto.visibility = View.VISIBLE
-          loadUploadButton(R.drawable.image_file, R.string.upload_photo)
-        } else if (questionnaireItem.hasMimeType(MimeType.IMAGE.value)) {
-          takePhoto.visibility = View.VISIBLE
-          loadUploadButton(R.drawable.file, R.string.select_file)
-        } else {
-          takePhoto.visibility = View.GONE
-          loadUploadButton(R.drawable.file, R.string.select_file)
+        }
+      }
+
+      private fun displayActionButton(questionnaireItem: QuestionnaireItemComponent) {
+        when {
+          questionnaireItem.hasMimeTypeOnly(MimeType.IMAGE.value) -> {
+            uploadPhoto.visibility = View.VISIBLE
+          }
+          questionnaireItem.hasMimeTypeOnly(MimeType.AUDIO.value) -> {
+            uploadAudio.visibility =  View.VISIBLE
+          }
+          questionnaireItem.hasMimeTypeOnly(MimeType.VIDEO.value) -> {
+            uploadVideo.visibility =  View.VISIBLE
+          }
+          questionnaireItem.hasMimeTypeOnly(MimeType.DOCUMENT.value) -> {
+            uploadDocument.visibility =  View.VISIBLE
+          }
+          else -> {
+            uploadFile.visibility =  View.VISIBLE
+          }
         }
       }
 
@@ -238,14 +276,14 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
               R.string.max_size_file_above_limit_validation_error_msg,
               questionnaireItem.maxSizeInMiB
             )
-            displaySnackbar(selectFile, R.string.upload_failed)
+            displaySnackbar(uploadDocument, R.string.upload_failed)
             return@setFragmentResultListener
           }
 
           val mimeType = context.getMimeTypeFromUri(uri)
           if (!questionnaireItem.hasMimeType(mimeType.type)) {
             displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
-            displaySnackbar(selectFile, R.string.upload_failed)
+            displaySnackbar(uploadDocument, R.string.upload_failed)
             return@setFragmentResultListener
           }
 
@@ -269,23 +307,23 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
               loadDeleteButton(R.string.delete_image)
             }
             MimeType.DOCUMENT.value -> {
-              loadFilePreview(R.drawable.file, fileName)
+              loadFilePreview(R.drawable.ic_document_file, fileName)
               clearPhotoPreview()
               loadDeleteButton(R.string.delete_file)
             }
             MimeType.VIDEO.value -> {
-              loadFilePreview(R.drawable.video_file, fileName)
+              loadFilePreview(R.drawable.ic_video_file, fileName)
               clearPhotoPreview()
               loadDeleteButton(R.string.delete_file)
             }
             MimeType.AUDIO.value -> {
-              loadFilePreview(R.drawable.audio_file, fileName)
+              loadFilePreview(R.drawable.ic_audio_file, fileName)
               clearPhotoPreview()
               loadDeleteButton(R.string.delete_file)
             }
           }
 
-          displaySnackbar(selectFile, R.string.file_uploaded)
+          displaySnackbar(uploadDocument, R.string.file_uploaded)
         }
 
         SelectFileLauncherFragment()
@@ -294,11 +332,6 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             context.supportFragmentManager,
             QuestionnaireItemAttachmentViewHolderFactory.javaClass.simpleName
           )
-      }
-
-      private fun loadUploadButton(@DrawableRes iconResource: Int, @StringRes textResource: Int) {
-        selectFile.setCompoundDrawablesWithIntrinsicBounds(iconResource, 0, 0, 0)
-        selectFile.text = context.getString(textResource)
       }
 
       private fun loadFilePreview(@DrawableRes iconResource: Int, title: String) {

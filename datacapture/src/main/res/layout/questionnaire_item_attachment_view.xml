@@ -42,16 +42,68 @@
             android:id="@+id/take_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             style="?attr/questionnaireAttachmentTakePhotoButtonStyle"
             android:layout_marginEnd="@dimen/padding_half_size"
             android:paddingHorizontal="@dimen/padding_default"
         />
 
         <Button
-            android:id="@+id/select_file"
+            android:id="@+id/upload_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/padding_half_size"
+            android:drawableLeft="@drawable/ic_image_file"
+            android:text="@string/upload_photo"
+            android:visibility="gone"
+            style="?attr/questionnaireAttachmentSelectFileButtonStyle"
+            android:paddingHorizontal="@dimen/padding_default"
+        />
+
+        <Button
+            android:id="@+id/upload_audio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_half_size"
+            android:drawableLeft="@drawable/ic_audio_file"
+            android:text="@string/upload_audio"
+            android:visibility="gone"
+            style="?attr/questionnaireAttachmentSelectFileButtonStyle"
+            android:paddingHorizontal="@dimen/padding_default"
+        />
+
+        <Button
+            android:id="@+id/upload_video"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_half_size"
+            android:drawableLeft="@drawable/ic_video_file"
+            android:text="@string/upload_video"
+            android:visibility="gone"
+            style="?attr/questionnaireAttachmentSelectFileButtonStyle"
+            android:paddingHorizontal="@dimen/padding_default"
+        />
+
+        <Button
+            android:id="@+id/upload_document"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_half_size"
+            android:drawableLeft="@drawable/ic_document_file"
+            android:text="@string/upload_document"
+            android:visibility="gone"
+            style="?attr/questionnaireAttachmentSelectFileButtonStyle"
+            android:paddingHorizontal="@dimen/padding_default"
+        />
+
+        <Button
+            android:id="@+id/upload_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_half_size"
+            android:drawableLeft="@drawable/ic_file"
+            android:text="@string/upload_file"
+            android:visibility="gone"
             style="?attr/questionnaireAttachmentSelectFileButtonStyle"
             android:paddingHorizontal="@dimen/padding_default"
         />
