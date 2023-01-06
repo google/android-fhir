@@ -130,7 +130,8 @@ internal class AnswerOptionDropDownArrayAdapter(
   answerOption: List<DropDownAnswerOption>
 ) : ArrayAdapter<DropDownAnswerOption>(context, layoutResourceId, answerOption) {
   override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-    val listItemView = convertView ?: LayoutInflater.from(parent.context).inflate(layoutResourceId, parent, false)
+    val listItemView =
+      convertView ?: LayoutInflater.from(parent.context).inflate(layoutResourceId, parent, false)
     try {
       val answerOption: DropDownAnswerOption? = getItem(position)
       val answerOptionTextView =

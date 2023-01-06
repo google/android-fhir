@@ -44,25 +44,23 @@ internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.optionExclusiv
 fun Questionnaire.QuestionnaireItemAnswerOptionComponent.itemAnswerOptionImage(
   context: Context
 ): Drawable? {
-  val extension =
-    this.extension.singleOrNull { it.url == EXTENSION_ITEM_ANSWER_MEDIA }?.value as Attachment?
-  extension?.let {
-    if (it.hasContentType() && it.hasData()) {
-      when (it.contentType) {
-        "image/jpeg",
-        "image/jpg",
-        "image/png" -> {
-          val bitmap = BitmapFactory.decodeByteArray(it.data, 0, it.data.size)
-          val imageSize = context.resources.getDimensionPixelOffset(R.dimen.choice_button_image)
-          val drawable: Drawable = BitmapDrawable(context.resources, bitmap)
-          drawable.setBounds(0, 0, imageSize, imageSize)
-          return drawable
+  return (extension.singleOrNull { it.url == EXTENSION_ITEM_ANSWER_MEDIA }?.value as Attachment?)
+    ?.let {
+      if (it.hasContentType() && it.hasData()) {
+        when (it.contentType) {
+          "image/jpeg",
+          "image/jpg",
+          "image/png" -> {
+            val bitmap = BitmapFactory.decodeByteArray(it.data, 0, it.data.size)
+            val imageSize = context.resources.getDimensionPixelOffset(R.dimen.choice_button_image)
+            val drawable: Drawable = BitmapDrawable(context.resources, bitmap)
+            drawable.setBounds(0, 0, imageSize, imageSize)
+            drawable
+          }
+          else -> null
         }
-        // return null as for now only mime type image is supported with binary data
-        else -> return null
+      } else {
+        null
       }
     }
-  }
-  // return null as extension does not have content type ot data available
-  return null
 }
