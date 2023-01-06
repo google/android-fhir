@@ -211,7 +211,7 @@ internal const val EXTENSION_MAX_SIZE = "http://hl7.org/fhir/StructureDefinition
 internal val Questionnaire.QuestionnaireItemComponent.maxSizeInByte: BigDecimal?
   get() {
     return (extension.firstOrNull { it.url == EXTENSION_MAX_SIZE }?.valueAsPrimitive
-            as DecimalType?)
+        as DecimalType?)
       ?.value
   }
 

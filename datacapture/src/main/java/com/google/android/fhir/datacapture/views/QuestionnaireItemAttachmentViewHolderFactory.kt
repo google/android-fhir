@@ -47,7 +47,6 @@ import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.util.Date
 import org.hl7.fhir.r4.model.Attachment
-import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -171,23 +170,24 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             uploadPhotoButton.visibility = View.VISIBLE
           }
           questionnaireItem.hasMimeTypeOnly(MimeType.AUDIO.value) -> {
-            uploadAudioButton.visibility =  View.VISIBLE
+            uploadAudioButton.visibility = View.VISIBLE
           }
           questionnaireItem.hasMimeTypeOnly(MimeType.VIDEO.value) -> {
-            uploadVideoButton.visibility =  View.VISIBLE
+            uploadVideoButton.visibility = View.VISIBLE
           }
           questionnaireItem.hasMimeTypeOnly(MimeType.DOCUMENT.value) -> {
-            uploadDocumentButton.visibility =  View.VISIBLE
+            uploadDocumentButton.visibility = View.VISIBLE
           }
           else -> {
-            uploadFileButton.visibility =  View.VISIBLE
+            uploadFileButton.visibility = View.VISIBLE
           }
         }
       }
 
-      private fun onTakePhotoClicked(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
+      private fun onTakePhotoClicked(questionnaireItem: QuestionnaireItemComponent) {
         val file = File.createTempFile("IMG_", ".jpeg", context.cacheDir)
-        val attachmentUri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+        val attachmentUri =
+          FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
 
         context.supportFragmentManager.setFragmentResultListener(
           CameraLauncherFragment.CAMERA_RESULT_KEY,
@@ -291,14 +291,21 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         }
 
         SelectFileLauncherFragment()
-          .apply { arguments = bundleOf(EXTRA_MIME_TYPE_KEY to questionnaireItem.mimeTypes.toTypedArray()) }
+          .apply {
+            arguments = bundleOf(EXTRA_MIME_TYPE_KEY to questionnaireItem.mimeTypes.toTypedArray())
+          }
           .show(
             context.supportFragmentManager,
             QuestionnaireItemAttachmentViewHolderFactory.javaClass.simpleName
           )
       }
 
-      private fun displayPreview(attachmentType: String, attachmentTitle: String, attachmentByteArray: ByteArray? = null, attachmentUri: Uri? = null) {
+      private fun displayPreview(
+        attachmentType: String,
+        attachmentTitle: String,
+        attachmentByteArray: ByteArray? = null,
+        attachmentUri: Uri? = null
+      ) {
         when (attachmentType) {
           MimeType.IMAGE.value -> {
             if (attachmentByteArray != null) {

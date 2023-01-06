@@ -88,10 +88,7 @@
         format="reference"
     />
     <!--   Style for attachment action button. -->
-    <attr
-        name="questionnaireAttachmentActionButtonStyle"
-        format="reference"
-    />
+    <attr name="questionnaireAttachmentActionButtonStyle" format="reference" />
     <!--   Style for attachment delete button. -->
     <attr name="questionnaireAttachmentDeleteButtonStyle" format="reference" />
     <!--   Style for attachment preview icon. -->
