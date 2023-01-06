@@ -96,11 +96,11 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         displayTakePhotoButton(questionnaireItem)
         displayActionButton(questionnaireItem)
         takePhotoButton.setOnClickListener { onTakePhotoClicked(questionnaireItem) }
-        uploadPhotoButton.setOnClickListener { onUploadClicked(questionnaireItem) }
-        uploadAudioButton.setOnClickListener { onUploadClicked(questionnaireItem) }
-        uploadVideoButton.setOnClickListener { onUploadClicked(questionnaireItem) }
-        uploadDocumentButton.setOnClickListener { onUploadClicked(questionnaireItem) }
-        uploadFileButton.setOnClickListener { onUploadClicked(questionnaireItem) }
+        uploadPhotoButton.setOnClickListener { view -> onUploadClicked(view, questionnaireItem) }
+        uploadAudioButton.setOnClickListener { view -> onUploadClicked(view, questionnaireItem) }
+        uploadVideoButton.setOnClickListener { view -> onUploadClicked(view, questionnaireItem) }
+        uploadDocumentButton.setOnClickListener { view -> onUploadClicked(view, questionnaireItem) }
+        uploadFileButton.setOnClickListener { view -> onUploadClicked(view, questionnaireItem) }
         deleteButton.setOnClickListener { onDeleteClicked() }
       }
 
@@ -242,7 +242,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           )
       }
 
-      private fun onSelectFileClicked(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
+      private fun onUploadClicked(view: View, questionnaireItem: QuestionnaireItemComponent) {
         context.supportFragmentManager.setFragmentResultListener(
           SelectFileLauncherFragment.SELECT_FILE_RESULT_KEY,
           context
@@ -366,8 +366,8 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         clearFilePreview()
       }
 
-      private fun displaySnackbar(anchorView: Button, @StringRes textResource: Int) {
-        Snackbar.make(anchorView, context.getString(textResource), Snackbar.LENGTH_SHORT).show()
+      private fun displaySnackbar(view: View, @StringRes textResource: Int) {
+        Snackbar.make(view, context.getString(textResource), Snackbar.LENGTH_SHORT).show()
       }
 
       private fun displayError(@StringRes textResource: Int) {
