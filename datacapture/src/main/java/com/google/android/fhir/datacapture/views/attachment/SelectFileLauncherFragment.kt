@@ -32,13 +32,13 @@ class SelectFileLauncherFragment : DialogFragment() {
       arguments?.getStringArray(QuestionnaireItemAttachmentViewHolderFactory.EXTRA_MIME_TYPE_KEY)
 
     registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        setFragmentResult(RESULT_REQUEST_KEY, bundleOf(RESULT_REQUEST_KEY to uri))
+        setFragmentResult(SELECT_FILE_RESULT_KEY, bundleOf(SELECT_FILE_RESULT_KEY to uri))
         dismiss()
       }
       .launch(mimeTypes)
   }
 
   companion object {
-    const val RESULT_REQUEST_KEY = "result"
+    const val SELECT_FILE_RESULT_KEY = "result"
   }
 }

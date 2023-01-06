@@ -208,10 +208,10 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
 
         context.supportFragmentManager.setFragmentResultListener(
-          CameraLauncherFragment.RESULT_REQUEST_KEY,
+          CameraLauncherFragment.CAMERA_RESULT_KEY,
           context
         ) { _, result ->
-          val isSaved = result.getBoolean(CameraLauncherFragment.RESULT_REQUEST_KEY)
+          val isSaved = result.getBoolean(CameraLauncherFragment.CAMERA_RESULT_KEY)
           if (!isSaved) return@setFragmentResultListener
 
           if (questionnaireItem.isMaxSizeOverLimit(file.length().toBigDecimal())) {
@@ -262,11 +262,11 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
       private fun onSelectFileClicked(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
         context.supportFragmentManager.setFragmentResultListener(
-          SelectFileLauncherFragment.RESULT_REQUEST_KEY,
+          SelectFileLauncherFragment.SELECT_FILE_RESULT_KEY,
           context
         ) { _, result ->
           val uri =
-            (result.get(SelectFileLauncherFragment.RESULT_REQUEST_KEY)
+            (result.get(SelectFileLauncherFragment.SELECT_FILE_RESULT_KEY)
               ?: return@setFragmentResultListener)
               as Uri
 

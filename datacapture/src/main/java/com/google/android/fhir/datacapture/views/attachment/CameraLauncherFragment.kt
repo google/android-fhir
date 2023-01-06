@@ -52,13 +52,13 @@ class CameraLauncherFragment : DialogFragment() {
     }
 
     registerForActivityResult(ActivityResultContracts.TakePicture()) { isSaved ->
-        setFragmentResult(RESULT_REQUEST_KEY, bundleOf(RESULT_REQUEST_KEY to isSaved))
+        setFragmentResult(CAMERA_RESULT_KEY, bundleOf(CAMERA_RESULT_KEY to isSaved))
         dismiss()
       }
       .launch(uri)
   }
 
   companion object {
-    const val RESULT_REQUEST_KEY = "result"
+    const val CAMERA_RESULT_KEY = "camera_result"
   }
 }
