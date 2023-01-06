@@ -133,7 +133,7 @@
 
         <ImageView
             android:id="@+id/icon_file_preview"
-            style="?attr/questionnaireAttachmentPreviewTextStyle"
+            style="?attr/questionnaireAttachmentPreviewIconStyle"
             android:layout_width="@dimen/attachment_icon_file_preview_width"
             android:layout_height="@dimen/attachment_icon_file_preview_height"
             android:contentDescription="@string/cd_icon_file_preview"
