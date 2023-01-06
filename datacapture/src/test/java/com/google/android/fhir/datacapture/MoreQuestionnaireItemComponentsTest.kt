@@ -426,111 +426,108 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun choiceOrientation_shouldReturnVertical() {
-    val questionnaire =
+    val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
           EXTENSION_CHOICE_ORIENTATION_URL,
           CodeType(ChoiceOrientationTypes.VERTICAL.extensionCode)
         )
       }
-    assertThat(questionnaire.choiceOrientation).isEqualTo(ChoiceOrientationTypes.VERTICAL)
+    assertThat(questionnaireItem.choiceOrientation).isEqualTo(ChoiceOrientationTypes.VERTICAL)
   }
 
   @Test
   fun choiceOrientation_shouldReturnHorizontal() {
-    val questionnaire =
+    val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
           EXTENSION_CHOICE_ORIENTATION_URL,
           CodeType(ChoiceOrientationTypes.HORIZONTAL.extensionCode)
         )
       }
-    assertThat(questionnaire.choiceOrientation).isEqualTo(ChoiceOrientationTypes.HORIZONTAL)
+    assertThat(questionnaireItem.choiceOrientation).isEqualTo(ChoiceOrientationTypes.HORIZONTAL)
   }
 
   @Test
   fun choiceOrientation_missingExtension_shouldReturnNull() {
-    val questionnaire = Questionnaire.QuestionnaireItemComponent()
-    assertThat(questionnaire.choiceOrientation).isNull()
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaireItem.choiceOrientation).isNull()
   }
 
   @Test
   fun choiceOrientation_missingOrientation_shouldReturnNull() {
-    val questionnaire =
+    val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(EXTENSION_CHOICE_ORIENTATION_URL, CodeType(""))
       }
-    assertThat(questionnaire.choiceOrientation).isNull()
+    assertThat(questionnaireItem.choiceOrientation).isNull()
   }
 
   @Test
   fun mimeTypes_shouldReturnMimeTypes() {
-    val questionnaire =
+    val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(EXTENSION_MIME_TYPE, CodeType("image/jpg"))
         addExtension(EXTENSION_MIME_TYPE, CodeType("application/pdf"))
       }
-    assertThat(questionnaire.mimeTypes).isEqualTo(listOf("image/jpg", "application/pdf"))
+    assertThat(questionnaireItem.mimeTypes).isEqualTo(listOf("image/jpg", "application/pdf"))
   }
 
   @Test
   fun mimeTypes_missingMimeType_shouldReturnEmpty() {
-    val questionnaire =
+    val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(EXTENSION_MIME_TYPE, CodeType(""))
       }
-    assertThat(questionnaire.mimeTypes).isEmpty()
+    assertThat(questionnaireItem.mimeTypes).isEmpty()
   }
 
   @Test
   fun mimeTypes_missingExtension_shouldReturnNull() {
-    val questionnaire = Questionnaire.QuestionnaireItemComponent()
-    assertThat(questionnaire.mimeTypes).isEmpty()
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaireItem.mimeTypes).isEmpty()
   }
 
   @Test
-  fun maxSize_shouldReturnBytes() {
-    val questionnaire =
+  fun `should return max size in bytes`() {
+    val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
       }
-    assertThat(questionnaire.maxSizeInByte).isEqualTo(BigDecimal(5242880))
+    assertThat(questionnaireItem.maxSizeInBytes).isEqualTo(BigDecimal(5242880))
   }
 
   @Test
-  fun maxSize_shouldReturnKibibytes() {
-    val questionnaire =
+  fun `should return max size in kibibytes`() {
+    val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
       }
-    assertThat(questionnaire.maxSizeInKiB).isEqualTo(BigDecimal(5120))
+    assertThat(questionnaireItem.maxSizeInKiBs).isEqualTo(BigDecimal(5120))
   }
 
   @Test
-  fun maxSize_shouldReturnMebibytes() {
-    val questionnaire =
+  fun `should return max size in mebibytes`() {
+    val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
       }
-    assertThat(questionnaire.maxSizeInMiB).isEqualTo(BigDecimal(5))
+    assertThat(questionnaireItem.maxSizeInMiBs).isEqualTo(BigDecimal(5))
   }
 
   @Test
-  fun maxSizeInByte_missingExtension_shouldReturnNull() {
-    val questionnaire = Questionnaire.QuestionnaireItemComponent()
-    assertThat(questionnaire.maxSizeInByte).isNull()
+  fun `should return null for max size in bytes`() {
+    assertThat(Questionnaire.QuestionnaireItemComponent().maxSizeInBytes).isNull()
   }
 
   @Test
-  fun maxSizeInKiB_missingExtension_shouldReturnNull() {
-    val questionnaire = Questionnaire.QuestionnaireItemComponent()
-    assertThat(questionnaire.maxSizeInKiB).isNull()
+  fun `should return null for max size in kibibytes`() {
+    assertThat(Questionnaire.QuestionnaireItemComponent().maxSizeInKiBs).isNull()
   }
 
   @Test
-  fun maxSizeInMiB_missingExtension_shouldReturnNull() {
-    val questionnaire = Questionnaire.QuestionnaireItemComponent()
-    assertThat(questionnaire.maxSizeInMiB).isNull()
+  fun `should return null for max size in mebibytes`() {
+    assertThat(Questionnaire.QuestionnaireItemComponent().maxSizeInMiBs).isNull()
   }
 
   @Test

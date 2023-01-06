@@ -189,29 +189,23 @@ internal val Questionnaire.QuestionnaireItemComponent.mimeTypes: List<String>
 
 internal const val EXTENSION_MAX_SIZE = "http://hl7.org/fhir/StructureDefinition/maxSize"
 
-/** Maximum size an attachment can be. Unit in Bytes. */
-internal val Questionnaire.QuestionnaireItemComponent.maxSizeInByte: BigDecimal?
-  get() {
-    return (extension.firstOrNull { it.url == EXTENSION_MAX_SIZE }?.valueAsPrimitive
-        as DecimalType?)
+/** The maximum size of an attachment in Bytes. */
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInBytes: BigDecimal?
+  get() =
+    (extension.firstOrNull { it.url == EXTENSION_MAX_SIZE }?.valueAsPrimitive as DecimalType?)
       ?.value
-  }
 
 private val BYTES_PER_KIB = BigDecimal(1024)
 
 /** The maximum size of an attachment in Kibibytes. */
-internal val Questionnaire.QuestionnaireItemComponent.maxSizeInKiB: BigDecimal?
-  get() {
-    return maxSizeInByte?.div(BYTES_PER_KIB)
-  }
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInKiBs: BigDecimal?
+  get() = maxSizeInBytes?.div(BYTES_PER_KIB)
 
 private val BYTES_PER_MIB = BigDecimal(1048576)
 
 /** The maximum size of an attachment in Mebibytes. */
-internal val Questionnaire.QuestionnaireItemComponent.maxSizeInMiB: BigDecimal?
-  get() {
-    return maxSizeInByte?.div(BYTES_PER_MIB)
-  }
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInMiBs: BigDecimal?
+  get() = maxSizeInBytes?.div(BYTES_PER_MIB)
 
 /** UI controls relevant to rendering questionnaire items. */
 internal enum class DisplayItemControlType(val extensionCode: String) {
