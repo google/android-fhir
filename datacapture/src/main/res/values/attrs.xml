@@ -87,9 +87,9 @@
         name="questionnaireAttachmentTakePhotoButtonStyle"
         format="reference"
     />
-    <!--   Style for attachment select file button. -->
+    <!--   Style for attachment action button. -->
     <attr
-        name="questionnaireAttachmentSelectFileButtonStyle"
+        name="questionnaireAttachmentActionButtonStyle"
         format="reference"
     />
     <!--   Style for attachment delete button. -->

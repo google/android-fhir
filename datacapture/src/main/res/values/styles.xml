@@ -127,8 +127,8 @@
         >@style/Questionnaire.AttachmentTakePhotoButtonStyle
         </item>
         <item
-            name="questionnaireAttachmentSelectFileButtonStyle"
-        >@style/Questionnaire.AttachmentSelectFileButtonStyle
+            name="questionnaireAttachmentActionButtonStyle"
+        >@style/Questionnaire.AttachmentActionButtonStyle
         </item>
         <item
             name="questionnaireAttachmentDeleteButtonStyle"
@@ -289,13 +289,13 @@
         name="Questionnaire.AttachmentTakePhotoButtonStyle"
         parent="Widget.Material3.Button.OutlinedButton"
     >
-        <item name="android:drawableLeft">@drawable/camera</item>
+        <item name="android:drawableLeft">@drawable/ic_camera</item>
         <item name="android:drawableTint">?attr/colorPrimary</item>
         <item name="android:text">@string/take_photo</item>
     </style>
 
     <style
-        name="Questionnaire.AttachmentSelectFileButtonStyle"
+        name="Questionnaire.AttachmentActionButtonStyle"
         parent="Widget.Material3.Button.OutlinedButton"
     >
         <item name="android:drawableTint">?attr/colorPrimary</item>
@@ -312,7 +312,7 @@
         name="Questionnaire.AttachmentDeleteButtonStyle"
         parent="Widget.Material3.Button.OutlinedButton"
     >
-        <item name="android:drawableLeft">@drawable/delete</item>
+        <item name="android:drawableLeft">@drawable/ic_delete</item>
         <item name="android:drawableTint">?attr/colorError</item>
         <item name="android:textColor">?attr/colorError</item>
     </style>

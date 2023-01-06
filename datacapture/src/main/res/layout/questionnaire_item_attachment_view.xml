@@ -56,7 +56,7 @@
             android:drawableLeft="@drawable/ic_image_file"
             android:text="@string/upload_photo"
             android:visibility="gone"
-            style="?attr/questionnaireAttachmentSelectFileButtonStyle"
+            style="?attr/questionnaireAttachmentActionButtonStyle"
             android:paddingHorizontal="@dimen/padding_default"
         />
 
@@ -68,7 +68,7 @@
             android:drawableLeft="@drawable/ic_audio_file"
             android:text="@string/upload_audio"
             android:visibility="gone"
-            style="?attr/questionnaireAttachmentSelectFileButtonStyle"
+            style="?attr/questionnaireAttachmentActionButtonStyle"
             android:paddingHorizontal="@dimen/padding_default"
         />
 
@@ -80,7 +80,7 @@
             android:drawableLeft="@drawable/ic_video_file"
             android:text="@string/upload_video"
             android:visibility="gone"
-            style="?attr/questionnaireAttachmentSelectFileButtonStyle"
+            style="?attr/questionnaireAttachmentActionButtonStyle"
             android:paddingHorizontal="@dimen/padding_default"
         />
 
@@ -92,7 +92,7 @@
             android:drawableLeft="@drawable/ic_document_file"
             android:text="@string/upload_document"
             android:visibility="gone"
-            style="?attr/questionnaireAttachmentSelectFileButtonStyle"
+            style="?attr/questionnaireAttachmentActionButtonStyle"
             android:paddingHorizontal="@dimen/padding_default"
         />
 
@@ -104,7 +104,7 @@
             android:drawableLeft="@drawable/ic_file"
             android:text="@string/upload_file"
             android:visibility="gone"
-            style="?attr/questionnaireAttachmentSelectFileButtonStyle"
+            style="?attr/questionnaireAttachmentActionButtonStyle"
             android:paddingHorizontal="@dimen/padding_default"
         />
 
