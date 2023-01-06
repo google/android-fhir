@@ -96,7 +96,11 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         displayTakePhotoButton(questionnaireItem)
         displayActionButton(questionnaireItem)
         takePhotoButton.setOnClickListener { onTakePhotoClicked(questionnaireItem) }
-        uploadDocumentButton.setOnClickListener { onSelectFileClicked(questionnaireItem) }
+        uploadPhotoButton.setOnClickListener { onUploadClicked(questionnaireItem) }
+        uploadAudioButton.setOnClickListener { onUploadClicked(questionnaireItem) }
+        uploadVideoButton.setOnClickListener { onUploadClicked(questionnaireItem) }
+        uploadDocumentButton.setOnClickListener { onUploadClicked(questionnaireItem) }
+        uploadFileButton.setOnClickListener { onUploadClicked(questionnaireItem) }
         deleteButton.setOnClickListener { onDeleteClicked() }
       }
 
