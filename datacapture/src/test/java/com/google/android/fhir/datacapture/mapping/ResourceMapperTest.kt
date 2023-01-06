@@ -20,6 +20,7 @@ import android.app.Application
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.views.localDate
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -62,7 +63,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class ResourceMapperTest {
   private val context = ApplicationProvider.getApplicationContext<Application>()
-  private val iParser = FhirContext.forR4().newJsonParser()
+  private val iParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
   @Test
   fun `extract() should perform definition-based extraction`() = runBlocking {
