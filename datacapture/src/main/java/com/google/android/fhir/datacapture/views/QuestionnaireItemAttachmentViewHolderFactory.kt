@@ -142,17 +142,17 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
       private fun displayUploadButton(questionnaireItem: QuestionnaireItemComponent) {
         when {
-          questionnaireItem.hasMimeTypeOnly(MimeType.IMAGE.value) -> {
-            uploadPhotoButton.visibility = View.VISIBLE
-          }
           questionnaireItem.hasMimeTypeOnly(MimeType.AUDIO.value) -> {
             uploadAudioButton.visibility = View.VISIBLE
           }
-          questionnaireItem.hasMimeTypeOnly(MimeType.VIDEO.value) -> {
-            uploadVideoButton.visibility = View.VISIBLE
-          }
           questionnaireItem.hasMimeTypeOnly(MimeType.DOCUMENT.value) -> {
             uploadDocumentButton.visibility = View.VISIBLE
+          }
+          questionnaireItem.hasMimeTypeOnly(MimeType.IMAGE.value) -> {
+            uploadPhotoButton.visibility = View.VISIBLE
+          }
+          questionnaireItem.hasMimeTypeOnly(MimeType.VIDEO.value) -> {
+            uploadVideoButton.visibility = View.VISIBLE
           }
           else -> {
             uploadFileButton.visibility = View.VISIBLE
@@ -283,6 +283,14 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         attachmentUri: Uri? = null
       ) {
         when (attachmentType) {
+          MimeType.AUDIO.value -> {
+            loadFilePreview(R.drawable.ic_audio_file, attachmentTitle)
+            clearPhotoPreview()
+          }
+          MimeType.DOCUMENT.value -> {
+            loadFilePreview(R.drawable.ic_document_file, attachmentTitle)
+            clearPhotoPreview()
+          }
           MimeType.IMAGE.value -> {
             if (attachmentByteArray != null) {
               loadPhotoPreview(attachmentByteArray)
@@ -291,16 +299,8 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             }
             clearFilePreview()
           }
-          MimeType.DOCUMENT.value -> {
-            loadFilePreview(R.drawable.ic_document_file, attachmentTitle)
-            clearPhotoPreview()
-          }
           MimeType.VIDEO.value -> {
             loadFilePreview(R.drawable.ic_video_file, attachmentTitle)
-            clearPhotoPreview()
-          }
-          MimeType.AUDIO.value -> {
-            loadFilePreview(R.drawable.ic_audio_file, attachmentTitle)
             clearPhotoPreview()
           }
         }
@@ -359,34 +359,34 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
       private fun displaySnackbarOnUpload(view: View, attachmentType: String) {
         when (attachmentType) {
-          MimeType.IMAGE.value -> {
-            displaySnackbar(view, R.string.image_uploaded)
+          MimeType.AUDIO.value -> {
+            displaySnackbar(view, R.string.audio_uploaded)
           }
           MimeType.DOCUMENT.value -> {
             displaySnackbar(view, R.string.file_uploaded)
           }
+          MimeType.IMAGE.value -> {
+            displaySnackbar(view, R.string.image_uploaded)
+          }
           MimeType.VIDEO.value -> {
             displaySnackbar(view, R.string.video_uploaded)
-          }
-          MimeType.AUDIO.value -> {
-            displaySnackbar(view, R.string.audio_uploaded)
           }
         }
       }
 
       private fun displaySnackbarOnDelete(view: View, attachmentType: String) {
         when (attachmentType) {
-          MimeType.IMAGE.value -> {
-            displaySnackbar(view, R.string.image_deleted)
+          MimeType.AUDIO.value -> {
+            displaySnackbar(view, R.string.audio_deleted)
           }
           MimeType.DOCUMENT.value -> {
             displaySnackbar(view, R.string.file_deleted)
           }
+          MimeType.IMAGE.value -> {
+            displaySnackbar(view, R.string.image_deleted)
+          }
           MimeType.VIDEO.value -> {
             displaySnackbar(view, R.string.video_deleted)
-          }
-          MimeType.AUDIO.value -> {
-            displaySnackbar(view, R.string.audio_deleted)
           }
         }
       }
