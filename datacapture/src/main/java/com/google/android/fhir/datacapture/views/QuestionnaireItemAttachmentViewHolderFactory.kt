@@ -115,37 +115,44 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
-        if (isReadOnly) {
-          takePhotoButton.isClickable = false
-          takePhotoButton.alpha = 0.6F
-          uploadPhotoButton.isClickable = false
-          uploadPhotoButton.alpha = 0.6F
-          uploadAudioButton.isClickable = false
-          uploadAudioButton.alpha = 0.6F
-          uploadVideoButton.isClickable = false
-          uploadVideoButton.alpha = 0.6F
-          uploadDocumentButton.isClickable = false
-          uploadDocumentButton.alpha = 0.6F
-          uploadFileButton.isClickable = false
-          uploadFileButton.alpha = 0.6F
-          deleteButton.isClickable = false
-          deleteButton.alpha = 0.6F
-        } else {
-          takePhotoButton.isClickable = true
-          takePhotoButton.alpha = 1F
-          uploadPhotoButton.isClickable = true
-          uploadPhotoButton.alpha = 1F
-          uploadAudioButton.isClickable = true
-          uploadAudioButton.alpha = 1F
-          uploadVideoButton.isClickable = true
-          uploadVideoButton.alpha = 1F
-          uploadDocumentButton.isClickable = true
-          uploadDocumentButton.alpha = 1F
-          uploadFileButton.isClickable = true
-          uploadFileButton.alpha = 1F
-          deleteButton.isClickable = true
-          deleteButton.alpha = 1F
-        }
+        takePhotoButton.isEnabled = !isReadOnly
+        uploadPhotoButton.isEnabled = !isReadOnly
+        uploadAudioButton.isEnabled = !isReadOnly
+        uploadVideoButton.isEnabled = !isReadOnly
+        uploadDocumentButton.isEnabled = !isReadOnly
+        uploadFileButton.isEnabled = !isReadOnly
+        deleteButton.isEnabled = !isReadOnly
+        //        if (isReadOnly) {
+        //          takePhotoButton.isClickable = false
+        //          takePhotoButton.alpha = 0.6F
+        //          uploadPhotoButton.isClickable = false
+        //          uploadPhotoButton.alpha = 0.6F
+        //          uploadAudioButton.isClickable = false
+        //          uploadAudioButton.alpha = 0.6F
+        //          uploadVideoButton.isClickable = false
+        //          uploadVideoButton.alpha = 0.6F
+        //          uploadDocumentButton.isClickable = false
+        //          uploadDocumentButton.alpha = 0.6F
+        //          uploadFileButton.isClickable = false
+        //          uploadFileButton.alpha = 0.6F
+        //          deleteButton.isClickable = false
+        //          deleteButton.alpha = 0.6F
+        //        } else {
+        //          takePhotoButton.isClickable = true
+        //          takePhotoButton.alpha = 1F
+        //          uploadPhotoButton.isClickable = true
+        //          uploadPhotoButton.alpha = 1F
+        //          uploadAudioButton.isClickable = true
+        //          uploadAudioButton.alpha = 1F
+        //          uploadVideoButton.isClickable = true
+        //          uploadVideoButton.alpha = 1F
+        //          uploadDocumentButton.isClickable = true
+        //          uploadDocumentButton.alpha = 1F
+        //          uploadFileButton.isClickable = true
+        //          uploadFileButton.alpha = 1F
+        //          deleteButton.isClickable = true
+        //          deleteButton.alpha = 1F
+        //        }
       }
 
       private fun displayInitialPreview() {
