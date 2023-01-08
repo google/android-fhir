@@ -301,10 +301,7 @@
         <item name="android:drawableTint">?attr/colorPrimary</item>
     </style>
 
-    <style
-        name="Questionnaire.AttachmentPreviewIconStyle"
-        parent="Widget.Material3.Button.OutlinedButton"
-    >
+    <style name="Questionnaire.AttachmentPreviewIconStyle" parent="">
         <item name="android:tint">?attr/colorPrimary</item>
     </style>
 
