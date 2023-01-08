@@ -289,8 +289,9 @@
         name="Questionnaire.AttachmentTakePhotoButtonStyle"
         parent="Widget.Material3.Button.OutlinedButton"
     >
-        <item name="android:drawableLeft">@drawable/ic_camera</item>
-        <item name="android:drawableTint">?attr/colorPrimary</item>
+        <item name="icon">@drawable/ic_camera</item>
+        <item name="iconTint">?attr/colorPrimary</item>
+        <item name="iconSize">@dimen/attachment_icon_button_size</item>
         <item name="android:text">@string/take_photo</item>
     </style>
 
@@ -298,7 +299,8 @@
         name="Questionnaire.AttachmentUploadButtonStyle"
         parent="Widget.Material3.Button.OutlinedButton"
     >
-        <item name="android:drawableTint">?attr/colorPrimary</item>
+        <item name="iconTint">?attr/colorPrimary</item>
+        <item name="iconSize">@dimen/attachment_icon_button_size</item>
     </style>
 
     <style name="Questionnaire.AttachmentPreviewIconStyle" parent="">

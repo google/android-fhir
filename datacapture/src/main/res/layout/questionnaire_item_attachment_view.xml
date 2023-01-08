@@ -16,6 +16,7 @@
 -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/padding_default"
@@ -62,10 +63,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/padding_half_size"
-            android:drawableLeft="@drawable/ic_image_file"
             android:paddingHorizontal="@dimen/padding_default"
             android:text="@string/upload_photo"
             android:visibility="gone"
+            app:icon="@drawable/ic_image_file"
         />
 
         <Button
@@ -74,10 +75,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/padding_half_size"
-            android:drawableLeft="@drawable/ic_audio_file"
             android:paddingHorizontal="@dimen/padding_default"
             android:text="@string/upload_audio"
             android:visibility="gone"
+            app:icon="@drawable/ic_audio_file"
         />
 
         <Button
@@ -86,10 +87,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/padding_half_size"
-            android:drawableLeft="@drawable/ic_video_file"
             android:paddingHorizontal="@dimen/padding_default"
             android:text="@string/upload_video"
             android:visibility="gone"
+            app:icon="@drawable/ic_video_file"
         />
 
         <Button
@@ -98,10 +99,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/padding_half_size"
-            android:drawableLeft="@drawable/ic_document_file"
             android:paddingHorizontal="@dimen/padding_default"
             android:text="@string/upload_document"
             android:visibility="gone"
+            app:icon="@drawable/ic_document_file"
         />
 
         <Button
@@ -110,10 +111,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/padding_half_size"
-            android:drawableLeft="@drawable/ic_file"
             android:paddingHorizontal="@dimen/padding_default"
             android:text="@string/upload_file"
             android:visibility="gone"
+            app:icon="@drawable/ic_file"
         />
 
     </LinearLayout>
@@ -131,7 +132,6 @@
     />
 
     <LinearLayout
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/file_preview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
