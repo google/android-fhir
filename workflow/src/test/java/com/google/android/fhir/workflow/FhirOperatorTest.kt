@@ -98,6 +98,26 @@ class FhirOperatorTest {
   }
 
   @Test
+  fun generateCarePlanWithoutEncounter() = runBlocking {
+    loadBundle(parseJson("/plan-definition/med-request/med_request_patient.json"))
+    loadBundle(parseJson("/plan-definition/med-request/med_request_plan_definition.json"))
+
+    val carePlan =
+      fhirOperator.generateCarePlan(
+        planDefinitionId = "MedRequest-Example",
+        patientId = "Patient/Patient-Example"
+      )
+
+    println(jsonParser.encodeResourceToString(carePlan))
+
+    JSONAssert.assertEquals(
+      readResourceAsString("/plan-definition/med-request/med_request_careplan.json"),
+      jsonParser.encodeResourceToString(carePlan),
+      true
+    )
+  }
+
+  @Test
   fun evaluatePopulationMeasure() = runBlocking {
     loadBundle(libraryBundle)
     fhirEngine.run {

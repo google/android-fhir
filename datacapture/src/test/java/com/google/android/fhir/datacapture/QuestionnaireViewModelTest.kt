@@ -28,13 +28,13 @@ import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_READ_ONLY
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import com.google.android.fhir.logicalId
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
@@ -61,7 +61,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.ValueSet
 import org.hl7.fhir.r4.utils.ToolingExtensions
-import org.junit.Assert
+import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
@@ -1150,10 +1150,15 @@ class QuestionnaireViewModelTest {
         createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
       val questionnaireItemViewItem = questionnaireViewModel.questionnaireStateFlow.first()
-      assertThat(questionnaireItemViewItem.items.first().questionnaireItem.linkId)
+      assertThat(questionnaireItemViewItem.items.first().asQuestion().questionnaireItem.linkId)
         .isEqualTo(questionnaireResponseWithMissingItem.item.first().linkId)
       assertThat(
-          questionnaireItemViewItem.items.single().answers.single().valueBooleanType.booleanValue()
+          questionnaireItemViewItem.items
+            .single()
+            .asQuestion()
+            .answers
+            .single()
+            .valueBooleanType.booleanValue()
         )
         .isTrue()
     }
@@ -1211,19 +1216,19 @@ class QuestionnaireViewModelTest {
         questionnaireViewModel.questionnaireStateFlow.first().items
 
       // Answer to first question should be created from questionnaire
-      val questionnaireItemViewItem1 = questionnaireItemViewItemList[0]
+      val questionnaireItemViewItem1 = questionnaireItemViewItemList[0].asQuestion()
       assertThat(questionnaireItemViewItem1.questionnaireItem.linkId).isEqualTo("q1")
       assertThat(questionnaireItemViewItem1.answers.single().valueBooleanType.booleanValue())
         .isFalse()
 
       // Answer to second question should be copied from questionnaire response
-      val questionnaireItemViewItem2 = questionnaireItemViewItemList[1]
+      val questionnaireItemViewItem2 = questionnaireItemViewItemList[1].asQuestion()
       assertThat(questionnaireItemViewItem2.questionnaireItem.linkId).isEqualTo("q2")
       assertThat(questionnaireItemViewItem2.answers.single().valueBooleanType.booleanValue())
         .isTrue()
 
       // Answer to third quesiton should be created from questionnaire
-      val questionnaireItemViewItem3 = questionnaireItemViewItemList[2]
+      val questionnaireItemViewItem3 = questionnaireItemViewItemList[2].asQuestion()
       assertThat(questionnaireItemViewItem3.questionnaireItem.linkId).isEqualTo("q3")
       assertThat(questionnaireItemViewItem3.answers.single().valueBooleanType.booleanValue())
         .isFalse()
@@ -1255,12 +1260,12 @@ class QuestionnaireViewModelTest {
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
     assertThat(questionnaireItemViewItemList).hasSize(2)
 
-    val firstQuestionnaireItem = questionnaireItemViewItemList[0].questionnaireItem
+    val firstQuestionnaireItem = questionnaireItemViewItemList[0].asQuestion().questionnaireItem
     assertThat(firstQuestionnaireItem.linkId).isEqualTo("a-link-id")
     assertThat(firstQuestionnaireItem.text).isEqualTo("Basic questions")
     assertThat(firstQuestionnaireItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.GROUP)
 
-    val secondQuestionnaireItem = questionnaireItemViewItemList[1].questionnaireItem
+    val secondQuestionnaireItem = questionnaireItemViewItemList[1].asQuestion().questionnaireItem
     assertThat(secondQuestionnaireItem.linkId).isEqualTo("another-link-id")
     assertThat(secondQuestionnaireItem.text).isEqualTo("Name?")
     assertThat(secondQuestionnaireItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.STRING)
@@ -1282,7 +1287,8 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    assertThat(questionnaireItemViewItemList.single().validationResult).isEqualTo(NotValidated)
+    assertThat(questionnaireItemViewItemList.single().asQuestion().validationResult)
+      .isEqualTo(NotValidated)
   }
 
   @Test
@@ -1303,8 +1309,9 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     viewModel.runViewModelBlocking {
-      viewModel.getQuestionnaireItemViewItemList().single().clearAnswer()
-      assertThat(viewModel.getQuestionnaireItemViewItemList().single().validationResult)
+      val question = viewModel.getQuestionnaireItemViewItemList().single().asQuestion()
+      question.clearAnswer()
+      assertThat(question.validationResult)
         .isEqualTo(Invalid(listOf("Missing answer for required field.")))
     }
   }
@@ -1335,7 +1342,9 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
+    assertThat(
+        viewModel.getQuestionnaireItemViewItemList().single().asQuestion().questionnaireItem.linkId
+      )
       .isEqualTo("question-1")
   }
 
@@ -1368,8 +1377,10 @@ class QuestionnaireViewModelTest {
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
 
     assertThat(questionnaireItemViewItemList).hasSize(2)
-    assertThat(questionnaireItemViewItemList[0].questionnaireItem.linkId).isEqualTo("question-1")
-    assertThat(questionnaireItemViewItemList[1].questionnaireItem.linkId).isEqualTo("question-2")
+    assertThat(questionnaireItemViewItemList[0].asQuestion().questionnaireItem.linkId)
+      .isEqualTo("question-1")
+    assertThat(questionnaireItemViewItemList[1].asQuestion().questionnaireItem.linkId)
+      .isEqualTo("question-2")
   }
 
   @Test
@@ -1417,7 +1428,9 @@ class QuestionnaireViewModelTest {
 
     val viewModel = QuestionnaireViewModel(context, state)
 
-    assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
+    assertThat(
+        viewModel.getQuestionnaireItemViewItemList().single().asQuestion().questionnaireItem.linkId
+      )
       .isEqualTo("a-boolean-item-1")
   }
 
@@ -1444,7 +1457,13 @@ class QuestionnaireViewModelTest {
 
       val viewModel = QuestionnaireViewModel(context, state)
 
-      assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
+      assertThat(
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .single()
+            .asQuestion()
+            .questionnaireItem.linkId
+        )
         .isEqualTo("a-boolean-item-1")
     }
 
@@ -1493,7 +1512,9 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     viewModel
-      .getQuestionnaireItemViewItemList()[1].setAnswer(
+      .getQuestionnaireItemViewItemList()[1]
+      .asQuestion()
+      .setAnswer(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
           this.value = valueBooleanType.setValue(false)
         }
@@ -1556,32 +1577,44 @@ class QuestionnaireViewModelTest {
 
     fun repeatedGroupA() =
       viewModel.getQuestionnaireItemViewItemList().single {
-        it.questionnaireItem.linkId == "repeated-group-a"
+        it.asQuestion().questionnaireItem.linkId == "repeated-group-a"
       }
 
     fun repeatedGroupB() =
       viewModel.getQuestionnaireItemViewItemList().single {
-        it.questionnaireItem.linkId == "repeated-group-b"
+        it.asQuestion().questionnaireItem.linkId == "repeated-group-b"
       }
     viewModel.runViewModelBlocking {
       // Calling addAnswer out of order should not result in the answers in the response being out
       // of order; all of the answers to repeated-group-a should come before repeated-group-b.
       repeat(times = 2) {
         repeatedGroupA()
+          .asQuestion()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              item = repeatedGroupA().questionnaireItem.getNestedQuestionnaireResponseItems()
+              item =
+                repeatedGroupA()
+                  .asQuestion()
+                  .questionnaireItem.getNestedQuestionnaireResponseItems()
             }
           )
         repeatedGroupB()
+          .asQuestion()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              item = repeatedGroupB().questionnaireItem.getNestedQuestionnaireResponseItems()
+              item =
+                repeatedGroupB()
+                  .asQuestion()
+                  .questionnaireItem.getNestedQuestionnaireResponseItems()
             }
           )
       }
 
-      assertThat(viewModel.getQuestionnaireItemViewItemList().map { it.questionnaireItem.linkId })
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList().map {
+            it.asQuestion().questionnaireItem.linkId
+          }
+        )
         .containsExactly(
           "repeated-group-a",
           "nested-item-a",
@@ -1726,13 +1759,17 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     viewModel
-      .getQuestionnaireItemViewItemList()[0].setAnswer(
+      .getQuestionnaireItemViewItemList()[0]
+      .asQuestion()
+      .setAnswer(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
           this.value = valueBooleanType.setValue(false)
         }
       )
     viewModel
-      .getQuestionnaireItemViewItemList()[1].setAnswer(
+      .getQuestionnaireItemViewItemList()[1]
+      .asQuestion()
+      .setAnswer(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
           this.value = valueBooleanType.setValue(false)
         }
@@ -1780,7 +1817,7 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire)
       val state = viewModel.questionnaireStateFlow.first()
-      assertThat(state.pagination)
+      assertThat((state.displayMode as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -1793,11 +1830,11 @@ class QuestionnaireViewModelTest {
           )
         )
       assertThat(state.items).hasSize(2)
-      state.items[0].questionnaireItem.let { groupItem ->
+      state.items[0].asQuestion().questionnaireItem.let { groupItem ->
         assertThat(groupItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.GROUP)
         assertThat(groupItem.linkId).isEqualTo("page1")
       }
-      state.items[1].questionnaireItem.let { questionItem ->
+      state.items[1].asQuestion().questionnaireItem.let { questionItem ->
         assertThat(questionItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.BOOLEAN)
         assertThat(questionItem.linkId).isEqualTo("page1-1")
         assertThat(questionItem.text).isEqualTo("Question on page 1")
@@ -1841,7 +1878,7 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -1894,7 +1931,7 @@ class QuestionnaireViewModelTest {
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       viewModel.goToPreviousPage()
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -1965,7 +2002,7 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2032,7 +2069,7 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2100,7 +2137,7 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2160,7 +2197,7 @@ class QuestionnaireViewModelTest {
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2217,7 +2254,7 @@ class QuestionnaireViewModelTest {
       viewModel.goToPreviousPage()
 
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2271,7 +2308,7 @@ class QuestionnaireViewModelTest {
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
 
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2505,7 +2542,7 @@ class QuestionnaireViewModelTest {
       viewModel.goToNextPage()
 
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2559,7 +2596,7 @@ class QuestionnaireViewModelTest {
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
 
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2615,7 +2652,7 @@ class QuestionnaireViewModelTest {
       viewModel.goToNextPage()
       viewModel.goToPreviousPage()
 
-      assertThat(viewModel.questionnaireStateFlow.value.pagination)
+      assertThat((viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination)
         .isEqualTo(
           QuestionnairePagination(
             isPaginated = true,
@@ -2742,7 +2779,9 @@ class QuestionnaireViewModelTest {
 
     val viewModel = QuestionnaireViewModel(context, state)
 
-    assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireItem.linkId)
+    assertThat(
+        viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
+      )
       .isEqualTo("nested-display-question")
   }
 
@@ -2789,7 +2828,9 @@ class QuestionnaireViewModelTest {
 
       val viewModel = QuestionnaireViewModel(context, state)
 
-      assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireItem.linkId)
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
+        )
         .isEqualTo("parent-question")
     }
 
@@ -2836,7 +2877,9 @@ class QuestionnaireViewModelTest {
 
       val viewModel = QuestionnaireViewModel(context, state)
 
-      assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireItem.linkId)
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
+        )
         .isEqualTo("parent-question")
     }
 
@@ -2883,7 +2926,9 @@ class QuestionnaireViewModelTest {
 
       val viewModel = QuestionnaireViewModel(context, state)
 
-      assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireItem.linkId)
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
+        )
         .isEqualTo("parent-question")
     }
 
@@ -2893,13 +2938,13 @@ class QuestionnaireViewModelTest {
   fun `resolveAnswerExpression() should return questionnaire item answer options for answer expression and choice column`() =
     runBlocking {
       val practitioner =
-        Practitioner()
-          .apply {
-            id = UUID.randomUUID().toString()
-            active = true
-            addName(HumanName().apply { this.family = "John" })
-          }
-          .also { fhirEngine.create(it) }
+        Practitioner().apply {
+          id = UUID.randomUUID().toString()
+          active = true
+          addName(HumanName().apply { this.family = "John" })
+        }
+      ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+        .dataCaptureConfiguration = DataCaptureConfig(xFhirQueryResolver = { listOf(practitioner) })
 
       val questionnaire =
         Questionnaire().apply {
@@ -2938,6 +2983,47 @@ class QuestionnaireViewModelTest {
         .isEqualTo("Practitioner/${practitioner.logicalId}")
     }
 
+  @Test
+  fun `resolveAnswerExpression() should throw exception when XFhirQueryResolver is not provided`() {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a"
+            text = "answer expression question text"
+            type = Questionnaire.QuestionnaireItemType.REFERENCE
+            extension =
+              listOf(
+                Extension(
+                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                  Expression().apply {
+                    this.expression = "Practitioner?active=true"
+                    this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                  }
+                ),
+                Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
+                  )
+                  .apply {
+                    this.addExtension(Extension("path", StringType("id")))
+                    this.addExtension(Extension("label", StringType("name")))
+                    this.addExtension(Extension("forDisplay", BooleanType(true)))
+                  }
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    val viewModel = QuestionnaireViewModel(context, state)
+    val exception =
+      assertThrows(null, IllegalStateException::class.java) {
+        runBlocking { viewModel.resolveAnswerExpression(questionnaire.itemFirstRep) }
+      }
+    assertThat(exception.message)
+      .isEqualTo(
+        "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
+      )
+  }
   // Test cases for submit button
 
   @Test
@@ -2955,7 +3041,11 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire)
       viewModel.setShowSubmitButtonFlag(false)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showSubmitButton).isFalse()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showSubmitButton
+        )
+        .isFalse()
     }
   }
 
@@ -2974,14 +3064,18 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire)
       viewModel.setShowSubmitButtonFlag(true)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showSubmitButton).isTrue()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showSubmitButton
+        )
+        .isTrue()
     }
   }
 
   // Test cases for review mode
 
   @Test
-  fun `state has review feature and submit button to true should show submit button when moved to review page`() {
+  fun `state has review feature and submit button to true should move to review page`() {
     runBlocking {
       val questionnaire =
         Questionnaire().apply {
@@ -2996,7 +3090,8 @@ class QuestionnaireViewModelTest {
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
       viewModel.setShowSubmitButtonFlag(true)
       viewModel.setReviewMode(true)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showSubmitButton).isTrue()
+      assertThat(viewModel.questionnaireStateFlow.first().displayMode)
+        .isInstanceOf(DisplayMode.ReviewMode::class.java)
     }
   }
 
@@ -3014,7 +3109,11 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isFalse()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isFalse()
     }
   }
 
@@ -3032,12 +3131,16 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isTrue()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isTrue()
     }
   }
 
   @Test
-  fun `state has review feature and show review page first should not show review button`() {
+  fun `state has review feature and show review page first should be in review mode`() {
     runBlocking {
       val questionnaire =
         Questionnaire().apply {
@@ -3055,7 +3158,12 @@ class QuestionnaireViewModelTest {
           enableReviewPage = true,
           showReviewPageFirst = true
         )
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isFalse()
+
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.ReviewMode)
+            .showEditButton
+        )
+        .isTrue()
     }
   }
 
@@ -3078,7 +3186,11 @@ class QuestionnaireViewModelTest {
           enableReviewPage = false,
           showReviewPageFirst = true
         )
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isFalse()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isFalse()
     }
   }
 
@@ -3121,7 +3233,11 @@ class QuestionnaireViewModelTest {
       viewModel.runViewModelBlocking {
         viewModel.goToNextPage()
 
-        assertThat(viewModel.questionnaireStateFlow.value.pagination.showReviewButton).isFalse()
+        assertThat(
+            (viewModel.questionnaireStateFlow.value as DisplayMode.EditMode)
+              .pagination.showReviewButton
+          )
+          .isFalse()
       }
     }
 
@@ -3163,7 +3279,11 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
 
-      assertThat(viewModel.questionnaireStateFlow.value.pagination.showReviewButton).isFalse()
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isFalse()
     }
 
   @Test
@@ -3205,7 +3325,11 @@ class QuestionnaireViewModelTest {
       viewModel.runViewModelBlocking {
         viewModel.goToNextPage()
 
-        assertThat(viewModel.questionnaireStateFlow.value.pagination.showReviewButton).isTrue()
+        assertThat(
+            (viewModel.questionnaireStateFlow.value as DisplayMode.EditMode)
+              .pagination.showReviewButton
+          )
+          .isTrue()
       }
     }
 
@@ -3247,7 +3371,11 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
 
-      assertThat(viewModel.questionnaireStateFlow.value.pagination.showReviewButton).isTrue()
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isTrue()
     }
 
   @Test
@@ -3265,12 +3393,16 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
       viewModel.setReviewMode(false)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isTrue()
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isTrue()
     }
   }
 
   @Test
-  fun `toggle review mode to true should not show review button`() {
+  fun `toggle review mode to true should show edit button only`() {
     runBlocking {
       val questionnaire =
         Questionnaire().apply {
@@ -3284,9 +3416,41 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
       viewModel.setReviewMode(true)
-      assertThat(viewModel.questionnaireStateFlow.first().pagination.showReviewButton).isFalse()
+
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.ReviewMode)
+            .showEditButton
+        )
+        .isTrue()
     }
   }
+
+  // Read-only mode
+
+  @Test
+  fun `read-only mode should not show edit button`() {
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-link-id"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            }
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire, readOnlyMode = true)
+
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.ReviewMode)
+            .showEditButton
+        )
+        .isFalse()
+    }
+  }
+
+  // Other test cases
 
   @Test
   fun `should calculate value on start for questionnaire item with calculated expression extension`() =
@@ -3375,15 +3539,17 @@ class QuestionnaireViewModelTest {
       val viewModel = createQuestionnaireViewModel(questionnaire)
 
       val birthdateItem =
-        viewModel.getQuestionnaireItemViewItemList().first {
-          it.questionnaireItem.linkId == "a-birthdate"
-        }
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-birthdate" }
+          .asQuestion()
 
       assertThat(birthdateItem.getQuestionnaireResponseItem().answer).isEmpty()
 
       viewModel
         .getQuestionnaireItemViewItemList()
-        .first { it.questionnaireItem.linkId == "a-age-years" }
+        .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-age-years" }
+        .asQuestion()
         .apply {
           this.answersChangedCallback(
             this.questionnaireItem,
@@ -3434,9 +3600,10 @@ class QuestionnaireViewModelTest {
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
       val birthdateItem =
-        viewModel.getQuestionnaireItemViewItemList().first {
-          it.questionnaireItem.linkId == "a-birthdate"
-        }
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-birthdate" }
+          .asQuestion()
       val birthdateValue = DateType(Date())
       birthdateItem.apply {
         this.answersChangedCallback(
@@ -3457,7 +3624,8 @@ class QuestionnaireViewModelTest {
 
       viewModel
         .getQuestionnaireItemViewItemList()
-        .first { it.questionnaireItem.linkId == "a-age-years" }
+        .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-age-years" }
+        .asQuestion()
         .apply {
           this.answersChangedCallback(
             this.questionnaireItem,
@@ -3523,7 +3691,7 @@ class QuestionnaireViewModelTest {
         }
 
       val exception =
-        Assert.assertThrows(null, IllegalStateException::class.java) {
+        assertThrows(null, IllegalStateException::class.java) {
           createQuestionnaireViewModel(questionnaire)
         }
       assertThat(exception.message)
@@ -3588,7 +3756,7 @@ class QuestionnaireViewModelTest {
         }
 
       val exception =
-        Assert.assertThrows(null, IllegalStateException::class.java) {
+        assertThrows(null, IllegalStateException::class.java) {
           createQuestionnaireViewModel(questionnaire)
         }
       assertThat(exception.message)
@@ -3602,6 +3770,7 @@ class QuestionnaireViewModelTest {
     questionnaireResponse: QuestionnaireResponse? = null,
     enableReviewPage: Boolean = false,
     showReviewPageFirst: Boolean = false,
+    readOnlyMode: Boolean = false,
   ): QuestionnaireViewModel {
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
@@ -3613,6 +3782,7 @@ class QuestionnaireViewModelTest {
     }
     enableReviewPage.let { state.set(EXTRA_ENABLE_REVIEW_PAGE, it) }
     showReviewPageFirst.let { state.set(EXTRA_SHOW_REVIEW_PAGE_FIRST, it) }
+    readOnlyMode.let { state.set(EXTRA_READ_ONLY, it) }
     return QuestionnaireViewModel(context, state)
   }
 
@@ -3655,6 +3825,14 @@ class QuestionnaireViewModelTest {
     }
   }
 }
+
+private fun QuestionnaireAdapterItem.asQuestion(): QuestionnaireItemViewItem {
+  assertThat(this).isInstanceOf(QuestionnaireAdapterItem.Question::class.java)
+  return (this as QuestionnaireAdapterItem.Question).item
+}
+
+private fun QuestionnaireAdapterItem.asQuestionOrNull(): QuestionnaireItemViewItem? =
+  (this as? QuestionnaireAdapterItem.Question)?.item
 
 /**
  * Runs code that relies on the [QuestionnaireViewModel.viewModelScope]. Runs on [Dispatchers.Main],

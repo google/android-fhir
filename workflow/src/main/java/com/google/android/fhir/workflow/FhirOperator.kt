@@ -156,6 +156,16 @@ class FhirOperator(fhirContext: FhirContext, vararg providers: WorkflowApiProvid
     )
 
   /**
+   * The function evaluates a FHIR library against the database
+   * @param libraryUrl the url of the Library to evaluate
+   * @param expressions names of expressions in the Library to evaluate.
+   * @return a Parameters resource that contains an evaluation result for each expression requested
+   */
+  fun evaluateLibrary(libraryUrl: String, expressions: Set<String>): IBaseParameters {
+    return evaluateLibrary(libraryUrl, null, null, expressions)
+  }
+
+  /**
    * The function evaluates a FHIR library against a patient's records.
    * @param libraryUrl the url of the Library to evaluate
    * @param patientId the Id of the patient to be evaluated
@@ -167,6 +177,38 @@ class FhirOperator(fhirContext: FhirContext, vararg providers: WorkflowApiProvid
     patientId: String,
     expressions: Set<String>
   ): IBaseParameters {
+    return evaluateLibrary(libraryUrl, patientId, null, expressions)
+  }
+
+  /**
+   * The function evaluates a FHIR library against the database
+   * @param libraryUrl the url of the Library to evaluate
+   * @param parameters list of parameters to be passed to the CQL library
+   * @param expressions names of expressions in the Library to evaluate.
+   * @return a Parameters resource that contains an evaluation result for each expression requested
+   */
+  fun evaluateLibrary(
+    libraryUrl: String,
+    parameters: Parameters,
+    expressions: Set<String>
+  ): IBaseParameters {
+    return evaluateLibrary(libraryUrl, null, parameters, expressions)
+  }
+
+  /**
+   * The function evaluates a FHIR library against the database
+   * @param libraryUrl the url of the Library to evaluate
+   * @param patientId the Id of the patient to be evaluated, if applicable
+   * @param parameters list of parameters to be passed to the CQL library, if applicable
+   * @param expressions names of expressions in the Library to evaluate.
+   * @return a Parameters resource that contains an evaluation result for each expression requested
+   */
+  fun evaluateLibrary(
+    libraryUrl: String,
+    patientId: String?,
+    parameters: Parameters?,
+    expressions: Set<String>
+  ): IBaseParameters {
     val dataEndpoint =
       Endpoint()
         .setAddress("localhost")
@@ -175,7 +217,7 @@ class FhirOperator(fhirContext: FhirContext, vararg providers: WorkflowApiProvid
     return libraryProcessor.evaluate(
       libraryUrl,
       patientId,
-      null,
+      parameters,
       null,
       null,
       dataEndpoint,
@@ -208,7 +250,15 @@ class FhirOperator(fhirContext: FhirContext, vararg providers: WorkflowApiProvid
     )
   }
 
-  fun generateCarePlan(planDefinitionId: String, patientId: String, encounterId: String): CarePlan {
+  fun generateCarePlan(planDefinitionId: String, patientId: String): CarePlan {
+    return generateCarePlan(planDefinitionId, patientId, encounterId = null)
+  }
+
+  fun generateCarePlan(
+    planDefinitionId: String,
+    patientId: String,
+    encounterId: String?
+  ): CarePlan {
     return planDefinitionProcessor.apply(
       IdType("PlanDefinition", planDefinitionId),
       patientId,
