@@ -20,14 +20,13 @@ import androidx.annotation.WorkerThread
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.implementationguide.IgManager
 import java.util.function.Supplier
 import org.hl7.fhir.instance.model.api.IBaseParameters
 import org.hl7.fhir.instance.model.api.IBaseResource
-import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Endpoint
 import org.hl7.fhir.r4.model.IdType
-import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.MeasureReport
 import org.hl7.fhir.r4.model.Parameters
 import org.opencds.cqf.cql.engine.data.CompositeDataProvider
@@ -61,23 +60,25 @@ import org.opencds.cqf.cql.evaluator.plandefinition.r4.PlanDefinitionProcessor
 // This is a heavy object to load. Avoid having to create a new one.
 object cachedR4FhirModelResolver : R4FhirModelResolver(FhirContext.forR4Cached())
 
-class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
+class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine, igManager: IgManager) {
   // Initialize the measure processor
-  private val fhirEngineTerminologyProvider = FhirEngineTerminologyProvider(fhirContext, fhirEngine)
+  private val fhirEngineTerminologyProvider =
+    FhirEngineTerminologyProvider(fhirContext, fhirEngine, igManager)
   private val adapterFactory = AdapterFactory()
-  private val libraryContentProvider = FhirEngineLibraryContentProvider(adapterFactory)
+  private val libraryContentProvider = FhirEngineLibraryContentProvider(adapterFactory, igManager)
   private val fhirTypeConverter = FhirTypeConverterFactory().create(FhirVersionEnum.R4)
   private val fhirEngineRetrieveProvider =
     FhirEngineRetrieveProvider(fhirEngine).apply {
       terminologyProvider = fhirEngineTerminologyProvider
       isExpandValueSets = true
     }
+
   private val dataProvider =
     CompositeDataProvider(
       CachingModelResolverDecorator(cachedR4FhirModelResolver),
       fhirEngineRetrieveProvider
     )
-  private val fhirEngineDal = FhirEngineDal(fhirEngine)
+  private val fhirEngineDal = FhirEngineDal(fhirEngine, igManager)
 
   private val measureProcessor =
     R4MeasureProcessor(
@@ -174,21 +175,6 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       activityDefinitionProcessor,
       operationParametersParser
     )
-
-  fun loadLib(lib: Library) {
-    if (lib.url != null) {
-      fhirEngineDal.libs[lib.url] = lib
-    }
-    if (lib.name != null) {
-      libraryContentProvider.libs[lib.name] = lib
-    }
-  }
-
-  fun loadLibs(libBundle: Bundle) {
-    for (entry in libBundle.entry) {
-      loadLib(entry.resource as Library)
-    }
-  }
 
   /**
    * The function evaluates a FHIR library against the database.

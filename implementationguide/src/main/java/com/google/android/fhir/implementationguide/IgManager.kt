@@ -24,6 +24,8 @@ import com.google.android.fhir.implementationguide.db.impl.entities.ResourceMeta
 import com.google.android.fhir.implementationguide.db.impl.entities.toEntity
 import java.io.File
 import java.io.FileInputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.MetadataResource
 import org.hl7.fhir.r4.model.Resource
@@ -31,10 +33,11 @@ import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
 /** Responsible for importing, accessing and deleting Implementation Guides. */
-class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
+class IgManager internal constructor(private val igDatabase: ImplementationGuideDatabase) {
 
   private val igDao = igDatabase.implementationGuideDao()
   private val jsonParser = FhirContext.forR4().newJsonParser()
+  private var defaultIgId: Long = -1L
 
   /**
    * * Checks if the [igDependencies] are present in DB. If necessary, downloads the dependencies
@@ -68,7 +71,16 @@ class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
 
   /** Imports the IG from the provided [file] to the default dependency. */
   suspend fun install(file: File) {
-    TODO("not implemented yet")
+    // lazy suspend initialization
+    defaultIgId =
+      igDao
+        .getImplementationGuide(DEFAULT_DEPENDENCY.packageId, DEFAULT_DEPENDENCY.version)
+        ?.implementationGuideId
+        ?: -1
+    if (defaultIgId == -1L) {
+      defaultIgId = igDao.insert(DEFAULT_DEPENDENCY.toEntity(File("NotARealDirectory")))
+    }
+    importFile(defaultIgId, file)
   }
 
   /** Loads resources from IGs listed in dependencies. */
@@ -94,8 +106,24 @@ class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
   suspend fun delete(vararg igDependencies: ImplementationGuide) {
     igDependencies.forEach { igDependency ->
       val igEntity = igDao.getImplementationGuide(igDependency.packageId, igDependency.version)
-      igDao.deleteImplementationGuide(igEntity)
-      igEntity.rootDirectory.deleteRecursively()
+      if (igEntity != null) {
+        igDao.deleteImplementationGuide(igEntity)
+        igEntity.rootDirectory.deleteRecursively()
+      }
+    }
+  }
+
+  private suspend fun importFile(igId: Long, file: File) {
+    val resource =
+      withContext(Dispatchers.IO) {
+        try {
+          FileInputStream(file).use(jsonParser::parseResource)
+        } catch (exception: Exception) {
+          Timber.d(exception, "Unable to import file: %file")
+        }
+      }
+    when (resource) {
+      is Resource -> importResource(igId, resource, file)
     }
   }
 
@@ -117,8 +145,18 @@ class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
     return jsonParser.parseResource(FileInputStream(resourceEntity.resourceFile))
   }
 
+  fun close() {
+    igDatabase.close()
+  }
+
   companion object {
     private const val DB_NAME = "implementationguide.db"
+    val DEFAULT_DEPENDENCY =
+      ImplementationGuide(
+        "com.google.android.fhir",
+        "1.0.0",
+        "http://github.com/google/android-fhir"
+      )
 
     /** Creates an [IgManager] backed by the Room DB. */
     fun create(context: Context) =

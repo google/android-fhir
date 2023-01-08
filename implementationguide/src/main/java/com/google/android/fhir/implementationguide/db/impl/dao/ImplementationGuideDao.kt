@@ -53,8 +53,10 @@ abstract class ImplementationGuideDao {
   @Transaction
   internal open suspend fun deleteImplementationGuide(name: String, version: String) {
     val igEntity = getImplementationGuide(name, version)
-    deleteImplementationGuide(igEntity)
-    deleteOrphanedResources()
+    if (igEntity != null) {
+      deleteImplementationGuide(igEntity)
+      deleteOrphanedResources()
+    }
   }
 
   @Query(
@@ -71,7 +73,7 @@ abstract class ImplementationGuideDao {
   internal abstract suspend fun getImplementationGuide(
     packageId: String,
     version: String?,
-  ): ImplementationGuideEntity
+  ): ImplementationGuideEntity?
 
   @Query("SELECT * from ResourceMetadataEntity")
   internal abstract suspend fun getResources(): List<ResourceMetadataEntity>
