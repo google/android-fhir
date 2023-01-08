@@ -94,13 +94,13 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         displayInitialPreview()
         displayTakePhotoButton(questionnaireItem)
         displayUploadButton(questionnaireItem)
-        takePhotoButton.setOnClickListener { onTakePhotoClicked(questionnaireItem) }
+        takePhotoButton.setOnClickListener { view -> onTakePhotoClicked(view, questionnaireItem) }
         uploadPhotoButton.setOnClickListener { view -> onUploadClicked(view, questionnaireItem) }
         uploadAudioButton.setOnClickListener { view -> onUploadClicked(view, questionnaireItem) }
         uploadVideoButton.setOnClickListener { view -> onUploadClicked(view, questionnaireItem) }
         uploadDocumentButton.setOnClickListener { view -> onUploadClicked(view, questionnaireItem) }
         uploadFileButton.setOnClickListener { view -> onUploadClicked(view, questionnaireItem) }
-        deleteButton.setOnClickListener { onDeleteClicked() }
+        deleteButton.setOnClickListener { view -> onDeleteClicked(view) }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
@@ -160,7 +160,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         }
       }
 
-      private fun onTakePhotoClicked(questionnaireItem: QuestionnaireItemComponent) {
+      private fun onTakePhotoClicked(view: View, questionnaireItem: QuestionnaireItemComponent) {
         val file = File.createTempFile("IMG_", ".jpeg", context.cacheDir)
         val attachmentUri =
           FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
@@ -177,7 +177,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
               R.string.max_size_image_above_limit_validation_error_msg,
               questionnaireItem.maxSizeInMiB
             )
-            displaySnackbar(takePhotoButton, R.string.upload_failed)
+            displaySnackbar(view, R.string.upload_failed)
             file.delete()
             return@setFragmentResultListener
           }
@@ -185,7 +185,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           val attachmentMimeType = context.getMimeTypeFromUri(attachmentUri)
           if (!questionnaireItem.hasMimeType(attachmentMimeType.type)) {
             displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
-            displaySnackbar(takePhotoButton, R.string.upload_failed)
+            displaySnackbar(view, R.string.upload_failed)
             file.delete()
             return@setFragmentResultListener
           }
@@ -206,7 +206,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           loadPhotoPreview(attachmentUri)
           clearFilePreview()
           displayDeleteButton()
-          displaySnackbar(takePhotoButton, R.string.image_uploaded)
+          displaySnackbarOnUpload(view, attachmentMimeType.type)
           file.delete()
         }
 
@@ -234,14 +234,14 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
               R.string.max_size_file_above_limit_validation_error_msg,
               questionnaireItem.maxSizeInMiB
             )
-            displaySnackbar(uploadDocumentButton, R.string.upload_failed)
+            displaySnackbar(view, R.string.upload_failed)
             return@setFragmentResultListener
           }
 
           val attachmentMimeType = context.getMimeTypeFromUri(attachmentUri)
           if (!questionnaireItem.hasMimeType(attachmentMimeType.type)) {
             displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
-            displaySnackbar(uploadDocumentButton, R.string.upload_failed)
+            displaySnackbar(view, R.string.upload_failed)
             return@setFragmentResultListener
           }
 
@@ -263,7 +263,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             attachmentTitle = attachmentTitle,
             attachmentUri = attachmentUri
           )
-          displaySnackbar(view, R.string.file_uploaded)
+          displaySnackbarOnUpload(view, attachmentMimeType.type)
         }
 
         OpenDocumentLauncherFragment()
@@ -342,15 +342,53 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         deleteButton.visibility = View.GONE
       }
 
-      private fun onDeleteClicked() {
+      private fun onDeleteClicked(view: View) {
         questionnaireItemViewItem.clearAnswer()
         hideDeleteButton()
         clearPhotoPreview()
         clearFilePreview()
+        displaySnackbarOnDelete(
+          view,
+          questionnaireItemViewItem.answers.first().valueAttachment.contentType.type
+        )
       }
 
       private fun displaySnackbar(view: View, @StringRes textResource: Int) {
         Snackbar.make(view, context.getString(textResource), Snackbar.LENGTH_SHORT).show()
+      }
+
+      private fun displaySnackbarOnUpload(view: View, attachmentType: String) {
+        when (attachmentType) {
+          MimeType.IMAGE.value -> {
+            displaySnackbar(view, R.string.image_uploaded)
+          }
+          MimeType.DOCUMENT.value -> {
+            displaySnackbar(view, R.string.file_uploaded)
+          }
+          MimeType.VIDEO.value -> {
+            displaySnackbar(view, R.string.video_uploaded)
+          }
+          MimeType.AUDIO.value -> {
+            displaySnackbar(view, R.string.audio_uploaded)
+          }
+        }
+      }
+
+      private fun displaySnackbarOnDelete(view: View, attachmentType: String) {
+        when (attachmentType) {
+          MimeType.IMAGE.value -> {
+            displaySnackbar(view, R.string.image_deleted)
+          }
+          MimeType.DOCUMENT.value -> {
+            displaySnackbar(view, R.string.file_deleted)
+          }
+          MimeType.VIDEO.value -> {
+            displaySnackbar(view, R.string.video_deleted)
+          }
+          MimeType.AUDIO.value -> {
+            displaySnackbar(view, R.string.audio_deleted)
+          }
+        }
       }
 
       private fun displayError(@StringRes textResource: Int) {
