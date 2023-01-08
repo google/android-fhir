@@ -20,6 +20,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -31,10 +32,18 @@ import timber.log.Timber
 /** Used for launching camera activity */
 class CameraLauncherFragment : DialogFragment() {
 
+  private lateinit var cameraLauncher: ActivityResultLauncher<Uri>
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val uri =
       arguments?.get(QuestionnaireItemAttachmentViewHolderFactory.EXTRA_SAVED_PHOTO_URI_KEY) as Uri
+
+    cameraLauncher =
+      registerForActivityResult(ActivityResultContracts.TakePicture()) { isSaved ->
+        setFragmentResult(CAMERA_RESULT_KEY, bundleOf(CAMERA_RESULT_KEY to isSaved))
+        dismiss()
+      }
 
     if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) ==
         PackageManager.PERMISSION_DENIED
@@ -42,20 +51,16 @@ class CameraLauncherFragment : DialogFragment() {
       registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
           if (isGranted) {
             Timber.d("Camera permission granted")
+            cameraLauncher.launch(uri)
           } else {
             Timber.d("Camera permission not granted")
+            dismiss()
           }
         }
         .launch(Manifest.permission.CAMERA)
-      dismiss()
-      return
+    } else {
+      cameraLauncher.launch(uri)
     }
-
-    registerForActivityResult(ActivityResultContracts.TakePicture()) { isSaved ->
-        setFragmentResult(CAMERA_RESULT_KEY, bundleOf(CAMERA_RESULT_KEY to isSaved))
-        dismiss()
-      }
-      .launch(uri)
   }
 
   companion object {
