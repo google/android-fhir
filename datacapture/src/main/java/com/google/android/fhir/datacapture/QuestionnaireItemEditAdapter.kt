@@ -44,25 +44,36 @@ import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 internal class QuestionnaireItemEditAdapter(
   private val questionnaireItemViewHolderMatchers:
     List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> =
-    emptyList()
-) : ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
+    emptyList(),
+) : ListAdapter<QuestionnaireAdapterItem, QuestionnaireItemViewHolder>(DiffCallbacks.ITEMS) {
   /**
    * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
    * [QuestionnaireItemViewItem].
    */
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
+    val typedViewType = ViewType.parse(viewType)
+    val subtype = typedViewType.subtype
+    return when (typedViewType.type) {
+      ViewType.Type.QUESTION -> onCreateViewHolderQuestion(parent = parent, subtype = subtype)
+    }
+  }
+
+  private fun onCreateViewHolderQuestion(
+    parent: ViewGroup,
+    subtype: Int,
+  ): QuestionnaireItemViewHolder {
     val numOfCanonicalWidgets = QuestionnaireItemViewHolderType.values().size
-    check(viewType < numOfCanonicalWidgets + questionnaireItemViewHolderMatchers.size) {
+    check(subtype < numOfCanonicalWidgets + questionnaireItemViewHolderMatchers.size) {
       "Invalid widget type specified. Widget Int type cannot exceed the total number of supported custom and canonical widgets"
     }
 
     // Map custom widget viewTypes to their corresponding widget factories
-    if (viewType >= numOfCanonicalWidgets)
-      return questionnaireItemViewHolderMatchers[viewType - numOfCanonicalWidgets]
+    if (subtype >= numOfCanonicalWidgets)
+      return questionnaireItemViewHolderMatchers[subtype - numOfCanonicalWidgets]
         .factory.create(parent)
 
     val viewHolderFactory =
-      when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
+      when (QuestionnaireItemViewHolderType.fromInt(subtype)) {
         QuestionnaireItemViewHolderType.GROUP -> QuestionnaireItemGroupViewHolderFactory
         QuestionnaireItemViewHolderType.BOOLEAN_TYPE_PICKER ->
           QuestionnaireItemBooleanTypePickerViewHolderFactory
@@ -97,7 +108,56 @@ internal class QuestionnaireItemEditAdapter(
   }
 
   override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
-    holder.bind(getItem(position))
+    when (val item = getItem(position)) {
+      is QuestionnaireAdapterItem.Question -> {
+        holder.bind(item.item)
+      }
+    }
+  }
+
+  override fun getItemViewType(position: Int): Int {
+    // Because we have multiple Item subtypes, we will pack two ints into the item view type.
+
+    // The first 8 bits will be represented by this type, which is unique for each Item subclass.
+    val type: ViewType.Type
+    // The last 24 bits will be represented by this subtype, which will further divide each Item
+    // subclass into more view types.
+    val subtype: Int
+    when (val item = getItem(position)) {
+      is QuestionnaireAdapterItem.Question -> {
+        type = ViewType.Type.QUESTION
+        subtype = getItemViewTypeForQuestion(item.item)
+      }
+    }
+    return ViewType.from(type = type, subtype = subtype).viewType
+  }
+
+  /**
+   * Utility to pack two types (a "type" and "subtype") into a single "viewType" int, for use with
+   * [getItemViewType].
+   *
+   * [type] is contained in the first 8 bits of the int, and should be unique for each type of
+   * [QuestionnaireAdapterItem].
+   *
+   * [subtype] is contained in the lower 24 bits of the int, and should be used to differentiate
+   * between different items within the same [QuestionnaireAdapterItem] type.
+   */
+  @JvmInline
+  internal value class ViewType(val viewType: Int) {
+    val subtype: Int
+      get() = viewType and 0xFFFFFF
+    val type: Type
+      get() = Type.values()[viewType shr 24]
+
+    companion object {
+      fun parse(viewType: Int): ViewType = ViewType(viewType)
+
+      fun from(type: Type, subtype: Int): ViewType = ViewType((type.ordinal shl 24) or subtype)
+    }
+
+    enum class Type {
+      QUESTION,
+    }
   }
 
   /**
@@ -107,11 +167,9 @@ internal class QuestionnaireItemEditAdapter(
    * (http://hl7.org/fhir/R4/valueset-questionnaire-item-control.html) used in the itemControl
    * extension (http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html).
    */
-  override fun getItemViewType(position: Int): Int {
-    return getItemViewTypeMapping(getItem(position))
-  }
-
-  internal fun getItemViewTypeMapping(questionnaireItemViewItem: QuestionnaireItemViewItem): Int {
+  internal fun getItemViewTypeForQuestion(
+    questionnaireItemViewItem: QuestionnaireItemViewItem,
+  ): Int {
     val questionnaireItem = questionnaireItemViewItem.questionnaireItem
     // For custom widgets, generate an int value that's greater than any int assigned to the
     // canonical FHIR widgets
@@ -144,7 +202,7 @@ internal class QuestionnaireItemEditAdapter(
   }
 
   private fun getChoiceViewHolderType(
-    questionnaireItemViewItem: QuestionnaireItemViewItem
+    questionnaireItemViewItem: QuestionnaireItemViewItem,
   ): QuestionnaireItemViewHolderType {
     val questionnaireItem = questionnaireItemViewItem.questionnaireItem
 
@@ -172,7 +230,7 @@ internal class QuestionnaireItemEditAdapter(
   }
 
   private fun getIntegerViewHolderType(
-    questionnaireItemViewItem: QuestionnaireItemViewItem
+    questionnaireItemViewItem: QuestionnaireItemViewItem,
   ): QuestionnaireItemViewHolderType {
     val questionnaireItem = questionnaireItemViewItem.questionnaireItem
     // Use the view type that the client wants if they specified an itemControl
@@ -181,7 +239,7 @@ internal class QuestionnaireItemEditAdapter(
   }
 
   private fun getStringViewHolderType(
-    questionnaireItemViewItem: QuestionnaireItemViewItem
+    questionnaireItemViewItem: QuestionnaireItemViewItem,
   ): QuestionnaireItemViewHolderType {
     val questionnaireItem = questionnaireItemViewItem.questionnaireItem
     // Use the view type that the client wants if they specified an itemControl
@@ -198,26 +256,54 @@ internal class QuestionnaireItemEditAdapter(
   }
 }
 
-internal object DiffCallback : DiffUtil.ItemCallback<QuestionnaireItemViewItem>() {
-  /**
-   * [QuestionnaireItemViewItem] is a transient object for the UI only. Whenever the user makes any
-   * change via the UI, a new list of [QuestionnaireItemViewItem]s will be created, each holding
-   * references to the underlying [QuestionnaireItem] and [QuestionnaireResponseItem], both of which
-   * should be read-only, and the current answers. To help recycler view handle update and/or
-   * animations, we consider two [QuestionnaireItemViewItem]s to be the same if they have the same
-   * underlying [QuestionnaireItem] and [QuestionnaireResponseItem].
-   */
-  override fun areItemsTheSame(
-    oldItem: QuestionnaireItemViewItem,
-    newItem: QuestionnaireItemViewItem
-  ) = oldItem.hasTheSameItem(newItem)
+internal object DiffCallbacks {
+  val ITEMS =
+    object : DiffUtil.ItemCallback<QuestionnaireAdapterItem>() {
+      override fun areItemsTheSame(
+        oldItem: QuestionnaireAdapterItem,
+        newItem: QuestionnaireAdapterItem,
+      ): Boolean =
+        when (oldItem) {
+          is QuestionnaireAdapterItem.Question -> {
+            newItem is QuestionnaireAdapterItem.Question &&
+              QUESTIONS.areItemsTheSame(oldItem, newItem)
+          }
+        }
 
-  override fun areContentsTheSame(
-    oldItem: QuestionnaireItemViewItem,
-    newItem: QuestionnaireItemViewItem
-  ): Boolean {
-    return oldItem.hasTheSameItem(newItem) &&
-      oldItem.hasTheSameAnswer(newItem) &&
-      oldItem.hasTheSameValidationResult(newItem)
-  }
+      override fun areContentsTheSame(
+        oldItem: QuestionnaireAdapterItem,
+        newItem: QuestionnaireAdapterItem,
+      ): Boolean =
+        when (oldItem) {
+          is QuestionnaireAdapterItem.Question -> {
+            newItem is QuestionnaireAdapterItem.Question &&
+              QUESTIONS.areContentsTheSame(oldItem, newItem)
+          }
+        }
+    }
+
+  val QUESTIONS =
+    object : DiffUtil.ItemCallback<QuestionnaireAdapterItem.Question>() {
+      /**
+       * [QuestionnaireItemViewItem] is a transient object for the UI only. Whenever the user makes
+       * any change via the UI, a new list of [QuestionnaireItemViewItem]s will be created, each
+       * holding references to the underlying [QuestionnaireItem] and [QuestionnaireResponseItem],
+       * both of which should be read-only, and the current answers. To help recycler view handle
+       * update and/or animations, we consider two [QuestionnaireItemViewItem]s to be the same if
+       * they have the same underlying [QuestionnaireItem] and [QuestionnaireResponseItem].
+       */
+      override fun areItemsTheSame(
+        oldItem: QuestionnaireAdapterItem.Question,
+        newItem: QuestionnaireAdapterItem.Question,
+      ) = oldItem.item.hasTheSameItem(newItem.item)
+
+      override fun areContentsTheSame(
+        oldItem: QuestionnaireAdapterItem.Question,
+        newItem: QuestionnaireAdapterItem.Question,
+      ): Boolean {
+        return oldItem.item.hasTheSameItem(newItem.item) &&
+          oldItem.item.hasTheSameAnswer(newItem.item) &&
+          oldItem.item.hasTheSameValidationResult(newItem.item)
+      }
+    }
 }
