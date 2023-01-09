@@ -41,6 +41,7 @@ internal object QuestionnaireItemEditTextIntegerViewHolderFactory :
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(IntegerType(it))
         }
           ?: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+            .setValue(IntegerType())
       }
 
       override fun getText(
