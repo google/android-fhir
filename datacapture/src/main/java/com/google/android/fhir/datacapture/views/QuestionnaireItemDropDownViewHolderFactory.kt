@@ -85,12 +85,11 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.onItemClickListener =
           AdapterView.OnItemClickListener { _, _, position, _ ->
-            autoCompleteTextView.setText(adapter.getItem(position)?.answerOptionString, false)
+            val selectedItem = adapter.getItem(position)
+            autoCompleteTextView.setText(selectedItem?.answerOptionString, false)
             val selectedAnswer =
               questionnaireItemViewItem.answerOption
-                .firstOrNull {
-                  it.value.displayString(context) == autoCompleteTextView.adapter.getItem(position)
-                }
+                .firstOrNull { it.value.displayString(context) == selectedItem?.answerOptionString }
                 ?.value
 
             if (selectedAnswer == null) {
