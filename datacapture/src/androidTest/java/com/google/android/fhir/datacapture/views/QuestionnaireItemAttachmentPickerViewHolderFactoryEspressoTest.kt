@@ -21,8 +21,8 @@ import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -58,7 +58,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shouldShowTakePhotoAndUploadPhotoButton() {
+  fun shouldDisplayTakePhotoAndUploadPhotoButton() {
     val questionnaireItemView =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -77,15 +77,87 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
     assertThat(viewHolder.itemView.findViewById<Button>(R.id.take_photo).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).visibility)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_photo).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).text)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_photo).text)
       .isEqualTo(parent.context.getString(R.string.upload_photo))
   }
 
   @Test
-  fun shouldShowTakePhotoAndSelectFileButton() {
+  fun shouldDisplayUploadAudioButton() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("audio/*"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_audio).visibility)
+      .isEqualTo(View.VISIBLE)
+
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_audio).text)
+      .isEqualTo(parent.context.getString(R.string.upload_audio))
+  }
+
+  @Test
+  fun shouldDisplayUploadVideoButton() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("video/*"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_video).visibility)
+      .isEqualTo(View.VISIBLE)
+
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_video).text)
+      .isEqualTo(parent.context.getString(R.string.upload_video))
+  }
+
+  @Test
+  fun shouldDisplayUploadDocumentButton() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("application/pdf"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_document).visibility)
+      .isEqualTo(View.VISIBLE)
+
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_document).text)
+      .isEqualTo(parent.context.getString(R.string.upload_document))
+  }
+
+  @Test
+  fun shouldDisplayTakePhotoAndUploadFileButton() {
     val questionnaireItemView =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -108,42 +180,15 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
     assertThat(viewHolder.itemView.findViewById<Button>(R.id.take_photo).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).visibility)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_file).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).text)
-      .isEqualTo(parent.context.getString(R.string.select_file))
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_file).text)
+      .isEqualTo(parent.context.getString(R.string.upload_file))
   }
 
   @Test
-  fun shouldShowSelectFileButtonOnly() {
-    val questionnaireItemView =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("application/pdf"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
-      )
-
-    runOnUI { viewHolder.bind(questionnaireItemView) }
-
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.take_photo).visibility)
-      .isEqualTo(View.GONE)
-
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).visibility)
-      .isEqualTo(View.VISIBLE)
-
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).text)
-      .isEqualTo(parent.context.getString(R.string.select_file))
-  }
-
-  @Test
-  fun shouldShowPreviewImageFromAnswer() {
+  fun shouldDisplayImagePreviewFromAnswer() {
     val questionnaireItemView =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -157,6 +202,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
                 Attachment().apply {
+                  title = "IMG_1"
                   data =
                     Base64.decode(
                       "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
@@ -176,10 +222,10 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
     assertThat(viewHolder.itemView.findViewById<Button>(R.id.take_photo).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).visibility)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_photo).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).text)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_photo).text)
       .isEqualTo(parent.context.getString(R.string.upload_photo))
 
     assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.photo_preview).visibility)
@@ -187,103 +233,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shouldShowPreviewDocumentFileFromAnswer() {
-    val questionnaireItemView =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("application/pdf"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value =
-                Attachment().apply {
-                  title = "Document File"
-                  data =
-                    Base64.decode(
-                      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-                      Base64.DEFAULT
-                    )
-                  contentType = "application/pdf"
-                }
-            }
-          )
-        },
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
-      )
-
-    runOnUI { viewHolder.bind(questionnaireItemView) }
-
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).visibility)
-      .isEqualTo(View.VISIBLE)
-
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).text)
-      .isEqualTo(parent.context.getString(R.string.select_file))
-
-    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.file_preview).visibility)
-      .isEqualTo(View.VISIBLE)
-
-    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.icon_file_preview).visibility)
-      .isEqualTo(View.VISIBLE)
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.title_file_preview).text)
-      .isEqualTo("Document File")
-  }
-
-  @Test
-  fun shouldShowPreviewVideoFileFromAnswer() {
-    val questionnaireItemView =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("video/*"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value =
-                Attachment().apply {
-                  title = "Video File"
-                  data =
-                    Base64.decode(
-                      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-                      Base64.DEFAULT
-                    )
-                  contentType = "video/*"
-                }
-            }
-          )
-        },
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
-      )
-
-    runOnUI { viewHolder.bind(questionnaireItemView) }
-
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).visibility)
-      .isEqualTo(View.VISIBLE)
-
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).text)
-      .isEqualTo(parent.context.getString(R.string.select_file))
-
-    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.file_preview).visibility)
-      .isEqualTo(View.VISIBLE)
-
-    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.icon_file_preview).visibility)
-      .isEqualTo(View.VISIBLE)
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.title_file_preview).text)
-      .isEqualTo("Video File")
-  }
-
-  @Test
-  fun shouldShowPreviewAudioFileFromAnswer() {
+  fun shouldDisplayAudioFilePreviewFromAnswer() {
     val questionnaireItemView =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -314,13 +264,13 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).visibility)
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_audio).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.select_file).text)
-      .isEqualTo(parent.context.getString(R.string.select_file))
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_audio).text)
+      .isEqualTo(parent.context.getString(R.string.upload_audio))
 
-    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.file_preview).visibility)
+    assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.file_preview).visibility)
       .isEqualTo(View.VISIBLE)
 
     assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.icon_file_preview).visibility)
@@ -328,6 +278,102 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.title_file_preview).text)
       .isEqualTo("Audio File")
+  }
+
+  @Test
+  fun shouldDisplayVideoFilePreviewFromAnswer() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("video/*"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value =
+                Attachment().apply {
+                  title = "Video File"
+                  data =
+                    Base64.decode(
+                      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+                      Base64.DEFAULT
+                    )
+                  contentType = "video/*"
+                }
+            }
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_video).visibility)
+      .isEqualTo(View.VISIBLE)
+
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_video).text)
+      .isEqualTo(parent.context.getString(R.string.upload_video))
+
+    assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.file_preview).visibility)
+      .isEqualTo(View.VISIBLE)
+
+    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.icon_file_preview).visibility)
+      .isEqualTo(View.VISIBLE)
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.title_file_preview).text)
+      .isEqualTo("Video File")
+  }
+
+  @Test
+  fun shouldDisplayDocumentFilePreviewFromAnswer() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("application/pdf"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value =
+                Attachment().apply {
+                  title = "Document File"
+                  data =
+                    Base64.decode(
+                      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+                      Base64.DEFAULT
+                    )
+                  contentType = "application/pdf"
+                }
+            }
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_document).visibility)
+      .isEqualTo(View.VISIBLE)
+
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_document).text)
+      .isEqualTo(parent.context.getString(R.string.upload_document))
+
+    assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.file_preview).visibility)
+      .isEqualTo(View.VISIBLE)
+
+    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.icon_file_preview).visibility)
+      .isEqualTo(View.VISIBLE)
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.title_file_preview).text)
+      .isEqualTo("Document File")
   }
 
   /** Method to run code snippet on UI/main thread */
