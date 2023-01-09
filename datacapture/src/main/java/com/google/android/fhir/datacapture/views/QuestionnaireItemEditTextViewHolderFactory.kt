@@ -101,7 +101,10 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   private fun updateAnswer(editable: Editable?) {
     val input = getValue(editable.toString())
     if (input != null) {
-      if (input.hasValue()) {
+      // Non-empty checks because some widget can return a non null but still an empty value.
+      // The widget returns empty value to prevent clearing itself when the value surpasses it's
+      // limit e.g. QuestionnaireItemEditTextIntegerViewHolderFactory.
+      if (!input.isEmpty) {
         questionnaireItemViewItem.setAnswer(input)
       }
     } else {
