@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture
 import android.app.Application
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
+import com.google.android.fhir.datacapture.common.datatype.displayString
 import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.utilities.toLocalizedString
 import com.google.common.truth.Truth.assertThat
@@ -34,6 +35,7 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.UriType
@@ -48,12 +50,65 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
   private val context = ApplicationProvider.getApplicationContext<Application>()
 
   @Test
+  fun `displayString() should return name value for reference`() {
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        .setValue(Reference().setDisplay("Newton"))
+
+    assertThat(answer.value.displayString(context)).isEqualTo("Newton")
+  }
+
+  @Test
+  fun `displayString() should return name field when both display and reference set`() {
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        .setValue(Reference().setDisplay("Newton").setReference("obs/apple"))
+
+    assertThat(answer.value.displayString(context)).isEqualTo("Newton")
+  }
+
+  @Test
+  fun `displayString() should return not answered for null reference`() {
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(Reference())
+    assertThat(answer.value.displayString(context))
+      .isEqualTo(context.getString(R.string.not_answered))
+  }
+
+  @Test
+  fun `displayString() should return not answered for empty display field`() {
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        .setValue(Reference().setDisplay(""))
+    assertThat(answer.value.displayString(context))
+      .isEqualTo(context.getString(R.string.not_answered))
+  }
+
+  @Test
+  fun `displayString() should return not answered for empty reference field`() {
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        .setValue(Reference().setReference(""))
+    assertThat(answer.value.displayString(context))
+      .isEqualTo(context.getString(R.string.not_answered))
+  }
+
+  @Test
+  fun `displayString() should return reference field for no display but reference set`() {
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        .setValue(Reference().setReference("obs/apple"))
+
+    assertThat(answer.value.displayString(context)).isEqualTo("obs/apple")
+  }
+
+  @Test
   fun `displayString() should return url value for attachment`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(Attachment().setUrl("http://photos.com/a.png"))
 
-    assertThat(answer.displayString(context)).isEqualTo("http://photos.com/a.png")
+    assertThat(answer.value.displayString(context)).isEqualTo("http://photos.com/a.png")
   }
 
   @Test
@@ -61,7 +116,8 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(Attachment())
 
-    assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.not_answered))
+    assertThat(answer.value.displayString(context))
+      .isEqualTo(context.getString(R.string.not_answered))
   }
 
   @Test
@@ -69,7 +125,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType(true))
 
-    assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.yes))
+    assertThat(answer.value.displayString(context)).isEqualTo(context.getString(R.string.yes))
   }
 
   @Test
@@ -77,7 +133,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType(false))
 
-    assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.no))
+    assertThat(answer.value.displayString(context)).isEqualTo(context.getString(R.string.no))
   }
 
   @Test
@@ -85,7 +141,8 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType())
 
-    assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.not_answered))
+    assertThat(answer.value.displayString(context))
+      .isEqualTo(context.getString(R.string.not_answered))
   }
 
   @Test
@@ -94,7 +151,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(Coding().setCode("test-code").setDisplay("Test Code"))
 
-    assertThat(answer.displayString(context)).isEqualTo("Test Code")
+    assertThat(answer.value.displayString(context)).isEqualTo("Test Code")
   }
 
   @Test
@@ -103,14 +160,15 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(Coding().setCode("test-code"))
 
-    assertThat(answer.displayString(context)).isEqualTo("test-code")
+    assertThat(answer.value.displayString(context)).isEqualTo("test-code")
   }
 
   @Test
   fun `displayString() should return not answered for null coding type`() {
     val answer = QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(Coding())
 
-    assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.not_answered))
+    assertThat(answer.value.displayString(context))
+      .isEqualTo(context.getString(R.string.not_answered))
   }
 
   @Test
@@ -118,7 +176,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(DateType(Date()))
 
-    assertThat(answer.displayString(context)).isEqualTo(LocalDate.now().localizedString)
+    assertThat(answer.value.displayString(context)).isEqualTo(LocalDate.now().localizedString)
   }
 
   @Test
@@ -127,7 +185,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(DateTimeType(Date()))
 
-    assertThat(answer.displayString(context))
+    assertThat(answer.value.displayString(context))
       .isEqualTo("${LocalDate.now().localizedString} ${LocalTime.now().toLocalizedString(context)}")
   }
 
@@ -137,7 +195,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(DecimalType(12.5612))
 
-    assertThat(answer.displayString(context)).isEqualTo("12.5612")
+    assertThat(answer.value.displayString(context)).isEqualTo("12.5612")
   }
 
   @Test
@@ -145,7 +203,8 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(DecimalType())
 
-    assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.not_answered))
+    assertThat(answer.value.displayString(context))
+      .isEqualTo(context.getString(R.string.not_answered))
   }
 
   @Test
@@ -153,7 +212,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(IntegerType(12))
 
-    assertThat(answer.displayString(context)).isEqualTo("12")
+    assertThat(answer.value.displayString(context)).isEqualTo("12")
   }
 
   @Test
@@ -161,7 +220,8 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(IntegerType())
 
-    assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.not_answered))
+    assertThat(answer.value.displayString(context))
+      .isEqualTo(context.getString(R.string.not_answered))
   }
 
   @Test
@@ -169,7 +229,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(Quantity(59.125))
 
-    assertThat(answer.displayString(context)).isEqualTo("59.125")
+    assertThat(answer.value.displayString(context)).isEqualTo("59.125")
   }
 
   @Test
@@ -178,7 +238,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(StringType("Answer"))
 
-    assertThat(answer.displayString(context)).isEqualTo("Answer")
+    assertThat(answer.value.displayString(context)).isEqualTo("Answer")
   }
 
   @Test
@@ -186,7 +246,8 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(StringType())
 
-    assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.not_answered))
+    assertThat(answer.value.displayString(context))
+      .isEqualTo(context.getString(R.string.not_answered))
   }
 
   @Test
@@ -195,7 +256,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(TimeType("03:00:56"))
 
-    assertThat(answer.displayString(context)).isEqualTo("03:00:56")
+    assertThat(answer.value.displayString(context)).isEqualTo("03:00:56")
   }
 
   @Test
@@ -203,7 +264,8 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(TimeType())
 
-    assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.not_answered))
+    assertThat(answer.value.displayString(context))
+      .isEqualTo(context.getString(R.string.not_answered))
   }
 
   @Test
@@ -211,7 +273,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(UriType("./a"))
 
-    assertThat(answer.displayString(context)).isEqualTo("./a")
+    assertThat(answer.value.displayString(context)).isEqualTo("./a")
   }
 
   @Test
@@ -219,7 +281,8 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(UriType())
 
-    assertThat(answer.displayString(context)).isEqualTo(context.getString(R.string.not_answered))
+    assertThat(answer.value.displayString(context))
+      .isEqualTo(context.getString(R.string.not_answered))
   }
 
   @Test
