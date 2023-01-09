@@ -68,6 +68,12 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryEspressoTest {
         viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error.toString()
       )
       .isNotEmpty()
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error.toString()
+      )
+      .isEqualTo(
+        parent.resources.getString(R.string.integer_field_upper_limit_validation_error_msg)
+      )
   }
 
   /** Method to run code snippet on UI/main thread */
