@@ -37,15 +37,15 @@ internal class QuestionnaireGroupTypeHeaderView(context: Context, attrs: Attribu
     val prefix = findViewById<TextView>(R.id.prefix)
     val question = findViewById<TextView>(R.id.question)
     val hint = findViewById<TextView>(R.id.hint)
-    initHelpButton(
-      findViewById(R.id.helpButton),
-      findViewById(R.id.helpCardView),
-      findViewById(R.id.helpText),
+    initHelpViews(
+      helpButton = findViewById(R.id.helpButton),
+      helpCardView = findViewById(R.id.helpCardView),
+      helpTextView = findViewById(R.id.helpText),
       questionnaireItem
     )
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
     updateQuestionText(question, questionnaireItem)
     hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
-    visibility = getViewGroupVisibility(prefix, question, hint)
+    visibility = headerViewVisibility(prefix, question, hint)
   }
 }

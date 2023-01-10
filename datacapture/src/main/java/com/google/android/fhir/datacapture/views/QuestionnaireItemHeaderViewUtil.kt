@@ -22,7 +22,6 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.util.TypedValue
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Button
@@ -39,8 +38,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 /**
  * Updates textview [R.id.question] with
  * [Questionnaire.QuestionnaireItemComponent.localizedTextSpanned] text and `*` if
- * [Questionnaire.QuestionnaireItemComponent.required] is true. And applies [R.attr.colorError] to
- * `*`.
+ * [Questionnaire.QuestionnaireItemComponent.required] is true.
  */
 internal fun updateQuestionText(
   questionTextView: TextView,
@@ -49,10 +47,7 @@ internal fun updateQuestionText(
   val builder = SpannableStringBuilder()
   questionnaireItem.localizedTextSpanned?.let { builder.append(it) }
   if (questionnaireItem.required) {
-    builder.appendWithSpan(
-      questionTextView.context.applicationContext.getString(R.string.space_asterisk),
-      questionTextView.context.getColorFromAttr(R.attr.colorError)
-    )
+    builder.append(questionTextView.context.applicationContext.getString(R.string.space_asterisk))
   }
   questionTextView.updateTextAndVisibility(builder)
 }
@@ -68,45 +63,17 @@ internal fun TextView.updateTextAndVisibility(localizedText: Spanned? = null) {
 }
 
 /** Returns [VISIBLE] if any of the [view] is visible, else returns [GONE]. */
-internal fun getViewGroupVisibility(vararg view: TextView): Int {
+internal fun headerViewVisibility(vararg view: TextView): Int {
   if (view.any { it.visibility == VISIBLE }) {
     return VISIBLE
   }
   return GONE
 }
 
-internal fun initHelpButton(
-  view: View,
-  questionnaireItem: Questionnaire.QuestionnaireItemComponent
-) {
-  val helpButton = view.findViewById<Button>(R.id.helpButton)
-  helpButton.visibility =
-    if (questionnaireItem.hasHelpButton) {
-      VISIBLE
-    } else {
-      GONE
-    }
-  val helpCardView = view.findViewById<MaterialCardView>(R.id.helpCardView)
-  var isHelpCardViewVisible = false
-  helpButton.setOnClickListener {
-    if (isHelpCardViewVisible) {
-      isHelpCardViewVisible = false
-      helpCardView.visibility = GONE
-    } else {
-      isHelpCardViewVisible = true
-      helpCardView.visibility = VISIBLE
-    }
-  }
-
-  view
-    .findViewById<TextView>(R.id.helpText)
-    .updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
-}
-
-internal fun initHelpButton(
+internal fun initHelpViews(
   helpButton: Button,
   helpCardView: MaterialCardView,
-  helpText: TextView,
+  helpTextView: TextView,
   questionnaireItem: Questionnaire.QuestionnaireItemComponent
 ) {
   helpButton.visibility =
@@ -115,17 +82,14 @@ internal fun initHelpButton(
     } else {
       GONE
     }
-  var isHelpCardViewVisible = false
   helpButton.setOnClickListener {
-    if (isHelpCardViewVisible) {
-      isHelpCardViewVisible = false
-      helpCardView.visibility = GONE
-    } else {
-      isHelpCardViewVisible = true
-      helpCardView.visibility = VISIBLE
-    }
+    helpCardView.visibility =
+      when (helpCardView.visibility) {
+        VISIBLE -> GONE
+        else -> VISIBLE
+      }
   }
-  helpText.updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
+  helpTextView.updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
 }
 
 private fun SpannableStringBuilder.appendWithSpan(value: String, @ColorInt color: Int) {

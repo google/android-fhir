@@ -21,7 +21,6 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.graphics.ColorUtils
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.localizedInstructionsSpanned
@@ -40,8 +39,8 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var flyOverTextView: TextView
-      private lateinit var answerTextView: TextView
-      private lateinit var errorIcon: View
+      private lateinit var notAnsweredView: View
+      private lateinit var answerView: TextView
       private lateinit var divider: MaterialDivider
       private lateinit var prefix: TextView
       private lateinit var question: TextView
@@ -52,12 +51,12 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         flyOverTextView = itemView.findViewById(R.id.flyover_text_view)
-        answerTextView = itemView.findViewById(R.id.answer_text_view)
         divider = itemView.findViewById(R.id.text_divider)
-        errorIcon = itemView.findViewById(R.id.error_icon_in_review_mode)
         prefix = itemView.findViewById(R.id.prefix)
         question = itemView.findViewById(R.id.question)
         hint = itemView.findViewById(R.id.hint)
+        notAnsweredView = itemView.findViewById(R.id.not_answered_view)
+        answerView = itemView.findViewById(R.id.answer_text_view)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -68,7 +67,7 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
         hint.updateTextAndVisibility(
           questionnaireItemViewItem.questionnaireItem.localizedInstructionsSpanned
         )
-        header.visibility = getViewGroupVisibility(prefix, question, hint)
+        header.visibility = headerViewVisibility(prefix, question, hint)
 
         val localizedFlyoverSpanned =
           questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
@@ -82,36 +81,31 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
           text = localizedFlyoverSpanned
         }
 
-        answerTextView.apply {
-          visibility =
-            when (questionnaireItemViewItem.questionnaireItem.type) {
-              Questionnaire.QuestionnaireItemType.GROUP,
-              Questionnaire.QuestionnaireItemType.DISPLAY -> GONE
-              else -> VISIBLE
-            }
-          text = questionnaireItemViewItem.answerString(context)
-          setTextColorAsPerAnswer()
-        }
-
-        errorIcon.visibility =
-          when (questionnaireItemViewItem.questionnaireItem.type) {
-            Questionnaire.QuestionnaireItemType.GROUP,
-            Questionnaire.QuestionnaireItemType.DISPLAY -> {
-              GONE
-            }
-            else -> {
-              if (questionnaireItemViewItem.hasAnswerString) {
-                GONE
-              } else {
-                VISIBLE
-              }
+        when (questionnaireItemViewItem.questionnaireItem.type) {
+          Questionnaire.QuestionnaireItemType.GROUP,
+          Questionnaire.QuestionnaireItemType.DISPLAY -> {
+            notAnsweredView.visibility = GONE
+            answerView.visibility = GONE
+          }
+          else -> {
+            if (questionnaireItemViewItem.hasAnswer) {
+              notAnsweredView.visibility = GONE
+              answerView.visibility = VISIBLE
+              answerView.text = questionnaireItemViewItem.answerString(answerView.context)
+            } else {
+              notAnsweredView.visibility = VISIBLE
+              answerView.visibility = GONE
+              notAnsweredView.findViewById<TextView>(R.id.error_text_view).text =
+                questionnaireItemViewItem.answerString(answerView.context)
             }
           }
+        }
 
         divider.visibility =
           if (header.visibility == VISIBLE ||
               flyOverTextView.visibility == VISIBLE ||
-              answerTextView.visibility == VISIBLE
+              answerView.visibility == VISIBLE ||
+              notAnsweredView.visibility == VISIBLE
           ) {
             VISIBLE
           } else {
@@ -122,16 +116,5 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {}
 
       override fun setReadOnly(isReadOnly: Boolean) {}
-
-      private fun TextView.setTextColorAsPerAnswer() =
-        if (questionnaireItemViewItem.hasAnswerString) {
-          val color = context.getColorFromAttr(android.R.attr.textColor)
-          setTextColor(ColorUtils.setAlphaComponent(color, TEXT_COLOR_ALPHA))
-        } else {
-          val color = context.getColorFromAttr(R.attr.colorError)
-          setTextColor(color)
-        }
     }
 }
-
-private const val TEXT_COLOR_ALPHA = 0x80 // 50%

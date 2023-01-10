@@ -277,10 +277,7 @@ open class QuestionnaireFragment : Fragment() {
      */
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI = "questionnaire-response-uri"
 
-    /**
-     * A [Boolean] extra to control if a review page is shown. By default value is false, it will be
-     * shown at the end of the questionnaire if value is true.
-     */
+    /** A [Boolean] extra to enable the review page. Default to false. */
     const val EXTRA_ENABLE_REVIEW_PAGE = "enable-review-page"
 
     /**

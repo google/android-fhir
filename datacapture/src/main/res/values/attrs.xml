@@ -30,11 +30,18 @@
     <attr name="questionnaireHelpTextStyle" format="reference" />
     <!--   Style for help button -->
     <attr name="questionnaireHelpButtonStyle" format="reference" />
-    <!--   Style for answer text. -->
-    <attr name="questionnaireAnswerTextStyle" format="reference" />
-
     <!--   Style for question text in review mode -->
     <attr name="questionnaireReviewModeQuestionTextStyle" format="reference" />
+
+    <!--   Style for answer text. -->
+    <attr name="questionnaireReviewModeAnswerTextStyle" format="reference" />
+    <!--   Style for not answered text. -->
+    <attr
+        name="questionnaireReviewModeNotAnsweredTextStyle"
+        format="reference"
+    />
+
+    <attr name="questionnaireReviewModeItemDividerStyle" format="reference" />
 
     <!--   Style for radio buttons. -->
     <attr name="questionnaireRadioButtonStyle" format="reference" />

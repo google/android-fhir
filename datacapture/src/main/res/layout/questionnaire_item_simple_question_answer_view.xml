@@ -61,7 +61,6 @@
             app:layout_constraintStart_toStartOf="parent"
         />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
     <TextView
         android:id="@+id/flyover_text_view"
         style="?attr/questionnaireSubtitleTextStyle"
@@ -70,32 +69,39 @@
     />
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/not_answered_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/item_margin_vertical"
         android:orientation="horizontal"
         android:gravity="center_vertical"
     >
-    <TextView
+        <View
             android:id="@+id/error_icon_in_review_mode"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="@dimen/error_icon_width"
+            android:layout_height="@dimen/error_icon_height"
             android:layout_marginEnd="@dimen/error_icon_margin_end"
             android:background="@drawable/ic_error_48px"
             android:backgroundTint="?attr/colorError"
-            android:visibility="gone"
         />
 
-    <TextView
-            android:id="@+id/answer_text_view"
-            style="?attr/questionnaireAnswerTextStyle"
+        <TextView
+            android:id="@+id/error_text_view"
+            style="?attr/questionnaireReviewModeNotAnsweredTextStyle"
+            android:textColor="?attr/colorError"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
         />
     </LinearLayout>
-
+    <TextView
+        android:id="@+id/answer_text_view"
+        style="?attr/questionnaireReviewModeAnswerTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+    />
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/text_divider"
+        style="?attr/questionnaireReviewModeItemDividerStyle"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/item_margin_vertical"
         android:layout_width="match_parent"

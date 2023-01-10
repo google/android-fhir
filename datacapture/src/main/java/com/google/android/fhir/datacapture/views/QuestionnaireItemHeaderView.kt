@@ -43,15 +43,15 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
     updateQuestionText(question, questionnaireItem)
     hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
-    initHelpButton(
-      findViewById(R.id.helpButton),
-      findViewById(R.id.helpCardView),
-      findViewById(R.id.helpText),
+    initHelpViews(
+      helpButton = findViewById(R.id.helpButton),
+      helpCardView = findViewById(R.id.helpCardView),
+      helpTextView = findViewById(R.id.helpText),
       questionnaireItem
     )
     //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
-    visibility = getViewGroupVisibility(prefix, question, hint)
+    visibility = headerViewVisibility(prefix, question, hint)
   }
 
   /**

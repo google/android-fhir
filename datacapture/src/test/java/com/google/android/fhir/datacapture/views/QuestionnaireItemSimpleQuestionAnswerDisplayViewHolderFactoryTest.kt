@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views
 import android.app.Application
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.test.core.app.ApplicationProvider
@@ -174,7 +175,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
       .isEqualTo(
         ApplicationProvider.getApplicationContext<Application>().getString(R.string.not_answered)
       )
@@ -332,7 +333,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<View>(R.id.error_icon_in_review_mode).visibility)
+    assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.not_answered_view).visibility)
       .isEqualTo(View.GONE)
   }
 
