@@ -152,4 +152,8 @@ internal class AnswerOptionDropDownArrayAdapter(
 internal data class DropDownAnswerOption(
   val answerOptionString: String,
   val answerOptionImage: Drawable?
-)
+) {
+  override fun toString(): String {
+    return this.answerOptionString
+  }
+}
