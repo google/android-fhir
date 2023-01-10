@@ -74,19 +74,32 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
             R.layout.questionnaire_item_drop_down_list_item,
             answerOptionList
           )
-        questionnaireItemViewItem.answers
+        val selectedAnswer =
+          questionnaireItemViewItem.answers.singleOrNull()?.value?.displayString(header.context)
+        answerOptionList
+          .filter { it.answerOptionString == selectedAnswer }
           .singleOrNull()
-          ?.value
-          ?.displayString(header.context)
           ?.let {
-            autoCompleteTextView.setText(it)
-            autoCompleteTextView.setSelection(it.length)
+            autoCompleteTextView.setText(it.answerOptionString)
+            autoCompleteTextView.setSelection(it.answerOptionString.length)
+            autoCompleteTextView.setCompoundDrawablesRelative(
+              it.answerOptionImage,
+              null,
+              null,
+              null
+            )
           }
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.onItemClickListener =
           AdapterView.OnItemClickListener { _, _, position, _ ->
             val selectedItem = adapter.getItem(position)
             autoCompleteTextView.setText(selectedItem?.answerOptionString, false)
+            autoCompleteTextView.setCompoundDrawablesRelative(
+              adapter.getItem(position)?.answerOptionImage,
+              null,
+              null,
+              null
+            )
             val selectedAnswer =
               questionnaireItemViewItem.answerOption
                 .firstOrNull { it.value.displayString(context) == selectedItem?.answerOptionString }
@@ -119,6 +132,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
       private fun cleanupOldState() {
         autoCompleteTextView.setAdapter(null)
         autoCompleteTextView.text = null
+        autoCompleteTextView.setCompoundDrawablesRelative(null, null, null, null)
       }
     }
 }
