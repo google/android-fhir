@@ -16,18 +16,12 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.content.Context
-import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
-import android.text.style.ForegroundColorSpan
-import android.util.TypedValue
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Button
 import android.widget.TextView
-import androidx.annotation.AttrRes
-import androidx.annotation.ColorInt
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.hasHelpButton
 import com.google.android.fhir.datacapture.localizedHelpSpanned
@@ -36,7 +30,7 @@ import com.google.android.material.card.MaterialCardView
 import org.hl7.fhir.r4.model.Questionnaire
 
 /**
- * Updates textview [R.id.question] with
+ * Updates textview [questionTextView] with
  * [Questionnaire.QuestionnaireItemComponent.localizedTextSpanned] text and `*` if
  * [Questionnaire.QuestionnaireItemComponent.required] is true.
  */
@@ -90,22 +84,4 @@ internal fun initHelpViews(
       }
   }
   helpTextView.updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
-}
-
-private fun SpannableStringBuilder.appendWithSpan(value: String, @ColorInt color: Int) {
-  val start = length
-  append(value)
-  val end = length
-  setSpan(ForegroundColorSpan(color), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-}
-
-/**
- * Reads @ColorInt value from android resource attribute. e.g [attrColor] value is
- * [R.attr.colorError] to get the colorInt.
- */
-@ColorInt
-internal fun Context.getColorFromAttr(@AttrRes attrColor: Int): Int {
-  val typedValue = TypedValue()
-  theme.resolveAttribute(attrColor, typedValue, true)
-  return typedValue.data
 }

@@ -89,14 +89,9 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
           }
           else -> {
             if (questionnaireItemViewItem.hasAnswer) {
-              notAnsweredView.visibility = GONE
-              answerView.visibility = VISIBLE
-              answerView.text = questionnaireItemViewItem.answerString(answerView.context)
+              showAnswerView(questionnaireItemViewItem)
             } else {
-              notAnsweredView.visibility = VISIBLE
-              answerView.visibility = GONE
-              notAnsweredView.findViewById<TextView>(R.id.error_text_view).text =
-                questionnaireItemViewItem.answerString(answerView.context)
+              showNotAnsweredView(questionnaireItemViewItem)
             }
           }
         }
@@ -111,6 +106,19 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
           } else {
             GONE
           }
+      }
+
+      private fun showAnswerView(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        notAnsweredView.visibility = GONE
+        answerView.visibility = VISIBLE
+        answerView.text = questionnaireItemViewItem.answerString(answerView.context)
+      }
+
+      private fun showNotAnsweredView(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        answerView.visibility = GONE
+        notAnsweredView.visibility = VISIBLE
+        notAnsweredView.findViewById<TextView>(R.id.error_text_view).text =
+          questionnaireItemViewItem.answerString(answerView.context)
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {}

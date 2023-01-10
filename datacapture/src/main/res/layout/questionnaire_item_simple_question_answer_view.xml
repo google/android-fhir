@@ -77,7 +77,6 @@
         android:gravity="center_vertical"
     >
         <View
-            android:id="@+id/error_icon_in_review_mode"
             android:layout_width="@dimen/error_icon_width"
             android:layout_height="@dimen/error_icon_height"
             android:layout_marginEnd="@dimen/error_icon_margin_end"
