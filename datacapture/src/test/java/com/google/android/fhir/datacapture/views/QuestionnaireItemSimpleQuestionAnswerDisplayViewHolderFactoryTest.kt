@@ -297,7 +297,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
   }
 
   @Test
-  fun `shows error icon if answer is not present`() {
+  fun `shows not answered view if answer is not present`() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -310,12 +310,12 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<View>(R.id.error_icon_in_review_mode).visibility)
+    assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.not_answered_view).visibility)
       .isEqualTo(View.VISIBLE)
   }
 
   @Test
-  fun `does not show error icon if answer is present`() {
+  fun `does not show not answered view if answer is present`() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
