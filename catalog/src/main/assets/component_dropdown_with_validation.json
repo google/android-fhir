@@ -19,43 +19,43 @@
           }
         }
       ],
-      "text": "Question title",
+      "text": "Choose one from the options below",
       "required": true,
       "answerOption": [
         {
           "valueCoding": {
             "code": "option-1",
-            "display": "State A"
+            "display": "Option 1"
           }
         },
         {
           "valueCoding": {
             "code": "option-2",
-            "display": "State B"
+            "display": "Option 2"
           }
         },
         {
           "valueCoding": {
             "code": "option-3",
-            "display": "State C"
+            "display": "Option 3"
           }
         },
         {
           "valueCoding": {
             "code": "mother",
-            "display": "State D"
+            "display": "Option 4"
           }
         },
         {
           "valueCoding": {
             "code": "sibling",
-            "display": "State E"
+            "display": "Option 5"
           }
         },
         {
           "valueCoding": {
             "code": "other",
-            "display": "State F"
+            "display": "Option 6"
           }
         }
       ],
