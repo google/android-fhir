@@ -24,6 +24,10 @@ import java.io.File
 /**
  * A DB Entity containing a minimal
  * [Implementation Guide](https://build.fhir.org/implementationguide.html) description.
+ *
+ * The metadata stored there is enough for `NpmPackageManager` to resolve the
+ * [dependency](https://build.fhir.org/implementationguide-definitions.html#ImplementationGuide.dependsOn)
+ * to another Implementation guide.
  */
 @Entity(indices = [Index(value = ["packageId", "url", "version"], unique = true)])
 internal data class ImplementationGuideEntity(
