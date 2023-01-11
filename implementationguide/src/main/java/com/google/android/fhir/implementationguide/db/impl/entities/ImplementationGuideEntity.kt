@@ -22,14 +22,15 @@ import androidx.room.PrimaryKey
 import java.io.File
 
 /**
- * Implementation Guide Dependency for the `NpmPackageManager`.
- * Dependency is defined by the name and version,
+ * A DB Entity containing a minimal
+ * [Implementation Guide](https://build.fhir.org/implementationguide.html) description.
  */
-@Entity(indices = [Index(value = ["name", "version"], unique = true)])
+@Entity(indices = [Index(value = ["packageId", "url", "version"], unique = true)])
 internal data class ImplementationGuideEntity(
-  @PrimaryKey(autoGenerate = true) val id: Long,
-  val name: String,
-  val version: String,
-  val url: String? = null,
-  val rootDirectory: File
+  @PrimaryKey(autoGenerate = true) val implementationGuideId: Long,
+  val url: String,
+  val packageId: String,
+  val version: String?,
+  /** Location of the physical files of Implementation guide */
+  val rootDirectory: File,
 )

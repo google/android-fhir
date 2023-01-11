@@ -46,7 +46,7 @@ internal class ImplementationGuideDatabaseTest {
   @Test
   fun igInserted(): Unit = runBlocking {
     assertThat(igDao.insert(IG_ENTITY)).isGreaterThan(0)
-    assertThat(igDao.getImplementationGuides().map { it.name }).containsExactly(IG_NAME)
+    assertThat(igDao.getImplementationGuides().map { it.packageId }).containsExactly(IG_PACKAGE_ID)
   }
 
   @Test
@@ -55,7 +55,6 @@ internal class ImplementationGuideDatabaseTest {
     val resource =
       ResourceMetadataEntity(
         0L,
-        igId,
         ResourceType.ValueSet,
         RES_URL,
         RES_NAME,
@@ -63,12 +62,13 @@ internal class ImplementationGuideDatabaseTest {
         File("resId")
       )
 
-    igDao.insert(resource)
+    igDao.insertResource(igId, resource)
 
-    assertThat(igDao.getResources(ResourceType.ValueSet, listOf(igId)).map { it.url })
+    assertThat(igDao.getResources(ResourceType.ValueSet).map { it.url }).containsExactly(RES_URL)
+    assertThat(igDao.getResources(ResourceType.Account)).isEmpty()
+    assertThat(igDao.getImplementationGuidesWithResources(igId)?.resources?.map { it.url })
       .containsExactly(RES_URL)
-    assertThat(igDao.getResources(ResourceType.Account, listOf(igId))).isEmpty()
-    assertThat(igDao.getResources(listOf(-1L))).isEmpty()
+    assertThat(igDao.getImplementationGuidesWithResources(-1)).isNull()
   }
 
   @Test
@@ -77,32 +77,33 @@ internal class ImplementationGuideDatabaseTest {
     val resource =
       ResourceMetadataEntity(
         0L,
-        igId,
         ResourceType.ValueSet,
         RES_URL,
         RES_NAME,
         RES_VERSION,
         File("resId")
       )
-    igDao.insert(resource)
+    igDao.insertResource(igId, resource)
 
-    igDao.deleteImplementationGuide(IG_NAME, IG_VERSION)
+    igDao.deleteImplementationGuide(IG_PACKAGE_ID, IG_VERSION)
 
     assertThat(igDao.getImplementationGuides()).isEmpty()
-    assertThat(igDao.getResources(listOf(igId))).isEmpty()
+    assertThat(igDao.getResources()).isEmpty()
+    assertThat(igDao.getImplementationGuidesWithResources(igId)).isNull()
   }
 
   private companion object {
-    const val IG_NAME = "test.ig"
+    const val IG_PACKAGE_ID = "test.ig"
     const val IG_VERSION = "1.0.0"
     const val RES_NAME = "res-name-1"
     const val RES_VERSION = "1.0.0"
     const val RES_URL = "http://url.com/ValueSet/$RES_NAME/$RES_VERSION"
     val IG_ENTITY =
       ImplementationGuideEntity(
-        id = 0L,
-        name = IG_NAME,
+        implementationGuideId = 0L,
+        packageId = IG_PACKAGE_ID,
         version = IG_VERSION,
+        url = "http://url",
         rootDirectory = File("test")
       )
   }

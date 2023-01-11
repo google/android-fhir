@@ -20,12 +20,14 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.google.android.fhir.implementationguide.db.impl.dao.ImplementationGuideDao
+import com.google.android.fhir.implementationguide.db.impl.entities.IgResourceCrossRef
 import com.google.android.fhir.implementationguide.db.impl.entities.ImplementationGuideEntity
 import com.google.android.fhir.implementationguide.db.impl.entities.ResourceMetadataEntity
 
-/** Holds metadata for implementation guides and their containing FHIR Resources. */
+/** Stores metadata for implementation guides and their containing FHIR Resources. */
 @Database(
-  entities = [ImplementationGuideEntity::class, ResourceMetadataEntity::class],
+  entities =
+    [ImplementationGuideEntity::class, ResourceMetadataEntity::class, IgResourceCrossRef::class],
   version = 1,
   exportSchema = false
 )
