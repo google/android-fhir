@@ -796,7 +796,8 @@ private val Questionnaire.QuestionnaireItemComponent.itemExtractionContextExtens
 
 /**
  * The item extraction context extension value of type Expression or CodeType if one and only one
- * such extension exists, or null otherwise. See
+ * such extension exists or null otherwise. If there are multiple extensions exists, it will be
+ * ignored. See
  * http://hl7.org/fhir/uv/sdc/STU3/StructureDefinition-sdc-questionnaire-itemExtractionContext.html
  */
 private val List<Extension>.itemExtractionContextExtensionValue
@@ -805,6 +806,7 @@ private val List<Extension>.itemExtractionContextExtensionValue
       ?.let {
         when (it.value) {
           is Expression -> {
+            // TODO update the existing resource
             val expression = it.value as Expression
             expression.expression
           }
