@@ -29,7 +29,7 @@ import org.hl7.fhir.r4.model.ResourceType
   indices =
     [
       Index(value = ["implementationGuideId"], unique = false),
-      Index(value = ["resourceType", "url", "implementationGuideId"], unique = true)
+      Index(value = ["url", "version", "implementationGuideId"], unique = true)
     ],
   foreignKeys =
     [
