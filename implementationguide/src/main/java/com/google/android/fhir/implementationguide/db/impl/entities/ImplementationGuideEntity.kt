@@ -21,11 +21,15 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.io.File
 
+/**
+ * Implementation Guide Dependency for the `NpmPackageManager`.
+ * Dependency is defined by the name and version,
+ */
 @Entity(indices = [Index(value = ["name", "version"], unique = true)])
 internal data class ImplementationGuideEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val name: String,
-  val version: String? = null,
-  val canonicalUrl: String? = null,
+  val version: String,
+  val url: String? = null,
   val rootDirectory: File
 )
