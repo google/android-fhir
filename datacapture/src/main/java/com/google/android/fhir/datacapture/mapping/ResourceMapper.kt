@@ -772,8 +772,8 @@ private fun Questionnaire.createResource(): Resource? =
   }
 
 /**
- * The item extraction context extension value of type Expression or CodeType if one and only one such
- * extension exists, or null otherwise.
+ * The item extraction context extension value of type Expression or CodeType if one and only one
+ * such extension exists, or null otherwise.
  */
 private val Questionnaire.itemExtractionContextExtensionValue
   get() = this.extension.itemExtractionContextExtensionValue
@@ -788,15 +788,15 @@ private fun Questionnaire.QuestionnaireItemComponent.createResource(): Resource?
   }
 
 /**
- * The item extraction context extension value of type Expression or CodeType if one and only one such
- * extension exists, or null otherwise.
+ * The item extraction context extension value of type Expression or CodeType if one and only one
+ * such extension exists, or null otherwise.
  */
 private val Questionnaire.QuestionnaireItemComponent.itemExtractionContextExtensionValue: String?
   get() = this.extension.itemExtractionContextExtensionValue
 
 /**
- *  The item extraction context extension value of type Expression or CodeType if one and only one such
- * extension exists, or null otherwise. See
+ * The item extraction context extension value of type Expression or CodeType if one and only one
+ * such extension exists, or null otherwise. See
  * http://hl7.org/fhir/uv/sdc/STU3/StructureDefinition-sdc-questionnaire-itemExtractionContext.html
  */
 private val List<Extension>.itemExtractionContextExtensionValue
