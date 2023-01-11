@@ -27,7 +27,11 @@ import org.hl7.fhir.r4.model.ResourceType
  * [FHIR Resource](https://build.fhir.org/canonicalresource.html).
  */
 @Entity(
-  indices = [Index(value = ["url", "version", "fileUri"], unique = true)],
+  indices =
+    [
+      Index(value = ["resourceMetadataId"]),
+      Index(value = ["url", "version", "fileUri"], unique = true)
+    ],
 )
 internal data class ResourceMetadataEntity(
   @PrimaryKey(autoGenerate = true) val resourceMetadataId: Long,

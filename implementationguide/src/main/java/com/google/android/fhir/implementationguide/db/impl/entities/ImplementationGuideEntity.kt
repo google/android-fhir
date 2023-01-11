@@ -29,7 +29,13 @@ import java.io.File
  * [dependency](https://build.fhir.org/implementationguide-definitions.html#ImplementationGuide.dependsOn)
  * to another Implementation guide.
  */
-@Entity(indices = [Index(value = ["packageId", "url", "version"], unique = true)])
+@Entity(
+  indices =
+    [
+      Index(value = ["implementationGuideId"]),
+      Index(value = ["packageId", "url", "version"], unique = true)
+    ]
+)
 internal data class ImplementationGuideEntity(
   @PrimaryKey(autoGenerate = true) val implementationGuideId: Long,
   val url: String,

@@ -19,6 +19,7 @@ package com.google.android.fhir.implementationguide.db.impl.entities
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.Junction
 import androidx.room.Relation
 
@@ -27,6 +28,7 @@ import androidx.room.Relation
  */
 @Entity(
   primaryKeys = ["implementationGuideId", "resourceMetadataId"],
+  indices = [Index(value = ["implementationGuideId"]), Index(value = ["resourceMetadataId"])],
   foreignKeys =
     [
       ForeignKey(
