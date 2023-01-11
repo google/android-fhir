@@ -1,3 +1,6 @@
+import Dependencies.forceHapiVersion
+import Dependencies.removeIncompatibleDependencies
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -67,15 +70,8 @@ android {
 
 configurations {
   all {
-    exclude(module = "xpp3")
-    exclude(module = "xpp3_min")
-    exclude(module = "xmlpull")
-    exclude(module = "javax.json")
-    exclude(module = "jcl-over-slf4j")
-    exclude(group = "org.apache.httpcomponents")
-    // Remove this after this issue has been fixed:
-    // https://github.com/cqframework/clinical_quality_language/issues/799
-    exclude(module = "antlr4")
+    removeIncompatibleDependencies()
+    forceHapiVersion()
   }
 }
 

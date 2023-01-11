@@ -100,10 +100,6 @@ fun Project.configureLicensee() {
     allowDependency("org.antlr", "antlr4-runtime", "4.10.1") {
       because("BSD 3-clause. http://www.antlr.org/license.html")
     }
-    // ANTLR 4
-    allowDependency("org.antlr", "antlr4", "4.10.1") {
-      because("BSD 3-clause. http://www.antlr.org/license.html")
-    }
 
     // Utilities
     // https://developers.google.com/android/reference/com/google/android/gms/common/package-summary
