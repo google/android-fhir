@@ -149,12 +149,13 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
     var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
-        answerOptionsValueWithImageExtension(
+        createAnswerOptions(
           "Coding 1",
           "Coding 2",
           "Coding 3",
           "Coding 4",
-          "Coding 5"
+          "Coding 5",
+          hasImageExtension = true
         ),
         responseOptions(),
         validationResult = NotValidated,
@@ -182,7 +183,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
     var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
-        answerOptionsValueString("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
+        createAnswerOptions("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseValueStringOptions(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers -> answerHolder = answers },
@@ -203,7 +204,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
   fun shouldReturnNonFilteredDropDownMenuItems() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
-        answerOptionsValueString("Coding 1", "Coding 2", "Coding 3", "Add", "Subtract"),
+        createAnswerOptions("Coding 1", "Coding 2", "Coding 3", "Add", "Subtract"),
         responseValueStringOptions(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
@@ -222,7 +223,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
   fun shouldReturnFilteredDropDownMenuItems() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
-        answerOptionsValueString("Coding 1", "Coding 2", "Coding 3", "Add", "Subtract"),
+        createAnswerOptions("Coding 1", "Coding 2", "Coding 3", "Add", "Subtract"),
         responseValueStringOptions(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
@@ -243,7 +244,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
   fun shouldReturnFilteredWithNoResultsDropDownMenuItems() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
-        answerOptionsValueString("Coding 1", "Coding 2", "Coding 3", "Add", "Subtract"),
+        createAnswerOptions("Coding 1", "Coding 2", "Coding 3", "Add", "Subtract"),
         responseValueStringOptions(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _ -> },
@@ -297,23 +298,14 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
       }
     }
 
-  private fun answerOptionsValueString(vararg options: String) =
+  private fun createAnswerOptions(vararg options: String, hasImageExtension: Boolean = false) =
     Questionnaire.QuestionnaireItemComponent().apply {
       options.forEach { option ->
         addAnswerOption(
           Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-            value = StringType().apply { valueAsString = option }
-          }
-        )
-      }
-    }
-
-  private fun answerOptionsValueWithImageExtension(vararg options: String) =
-    Questionnaire.QuestionnaireItemComponent().apply {
-      options.forEach { option ->
-        addAnswerOption(
-          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-            extension = listOf(itemAnswerMediaExtension)
+            if (hasImageExtension) {
+              extension = listOf(itemAnswerMediaExtension)
+            }
             value = StringType().apply { valueAsString = option }
           }
         )

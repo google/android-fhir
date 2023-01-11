@@ -46,21 +46,20 @@ fun Questionnaire.QuestionnaireItemAnswerOptionComponent.itemAnswerOptionImage(
 ): Drawable? {
   return (extension.singleOrNull { it.url == EXTENSION_ITEM_ANSWER_MEDIA }?.value as Attachment?)
     ?.let {
-      if (it.hasContentType() && it.hasData()) {
-        when (it.contentType) {
-          "image/jpeg",
-          "image/jpg",
-          "image/png" -> {
-            val bitmap = BitmapFactory.decodeByteArray(it.data, 0, it.data.size)
-            val imageSize = context.resources.getDimensionPixelOffset(R.dimen.choice_button_image)
-            val drawable: Drawable = BitmapDrawable(context.resources, bitmap)
-            drawable.setBounds(0, 0, imageSize, imageSize)
-            drawable
-          }
-          else -> null
+      if (!it.hasContentType() || !it.hasData()) {
+        return null
+      }
+      when (it.contentType) {
+        "image/jpeg",
+        "image/jpg",
+        "image/png" -> {
+          val bitmap = BitmapFactory.decodeByteArray(it.data, 0, it.data.size)
+          val imageSize = context.resources.getDimensionPixelOffset(R.dimen.choice_button_image)
+          val drawable: Drawable = BitmapDrawable(context.resources, bitmap)
+          drawable.setBounds(0, 0, imageSize, imageSize)
+          drawable
         }
-      } else {
-        null
+        else -> null
       }
     }
 }
