@@ -295,7 +295,8 @@ internal fun getConditionParamPair(
       (prefix != ParamPrefixEnum.STARTS_AFTER && prefix != ParamPrefixEnum.ENDS_BEFORE)
   ) { "Prefix $prefix not allowed for Integer type" }
   return when (prefix) {
-    ParamPrefixEnum.EQUAL, null -> {
+    ParamPrefixEnum.EQUAL,
+    null -> {
       val precision = value.getRange()
       ConditionParam(
         "index_value >= ? AND index_value < ?",
