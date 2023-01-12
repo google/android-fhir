@@ -3,7 +3,7 @@
   "item": [
     {
       "linkId": "1",
-      "text": "When was your last menstrual period? (LMP)",
+      "text": "Enter a date",
       "type": "date",
       "required": true,
       "extension": [
@@ -28,7 +28,7 @@
             }
           ],
           "linkId": "1-most-recent",
-          "text": "First day of most recent period",
+          "text": "Use keyboard entry or date picker",
           "type": "display"
         }
       ]

@@ -1,4 +1,5 @@
 import codegen.GenerateSourcesTask
+import java.net.URL
 
 plugins {
   id(Plugins.BuildPlugins.androidLib)
@@ -6,6 +7,7 @@ plugins {
   id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
+  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
 }
 
 publishArtifact(Releases.Engine)
@@ -131,4 +133,27 @@ dependencies {
   testImplementation(Dependencies.truth)
 }
 
-configureDokka(Releases.Engine.artifactId, Releases.Engine.version)
+tasks.dokkaHtml.configure {
+  outputDirectory.set(file("../docs/${Releases.Engine.artifactId}/${Releases.Engine.version}"))
+  suppressInheritedMembers.set(true)
+  dokkaSourceSets {
+    named("main") {
+      moduleName.set(Releases.Engine.artifactId)
+      moduleVersion.set(Releases.Engine.version)
+      noAndroidSdkLink.set(false)
+      sourceLink {
+        localDirectory.set(file("src/main/java"))
+        remoteUrl.set(
+          URL("https://github.com/google/android-fhir/tree/master/engine/src/main/java")
+        )
+        remoteLineSuffix.set("#L")
+      }
+      externalDocumentationLink {
+        url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
+        packageListUrl.set(
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+        )
+      }
+    }
+  }
+}

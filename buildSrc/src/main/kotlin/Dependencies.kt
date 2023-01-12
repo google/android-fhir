@@ -14,6 +14,25 @@
  * limitations under the License.
  */
 
+import org.gradle.api.artifacts.Configuration
+import org.gradle.kotlin.dsl.exclude
+
+/*
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 object Dependencies {
 
   object Androidx {
@@ -34,10 +53,6 @@ object Dependencies {
     const val openCdsGroup = "org.opencds.cqf.cql"
     const val translatorGroup = "info.cqframework"
 
-    // Remove this after this issue has been fixed:
-    // https://github.com/cqframework/clinical_quality_language/issues/799
-    const val antlr4Runtime = "org.antlr:antlr4-runtime:${Versions.Cql.antlr}"
-
     const val engine = "$openCdsGroup:engine:${Versions.Cql.engine}"
     const val engineJackson = "$openCdsGroup:engine.jackson:${Versions.Cql.engine}"
 
@@ -54,9 +69,32 @@ object Dependencies {
   }
 
   object HapiFhir {
-    const val coreLibrary = "ca.uhn.hapi.fhir:hapi-fhir-base:${Versions.hapiFhir}"
+    const val fhirBase = "ca.uhn.hapi.fhir:hapi-fhir-base:${Versions.hapiFhir}"
+    const val fhirClient = "ca.uhn.hapi.fhir:hapi-fhir-client:${Versions.hapiFhir}"
+    const val structuresDstu2 = "ca.uhn.hapi.fhir:hapi-fhir-structures-dstu2:${Versions.hapiFhir}"
+    const val structuresDstu3 = "ca.uhn.hapi.fhir:hapi-fhir-structures-dstu3:${Versions.hapiFhir}"
     const val structuresR4 = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhir}"
+    const val structuresR4b = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4b:${Versions.hapiFhir}"
+    const val structuresR5 = "ca.uhn.hapi.fhir:hapi-fhir-structures-r5:${Versions.hapiFhir}"
+
     const val validation = "ca.uhn.hapi.fhir:hapi-fhir-validation:${Versions.hapiFhir}"
+    const val validationDstu3 =
+      "ca.uhn.hapi.fhir:hapi-fhir-validation-resources-dstu3:${Versions.hapiFhir}"
+    const val validationR4 =
+      "ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:${Versions.hapiFhir}"
+    const val validationR5 =
+      "ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r5:${Versions.hapiFhir}"
+
+    const val fhirCoreDstu2 = "ca.uhn.hapi.fhir:org.hl7.fhir.dstu2:${Versions.hapiFhirCore}"
+    const val fhirCoreDstu2016 =
+      "ca.uhn.hapi.fhir:org.hl7.fhir.dstu2016may:${Versions.hapiFhirCore}"
+    const val fhirCoreDstu3 = "ca.uhn.hapi.fhir:org.hl7.fhir.dstu3:${Versions.hapiFhirCore}"
+    const val fhirCoreR4 = "ca.uhn.hapi.fhir:org.hl7.fhir.r4:${Versions.hapiFhirCore}"
+    const val fhirCoreR4b = "ca.uhn.hapi.fhir:org.hl7.fhir.r4b:${Versions.hapiFhirCore}"
+    const val fhirCoreR5 = "ca.uhn.hapi.fhir:org.hl7.fhir.r5:${Versions.hapiFhirCore}"
+    const val fhirCoreUtils = "ca.uhn.hapi.fhir:org.hl7.fhir.utilities:${Versions.hapiFhirCore}"
+    const val fhirCoreConvertors =
+      "ca.uhn.hapi.fhir:org.hl7.fhir.convertors:${Versions.hapiFhirCore}"
 
     // Runtime dependency that is required to run FhirPath (also requires minSDK of 26).
     // Version 3.0 uses java.lang.System.Logger, which is not available on Android
@@ -65,9 +103,19 @@ object Dependencies {
   }
 
   object Jackson {
-    const val annotations = "com.fasterxml.jackson.core:jackson-annotations:${Versions.jackson}"
-    const val core = "com.fasterxml.jackson.core:jackson-core:${Versions.jackson}"
-    const val databind = "com.fasterxml.jackson.core:jackson-databind:${Versions.jackson}"
+    const val mainGroup = "com.fasterxml.jackson"
+    const val coreGroup = "$mainGroup.core"
+    const val dataformatGroup = "$mainGroup.dataformat"
+    const val datatypeGroup = "$mainGroup.datatype"
+    const val moduleGroup = "$mainGroup.module"
+
+    const val annotations = "$coreGroup:jackson-annotations:${Versions.jackson}"
+    const val bom = "$mainGroup:jackson-bom:${Versions.jackson}"
+    const val core = "$coreGroup:jackson-core:${Versions.jackson}"
+    const val databind = "$coreGroup:jackson-databind:${Versions.jackson}"
+    const val dataformatXml = "$dataformatGroup:jackson-dataformat-xml:${Versions.jackson}"
+    const val jaxbAnnotations = "$moduleGroup:jackson-module-jaxb-annotations:${Versions.jackson}"
+    const val jsr310 = "$datatypeGroup:jackson-datatype-jsr310:${Versions.jackson}"
   }
 
   object Kotlin {
@@ -189,9 +237,9 @@ object Dependencies {
 
     object Cql {
       const val antlr = "4.10.1"
-      const val engine = "2.1.0"
-      const val evaluator = "2.1.0"
-      const val translator = "2.2.0"
+      const val engine = "2.4.0"
+      const val evaluator = "2.4.0"
+      const val translator = "2.4.0"
     }
 
     object Kotlin {
@@ -205,9 +253,17 @@ object Dependencies {
     const val caffeine = "2.9.1"
     const val fhirUcum = "1.0.3"
     const val guava = "28.2-android"
+
+    // Hapi FHIR and HL7 Core Components are interlinked.
+    // Newer versions of HapiFhir don't work on Android due to the use of Caffeine 3+
+    // Wait for this to release (6.3): https://github.com/hapifhir/hapi-fhir/pull/4196
     const val hapiFhir = "6.0.1"
+    // Newer versions don't work on Android due to Apache Commons Codec:
+    // Wait for this fix: https://github.com/hapifhir/org.hl7.fhir.core/issues/1046
+    const val hapiFhirCore = "5.6.36"
+
     const val http = "4.9.1"
-    const val jackson = "2.12.2"
+    const val jackson = "2.14.1"
     const val jsonToolsPatch = "1.13"
     const val jsonAssert = "1.5.1"
     const val kotlinPoet = "1.9.0"
@@ -244,6 +300,47 @@ object Dependencies {
       const val barcodeScanning = "16.1.1"
       const val objectDetection = "16.2.3"
       const val objectDetectionCustom = "16.3.1"
+    }
+  }
+
+  fun Configuration.removeIncompatibleDependencies() {
+    exclude(module = "xpp3")
+    exclude(module = "xpp3_min")
+    exclude(module = "xmlpull")
+    exclude(module = "javax.json")
+    exclude(module = "jcl-over-slf4j")
+    exclude(group = "org.apache.httpcomponents")
+  }
+
+  fun Configuration.forceHapiVersion() {
+    // Removes newer versions of caffeine and manually imports 2.9
+    // Removes newer versions of hapi and keeps on 6.0.1
+    // Removes newer versions of HL7 core and keeps it on 5.6.36
+    // (newer versions don't work on Android)
+    resolutionStrategy {
+      force(HapiFhir.caffeine)
+
+      force(HapiFhir.fhirBase)
+      force(HapiFhir.fhirClient)
+      force(HapiFhir.fhirCoreConvertors)
+
+      force(HapiFhir.fhirCoreDstu2)
+      force(HapiFhir.fhirCoreDstu2016)
+      force(HapiFhir.fhirCoreDstu3)
+      force(HapiFhir.fhirCoreR4)
+      force(HapiFhir.fhirCoreR4b)
+      force(HapiFhir.fhirCoreR5)
+      force(HapiFhir.fhirCoreUtils)
+
+      force(HapiFhir.structuresDstu2)
+      force(HapiFhir.structuresDstu3)
+      force(HapiFhir.structuresR4)
+      force(HapiFhir.structuresR5)
+
+      force(HapiFhir.validation)
+      force(HapiFhir.validationDstu3)
+      force(HapiFhir.validationR4)
+      force(HapiFhir.validationR5)
     }
   }
 }

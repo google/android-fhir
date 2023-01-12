@@ -21,11 +21,12 @@ import androidx.core.text.HtmlCompat
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.utilities.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
-import com.google.android.fhir.logicalId
+import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -185,6 +186,26 @@ internal val Questionnaire.QuestionnaireItemComponent.mimeTypes: List<String>
       .map { (it.value as CodeType).valueAsString }
       .filter { !it.isNullOrEmpty() }
   }
+
+internal const val EXTENSION_MAX_SIZE = "http://hl7.org/fhir/StructureDefinition/maxSize"
+
+/** The maximum size of an attachment in Bytes. */
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInBytes: BigDecimal?
+  get() =
+    (extension.firstOrNull { it.url == EXTENSION_MAX_SIZE }?.valueAsPrimitive as DecimalType?)
+      ?.value
+
+private val BYTES_PER_KIB = BigDecimal(1024)
+
+/** The maximum size of an attachment in Kibibytes. */
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInKiBs: BigDecimal?
+  get() = maxSizeInBytes?.div(BYTES_PER_KIB)
+
+private val BYTES_PER_MIB = BigDecimal(1048576)
+
+/** The maximum size of an attachment in Mebibytes. */
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInMiBs: BigDecimal?
+  get() = maxSizeInBytes?.div(BYTES_PER_MIB)
 
 /** UI controls relevant to rendering questionnaire items. */
 internal enum class DisplayItemControlType(val extensionCode: String) {
@@ -545,3 +566,8 @@ fun List<Questionnaire.QuestionnaireItemComponent>.flattened():
  */
 fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
   item.map { it.createQuestionnaireResponseItem() }
+
+val Resource.logicalId: String
+  get() {
+    return this.idElement?.idPart.orEmpty()
+  }

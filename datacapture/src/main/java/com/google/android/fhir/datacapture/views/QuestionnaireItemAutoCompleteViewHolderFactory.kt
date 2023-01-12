@@ -24,7 +24,7 @@ import androidx.core.view.children
 import androidx.core.view.get
 import androidx.core.view.isEmpty
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.common.datatype.displayString
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -62,7 +62,8 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
                 value =
                   questionnaireItemViewItem.answerOption
                     .first {
-                      it.displayString == autoCompleteTextView.adapter.getItem(position) as String
+                      it.value.displayString(header.context) ==
+                        autoCompleteTextView.adapter.getItem(position) as String
                     }
                     .valueCoding
               }
@@ -75,11 +76,12 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
 
-        val answerOptionString = questionnaireItemViewItem.answerOption.map { it.displayString }
+        val answerOptionString =
+          questionnaireItemViewItem.answerOption.map { it.value.displayString(header.context) }
         val adapter =
           ArrayAdapter(
             header.context,
-            R.layout.questionnaire_item_drop_down_list,
+            R.layout.questionnaire_item_drop_down_list_item,
             answerOptionString
           )
         autoCompleteTextView.setAdapter(adapter)
