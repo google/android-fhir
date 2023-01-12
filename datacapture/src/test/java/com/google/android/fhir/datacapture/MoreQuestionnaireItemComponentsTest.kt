@@ -531,6 +531,24 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun `should return false if given size is below maximum size allowed`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
+      }
+    assertThat(questionnaireItem.isGivenSizeOverLimit(BigDecimal(10))).isFalse()
+  }
+
+  @Test
+  fun `should return true if given size is above maximum size allowed`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
+      }
+    assertThat(questionnaireItem.isGivenSizeOverLimit(BigDecimal(52428809))).isTrue()
+  }
+
+  @Test
   fun mimeType_size_shouldReturnNumberOfSupportedMimeTypes() {
     assertThat(MimeType.values().size).isEqualTo(4)
   }
@@ -581,7 +599,7 @@ class MoreQuestionnaireItemComponentsTest {
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
       }
-    assertThat(questionnaire.maxSizeInByte).isEqualTo(BigDecimal(5242880))
+    assertThat(questionnaire.maxSizeInBytes).isEqualTo(BigDecimal(5242880))
   }
 
   @Test
@@ -590,7 +608,7 @@ class MoreQuestionnaireItemComponentsTest {
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
       }
-    assertThat(questionnaire.maxSizeInKiB).isEqualTo(BigDecimal(5120))
+    assertThat(questionnaire.maxSizeInKiBs).isEqualTo(BigDecimal(5120))
   }
 
   @Test
@@ -599,25 +617,25 @@ class MoreQuestionnaireItemComponentsTest {
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
       }
-    assertThat(questionnaire.maxSizeInMiB).isEqualTo(BigDecimal(5))
+    assertThat(questionnaire.maxSizeInMiBs).isEqualTo(BigDecimal(5))
   }
 
   @Test
   fun maxSizeInByte_missingExtension_shouldReturnNull() {
     val questionnaire = Questionnaire.QuestionnaireItemComponent()
-    assertThat(questionnaire.maxSizeInByte).isNull()
+    assertThat(questionnaire.maxSizeInBytes).isNull()
   }
 
   @Test
   fun maxSizeInKiB_missingExtension_shouldReturnNull() {
     val questionnaire = Questionnaire.QuestionnaireItemComponent()
-    assertThat(questionnaire.maxSizeInKiB).isNull()
+    assertThat(questionnaire.maxSizeInKiBs).isNull()
   }
 
   @Test
   fun maxSizeInMiB_missingExtension_shouldReturnNull() {
     val questionnaire = Questionnaire.QuestionnaireItemComponent()
-    assertThat(questionnaire.maxSizeInMiB).isNull()
+    assertThat(questionnaire.maxSizeInMiBs).isNull()
   }
 
   @Test
