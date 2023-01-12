@@ -26,11 +26,8 @@ typealias ResourceBundleAndAssociatedLocalChangeTokens = Pair<IBaseBundle, List<
 
 /** Manager that generates the FHIR requests and handles the FHIR responses of an upload job. */
 interface UploadWorkManager {
-  /**
-   * Returns the URL for the next download request, or `null` if there is no more download request
-   * to be issued.
-   */
-  fun generate(
+
+  fun generateUploadContent(
     localChanges: List<List<LocalChange>>
   ): List<ResourceBundleAndAssociatedLocalChangeTokens>
 
