@@ -25,8 +25,7 @@ import com.google.android.fhir.DateProvider
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
-import com.google.android.fhir.rangeEpochDays
-import com.google.android.fhir.rangeEpochMillis
+import com.google.android.fhir.epochDay
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import java.util.Date
@@ -296,8 +295,7 @@ internal fun getConditionParamPair(
       (prefix != ParamPrefixEnum.STARTS_AFTER && prefix != ParamPrefixEnum.ENDS_BEFORE)
   ) { "Prefix $prefix not allowed for Integer type" }
   return when (prefix) {
-    ParamPrefixEnum.EQUAL,
-    null -> {
+    ParamPrefixEnum.EQUAL, null -> {
       val precision = value.getRange()
       ConditionParam(
         "index_value >= ? AND index_value < ?",
@@ -400,6 +398,22 @@ private fun BigDecimal.getRange(): BigDecimal {
   }
 }
 
+internal val DateType.rangeEpochDays: LongRange
+  get() {
+    return LongRange(value.epochDay, precision.add(value, 1).epochDay - 1)
+  }
+
+/**
+ * The range of the range of the Date's epoch Timestamp. The value is related to the precision of
+ * the DateTimeType
+ *
+ * For example 2001-01-01 includes all values on the given day and thus this functions will return
+ * 978307200 (epoch timestamp of 2001-01-01) and 978393599 ( which is one second less than the epoch
+ * of 2001-01-02)
+ */
+internal val DateTimeType.rangeEpochMillis
+  get() = LongRange(value.time, precision.add(value, 1).time - 1)
+
 data class ConditionParam<T>(val condition: String, val params: List<T>) {
   constructor(condition: String, vararg params: T) : this(condition, params.asList())
 }
@@ -411,7 +425,7 @@ private enum class SortTableInfo(val tableName: String, val columnName: String) 
   DATE_TIME_SORT_TABLE_INFO("DateTimeIndexEntity", "index_from")
 }
 
-fun getApproximateDateRange(
+internal fun getApproximateDateRange(
   valueRange: LongRange,
   currentRange: LongRange,
   approximationCoefficient: Double = APPROXIMATION_COEFFICIENT
@@ -426,4 +440,4 @@ fun getApproximateDateRange(
   )
 }
 
-data class ApproximateDateRange(val start: Long, val end: Long)
+internal data class ApproximateDateRange(val start: Long, val end: Long)

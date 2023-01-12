@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.r4
+package com.google.android.fhir
 
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
-import com.google.android.fhir.ConverterException
-import com.google.android.fhir.DateProvider
-import com.google.android.fhir.FhirAdapter
-import com.google.android.fhir.UcumValue
-import com.google.android.fhir.UnitConverter
-import com.google.android.fhir.epochDay
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.DateTimeIndex
 import com.google.android.fhir.index.entities.NumberIndex
@@ -33,13 +27,12 @@ import com.google.android.fhir.index.entities.ReferenceIndex
 import com.google.android.fhir.index.entities.StringIndex
 import com.google.android.fhir.index.entities.TokenIndex
 import com.google.android.fhir.index.entities.UriIndex
-import com.google.android.fhir.rangeEpochDays
-import com.google.android.fhir.rangeEpochMillis
 import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.filter.TokenFilterValue
 import com.google.android.fhir.search.filter.TokenParamFilterValueInstance
 import com.google.android.fhir.search.getApproximateDateRange
-import com.google.android.fhir.ucumUrl
+import com.google.android.fhir.search.rangeEpochDays
+import com.google.android.fhir.search.rangeEpochMillis
 import java.math.BigDecimal
 import java.util.Date
 import org.hl7.fhir.r4.context.SimpleWorkerContext
