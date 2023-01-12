@@ -225,13 +225,13 @@ private val BYTES_PER_MIB = BigDecimal(1048576)
 internal val Questionnaire.QuestionnaireItemComponent.maxSizeInMiBs: BigDecimal?
   get() = maxSizeInBytes?.div(BYTES_PER_MIB)
 
-/** Written as Binary Bytes. Equals to 1 MB of file size. */
-private val DEFAULT_FILE_SIZE = BigDecimal(1048576)
+/** The default maximum size of an attachment is 1 Mebibytes. */
+private val DEFAULT_SIZE = BigDecimal(1048576)
 
 internal fun Questionnaire.QuestionnaireItemComponent.isMaxSizeOverLimit(
   uploadedFileSize: BigDecimal
 ): Boolean {
-  return uploadedFileSize > (maxSizeInBytes ?: DEFAULT_FILE_SIZE)
+  return uploadedFileSize > (maxSizeInBytes ?: DEFAULT_SIZE)
 }
 
 /** UI controls relevant to rendering questionnaire items. */
