@@ -228,10 +228,11 @@ internal val Questionnaire.QuestionnaireItemComponent.maxSizeInMiBs: BigDecimal?
 /** The default maximum size of an attachment is 1 Mebibytes. */
 private val DEFAULT_SIZE = BigDecimal(1048576)
 
-internal fun Questionnaire.QuestionnaireItemComponent.isMaxSizeOverLimit(
-  uploadedFileSize: BigDecimal
+/** Returns true if given size is above maximum size allowed. */
+internal fun Questionnaire.QuestionnaireItemComponent.isGivenSizeOverLimit(
+  size: BigDecimal
 ): Boolean {
-  return uploadedFileSize > (maxSizeInBytes ?: DEFAULT_SIZE)
+  return size > (maxSizeInBytes ?: DEFAULT_SIZE)
 }
 
 /** UI controls relevant to rendering questionnaire items. */
