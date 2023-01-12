@@ -35,7 +35,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.hasMimeType
 import com.google.android.fhir.datacapture.hasMimeTypeOnly
 import com.google.android.fhir.datacapture.isGivenSizeOverLimit
-import com.google.android.fhir.datacapture.maxSizeInMiB
+import com.google.android.fhir.datacapture.maxSizeInMiBs
 import com.google.android.fhir.datacapture.mimeTypes
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -175,7 +175,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           if (questionnaireItem.isGivenSizeOverLimit(file.length().toBigDecimal())) {
             displayError(
               R.string.max_size_image_above_limit_validation_error_msg,
-              questionnaireItem.maxSizeInMiB
+              questionnaireItem.maxSizeInMiBs
             )
             displaySnackbar(view, R.string.upload_failed)
             file.delete()
@@ -232,7 +232,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           if (questionnaireItem.isGivenSizeOverLimit(attachmentByteArray.size.toBigDecimal())) {
             displayError(
               R.string.max_size_file_above_limit_validation_error_msg,
-              questionnaireItem.maxSizeInMiB
+              questionnaireItem.maxSizeInMiBs
             )
             displaySnackbar(view, R.string.upload_failed)
             return@setFragmentResultListener
