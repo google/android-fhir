@@ -44,7 +44,7 @@
     <string name="not_answered">"Not Answered"</string>
     <string name="help">Help</string>
     <string name="space_asterisk">\u0020\u002a</string>
-    <string name="required">\u002arequired</string>
+    <string name="required">Required</string>
     <string name="group_header_add_item_button">Add item</string>
 
     <!-- Questionnaire validation popup texts-->
