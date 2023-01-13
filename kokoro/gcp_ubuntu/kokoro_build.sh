@@ -63,7 +63,9 @@ function zip_artifacts() {
 function setup() {
   sudo npm cache clean -f
   sudo npm install -g n
-  sudo n stable
+  sudo n 16.18.0
+
+  gcloud components update --quiet
 
   wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip \
     -O ${HOME}/android_sdk.zip -q
@@ -115,6 +117,7 @@ function device_tests() {
       --results-bucket=$GCS_BUCKET \
       --results-dir=$KOKORO_BUILD_ARTIFACTS_SUBDIR/firebase/$lib_name \
       --project=android-fhir-instrumeted-tests \
+      --num-flaky-test-attempts 3 \
       --no-use-orchestrator &
       firebase_pids+=("$!")
   done

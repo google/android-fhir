@@ -37,7 +37,6 @@ import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -2376,7 +2375,7 @@ class ResourceMapperTest {
   }
 
   @Test
-  fun `extract() should perform definition based extraction for custom extensions with valueAsPrimitive`():
+  fun `extract() definition based extraction should extract multiple values of a list field in a group`():
     Unit = runBlocking {
     @Language("JSON")
     val questionnaire =
@@ -2384,94 +2383,35 @@ class ResourceMapperTest {
         {
           "resourceType": "Questionnaire",
           "subjectType": [
-            "Encounter"
-          ],
+          "Patient"
+        ],
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
               "valueExpression": {
                 "language": "application/x-fhir-query",
-                "expression": "Encounter",
-                "name": "encounter"
+                "expression": "Patient",
+                "name": "patient"
               }
             }
           ],
           "item": [
             {
-              "linkId": "1",
-              "definition": "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-encounter#Encounter.contactNumber",
-              "text": "ANC contact number",
-              "type": "integer"
-            }
-          ]
-        }
-      """.trimIndent()
-
-    @Language("JSON")
-    val response =
-      """
-        {
-          "resourceType": "QuestionnaireResponse",
-          "item": [
-            {
-              "linkId": "1",
-              "answer": [
-                {
-                  "valueInteger": 9
-                }
-              ]
-            }
-          ]
-        }
-      """.trimIndent()
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
-    val questionnaireObj =
-      iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
-    val temperatureQuestionnaireResponse =
-      iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
-    val bundle = ResourceMapper.extract(questionnaireObj, temperatureQuestionnaireResponse)
-    val encounter = bundle.entry.single().resource as Encounter
-
-    assertThat(encounter).isNotNull()
-    assertThat(
-        encounter
-          .getExtensionByUrl(
-            "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-encounter#Encounter.contactNumber"
-          )
-          .valueAsPrimitive.value
-      )
-      .isEqualTo(9)
-  }
-
-  @Test
-  fun `extract() should perform definition based extraction for custom extensions with valueCodeableConcept`():
-    Unit = runBlocking {
-    @Language("JSON")
-    val questionnaire =
-      """
-        {
-          "resourceType": "Questionnaire",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-              "valueExpression": {
-                "name": "patient",
-                "language": "application/x-fhir-query",
-                "expression": "Patient"
-              }
-            }
-          ],
-          "item": [
-            {
+              "linkId": "PR-name",
               "type": "group",
-              "linkId": "patient-other-details",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
               "item": [
                 {
-                  "type": "choice",
-                  "linkId": "tribe",
-                  "text": "Tribe",
-                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension:tribe"
-
+                  "linkId": "PR-name-text",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
+                  "type": "string",
+                  "text": "First Name"
+                },
+                {
+                  "linkId": "PR-name-middle",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#Patient.name.given",
+                  "type": "string",
+                  "text": "Middle Name"
                 }
               ]
             }
@@ -2486,107 +2426,22 @@ class ResourceMapperTest {
           "resourceType": "QuestionnaireResponse",
           "item": [
             {
-              "linkId": "patient-other-details",
+              "linkId": "PR-name",
               "item": [
                 {
-                  "linkId": "tribe",
+                  "linkId": "PR-name-text",
                   "answer": [
-                    {
-                      "valueCoding": {
-                        "code": "hausa",
-                        "display": "Hausa"
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      """.trimIndent()
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
-    val questionnaireObj =
-      iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
-    val temperatureQuestionnaireResponse =
-      iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
-    val bundle = ResourceMapper.extract(questionnaireObj, temperatureQuestionnaireResponse)
-    val patient = bundle.entry.single().resource as Patient
-
-    assertThat(patient).isNotNull()
-    val coding =
-      patient
-        .getExtensionByUrl(
-          "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension:tribe"
-        )
-        .value as Coding
-    assertThat(coding.code).isEqualTo("hausa")
-    assertThat(coding.display).isEqualTo("Hausa")
-  }
-
-  @Test
-  fun `extract() should perform definition based extraction for Complex DataType with custom extensions`():
-    Unit = runBlocking {
-    @Language("JSON")
-    val questionnaire =
-      """
-        {
-          "resourceType": "Questionnaire",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-              "valueExpression": {
-                "name": "patient",
-                "language": "application/x-fhir-query",
-                "expression": "Patient"
-              }
-            }
-          ],
-          "item": [
-            {
-              "type": "group",
-              "linkId": "patient-basic-details",
-              "text": "Patient details",
-              "item": [
-                {
-                  "linkId": "patient-name",
-                  "type": "group",
-                  "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name",
-                  "item": [
-                    {
-                      "type": "string",
-                      "definition": "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.middle",
-                      "linkId": "middle-name",
-                      "text": "Middle name"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      """.trimIndent()
-
-    @Language("JSON")
-    val response =
-      """
-        {
-          "resourceType": "QuestionnaireResponse",
-          "item": [
-            {
-              "linkId": "patient-basic-details",
-              "item": [
-                {
-                  "linkId": "patient-name",
-                  "item": [
-                    {
-                      "linkId": "middle-name",
-                      "answer": [
                         {
-                          "valueString": "TestName"
+                          "valueString": "TestName-First"
                         }
                       ]
-                    }
-                  ]
+                },{
+                  "linkId": "PR-name-middle",
+                  "answer": [
+                        {
+                          "valueString": "TestName-Middle"
+                        }
+                      ]
                 }
               ]
             }
@@ -2602,15 +2457,8 @@ class ResourceMapperTest {
     val patient = bundle.entry.single().resource as Patient
 
     assertThat(patient).isNotNull()
-    assertThat(
-        patient.name
-          .first()
-          .getExtensionByUrl(
-            "http://build.fhir.org/ig/WorldHealthOrganization/smart-anc/StructureDefinition-anc-patient-definitions.html#Patient.name.middle"
-          )
-          .valueAsPrimitive.valueAsString
-      )
-      .isEqualTo("TestName")
+    assertThat(patient.name.first().given.map { it.value })
+      .containsExactly("TestName-First", "TestName-Middle")
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)
