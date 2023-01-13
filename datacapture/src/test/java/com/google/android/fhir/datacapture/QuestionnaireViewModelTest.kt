@@ -1191,13 +1191,13 @@ class QuestionnaireViewModelTest {
 
       val viewModel = QuestionnaireViewModel(context, state)
       viewModel.runViewModelBlocking {
-        var items = viewModel.getQuestionnaireItemViewItemList()
+        var items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
         assertThat(items.map { it.questionnaireItem.linkId })
           .containsExactly("question-1", "question-2", "question-3")
 
         items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
 
-        items = viewModel.getQuestionnaireItemViewItemList()
+        items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
         assertThat(items.map { it.questionnaireItem.linkId }).containsExactly("question-1")
       }
     }

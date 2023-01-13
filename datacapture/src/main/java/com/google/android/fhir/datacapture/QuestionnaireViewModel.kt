@@ -47,6 +47,7 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ValueSet
 import timber.log.Timber
@@ -62,6 +63,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
   private lateinit var currentPageItems: List<QuestionnaireAdapterItem>
+  /**
+   * Map of [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] for
+   * [Questionnaire.QuestionnaireItemComponent]s that are disabled now. The answers will be used to
+   * pre-populate the [QuestionnaireResponse.QuestionnaireResponseItemComponent] once the item is
+   * enabled again.
+   */
+  private val linkIdToAnswersMapForDisabledQuestionnaireResponseItem =
+    mutableMapOf<String, List<QuestionnaireResponseItemAnswerComponent>>()
 
   init {
     questionnaire =
@@ -567,16 +576,31 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   ): List<QuestionnaireAdapterItem> {
     // Disabled/hidden questions should not get QuestionnaireItemViewItem instances
+    if (questionnaireItem.isHidden) return emptyList()
     val enabled =
       EnablementEvaluator(questionnaireResponse)
         .evaluate(questionnaireItem, questionnaireResponseItem)
-    if (questionnaireItem.isHidden) return emptyList()
     if (!enabled) {
       // If the item is not enabled, clear the answers that it may have from the previous enabled
       // state. This will also prevent any questionnaire item that depends on the answer of this
       // questionnaire item to be wrongly evaluated as well.
-      if (questionnaireResponseItem.hasAnswer()) questionnaireResponseItem.answer = listOf()
+      if (questionnaireResponseItem.hasAnswer()) {
+        linkIdToAnswersMapForDisabledQuestionnaireResponseItem[questionnaireResponseItem.linkId] =
+          questionnaireResponseItem.answer
+        questionnaireResponseItem.answer = listOf()
+      }
       return emptyList()
+    }
+
+    if (linkIdToAnswersMapForDisabledQuestionnaireResponseItem.contains(
+        questionnaireResponseItem.linkId
+      )
+    ) {
+      questionnaireResponseItem.answer =
+        linkIdToAnswersMapForDisabledQuestionnaireResponseItem[questionnaireResponseItem.linkId]
+      linkIdToAnswersMapForDisabledQuestionnaireResponseItem.remove(
+        questionnaireResponseItem.linkId
+      )
     }
 
     // Determine the validation result, which will be displayed on the item itself
