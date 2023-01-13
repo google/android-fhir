@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.view.View
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -26,7 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.ItemControlTypes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
-import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.common.datatype.displayString
 import com.google.android.fhir.datacapture.itemControl
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
@@ -79,7 +80,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
             // Set the initial selected options state from the FHIR data model
             viewModel.updateSelectedOptions(
               item.linkId,
-              questionnaireItemViewItem.extractInitialOptions()
+              questionnaireItemViewItem.extractInitialOptions(holder.header.context)
             )
 
             // Listen for changes to selected options to update summary + FHIR data model
@@ -182,14 +183,19 @@ data class SelectedOptions(
 data class OptionSelectOption(
   val item: Questionnaire.QuestionnaireItemAnswerOptionComponent,
   val selected: Boolean,
+  val context: Context,
 ) {
-  val displayString: String = item.displayString
+  val displayString: String = item.value.displayString(context)
 }
 
-private fun QuestionnaireItemViewItem.extractInitialOptions(): SelectedOptions {
+private fun QuestionnaireItemViewItem.extractInitialOptions(context: Context): SelectedOptions {
   val options =
     answerOption.map { answerOption ->
-      OptionSelectOption(item = answerOption, selected = isAnswerOptionSelected(answerOption))
+      OptionSelectOption(
+        item = answerOption,
+        selected = isAnswerOptionSelected(answerOption),
+        context = context
+      )
     }
   return SelectedOptions(
     options = options,

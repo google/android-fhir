@@ -7,6 +7,7 @@
       "resource": {
         "resourceType": "PlanDefinition",
         "id": "ChildRoutineVisit-PlanDefinition-1.0.0",
+        "url": "http://fhir.org/guides/cdc/opioid-cds/PlanDefinition/ChildRoutineVisit-PlanDefinition-1.0.0",
         "name": "Child Routine visit PlanDefinition",
         "title": "Child Routine visit PlanDefinition",
         "status": "active",
