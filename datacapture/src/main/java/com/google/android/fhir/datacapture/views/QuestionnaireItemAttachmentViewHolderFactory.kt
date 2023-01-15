@@ -19,8 +19,10 @@ package com.google.android.fhir.datacapture.views
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.view.Gravity
 import android.view.View
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
@@ -368,7 +370,9 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
       }
 
       private fun displaySnackbar(view: View, @StringRes textResource: Int) {
-        Snackbar.make(view, context.getString(textResource), Snackbar.LENGTH_SHORT).show()
+        Snackbar.make(view, context.getString(textResource), Snackbar.LENGTH_SHORT)
+          .apply { gravityTop() }
+          .show()
       }
 
       private fun displaySnackbarOnUpload(view: View, attachmentType: String) {
@@ -447,4 +451,12 @@ private fun Context.readBytesFromUri(uri: Uri): ByteArray {
 
 private fun Context.getMimeTypeFromUri(uri: Uri): String {
   return contentResolver.getType(uri) ?: "*/*"
+}
+
+/** Set Snackbar gravity to top. */
+private fun Snackbar.gravityTop() {
+  if (view.layoutParams is FrameLayout.LayoutParams) {
+    view.layoutParams =
+      (view.layoutParams as FrameLayout.LayoutParams).apply { gravity = Gravity.TOP }
+  }
 }
