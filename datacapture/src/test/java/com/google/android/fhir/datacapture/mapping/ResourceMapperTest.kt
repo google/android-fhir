@@ -20,7 +20,7 @@ import android.app.Application
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.parser.IParser
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.views.localDate
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -63,6 +63,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class ResourceMapperTest {
   private val context = ApplicationProvider.getApplicationContext<Application>()
+  private val iParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
   @Test
   fun `extract() should perform definition-based extraction`() = runBlocking {
@@ -467,8 +468,6 @@ class ResourceMapperTest {
         }
       """.trimIndent()
 
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
-
     val uriTestQuestionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
@@ -489,6 +488,123 @@ class ResourceMapperTest {
     assertThat(patient.contact[0].name.family).isEqualTo("Penman")
     assertThat(patient.telecom[0].system).isNull()
     assertThat(patient.telecom[0].value).isEqualTo("+254711001122")
+  }
+
+  @Test
+  fun `extract() should extract list of non primitive values`() = runBlocking {
+    @Language("JSON")
+    val questionnaireJson =
+      """
+      {
+        "resourceType": "Questionnaire",
+        "item": [
+          {
+            "linkId": "9",
+            "type": "group",
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+                "valueExpression": {
+                  "expression": "Observation"
+                }
+              }
+            ],
+            "item": [
+              {
+                "linkId": "9.1",
+                "type": "group",
+                "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept",
+                "item": [
+                  {
+                    "linkId": "9.1.1",
+                    "type": "choice",
+                    "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept.coding"
+                  }
+                ]
+              },
+              {
+                "linkId": "9.1.3",
+                "type": "choice",
+                "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                    "valueBoolean": true
+                  }
+                ],
+                "initial": [
+                  {
+                    "valueCoding": {
+                      "code": "8888",
+                      "display": "dummy",
+                      "system": "dummy"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+      """.trimIndent()
+
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "9",
+              "item": [
+                {
+                  "linkId": "9.1",
+                  "item": [
+                    {
+                      "linkId": "9.1.1",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "system": "test-coding-system",
+                            "code": "test-coding-code",
+                            "display": "Test Coding Display"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "9.1.3",
+                  "answer": [
+                    {
+                      "valueCoding": {
+                        "system": "dummy",
+                        "code": "8888",
+                        "display": "dummy"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    val uriTestQuestionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+
+    val uriTestQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+        as QuestionnaireResponse
+
+    val observation =
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse)
+        .entry
+        .single()
+        .resource as Observation
+    assertThat(observation.valueCodeableConcept.coding[0].code).isEqualTo("test-coding-code")
   }
 
   @Test
@@ -577,8 +693,6 @@ class ResourceMapperTest {
               ]
             }
       """.trimIndent()
-
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
 
     val uriTestQuestionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
@@ -847,8 +961,6 @@ class ResourceMapperTest {
         }
         """.trimIndent()
 
-      val iParser: IParser = FhirContext.forR4().newJsonParser()
-
       val uriTestQuestionnaire =
         iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
@@ -949,8 +1061,6 @@ class ResourceMapperTest {
           ]
         }
         """.trimIndent()
-
-      val iParser: IParser = FhirContext.forR4().newJsonParser()
 
       val pulseOximetryQuestionnaire =
         iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
@@ -1158,8 +1268,6 @@ class ResourceMapperTest {
           ]
         }
         """.trimIndent()
-
-      val iParser: IParser = FhirContext.forR4().newJsonParser()
 
       val uriTestQuestionnaire =
         iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson)
@@ -1752,8 +1860,6 @@ class ResourceMapperTest {
              };
         }"""
 
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
-
     val uriTestQuestionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
@@ -1840,8 +1946,6 @@ class ResourceMapperTest {
         group ExtractImmunization(source src : QuestionnaireResponse, target tgt : Immunization) {
              src -> tgt.reaction = create('Immunization_Reaction') "rule_z1";
         }"""
-
-      val iParser: IParser = FhirContext.forR4().newJsonParser()
 
       val uriTestQuestionnaire =
         iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
@@ -2034,7 +2138,6 @@ class ResourceMapperTest {
           ]
         }
       """.trimIndent()
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
     val temperatureQuestionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
     val temperatureQuestionnaireResponse =
@@ -2131,8 +2234,6 @@ class ResourceMapperTest {
           ]
         }
       """.trimIndent()
-
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
     val questionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
     val response =
@@ -2312,8 +2413,6 @@ class ResourceMapperTest {
           ]
         }
       """.trimIndent()
-
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
     val questionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
     val response =
@@ -2448,7 +2547,6 @@ class ResourceMapperTest {
           ]
         }
       """.trimIndent()
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
     val questionnaireObj =
       iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
     val temperatureQuestionnaireResponse =
