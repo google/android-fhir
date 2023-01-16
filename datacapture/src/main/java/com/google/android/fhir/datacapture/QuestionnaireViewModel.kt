@@ -48,6 +48,7 @@ import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ValueSet
 import timber.log.Timber
@@ -62,15 +63,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
-  private lateinit var currentPageItems: List<QuestionnaireAdapterItem>
-  /**
-   * Map of [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] for
-   * [Questionnaire.QuestionnaireItemComponent]s that are disabled now. The answers will be used to
-   * pre-populate the [QuestionnaireResponse.QuestionnaireResponseItemComponent] once the item is
-   * enabled again.
-   */
-  private val linkIdToAnswersMapForDisabledQuestionnaireResponseItem =
-    mutableMapOf<String, List<QuestionnaireResponseItemAnswerComponent>>()
 
   init {
     questionnaire =
@@ -102,15 +94,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
-
-  /**
-   * True if the user has tapped the next/previous pagination buttons on the current page. This is
-   * needed to avoid spewing validation errors before any questions are answered.
-   */
-  private var isPaginationButtonPressed = false
-
-  /** Forces response validation each time [getQuestionnaireAdapterItems] is called. */
-  private var hasPressedSubmitButton = false
 
   init {
     when {
@@ -201,13 +184,33 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val isInReviewModeFlow = MutableStateFlow(shouldShowReviewPageFirst)
 
   /**
-   * Contains [QuestionnaireResponse.QuestionnaireResponseItemComponent]s that have been modified by
-   * the user. [QuestionnaireResponse.QuestionnaireResponseItemComponent]s that have not been
-   * modified by the user will not be validated. This is to avoid spamming the user with a sea of
-   * validation errors when the questionnaire is loaded initially.
+   * Contains [QuestionnaireResponseItemComponent]s that have been modified by the user.
+   * [QuestionnaireResponseItemComponent]s that have not been modified by the user will not be
+   * validated. This is to avoid spamming the user with a sea of validation errors when the
+   * questionnaire is loaded initially.
    */
   private val modifiedQuestionnaireResponseItemSet =
-    mutableSetOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
+    mutableSetOf<QuestionnaireResponseItemComponent>()
+
+  private lateinit var currentPageItems: List<QuestionnaireAdapterItem>
+
+  /**
+   * True if the user has tapped the next/previous pagination buttons on the current page. This is
+   * needed to avoid spewing validation errors before any questions are answered.
+   */
+  private var isPaginationButtonPressed = false
+
+  /** Forces response validation each time [getQuestionnaireAdapterItems] is called. */
+  private var hasPressedSubmitButton = false
+
+  /**
+   * Map of [QuestionnaireResponseItemAnswerComponent] for
+   * [Questionnaire.QuestionnaireItemComponent]s that are disabled now. The answers will be used to
+   * pre-populate the [QuestionnaireResponseItemComponent] once the item is enabled again.
+   */
+  private val responseItemToAnswersMapForDisabledQuestionnaireItem =
+    mutableMapOf<
+      QuestionnaireResponseItemComponent, List<QuestionnaireResponseItemAnswerComponent>>()
 
   /**
    * Callback function to update the view model after the answer(s) to a question have been changed.
@@ -220,16 +223,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    *
    * This callback function has 3 params:
    * - the reference to the [Questionnaire.QuestionnaireItemComponent] in the [Questionnaire]
-   * - the reference to the [QuestionnaireResponse.QuestionnaireResponseItemComponent] in the
-   * [QuestionnaireResponse]
-   * - a [List] of [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] which are the
-   * new answers to the question.
+   * - the reference to the [QuestionnaireResponseItemComponent] in the [QuestionnaireResponse]
+   * - a [List] of [QuestionnaireResponseItemAnswerComponent] which are the new answers to the
+   * question.
    */
   private val answersChangedCallback:
     (
       Questionnaire.QuestionnaireItemComponent,
-      QuestionnaireResponse.QuestionnaireResponseItemComponent,
-      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
+      QuestionnaireResponseItemComponent,
+      List<QuestionnaireResponseItemAnswerComponent>,
     ) -> Unit =
     { questionnaireItem, questionnaireResponseItem, answers ->
       // TODO(jingtang10): update the questionnaire response item pre-order list and the parent map
@@ -386,9 +388,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             if (questionnaireResponseItem.answer.hasDifferentAnswerSet(calculatedAnswers)) {
               questionnaireResponseItem.answer =
                 calculatedAnswers.map {
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = it
-                  }
+                  QuestionnaireResponseItemAnswerComponent().apply { value = it }
                 }
             }
           }
@@ -546,7 +546,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    */
   private fun getQuestionnaireAdapterItems(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
-    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+    questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>,
   ): List<QuestionnaireAdapterItem> {
     var responseIndex = 0
     return questionnaireItemList
@@ -573,34 +573,29 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    */
   private fun getQuestionnaireAdapterItems(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
   ): List<QuestionnaireAdapterItem> {
-    // Disabled/hidden questions should not get QuestionnaireItemViewItem instances
+    // Hidden questions should not get QuestionnaireItemViewItem instances
     if (questionnaireItem.isHidden) return emptyList()
     val enabled =
       EnablementEvaluator(questionnaireResponse)
         .evaluate(questionnaireItem, questionnaireResponseItem)
+    // Disabled questions should not get QuestionnaireItemViewItem instances
     if (!enabled) {
       // If the item is not enabled, clear the answers that it may have from the previous enabled
       // state. This will also prevent any questionnaire item that depends on the answer of this
       // questionnaire item to be wrongly evaluated as well.
       if (questionnaireResponseItem.hasAnswer()) {
-        linkIdToAnswersMapForDisabledQuestionnaireResponseItem[questionnaireResponseItem.linkId] =
+        responseItemToAnswersMapForDisabledQuestionnaireItem[questionnaireResponseItem] =
           questionnaireResponseItem.answer
         questionnaireResponseItem.answer = listOf()
       }
       return emptyList()
     }
 
-    if (linkIdToAnswersMapForDisabledQuestionnaireResponseItem.contains(
-        questionnaireResponseItem.linkId
-      )
-    ) {
+    if (responseItemToAnswersMapForDisabledQuestionnaireItem.contains(questionnaireResponseItem)) {
       questionnaireResponseItem.answer =
-        linkIdToAnswersMapForDisabledQuestionnaireResponseItem[questionnaireResponseItem.linkId]
-      linkIdToAnswersMapForDisabledQuestionnaireResponseItem.remove(
-        questionnaireResponseItem.linkId
-      )
+        responseItemToAnswersMapForDisabledQuestionnaireItem.remove(questionnaireResponseItem)
     }
 
     // Determine the validation result, which will be displayed on the item itself
@@ -632,7 +627,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             )
           )
         )
-        val nestedResponses: List<List<QuestionnaireResponse.QuestionnaireResponseItemComponent>> =
+        val nestedResponses: List<List<QuestionnaireResponseItemComponent>> =
           when {
             // Repeated questions have one answer item per response instance, which we must display
             // after the question.
@@ -661,8 +656,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   private fun getEnabledResponseItems(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
-    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
-  ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+    questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>,
+  ): List<QuestionnaireResponseItemComponent> {
     val enablementEvaluator = EnablementEvaluator(questionnaireResponse)
     val responseItemKeys = questionnaireResponseItemList.map { it.linkId }
     return questionnaireItemList
@@ -709,15 +704,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    */
   private fun createRepeatedGroupResponse(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-  ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
+  ): List<QuestionnaireResponseItemComponent> {
     val individualQuestions = questionnaireItem.item
     return questionnaireResponseItem.answer.map { repeatedGroupInstance ->
       val responsesToIndividualQuestions = repeatedGroupInstance.item
       check(responsesToIndividualQuestions.size == individualQuestions.size) {
         "Repeated groups responses must have the same # of responses as the group has questions"
       }
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+      QuestionnaireResponseItemComponent().apply {
         linkId = questionnaireItem.linkId
         text = questionnaireItem.localizedTextSpanned?.toString()
         item =
