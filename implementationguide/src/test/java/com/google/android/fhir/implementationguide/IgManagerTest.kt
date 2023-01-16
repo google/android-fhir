@@ -17,6 +17,7 @@
 package com.google.android.fhir.implementationguide
 
 import android.content.Context
+import androidx.room.Ignore
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.implementationguide.db.impl.ImplementationGuideDatabase
@@ -35,18 +36,8 @@ internal class IgManagerTest {
   private val igDb =
     Room.inMemoryDatabaseBuilder(context, ImplementationGuideDatabase::class.java).build()
   private val igManager = IgManager(igDb)
-  private val igDependency = IgDependency("anc-cds", "0.3.0")
-  private lateinit var igRoot: File
-
-  @Before
-  fun importIg() = runBlocking {
-    val dataFolder = File(javaClass.getResource("/anc-cds")!!.file)
-    igRoot = File(dataFolder.parentFile, "anc-cds.copy")
-    igRoot.deleteOnExit()
-    dataFolder.copyRecursively(igRoot)
-
-    igManager.install(igDependency, igRoot)
-  }
+  private val igDependency = IgDependency("anc-cds", "0.3.0", "http://url.com")
+  private val dataFolder = File(javaClass.getResource("/anc-cds")!!.file)
 
   @After
   fun closeDb() {
@@ -55,18 +46,25 @@ internal class IgManagerTest {
 
   @Test
   fun `importing IG creates entries in DB`() = runBlocking {
+    igManager.install(igDependency, dataFolder)
+
     assertThat(
-        igDb
-          .implementationGuideDao()
-          .getResources(
-            listOf(igDb.implementationGuideDao().getImplementationGuide("anc-cds", "0.3.0").id)
-          )
-      )
+      igDb
+        .implementationGuideDao()
+        .getImplementationGuidesWithResources(igDb.implementationGuideDao()
+                                                .getImplementationGuide(
+                                                  "anc-cds", "0.3.0").implementationGuideId)
+        ?.resources)
       .hasSize(6)
   }
 
   @Test
   fun `deleting IG deletes files and DB entries`() = runBlocking {
+    val igRoot = File(dataFolder.parentFile, "anc-cds.copy")
+    igRoot.deleteOnExit()
+    dataFolder.copyRecursively(igRoot)
+    igManager.install(igDependency, igRoot)
+
     igManager.delete(igDependency)
 
     assertThat(igDb.implementationGuideDao().getImplementationGuides()).isEmpty()
@@ -76,9 +74,10 @@ internal class IgManagerTest {
 
   @Test
   fun `imported entries are readable`() = runBlocking {
+    igManager.install(igDependency, dataFolder)
+
     assertThat(
       igManager.loadResources(
-        igDependencies = arrayOf(igDependency),
         resourceType = "Library",
         name = "WHOCommon"
       )
@@ -86,19 +85,17 @@ internal class IgManagerTest {
       .isNotNull()
     assertThat(
       igManager.loadResources(
-        igDependencies = arrayOf(igDependency),
         resourceType = "Library",
         url = "FHIRCommon"
       )
     )
       .isNotNull()
     assertThat(
-      igManager.loadResources(igDependencies = arrayOf(igDependency), resourceType = "Measure")
+      igManager.loadResources(resourceType = "Measure")
     )
       .hasSize(1)
     assertThat(
       igManager.loadResources(
-        igDependencies = arrayOf(igDependency),
         resourceType = "Measure",
         url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01"
       )
@@ -106,7 +103,6 @@ internal class IgManagerTest {
       .isNotEmpty()
     assertThat(
       igManager.loadResources(
-        igDependencies = arrayOf(igDependency),
         resourceType = "Measure",
         url = "Measure/ANCIND01"
       )

@@ -47,5 +47,5 @@ internal data class ImplementationGuideEntity(
 )
 
 internal fun IgDependency.toEntity(rootFolder: File): ImplementationGuideEntity {
-  return ImplementationGuideEntity(0L, packageId, version, rootFolder)
+  return ImplementationGuideEntity(0L, uri, packageId, version, rootFolder)
 }

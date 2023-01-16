@@ -68,22 +68,19 @@ class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
 
   /** Loads resources from IGs listed in dependencies. */
   suspend fun loadResources(
-    vararg igDependencies: IgDependency,
     resourceType: String,
     url: String? = null,
     name: String? = null,
     version: String? = null,
   ): Iterable<IBaseResource> {
     val resType = ResourceType.fromCode(resourceType)
-    val igIds =
-      igDependencies.map { igDao.getImplementationGuide(it.packageId, it.version) }.map { it.id }
     val resourceEntities =
       when {
-        url != null -> igDao.getResourcesWithUrl(resType, url, igIds)
+        url != null -> listOfNotNull(igDao.getResourceWithUrl(url))
         name != null && version != null ->
-          igDao.getResourcesWithNameAndVersion(resType, name, version, igIds)
-        name != null -> igDao.getResourcesWithName(resType, name, igIds)
-        else -> igDao.getResources(resType, igIds)
+          listOfNotNull(igDao.getResourcesWithNameAndVersion(resType, name, version))
+        name != null -> igDao.getResourcesWithName(resType, name)
+        else -> igDao.getResources(resType)
       }
     return resourceEntities.map { loadResource(it) }
   }
@@ -114,17 +111,15 @@ class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
       ResourceMetadataEntity(
         0L,
         resource.resourceType,
-        resource.id,
         metadataResource?.url,
         metadataResource?.name,
         metadataResource?.version,
-        file,
-        igId
+        file
       )
-    igDao.insert(res)
+    igDao.insertResource(igId, res)
   }
 
   private fun loadResource(resourceEntity: ResourceMetadataEntity): IBaseResource {
-    return jsonParser.parseResource(FileInputStream(resourceEntity.fileUri))
+    return jsonParser.parseResource(FileInputStream(resourceEntity.resourceFile))
   }
 }
