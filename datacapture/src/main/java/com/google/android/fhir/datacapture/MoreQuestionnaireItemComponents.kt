@@ -187,6 +187,24 @@ internal val Questionnaire.QuestionnaireItemComponent.mimeTypes: List<String>
       .filter { !it.isNullOrEmpty() }
   }
 
+/** Currently supported mime types. */
+internal enum class MimeType(val value: String) {
+  AUDIO("audio"),
+  DOCUMENT("application"),
+  IMAGE("image"),
+  VIDEO("video")
+}
+
+/** Returns true if at least one mime type matches the given type. */
+internal fun Questionnaire.QuestionnaireItemComponent.hasMimeType(type: String): Boolean {
+  return mimeTypes.any { it.substringBefore("/") == type }
+}
+
+/** Returns true if all mime types match the given type. */
+internal fun Questionnaire.QuestionnaireItemComponent.hasMimeTypeOnly(type: String): Boolean {
+  return mimeTypes.all { it.substringBefore("/") == type }
+}
+
 internal const val EXTENSION_MAX_SIZE = "http://hl7.org/fhir/StructureDefinition/maxSize"
 
 /** The maximum size of an attachment in Bytes. */
@@ -206,6 +224,16 @@ private val BYTES_PER_MIB = BigDecimal(1048576)
 /** The maximum size of an attachment in Mebibytes. */
 internal val Questionnaire.QuestionnaireItemComponent.maxSizeInMiBs: BigDecimal?
   get() = maxSizeInBytes?.div(BYTES_PER_MIB)
+
+/** The default maximum size of an attachment is 1 Mebibytes. */
+private val DEFAULT_SIZE = BigDecimal(1048576)
+
+/** Returns true if given size is above maximum size allowed. */
+internal fun Questionnaire.QuestionnaireItemComponent.isGivenSizeOverLimit(
+  size: BigDecimal
+): Boolean {
+  return size > (maxSizeInBytes ?: DEFAULT_SIZE)
+}
 
 /** UI controls relevant to rendering questionnaire items. */
 internal enum class DisplayItemControlType(val extensionCode: String) {
