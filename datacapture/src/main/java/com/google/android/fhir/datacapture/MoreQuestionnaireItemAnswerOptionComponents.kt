@@ -16,42 +16,18 @@
 
 package com.google.android.fhir.datacapture
 
-import com.google.android.fhir.getLocalizedText
+import android.content.Context
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
-import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.Reference
-import org.hl7.fhir.r4.model.StringType
-import org.hl7.fhir.r4.model.TimeType
 
 internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive"
-
-/**
- * Text value for answer option [Questionnaire.QuestionnaireItemAnswerOptionComponent] if answer
- * option is [IntegerType], [StringType], [Coding], or [Reference] type.
- */
-internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
-  get() {
-    return when (value) {
-      is IntegerType,
-      is DateType,
-      is TimeType -> value.primitiveValue()
-      is StringType -> (value as StringType).getLocalizedText() ?: value.toString()
-      is Reference -> valueReference.display ?: valueReference.reference
-      is Coding -> {
-        val display = valueCoding.displayElement.getLocalizedText() ?: valueCoding.display
-        if (display.isNullOrEmpty()) {
-          valueCoding.code
-        } else {
-          display
-        }
-      }
-      else -> throw IllegalArgumentException("$value is not supported.")
-    }
-  }
+internal const val EXTENSION_ITEM_ANSWER_MEDIA =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemAnswerMedia"
 
 /** Indicates that if this answerOption is selected, no other possible answers may be selected. */
 internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.optionExclusive: Boolean
@@ -64,3 +40,26 @@ internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.optionExclusiv
     }
     return false
   }
+
+fun Questionnaire.QuestionnaireItemAnswerOptionComponent.itemAnswerOptionImage(
+  context: Context
+): Drawable? {
+  return (extension.singleOrNull { it.url == EXTENSION_ITEM_ANSWER_MEDIA }?.value as Attachment?)
+    ?.let {
+      if (!it.hasContentType() || !it.hasData()) {
+        return null
+      }
+      when (it.contentType) {
+        "image/jpeg",
+        "image/jpg",
+        "image/png" -> {
+          val bitmap = BitmapFactory.decodeByteArray(it.data, 0, it.data.size)
+          val imageSize = context.resources.getDimensionPixelOffset(R.dimen.choice_button_image)
+          val drawable: Drawable = BitmapDrawable(context.resources, bitmap)
+          drawable.setBounds(0, 0, imageSize, imageSize)
+          drawable
+        }
+        else -> null
+      }
+    }
+}
