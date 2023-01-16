@@ -22,8 +22,8 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import java.util.function.Supplier
 import org.hl7.fhir.instance.model.api.IBaseParameters
+import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.CarePlan
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Endpoint
 import org.hl7.fhir.r4.model.IdType
@@ -53,7 +53,7 @@ import org.opencds.cqf.cql.evaluator.fhir.adapter.r4.AdapterFactory
 import org.opencds.cqf.cql.evaluator.library.CqlFhirParametersConverter
 import org.opencds.cqf.cql.evaluator.library.LibraryProcessor
 import org.opencds.cqf.cql.evaluator.measure.r4.R4MeasureProcessor
-import org.opencds.cqf.cql.evaluator.plandefinition.r4.OperationParametersParser
+import org.opencds.cqf.cql.evaluator.plandefinition.OperationParametersParser
 import org.opencds.cqf.cql.evaluator.plandefinition.r4.PlanDefinitionProcessor
 
 class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
@@ -310,7 +310,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
    */
   @WorkerThread
-  fun generateCarePlan(planDefinitionId: String, patientId: String): CarePlan {
+  fun generateCarePlan(planDefinitionId: String, patientId: String): IBaseResource {
     return generateCarePlan(planDefinitionId, patientId, encounterId = null)
   }
 
@@ -325,7 +325,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     planDefinitionId: String,
     patientId: String,
     encounterId: String?
-  ): CarePlan {
+  ): IBaseResource {
     return planDefinitionProcessor.apply(
       IdType("PlanDefinition", planDefinitionId),
       patientId,
@@ -345,6 +345,6 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       /* dataEndpoint= */ null,
       /* contentEndpoint*/ null,
       /* terminologyEndpoint= */ null
-    )
+    ) as IBaseResource
   }
 }
