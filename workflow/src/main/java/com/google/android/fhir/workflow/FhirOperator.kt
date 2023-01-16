@@ -21,8 +21,8 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import java.util.function.Supplier
 import org.hl7.fhir.instance.model.api.IBaseParameters
+import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.CarePlan
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Endpoint
 import org.hl7.fhir.r4.model.IdType
@@ -52,7 +52,7 @@ import org.opencds.cqf.cql.evaluator.fhir.adapter.r4.AdapterFactory
 import org.opencds.cqf.cql.evaluator.library.CqlFhirParametersConverter
 import org.opencds.cqf.cql.evaluator.library.LibraryProcessor
 import org.opencds.cqf.cql.evaluator.measure.r4.R4MeasureProcessor
-import org.opencds.cqf.cql.evaluator.plandefinition.r4.OperationParametersParser
+import org.opencds.cqf.cql.evaluator.plandefinition.OperationParametersParser
 import org.opencds.cqf.cql.evaluator.plandefinition.r4.PlanDefinitionProcessor
 
 class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
@@ -185,6 +185,16 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   }
 
   /**
+   * The function evaluates a FHIR library against the database
+   * @param libraryUrl the url of the Library to evaluate
+   * @param expressions names of expressions in the Library to evaluate.
+   * @return a Parameters resource that contains an evaluation result for each expression requested
+   */
+  fun evaluateLibrary(libraryUrl: String, expressions: Set<String>): IBaseParameters {
+    return evaluateLibrary(libraryUrl, null, null, expressions)
+  }
+
+  /**
    * The function evaluates a FHIR library against a patient's records.
    * @param libraryUrl the url of the Library to evaluate
    * @param patientId the Id of the patient to be evaluated
@@ -196,6 +206,38 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     patientId: String,
     expressions: Set<String>
   ): IBaseParameters {
+    return evaluateLibrary(libraryUrl, patientId, null, expressions)
+  }
+
+  /**
+   * The function evaluates a FHIR library against the database
+   * @param libraryUrl the url of the Library to evaluate
+   * @param parameters list of parameters to be passed to the CQL library
+   * @param expressions names of expressions in the Library to evaluate.
+   * @return a Parameters resource that contains an evaluation result for each expression requested
+   */
+  fun evaluateLibrary(
+    libraryUrl: String,
+    parameters: Parameters,
+    expressions: Set<String>
+  ): IBaseParameters {
+    return evaluateLibrary(libraryUrl, null, parameters, expressions)
+  }
+
+  /**
+   * The function evaluates a FHIR library against the database
+   * @param libraryUrl the url of the Library to evaluate
+   * @param patientId the Id of the patient to be evaluated, if applicable
+   * @param parameters list of parameters to be passed to the CQL library, if applicable
+   * @param expressions names of expressions in the Library to evaluate.
+   * @return a Parameters resource that contains an evaluation result for each expression requested
+   */
+  fun evaluateLibrary(
+    libraryUrl: String,
+    patientId: String?,
+    parameters: Parameters?,
+    expressions: Set<String>
+  ): IBaseParameters {
     val dataEndpoint =
       Endpoint()
         .setAddress("localhost")
@@ -204,7 +246,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     return libraryProcessor.evaluate(
       libraryUrl,
       patientId,
-      null,
+      parameters,
       null,
       null,
       dataEndpoint,
@@ -236,7 +278,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     )
   }
 
-  fun generateCarePlan(planDefinitionId: String, patientId: String): CarePlan {
+  fun generateCarePlan(planDefinitionId: String, patientId: String): IBaseResource {
     return generateCarePlan(planDefinitionId, patientId, encounterId = null)
   }
 
@@ -244,7 +286,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     planDefinitionId: String,
     patientId: String,
     encounterId: String?
-  ): CarePlan {
+  ): IBaseResource {
     return planDefinitionProcessor.apply(
       IdType("PlanDefinition", planDefinitionId),
       patientId,
@@ -264,6 +306,6 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       /* dataEndpoint= */ null,
       /* contentEndpoint*/ null,
       /* terminologyEndpoint= */ null
-    )
+    ) as IBaseResource
   }
 }
