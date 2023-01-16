@@ -20,14 +20,26 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.google.android.fhir.implementationguide.db.impl.dao.ImplementationGuideDao
-import com.google.android.fhir.implementationguide.db.impl.entities.IgResourceCrossRef
 import com.google.android.fhir.implementationguide.db.impl.entities.ImplementationGuideEntity
+import com.google.android.fhir.implementationguide.db.impl.entities.ImplementationGuideResourceMetadataEntity
 import com.google.android.fhir.implementationguide.db.impl.entities.ResourceMetadataEntity
 
-/** Stores metadata for implementation guides and their containing FHIR Resources. */
+/**
+ * Stores metadata for implementation guides and their containing FHIR Resources.
+ *
+ * Same FhirResource (identified as the resource with the same `url`) can be part of the different
+ * IGs. To spare avoid duplications, [ImplementationGuideEntity] are connected with
+ * [ResourceMetadataEntity] through [ImplementationGuideResourceMetadataEntity] in a
+ * [many-to-many](https://developer.android.com/training/data-storage/room/relationships#many-to-many)
+ * relationship.
+ */
 @Database(
   entities =
-    [ImplementationGuideEntity::class, ResourceMetadataEntity::class, IgResourceCrossRef::class],
+    [
+      ImplementationGuideEntity::class,
+      ResourceMetadataEntity::class,
+      ImplementationGuideResourceMetadataEntity::class
+    ],
   version = 1,
   exportSchema = false
 )

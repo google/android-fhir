@@ -23,14 +23,14 @@ import java.io.File
 import org.hl7.fhir.r4.model.ResourceType
 
 /**
- * A DB entity containing description and metadata for
+ * A DB entity containing the description and metadata for
  * [FHIR Resource](https://build.fhir.org/canonicalresource.html).
  */
 @Entity(
   indices =
     [
       Index(value = ["resourceMetadataId"]),
-      Index(value = ["url", "version", "fileUri"], unique = true)
+      Index(value = ["url", "version", "resourceFile"], unique = true)
     ],
 )
 internal data class ResourceMetadataEntity(
@@ -40,5 +40,5 @@ internal data class ResourceMetadataEntity(
   val version: String?,
   val name: String?,
   /** Location of the JSON file with a full Resource. */
-  val fileUri: File,
+  val resourceFile: File,
 )

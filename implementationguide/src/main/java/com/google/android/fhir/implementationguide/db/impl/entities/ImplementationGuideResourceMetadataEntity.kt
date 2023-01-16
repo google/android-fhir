@@ -23,9 +23,7 @@ import androidx.room.Index
 import androidx.room.Junction
 import androidx.room.Relation
 
-/**
- * Connects [ImplementationGuideEntity] and [ResourceMetadataEntity] in a many-to-many relationship.
- */
+/** Connects [ImplementationGuideEntity] to [ResourceMetadataEntity]. */
 @Entity(
   primaryKeys = ["implementationGuideId", "resourceMetadataId"],
   indices = [Index(value = ["implementationGuideId"]), Index(value = ["resourceMetadataId"])],
@@ -45,7 +43,7 @@ import androidx.room.Relation
       )
     ]
 )
-internal data class IgResourceCrossRef(
+internal data class ImplementationGuideResourceMetadataEntity(
   val implementationGuideId: Long,
   val resourceMetadataId: Long,
 )
@@ -55,7 +53,7 @@ internal data class ImplementationGuideWithResources(
   @Relation(
     parentColumn = "implementationGuideId",
     entityColumn = "resourceMetadataId",
-    associateBy = Junction(IgResourceCrossRef::class)
+    associateBy = Junction(ImplementationGuideResourceMetadataEntity::class)
   )
   val resources: List<ResourceMetadataEntity>
 )

@@ -22,8 +22,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.google.android.fhir.implementationguide.db.impl.entities.IgResourceCrossRef
 import com.google.android.fhir.implementationguide.db.impl.entities.ImplementationGuideEntity
+import com.google.android.fhir.implementationguide.db.impl.entities.ImplementationGuideResourceMetadataEntity
 import com.google.android.fhir.implementationguide.db.impl.entities.ImplementationGuideWithResources
 import com.google.android.fhir.implementationguide.db.impl.entities.ResourceMetadataEntity
 import org.hl7.fhir.r4.model.ResourceType
@@ -36,8 +36,18 @@ abstract class ImplementationGuideDao {
     implementationGuideId: Long,
     resource: ResourceMetadataEntity,
   ) {
-    val resourceMetadataId = insert(resource)
-    insert(IgResourceCrossRef(implementationGuideId, resourceMetadataId))
+
+    val resourceMetadata =
+      if (resource.url != null) {
+        getResourceWithUrl(resource.url)
+      } else {
+        getResourcesWithNameAndVersion(resource.resourceType, resource.name, resource.version)
+      }
+    // TODO(ktarasenko) compare the substantive part of the old and new resource and thrown an
+    // exception if they
+    // are different.
+    val resourceMetadataId = resourceMetadata?.resourceMetadataId ?: insert(resource)
+    insert(ImplementationGuideResourceMetadataEntity(implementationGuideId, resourceMetadataId))
   }
 
   @Transaction
@@ -48,7 +58,7 @@ abstract class ImplementationGuideDao {
   }
 
   @Query(
-    "DELETE from ResourceMetadataEntity WHERE resourceMetadataId NOT IN (SELECT DISTINCT resourceMetadataId from IgResourceCrossRef)"
+    "DELETE from ResourceMetadataEntity WHERE resourceMetadataId NOT IN (SELECT DISTINCT resourceMetadataId from ImplementationGuideResourceMetadataEntity)"
   )
   internal abstract suspend fun deleteOrphanedResources()
 
@@ -71,18 +81,17 @@ abstract class ImplementationGuideDao {
     resourceType: ResourceType,
   ): List<ResourceMetadataEntity>
 
-  @Query("SELECT * from ResourceMetadataEntity WHERE  resourceType = :resourceType AND url = :url")
-  internal abstract suspend fun getResourcesWithUrl(
-    resourceType: ResourceType,
+  @Query("SELECT * from ResourceMetadataEntity WHERE url = :url")
+  internal abstract suspend fun getResourceWithUrl(
     url: String,
-  ): List<ResourceMetadataEntity>
+  ): ResourceMetadataEntity?
 
   @Query(
     "SELECT * from ResourceMetadataEntity WHERE  resourceType = :resourceType AND name = :name"
   )
   internal abstract suspend fun getResourcesWithName(
     resourceType: ResourceType,
-    name: String,
+    name: String?,
   ): List<ResourceMetadataEntity>
 
   @Query(
@@ -90,26 +99,26 @@ abstract class ImplementationGuideDao {
   )
   internal abstract suspend fun getResourcesWithNameAndVersion(
     resourceType: ResourceType,
-    name: String,
-    version: String,
-  ): List<ResourceMetadataEntity>
+    name: String?,
+    version: String?,
+  ): ResourceMetadataEntity?
 
   @Transaction
   @Query("SELECT * FROM ImplementationGuideEntity WHERE implementationGuideId = :igId")
   internal abstract suspend fun getImplementationGuidesWithResources(
-    igId: Long
+    igId: Long,
   ): ImplementationGuideWithResources?
 
   @Delete
   internal abstract suspend fun deleteImplementationGuide(igEntity: ImplementationGuideEntity)
 
-  // TODO: implement better conflict resolution (compare the substantive part of the resource and
-  // fail only if they are different)
-  @Insert(onConflict = OnConflictStrategy.ABORT)
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
   internal abstract suspend fun insert(resource: ResourceMetadataEntity): Long
 
   @Insert(onConflict = OnConflictStrategy.IGNORE)
-  internal abstract suspend fun insert(igResourceXRef: IgResourceCrossRef): Long
+  internal abstract suspend fun insert(
+    igResourceXRef: ImplementationGuideResourceMetadataEntity
+  ): Long
 
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   internal abstract suspend fun insert(ig: ImplementationGuideEntity): Long

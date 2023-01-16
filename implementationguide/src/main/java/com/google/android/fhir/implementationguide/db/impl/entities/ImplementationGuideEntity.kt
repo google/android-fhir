@@ -22,12 +22,12 @@ import androidx.room.PrimaryKey
 import java.io.File
 
 /**
- * A DB Entity containing a minimal
- * [Implementation Guide](https://build.fhir.org/implementationguide.html) description.
+ * A DB Entity containing the metadata of the
+ * [Implementation Guide](https://build.fhir.org/implementationguide.html).
  *
- * The metadata stored there is enough for `NpmPackageManager` to resolve the
+ * This entity stores as much metadata as necessary for `NpmPackageManager` to resolve the
  * [dependency](https://build.fhir.org/implementationguide-definitions.html#ImplementationGuide.dependsOn)
- * to another Implementation guide.
+ * on another Implementation guide.
  */
 @Entity(
   indices =
@@ -41,6 +41,6 @@ internal data class ImplementationGuideEntity(
   val url: String,
   val packageId: String,
   val version: String?,
-  /** Location of the physical files of Implementation guide */
+  /** Directory where the Implementation Guide files are stored */
   val rootDirectory: File,
 )
