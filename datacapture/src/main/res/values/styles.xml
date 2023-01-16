@@ -355,7 +355,8 @@
         <item name="android:textColor">?attr/colorError</item>
         <item name="android:text">@string/delete</item>
         <item name="android:visibility">visible</item>
-        <item name="android:paddingHorizontal">@dimen/padding_default</item>
+        <item name="android:paddingRight">@dimen/padding_default</item>
+        <item name="android:paddingLeft">@dimen/padding_default</item>
     </style>
 
 </resources>
