@@ -7,6 +7,7 @@ buildscript {
   }
   dependencies {
     classpath(Plugins.androidGradlePlugin)
+    classpath(Plugins.benchmarkGradlePlugin)
     classpath(Plugins.kotlinGradlePlugin)
     classpath(Plugins.navSafeArgsGradlePlugin)
     classpath(Plugins.rulerGradlePlugin)
@@ -34,26 +35,6 @@ subprojects {
     if (project.providers.environmentVariable("GITHUB_ACTIONS").isPresent) {
       // limit memory usage to avoid running out of memory in the docker container.
       maxHeapSize = "512m"
-    }
-  }
-}
-
-// Create a CI repository and also change versions to include the build number
-afterEvaluate {
-  val buildNumber = System.getenv("GITHUB_RUN_ID")
-  if (buildNumber != null) {
-    subprojects {
-      apply(plugin = Plugins.BuildPlugins.mavenPublish)
-      configure<PublishingExtension> {
-        repositories {
-          maven {
-            name = "CI"
-            url = uri("file://${rootProject.buildDir}/ci-repo")
-          }
-        }
-        // update version to have suffix of build id
-        project.version = "${project.version}-build_$buildNumber"
-      }
     }
   }
 }

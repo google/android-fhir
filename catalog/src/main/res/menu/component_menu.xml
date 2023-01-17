@@ -8,6 +8,5 @@
         android:icon="@drawable/ic_icon"
         android:title="@string/error"
         app:showAsAction="always"
-    >
-  </item>
+    />
 </menu>

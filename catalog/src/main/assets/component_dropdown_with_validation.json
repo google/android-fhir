@@ -19,7 +19,7 @@
           }
         }
       ],
-      "text": "Question title",
+      "text": "Choose one from the options below",
       "required": true,
       "answerOption": [
         {
@@ -42,27 +42,27 @@
         },
         {
           "valueCoding": {
-            "code": "mother",
-            "display": "Mother"
+            "code": "option-4",
+            "display": "Option 4"
           }
         },
         {
           "valueCoding": {
-            "code": "sibling",
-            "display": "Sibling"
+            "code": "option-5",
+            "display": "Option 5"
           }
         },
         {
           "valueCoding": {
-            "code": "other",
-            "display": "Other"
+            "code": "option-6",
+            "display": "Option 6"
           }
         }
       ],
       "item": [
         {
           "linkId": "1-relationship",
-          "text": "Relationship",
+          "text": "State",
           "type": "display",
           "extension": [
             {

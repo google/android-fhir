@@ -25,13 +25,14 @@ import androidx.core.text.HtmlCompat
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.utilities.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
-import com.google.android.fhir.logicalId
+import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -183,6 +184,65 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceO
         ?.valueAsString
     return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
   }
+
+internal const val EXTENSION_MIME_TYPE = "http://hl7.org/fhir/StructureDefinition/mimeType"
+
+/** Identifies the kinds of attachment allowed to be sent for an element. */
+internal val Questionnaire.QuestionnaireItemComponent.mimeTypes: List<String>
+  get() {
+    return extension
+      .filter { it.url == EXTENSION_MIME_TYPE }
+      .map { (it.value as CodeType).valueAsString }
+      .filter { !it.isNullOrEmpty() }
+  }
+
+/** Currently supported mime types. */
+internal enum class MimeType(val value: String) {
+  AUDIO("audio"),
+  DOCUMENT("application"),
+  IMAGE("image"),
+  VIDEO("video")
+}
+
+/** Returns true if at least one mime type matches the given type. */
+internal fun Questionnaire.QuestionnaireItemComponent.hasMimeType(type: String): Boolean {
+  return mimeTypes.any { it.substringBefore("/") == type }
+}
+
+/** Returns true if all mime types match the given type. */
+internal fun Questionnaire.QuestionnaireItemComponent.hasMimeTypeOnly(type: String): Boolean {
+  return mimeTypes.all { it.substringBefore("/") == type }
+}
+
+internal const val EXTENSION_MAX_SIZE = "http://hl7.org/fhir/StructureDefinition/maxSize"
+
+/** The maximum size of an attachment in Bytes. */
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInBytes: BigDecimal?
+  get() =
+    (extension.firstOrNull { it.url == EXTENSION_MAX_SIZE }?.valueAsPrimitive as DecimalType?)
+      ?.value
+
+private val BYTES_PER_KIB = BigDecimal(1024)
+
+/** The maximum size of an attachment in Kibibytes. */
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInKiBs: BigDecimal?
+  get() = maxSizeInBytes?.div(BYTES_PER_KIB)
+
+private val BYTES_PER_MIB = BigDecimal(1048576)
+
+/** The maximum size of an attachment in Mebibytes. */
+internal val Questionnaire.QuestionnaireItemComponent.maxSizeInMiBs: BigDecimal?
+  get() = maxSizeInBytes?.div(BYTES_PER_MIB)
+
+/** The default maximum size of an attachment is 1 Mebibytes. */
+private val DEFAULT_SIZE = BigDecimal(1048576)
+
+/** Returns true if given size is above maximum size allowed. */
+internal fun Questionnaire.QuestionnaireItemComponent.isGivenSizeOverLimit(
+  size: BigDecimal
+): Boolean {
+  return size > (maxSizeInBytes ?: DEFAULT_SIZE)
+}
 
 /** UI controls relevant to rendering questionnaire items. */
 internal enum class DisplayItemControlType(val extensionCode: String) {
@@ -541,8 +601,13 @@ fun List<Questionnaire.QuestionnaireItemComponent>.flattened():
  * The hierarchy and order of child items will be retained as specified in the standard. See
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
-private inline fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
+fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
   item.map { it.createQuestionnaireResponseItem() }
+
+val Resource.logicalId: String
+  get() {
+    return this.idElement?.idPart.orEmpty()
+  }
 
 /** The Attachment defined in the [EXTENSION_ITEM_MEDIA] extension where applicable */
 internal val Questionnaire.QuestionnaireItemComponent.itemMedia: Attachment?

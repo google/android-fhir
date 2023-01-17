@@ -109,9 +109,38 @@
             name="questionnaireAddAnotherAnswerButtonStyle"
         >@style/Widget.Material3.Button
         </item>
+        <item name="questionnaireValidationDialogTitleStyle">
+            @style/TextAppearance.Material3.HeadlineSmall
+        </item>
+        <item name="questionnaireValidationDialogBodyStyle">
+            @style/TextAppearance.Material3.BodyMedium
+        </item>
+        <item name="questionnaireValidationDialogButtonStyle">
+            @style/Widget.Material3.Button.TextButton.Dialog
+        </item>
         <item
             name="questionnaireLinearProgressIndicatorStyle"
         >@style/Widget.Material3.LinearProgressIndicator
+        </item>
+        <item
+            name="questionnaireAttachmentTakePhotoButtonStyle"
+        >@style/Questionnaire.AttachmentTakePhotoButtonStyle
+        </item>
+        <item
+            name="questionnaireAttachmentUploadButtonStyle"
+        >@style/Questionnaire.AttachmentUploadButtonStyle
+        </item>
+        <item
+            name="questionnaireAttachmentDeleteButtonStyle"
+        >@style/Questionnaire.AttachmentDeleteButtonStyle
+        </item>
+        <item
+            name="questionnaireAttachmentPreviewIconStyle"
+        >@style/Questionnaire.AttachmentPreviewIconStyle
+        </item>
+        <item
+            name="questionnaireAttachmentPreviewTextStyle"
+        >@style/TextAppearance.Material3.BodySmall
         </item>
     </style>
 
@@ -233,6 +262,10 @@
             name="android:background"
         >@drawable/questionnaire_item_checkbox_background</item>
         <item name="android:padding">@dimen/padding_default</item>
+        <item
+            name="android:paddingStart"
+        >@dimen/padding_between_text_and_icon</item>
+        <item name="android:paddingEnd">@dimen/padding_after_text</item>
     </style>
 
     <style
@@ -249,7 +282,38 @@
     >
         <item name="android:text">@string/submit_questionnaire</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:visibility">gone</item>
+        <item name="android:visibility">visible</item>
+    </style>
+
+    <style
+        name="Questionnaire.AttachmentTakePhotoButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
+        <item name="icon">@drawable/ic_camera</item>
+        <item name="iconTint">?attr/colorPrimary</item>
+        <item name="iconSize">@dimen/attachment_icon_button_size</item>
+        <item name="android:text">@string/take_photo</item>
+    </style>
+
+    <style
+        name="Questionnaire.AttachmentUploadButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
+        <item name="iconTint">?attr/colorPrimary</item>
+        <item name="iconSize">@dimen/attachment_icon_button_size</item>
+    </style>
+
+    <style name="Questionnaire.AttachmentPreviewIconStyle" parent="">
+        <item name="android:tint">?attr/colorPrimary</item>
+    </style>
+
+    <style
+        name="Questionnaire.AttachmentDeleteButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
+        <item name="android:drawableLeft">@drawable/ic_delete</item>
+        <item name="android:drawableTint">?attr/colorError</item>
+        <item name="android:textColor">?attr/colorError</item>
     </style>
 
 </resources>

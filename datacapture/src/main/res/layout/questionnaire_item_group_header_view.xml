@@ -20,27 +20,42 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
 >
-    <com.google.android.fhir.datacapture.views.QuestionnaireGroupTypeHeaderView
-        android:id="@+id/header"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-        android:layout_marginTop="@dimen/padding_default"
-    />
+        android:orientation="horizontal"
+    >
+        <com.google.android.fhir.datacapture.views.QuestionnaireGroupTypeHeaderView
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_default"
+            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+        />
+
+        <include
+            android:id="@+id/error"
+            layout="@layout/input_error_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+            android:layout_marginVertical="@dimen/item_margin_vertical"
+        />
+    </LinearLayout>
 
     <com.google.android.fhir.datacapture.views.QuestionnaireItemMediaView
         android:id="@+id/item_media"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-    />
+        />
 
-    <include
-        android:id="@+id/error"
-        layout="@layout/input_error_text_view"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/add_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-        android:layout_marginVertical="@dimen/item_margin_vertical"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical"
+        android:text="@string/group_header_add_item_button"
     />
 
 </LinearLayout>

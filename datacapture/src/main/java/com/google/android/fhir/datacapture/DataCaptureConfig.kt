@@ -22,6 +22,7 @@ import com.google.android.fhir.datacapture.DataCaptureConfig.Provider
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.utilities.npm.NpmPackage
 
@@ -48,6 +49,12 @@ data class DataCaptureConfig(
    * needed by [StructureMap]s used by the client app.
    */
   var npmPackage: NpmPackage? = null,
+
+  /**
+   * A [XFhirQueryResolver] may be set by the client to resolve x-fhir-query for the library. See
+   * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirquery for more details.
+   */
+  var xFhirQueryResolver: XFhirQueryResolver? = null,
 
   /**
    * Used to resolve/process [org.hl7.fhir.r4.model.Attachment] to it's binary equivalent. The
@@ -82,6 +89,17 @@ data class DataCaptureConfig(
  */
 interface ExternalAnswerValueSetResolver {
   suspend fun resolve(uri: String): List<Coding>
+}
+
+/**
+ * Resolves resources based on the provided xFhir query. This allows the library to resolve
+ * x-fhir-query answer expressions.
+ *
+ * NOTE: The result of the resolution may be cached to improve performance. In other words, the
+ * resolver may be called only once after which the Resources may be used multiple times in the UI.
+ */
+fun interface XFhirQueryResolver {
+  suspend fun resolve(xFhirQuery: String): List<Resource>
 }
 
 interface AttachmentResolver {

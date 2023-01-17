@@ -21,7 +21,6 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import org.hl7.fhir.instance.model.api.IBaseBundle
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.CarePlan
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Endpoint
 import org.hl7.fhir.r4.model.IdType
@@ -49,7 +48,7 @@ import org.opencds.cqf.cql.evaluator.fhir.adapter.r4.AdapterFactory
 import org.opencds.cqf.cql.evaluator.fhir.dal.FhirDal
 import org.opencds.cqf.cql.evaluator.library.CqlFhirParametersConverter
 import org.opencds.cqf.cql.evaluator.library.LibraryProcessor
-import org.opencds.cqf.cql.evaluator.plandefinition.r4.OperationParametersParser
+import org.opencds.cqf.cql.evaluator.plandefinition.OperationParametersParser
 import org.opencds.cqf.cql.evaluator.plandefinition.r4.PlanDefinitionProcessor
 import org.skyscreamer.jsonassert.JSONAssert
 
@@ -156,6 +155,8 @@ object PlanDefinition : Loadable() {
   object Assert {
     fun that(planDefinitionID: String, patientID: String, encounterID: String?) =
       Apply(planDefinitionID, patientID, encounterID)
+
+    fun that(planDefinitionID: String, patientID: String) = Apply(planDefinitionID, patientID, null)
   }
 
   class Apply(
@@ -216,7 +217,7 @@ object PlanDefinition : Loadable() {
     }
   }
 
-  class GeneratedCarePlan(val carePlan: CarePlan) {
+  class GeneratedCarePlan(val carePlan: IBaseResource) {
     fun isEqualsTo(expectedCarePlanAssetName: String) {
       try {
         JSONAssert.assertEquals(
@@ -227,6 +228,9 @@ object PlanDefinition : Loadable() {
       } catch (e: JSONException) {
         e.printStackTrace()
         fail("Unable to compare Jsons: " + e.message)
+      } catch (e: AssertionError) {
+        println("Actual: " + jsonParser.encodeResourceToString(carePlan))
+        throw e
       }
     }
   }

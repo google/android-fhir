@@ -164,4 +164,34 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
       )
       .isEqualTo(View.GONE)
   }
+
+  @Test
+  fun repeatingGroup_shouldHaveAddItemButtonVisible() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { repeats = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<View>(R.id.add_item).visibility)
+      .isEqualTo(View.VISIBLE)
+  }
+
+  @Test
+  fun nonRepeatingGroup_shouldHaveAddItemButtonGone() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { repeats = false },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<View>(R.id.add_item).visibility)
+      .isEqualTo(View.GONE)
+  }
 }
