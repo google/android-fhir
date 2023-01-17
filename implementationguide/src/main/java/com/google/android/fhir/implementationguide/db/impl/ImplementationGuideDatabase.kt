@@ -28,7 +28,7 @@ import com.google.android.fhir.implementationguide.db.impl.entities.ResourceMeta
  * Stores metadata for implementation guides and their containing FHIR Resources.
  *
  * Same FhirResource (identified as the resource with the same `url`) can be part of the different
- * IGs. To spare avoid duplications, [ImplementationGuideEntity] are connected with
+ * IGs. To avoid duplications, [ImplementationGuideEntity] are connected with
  * [ResourceMetadataEntity] through [ImplementationGuideResourceMetadataEntity] in a
  * [many-to-many](https://developer.android.com/training/data-storage/room/relationships#many-to-many)
  * relationship.
