@@ -1112,6 +1112,208 @@ class QuestionnaireViewModelTest {
     assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
   }
 
+  @Test
+  fun `should disable all questions in a chain of dependent questions after top question is disabled`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addEnableWhen().apply {
+              answer = BooleanType(true)
+              question = "question-1"
+              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+            }
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-3"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addEnableWhen().apply {
+              answer = BooleanType(true)
+              question = "question-2"
+              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+            }
+          }
+        )
+      }
+
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-1"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-2"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-3"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+      }
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    state.set(
+      EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
+      printer.encodeResourceToString(questionnaireResponse)
+    )
+
+    val viewModel = QuestionnaireViewModel(context, state)
+    viewModel.runViewModelBlocking {
+      var items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      assertThat(items.map { it.questionnaireItem.linkId })
+        .containsExactly("question-1", "question-2", "question-3")
+
+      items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
+
+      items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      assertThat(items.map { it.questionnaireItem.linkId }).containsExactly("question-1")
+    }
+  }
+
+  @Test
+  fun `should restore previous state in a chain of dependent question items when item is disabled and enabled`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addEnableWhen().apply {
+              answer = BooleanType(true)
+              question = "question-1"
+              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+            }
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-3"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addEnableWhen().apply {
+              answer = BooleanType(true)
+              question = "question-2"
+              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+            }
+          }
+        )
+      }
+
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-1"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-2"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-3"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+      }
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    state.set(
+      EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
+      printer.encodeResourceToString(questionnaireResponse)
+    )
+
+    val viewModel = QuestionnaireViewModel(context, state)
+    viewModel.runViewModelBlocking {
+      val items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      // Clearing the answer disables question-2 that in turn disables question-3.
+      items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
+
+      assertResourceEquals(
+        viewModel.getQuestionnaireResponse(),
+        QuestionnaireResponse().apply {
+          id = "a-questionnaire-response"
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "question-1"
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(false)
+                }
+              )
+            }
+          )
+        }
+      )
+
+      // Setting the answer of  "question-1" to true should enable question-2 that in turn enables
+      // question-3 and restore their previous states.
+      items
+        .first { it.questionnaireItem.linkId == "question-1" }
+        .addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = BooleanType(true)
+          }
+        )
+
+      assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+    }
+  }
+
   // Test cases for state flow
 
   @Test
