@@ -531,6 +531,114 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun `should return false if given size is below maximum size allowed`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
+      }
+    assertThat(questionnaireItem.isGivenSizeOverLimit(BigDecimal(10))).isFalse()
+  }
+
+  @Test
+  fun `should return true if given size is above maximum size allowed`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
+      }
+    assertThat(questionnaireItem.isGivenSizeOverLimit(BigDecimal(52428809))).isTrue()
+  }
+
+  @Test
+  fun mimeType_size_shouldReturnNumberOfSupportedMimeTypes() {
+    assertThat(MimeType.values().size).isEqualTo(4)
+  }
+
+  @Test
+  fun hasMimeType_shouldReturnTrue() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MIME_TYPE, CodeType("image/jpg"))
+        addExtension(EXTENSION_MIME_TYPE, CodeType("application/pdf"))
+      }
+    assertThat(questionnaire.hasMimeType(MimeType.IMAGE.value)).isTrue()
+  }
+
+  @Test
+  fun hasMimeType_shouldReturnFalse() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MIME_TYPE, CodeType("image/jpg"))
+        addExtension(EXTENSION_MIME_TYPE, CodeType("application/pdf"))
+      }
+    assertThat(questionnaire.hasMimeType(MimeType.VIDEO.value)).isFalse()
+  }
+
+  @Test
+  fun hasMimeTypeOnly_shouldReturnTrue() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MIME_TYPE, CodeType("image/jpg"))
+        addExtension(EXTENSION_MIME_TYPE, CodeType("image/png"))
+      }
+    assertThat(questionnaire.hasMimeTypeOnly(MimeType.IMAGE.value)).isTrue()
+  }
+
+  @Test
+  fun hasMimeTypeOnly_shouldReturnFalse() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MIME_TYPE, CodeType("image/jpg"))
+        addExtension(EXTENSION_MIME_TYPE, CodeType("application/pdf"))
+      }
+    assertThat(questionnaire.hasMimeTypeOnly(MimeType.IMAGE.value)).isFalse()
+  }
+
+  @Test
+  fun maxSize_shouldReturnBytes() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
+      }
+    assertThat(questionnaire.maxSizeInBytes).isEqualTo(BigDecimal(5242880))
+  }
+
+  @Test
+  fun maxSize_shouldReturnKibibytes() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
+      }
+    assertThat(questionnaire.maxSizeInKiBs).isEqualTo(BigDecimal(5120))
+  }
+
+  @Test
+  fun maxSize_shouldReturnMebibytes() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_MAX_SIZE, DecimalType(5242880))
+      }
+    assertThat(questionnaire.maxSizeInMiBs).isEqualTo(BigDecimal(5))
+  }
+
+  @Test
+  fun maxSizeInByte_missingExtension_shouldReturnNull() {
+    val questionnaire = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaire.maxSizeInBytes).isNull()
+  }
+
+  @Test
+  fun maxSizeInKiB_missingExtension_shouldReturnNull() {
+    val questionnaire = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaire.maxSizeInKiBs).isNull()
+  }
+
+  @Test
+  fun maxSizeInMiB_missingExtension_shouldReturnNull() {
+    val questionnaire = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaire.maxSizeInMiBs).isNull()
+  }
+
+  @Test
   fun localizedTextSpanned_noText_shouldReturnNull() {
     assertThat(Questionnaire.QuestionnaireItemComponent().localizedTextSpanned).isNull()
   }

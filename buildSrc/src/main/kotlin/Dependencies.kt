@@ -68,6 +68,10 @@ object Dependencies {
     const val translatorModelJackson = "$translatorGroup:model-jackson:${Versions.Cql.translator}"
   }
 
+  object Glide {
+    const val glide = "com.github.bumptech.glide:glide:${Versions.Glide.glide}"
+  }
+
   object HapiFhir {
     const val fhirBase = "ca.uhn.hapi.fhir:hapi-fhir-base:${Versions.hapiFhir}"
     const val fhirClient = "ca.uhn.hapi.fhir:hapi-fhir-client:${Versions.hapiFhir}"
@@ -240,6 +244,10 @@ object Dependencies {
       const val engine = "2.4.0"
       const val evaluator = "2.4.0"
       const val translator = "2.4.0"
+    }
+
+    object Glide {
+      const val glide = "4.14.2"
     }
 
     object Kotlin {
