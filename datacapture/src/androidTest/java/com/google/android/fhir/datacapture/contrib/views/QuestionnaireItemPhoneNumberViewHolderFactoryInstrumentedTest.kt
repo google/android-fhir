@@ -65,7 +65,11 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
     val viewHolderFromAdapter =
       questionnaireItemEditAdapter.createViewHolder(
         parent,
-        QuestionnaireItemViewHolderType.PHONE_NUMBER.value
+        QuestionnaireItemEditAdapter.ViewType.from(
+            type = QuestionnaireItemEditAdapter.ViewType.Type.QUESTION,
+            subtype = QuestionnaireItemViewHolderType.PHONE_NUMBER.value,
+          )
+          .viewType,
       )
     assertThat(viewHolderFromAdapter).isInstanceOf(viewHolder::class.java)
   }
