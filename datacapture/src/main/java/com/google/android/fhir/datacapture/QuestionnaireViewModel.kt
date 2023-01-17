@@ -582,21 +582,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         .evaluate(questionnaireItem, questionnaireResponseItem)
     // Disabled questions should not get QuestionnaireItemViewItem instances
     if (!enabled) {
-      // If the item is not enabled, clear the answers that it may have from the previous enabled
-      // state. This will also prevent any questionnaire item that depends on the answer of this
-      // questionnaire item to be wrongly evaluated as well.
-      if (questionnaireResponseItem.hasAnswer()) {
-        responseItemToAnswersMapForDisabledQuestionnaireItem[questionnaireResponseItem] =
-          questionnaireResponseItem.answer
-        questionnaireResponseItem.answer = listOf()
-      }
+      cacheDisabledQuestionnaireItemAnswers(questionnaireResponseItem)
       return emptyList()
     }
 
-    if (responseItemToAnswersMapForDisabledQuestionnaireItem.contains(questionnaireResponseItem)) {
-      questionnaireResponseItem.answer =
-        responseItemToAnswersMapForDisabledQuestionnaireItem.remove(questionnaireResponseItem)
-    }
+    restoreFromDisabledQuestionnaireItemAnswersCache(questionnaireResponseItem)
 
     // Determine the validation result, which will be displayed on the item itself
     val validationResult =
@@ -652,6 +642,33 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
     currentPageItems = items
     return items
+  }
+
+  /**
+   * If the item is not enabled, clear the answers that it may have from the previous enabled state.
+   * This will also prevent any questionnaire item that depends on the answer of this questionnaire
+   * item to be wrongly evaluated as well.
+   */
+  private fun cacheDisabledQuestionnaireItemAnswers(
+    questionnaireResponseItem: QuestionnaireResponseItemComponent
+  ) {
+    if (questionnaireResponseItem.hasAnswer()) {
+      responseItemToAnswersMapForDisabledQuestionnaireItem[questionnaireResponseItem] =
+        questionnaireResponseItem.answer
+      questionnaireResponseItem.answer = listOf()
+    }
+  }
+
+  /**
+   * If the questionnaire item was previously disabled, check the cache to restore previous answers.
+   */
+  private fun restoreFromDisabledQuestionnaireItemAnswersCache(
+    questionnaireResponseItem: QuestionnaireResponseItemComponent
+  ) {
+    if (responseItemToAnswersMapForDisabledQuestionnaireItem.contains(questionnaireResponseItem)) {
+      questionnaireResponseItem.answer =
+        responseItemToAnswersMapForDisabledQuestionnaireItem.remove(questionnaireResponseItem)
+    }
   }
 
   private fun getEnabledResponseItems(
