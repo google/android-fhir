@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.google.android.fhir.datacapture.contrib.views.QuestionnaireItemPhoneNumberViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemAttachmentViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemAutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemBooleanTypePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxGroupViewHolderFactory
@@ -101,6 +102,7 @@ internal class QuestionnaireItemEditAdapter(
         QuestionnaireItemViewHolderType.SLIDER -> QuestionnaireItemSliderViewHolderFactory
         QuestionnaireItemViewHolderType.PHONE_NUMBER ->
           QuestionnaireItemPhoneNumberViewHolderFactory
+        QuestionnaireItemViewHolderType.ATTACHMENT -> QuestionnaireItemAttachmentViewHolderFactory
       }
     return viewHolderFactory.create(parent)
   }
@@ -194,6 +196,7 @@ internal class QuestionnaireItemEditAdapter(
       QuestionnaireItemType.DISPLAY -> QuestionnaireItemViewHolderType.DISPLAY
       QuestionnaireItemType.QUANTITY -> QuestionnaireItemViewHolderType.QUANTITY
       QuestionnaireItemType.REFERENCE -> getChoiceViewHolderType(questionnaireItemViewItem)
+      QuestionnaireItemType.ATTACHMENT -> QuestionnaireItemViewHolderType.ATTACHMENT
       else -> throw NotImplementedError("Question type $type not supported.")
     }.value
   }
