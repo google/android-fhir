@@ -17,7 +17,6 @@
 package com.google.android.fhir.implementationguide
 
 import android.content.Context
-import androidx.room.Ignore
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.implementationguide.db.impl.ImplementationGuideDatabase
@@ -25,7 +24,6 @@ import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlinx.coroutines.runBlocking
 import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -49,12 +47,16 @@ internal class IgManagerTest {
     igManager.install(igDependency, dataFolder)
 
     assertThat(
-      igDb
-        .implementationGuideDao()
-        .getImplementationGuidesWithResources(igDb.implementationGuideDao()
-                                                .getImplementationGuide(
-                                                  "anc-cds", "0.3.0").implementationGuideId)
-        ?.resources)
+        igDb
+          .implementationGuideDao()
+          .getImplementationGuidesWithResources(
+            igDb
+              .implementationGuideDao()
+              .getImplementationGuide("anc-cds", "0.3.0")
+              .implementationGuideId
+          )
+          ?.resources
+      )
       .hasSize(6)
   }
 
@@ -71,42 +73,21 @@ internal class IgManagerTest {
     assertThat(igRoot.exists()).isFalse()
   }
 
-
   @Test
   fun `imported entries are readable`() = runBlocking {
     igManager.install(igDependency, dataFolder)
 
+    assertThat(igManager.loadResources(resourceType = "Library", name = "WHOCommon")).isNotNull()
+    assertThat(igManager.loadResources(resourceType = "Library", url = "FHIRCommon")).isNotNull()
+    assertThat(igManager.loadResources(resourceType = "Measure")).hasSize(1)
     assertThat(
-      igManager.loadResources(
-        resourceType = "Library",
-        name = "WHOCommon"
+        igManager.loadResources(
+          resourceType = "Measure",
+          url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01"
+        )
       )
-    )
-      .isNotNull()
-    assertThat(
-      igManager.loadResources(
-        resourceType = "Library",
-        url = "FHIRCommon"
-      )
-    )
-      .isNotNull()
-    assertThat(
-      igManager.loadResources(resourceType = "Measure")
-    )
-      .hasSize(1)
-    assertThat(
-      igManager.loadResources(
-        resourceType = "Measure",
-        url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01"
-      )
-    )
       .isNotEmpty()
-    assertThat(
-      igManager.loadResources(
-        resourceType = "Measure",
-        url = "Measure/ANCIND01"
-      )
-    )
+    assertThat(igManager.loadResources(resourceType = "Measure", url = "Measure/ANCIND01"))
       .isNotNull()
   }
 }
