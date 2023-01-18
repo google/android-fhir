@@ -188,7 +188,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   /**
    * The function evaluates a FHIR library against the database.
    *
-   * NOTE: The api may internally result in a blocking IO operation. The users should call the api
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
    * @param libraryUrl the url of the Library to evaluate
    * @param expressions names of expressions in the Library to evaluate.
@@ -202,7 +202,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   /**
    * The function evaluates a FHIR library against a patient's records.
    *
-   * NOTE: The api may internally result in a blocking IO operation. The users should call the api
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
    * @param libraryUrl the url of the Library to evaluate
    * @param patientId the Id of the patient to be evaluated
@@ -221,7 +221,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   /**
    * The function evaluates a FHIR library against the database.
    *
-   * NOTE: The api may internally result in a blocking IO operation. The users should call the api
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
    * @param libraryUrl the url of the Library to evaluate
    * @param parameters list of parameters to be passed to the CQL library
@@ -240,7 +240,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   /**
    * The function evaluates a FHIR library against the database.
    *
-   * NOTE: The api may internally result in a blocking IO operation. The users should call the api
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
    * @param libraryUrl the url of the Library to evaluate
    * @param patientId the Id of the patient to be evaluated, if applicable
@@ -275,7 +275,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   /**
    * Generates a [MeasureReport] based on the provided inputs.
    *
-   * NOTE: The api may internally result in a blocking IO operation. The users should call the api
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
    */
   @WorkerThread
@@ -306,7 +306,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   /**
    * Generates a [CarePlan] based on the provided inputs.
    *
-   * NOTE: The api may internally result in a blocking IO operation. The users should call the api
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
    */
   @WorkerThread
@@ -317,7 +317,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   /**
    * Generates a [CarePlan] based on the provided inputs.
    *
-   * NOTE: The api may internally result in a blocking IO operation. The users should call the api
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
    */
   @WorkerThread

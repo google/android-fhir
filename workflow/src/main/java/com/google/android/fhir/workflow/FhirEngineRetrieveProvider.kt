@@ -70,19 +70,10 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
       codes.mapNotNull { safeGet(fhirEngine, ResourceType.fromCode(dataType), it.code) }
     } else {
       val search = Search(ResourceType.fromCode(dataType))
-
-      // filter by context
       filterByContext(context, contextPath, contextValue, dataType, search)
-
-      // filter by code in codes
       filterByCode(codePath, codes, search)
-
-      // filter by code into valueSet
       filterByValueSet(codePath, valueSet, search)
-
-      // filter by date in range
       filterByDateRange(datePath, dateLowPath, dateHighPath, dateRange, search)
-
       fhirEngine.search(search)
     }
   }

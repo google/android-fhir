@@ -21,8 +21,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 
 /**
- * Blocks the current thread and run the code in a [CoroutineScope].
- * @throws BlockingMainThreadException if the calling thread is main thread.
+ * Blocks the current thread and runs the code in a [CoroutineScope].
+ * @throws BlockingMainThreadException if the calling thread is the main thread.
  */
 internal fun <T> runBlockingOrThrowMainThreadException(block: suspend (CoroutineScope) -> T): T {
   if (Looper.myLooper() == Looper.getMainLooper()) {
@@ -35,4 +35,7 @@ internal fun <T> runBlockingOrThrowMainThreadException(block: suspend (Coroutine
  * The exception that is thrown when an application attempts to perform [runBlocking] operation its
  * main thread.
  */
-class BlockingMainThreadException : RuntimeException()
+internal class BlockingMainThreadException :
+  RuntimeException(
+    "The com.google.android.fhir.workflow.FhirOperator API has been called from the main thread resulting in a blocking call. Make sure that the com.google.android.fhir.workflow.FhirOperator API is called from a worker thread instead. See https://developer.android.com/kotlin/coroutines for more details."
+  )
