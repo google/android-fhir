@@ -39,10 +39,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.itemAnswerOptionImage
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.concurrent.atomic.AtomicInteger
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 internal class OptionSelectDialogFragment(
@@ -198,6 +198,12 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
             (holder as OptionSelectViewHolder.OptionSingle).radioButton
           }
         compoundButton.text = item.option.displayString
+        compoundButton.setCompoundDrawablesRelative(
+          item.option.item.itemAnswerOptionImage(compoundButton.context),
+          null,
+          null,
+          null
+        )
         compoundButton.setOnCheckedChangeListener(null)
         compoundButton.isChecked = item.option.selected
         compoundButton.setOnCheckedChangeListener { _, checked ->

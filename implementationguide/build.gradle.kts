@@ -1,9 +1,12 @@
+import java.net.URL
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
+  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
 }
 
 publishArtifact(Releases.ImplmentationGuide)
@@ -70,9 +73,6 @@ configurations {
 }
 
 dependencies {
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
-  kapt(Dependencies.Room.compiler)
-
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
@@ -82,10 +82,32 @@ dependencies {
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.timber)
+
+  kapt(Dependencies.Room.compiler)
 }
 
-configureDokka(Releases.ImplmentationGuide.artifactId, Releases.ImplmentationGuide.version)
+tasks.dokkaHtml.configure {
+  outputDirectory.set(
+    file("../docs/${Releases.ImplmentationGuide.artifactId}/${Releases.ImplmentationGuide.version}")
+  )
+  suppressInheritedMembers.set(true)
+  dokkaSourceSets {
+    named("main") {
+      moduleName.set(Releases.ImplmentationGuide.artifactId)
+      moduleVersion.set(Releases.ImplmentationGuide.version)
+      noAndroidSdkLink.set(false)
+      externalDocumentationLink {
+        url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
+        packageListUrl.set(
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+        )
+      }
+    }
+  }
+}

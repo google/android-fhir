@@ -192,6 +192,56 @@ class QuestionnaireResponseValidatorTest {
   }
 
   @Test
+  fun `validation passes if question is required but not enabled`() {
+    val questionnaire =
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "q1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "q2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            required = true
+            addEnableWhen(
+              Questionnaire.QuestionnaireItemEnableWhenComponent()
+                .setQuestion("q1")
+                .setOperator(Questionnaire.QuestionnaireItemOperator.EXISTS)
+                .setAnswer(BooleanType(true))
+            )
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        this.questionnaire = "questionnaire-1"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "q1"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+      }
+
+    val result =
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        questionnaireResponse,
+        context
+      )
+    assertThat(result.keys).containsExactly("q1")
+    assertThat(result["q1"]).containsExactly(Valid)
+  }
+
+  @Test
   fun validateQuestionnaireResponse_questionnaireResponseHasFewerItems_shouldReturnValidResult() {
     val questionnaire =
       Questionnaire().apply {
@@ -270,18 +320,6 @@ class QuestionnaireResponseValidatorTest {
       Questionnaire().apply { url = "questionnaire-1" },
       QuestionnaireResponse(),
       context
-    )
-  }
-
-  @Test
-  fun `check passes if questionnaire response matches questionnaire`() {
-    QuestionnaireResponseValidator.checkQuestionnaireResponse(
-      Questionnaire().apply {
-        url = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
-      },
-      QuestionnaireResponse().apply {
-        questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
-      }
     )
   }
 
@@ -525,6 +563,18 @@ class QuestionnaireResponseValidatorTest {
       },
       "Multiple answers for non-repeat questionnaire item question-1",
       context
+    )
+  }
+
+  @Test
+  fun `check passes if questionnaire response matches questionnaire`() {
+    QuestionnaireResponseValidator.checkQuestionnaireResponse(
+      Questionnaire().apply {
+        url = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
+      },
+      QuestionnaireResponse().apply {
+        questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
+      }
     )
   }
 

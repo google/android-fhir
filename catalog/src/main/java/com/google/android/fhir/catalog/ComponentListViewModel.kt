@@ -89,6 +89,12 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_text_fields.json",
       "component_text_fields_with_validation.json"
     ),
+    AUTO_COMPLETE(
+      R.drawable.ic_autocomplete,
+      R.string.component_name_auto_complete,
+      "component_auto_complete.json",
+      "component_auto_complete_with_validation.json"
+    ),
     DATE_PICKER(
       R.drawable.ic_datepicker,
       R.string.component_name_date_picker,
@@ -101,20 +107,17 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_date_time_picker.json",
       "component_date_time_picker_with_validation.json"
     ),
-
-    // TODO https://github.com/google/android-fhir/issues/1260
-    //    SLIDER(
-    //      R.drawable.ic_slider,
-    //      R.string.component_name_slider,
-    //      "component_slider.json",
-    //      "component_slider_with_validation.json"
-    //    ),
-    IMAGE(R.drawable.ic_image, R.string.component_name_image, "", ""),
-    AUTO_COMPLETE(
-      R.drawable.ic_autocomplete,
-      R.string.component_name_auto_complete,
-      "component_auto_complete.json",
-      "component_auto_complete_with_validation.json"
+    SLIDER(
+      R.drawable.ic_slider,
+      R.string.component_name_slider,
+      "component_slider.json",
+      "component_slider_with_validation.json"
+    ),
+    ATTACHMENT(
+      R.drawable.ic_attachment,
+      R.string.component_name_attachment,
+      "component_attachment.json",
+      "component_attachment_with_validation.json"
     ),
     REPEATED_GROUP(
       R.drawable.ic_textfield,
@@ -134,10 +137,11 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       ViewItem.ComponentItem(Component.MODAL),
       ViewItem.ComponentItem(Component.OPEN_CHOICE),
       ViewItem.ComponentItem(Component.TEXT_FIELD),
+      ViewItem.ComponentItem(Component.AUTO_COMPLETE),
       ViewItem.ComponentItem(Component.DATE_PICKER),
       ViewItem.ComponentItem(Component.DATE_TIME_PICKER),
-      ViewItem.ComponentItem(Component.IMAGE),
-      ViewItem.ComponentItem(Component.AUTO_COMPLETE),
+      ViewItem.ComponentItem(Component.SLIDER),
+      ViewItem.ComponentItem(Component.ATTACHMENT),
       ViewItem.ComponentItem(Component.REPEATED_GROUP),
       ViewItem.HeaderItem(Header.MISC_COMPONENTS),
       ViewItem.ComponentItem(Component.HELP),

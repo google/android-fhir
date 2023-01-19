@@ -1,8 +1,13 @@
+import Dependencies.forceHapiVersion
+import Dependencies.removeIncompatibleDependencies
+import java.net.URL
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
+  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
 }
 
 publishArtifact(Releases.Workflow)
@@ -70,15 +75,8 @@ android {
 
 configurations {
   all {
-    exclude(module = "xpp3")
-    exclude(module = "xpp3_min")
-    exclude(module = "xmlpull")
-    exclude(module = "javax.json")
-    exclude(module = "jcl-over-slf4j")
-    exclude(group = "org.apache.httpcomponents")
-    // Remove this after this issue has been fixed:
-    // https://github.com/cqframework/clinical_quality_language/issues/799
-    exclude(module = "antlr4")
+    removeIncompatibleDependencies()
+    forceHapiVersion()
   }
 }
 
@@ -99,10 +97,6 @@ dependencies {
 
   implementation(Dependencies.Androidx.coreKtx)
 
-  // Remove this after this issue has been fixed:
-  // https://github.com/cqframework/clinical_quality_language/issues/799
-  implementation(Dependencies.Cql.antlr4Runtime)
-
   implementation(Dependencies.Cql.engine)
   implementation(Dependencies.Cql.engineJackson) // Necessary to import Executable XML/JSON CQL libs
   implementation(Dependencies.Cql.evaluator)
@@ -114,6 +108,16 @@ dependencies {
   implementation(Dependencies.Cql.translatorElmJackson) // Necessary to import XML/JSON CQL Libs
   implementation(Dependencies.Cql.translatorModel) // Overrides HAPI's old versions
   implementation(Dependencies.Cql.translatorModelJackson) // Necessary to import XML/JSON ModelInfos
+
+  // Forces the most recent version of jackson, ignoring what dependencies use.
+  // Remove these lines when HAPI 6.4 becomes available.
+  implementation(Dependencies.Jackson.annotations)
+  implementation(Dependencies.Jackson.bom)
+  implementation(Dependencies.Jackson.core)
+  implementation(Dependencies.Jackson.databind)
+  implementation(Dependencies.Jackson.dataformatXml)
+  implementation(Dependencies.Jackson.jaxbAnnotations)
+  implementation(Dependencies.Jackson.jsr310)
 
   // Runtime dependency that is required to run FhirPath (also requires minSDK of 26).
   // Version 3.0 uses java.lang.System.Logger, which is not available on Android
@@ -136,4 +140,31 @@ dependencies {
   testImplementation(project(":workflow-testing"))
 }
 
-configureDokka(Releases.Workflow.artifactId, Releases.Workflow.version)
+tasks.dokkaHtml.configure {
+  outputDirectory.set(file("../docs/${Releases.Workflow.artifactId}/${Releases.Workflow.version}"))
+  suppressInheritedMembers.set(true)
+  dokkaSourceSets {
+    named("main") {
+      moduleName.set(Releases.Workflow.artifactId)
+      moduleVersion.set(Releases.Workflow.version)
+      noAndroidSdkLink.set(false)
+      sourceLink {
+        localDirectory.set(file("src/main/java"))
+        remoteUrl.set(
+          URL("https://github.com/google/android-fhir/tree/master/workflow/src/main/java")
+        )
+        remoteLineSuffix.set("#L")
+      }
+      externalDocumentationLink {
+        url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
+        packageListUrl.set(
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+        )
+      }
+      externalDocumentationLink {
+        url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-base/"))
+        packageListUrl.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-base/element-list"))
+      }
+    }
+  }
+}
