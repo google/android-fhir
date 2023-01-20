@@ -6,7 +6,7 @@
   "item": [
     {
       "linkId": "1.0.0",
-      "text": "Do you have any of the following symptoms?",
+      "text": "What’s the reason for today’s visit?",
       "type": "choice",
       "repeats": true,
       "extension": [
@@ -28,42 +28,42 @@
         {
           "valueCoding": {
             "code": "code_1",
-            "display": "Missed period",
+            "display": "ANC",
             "system": "http://snomed.info/sct"
           }
         },
         {
           "valueCoding": {
             "code": "code_2",
-            "display": "Tender, swollen breasts",
+            "display": "Immunization",
             "system": "http://snomed.info/sct"
           }
         },
         {
           "valueCoding": {
             "code": "code_3",
-            "display": "Nausea",
+            "display": "Malaria Testing",
             "system": "http://snomed.info/sct"
           }
         },
         {
           "valueCoding": {
             "code": "code_4",
-            "display": "Vomiting",
+            "display": "Feeling sick",
             "system": "http://snomed.info/sct"
           }
         },
         {
           "valueCoding": {
             "code": "code_5",
-            "display": "Increased urination",
+            "display": "Family planning",
             "system": "http://snomed.info/sct"
           }
         },
         {
           "valueCoding": {
             "code": "code_6",
-            "display": "Fatigue",
+            "display": "Lab Tests",
             "system": "http://snomed.info/sct"
           }
         }
@@ -84,7 +84,7 @@
             }
           ],
           "linkId": "1-select-one",
-          "text": "Check all that apply",
+          "text": "Select all that apply",
           "type": "display"
         }
       ]

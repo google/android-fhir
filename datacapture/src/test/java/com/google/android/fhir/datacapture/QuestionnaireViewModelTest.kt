@@ -1112,6 +1112,208 @@ class QuestionnaireViewModelTest {
     assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
   }
 
+  @Test
+  fun `should disable all questions in a chain of dependent questions after top question is disabled`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addEnableWhen().apply {
+              answer = BooleanType(true)
+              question = "question-1"
+              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+            }
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-3"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addEnableWhen().apply {
+              answer = BooleanType(true)
+              question = "question-2"
+              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+            }
+          }
+        )
+      }
+
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-1"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-2"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-3"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+      }
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    state.set(
+      EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
+      printer.encodeResourceToString(questionnaireResponse)
+    )
+
+    val viewModel = QuestionnaireViewModel(context, state)
+    viewModel.runViewModelBlocking {
+      var items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      assertThat(items.map { it.questionnaireItem.linkId })
+        .containsExactly("question-1", "question-2", "question-3")
+
+      items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
+
+      items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      assertThat(items.map { it.questionnaireItem.linkId }).containsExactly("question-1")
+    }
+  }
+
+  @Test
+  fun `should restore previous state in a chain of dependent question items when item is disabled and enabled`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addEnableWhen().apply {
+              answer = BooleanType(true)
+              question = "question-1"
+              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+            }
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-3"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addEnableWhen().apply {
+              answer = BooleanType(true)
+              question = "question-2"
+              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+            }
+          }
+        )
+      }
+
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-1"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-2"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-3"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+      }
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    state.set(
+      EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
+      printer.encodeResourceToString(questionnaireResponse)
+    )
+
+    val viewModel = QuestionnaireViewModel(context, state)
+    viewModel.runViewModelBlocking {
+      val items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      // Clearing the answer disables question-2 that in turn disables question-3.
+      items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
+
+      assertResourceEquals(
+        viewModel.getQuestionnaireResponse(),
+        QuestionnaireResponse().apply {
+          id = "a-questionnaire-response"
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "question-1"
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(false)
+                }
+              )
+            }
+          )
+        }
+      )
+
+      // Setting the answer of  "question-1" to true should enable question-2 that in turn enables
+      // question-3 and restore their previous states.
+      items
+        .first { it.questionnaireItem.linkId == "question-1" }
+        .addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = BooleanType(true)
+          }
+        )
+
+      assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+    }
+  }
+
   // Test cases for state flow
 
   @Test
@@ -1150,10 +1352,15 @@ class QuestionnaireViewModelTest {
         createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
       val questionnaireItemViewItem = questionnaireViewModel.questionnaireStateFlow.first()
-      assertThat(questionnaireItemViewItem.items.first().questionnaireItem.linkId)
+      assertThat(questionnaireItemViewItem.items.first().asQuestion().questionnaireItem.linkId)
         .isEqualTo(questionnaireResponseWithMissingItem.item.first().linkId)
       assertThat(
-          questionnaireItemViewItem.items.single().answers.single().valueBooleanType.booleanValue()
+          questionnaireItemViewItem.items
+            .single()
+            .asQuestion()
+            .answers
+            .single()
+            .valueBooleanType.booleanValue()
         )
         .isTrue()
     }
@@ -1211,19 +1418,19 @@ class QuestionnaireViewModelTest {
         questionnaireViewModel.questionnaireStateFlow.first().items
 
       // Answer to first question should be created from questionnaire
-      val questionnaireItemViewItem1 = questionnaireItemViewItemList[0]
+      val questionnaireItemViewItem1 = questionnaireItemViewItemList[0].asQuestion()
       assertThat(questionnaireItemViewItem1.questionnaireItem.linkId).isEqualTo("q1")
       assertThat(questionnaireItemViewItem1.answers.single().valueBooleanType.booleanValue())
         .isFalse()
 
       // Answer to second question should be copied from questionnaire response
-      val questionnaireItemViewItem2 = questionnaireItemViewItemList[1]
+      val questionnaireItemViewItem2 = questionnaireItemViewItemList[1].asQuestion()
       assertThat(questionnaireItemViewItem2.questionnaireItem.linkId).isEqualTo("q2")
       assertThat(questionnaireItemViewItem2.answers.single().valueBooleanType.booleanValue())
         .isTrue()
 
       // Answer to third quesiton should be created from questionnaire
-      val questionnaireItemViewItem3 = questionnaireItemViewItemList[2]
+      val questionnaireItemViewItem3 = questionnaireItemViewItemList[2].asQuestion()
       assertThat(questionnaireItemViewItem3.questionnaireItem.linkId).isEqualTo("q3")
       assertThat(questionnaireItemViewItem3.answers.single().valueBooleanType.booleanValue())
         .isFalse()
@@ -1255,12 +1462,12 @@ class QuestionnaireViewModelTest {
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
     assertThat(questionnaireItemViewItemList).hasSize(2)
 
-    val firstQuestionnaireItem = questionnaireItemViewItemList[0].questionnaireItem
+    val firstQuestionnaireItem = questionnaireItemViewItemList[0].asQuestion().questionnaireItem
     assertThat(firstQuestionnaireItem.linkId).isEqualTo("a-link-id")
     assertThat(firstQuestionnaireItem.text).isEqualTo("Basic questions")
     assertThat(firstQuestionnaireItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.GROUP)
 
-    val secondQuestionnaireItem = questionnaireItemViewItemList[1].questionnaireItem
+    val secondQuestionnaireItem = questionnaireItemViewItemList[1].asQuestion().questionnaireItem
     assertThat(secondQuestionnaireItem.linkId).isEqualTo("another-link-id")
     assertThat(secondQuestionnaireItem.text).isEqualTo("Name?")
     assertThat(secondQuestionnaireItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.STRING)
@@ -1282,7 +1489,8 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    assertThat(questionnaireItemViewItemList.single().validationResult).isEqualTo(NotValidated)
+    assertThat(questionnaireItemViewItemList.single().asQuestion().validationResult)
+      .isEqualTo(NotValidated)
   }
 
   @Test
@@ -1303,8 +1511,9 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     viewModel.runViewModelBlocking {
-      viewModel.getQuestionnaireItemViewItemList().single().clearAnswer()
-      assertThat(viewModel.getQuestionnaireItemViewItemList().single().validationResult)
+      val question = viewModel.getQuestionnaireItemViewItemList().single().asQuestion()
+      question.clearAnswer()
+      assertThat(question.validationResult)
         .isEqualTo(Invalid(listOf("Missing answer for required field.")))
     }
   }
@@ -1335,7 +1544,9 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
+    assertThat(
+        viewModel.getQuestionnaireItemViewItemList().single().asQuestion().questionnaireItem.linkId
+      )
       .isEqualTo("question-1")
   }
 
@@ -1368,8 +1579,10 @@ class QuestionnaireViewModelTest {
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
 
     assertThat(questionnaireItemViewItemList).hasSize(2)
-    assertThat(questionnaireItemViewItemList[0].questionnaireItem.linkId).isEqualTo("question-1")
-    assertThat(questionnaireItemViewItemList[1].questionnaireItem.linkId).isEqualTo("question-2")
+    assertThat(questionnaireItemViewItemList[0].asQuestion().questionnaireItem.linkId)
+      .isEqualTo("question-1")
+    assertThat(questionnaireItemViewItemList[1].asQuestion().questionnaireItem.linkId)
+      .isEqualTo("question-2")
   }
 
   @Test
@@ -1417,7 +1630,9 @@ class QuestionnaireViewModelTest {
 
     val viewModel = QuestionnaireViewModel(context, state)
 
-    assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
+    assertThat(
+        viewModel.getQuestionnaireItemViewItemList().single().asQuestion().questionnaireItem.linkId
+      )
       .isEqualTo("a-boolean-item-1")
   }
 
@@ -1444,7 +1659,13 @@ class QuestionnaireViewModelTest {
 
       val viewModel = QuestionnaireViewModel(context, state)
 
-      assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
+      assertThat(
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .single()
+            .asQuestion()
+            .questionnaireItem.linkId
+        )
         .isEqualTo("a-boolean-item-1")
     }
 
@@ -1493,7 +1714,9 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     viewModel
-      .getQuestionnaireItemViewItemList()[1].setAnswer(
+      .getQuestionnaireItemViewItemList()[1]
+      .asQuestion()
+      .setAnswer(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
           this.value = valueBooleanType.setValue(false)
         }
@@ -1556,32 +1779,44 @@ class QuestionnaireViewModelTest {
 
     fun repeatedGroupA() =
       viewModel.getQuestionnaireItemViewItemList().single {
-        it.questionnaireItem.linkId == "repeated-group-a"
+        it.asQuestion().questionnaireItem.linkId == "repeated-group-a"
       }
 
     fun repeatedGroupB() =
       viewModel.getQuestionnaireItemViewItemList().single {
-        it.questionnaireItem.linkId == "repeated-group-b"
+        it.asQuestion().questionnaireItem.linkId == "repeated-group-b"
       }
     viewModel.runViewModelBlocking {
       // Calling addAnswer out of order should not result in the answers in the response being out
       // of order; all of the answers to repeated-group-a should come before repeated-group-b.
       repeat(times = 2) {
         repeatedGroupA()
+          .asQuestion()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              item = repeatedGroupA().questionnaireItem.getNestedQuestionnaireResponseItems()
+              item =
+                repeatedGroupA()
+                  .asQuestion()
+                  .questionnaireItem.getNestedQuestionnaireResponseItems()
             }
           )
         repeatedGroupB()
+          .asQuestion()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              item = repeatedGroupB().questionnaireItem.getNestedQuestionnaireResponseItems()
+              item =
+                repeatedGroupB()
+                  .asQuestion()
+                  .questionnaireItem.getNestedQuestionnaireResponseItems()
             }
           )
       }
 
-      assertThat(viewModel.getQuestionnaireItemViewItemList().map { it.questionnaireItem.linkId })
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList().map {
+            it.asQuestion().questionnaireItem.linkId
+          }
+        )
         .containsExactly(
           "repeated-group-a",
           "nested-item-a",
@@ -1726,13 +1961,17 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     viewModel
-      .getQuestionnaireItemViewItemList()[0].setAnswer(
+      .getQuestionnaireItemViewItemList()[0]
+      .asQuestion()
+      .setAnswer(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
           this.value = valueBooleanType.setValue(false)
         }
       )
     viewModel
-      .getQuestionnaireItemViewItemList()[1].setAnswer(
+      .getQuestionnaireItemViewItemList()[1]
+      .asQuestion()
+      .setAnswer(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
           this.value = valueBooleanType.setValue(false)
         }
@@ -1793,11 +2032,11 @@ class QuestionnaireViewModelTest {
           )
         )
       assertThat(state.items).hasSize(2)
-      state.items[0].questionnaireItem.let { groupItem ->
+      state.items[0].asQuestion().questionnaireItem.let { groupItem ->
         assertThat(groupItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.GROUP)
         assertThat(groupItem.linkId).isEqualTo("page1")
       }
-      state.items[1].questionnaireItem.let { questionItem ->
+      state.items[1].asQuestion().questionnaireItem.let { questionItem ->
         assertThat(questionItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.BOOLEAN)
         assertThat(questionItem.linkId).isEqualTo("page1-1")
         assertThat(questionItem.text).isEqualTo("Question on page 1")
@@ -2742,7 +2981,9 @@ class QuestionnaireViewModelTest {
 
     val viewModel = QuestionnaireViewModel(context, state)
 
-    assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireItem.linkId)
+    assertThat(
+        viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
+      )
       .isEqualTo("nested-display-question")
   }
 
@@ -2789,7 +3030,9 @@ class QuestionnaireViewModelTest {
 
       val viewModel = QuestionnaireViewModel(context, state)
 
-      assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireItem.linkId)
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
+        )
         .isEqualTo("parent-question")
     }
 
@@ -2836,7 +3079,9 @@ class QuestionnaireViewModelTest {
 
       val viewModel = QuestionnaireViewModel(context, state)
 
-      assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireItem.linkId)
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
+        )
         .isEqualTo("parent-question")
     }
 
@@ -2883,7 +3128,9 @@ class QuestionnaireViewModelTest {
 
       val viewModel = QuestionnaireViewModel(context, state)
 
-      assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireItem.linkId)
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
+        )
         .isEqualTo("parent-question")
     }
 
@@ -3494,15 +3741,17 @@ class QuestionnaireViewModelTest {
       val viewModel = createQuestionnaireViewModel(questionnaire)
 
       val birthdateItem =
-        viewModel.getQuestionnaireItemViewItemList().first {
-          it.questionnaireItem.linkId == "a-birthdate"
-        }
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-birthdate" }
+          .asQuestion()
 
       assertThat(birthdateItem.getQuestionnaireResponseItem().answer).isEmpty()
 
       viewModel
         .getQuestionnaireItemViewItemList()
-        .first { it.questionnaireItem.linkId == "a-age-years" }
+        .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-age-years" }
+        .asQuestion()
         .apply {
           this.answersChangedCallback(
             this.questionnaireItem,
@@ -3553,9 +3802,10 @@ class QuestionnaireViewModelTest {
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
       val birthdateItem =
-        viewModel.getQuestionnaireItemViewItemList().first {
-          it.questionnaireItem.linkId == "a-birthdate"
-        }
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-birthdate" }
+          .asQuestion()
       val birthdateValue = DateType(Date())
       birthdateItem.apply {
         this.answersChangedCallback(
@@ -3576,7 +3826,8 @@ class QuestionnaireViewModelTest {
 
       viewModel
         .getQuestionnaireItemViewItemList()
-        .first { it.questionnaireItem.linkId == "a-age-years" }
+        .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-age-years" }
+        .asQuestion()
         .apply {
           this.answersChangedCallback(
             this.questionnaireItem,
@@ -3776,6 +4027,14 @@ class QuestionnaireViewModelTest {
     }
   }
 }
+
+private fun QuestionnaireAdapterItem.asQuestion(): QuestionnaireItemViewItem {
+  assertThat(this).isInstanceOf(QuestionnaireAdapterItem.Question::class.java)
+  return (this as QuestionnaireAdapterItem.Question).item
+}
+
+private fun QuestionnaireAdapterItem.asQuestionOrNull(): QuestionnaireItemViewItem? =
+  (this as? QuestionnaireAdapterItem.Question)?.item
 
 /**
  * Runs code that relies on the [QuestionnaireViewModel.viewModelScope]. Runs on [Dispatchers.Main],

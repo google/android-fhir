@@ -3,7 +3,7 @@
   "item": [
     {
       "linkId": "1",
-      "text": "Have you taken a pregnancy test?",
+      "text": "Is this the first visit?",
       "type": "boolean",
       "required": true,
       "item": [
