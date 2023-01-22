@@ -53,7 +53,6 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
 
   override fun init(itemView: View) {
     header = itemView.findViewById(R.id.header)
-    itemMedia = itemView.findViewById(R.id.item_media)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
     textInputEditText.setRawInputType(rawInputType)
@@ -82,9 +81,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
 
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     header.bind(questionnaireItemViewItem.questionnaireItem)
-    itemMedia.bind(questionnaireItemViewItem.questionnaireItem)
     textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
-
     textInputEditText.removeTextChangedListener(textWatcher)
     val text = getText(questionnaireItemViewItem.answers.singleOrNull())
     if (isTextUpdatesRequired(text, textInputEditText.text.toString())) {

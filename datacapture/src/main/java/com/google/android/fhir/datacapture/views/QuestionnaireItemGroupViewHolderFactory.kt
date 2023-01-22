@@ -32,21 +32,18 @@ internal object QuestionnaireItemGroupViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: QuestionnaireGroupTypeHeaderView
-      private lateinit var itemMedia: QuestionnaireItemMediaView
       private lateinit var error: TextView
       private lateinit var addItemButton: Button
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
-        itemMedia = itemView.findViewById(R.id.item_media)
         error = itemView.findViewById(R.id.error)
         addItemButton = itemView.findViewById(R.id.add_item)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
-        itemMedia.bind(questionnaireItemViewItem.questionnaireItem)
         addItemButton.visibility =
           if (questionnaireItemViewItem.questionnaireItem.repeats) View.VISIBLE else View.GONE
         addItemButton.setOnClickListener {

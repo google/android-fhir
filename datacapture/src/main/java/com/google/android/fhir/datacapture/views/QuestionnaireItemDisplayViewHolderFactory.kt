@@ -25,17 +25,14 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: QuestionnaireItemHeaderView
-      private lateinit var itemMedia: QuestionnaireItemMediaView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
-        itemMedia = itemView.findViewById(R.id.item_media)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
-        itemMedia.bind(questionnaireItemViewItem.questionnaireItem)
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
