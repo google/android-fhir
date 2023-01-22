@@ -30,6 +30,12 @@
         android:layout_marginBottom="@dimen/padding_default"
     />
 
+    <com.google.android.fhir.datacapture.views.QuestionnaireItemMediaView
+        android:id="@+id/item_media"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/checkbox_group"
         android:layout_width="match_parent"
