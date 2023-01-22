@@ -20,12 +20,14 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.text.Spanned
-import android.util.Base64
 import androidx.core.text.HtmlCompat
+import ca.uhn.fhir.util.UrlUtil
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.utilities.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
 import java.math.BigDecimal
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Binary
@@ -71,6 +73,7 @@ internal const val EXTENSION_ITEM_CONTROL_SYSTEM = "http://hl7.org/fhir/question
 
 internal const val EXTENSION_HIDDEN_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
+
 internal const val EXTENSION_ITEM_MEDIA =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemMedia"
 
@@ -203,6 +206,10 @@ internal enum class MimeType(val value: String) {
   IMAGE("image"),
   VIDEO("video")
 }
+
+/** Only usable for a String known as mime type. */
+internal val String.type: String
+  get() = this.substringBefore("/")
 
 /** Returns true if at least one mime type matches the given type. */
 internal fun Questionnaire.QuestionnaireItemComponent.hasMimeType(type: String): Boolean {
@@ -609,56 +616,51 @@ val Resource.logicalId: String
     return this.idElement?.idPart.orEmpty()
   }
 
-/** The Attachment defined in the [EXTENSION_ITEM_MEDIA] extension where applicable */
+/** A media that is attached to a [Questionnaire.QuestionnaireItemComponent]. */
 internal val Questionnaire.QuestionnaireItemComponent.itemMedia: Attachment?
-  get() {
-    val extension = this.extension.singleOrNull { it.url == EXTENSION_ITEM_MEDIA }
-    return if (extension != null) extension.value as Attachment else null
-  }
+  get() =
+    (getExtensionByUrl(EXTENSION_ITEM_MEDIA)?.value as? Attachment)?.takeIf { it.hasContentType() }
 
-/** Whether the Attachment has a [Attachment.contentType] for an image */
-val Attachment.isImage: Boolean
-  get() = this.hasContentType() && contentType.startsWith("image")
+/** Fetch the Bitmap representation of [Attachment.url]. */
+internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
+  if (!hasUrl() || !UrlUtil.isValid(url) || !hasContentType()) return null
 
-/** Whether the Binary has a [Binary.contentType] for an image */
-fun Binary.isImage(): Boolean = this.hasContentType() && contentType.startsWith("image")
+  if (contentType.type != MimeType.IMAGE.value) return null
 
-/** Decodes the Bitmap from the Base64 encoded string in [Bitmap.data] */
-fun Binary.getBitmap(): Bitmap? {
-  return if (isImage()) {
-    Base64.decode(this.dataElement.valueAsString, Base64.DEFAULT).let { byteArray ->
-      BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+  val attachmentResolver = DataCapture.getConfiguration(context).urlResolver ?: return null
+
+  return withContext(Dispatchers.IO) {
+    if (url.contains("/Binary/")) {
+      attachmentResolver.resolveFhirServerUrl(url)?.decodeToBitmap()
+    } else {
+      attachmentResolver.resolveNonFhirServerUrlBitmap(url)
     }
-  } else {
-    Timber.e("Binary does not have a contentType image")
-    null
   }
 }
 
-/**
- * Returns the Bitmap defined in the attachment as inline Base64 encoded image, Binary resource
- * defined in the url or externally hosted image. Inline Base64 encoded image requires to have
- * contentType starting with image
- */
-suspend fun Attachment.fetchBitmap(context: Context): Bitmap? {
-  // Attachment's with data inline need the contentType property
-  // Conversion to Bitmap should only be made if the contentType is image
-  if (data != null) {
-    if (isImage) {
-      return BitmapFactory.decodeByteArray(data, 0, data.size)
-    }
-    Timber.e("Attachment of contentType ${this.contentType} is not supported")
-    return null
-  } else if (url != null && (url.startsWith("https") || url.startsWith("http"))) {
-    // Points to a Binary resource on a FHIR compliant server
-    val attachmentResolver = DataCapture.getConfiguration(context).attachmentResolver
-    return if (url.contains("/Binary/")) {
-      attachmentResolver?.run { resolveBinaryResource(url)?.getBitmap() }
-    } else {
-      attachmentResolver?.resolveImageUrl(url)
-    }
-  }
+/** Decode the Bitmap representation of [Binary.data]. */
+internal fun Binary.decodeToBitmap(): Bitmap? {
+  if (!hasContentType() || !hasData()) return null
 
-  Timber.e("Could not determine the Bitmap in Attachment $id")
-  return null
+  if (contentType.type != MimeType.IMAGE.value) return null
+
+  return data.decodeToBitmap()
+}
+
+/** Decode the Bitmap representation of [Attachment.data]. */
+internal fun Attachment.decodeToBitmap(): Bitmap? {
+  if (!hasContentType() || !hasData()) return null
+
+  if (contentType.type != MimeType.IMAGE.value) return null
+
+  return data.decodeToBitmap()
+}
+
+/** Returns Bitmap if Byte Array is a valid Bitmap representation, otherwise null. */
+private fun ByteArray.decodeToBitmap(): Bitmap? {
+  val bitmap = BitmapFactory.decodeByteArray(this, 0, this.size)
+
+  if (bitmap == null) Timber.w("Image could not be decoded")
+
+  return bitmap
 }

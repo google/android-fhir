@@ -17,20 +17,25 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
+import com.google.android.fhir.datacapture.MimeType
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.fetchBitmap
-import com.google.android.fhir.datacapture.isImage
+import com.google.android.fhir.datacapture.decodeToBitmap
+import com.google.android.fhir.datacapture.fetchBitmapFromUrl
 import com.google.android.fhir.datacapture.itemMedia
+import com.google.android.fhir.datacapture.type
 import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
+import timber.log.Timber
 
 class QuestionnaireItemMediaView(context: Context, attrs: AttributeSet?) :
   LinearLayout(context, attrs) {
@@ -39,24 +44,55 @@ class QuestionnaireItemMediaView(context: Context, attrs: AttributeSet?) :
     LayoutInflater.from(context).inflate(R.layout.questionnaire_item_media, this, true)
   }
 
-  private var itemImage: ImageView = findViewById(R.id.item_image)
+  private var imageAttachment: ImageView = findViewById(R.id.image_attachment)
+  private var context = context.tryUnwrapContext()!!
 
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
-    itemImage.setImageBitmap(null)
+    clearImage()
+    val attachment = questionnaireItem.itemMedia ?: return
+    when {
+      attachment.hasData() -> {
+        when (attachment.contentType.type) {
+          MimeType.IMAGE.value -> {
+            val image = attachment.decodeToBitmap() ?: return
+            loadImage(image)
 
-    questionnaireItem.itemMedia?.let {
-      val activity = context.tryUnwrapContext()!!
-
-      activity.lifecycleScope.launch(Dispatchers.IO) {
-        if (it.isImage) {
-          it.fetchBitmap(itemImage.context)?.run {
-            launch(Dispatchers.Main) {
-              itemImage.visibility = View.VISIBLE
-              itemImage.setImageBitmap(this@run)
-            }
+          }
+          MimeType.AUDIO.value -> {
+            Timber.w("Audio attachment from data is not supported in Item Media extension yet")
+          }
+          MimeType.VIDEO.value -> {
+            Timber.w("Video attachment from data not supported in Item Media extension yet")
           }
         }
       }
+      attachment.hasUrl() -> {
+        when (attachment.contentType.type) {
+          MimeType.IMAGE.value -> {
+            context.lifecycleScope.launch(Dispatchers.Main) {
+              val image = attachment.fetchBitmapFromUrl(context) ?: return@launch
+              loadImage(image)
+            }
+          }
+          MimeType.AUDIO.value -> {
+            Timber.w("Audio attachment from url is not supported in Item Media extension yet")
+          }
+          MimeType.VIDEO.value -> {
+            Timber.w("Video attachment from url not supported in Item Media extension yet")
+          }
+        }
+      }
+      else -> return
     }
+  }
+
+  private fun loadImage(image: Bitmap) {
+    Glide.with(context).load(image).into(imageAttachment)
+    imageAttachment.visibility = View.VISIBLE
+  }
+
+  private fun clearImage() {
+    Glide.with(context).clear(imageAttachment)
+    imageAttachment.visibility = View.GONE
   }
 }
