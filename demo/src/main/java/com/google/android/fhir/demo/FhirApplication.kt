@@ -58,7 +58,7 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
 
     dataCaptureConfiguration =
       DataCaptureConfig().apply {
-        attachmentResolver = ReferenceAttachmentResolver(this@FhirApplication as Context)
+        urlResolver = ReferenceUrlResolver(this@FhirApplication as Context)
       }
   }
 

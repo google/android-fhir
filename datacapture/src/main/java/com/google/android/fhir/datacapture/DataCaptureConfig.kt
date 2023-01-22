@@ -56,11 +56,8 @@ data class DataCaptureConfig(
    */
   var xFhirQueryResolver: XFhirQueryResolver? = null,
 
-  /**
-   * Used to resolve/process [org.hl7.fhir.r4.model.Attachment] to it's binary equivalent. The
-   * attachment's can either have the data or a URL
-   */
-  var attachmentResolver: AttachmentResolver? = null
+  /** A [UrlResolver] may be set by client to resolve url to it's media representation. */
+  var urlResolver: UrlResolver? = null
 ) {
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {
@@ -102,9 +99,11 @@ fun interface XFhirQueryResolver {
   suspend fun resolve(xFhirQuery: String): List<Resource>
 }
 
-interface AttachmentResolver {
-
-  suspend fun resolveBinaryResource(uri: String): Binary?
-
-  suspend fun resolveImageUrl(uri: String): Bitmap?
+/**
+ * Resolves media based on the provided url. This allows the library to retrieve media from a FHIR
+ * server or Non-FHIR server.
+ */
+interface UrlResolver {
+  suspend fun resolveFhirServerUrl(url: String): Binary?
+  suspend fun resolveNonFhirServerUrlBitmap(url: String): Bitmap?
 }
