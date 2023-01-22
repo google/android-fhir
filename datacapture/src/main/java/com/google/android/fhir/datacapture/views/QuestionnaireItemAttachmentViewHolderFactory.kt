@@ -37,6 +37,8 @@ import com.google.android.fhir.datacapture.hasMimeTypeOnly
 import com.google.android.fhir.datacapture.isGivenSizeOverLimit
 import com.google.android.fhir.datacapture.maxSizeInMiBs
 import com.google.android.fhir.datacapture.mimeTypes
+import com.google.android.fhir.datacapture.type
+import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -422,10 +424,6 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
   const val EXTRA_MIME_TYPE_KEY = "mime_type"
   const val EXTRA_SAVED_PHOTO_URI_KEY = "saved_photo_uri"
 }
-
-/** Only usable for a String known as mime type. */
-private val String.type: String
-  get() = this.substringBefore("/")
 
 private fun Context.readBytesFromUri(uri: Uri): ByteArray {
   return contentResolver.openInputStream(uri)?.use { it.buffered().readBytes() } ?: ByteArray(0)
