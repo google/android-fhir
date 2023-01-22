@@ -30,7 +30,7 @@ import androidx.appcompat.view.ContextThemeWrapper
  * TODO: find a more robust way to do this as it is not guaranteed that the activity is an
  * AppCompatActivity.
  */
-internal fun Context.tryUnwrapContext(): AppCompatActivity? {
+fun Context.tryUnwrapContext(): AppCompatActivity? {
   var context = this
   while (true) {
     when (context) {

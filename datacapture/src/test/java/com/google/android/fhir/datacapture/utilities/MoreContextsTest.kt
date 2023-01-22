@@ -25,7 +25,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class MoreContextTest {
+class MoreContextsTest {
 
   @Test
   fun context_should_return_appCompatActivity() {
