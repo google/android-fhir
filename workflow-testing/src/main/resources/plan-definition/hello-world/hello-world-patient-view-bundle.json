@@ -47,7 +47,7 @@
       } ],
       "purpose": "The purpose of this is to test the system to make sure we have complete end-to-end functionality",
       "usage": "This is to be used in conjunction with a patient-facing FHIR application.",
-      "copyright": "© CDC 2016+.",
+      "copyright": "息 CDC 2016+.",
       "library": [ "http://fhir.org/guides/cdc/opioid-cds/Library/HelloWorld" ],
       "action": [ {
         "title": "Hello World!",
