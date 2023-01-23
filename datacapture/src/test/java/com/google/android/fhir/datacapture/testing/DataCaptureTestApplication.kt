@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture.testing
 import android.app.Application
 import com.google.android.fhir.datacapture.DataCaptureConfig
 
-/** Application class when you want to test the DataCaptureConfig.Provider */
+/** Application class when you want to test the [DataCaptureConfig.Provider]. */
 class DataCaptureTestApplication : Application(), DataCaptureConfig.Provider {
   var dataCaptureConfiguration: DataCaptureConfig? = null
 

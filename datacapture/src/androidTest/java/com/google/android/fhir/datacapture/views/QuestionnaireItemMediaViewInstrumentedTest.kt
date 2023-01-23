@@ -59,56 +59,59 @@ class QuestionnaireItemMediaViewInstrumentedTest {
   fun shouldShowImage_whenItemMediaExtensionIsSet_withImageContentType() = runBlocking {
     val attachment =
       Attachment().apply {
-        data =
-          Base64.decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", Base64.DEFAULT)
         contentType = "image/png"
+        data = IMAGE_BASE64_DECODED
+        size = IMAGE_BASE64_DECODED.size
       }
-    val questionnaireItemComponent =
+
+    val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         text = "Kindly collect the reading as shown below in the figure"
         extension = listOf(Extension(EXTENSION_ITEM_MEDIA, attachment))
       }
 
-    runOnUI { view.bind(questionnaireItemComponent) }
+    runOnUI { view.bind(questionnaireItem) }
 
     delay(1000)
 
-    assertThat(view.findViewById<ImageView>(R.id.item_image).visibility).isEqualTo(View.VISIBLE)
+    assertThat(view.findViewById<ImageView>(R.id.image_attachment).visibility)
+      .isEqualTo(View.VISIBLE)
   }
 
   @Test
   fun shouldHideImageView_whenItemMediaExtensionIsSet_withNonImageContentType() = runBlocking {
     val attachment =
       Attachment().apply {
-        data =
-          Base64.decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", Base64.DEFAULT)
         contentType = "document/pdf"
+        data = DOCUMENT_BASE64_DECODED
+        size = DOCUMENT_BASE64_DECODED.size
       }
-    val questionnaireItemComponent =
+
+    val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         text = "Kindly collect the reading as shown below in the figure"
         extension = listOf(Extension(EXTENSION_ITEM_MEDIA, attachment))
       }
 
-    runOnUI { view.bind(questionnaireItemComponent) }
+    runOnUI { view.bind(questionnaireItem) }
 
     delay(1000)
 
-    assertThat(view.findViewById<ImageView>(R.id.item_image).visibility).isEqualTo(View.GONE)
+    assertThat(view.findViewById<ImageView>(R.id.image_attachment).visibility).isEqualTo(View.GONE)
   }
 
   @Test
   fun shouldHideImageView_whenItemMediaExtensionIsNotSet() = runBlocking {
-    val questionnaireItemComponent =
+    val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         text = "Kindly collect the reading as shown below in the figure"
       }
 
-    runOnUI { view.bind(questionnaireItemComponent) }
+    runOnUI { view.bind(questionnaireItem) }
 
     delay(1000)
 
-    assertThat(view.findViewById<ImageView>(R.id.item_image).visibility).isEqualTo(View.GONE)
+    assertThat(view.findViewById<ImageView>(R.id.image_attachment).visibility).isEqualTo(View.GONE)
   }
 
   /** Method to run code snippet on UI/main thread */
@@ -120,5 +123,11 @@ class QuestionnaireItemMediaViewInstrumentedTest {
   private fun setTestLayout(view: View) {
     activityScenarioRule.scenario.onActivity { activity -> activity.setContentView(view) }
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+  }
+
+  companion object {
+    private val IMAGE_BASE64_ENCODED = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7".encodeToByteArray()
+    private val IMAGE_BASE64_DECODED = Base64.decode(IMAGE_BASE64_ENCODED, Base64.DEFAULT)
+    private val DOCUMENT_BASE64_DECODED = "document".encodeToByteArray()
   }
 }

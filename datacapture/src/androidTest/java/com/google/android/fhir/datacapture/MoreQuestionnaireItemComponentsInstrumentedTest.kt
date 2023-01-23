@@ -22,7 +22,6 @@ import android.util.Base64
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import java.nio.charset.Charset
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Binary
@@ -33,94 +32,59 @@ import org.junit.runner.RunWith
 class MoreQuestionnaireItemComponentsInstrumentedTest {
 
   @Test
-  fun fetchBitmap_shouldReturnNull_whenAttachmentHasDataAndIncorrectContentType() {
-    val attachment =
-      Attachment().apply {
-        data = "some-byte".toByteArray(Charset.forName("UTF-8"))
-        contentType = "document/pdf"
-      }
-    val bitmap: Bitmap?
-    runBlocking { bitmap = attachment.fetchBitmap(ApplicationProvider.getApplicationContext()) }
-    assertThat(bitmap).isNull()
-  }
-
-  @Test
-  fun fetchBitmap_shouldReturnBitmap_whenAttachmentHasDataAndCorrectContentType() {
-    val attachment =
-      Attachment().apply {
-        data =
-          Base64.decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", Base64.DEFAULT)
-        contentType = "image/png"
-      }
-    val bitmap: Bitmap?
-    runBlocking { bitmap = attachment.fetchBitmap(ApplicationProvider.getApplicationContext()) }
-    assertThat(bitmap).isNotNull()
-  }
-
-  @Test
-  fun isImage_shouldTrue_whenAttachmentContentTypeIsImage() {
-    val attachment = Attachment().apply { contentType = "image/png" }
-    assertThat(attachment.isImage).isTrue()
-  }
-
-  @Test
-  fun isImage_shouldFalseWhenAttachmentContentTypeIsNotImage() {
-    val attachment = Attachment().apply { contentType = "document/pdf" }
-    assertThat(attachment.isImage).isFalse()
-  }
-
-  @Test
   fun fetchBitmap_shouldReturnBitmapAndCallAttachmentResolverResolveBinaryResource() {
-    val attachment = Attachment().apply { url = "https://hapi.fhir.org/Binary/f006" }
+    val attachment = Attachment().apply {
+      contentType = "image/png"
+      url = "https://hapi.fhir.org/Binary/f006"
+    }
     ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
       .getDataCaptureConfig()
-      .attachmentResolver = TestAttachmentResolver()
+      .urlResolver = TestUrlResolver()
 
     val bitmap: Bitmap?
-    runBlocking { bitmap = attachment.fetchBitmap(ApplicationProvider.getApplicationContext()) }
+    runBlocking { bitmap = attachment.fetchBitmapFromUrl(ApplicationProvider.getApplicationContext()) }
 
     assertThat(bitmap).isNotNull()
   }
 
   @Test
   fun fetchBitmap_shouldReturnBitmapAndCallAttachmentResolverResolveImageUrl() {
-    val attachment = Attachment().apply { url = "https://some-image-server.com/images/f0006.png" }
-
-    val byteArray =
-      Base64.decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", Base64.DEFAULT)
-    val expectedBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-
-    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
-      .getDataCaptureConfig()
-      .attachmentResolver = TestAttachmentResolver(expectedBitmap)
-
-    val resolvedBitmap: Bitmap?
-    runBlocking {
-      resolvedBitmap = attachment.fetchBitmap(ApplicationProvider.getApplicationContext())
+    val attachment = Attachment().apply {
+      contentType = "image/png"
+      url = "https://some-image-server.com/images/f0006.png"
     }
 
-    assertThat(resolvedBitmap).isEqualTo(expectedBitmap)
+    val expectedBitmap = BitmapFactory.decodeByteArray(IMAGE_BASE64_ENCODED, 0, IMAGE_BASE64_ENCODED.size)
+    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+      .getDataCaptureConfig()
+      .urlResolver = TestUrlResolver(expectedBitmap)
+
+    val bitmap: Bitmap?
+    runBlocking {
+      bitmap = attachment.fetchBitmapFromUrl(ApplicationProvider.getApplicationContext())
+    }
+
+    assertThat(bitmap).isEqualTo(expectedBitmap)
   }
 
-  class TestAttachmentResolver(var testBitmap: Bitmap? = null) : AttachmentResolver {
+  class TestUrlResolver(var testBitmap: Bitmap? = null) : UrlResolver {
 
-    override suspend fun resolveBinaryResource(uri: String): Binary? {
-      return if (uri == "https://hapi.fhir.org/Binary/f006") {
+    override suspend fun resolveFhirServerUrl(url: String): Binary? {
+      return if (url == "https://hapi.fhir.org/Binary/f006") {
         Binary().apply {
           contentType = "image/png"
-          data =
-            Base64.decode(
-              "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-              Base64.DEFAULT
-            )
+          data = IMAGE_BASE64_DECODED
         }
       } else null
     }
 
-    override suspend fun resolveImageUrl(uri: String): Bitmap? {
-      return if (uri == "https://some-image-server.com/images/f0006.png") {
-        testBitmap
-      } else null
+    override suspend fun resolveNonFhirServerUrlBitmap(url: String): Bitmap? {
+      return if (url == "https://some-image-server.com/images/f0006.png") testBitmap else null
     }
+  }
+
+  companion object {
+    private val IMAGE_BASE64_ENCODED = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7".encodeToByteArray()
+    private val IMAGE_BASE64_DECODED = Base64.decode(IMAGE_BASE64_ENCODED, Base64.DEFAULT)
   }
 }
