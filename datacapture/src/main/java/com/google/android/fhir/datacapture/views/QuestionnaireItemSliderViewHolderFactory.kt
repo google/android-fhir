@@ -57,13 +57,14 @@ internal object QuestionnaireItemSliderViewHolderFactory :
         }
 
         with(slider) {
+          clearOnChangeListeners()
           valueFrom = minValue
           valueTo = maxValue
           stepSize =
-            (questionnaireItemViewItem.questionnaireItem?.sliderStepValue
+            (questionnaireItemViewItem.questionnaireItem.sliderStepValue
                 ?: SLIDER_DEFAULT_STEP_SIZE)
               .toFloat()
-          value = answer?.valueIntegerType?.value?.toFloat() ?: slider.valueFrom
+          value = answer?.valueIntegerType?.value?.toFloat() ?: valueFrom
 
           addOnChangeListener { _, newValue, _ ->
             // Responds to when slider's value is changed
