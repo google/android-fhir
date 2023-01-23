@@ -45,7 +45,6 @@ class QuestionnaireItemMediaView(context: Context, attrs: AttributeSet?) :
   }
 
   private var imageAttachment: ImageView = findViewById(R.id.image_attachment)
-  private var context = context.tryUnwrapContext()!!
 
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
     clearImage()
@@ -68,6 +67,7 @@ class QuestionnaireItemMediaView(context: Context, attrs: AttributeSet?) :
       attachment.hasUrl() -> {
         when (attachment.contentType.type) {
           MimeType.IMAGE.value -> {
+            val context = context.tryUnwrapContext()!!
             context.lifecycleScope.launch(Dispatchers.Main) {
               val image = attachment.fetchBitmapFromUrl(context) ?: return@launch
               loadImage(image)
