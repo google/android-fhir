@@ -1627,10 +1627,11 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `fetchBitmapFromUrl() should return Bitmap from FHIR server url`() {
-    val attachment = Attachment().apply {
-      contentType = "image/png"
-      url = "https://hapi.fhir.org/Binary/f006"
-    }
+    val attachment =
+      Attachment().apply {
+        contentType = "image/png"
+        url = "https://hapi.fhir.org/Binary/f006"
+      }
     val binary =
       Binary().apply {
         contentType = "image/png"
@@ -1660,14 +1661,19 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `fetchBitmapFromUrl() should return Bitmap from Non-FHIR server url`() {
-    val attachment = Attachment().apply {
-      contentType = "image/png"
-      url = "https://some-image-server.com/images/f0006.png"
-    }
+    val attachment =
+      Attachment().apply {
+        contentType = "image/png"
+        url = "https://some-image-server.com/images/f0006.png"
+      }
 
     val urlResolver: UrlResolver = mock()
     runBlocking {
-      Mockito.`when`(urlResolver.resolveNonFhirServerUrlBitmap("https://some-image-server.com/images/f0006.png"))
+      Mockito.`when`(
+          urlResolver.resolveNonFhirServerUrlBitmap(
+            "https://some-image-server.com/images/f0006.png"
+          )
+        )
         .doReturn(mock())
     }
 
@@ -1682,15 +1688,14 @@ class MoreQuestionnaireItemComponentsTest {
 
     assertThat(bitmap).isNotNull()
     runBlocking {
-      Mockito.verify(urlResolver).resolveNonFhirServerUrlBitmap("https://some-image-server.com/images/f0006.png")
+      Mockito.verify(urlResolver)
+        .resolveNonFhirServerUrlBitmap("https://some-image-server.com/images/f0006.png")
     }
   }
 
   @Test
   fun `fetchBitmapFromUrl() should return null when Attachment has no content type`() {
-    val attachment = Attachment().apply {
-      url = "https://some-image-server.com/images/f0006.png"
-    }
+    val attachment = Attachment().apply { url = "https://some-image-server.com/images/f0006.png" }
 
     val bitmap: Bitmap?
     runBlocking {
@@ -1702,9 +1707,7 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `fetchBitmapFromUrl() should return null when Attachment has no url`() {
-    val attachment = Attachment().apply {
-      contentType = "image/png"
-    }
+    val attachment = Attachment().apply { contentType = "image/png" }
 
     val bitmap: Bitmap?
     runBlocking {
@@ -1728,10 +1731,11 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `fetchBitmapFromUrl() should return null when Attachment has invalid url`() {
-    val attachment = Attachment().apply {
-      contentType = "image/png"
-      url = "invalid url"
-    }
+    val attachment =
+      Attachment().apply {
+        contentType = "image/png"
+        url = "invalid url"
+      }
 
     val bitmap: Bitmap?
     runBlocking {
@@ -1743,10 +1747,11 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `fetchBitmapFromUrl() should return null when Attachment has non image content type`() {
-    val attachment = Attachment().apply {
-      contentType = "document/pdf"
-      data = DOCUMENT_BASE64_DECODED
-    }
+    val attachment =
+      Attachment().apply {
+        contentType = "document/pdf"
+        data = DOCUMENT_BASE64_DECODED
+      }
 
     val bitmap: Bitmap?
     runBlocking {
@@ -1758,10 +1763,11 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `fetchBitmapFromUrl() should return null when Attachment UrlResolver is not configured`() {
-    val attachment = Attachment().apply {
-      contentType = "image/png"
-      url = "https://hapi.fhir.org/Binary/f006"
-    }
+    val attachment =
+      Attachment().apply {
+        contentType = "image/png"
+        url = "https://hapi.fhir.org/Binary/f006"
+      }
     val bitmap: Bitmap?
 
     ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
@@ -1787,19 +1793,13 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `decodeToBitmap() should return null when Binary has no content type`() {
-    val binary =
-      Binary().apply {
-        data = IMAGE_BASE64_DECODED
-      }
+    val binary = Binary().apply { data = IMAGE_BASE64_DECODED }
     assertThat(binary.decodeToBitmap()).isNull()
   }
 
   @Test
   fun `decodeToBitmap() should return null when Binary has no data`() {
-    val binary =
-      Binary().apply {
-        contentType = "image/png"
-      }
+    val binary = Binary().apply { contentType = "image/png" }
     assertThat(binary.decodeToBitmap()).isNull()
   }
 
@@ -1811,10 +1811,11 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `decodeToBitmap() should return null when Binary contentType is for non image`() {
-    val binary = Binary().apply {
-      contentType = "document/pdf"
-      data = DOCUMENT_BASE64_DECODED
-    }
+    val binary =
+      Binary().apply {
+        contentType = "document/pdf"
+        data = DOCUMENT_BASE64_DECODED
+      }
     assertThat(binary.decodeToBitmap()).isNull()
   }
 
@@ -1830,19 +1831,13 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `decodeToBitmap() should return null when Attachment has no content type`() {
-    val attachment =
-      Attachment().apply {
-        data = IMAGE_BASE64_DECODED
-      }
+    val attachment = Attachment().apply { data = IMAGE_BASE64_DECODED }
     assertThat(attachment.decodeToBitmap()).isNull()
   }
 
   @Test
   fun `decodeToBitmap() should return null when Attachment has no data`() {
-    val attachment =
-      Attachment().apply {
-        contentType = "image/png"
-      }
+    val attachment = Attachment().apply { contentType = "image/png" }
     assertThat(attachment.decodeToBitmap()).isNull()
   }
 
@@ -1854,10 +1849,11 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `decodeToBitmap() should return null when Attachment contentType is for non image`() {
-    val attachment = Attachment().apply {
-      contentType = "document/pdf"
-      data = DOCUMENT_BASE64_DECODED
-    }
+    val attachment =
+      Attachment().apply {
+        contentType = "document/pdf"
+        data = DOCUMENT_BASE64_DECODED
+      }
     assertThat(attachment.decodeToBitmap()).isNull()
   }
 
@@ -2128,7 +2124,8 @@ class MoreQuestionnaireItemComponentsTest {
     }
 
   companion object {
-    private val IMAGE_BASE64_ENCODED = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7".encodeToByteArray()
+    private val IMAGE_BASE64_ENCODED =
+      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7".encodeToByteArray()
     private val IMAGE_BASE64_DECODED = Base64.decode(IMAGE_BASE64_ENCODED, Base64.DEFAULT)
     private val DOCUMENT_BASE64_DECODED = "document".encodeToByteArray()
   }

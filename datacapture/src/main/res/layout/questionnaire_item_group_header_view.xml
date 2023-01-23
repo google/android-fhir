@@ -47,7 +47,7 @@
         android:id="@+id/item_media"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        />
+    />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/add_item"

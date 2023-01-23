@@ -15,9 +15,9 @@
         android:layout_marginVertical="@dimen/item_margin_vertical"
         android:adjustViewBounds="true"
         android:contentDescription="@string/cd_item_media_image_attachment"
-        android:visibility="gone"
         android:maxWidth="@dimen/item_media_image_preview_max_width"
         android:maxHeight="@dimen/attachment_photo_preview_max_height"
+        android:visibility="gone"
     />
 
 </LinearLayout>

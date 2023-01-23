@@ -56,7 +56,6 @@ class QuestionnaireItemMediaView(context: Context, attrs: AttributeSet?) :
           MimeType.IMAGE.value -> {
             val image = attachment.decodeToBitmap() ?: return
             loadImage(image)
-
           }
           MimeType.AUDIO.value -> {
             Timber.w("Audio attachment from data is not supported in Item Media extension yet")

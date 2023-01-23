@@ -33,28 +33,33 @@ class MoreQuestionnaireItemComponentsInstrumentedTest {
 
   @Test
   fun fetchBitmap_shouldReturnBitmapAndCallAttachmentResolverResolveBinaryResource() {
-    val attachment = Attachment().apply {
-      contentType = "image/png"
-      url = "https://hapi.fhir.org/Binary/f006"
-    }
+    val attachment =
+      Attachment().apply {
+        contentType = "image/png"
+        url = "https://hapi.fhir.org/Binary/f006"
+      }
     ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
       .getDataCaptureConfig()
       .urlResolver = TestUrlResolver()
 
     val bitmap: Bitmap?
-    runBlocking { bitmap = attachment.fetchBitmapFromUrl(ApplicationProvider.getApplicationContext()) }
+    runBlocking {
+      bitmap = attachment.fetchBitmapFromUrl(ApplicationProvider.getApplicationContext())
+    }
 
     assertThat(bitmap).isNotNull()
   }
 
   @Test
   fun fetchBitmap_shouldReturnBitmapAndCallAttachmentResolverResolveImageUrl() {
-    val attachment = Attachment().apply {
-      contentType = "image/png"
-      url = "https://some-image-server.com/images/f0006.png"
-    }
+    val attachment =
+      Attachment().apply {
+        contentType = "image/png"
+        url = "https://some-image-server.com/images/f0006.png"
+      }
 
-    val expectedBitmap = BitmapFactory.decodeByteArray(IMAGE_BASE64_ENCODED, 0, IMAGE_BASE64_ENCODED.size)
+    val expectedBitmap =
+      BitmapFactory.decodeByteArray(IMAGE_BASE64_ENCODED, 0, IMAGE_BASE64_ENCODED.size)
     ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
       .getDataCaptureConfig()
       .urlResolver = TestUrlResolver(expectedBitmap)
@@ -84,7 +89,8 @@ class MoreQuestionnaireItemComponentsInstrumentedTest {
   }
 
   companion object {
-    private val IMAGE_BASE64_ENCODED = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7".encodeToByteArray()
+    private val IMAGE_BASE64_ENCODED =
+      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7".encodeToByteArray()
     private val IMAGE_BASE64_DECODED = Base64.decode(IMAGE_BASE64_ENCODED, Base64.DEFAULT)
   }
 }

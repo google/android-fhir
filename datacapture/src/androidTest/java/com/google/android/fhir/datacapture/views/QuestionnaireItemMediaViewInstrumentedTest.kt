@@ -126,7 +126,8 @@ class QuestionnaireItemMediaViewInstrumentedTest {
   }
 
   companion object {
-    private val IMAGE_BASE64_ENCODED = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7".encodeToByteArray()
+    private val IMAGE_BASE64_ENCODED =
+      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7".encodeToByteArray()
     private val IMAGE_BASE64_DECODED = Base64.decode(IMAGE_BASE64_ENCODED, Base64.DEFAULT)
     private val DOCUMENT_BASE64_DECODED = "document".encodeToByteArray()
   }
