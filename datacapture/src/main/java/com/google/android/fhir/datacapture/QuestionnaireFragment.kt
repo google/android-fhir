@@ -131,7 +131,7 @@ open class QuestionnaireFragment : Fragment() {
             questionnaireReviewRecyclerView.visibility = View.VISIBLE
 
             // Set button visibility
-            submitButton.visibility = View.GONE
+            submitButton.visibility = if (displayMode.showSubmitButton) View.VISIBLE else View.GONE
             reviewModeButton.visibility = View.GONE
             reviewModeEditButton.visibility =
               if (displayMode.showEditButton) {
@@ -202,7 +202,15 @@ open class QuestionnaireFragment : Fragment() {
     requireActivity().supportFragmentManager.setFragmentResultListener(
       QuestionnaireValidationErrorMessageDialogFragment.RESULT_CALLBACK,
       viewLifecycleOwner
-    ) { _, _ -> setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY) }
+    ) { _, bundle ->
+      when (bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]) {
+        QuestionnaireValidationErrorMessageDialogFragment.RESULT_VALUE_FIX -> {
+          // Go back to the Edit mode if currently in the Review mode.
+          viewModel.setReviewMode(false)
+        }
+        else -> setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
+      }
+    }
   }
 
   /** Calculates the progress percentage from given [count] and [totalCount] values. */
