@@ -178,7 +178,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
       )
     viewHolder.bind(item)
     viewHolder.dateInputView.text = "2020/11/19"
-    val answer = answers!!.single()?.value as DateType
+    val answer = answers!!.single().value as DateType
 
     assertThat(answer.day).isEqualTo(19)
     assertThat(answer.month).isEqualTo(10)

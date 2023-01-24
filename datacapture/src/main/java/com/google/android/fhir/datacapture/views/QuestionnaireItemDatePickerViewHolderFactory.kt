@@ -101,6 +101,13 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
+        val localeDatePattern =
+          DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+            FormatStyle.SHORT,
+            null,
+            IsoChronology.INSTANCE,
+            Locale.getDefault()
+          )
         acceptableDateFormat =
           generateAcceptableDateFormat(localeDatePattern, dateFormatSpecialChar)
         textInputLayout.hint = acceptableDateFormat
@@ -194,7 +201,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                   acceptableDateFormat,
                   acceptableDateFormat
                     .replace("dd", "01")
-                    .replace("mm", "01")
+                    .replace("MM", "01")
                     .replace("yyyy", "2023")
                 )
               )
@@ -280,18 +287,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
 internal const val TAG = "date-picker"
 internal val ZONE_ID_UTC = ZoneId.of("UTC")
-
-/**
- * Medium and long format styles use alphabetical month names which are difficult for the user to
- * input. Use short format style which is always numerical.
- */
-internal val localeDatePattern =
-  DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-    FormatStyle.SHORT,
-    null,
-    IsoChronology.INSTANCE,
-    Locale.getDefault()
-  )
 
 /**
  * Returns the [AppCompatActivity] if there exists one wrapped inside [ContextThemeWrapper] s, or

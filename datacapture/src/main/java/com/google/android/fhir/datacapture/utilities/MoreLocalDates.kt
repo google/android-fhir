@@ -20,18 +20,33 @@ import android.icu.text.DateFormat
 import android.icu.text.SimpleDateFormat
 import com.google.android.fhir.datacapture.views.length
 import com.google.android.fhir.datacapture.views.localDate
-import com.google.android.fhir.datacapture.views.localeDatePattern
 import java.lang.StringBuilder
 import java.text.ParseException
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.chrono.IsoChronology
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.FormatStyle
 import java.util.Date
+import java.util.Locale
 
 internal val LocalDate.localizedString: String
   get() {
     val date = Date.from(atStartOfDay(ZoneId.systemDefault())?.toInstant())
     return DateFormat.getDateInstance(DateFormat.SHORT).format(date)
   }
+
+/**
+ * Medium and long format styles use alphabetical month names which are difficult for the user to
+ * input. Use short format style which is always numerical.
+ */
+internal val localeDatePattern =
+  DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+    FormatStyle.SHORT,
+    null,
+    IsoChronology.INSTANCE,
+    Locale.getDefault()
+  )
 
 /** Special character used in date format */
 internal val dateFormatSpecialChar =
@@ -54,8 +69,8 @@ internal fun generateAcceptableDateFormat(
           newDateFormat.append("dd")
         }
       } else if (it == 'm') {
-        if (!newDateFormat.contains("mm")) {
-          newDateFormat.append("mm")
+        if (!newDateFormat.contains("MM")) {
+          newDateFormat.append("MM")
         }
       } else if (it == 'y') {
         if (!newDateFormat.contains("yyyy")) {
