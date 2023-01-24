@@ -316,7 +316,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
         val allCurrentPageItemsValid =
           currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().all {
-            it.item.validationResult is Valid
+            QuestionnaireResponseItemValidator.validate(
+              it.item.questionnaireItem,
+              it.item.answers,
+              getApplication()
+            ) is Valid
           }
         if (allCurrentPageItemsValid) {
           isPaginationButtonPressed = false
@@ -602,44 +606,43 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       } else {
         NotValidated
       }
-    val items =
-      buildList<QuestionnaireAdapterItem> {
-        // Add an item for the question itself
-        add(
-          QuestionnaireAdapterItem.Question(
-            QuestionnaireItemViewItem(
-              questionnaireItem,
-              questionnaireResponseItem,
-              validationResult = validationResult,
-              answersChangedCallback = answersChangedCallback,
-              resolveAnswerValueSet = { resolveAnswerValueSet(it) },
-              resolveAnswerExpression = { resolveAnswerExpression(it) }
-            )
+    val items = buildList {
+      // Add an item for the question itself
+      add(
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            questionnaireResponseItem,
+            validationResult = validationResult,
+            answersChangedCallback = answersChangedCallback,
+            resolveAnswerValueSet = { resolveAnswerValueSet(it) },
+            resolveAnswerExpression = { resolveAnswerExpression(it) }
           )
         )
-        val nestedResponses: List<List<QuestionnaireResponseItemComponent>> =
-          when {
-            // Repeated questions have one answer item per response instance, which we must display
-            // after the question.
-            questionnaireItem.repeats -> questionnaireResponseItem.answer.map { it.item }
-            // Non-repeated questions may have nested items, which we should display
-            else -> listOf(questionnaireResponseItem.item)
-          }
-        nestedResponses.forEach { nestedResponse ->
-          addAll(
-            getQuestionnaireAdapterItems(
-              // If nested display item is identified as instructions or flyover, then do not create
-              // questionnaire state for it.
-              questionnaireItemList =
-                questionnaireItem.item.filterNot {
-                  it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-                    (it.isInstructionsCode || it.isFlyoverCode || it.isHelpCode)
-                },
-              questionnaireResponseItemList = nestedResponse,
-            )
-          )
+      )
+      val nestedResponses: List<List<QuestionnaireResponseItemComponent>> =
+        when {
+          // Repeated questions have one answer item per response instance, which we must display
+          // after the question.
+          questionnaireItem.repeats -> questionnaireResponseItem.answer.map { it.item }
+          // Non-repeated questions may have nested items, which we should display
+          else -> listOf(questionnaireResponseItem.item)
         }
+      nestedResponses.forEach { nestedResponse ->
+        addAll(
+          getQuestionnaireAdapterItems(
+            // If nested display item is identified as instructions or flyover, then do not create
+            // questionnaire state for it.
+            questionnaireItemList =
+              questionnaireItem.item.filterNot {
+                it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+                  (it.isInstructionsCode || it.isFlyoverCode || it.isHelpCode)
+              },
+            questionnaireResponseItemList = nestedResponse,
+          )
+        )
       }
+    }
     currentPageItems = items
     return items
   }

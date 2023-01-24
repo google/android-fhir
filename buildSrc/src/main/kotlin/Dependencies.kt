@@ -186,6 +186,7 @@ object Dependencies {
   const val material = "com.google.android.material:material:${Versions.material}"
   const val sqlcipher = "net.zetetic:android-database-sqlcipher:${Versions.sqlcipher}"
   const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
+  const val turbine = "app.cash.turbine:turbine:${Versions.turbine}"
   const val woodstox = "com.fasterxml.woodstox:woodstox-core:${Versions.woodstox}"
   const val xerces = "xerces:xercesImpl:${Versions.xerces}"
 
@@ -251,7 +252,7 @@ object Dependencies {
     }
 
     object Kotlin {
-      const val kotlinCoroutinesCore = "1.6.2"
+      const val kotlinCoroutinesCore = "1.6.4"
       const val stdlib = "1.6.10"
     }
 
@@ -280,6 +281,7 @@ object Dependencies {
     const val slf4j = "1.7.36"
     const val sqlcipher = "4.5.0"
     const val timber = "5.0.1"
+    const val turbine = "0.12.1"
     const val truth = "1.0.1"
     const val woodstox = "6.2.7"
     const val xerces = "2.12.2"
