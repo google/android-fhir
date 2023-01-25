@@ -402,6 +402,9 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
 
     assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.file_preview).visibility)
       .isEqualTo(View.GONE)
+
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.delete).visibility)
+      .isEqualTo(View.GONE)
   }
 
   /** Method to run code snippet on UI/main thread */
