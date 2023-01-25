@@ -24,11 +24,7 @@ import java.lang.StringBuilder
 import java.text.ParseException
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.chrono.IsoChronology
-import java.time.format.DateTimeFormatterBuilder
-import java.time.format.FormatStyle
 import java.util.Date
-import java.util.Locale
 
 internal val LocalDate.localizedString: String
   get() {
@@ -36,20 +32,8 @@ internal val LocalDate.localizedString: String
     return DateFormat.getDateInstance(DateFormat.SHORT).format(date)
   }
 
-/**
- * Medium and long format styles use alphabetical month names which are difficult for the user to
- * input. Use short format style which is always numerical.
- */
-internal val localeDatePattern =
-  DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-    FormatStyle.SHORT,
-    null,
-    IsoChronology.INSTANCE,
-    Locale.getDefault()
-  )
-
 /** Special character used in date format */
-internal val dateFormatSpecialChar =
+internal fun getDateSeparator(localeDatePattern: String): Char =
   localeDatePattern.lowercase().replace("m", "").replace("d", "").replace("y", "").first()
 
 /**

@@ -25,8 +25,8 @@ import android.text.format.DateFormat
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.utilities.dateFormatSpecialChar
 import com.google.android.fhir.datacapture.utilities.generateAcceptableDateFormat
+import com.google.android.fhir.datacapture.utilities.getDateSeparator
 import com.google.android.fhir.datacapture.utilities.localizedDateString
 import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.utilities.parseDate
@@ -69,6 +69,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       private var localDate: LocalDate? = null
       private var localTime: LocalTime? = null
       private lateinit var acceptableDateFormat: String
+      private var dateFormatSpecialChar: Char? = null
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
@@ -135,9 +136,12 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             IsoChronology.INSTANCE,
             Locale.getDefault()
           )
-        acceptableDateFormat =
-          generateAcceptableDateFormat(localeDatePattern, dateFormatSpecialChar)
-
+        // Special character used in date format
+        dateFormatSpecialChar = getDateSeparator(localeDatePattern)
+        dateFormatSpecialChar?.let {
+          acceptableDateFormat =
+            generateAcceptableDateFormat(localeDatePattern, dateFormatSpecialChar!!)
+        }
         dateInputLayout.hint = acceptableDateFormat
         dateInputEditText.removeTextChangedListener(textWatcher)
         val dateTime = questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType
@@ -361,7 +365,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
 
       val textWatcher =
         object : TextWatcher {
-          private var isRunning = false
           private var isDeleting = false
 
           override fun beforeTextChanged(
@@ -389,8 +392,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               editable.replace(acceptableDateFormat.length, editableLength, "")
               return
             }
-            isRunning = true
-
             if (editableLength < acceptableDateFormat.length) {
               if (acceptableDateFormat[editableLength] != dateFormatSpecialChar) {
                 editable.append(acceptableDateFormat[editableLength])
@@ -405,8 +406,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 editable.insert(editableLength - 1, dateFormatSpecialChar.toString())
               }
             }
-            isRunning = false
-
             updateAnswerAfterTextChanged(editable.toString())
           }
         }

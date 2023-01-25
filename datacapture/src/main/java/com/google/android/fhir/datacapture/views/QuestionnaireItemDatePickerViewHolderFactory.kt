@@ -24,8 +24,8 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.utilities.dateFormatSpecialChar
 import com.google.android.fhir.datacapture.utilities.generateAcceptableDateFormat
+import com.google.android.fhir.datacapture.utilities.getDateSeparator
 import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.utilities.parseDate
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -66,6 +66,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private lateinit var acceptableDateFormat: String
+      private var dateFormatSpecialChar: Char? = null
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
@@ -101,6 +102,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
+        // Medium and long format styles use alphabetical month names which are difficult for the
+        // user to input. Use short format style which is always numerical.
         val localeDatePattern =
           DateTimeFormatterBuilder.getLocalizedDateTimePattern(
             FormatStyle.SHORT,
@@ -108,8 +111,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             IsoChronology.INSTANCE,
             Locale.getDefault()
           )
-        acceptableDateFormat =
-          generateAcceptableDateFormat(localeDatePattern, dateFormatSpecialChar)
+        // Special character used in date format
+        dateFormatSpecialChar = getDateSeparator(localeDatePattern)
+        dateFormatSpecialChar?.let {
+          acceptableDateFormat =
+            generateAcceptableDateFormat(localeDatePattern, dateFormatSpecialChar!!)
+        }
         textInputLayout.hint = acceptableDateFormat
         textInputEditText.removeTextChangedListener(textWatcher)
 
@@ -216,7 +223,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
       val textWatcher =
         object : TextWatcher {
-          private var isRunning = false
           private var isDeleting = false
 
           override fun beforeTextChanged(
@@ -244,8 +250,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               editable.replace(acceptableDateFormat.length, editableLength, "")
               return
             }
-            isRunning = true
-
             if (editableLength < acceptableDateFormat.length) {
               if (acceptableDateFormat[editableLength] != dateFormatSpecialChar) {
                 editable.append(acceptableDateFormat[editableLength])
@@ -260,8 +264,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                 editable.insert(editableLength - 1, dateFormatSpecialChar.toString())
               }
             }
-            isRunning = false
-
             updateAnswer(editable.toString())
           }
         }

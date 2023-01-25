@@ -18,8 +18,13 @@ package com.google.android.fhir.datacapture.utilities
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
+import java.text.ParseException
 import java.time.LocalDate
+import java.time.chrono.IsoChronology
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.FormatStyle
 import java.util.Locale
+import kotlin.test.assertFailsWith
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -48,5 +53,110 @@ class MoreLocalDatesTest {
     Locale.setDefault(Locale.ITALY)
     val localDate = LocalDate.of(2010, 10, 18)
     assertThat(localDate.localizedString).isEqualTo("18/10/10")
+  }
+
+  @Test
+  fun getDateSeparator_US() {
+    Locale.setDefault(Locale.US)
+    val localeDatePattern =
+      DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+        FormatStyle.SHORT,
+        null,
+        IsoChronology.INSTANCE,
+        Locale.getDefault()
+      )
+    assertThat(getDateSeparator(localeDatePattern)).isEqualTo('/')
+  }
+
+  @Test
+  fun getDateSeparator_KOREA() {
+    Locale.setDefault(Locale.KOREA)
+    val localeDatePattern =
+      DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+        FormatStyle.SHORT,
+        null,
+        IsoChronology.INSTANCE,
+        Locale.getDefault()
+      )
+    assertThat(getDateSeparator(localeDatePattern)).isEqualTo('.')
+  }
+
+  @Test
+  fun getDateSeparator_Canada() {
+    Locale.setDefault(Locale.CANADA)
+    val localeDatePattern =
+      DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+        FormatStyle.SHORT,
+        null,
+        IsoChronology.INSTANCE,
+        Locale.getDefault()
+      )
+    assertThat(getDateSeparator(localeDatePattern)).isEqualTo('-')
+  }
+
+  @Test
+  fun generateAcceptableDateFormat_US() {
+    Locale.setDefault(Locale.US)
+    val localeDatePattern =
+      DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+        FormatStyle.SHORT,
+        null,
+        IsoChronology.INSTANCE,
+        Locale.getDefault()
+      )
+    assertThat(generateAcceptableDateFormat(localeDatePattern, getDateSeparator(localeDatePattern)))
+      .isEqualTo("MM/dd/yyyy")
+  }
+
+  @Test
+  fun generateAcceptableDateFormat_KOREA() {
+    Locale.setDefault(Locale.KOREA)
+    val localeDatePattern =
+      DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+        FormatStyle.SHORT,
+        null,
+        IsoChronology.INSTANCE,
+        Locale.getDefault()
+      )
+    assertThat(generateAcceptableDateFormat(localeDatePattern, getDateSeparator(localeDatePattern)))
+      .isEqualTo("yyyy.MM.dd.")
+  }
+
+  @Test
+  fun generateAcceptableDateFormat_Canada() {
+    Locale.setDefault(Locale.CANADA)
+    val localeDatePattern =
+      DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+        FormatStyle.SHORT,
+        null,
+        IsoChronology.INSTANCE,
+        Locale.getDefault()
+      )
+    assertThat(generateAcceptableDateFormat(localeDatePattern, getDateSeparator(localeDatePattern)))
+      .isEqualTo("yyyy-MM-dd")
+  }
+
+  @Test
+  fun parseDate_US() {
+    Locale.setDefault(Locale.US)
+    val localDate = parseDate("01/25/2023", "MM/dd/yyyy")
+    assertThat(localDate.dayOfMonth).isEqualTo(25)
+    assertThat(localDate.month.value).isEqualTo(1)
+    assertThat(localDate.year).isEqualTo(2023)
+  }
+
+  @Test
+  fun parseDate_KOREA() {
+    Locale.setDefault(Locale.KOREA)
+    val localDate = parseDate("2023.01.25.", "yyyy.MM.dd.")
+    assertThat(localDate.dayOfMonth).isEqualTo(25)
+    assertThat(localDate.month.value).isEqualTo(1)
+    assertThat(localDate.year).isEqualTo(2023)
+  }
+
+  @Test
+  fun parseDateUS_inCanadaFormat() {
+    Locale.setDefault(Locale.CANADA)
+    assertFailsWith<ParseException> { parseDate("01/25/2023", "yyyy-MM-dd") }
   }
 }
