@@ -16,17 +16,9 @@
 
 package com.google.android.fhir.workflow
 
-import org.hl7.elm.r1.VersionedIdentifier
-import org.hl7.fhir.instance.model.api.IBaseResource
-import org.hl7.fhir.r4.model.Library
-import org.opencds.cqf.cql.evaluator.cql2elm.content.fhir.BaseFhirLibrarySourceProvider
-import org.opencds.cqf.cql.evaluator.fhir.adapter.r4.AdapterFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 
-internal class FhirEngineLibraryContentProvider(adapterFactory: AdapterFactory) :
-  BaseFhirLibrarySourceProvider(adapterFactory) {
-  val libs = mutableMapOf<String, Library>()
-
-  override fun getLibrary(libraryIdentifier: VersionedIdentifier): IBaseResource? {
-    return libs[libraryIdentifier.id]
-  }
-}
+internal fun <T> runBlockingOnWorkerThread(block: suspend (CoroutineScope) -> T) =
+  runBlocking(Dispatchers.IO) { block(this) }

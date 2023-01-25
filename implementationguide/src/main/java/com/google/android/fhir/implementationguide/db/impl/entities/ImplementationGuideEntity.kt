@@ -21,10 +21,26 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.io.File
 
-@Entity(indices = [Index(value = ["name", "version"], unique = true)])
+/**
+ * A DB Entity containing the metadata of the
+ * [Implementation Guide](https://build.fhir.org/implementationguide.html).
+ *
+ * This entity stores as much metadata as necessary for `NpmPackageManager` to resolve the
+ * [dependency](https://build.fhir.org/implementationguide-definitions.html#ImplementationGuide.dependsOn)
+ * on another Implementation guide.
+ */
+@Entity(
+  indices =
+    [
+      Index(value = ["implementationGuideId"]),
+      Index(value = ["packageId", "url", "version"], unique = true)
+    ]
+)
 internal data class ImplementationGuideEntity(
-  @PrimaryKey(autoGenerate = true) val id: Long,
-  val name: String,
-  val version: String,
-  val rootDirectory: File
+  @PrimaryKey(autoGenerate = true) val implementationGuideId: Long,
+  val url: String,
+  val packageId: String,
+  val version: String?,
+  /** Directory where the Implementation Guide files are stored */
+  val rootDirectory: File,
 )

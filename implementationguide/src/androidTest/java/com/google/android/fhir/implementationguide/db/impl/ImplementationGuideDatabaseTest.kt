@@ -46,7 +46,7 @@ internal class ImplementationGuideDatabaseTest {
   @Test
   fun igInserted(): Unit = runBlocking {
     assertThat(igDao.insert(IG_ENTITY)).isGreaterThan(0)
-    assertThat(igDao.getImplementationGuides().map { it.name }).containsExactly(IG_NAME)
+    assertThat(igDao.getImplementationGuides().map { it.packageId }).containsExactly(IG_PACKAGE_ID)
   }
 
   @Test
@@ -56,20 +56,19 @@ internal class ImplementationGuideDatabaseTest {
       ResourceMetadataEntity(
         0L,
         ResourceType.ValueSet,
-        RES_ID_1,
-        "http://url.com/ValueSet/Name/1.0.0",
+        RES_URL,
         RES_NAME,
-        "1.0.0",
-        File("resId"),
-        igId
+        RES_VERSION,
+        File("resId")
       )
 
-    igDao.insert(resource)
+    igDao.insertResource(igId, resource)
 
-    assertThat(igDao.getResources(ResourceType.ValueSet, listOf(igId)).map { it.resourceId })
-      .containsExactly(RES_ID_1)
-    assertThat(igDao.getResources(ResourceType.Account, listOf(igId))).isEmpty()
-    assertThat(igDao.getResources(listOf(-1L))).isEmpty()
+    assertThat(igDao.getResources(ResourceType.ValueSet).map { it.url }).containsExactly(RES_URL)
+    assertThat(igDao.getResources(ResourceType.Account)).isEmpty()
+    assertThat(igDao.getImplementationGuidesWithResources(igId)?.resources?.map { it.url })
+      .containsExactly(RES_URL)
+    assertThat(igDao.getImplementationGuidesWithResources(-1)).isNull()
   }
 
   @Test
@@ -79,26 +78,58 @@ internal class ImplementationGuideDatabaseTest {
       ResourceMetadataEntity(
         0L,
         ResourceType.ValueSet,
-        RES_ID_1,
-        "http://url.com/ValueSet/Name/1.0.0",
+        RES_URL,
         RES_NAME,
-        "1.0.0",
-        File("resId"),
-        igId
+        RES_VERSION,
+        File("resId")
       )
-    igDao.insert(resource)
+    igDao.insertResource(igId, resource)
 
-    igDao.deleteImplementationGuide(IG_NAME, IG_VERSION)
+    igDao.deleteImplementationGuide(IG_PACKAGE_ID, IG_VERSION)
 
     assertThat(igDao.getImplementationGuides()).isEmpty()
-    assertThat(igDao.getResources(listOf(igId))).isEmpty()
+    assertThat(igDao.getResources()).isEmpty()
+    assertThat(igDao.getImplementationGuidesWithResources(igId)).isNull()
+  }
+
+  @Test
+  fun resourcesReused() = runBlocking {
+    val igId1 = igDao.insert(IG_ENTITY)
+    val igId2 = igDao.insert(IG_ENTITY.copy(version = "2.0.0"))
+    val resource =
+      ResourceMetadataEntity(
+        0L,
+        ResourceType.ValueSet,
+        RES_URL,
+        RES_NAME,
+        RES_VERSION,
+        File("resId")
+      )
+
+    igDao.insertResource(igId1, resource)
+    igDao.insertResource(igId2, resource)
+
+    assertThat(igDao.getImplementationGuidesWithResources(igId1)?.resources?.map { it.url })
+      .containsExactly(RES_URL)
+    assertThat(igDao.getImplementationGuidesWithResources(igId2)?.resources?.map { it.url })
+      .containsExactly(RES_URL)
+    assertThat(igDao.getResources()).hasSize(1)
+    assertThat(igDao.getImplementationGuidesWithResources(-1)).isNull()
   }
 
   private companion object {
-    const val IG_NAME = "test.ig"
+    const val IG_PACKAGE_ID = "test.ig"
     const val IG_VERSION = "1.0.0"
-    const val RES_ID_1 = "res-id-1"
     const val RES_NAME = "res-name-1"
-    val IG_ENTITY = ImplementationGuideEntity(0L, IG_NAME, IG_VERSION, File("test"))
+    const val RES_VERSION = "1.0.0"
+    const val RES_URL = "http://url.com/ValueSet/$RES_NAME/$RES_VERSION"
+    val IG_ENTITY =
+      ImplementationGuideEntity(
+        implementationGuideId = 0L,
+        packageId = IG_PACKAGE_ID,
+        version = IG_VERSION,
+        url = "http://url",
+        rootDirectory = File("test")
+      )
   }
 }

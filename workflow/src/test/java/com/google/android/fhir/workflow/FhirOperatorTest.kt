@@ -25,7 +25,6 @@ import com.google.android.fhir.workflow.testing.CqlBuilder
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
 import java.util.TimeZone
-import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Library
@@ -64,14 +63,14 @@ class FhirOperatorTest {
   }
 
   @Before
-  fun setUp() = runBlocking {
+  fun setUp() = runBlockingOnWorkerThread {
     fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
     fhirOperator = FhirOperator(fhirContext, fhirEngine)
     TimeZone.setDefault(TimeZone.getTimeZone("GMT"))
   }
 
   @Test
-  fun generateCarePlan() = runBlocking {
+  fun generateCarePlan() = runBlockingOnWorkerThread {
     loadBundle(libraryBundle)
     fhirEngine.run {
       loadBundle(parseJson("/plan-definition/rule-filters/RuleFilters-1.0.0-bundle.json"))
@@ -95,7 +94,7 @@ class FhirOperatorTest {
   }
 
   @Test
-  fun generateCarePlanWithoutEncounter() = runBlocking {
+  fun generateCarePlanWithoutEncounter() = runBlockingOnWorkerThread {
     loadBundle(parseJson("/plan-definition/med-request/med_request_patient.json"))
     loadBundle(parseJson("/plan-definition/med-request/med_request_plan_definition.json"))
 
@@ -115,7 +114,7 @@ class FhirOperatorTest {
   }
 
   @Test
-  fun evaluatePopulationMeasure() = runBlocking {
+  fun evaluatePopulationMeasure() = runBlockingOnWorkerThread {
     loadBundle(libraryBundle)
     fhirEngine.run {
       loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
@@ -145,7 +144,7 @@ class FhirOperatorTest {
   }
 
   @Test
-  fun evaluateGroupPopulationMeasure() = runBlocking {
+  fun evaluateGroupPopulationMeasure() = runBlockingOnWorkerThread {
     val resourceBundle =
       Bundle().apply {
         addEntry().apply {
@@ -181,7 +180,7 @@ class FhirOperatorTest {
   }
 
   @Test
-  fun evaluateIndividualSubjectMeasure() = runBlocking {
+  fun evaluateIndividualSubjectMeasure() = runBlockingOnWorkerThread {
     loadBundle(libraryBundle)
     fhirEngine.run {
       loadFile("/first-contact/01-registration/patient-charity-otala-1.json")

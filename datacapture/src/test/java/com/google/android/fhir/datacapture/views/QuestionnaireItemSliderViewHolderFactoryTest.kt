@@ -327,4 +327,57 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).isEnabled).isFalse()
   }
+
+  @Test
+  fun `bind multiple times with different QuestionnaireItemViewItem should show proper slider value`() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = IntegerType(10)
+            }
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(10)
+
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = IntegerType(12)
+            }
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(12)
+
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue(IntegerType("50"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(50)
+  }
 }
