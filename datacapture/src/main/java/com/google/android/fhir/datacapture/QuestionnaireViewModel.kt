@@ -781,7 +781,7 @@ internal data class QuestionnaireState(
 
 internal sealed class DisplayMode {
   class EditMode(val pagination: QuestionnairePagination) : DisplayMode()
-  class ReviewMode(val showEditButton: Boolean, val showSubmitButton: Boolean) : DisplayMode()
+  data class ReviewMode(val showEditButton: Boolean, val showSubmitButton: Boolean) : DisplayMode()
 }
 
 /**
