@@ -91,7 +91,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         header.bind(questionnaireItem)
-        displayInitialPreview()
+        displayInitialPreviewOrClear()
         displayTakePhotoButton(questionnaireItem)
         displayUploadButton(questionnaireItem)
         takePhotoButton.setOnClickListener { view -> onTakePhotoClicked(view, questionnaireItem) }
@@ -124,13 +124,27 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         deleteButton.isEnabled = !isReadOnly
       }
 
-      private fun displayInitialPreview() {
-        questionnaireItemViewItem.answers.firstOrNull()?.valueAttachment?.let { attachment ->
+      private fun displayInitialPreviewOrClear() {
+        val answer = questionnaireItemViewItem.answers.firstOrNull()
+
+        answer?.valueAttachment?.let { attachment ->
           displayPreview(
             attachmentType = attachment.contentType.type,
             attachmentTitle = attachment.title,
             attachmentByteArray = attachment.data
           )
+        }
+
+        // When there are several Attachment widgets, this prevents a bug when the user uploads a
+        // file then shows a preview on the first widget, the last widget will also have the same
+        // preview but with no appended answer. So we should always clear the preview when there is
+        // no answer.
+        // This happens because RecyclerView is recycling a widget that already displays the
+        // preview.
+        if (answer == null) {
+          clearPhotoPreview()
+          clearFilePreview()
+          hideDeleteButton()
         }
       }
 
