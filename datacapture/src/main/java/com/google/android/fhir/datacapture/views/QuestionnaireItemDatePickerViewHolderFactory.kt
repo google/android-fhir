@@ -66,7 +66,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private lateinit var acceptableDateFormat: String
-      private var dateFormatSpecialChar: Char? = null
+      private var dateFormatSeparator: Char? = null
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
@@ -112,10 +112,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             Locale.getDefault()
           )
         // Special character used in date format
-        dateFormatSpecialChar = getDateSeparator(localeDatePattern)
-        dateFormatSpecialChar?.let {
+        dateFormatSeparator = getDateSeparator(localeDatePattern)
+        dateFormatSeparator?.let {
           acceptableDateFormat =
-            generateAcceptableDateFormat(localeDatePattern, dateFormatSpecialChar!!)
+            generateAcceptableDateFormat(localeDatePattern, dateFormatSeparator!!)
         }
         textInputLayout.hint = acceptableDateFormat
         textInputEditText.removeTextChangedListener(textWatcher)
@@ -251,17 +251,16 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               return
             }
             if (editableLength < acceptableDateFormat.length) {
-              if (acceptableDateFormat[editableLength] != dateFormatSpecialChar) {
+              if (acceptableDateFormat[editableLength] != dateFormatSeparator) {
                 editable.append(acceptableDateFormat[editableLength])
-              } else if (!isDeleting &&
-                  acceptableDateFormat[editableLength] == dateFormatSpecialChar
+              } else if (!isDeleting && acceptableDateFormat[editableLength] == dateFormatSeparator
               ) {
                 editable.append(acceptableDateFormat[editableLength])
               }
-              if (acceptableDateFormat[editableLength - 1] == dateFormatSpecialChar &&
-                  editable[editableLength - 1] != dateFormatSpecialChar
+              if (acceptableDateFormat[editableLength - 1] == dateFormatSeparator &&
+                  editable[editableLength - 1] != dateFormatSeparator
               ) {
-                editable.insert(editableLength - 1, dateFormatSpecialChar.toString())
+                editable.insert(editableLength - 1, dateFormatSeparator.toString())
               }
             }
             updateAnswer(editable.toString())

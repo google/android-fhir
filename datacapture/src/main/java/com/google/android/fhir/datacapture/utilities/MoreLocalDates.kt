@@ -37,13 +37,10 @@ internal fun getDateSeparator(localeDatePattern: String): Char =
   localeDatePattern.lowercase().replace("m", "").replace("d", "").replace("y", "").first()
 
 /**
- * Convert date pattern to acceptable date pattern where 2 digits are expected for day and month, 4
- * digits are expected for year.
+ * Convert date pattern to acceptable date pattern where 2 digits are expected for day(dd) and
+ * month(MM), 4 digits are expected for year(yyyy).
  */
-internal fun generateAcceptableDateFormat(
-  datePattern: String,
-  dateFormatSpecialChar: Char
-): String {
+internal fun generateAcceptableDateFormat(datePattern: String, dateFormatSeparator: Char): String {
   var newDateFormat = StringBuilder()
   datePattern
     .lowercase()
@@ -60,15 +57,15 @@ internal fun generateAcceptableDateFormat(
         if (!newDateFormat.contains("yyyy")) {
           newDateFormat.append("yyyy")
         }
-      } else if (it == dateFormatSpecialChar) {
-        newDateFormat.append(dateFormatSpecialChar)
+      } else if (it == dateFormatSeparator) {
+        newDateFormat.append(dateFormatSeparator)
       }
     }
     .toString()
   return newDateFormat.toString()
 }
 
-/** Parse date string into given given format. */
+/** Parse date string into given date format. */
 internal fun parseDate(text: CharSequence?, acceptableDateFormat: String?): LocalDate {
   val localDate =
     if (!acceptableDateFormat.isNullOrEmpty()) {
