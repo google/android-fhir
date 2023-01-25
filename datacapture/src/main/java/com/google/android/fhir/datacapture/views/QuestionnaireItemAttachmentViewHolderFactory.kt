@@ -127,14 +127,6 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
       private fun displayInitialPreviewOrClear() {
         val answer = questionnaireItemViewItem.answers.firstOrNull()
 
-        answer?.valueAttachment?.let { attachment ->
-          displayPreview(
-            attachmentType = attachment.contentType.type,
-            attachmentTitle = attachment.title,
-            attachmentByteArray = attachment.data
-          )
-        }
-
         // When there are several Attachment widgets, this prevents a bug when the user uploads a
         // file then shows a preview on the first widget, the last widget will also have the same
         // preview but with no appended answer. So we should always clear the preview when there is
@@ -145,6 +137,15 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           clearPhotoPreview()
           clearFilePreview()
           hideDeleteButton()
+          return
+        }
+
+        answer.valueAttachment?.let { attachment ->
+          displayPreview(
+            attachmentType = attachment.contentType.type,
+            attachmentTitle = attachment.title,
+            attachmentByteArray = attachment.data
+          )
         }
       }
 
