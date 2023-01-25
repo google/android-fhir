@@ -376,6 +376,34 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
       .isEqualTo("Document File")
   }
 
+  @Test
+  fun shouldNotDisplayPreviewFromNullAnswer() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("image/*"))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("application/pdf"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { addAnswer(null) },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.photo_preview).visibility)
+      .isEqualTo(View.GONE)
+
+    assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.file_preview).visibility)
+      .isEqualTo(View.GONE)
+  }
+
   /** Method to run code snippet on UI/main thread */
   private fun runOnUI(action: () -> Unit) {
     activityScenarioRule.getScenario().onActivity { activity -> action() }
