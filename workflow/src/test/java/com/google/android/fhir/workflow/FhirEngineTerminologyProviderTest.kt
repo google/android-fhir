@@ -23,9 +23,6 @@ import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.android.fhir.workflow.testing.Loadable
 import com.google.common.truth.Truth.assertThat
-import java.lang.Exception
-import java.lang.IllegalArgumentException
-import java.lang.UnsupportedOperationException
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.CodeSystem
 import org.hl7.fhir.r4.model.ValueSet
@@ -60,7 +57,7 @@ class FhirEngineTerminologyProviderTest : Loadable() {
 
   @Test
   @Throws(Exception::class)
-  fun resolveByUrlUsingUrlSucceeds() {
+  fun resolveByUrlUsingUrlSucceeds() = runBlockingOnWorkerThread {
     val info: ValueSetInfo = ValueSetInfo().withId("https://cts.nlm.nih.gov/fhir/ValueSet/1.2.3.4")
 
     val response =
@@ -68,13 +65,13 @@ class FhirEngineTerminologyProviderTest : Loadable() {
         id = "1.2.3.4"
         url = info.id
       }
-    runBlocking { fhirEngine.create(response) }
+    fhirEngine.create(response)
 
     assertThat(provider.resolveValueSetId(info)).isEqualTo(response.id)
   }
 
   @Test
-  fun resolveByUrlUsingIdentifierSucceeds() {
+  fun resolveByUrlUsingIdentifierSucceeds() = runBlockingOnWorkerThread {
     val info: ValueSetInfo = ValueSetInfo().withId("urn:oid:1.2.3.4")
 
     val response =
@@ -82,36 +79,36 @@ class FhirEngineTerminologyProviderTest : Loadable() {
         id = "1.2.3.4"
         addIdentifier().value = info.id
       }
-    runBlocking { fhirEngine.create(response) }
+    fhirEngine.create(response)
 
     assertThat(provider.resolveValueSetId(info)).isEqualTo(response.id)
   }
 
   @Test
-  fun resolveByUrlUsingResourceIdSucceeds() {
+  fun resolveByUrlUsingResourceIdSucceeds() = runBlockingOnWorkerThread {
     val info: ValueSetInfo = ValueSetInfo().withId("1.2.3.4")
 
     val response = ValueSet().apply { id = "1.2.3.4" }
 
-    runBlocking { fhirEngine.create(response) }
+    fhirEngine.create(response)
 
     assertThat(provider.resolveValueSetId(info)).isEqualTo(response.id)
   }
 
   @Test(expected = IllegalArgumentException::class)
-  fun resolveByUrlNoMatchesThrowsException() {
+  fun resolveByUrlNoMatchesThrowsException(): Unit = runBlockingOnWorkerThread {
     val info: ValueSetInfo = ValueSetInfo().withId("urn:oid:1.2.3.4")
     provider.resolveValueSetId(info)
   }
 
   @Test(expected = TerminologyProviderException::class)
-  fun expandByUrlNoMatchesThrowsException() {
+  fun expandByUrlNoMatchesThrowsException(): Unit = runBlockingOnWorkerThread {
     val info: ValueSetInfo = ValueSetInfo().withId("urn:oid:1.2.3.4")
     provider.expand(info)
   }
 
   @Test(expected = UnsupportedOperationException::class)
-  fun nonNullVersionUnsupported() {
+  fun nonNullVersionUnsupported(): Unit = runBlockingOnWorkerThread {
     val info =
       ValueSetInfo().apply {
         id = "urn:oid:Test"
@@ -121,7 +118,7 @@ class FhirEngineTerminologyProviderTest : Loadable() {
   }
 
   @Test(expected = UnsupportedOperationException::class)
-  fun nonNullCodeSystemsUnsupported() {
+  fun nonNullCodeSystemsUnsupported(): Unit = runBlockingOnWorkerThread {
     val codeSystem =
       CodeSystemInfo().apply {
         id = "SNOMED-CT"
@@ -136,7 +133,7 @@ class FhirEngineTerminologyProviderTest : Loadable() {
   }
 
   @Test
-  fun urnOidPrefixIsStripped() {
+  fun urnOidPrefixIsStripped() = runBlockingOnWorkerThread {
     val info = ValueSetInfo().withId("urn:oid:Test")
 
     val response =
@@ -145,13 +142,13 @@ class FhirEngineTerminologyProviderTest : Loadable() {
         expansion.containsFirstRep.setSystem(TEST_SYSTEM).code = TEST_CODE
       }
 
-    runBlocking { fhirEngine.create(response) }
+    fhirEngine.create(response)
 
     assertThat(provider.resolveValueSetId(info)).isEqualTo(response.id)
   }
 
   @Test(expected = IllegalArgumentException::class)
-  fun moreThanOneURLSearchResultIsError() {
+  fun moreThanOneURLSearchResultIsError(): Unit = runBlockingOnWorkerThread {
     val info = ValueSetInfo().withId("http://localhost/fhir/ValueSet/1.2.3.4")
 
     val response1 =
@@ -166,22 +163,20 @@ class FhirEngineTerminologyProviderTest : Loadable() {
         url = info.id
       }
 
-    runBlocking {
-      fhirEngine.create(response1)
-      fhirEngine.create(response2)
-    }
+    fhirEngine.create(response1)
+    fhirEngine.create(response2)
 
     provider.resolveValueSetId(info)
   }
 
   @Test(expected = IllegalArgumentException::class)
-  fun zeroURLSearchResultIsError() {
+  fun zeroURLSearchResultIsError(): Unit = runBlockingOnWorkerThread {
     val info = ValueSetInfo().withId("http://localhost/fhir/ValueSet/1.2.3.4")
     provider.resolveValueSetId(info)
   }
 
   @Test
-  fun expandOperationReturnsCorrectCodesMoreThanZero() {
+  fun expandOperationReturnsCorrectCodesMoreThanZero() = runBlockingOnWorkerThread {
     val info = ValueSetInfo().withId("urn:oid:Test")
     val response =
       ValueSet().apply {
@@ -189,7 +184,7 @@ class FhirEngineTerminologyProviderTest : Loadable() {
         expansion.containsFirstRep.setSystem(TEST_SYSTEM).code = TEST_CODE
       }
 
-    runBlocking { fhirEngine.create(response) }
+    fhirEngine.create(response)
 
     val list = provider.expand(info).toList()
     assertThat(list.size).isEqualTo(1)
@@ -198,7 +193,7 @@ class FhirEngineTerminologyProviderTest : Loadable() {
   }
 
   @Test
-  fun inOperationReturnsTrueWhenFhirReturnsTrue() {
+  fun inOperationReturnsTrueWhenFhirReturnsTrue() = runBlockingOnWorkerThread {
     val info = ValueSetInfo().withId("urn:oid:Test")
 
     val response =
@@ -211,7 +206,7 @@ class FhirEngineTerminologyProviderTest : Loadable() {
         }
       }
 
-    runBlocking { fhirEngine.create(response) }
+    fhirEngine.create(response)
 
     val code =
       Code().apply {
@@ -223,7 +218,7 @@ class FhirEngineTerminologyProviderTest : Loadable() {
   }
 
   @Test
-  fun inOperationReturnsFalseCodeIsNotInTheValueSet() {
+  fun inOperationReturnsFalseCodeIsNotInTheValueSet() = runBlockingOnWorkerThread {
     val info = ValueSetInfo().withId("urn:oid:Test")
 
     val response =
@@ -242,13 +237,13 @@ class FhirEngineTerminologyProviderTest : Loadable() {
         display = TEST_DISPLAY
       }
 
-    runBlocking { fhirEngine.create(response) }
+    fhirEngine.create(response)
 
     assertThat(provider.`in`(code, info)).isFalse()
   }
 
   @Test
-  fun inOperationHandlesNullSystem() {
+  fun inOperationHandlesNullSystem() = runBlockingOnWorkerThread {
     val info = ValueSetInfo().withId("urn:oid:Test")
 
     val response =
@@ -266,13 +261,13 @@ class FhirEngineTerminologyProviderTest : Loadable() {
         display = TEST_DISPLAY
       }
 
-    runBlocking { fhirEngine.create(response) }
+    fhirEngine.create(response)
 
     assertThat(provider.`in`(code, info)).isTrue()
   }
 
   @Test
-  fun lookupOperationSuccess() {
+  fun lookupOperationSuccess() = runBlockingOnWorkerThread {
     val info =
       CodeSystemInfo().apply {
         id = TEST_SYSTEM
@@ -292,7 +287,7 @@ class FhirEngineTerminologyProviderTest : Loadable() {
         }
       }
 
-    runBlocking { fhirEngine.create(codeSystem) }
+    fhirEngine.create(codeSystem)
 
     val result: Code = provider.lookup(code, info)
     assertThat(result).isNotNull()
@@ -300,4 +295,40 @@ class FhirEngineTerminologyProviderTest : Loadable() {
     assertThat(result.code).isEqualTo(TEST_CODE)
     assertThat(result.display).isEqualTo(TEST_DISPLAY)
   }
+
+  @Test(expected = BlockingMainThreadException::class)
+  fun `in when called from main thread should throw BlockingMainThreadException`(): Unit =
+    runBlocking {
+      val info = ValueSetInfo().withId("urn:oid:Test")
+      val code =
+        Code().apply {
+          code = TEST_CODE
+          display = TEST_DISPLAY
+        }
+
+      provider.`in`(code, info)
+    }
+
+  @Test(expected = BlockingMainThreadException::class)
+  fun `expand when called from main thread should throw BlockingMainThreadException`(): Unit =
+    runBlocking {
+      val info: ValueSetInfo = ValueSetInfo().withId("urn:oid:1.2.3.4")
+      provider.expand(info)
+    }
+
+  @Test(expected = BlockingMainThreadException::class)
+  fun `lookup when called from main thread should throw BlockingMainThreadException`(): Unit =
+    runBlocking {
+      val info =
+        CodeSystemInfo().apply {
+          id = TEST_SYSTEM
+          version = TEST_SYSTEM_VERSION
+        }
+      val code =
+        Code().apply {
+          code = TEST_CODE
+          display = TEST_DISPLAY
+        }
+      provider.lookup(code, info)
+    }
 }

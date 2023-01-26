@@ -29,7 +29,6 @@ import com.google.android.fhir.search.filter.TokenParamFilterCriterion
 import com.google.android.fhir.search.query.XFhirQueryTranslator.applyFilterParam
 import java.math.BigDecimal
 import java.util.Date
-import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Enumerations
@@ -41,7 +40,7 @@ import org.opencds.cqf.cql.engine.runtime.DateTime
 import org.opencds.cqf.cql.engine.runtime.Interval
 import org.opencds.cqf.cql.engine.terminology.ValueSetInfo
 
-class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
+internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
   TerminologyAwareRetrieveProvider() {
   override fun retrieve(
     context: String?,
@@ -56,37 +55,26 @@ class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
     dateLowPath: String?,
     dateHighPath: String?,
     dateRange: Interval?
-  ): Iterable<Any> {
-    return runBlocking {
-      if (dataType == null) {
-        emptyList()
-      } else if (contextPath == "id" && contextValue == null) {
-        emptyList()
-      } else if (contextPath == "id" && contextValue != null) {
-        listOfNotNull(
-          safeGet(fhirEngine, ResourceType.fromCode(dataType), "$contextValue"),
-          safeGet(fhirEngine, ResourceType.fromCode(dataType), "urn:uuid:$contextValue"),
-          safeGet(fhirEngine, ResourceType.fromCode(dataType), "urn:oid:$contextValue")
-        )
-      } else if (codePath == "id" && codes != null) {
-        codes.mapNotNull { safeGet(fhirEngine, ResourceType.fromCode(dataType), it.code) }
-      } else {
-        val search = Search(ResourceType.fromCode(dataType))
-
-        // filter by context
-        filterByContext(context, contextPath, contextValue, dataType, search)
-
-        // filter by code in codes
-        filterByCode(codePath, codes, search)
-
-        // filter by code into valueSet
-        filterByValueSet(codePath, valueSet, search)
-
-        // filter by date in range
-        filterByDateRange(datePath, dateLowPath, dateHighPath, dateRange, search)
-
-        fhirEngine.search(search)
-      }
+  ): Iterable<Any> = runBlockingOrThrowMainThreadException {
+    if (dataType == null) {
+      emptyList()
+    } else if (contextPath == "id" && contextValue == null) {
+      emptyList()
+    } else if (contextPath == "id") {
+      listOfNotNull(
+        safeGet(fhirEngine, ResourceType.fromCode(dataType), "$contextValue"),
+        safeGet(fhirEngine, ResourceType.fromCode(dataType), "urn:uuid:$contextValue"),
+        safeGet(fhirEngine, ResourceType.fromCode(dataType), "urn:oid:$contextValue")
+      )
+    } else if (codePath == "id" && codes != null) {
+      codes.mapNotNull { safeGet(fhirEngine, ResourceType.fromCode(dataType), it.code) }
+    } else {
+      val search = Search(ResourceType.fromCode(dataType))
+      filterByContext(context, contextPath, contextValue, dataType, search)
+      filterByCode(codePath, codes, search)
+      filterByValueSet(codePath, valueSet, search)
+      filterByDateRange(datePath, dateLowPath, dateHighPath, dateRange, search)
+      fhirEngine.search(search)
     }
   }
 
