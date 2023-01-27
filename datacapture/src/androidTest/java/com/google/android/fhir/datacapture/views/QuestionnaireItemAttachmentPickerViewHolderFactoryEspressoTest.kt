@@ -407,6 +407,74 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
       .isEqualTo(View.GONE)
   }
 
+  @Test
+  fun shouldNotDisplayPreviewFromNullAnswerAfterPreviouslyBindingNonNullAnswer() {
+    val questionnaireItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("image/*"))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("application/pdf"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value =
+                Attachment().apply {
+                  title = "IMG_1.jpeg"
+                  data =
+                    Base64.decode(
+                      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+                      Base64.DEFAULT
+                    )
+                  contentType = "image/jpeg"
+                }
+            }
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItem) }
+
+    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.photo_preview).visibility)
+      .isEqualTo(View.VISIBLE)
+
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.delete).visibility)
+      .isEqualTo(View.VISIBLE)
+
+    val questionnaireItemWithNullAnswer =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("image/*"))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("application/pdf"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { addAnswer(null) },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemWithNullAnswer) }
+
+    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.photo_preview).visibility)
+      .isEqualTo(View.GONE)
+
+    assertThat(viewHolder.itemView.findViewById<Button>(R.id.delete).visibility)
+      .isEqualTo(View.GONE)
+  }
+
   /** Method to run code snippet on UI/main thread */
   private fun runOnUI(action: () -> Unit) {
     activityScenarioRule.getScenario().onActivity { activity -> action() }
