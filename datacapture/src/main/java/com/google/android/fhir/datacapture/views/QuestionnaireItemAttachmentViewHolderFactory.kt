@@ -91,7 +91,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         header.bind(questionnaireItem)
-        displayInitialPreviewOrClear()
+        displayOrClearInitialPreview()
         displayTakePhotoButton(questionnaireItem)
         displayUploadButton(questionnaireItem)
         takePhotoButton.setOnClickListener { view -> onTakePhotoClicked(view, questionnaireItem) }
@@ -124,7 +124,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         deleteButton.isEnabled = !isReadOnly
       }
 
-      private fun displayInitialPreviewOrClear() {
+      private fun displayOrClearInitialPreview() {
         val answer = questionnaireItemViewItem.answers.firstOrNull()
 
         // When there are several Attachment widgets, this prevents a bug when the user uploads a
