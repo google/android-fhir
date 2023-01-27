@@ -384,26 +384,13 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           ) {}
 
           override fun afterTextChanged(editable: Editable) {
-            val editableLength = editable.length
-            if (editable.isEmpty()) {
-              return
-            }
-            if (editableLength > acceptableDateFormat.length) {
-              editable.replace(acceptableDateFormat.length, editableLength, "")
-              return
-            }
-            if (editableLength < acceptableDateFormat.length) {
-              if (acceptableDateFormat[editableLength] != dateFormatSeparator) {
-                editable.append(acceptableDateFormat[editableLength])
-              } else if (!isDeleting && acceptableDateFormat[editableLength] == dateFormatSeparator
-              ) {
-                editable.append(acceptableDateFormat[editableLength])
-              }
-              if (acceptableDateFormat[editableLength - 1] == dateFormatSeparator &&
-                  editable[editableLength - 1] != dateFormatSeparator
-              ) {
-                editable.insert(editableLength - 1, dateFormatSeparator.toString())
-              }
+            dateFormatSeparator?.let {
+              handleDateFormatAfterTextChange(
+                editable,
+                acceptableDateFormat,
+                dateFormatSeparator!!,
+                isDeleting
+              )
             }
             updateAnswerAfterTextChanged(editable.toString())
           }

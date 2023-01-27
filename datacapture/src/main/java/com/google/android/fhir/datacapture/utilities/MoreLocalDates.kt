@@ -20,6 +20,7 @@ import android.icu.text.DateFormat
 import android.icu.text.SimpleDateFormat
 import com.google.android.fhir.datacapture.views.length
 import com.google.android.fhir.datacapture.views.localDate
+import java.lang.Character.isLetterOrDigit
 import java.lang.StringBuilder
 import java.text.ParseException
 import java.time.LocalDate
@@ -34,7 +35,7 @@ internal val LocalDate.localizedString: String
 
 /** Special character used in date format */
 internal fun getDateSeparator(localeDatePattern: String): Char =
-  localeDatePattern.lowercase().replace("m", "").replace("d", "").replace("y", "").first()
+  localeDatePattern.filterNot { isLetterOrDigit(it) }.first()
 
 /**
  * Convert date pattern to acceptable date pattern where 2 digits are expected for day(dd) and
