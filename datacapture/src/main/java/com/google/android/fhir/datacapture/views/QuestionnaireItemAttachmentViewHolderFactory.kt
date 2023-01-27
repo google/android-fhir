@@ -127,12 +127,8 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
       private fun displayOrClearInitialPreview() {
         val answer = questionnaireItemViewItem.answers.firstOrNull()
 
-        // When there are several Attachment widgets, this prevents a bug when the user uploads a
-        // file then shows a preview on the first widget, the last widget will also have the same
-        // preview but with no appended answer. So we should always clear the preview when there is
-        // no answer.
-        // This happens because RecyclerView is recycling a widget that already displays the
-        // preview.
+        // Clear preview if there is no answer to prevent showing old previews in views that have
+        // been recycled.
         if (answer == null) {
           clearPhotoPreview()
           clearFilePreview()
