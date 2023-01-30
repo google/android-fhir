@@ -1724,7 +1724,6 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  @Ignore("https://github.com/google/android-fhir/issues/1820")
   fun questionnaireHasNestedItem_ofTypeRepeatedGroup_shouldNestMultipleItems() = runTest {
     val questionnaire =
       Questionnaire().apply {
@@ -1788,47 +1787,47 @@ class QuestionnaireViewModelTest {
     withContext(coroutineContext) {
       // Calling addAnswer out of order should not result in the answers in the response being out
       // of order; all of the answers to repeated-group-a should come before repeated-group-b.
-      repeat(times = 2) {
-        repeatedGroupA()
-          .asQuestion()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              item =
-                repeatedGroupA()
-                  .asQuestion()
-                  .questionnaireItem.getNestedQuestionnaireResponseItems()
-            }
-          )
-        repeatedGroupB()
-          .asQuestion()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              item =
-                repeatedGroupB()
-                  .asQuestion()
-                  .questionnaireItem.getNestedQuestionnaireResponseItems()
-            }
-          )
-      }
-
-      assertThat(
-          viewModel.getQuestionnaireItemViewItemList().map {
-            it.asQuestion().questionnaireItem.linkId
+      repeatedGroupA()
+        .asQuestion()
+        .setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            item =
+              repeatedGroupA().asQuestion().questionnaireItem.getNestedQuestionnaireResponseItems()
+          },
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            item =
+              repeatedGroupA().asQuestion().questionnaireItem.getNestedQuestionnaireResponseItems()
           }
         )
-        .containsExactly(
-          "repeated-group-a",
-          "nested-item-a",
-          "another-nested-item-a",
-          "nested-item-a",
-          "another-nested-item-a",
-          "repeated-group-b",
-          "nested-item-b",
-          "another-nested-item-b",
-          "nested-item-b",
-          "another-nested-item-b"
+      repeatedGroupB()
+        .asQuestion()
+        .setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            item =
+              repeatedGroupB().asQuestion().questionnaireItem.getNestedQuestionnaireResponseItems()
+          },
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            item =
+              repeatedGroupB().asQuestion().questionnaireItem.getNestedQuestionnaireResponseItems()
+          }
         )
-        .inOrder()
+
+      viewModel.questionnaireStateFlow.test {
+        assertThat(awaitItem().items.map { it.asQuestion().questionnaireItem.linkId })
+          .containsExactly(
+            "repeated-group-a",
+            "nested-item-a",
+            "another-nested-item-a",
+            "nested-item-a",
+            "another-nested-item-a",
+            "repeated-group-b",
+            "nested-item-b",
+            "another-nested-item-b",
+            "nested-item-b",
+            "another-nested-item-b"
+          )
+          .inOrder()
+      }
 
       assertResourceEquals(
         actual = viewModel.getQuestionnaireResponse(),
