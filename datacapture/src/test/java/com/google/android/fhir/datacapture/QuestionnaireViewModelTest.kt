@@ -43,7 +43,6 @@ import java.util.UUID
 import kotlin.test.assertFailsWith
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.instance.model.api.IBaseResource
@@ -952,7 +951,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should return questionnaire response without disabled questions`() = runBlocking {
+  fun `should return questionnaire response without disabled questions`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -997,7 +996,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should return questionnaire response with enabled questions`() = runBlocking {
+  fun `should return questionnaire response with enabled questions`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1045,7 +1044,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test // https://github.com/google/android-fhir/issues/1664
-  fun `should skip disabled questions`() = runBlocking {
+  fun `should skip disabled questions`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1207,7 +1206,6 @@ class QuestionnaireViewModelTest {
     }
 
   @Test
-  @Ignore("https://github.com/google/android-fhir/issues/1820")
   fun `should restore previous state in a chain of dependent question items when item is disabled and enabled`() =
     runTest {
       val questionnaire =
@@ -1278,58 +1276,47 @@ class QuestionnaireViewModelTest {
           )
         }
 
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-      state.set(
-        EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
-        printer.encodeResourceToString(questionnaireResponse)
-      )
+      val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-      val viewModel = QuestionnaireViewModel(context, state)
-      withContext(coroutineContext) {
-        val items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
-        // Clearing the answer disables question-2 that in turn disables question-3.
-        items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
-      }
+      val questionOne =
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .first { it.asQuestion().questionnaireItem.linkId == "question-1" }
+          .asQuestion()
 
-      viewModel.questionnaireStateFlow.test {
-        assertResourceEquals(
-          viewModel.getQuestionnaireResponse(),
-          QuestionnaireResponse().apply {
-            id = "a-questionnaire-response"
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "question-1"
-                addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = BooleanType(false)
-                  }
-                )
-              }
-            )
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .first { it.asQuestion().questionnaireItem.linkId == "question-1" }
+        .asQuestion()
+        .clearAnswer()
+
+      assertThat(questionOne.getQuestionnaireResponseItem().answer).isEmpty()
+
+      // Setting the answer of  "question-1" to true should enable question-2 that in turn
+      // enables question-3 and restore their previous states.
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .first { it.asQuestion().questionnaireItem.linkId == "question-1" }
+        .asQuestion()
+        .setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = BooleanType(true)
           }
         )
-      }
 
-      // Setting the answer of  "question-1" to true should enable question-2 that in turn enables
-      // question-3 and restore their previous states.
-      // items
-      //   .first { it.questionnaireItem.linkId == "question-1" }
-      //   .addAnswer(
-      //     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-      //       value = BooleanType(true)
-      //     }
-      //   )
-      // QuestionnaireViewModelTest.assertResourceEquals(
-      //   viewModel.getQuestionnaireResponse(),
-      //   questionnaireResponse
-      // )
+      assertThat(
+          (questionOne.getQuestionnaireResponseItem().answer[0].value as BooleanType).booleanValue()
+        )
+        .isEqualTo(true)
+
+      assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
     }
 
   // Test cases for state flow
 
   @Test
   fun stateHasQuestionnaireResponse_lessItemsInQuestionnaireResponse_shouldAddTheMissingItem() =
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -1377,78 +1364,74 @@ class QuestionnaireViewModelTest {
     }
 
   @Test
-  fun stateHasQuestionnaireResponse_lessItemsInQuestionnaireResponse_shouldCopyAnswer() =
-    runBlocking {
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "q1"
-              text = "Basic question"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(false)))
-            }
-          )
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "q2"
-              text = "Another basic question"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(false)))
-            }
-          )
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "q3"
-              text = "Another basic question"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(false)))
-            }
-          )
-        }
-      val questionnaireResponse =
-        QuestionnaireResponse().apply {
-          id = "a-questionnaire-response"
-          addItem(
-            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-              linkId = "q2"
-              answer =
-                listOf(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = BooleanType(true)
-                  }
-                )
-            }
-          )
-        }
+  fun stateHasQuestionnaireResponse_lessItemsInQuestionnaireResponse_shouldCopyAnswer() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "q1"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(false)))
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "q2"
+            text = "Another basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(false)))
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "q3"
+            text = "Another basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(false)))
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "q2"
+            answer =
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(true)
+                }
+              )
+          }
+        )
+      }
 
-      val questionnaireViewModel =
-        createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-      val questionnaireItemViewItemList =
-        questionnaireViewModel.questionnaireStateFlow.first().items
+    val questionnaireViewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+    val questionnaireItemViewItemList = questionnaireViewModel.questionnaireStateFlow.first().items
 
-      // Answer to first question should be created from questionnaire
-      val questionnaireItemViewItem1 = questionnaireItemViewItemList[0].asQuestion()
-      assertThat(questionnaireItemViewItem1.questionnaireItem.linkId).isEqualTo("q1")
-      assertThat(questionnaireItemViewItem1.answers.single().valueBooleanType.booleanValue())
-        .isFalse()
+    // Answer to first question should be created from questionnaire
+    val questionnaireItemViewItem1 = questionnaireItemViewItemList[0].asQuestion()
+    assertThat(questionnaireItemViewItem1.questionnaireItem.linkId).isEqualTo("q1")
+    assertThat(questionnaireItemViewItem1.answers.single().valueBooleanType.booleanValue())
+      .isFalse()
 
-      // Answer to second question should be copied from questionnaire response
-      val questionnaireItemViewItem2 = questionnaireItemViewItemList[1].asQuestion()
-      assertThat(questionnaireItemViewItem2.questionnaireItem.linkId).isEqualTo("q2")
-      assertThat(questionnaireItemViewItem2.answers.single().valueBooleanType.booleanValue())
-        .isTrue()
+    // Answer to second question should be copied from questionnaire response
+    val questionnaireItemViewItem2 = questionnaireItemViewItemList[1].asQuestion()
+    assertThat(questionnaireItemViewItem2.questionnaireItem.linkId).isEqualTo("q2")
+    assertThat(questionnaireItemViewItem2.answers.single().valueBooleanType.booleanValue()).isTrue()
 
-      // Answer to third quesiton should be created from questionnaire
-      val questionnaireItemViewItem3 = questionnaireItemViewItemList[2].asQuestion()
-      assertThat(questionnaireItemViewItem3.questionnaireItem.linkId).isEqualTo("q3")
-      assertThat(questionnaireItemViewItem3.answers.single().valueBooleanType.booleanValue())
-        .isFalse()
-    }
+    // Answer to third question should be created from questionnaire
+    val questionnaireItemViewItem3 = questionnaireItemViewItemList[2].asQuestion()
+    assertThat(questionnaireItemViewItem3.questionnaireItem.linkId).isEqualTo("q3")
+    assertThat(questionnaireItemViewItem3.answers.single().valueBooleanType.booleanValue())
+      .isFalse()
+  }
 
   @Test
-  fun `should emit questionnaire state flow`() = runBlocking {
+  fun `should emit questionnaire state flow`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1485,7 +1468,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should emit questionnaire state flow without initial validation`() = runBlocking {
+  fun `should emit questionnaire state flow without initial validation`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1539,7 +1522,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should emit questionnaire state flow without disabled questions`() = runBlocking {
+  fun `should emit questionnaire state flow without disabled questions`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1571,7 +1554,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should emit questionnaire state flow with enabled questions`() = runBlocking {
+  fun `should emit questionnaire state flow with enabled questions`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1606,7 +1589,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should emit questionnaire state flow without hidden questions`() = runBlocking {
+  fun `should emit questionnaire state flow without hidden questions`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1629,7 +1612,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should emit questionnaire state flow with non-hidden questions`() = runBlocking {
+  fun `should emit questionnaire state flow with non-hidden questions`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1657,42 +1640,37 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should emit questionnaire state flow with hidden extension without valid value`() =
-    runBlocking {
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "a-boolean-item-1"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              addExtension().apply {
-                url = EXTENSION_HIDDEN_URL
-                setValue(IntegerType(1))
-              }
-              addInitial().apply { value = BooleanType(true) }
+  fun `should emit questionnaire state flow with hidden extension without valid value`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-boolean-item-1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addExtension().apply {
+              url = EXTENSION_HIDDEN_URL
+              setValue(IntegerType(1))
             }
-          )
-        }
-      val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
-
-      val viewModel = QuestionnaireViewModel(context, state)
-
-      assertThat(
-          viewModel
-            .getQuestionnaireItemViewItemList()
-            .single()
-            .asQuestion()
-            .questionnaireItem.linkId
+            addInitial().apply { value = BooleanType(true) }
+          }
         )
-        .isEqualTo("a-boolean-item-1")
-    }
+      }
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(
+        viewModel.getQuestionnaireItemViewItemList().single().asQuestion().questionnaireItem.linkId
+      )
+      .isEqualTo("a-boolean-item-1")
+  }
 
   // Test cases for user interaction
 
   @Test
-  fun questionnaireHasNestedItem_ofTypeGroup_shouldNestItemWithinItem() = runBlocking {
+  fun questionnaireHasNestedItem_ofTypeGroup_shouldNestItemWithinItem() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1747,7 +1725,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   @Ignore("https://github.com/google/android-fhir/issues/1820")
-  fun questionnaireHasNestedItem_ofTypeRepeatedGroup_shouldNestMultipleItems() = runBlocking {
+  fun questionnaireHasNestedItem_ofTypeRepeatedGroup_shouldNestMultipleItems() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1935,7 +1913,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   @Ignore("https://github.com/google/android-fhir/issues/487")
-  fun questionnaireHasNestedItem_notOfTypeGroup_shouldNestItemWithinAnswerItem() = runBlocking {
+  fun questionnaireHasNestedItem_notOfTypeGroup_shouldNestItemWithinAnswerItem() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -2005,7 +1983,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `should show questionnaire items in the active page in a paginated questionnaire`() =
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -2548,7 +2526,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should allow user to move forward using random entry-mode`() = runBlocking {
+  fun `should allow user to move forward using random entry-mode`() = runTest {
     val entryModeExtension =
       Extension().apply {
         url = EXTENSION_ENTRY_MODE_URL
@@ -2595,7 +2573,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should allow user to move forward and back using random entry-mode`() = runBlocking {
+  fun `should allow user to move forward and back using random entry-mode`() = runTest {
     val entryModeExtension =
       Extension().apply {
         url = EXTENSION_ENTRY_MODE_URL
@@ -2643,7 +2621,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should allow user to move forward when no entry-mode is defined`() = runBlocking {
+  fun `should allow user to move forward when no entry-mode is defined`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -2684,7 +2662,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should allow user to move forward and back when no entry-mode is defined`() = runBlocking {
+  fun `should allow user to move forward and back when no entry-mode is defined`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -2895,7 +2873,7 @@ class QuestionnaireViewModelTest {
   // Test cases for answer value set
 
   @Test
-  fun questionnaire_resolveContainedAnswerValueSet() = runBlocking {
+  fun questionnaire_resolveContainedAnswerValueSet() = runTest {
     val valueSetId = "yesnodontknow"
     val questionnaire =
       Questionnaire().apply {
@@ -2941,7 +2919,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun questionnaire_resolveAnswerValueSetExternalResolved() = runBlocking {
+  fun questionnaire_resolveAnswerValueSetExternalResolved() = runTest {
     val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
 
     ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
@@ -2984,7 +2962,7 @@ class QuestionnaireViewModelTest {
   // Test cases for nested display items
 
   @Test
-  fun nestedDisplayItem_parentQuestionItemIsGroup_createQuestionnaireStateItem() = runBlocking {
+  fun nestedDisplayItem_parentQuestionItemIsGroup_createQuestionnaireStateItem() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -3016,7 +2994,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `nested display item with instructions code should not be created as questionnaire state item`() =
-    runBlocking {
+    runTest {
       val displayCategoryExtension =
         Extension().apply {
           url = EXTENSION_DISPLAY_CATEGORY_URL
@@ -3065,7 +3043,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `nested display item with flyover code should not be created as questionnaire state item`() =
-    runBlocking {
+    runTest {
       val itemControlExtensionWithFlyOverCode =
         Extension().apply {
           url = EXTENSION_ITEM_CONTROL_URL
@@ -3114,7 +3092,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `nested display item with help code should not be created as questionnaire state item`() =
-    runBlocking {
+    runTest {
       val itemControlExtensionWithHelpCode =
         Extension().apply {
           url = EXTENSION_ITEM_CONTROL_URL
@@ -3165,7 +3143,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `resolveAnswerExpression() should return questionnaire item answer options for answer expression and choice column`() =
-    runBlocking {
+    runTest {
       val practitioner =
         Practitioner().apply {
           id = UUID.randomUUID().toString()
@@ -3246,7 +3224,7 @@ class QuestionnaireViewModelTest {
     val viewModel = QuestionnaireViewModel(context, state)
     val exception =
       assertThrows(null, IllegalStateException::class.java) {
-        runBlocking { viewModel.resolveAnswerExpression(questionnaire.itemFirstRep) }
+        runTest { viewModel.resolveAnswerExpression(questionnaire.itemFirstRep) }
       }
     assertThat(exception.message)
       .isEqualTo(
@@ -3257,7 +3235,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `setShowSubmitButtonFlag() to false should not show submit button`() {
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -3280,7 +3258,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `setShowSubmitButtonFlag() to true should show submit button`() {
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -3305,7 +3283,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `state has review feature and submit button to true should move to review page`() {
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -3326,7 +3304,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `state has no review feature should not show review button`() {
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -3348,7 +3326,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `state has review feature should show review button`() {
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -3370,7 +3348,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `state has review feature and show review page first should be in review mode`() {
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -3398,7 +3376,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `state has no review feature but show review page first should not show review button`() {
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -3470,7 +3448,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `paginated questionnaire with no review feature should not show review button when last page is hidden`() =
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -3558,7 +3536,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `paginated questionnaire with review feature should show review button when last page is hidden`() =
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -3603,7 +3581,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `toggle review mode to false should show review button`() {
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -3626,7 +3604,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `toggle review mode to true should show edit button only`() {
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -3652,7 +3630,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `read-only mode should not show edit button`() {
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -3677,7 +3655,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `should calculate value on start for questionnaire item with calculated expression extension`() =
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -3731,7 +3709,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `should calculate value on change for questionnaire item with calculated expression extension`() =
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -3793,7 +3771,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `should not change value for modified questionnaire items with calculated expression extension`() =
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -3869,7 +3847,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `should detect cyclic dependency for questionnaire item with calculated expression extension in flat list`() =
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
@@ -3925,7 +3903,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `should detect cyclic dependency for questionnaire item with calculated expression extension in nested list`() =
-    runBlocking {
+    runTest {
       val questionnaire =
         Questionnaire().apply {
           id = "a-questionnaire"
