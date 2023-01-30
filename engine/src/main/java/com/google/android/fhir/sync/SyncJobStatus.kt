@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync
 
-import com.google.android.fhir.sync.progress.Progress
 import java.time.OffsetDateTime
 
 sealed class SyncJobStatus {
@@ -25,18 +24,11 @@ sealed class SyncJobStatus {
   /** Sync job has been started on the client but the syncing is not necessarily in progress. */
   class Started : SyncJobStatus()
 
-  /** A new sub process of type [SyncOperation] was started during the process. */
-  data class Spawned(
-    val syncOperation: SyncOperation,
-    val total: Number,
-    val details: Map<String, Number>
-  ) : SyncJobStatus()
-
   /** Syncing in progress with the server. */
   data class InProgress(
     val syncOperation: SyncOperation,
-    val percentCompleted: Double,
-    val details: Progress?
+    val total: Int = 0,
+    val completed: Int = 0
   ) : SyncJobStatus()
 
   /** Glitched but sync job is being retried. */

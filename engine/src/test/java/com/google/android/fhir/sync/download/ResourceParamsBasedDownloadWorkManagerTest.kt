@@ -215,12 +215,13 @@ class ResourceParamsBasedDownloadWorkManagerTest {
         }
       )
 
-    assertThat(urls.map { it.first }).containsExactly("Patient", "Observation", "Immunization")
-    assertThat(urls.map { it.second })
+    assertThat(urls.map { it.key })
+      .containsExactly(ResourceType.Patient, ResourceType.Immunization, ResourceType.Observation)
+    assertThat(urls.map { it.value })
       .containsExactly(
         "Patient?address-city=NAIROBI&_sort=_lastUpdated&_lastUpdated=gt2022-03-20&_summary=count",
-        "Observation?_sort=_lastUpdated&_lastUpdated=gt2022-03-20&_summary=count",
-        "Immunization?_sort=_lastUpdated&_lastUpdated=gt2022-03-20&_summary=count"
+        "Immunization?_sort=_lastUpdated&_lastUpdated=gt2022-03-20&_summary=count",
+        "Observation?_sort=_lastUpdated&_lastUpdated=gt2022-03-20&_summary=count"
       )
   }
 

@@ -19,8 +19,6 @@ package com.google.android.fhir.sync.download
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
-import com.google.android.fhir.sync.progress.Progress
-import com.google.android.fhir.sync.progress.ProgressCallback
 import com.google.common.truth.Truth.assertThat
 import java.net.UnknownHostException
 import kotlinx.coroutines.flow.collectIndexed
@@ -85,6 +83,7 @@ class DownloaderImplTest {
         object : DataSource {
           override suspend fun download(path: String): Resource {
             return when {
+              path.contains("summary") -> Bundle().apply { total = 1 }
               path.contains("patient-page1") ->
                 searchPageParamToSearchResponseBundleMap["patient-page1"]!!
               path.contains("patient-page2") ->
@@ -97,10 +96,7 @@ class DownloaderImplTest {
             }
           }
 
-          override suspend fun upload(
-            bundle: Bundle,
-            progressCallback: ProgressCallback?
-          ): Resource {
+          override suspend fun upload(bundle: Bundle): Resource {
             TODO("Not yet implemented")
           }
         },
@@ -117,10 +113,14 @@ class DownloaderImplTest {
       .download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
-        },
-        null
+        }
       )
-      .collectIndexed { index, value -> result.add(value) }
+      .collect { result.add(it) }
+
+    assertThat(result.filterIsInstance<DownloadState.Started>())
+      .containsExactly(
+        DownloadState.Started(ResourceType.Bundle, 2), // 1 patient and 1 observation
+      )
 
     assertThat(
         result.filterIsInstance<DownloadState.Success>().flatMap { it.resources }.map { it.id }
@@ -137,6 +137,7 @@ class DownloaderImplTest {
           object : DataSource {
             override suspend fun download(path: String): Resource {
               return when {
+                path.contains("summary") -> Bundle().apply { total = 1 }
                 path.contains("patient-page1") ->
                   searchPageParamToSearchResponseBundleMap["patient-page1"]!!
                 path.contains("patient-page2") ->
@@ -157,10 +158,7 @@ class DownloaderImplTest {
               }
             }
 
-            override suspend fun upload(
-              bundle: Bundle,
-              progressCallback: ProgressCallback?
-            ): Resource {
+            override suspend fun upload(bundle: Bundle): Resource {
               TODO("Upload not tested in this path")
             }
           },
@@ -177,10 +175,14 @@ class DownloaderImplTest {
         .download(
           object : SyncDownloadContext {
             override suspend fun getLatestTimestampFor(type: ResourceType) = null
-          },
-          null
+          }
         )
-        .collectIndexed { index, value -> result.add(value) }
+        .collect { result.add(it) }
+
+      assertThat(result.filterIsInstance<DownloadState.Started>())
+        .containsExactly(
+          DownloadState.Started(ResourceType.Bundle, 2), // 1 patient and 1 observation
+        )
 
       assertThat(result.filterIsInstance<DownloadState.Failure>()).hasSize(2)
 
@@ -205,6 +207,7 @@ class DownloaderImplTest {
           object : DataSource {
             override suspend fun download(path: String): Resource {
               return when {
+                path.contains("summary") -> Bundle().apply { total = 1 }
                 path.contains("patient-page1") || path.contains("patient-page2") ->
                   OperationOutcome().apply {
                     addIssue(
@@ -221,10 +224,7 @@ class DownloaderImplTest {
               }
             }
 
-            override suspend fun upload(
-              bundle: Bundle,
-              progressCallback: ProgressCallback?
-            ): Resource {
+            override suspend fun upload(bundle: Bundle): Resource {
               TODO("Not yet implemented")
             }
           },
@@ -241,10 +241,14 @@ class DownloaderImplTest {
         .download(
           object : SyncDownloadContext {
             override suspend fun getLatestTimestampFor(type: ResourceType) = null
-          },
-          null
+          }
         )
-        .collectIndexed { index, value -> result.add(value) }
+        .collect { result.add(it) }
+
+      assertThat(result.filterIsInstance<DownloadState.Started>())
+        .containsExactly(
+          DownloadState.Started(ResourceType.Bundle, 2), // 1 patient and 1 observation
+        )
 
       assertThat(result.filterIsInstance<DownloadState.Failure>().map { it.syncError.resourceType })
         .containsExactly(ResourceType.Patient)
@@ -259,7 +263,7 @@ class DownloaderImplTest {
     }
 
   @Test
-  fun `downloader should call progress on-start`() = runBlocking {
+  fun `downloader should emit Started state`() = runBlocking {
     val downloader =
       DownloaderImpl(
         object : DataSource {
@@ -271,10 +275,7 @@ class DownloaderImplTest {
             }
           }
 
-          override suspend fun upload(
-            bundle: Bundle,
-            progressCallback: ProgressCallback?
-          ): Resource {
+          override suspend fun upload(bundle: Bundle): Resource {
             throw UnsupportedOperationException()
           }
         },
@@ -283,31 +284,20 @@ class DownloaderImplTest {
         )
       )
 
-    var onStartCalled = false
-
-    val progressCallback =
-      object : ProgressCallback {
-        override suspend fun onStart(totalRecords: Int, details: Map<String, Number>) {
-          onStartCalled = true
-        }
-        override suspend fun onProgress(percentCompleted: Double, details: Progress?) {}
-      }
-
     val result = mutableListOf<DownloadState>()
     downloader
       .download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
-        },
-        progressCallback
+        }
       )
       .collectIndexed { index, value -> result.add(value) }
 
-    assertThat(onStartCalled).isTrue()
+    assertThat(result.first()).isInstanceOf(DownloadState.Started::class.java)
   }
 
   @Test
-  fun `downloader should call progress on-progress`() = runBlocking {
+  fun `downloader should emit Success state`() = runBlocking {
     val downloader =
       DownloaderImpl(
         object : DataSource {
@@ -319,10 +309,7 @@ class DownloaderImplTest {
             }
           }
 
-          override suspend fun upload(
-            bundle: Bundle,
-            progressCallback: ProgressCallback?
-          ): Resource {
+          override suspend fun upload(bundle: Bundle): Resource {
             throw UnsupportedOperationException()
           }
         },
@@ -331,30 +318,20 @@ class DownloaderImplTest {
         )
       )
 
-    var onStartCalled = false
-    var onProgressCalled = false
-
-    val progressCallback =
-      object : ProgressCallback {
-        override suspend fun onStart(totalRecords: Int, details: Map<String, Number>) {
-          onStartCalled = true
-        }
-        override suspend fun onProgress(percentCompleted: Double, details: Progress?) {
-          onProgressCalled = true
-        }
-      }
-
     val result = mutableListOf<DownloadState>()
     downloader
       .download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
-        },
-        progressCallback
+        }
       )
       .collectIndexed { index, value -> result.add(value) }
 
-    assertThat(onStartCalled).isTrue()
-    assertThat(onProgressCalled).isTrue()
+    assertThat(result.first()).isInstanceOf(DownloadState.Started::class.java)
+    assertThat(result.elementAt(1)).isInstanceOf(DownloadState.Success::class.java)
+
+    val success = result.elementAt(1) as DownloadState.Success
+    assertThat(success.total).isEqualTo(1)
+    assertThat(success.completed).isEqualTo(1)
   }
 }

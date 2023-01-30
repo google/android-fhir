@@ -19,7 +19,6 @@ package com.google.android.fhir.sync.remote
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.progress.ProgressCallback
 import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -37,8 +36,7 @@ internal interface RemoteFhirService : DataSource {
 
   @GET override suspend fun download(@Url path: String): Resource
 
-  @POST(".")
-  override suspend fun upload(bundle: Bundle, progressCallback: ProgressCallback?): Resource
+  @POST(".") override suspend fun upload(bundle: Bundle): Resource
 
   class Builder(
     private val baseUrl: String,

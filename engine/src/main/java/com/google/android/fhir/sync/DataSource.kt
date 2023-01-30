@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync
 
-import com.google.android.fhir.sync.progress.ProgressCallback
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
@@ -37,5 +36,5 @@ internal interface DataSource {
    * [OperationOutcome] otherwise. Call this api with the [Bundle] that needs to be uploaded to the
    * server.
    */
-  suspend fun upload(bundle: Bundle, progressCallback: ProgressCallback?): Resource
+  suspend fun upload(bundle: Bundle): Resource
 }

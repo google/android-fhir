@@ -18,7 +18,6 @@ package com.google.android.fhir.sync
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.sync.progress.ProgressCallback
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Bundle
 
@@ -30,13 +29,16 @@ internal interface Uploader {
    * transforming the [SquashedLocalChange]s to particular network operations. If [ProgressCallback]
    * is provided it also reports the intermediate progress
    */
-  suspend fun upload(
-    localChanges: List<LocalChange>,
-    progressCallback: ProgressCallback?
-  ): Flow<UploadResult>
+  suspend fun upload(localChanges: List<LocalChange>): Flow<UploadResult>
 }
 
 internal sealed class UploadResult {
-  data class Success(val localChangeToken: LocalChangeToken, val resource: Bundle) : UploadResult()
+  data class Started(val total: Int) : UploadResult()
+  data class Success(
+    val localChangeToken: LocalChangeToken,
+    val resource: Bundle,
+    val total: Int,
+    val completed: Int
+  ) : UploadResult()
   data class Failure(val syncError: ResourceSyncException) : UploadResult()
 }

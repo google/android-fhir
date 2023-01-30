@@ -17,18 +17,14 @@
 package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.SyncDownloadContext
-import com.google.android.fhir.percentOf
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.Downloader
 import com.google.android.fhir.sync.ResourceSyncException
-import com.google.android.fhir.sync.progress.Progress
-import com.google.android.fhir.sync.progress.ProgressCallback
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
@@ -44,49 +40,41 @@ internal class DownloaderImpl(
 ) : Downloader {
   private val resourceTypeList = ResourceType.values().map { it.name }
 
-  override suspend fun download(
-    context: SyncDownloadContext,
-    progressCallback: ProgressCallback?
-  ): Flow<DownloadState> = flow {
+  override suspend fun download(context: SyncDownloadContext): Flow<DownloadState> = flow {
     var resourceTypeToDownload: ResourceType = ResourceType.Bundle
-    emit(
-      DownloadState.Started(resourceTypeToDownload)
-    ) // TODO do need it????????????????????????????????
 
     // download count summary of all resources for progress i.e. <type, total, completed>
     val progressSummary =
-      progressCallback?.let {
-        downloadWorkManager
-          .getSummaryRequestUrls(context)
-          .map { summaryUrl ->
-            runCatching { dataSource.download(summaryUrl.second) }
+      downloadWorkManager
+        .getSummaryRequestUrls(context)
+        .map { summary ->
+          summary.key to
+            runCatching { dataSource.download(summary.value) }
               .onFailure { Timber.e(it) }
               .getOrNull()
-              .let { summary ->
-                Progress(type = summaryUrl.first, total = (summary as Bundle?)?.total ?: -1)
-              }
-          }
-          .also {
-            progressCallback.onStart(
-              totalRecords = it.sumOf { it.total },
-              details = it.associate { it.type to it.total }
-            )
-          }
-      }
+              .takeIf { it is Bundle }
+              ?.let { (it as Bundle).total }
+        }
+        .also { Timber.i("Download summary " + it.joinToString()) }
+        .toMap()
 
-    if (progressSummary?.sumOf { it.total } == 0) return@flow
+    val total = progressSummary.values.sumOf { it ?: 0 }
+    var completed = 0
 
-    var url =
-      downloadWorkManager.getNextRequestUrl(context).also { progressCallback?.onProgress(0.0) }
+    emit(DownloadState.Started(resourceTypeToDownload, total))
+
+    var url = downloadWorkManager.getNextRequestUrl(context)
     while (url != null) {
       try {
         resourceTypeToDownload =
           ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
 
-        downloadWorkManager.processResponse(dataSource.download(url)).toList().let { resources ->
-          reportProgress(progressCallback, progressSummary, resources)
-          emit(DownloadState.Success(resources))
-        }
+        emit(
+          downloadWorkManager.processResponse(dataSource.download(url!!)).toList().let {
+            completed += it.size
+            DownloadState.Success(it, total, completed)
+          }
+        )
       } catch (exception: Exception) {
         Timber.e(exception)
         emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
@@ -94,27 +82,5 @@ internal class DownloaderImpl(
 
       url = downloadWorkManager.getNextRequestUrl(context)
     }
-  }
-
-  private suspend fun reportProgress(
-    progressCallback: ProgressCallback?,
-    progressSummary: List<Progress>?,
-    resources: List<Resource>
-  ) {
-    if (progressSummary == null) return
-
-    val totalRecords = progressSummary.sumOf { it.total }
-
-    resources
-      .groupBy { it.resourceType }
-      .forEach { (type, list) ->
-        progressSummary
-          .find { it.type == type.name }
-          ?.let {
-            it.completed = it.completed + list.count()
-
-            progressCallback?.onProgress(percentOf(it.completed, totalRecords), it)
-          }
-      }
   }
 }

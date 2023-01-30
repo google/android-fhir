@@ -17,36 +17,20 @@
 package com.google.android.fhir.demo.data
 
 import android.content.Context
-import androidx.work.Constraints
 import androidx.work.WorkerParameters
 import com.google.android.fhir.demo.FhirApplication
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
-import com.google.android.fhir.sync.PeriodicSyncConfiguration
-import com.google.android.fhir.sync.RepeatInterval
-import com.google.android.fhir.sync.download.ResourceParamsBasedDownloadWorkManager
-import java.util.concurrent.TimeUnit
-import org.hl7.fhir.r4.model.ResourceType
 
 class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   FhirSyncWorker(appContext, workerParams) {
 
   override fun getDownloadWorkManager(): DownloadWorkManager {
-    return ResourceParamsBasedDownloadWorkManager(
-      mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
-    )
+    return DownloadWorkManagerImpl()
   }
 
   override fun getConflictResolver() = AcceptLocalConflictResolver
 
   override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)
-
-  companion object {
-    val periodicSyncConfiguration =
-      PeriodicSyncConfiguration(
-        syncConstraints = Constraints.Builder().build(),
-        repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
-      )
-  }
 }

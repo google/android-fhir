@@ -18,6 +18,7 @@ package com.google.android.fhir.sync
 
 import com.google.android.fhir.SyncDownloadContext
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Manager that generates the FHIR requests and handles the FHIR responses of a download job.
@@ -32,8 +33,10 @@ interface DownloadWorkManager {
    */
   suspend fun getNextRequestUrl(context: SyncDownloadContext): String?
 
-  /** Returns the pairs of type and URL for summary of total count for each download request */
-  suspend fun getSummaryRequestUrls(context: SyncDownloadContext): List<Pair<String, String>>
+  /**
+   * Returns the map of resourceType and URL for summary of total count for each download request
+   */
+  suspend fun getSummaryRequestUrls(context: SyncDownloadContext): Map<ResourceType, String>
 
   /**
    * Processes the download response and returns the resources to be saved to the local database.

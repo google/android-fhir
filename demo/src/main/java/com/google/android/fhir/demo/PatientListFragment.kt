@@ -157,10 +157,6 @@ class PatientListFragment : Fragment() {
             Timber.i("Sync: ${it::class.java.simpleName}")
             fadeInTopBanner(it)
           }
-          is SyncJobStatus.Spawned -> {
-            Timber.i("Sync: ${it::class.java.simpleName} with data $it")
-            fadeInTopBanner(it)
-          }
           is SyncJobStatus.InProgress -> {
             Timber.i("Sync: ${it::class.java.simpleName} with data $it")
             fadeInTopBanner(it)
@@ -225,7 +221,12 @@ class PatientListFragment : Fragment() {
       val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_in)
       topBanner.startAnimation(animation)
     } else if (state is SyncJobStatus.InProgress) {
-      val progress = state.percentCompleted.times(100).roundToInt()
+      val progress =
+        state
+          .let { it.completed.toDouble().div(it.total) }
+          .let { if (it.isNaN()) 0.0 else it }
+          .times(100)
+          .roundToInt()
       "$progress% ${state.syncOperation.name.lowercase()}ed".also { syncPercent.text = it }
       syncProgress.progress = progress
     }

@@ -26,12 +26,11 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadWorkManager
-import com.google.android.fhir.sync.progress.ProgressCallback
 import com.google.common.truth.Truth.assertThat
 import java.time.OffsetDateTime
 import java.util.Date
 import java.util.LinkedList
-import java.util.stream.Collectors
+import kotlin.streams.toList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
@@ -96,7 +95,7 @@ class TestingUtils constructor(private val iParser: IParser) {
       return Bundle().apply { type = Bundle.BundleType.SEARCHSET }
     }
 
-    override suspend fun upload(bundle: Bundle, progressCallback: ProgressCallback?): Resource {
+    override suspend fun upload(bundle: Bundle): Resource {
       return Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
     }
   }
@@ -109,8 +108,12 @@ class TestingUtils constructor(private val iParser: IParser) {
     override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? = urls.poll()
     override suspend fun getSummaryRequestUrls(
       context: SyncDownloadContext
-    ): List<Pair<String, String>> {
-      return queries.stream().map { it to it.plus("?_summary=count") }.collect(Collectors.toList())
+    ): Map<ResourceType, String> {
+      return queries
+        .stream()
+        .map { ResourceType.fromCode(it.substringBefore("?")) to it.plus("?_summary=count") }
+        .toList()
+        .toMap()
     }
 
     override suspend fun processResponse(response: Resource): Collection<Resource> {
@@ -190,7 +193,7 @@ class TestingUtils constructor(private val iParser: IParser) {
       throw Exception(hugeStackTraceMessage)
     }
 
-    override suspend fun upload(bundle: Bundle, progressCallback: ProgressCallback?): Resource {
+    override suspend fun upload(bundle: Bundle): Resource {
       throw Exception("Posting Bundle failed...")
     }
   }
@@ -201,7 +204,6 @@ class TestingUtils constructor(private val iParser: IParser) {
       TODO("Not yet implemented")
     }
 
-    override suspend fun upload(bundle: Bundle, progressCallback: ProgressCallback?) =
-      onPostBundle(bundle)
+    override suspend fun upload(bundle: Bundle) = onPostBundle(bundle)
   }
 }

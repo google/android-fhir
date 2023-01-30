@@ -22,7 +22,6 @@ import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.UploadResult
 import com.google.android.fhir.sync.Uploader
-import com.google.android.fhir.sync.progress.ProgressCallback
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.exceptions.FHIRException
@@ -38,29 +37,39 @@ internal class BundleUploader(
   private val localChangesPaginator: LocalChangesPaginator
 ) : Uploader {
 
-  override suspend fun upload(
-    localChanges: List<LocalChange>,
-    progressCallback: ProgressCallback?
-  ): Flow<UploadResult> = flow {
-    progressCallback?.onStart(localChanges.count())
+  override suspend fun upload(localChanges: List<LocalChange>): Flow<UploadResult> = flow {
+    val total = localChanges.size
+    var completed = 0
 
-    bundleGenerator
-      .generate(localChangesPaginator.page(localChanges))
-      .also { progressCallback?.onProgress(0.0) }
-      .forEach { (bundle, localChangeTokens) ->
-        try {
-          val response = dataSource.upload(bundle, progressCallback)
-          emit(getUploadResult(response, localChangeTokens))
-        } catch (e: Exception) {
-          emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
-        }
+    emit(UploadResult.Started(total))
+
+    bundleGenerator.generate(localChangesPaginator.page(localChanges)).forEach {
+      (bundle, localChangeTokens) ->
+      try {
+        val response = dataSource.upload(bundle)
+
+        completed += bundle.entry.size
+        emit(getUploadResult(response, localChangeTokens, total, completed))
+      } catch (e: Exception) {
+        emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
       }
+    }
   }
 
-  private fun getUploadResult(response: Resource, localChangeTokens: List<LocalChangeToken>) =
+  private fun getUploadResult(
+    response: Resource,
+    localChangeTokens: List<LocalChangeToken>,
+    total: Int,
+    completed: Int
+  ) =
     when {
       response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
-        UploadResult.Success(LocalChangeToken(localChangeTokens.flatMap { it.ids }), response)
+        UploadResult.Success(
+          LocalChangeToken(localChangeTokens.flatMap { it.ids }),
+          response,
+          total,
+          completed
+        )
       }
       response is OperationOutcome && response.issue.isNotEmpty() -> {
         UploadResult.Failure(

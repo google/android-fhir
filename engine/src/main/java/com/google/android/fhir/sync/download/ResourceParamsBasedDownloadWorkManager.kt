@@ -53,17 +53,20 @@ class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
     }
   }
 
+  /**
+   * Returns the map of resourceType and URL for summary of total count for each download request
+   */
   override suspend fun getSummaryRequestUrls(
     context: SyncDownloadContext
-  ): List<Pair<String, String>> {
-    return resourcesToDownloadWithSearchParams.map { (resourceType, params) ->
+  ): Map<ResourceType, String> {
+    return resourcesToDownloadWithSearchParams.associate { (resourceType, params) ->
       val newParams =
         params.toMutableMap().apply {
           putAll(getLastUpdatedParam(resourceType, params, context))
           putAll(getSummaryParam(params))
         }
 
-      resourceType.name to "${resourceType.name}?${newParams.concatParams()}"
+      resourceType to "${resourceType.name}?${newParams.concatParams()}"
     }
   }
 

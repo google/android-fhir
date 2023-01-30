@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync
 
 import com.google.android.fhir.SyncDownloadContext
-import com.google.android.fhir.sync.progress.ProgressCallback
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -28,17 +27,15 @@ internal interface Downloader {
    * @return Flow of the [DownloadState] which keeps emitting [Resource]s or Error based on the
    * response of each page download request. It also updates progress if [ProgressCallback] exists
    */
-  suspend fun download(
-    context: SyncDownloadContext,
-    progressCallback: ProgressCallback?
-  ): Flow<DownloadState>
+  suspend fun download(context: SyncDownloadContext): Flow<DownloadState>
 }
 
 internal sealed class DownloadState {
 
-  data class Started(val type: ResourceType) : DownloadState()
+  data class Started(val type: ResourceType, val total: Int) : DownloadState()
 
-  data class Success(val resources: List<Resource>) : DownloadState()
+  data class Success(val resources: List<Resource>, val total: Int, val completed: Int) :
+    DownloadState()
 
   data class Failure(val syncError: ResourceSyncException) : DownloadState()
 }
