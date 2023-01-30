@@ -285,10 +285,7 @@ internal fun handleDateFormatAfterTextChange(
   }
   // handle delete text and separator
   if (editableLength < acceptableDateFormat.length) {
-    if (acceptableDateFormat[editableLength] != dateFormatSeparator) {
-      // appends date digits as it is
-      editable.append(acceptableDateFormat[editableLength])
-    } else if (!isDeleting && acceptableDateFormat[editableLength] == dateFormatSeparator) {
+    if (!isDeleting && acceptableDateFormat[editableLength] == dateFormatSeparator) {
       // 02 is entered with dd/MM/yyyy so appending / to editable 02/
       editable.append(acceptableDateFormat[editableLength])
     }
