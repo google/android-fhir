@@ -63,22 +63,19 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
  * Indexes a FHIR resource according to the
  * [search parameters](https://www.hl7.org/fhir/searchparameter-registry.html).
  */
-internal object ResourceIndexer {
+internal class ResourceIndexer(
+  private val searchParamDefinitionsProvider: SearchParamDefinitionsProvider
+) {
   // Switched HapiWorkerContext to SimpleWorkerContext as a fix for
   // https://github.com/google/android-fhir/issues/768
   private val fhirPathEngine = FHIRPathEngine(SimpleWorkerContext())
 
-  fun <R : Resource> index(
-    resource: R,
-    customSearchParams: (R) -> List<SearchParamDefinition> = { emptyList() }
-  ) = extractIndexValues(resource, customSearchParams)
+  fun <R : Resource> index(resource: R) = extractIndexValues(resource)
 
-  private fun <R : Resource> extractIndexValues(
-    resource: R,
-    customSearchParams: (R) -> List<SearchParamDefinition>
-  ): ResourceIndices {
+  private fun <R : Resource> extractIndexValues(resource: R): ResourceIndices {
     val indexBuilder = ResourceIndices.Builder(resource.resourceType, resource.logicalId)
-    (customSearchParams(resource) + getSearchParamList(resource))
+    searchParamDefinitionsProvider
+      .get(resource)
       .map { it to fhirPathEngine.evaluate(resource, it.path) }
       .flatMap { pair -> pair.second.map { pair.first to it } }
       .forEach { pair ->
@@ -406,11 +403,13 @@ internal object ResourceIndexer {
     }
   }
 
-  /**
-   * The FHIR currency code system. See: https://bit.ly/30YB3ML. See:
-   * https://www.hl7.org/fhir/valueset-currencies.html.
-   */
-  private const val FHIR_CURRENCY_CODE_SYSTEM = "urn:iso:std:iso:4217"
+  companion object {
+    /**
+     * The FHIR currency code system. See: https://bit.ly/30YB3ML. See:
+     * https://www.hl7.org/fhir/valueset-currencies.html.
+     */
+    private const val FHIR_CURRENCY_CODE_SYSTEM = "urn:iso:std:iso:4217"
+  }
 }
 
 data class SearchParamDefinition(val name: String, val type: SearchParamType, val path: String)

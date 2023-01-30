@@ -27,7 +27,7 @@ internal fun List<SearchParameter>.asMapOfResourceTypeToSearchParamDefinitions()
   Map<String, List<SearchParamDefinition>> =
   flatMap { it.toSearchParamDefinition() }.groupBy({ it.first }, { it.second })
 
-/** @return List of pair of resourceType string and list of associated [SearchParamDefinition]. */
+/** @return List of pairs of resourceType string and associated [SearchParamDefinition]. */
 internal fun SearchParameter.toSearchParamDefinition(): List<Pair<String, SearchParamDefinition>> {
   require(!name.isNullOrEmpty()) { "SearchParameter.name can't be null or empty." }
 

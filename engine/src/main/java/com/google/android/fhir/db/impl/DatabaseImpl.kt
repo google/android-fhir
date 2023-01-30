@@ -31,7 +31,7 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.index.SearchParamDefinition
+import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
@@ -47,7 +47,7 @@ internal class DatabaseImpl(
   private val context: Context,
   private val iParser: IParser,
   databaseConfig: DatabaseConfig,
-  private val customSearchParamDefinitions: Map<String, List<SearchParamDefinition>> = emptyMap()
+  private val resourceIndexer: ResourceIndexer
 ) : com.google.android.fhir.db.Database {
 
   val db: ResourceDatabase
@@ -100,7 +100,7 @@ internal class DatabaseImpl(
   private val resourceDao by lazy {
     db.resourceDao().also {
       it.iParser = iParser
-      it.customSearchParamDefinitions = customSearchParamDefinitions
+      it.resourceIndexer = resourceIndexer
     }
   }
   private val syncedResourceDao = db.syncedResourceDao()

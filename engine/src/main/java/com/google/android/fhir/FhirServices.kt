@@ -25,6 +25,8 @@ import com.google.android.fhir.db.impl.DatabaseConfig
 import com.google.android.fhir.db.impl.DatabaseEncryptionKeyProvider.isDatabaseEncryptionSupported
 import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
+import com.google.android.fhir.index.ResourceIndexer
+import com.google.android.fhir.index.SearchParamDefinitionsProviderImpl
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.remote.RemoteFhirService
 import org.hl7.fhir.r4.model.SearchParameter
@@ -74,7 +76,7 @@ internal data class FhirServices(
           context = context,
           iParser = parser,
           DatabaseConfig(inMemory, enableEncryption, databaseErrorStrategy),
-          customSearchParamDefinitions = searchParamMap
+          resourceIndexer = ResourceIndexer(SearchParamDefinitionsProviderImpl(searchParamMap))
         )
       val engine = FhirEngineImpl(database = db, context = context)
       val remoteDataSource =
