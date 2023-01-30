@@ -1785,8 +1785,7 @@ class QuestionnaireViewModelTest {
         it.asQuestion().questionnaireItem.linkId == "repeated-group-b"
       }
     withContext(coroutineContext) {
-      // Calling addAnswer out of order should not result in the answers in the response being out
-      // of order; all of the answers to repeated-group-a should come before repeated-group-b.
+      // TODO: Revert to using addAnswer out of order instead of setAnswer
       repeatedGroupA()
         .asQuestion()
         .setAnswer(
