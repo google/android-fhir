@@ -69,7 +69,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       private var localDate: LocalDate? = null
       private var localTime: LocalTime? = null
       private lateinit var acceptableDateFormat: String
-      private var dateFormatSeparator: Char? = null
+      private lateinit var textWatcher: DateTextWatcher
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
@@ -137,11 +137,9 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             Locale.getDefault()
           )
         // Special character used in date format
-        dateFormatSeparator = getDateSeparator(localeDatePattern)
-        dateFormatSeparator?.let {
-          acceptableDateFormat =
-            generateAcceptableDateFormat(localeDatePattern, dateFormatSeparator!!)
-        }
+        val dateFormatSeparator = getDateSeparator(localeDatePattern)
+        textWatcher = DateTextWatcher(dateFormatSeparator)
+        acceptableDateFormat = generateAcceptableDateFormat(localeDatePattern, dateFormatSeparator)
         dateInputLayout.hint = acceptableDateFormat
         dateInputEditText.removeTextChangedListener(textWatcher)
         val dateTime = questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType
@@ -363,38 +361,36 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         }
       }
 
-      val textWatcher =
-        object : TextWatcher {
-          private var isDeleting = false
+      inner class DateTextWatcher(dateFormatSeparator: Char) : TextWatcher {
+        private var isDeleting = false
+        private val dateFormatSeparator = dateFormatSeparator
 
-          override fun beforeTextChanged(
-            charSequence: CharSequence,
-            start: Int,
-            count: Int,
-            after: Int
-          ) {
-            isDeleting = count > after
-          }
-
-          override fun onTextChanged(
-            charSequence: CharSequence,
-            start: Int,
-            before: Int,
-            count: Int
-          ) {}
-
-          override fun afterTextChanged(editable: Editable) {
-            dateFormatSeparator?.let {
-              handleDateFormatAfterTextChange(
-                editable,
-                acceptableDateFormat,
-                dateFormatSeparator!!,
-                isDeleting
-              )
-            }
-            updateAnswerAfterTextChanged(editable.toString())
-          }
+        override fun beforeTextChanged(
+          charSequence: CharSequence,
+          start: Int,
+          count: Int,
+          after: Int
+        ) {
+          isDeleting = count > after
         }
+
+        override fun onTextChanged(
+          charSequence: CharSequence,
+          start: Int,
+          before: Int,
+          count: Int
+        ) {}
+
+        override fun afterTextChanged(editable: Editable) {
+          handleDateFormatAfterTextChange(
+            editable,
+            acceptableDateFormat,
+            dateFormatSeparator,
+            isDeleting
+          )
+          updateAnswerAfterTextChanged(editable.toString())
+        }
+      }
     }
 }
 

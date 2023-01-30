@@ -20,7 +20,7 @@ import android.icu.text.DateFormat
 import android.icu.text.SimpleDateFormat
 import com.google.android.fhir.datacapture.views.length
 import com.google.android.fhir.datacapture.views.localDate
-import java.lang.Character.isLetterOrDigit
+import java.lang.Character.isLetter
 import java.lang.StringBuilder
 import java.text.ParseException
 import java.time.LocalDate
@@ -35,7 +35,7 @@ internal val LocalDate.localizedString: String
 
 /** Special character used in date format */
 internal fun getDateSeparator(localeDatePattern: String): Char =
-  localeDatePattern.filterNot { isLetterOrDigit(it) }.first()
+  localeDatePattern.filterNot { isLetter(it) }.first()
 
 /**
  * Convert date pattern to acceptable date pattern where 2 digits are expected for day(dd) and
@@ -43,26 +43,29 @@ internal fun getDateSeparator(localeDatePattern: String): Char =
  */
 internal fun generateAcceptableDateFormat(datePattern: String, dateFormatSeparator: Char): String {
   var newDateFormat = StringBuilder()
-  datePattern
-    .lowercase()
-    .forEach {
-      if (it == 'd') {
+  datePattern.lowercase().forEach {
+    when (it) {
+      'd' -> {
         if (!newDateFormat.contains("dd")) {
           newDateFormat.append("dd")
         }
-      } else if (it == 'm') {
+      }
+      'm' -> {
         if (!newDateFormat.contains("MM")) {
           newDateFormat.append("MM")
         }
-      } else if (it == 'y') {
+      }
+      'y' -> {
         if (!newDateFormat.contains("yyyy")) {
           newDateFormat.append("yyyy")
         }
-      } else if (it == dateFormatSeparator) {
+      }
+      dateFormatSeparator -> {
         newDateFormat.append(dateFormatSeparator)
       }
+      else -> {}
     }
-    .toString()
+  }
   return newDateFormat.toString()
 }
 

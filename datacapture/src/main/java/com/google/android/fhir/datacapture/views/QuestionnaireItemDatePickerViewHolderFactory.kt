@@ -66,7 +66,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private lateinit var acceptableDateFormat: String
-      private var dateFormatSeparator: Char? = null
+      private lateinit var textWatcher: DateTextWatcher
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
@@ -112,14 +112,11 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             Locale.getDefault()
           )
         // Special character used in date format
-        dateFormatSeparator = getDateSeparator(localeDatePattern)
-        dateFormatSeparator?.let {
-          acceptableDateFormat =
-            generateAcceptableDateFormat(localeDatePattern, dateFormatSeparator!!)
-        }
+        val dateFormatSeparator = getDateSeparator(localeDatePattern)
+        textWatcher = DateTextWatcher(dateFormatSeparator)
+        acceptableDateFormat = generateAcceptableDateFormat(localeDatePattern, dateFormatSeparator)
         textInputLayout.hint = acceptableDateFormat
         textInputEditText.removeTextChangedListener(textWatcher)
-
         if (isTextUpdateRequired(
             questionnaireItemViewItem.answers.singleOrNull()?.valueDateType,
             textInputEditText.text.toString(),
@@ -221,38 +218,36 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
       }
 
-      val textWatcher =
-        object : TextWatcher {
-          private var isDeleting = false
+      inner class DateTextWatcher(dateFormatSeparator: Char) : TextWatcher {
+        private var isDeleting = false
+        private val dateFormatSeparator = dateFormatSeparator
 
-          override fun beforeTextChanged(
-            charSequence: CharSequence,
-            start: Int,
-            count: Int,
-            after: Int
-          ) {
-            isDeleting = count > after
-          }
-
-          override fun onTextChanged(
-            charSequence: CharSequence,
-            start: Int,
-            before: Int,
-            count: Int
-          ) {}
-
-          override fun afterTextChanged(editable: Editable) {
-            dateFormatSeparator?.let {
-              handleDateFormatAfterTextChange(
-                editable,
-                acceptableDateFormat,
-                dateFormatSeparator!!,
-                isDeleting
-              )
-            }
-            updateAnswer(editable.toString())
-          }
+        override fun beforeTextChanged(
+          charSequence: CharSequence,
+          start: Int,
+          count: Int,
+          after: Int
+        ) {
+          isDeleting = count > after
         }
+
+        override fun onTextChanged(
+          charSequence: CharSequence,
+          start: Int,
+          before: Int,
+          count: Int
+        ) {}
+
+        override fun afterTextChanged(editable: Editable) {
+          handleDateFormatAfterTextChange(
+            editable,
+            acceptableDateFormat,
+            dateFormatSeparator,
+            isDeleting
+          )
+          updateAnswer(editable.toString())
+        }
+      }
     }
 
   private fun isTextUpdateRequired(
@@ -291,13 +286,17 @@ internal fun handleDateFormatAfterTextChange(
   // handle delete text and separator
   if (editableLength < acceptableDateFormat.length) {
     if (acceptableDateFormat[editableLength] != dateFormatSeparator) {
+      // appends date digits as it is
       editable.append(acceptableDateFormat[editableLength])
     } else if (!isDeleting && acceptableDateFormat[editableLength] == dateFormatSeparator) {
+      // 02 is entered with dd/MM/yyyy so appending / to editable 02/
       editable.append(acceptableDateFormat[editableLength])
     }
     if (acceptableDateFormat[editableLength - 1] == dateFormatSeparator &&
         editable[editableLength - 1] != dateFormatSeparator
     ) {
+      // this case to handle when user deletes separator from "12/" to "12" and enter digit again
+      // like "123" then it should convert to "12/3" as per format
       editable.insert(editableLength - 1, dateFormatSeparator.toString())
     }
   }
