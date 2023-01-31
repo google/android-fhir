@@ -80,6 +80,12 @@ internal fun parseDate(text: CharSequence?, acceptableDateFormat: String?): Loca
           .parse(text.toString())
       }
       .localDate
+
+  // date/localDate with year less than 4 digit throws ParseException which force user to enter year
+  // with digit 4 from >=1000
+  if (localDate.year.length() < 4) {
+    throw ParseException("Year has lesss than 4 digits.", -4)
+  }
   // date/localDate with year more than 4 digit throws data format exception if deep copy
   // operation get performed on QuestionnaireResponse,
   // QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent in org.hl7.fhir.r4.model

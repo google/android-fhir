@@ -47,6 +47,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.chrono.IsoChronology
+import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.FormatStyle
 import java.util.Date
@@ -81,9 +82,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           createMaterialDatePicker()
             .apply {
               addOnPositiveButtonClickListener { epochMilli ->
-                textInputEditText.setText(
-                  Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate().localizedString
-                )
+                val formattedDate =
+                  formatDate(
+                    Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate(),
+                    acceptableDateFormat
+                  )
+                textInputEditText.setText(formattedDate)
                 questionnaireItemViewItem.setAnswer(
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                     val localDate =
@@ -123,14 +127,16 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             acceptableDateFormat
           )
         ) {
-          textInputEditText.setText(
-            questionnaireItemViewItem.answers
-              .singleOrNull()
-              ?.takeIf { it.hasValue() }
-              ?.valueDateType
-              ?.localDate
-              ?.localizedString
-          )
+          val formattedDate =
+            formatDate(
+              questionnaireItemViewItem.answers
+                .singleOrNull()
+                ?.takeIf { it.hasValue() }
+                ?.valueDateType
+                ?.localDate,
+              acceptableDateFormat
+            )
+          textInputEditText.setText(formattedDate)
         }
         textInputEditText.addTextChangedListener(textWatcher)
       }
@@ -266,6 +272,18 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
     }
     return answer?.localDate != inputDate
   }
+}
+
+internal fun formatDate(localDate: LocalDate?, acceptableDateFormat: String?): String {
+  localDate?.let {
+    if (!acceptableDateFormat.isNullOrEmpty()) {
+      val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern(acceptableDateFormat)
+      return formatter.format(localDate)
+    } else {
+      return it.localizedString
+    }
+  }
+  return ""
 }
 
 internal fun handleDateFormatAfterTextChange(

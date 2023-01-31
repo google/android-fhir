@@ -27,8 +27,6 @@ import android.view.inputmethod.InputMethodManager
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.utilities.generateAcceptableDateFormat
 import com.google.android.fhir.datacapture.utilities.getDateSeparator
-import com.google.android.fhir.datacapture.utilities.localizedDateString
-import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.utilities.parseDate
 import com.google.android.fhir.datacapture.utilities.toLocalizedString
 import com.google.android.fhir.datacapture.utilities.toLocalizedTimeString
@@ -95,7 +93,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               addOnPositiveButtonClickListener { epochMilli ->
                 with(Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()) {
                   localDate = this
-                  dateInputEditText.setText(this.localizedString)
+                  dateInputEditText.setText(formatDate(this, acceptableDateFormat))
                   enableOrDisableTimePicker(enableIt = true)
                   generateLocalDateTime(this, localTime)?.let {
                     updateDateTimeInput(it, acceptableDateFormat)
@@ -210,7 +208,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             acceptableDateFormat
           )
         ) {
-          dateInputEditText.setText(localDateTime?.localizedDateString ?: "")
+          dateInputEditText.setText(formatDate(localDateTime?.toLocalDate(), acceptableDateFormat))
         }
         timeInputEditText.setText(
           localDateTime?.toLocalizedTimeString(timeInputEditText.context) ?: ""
