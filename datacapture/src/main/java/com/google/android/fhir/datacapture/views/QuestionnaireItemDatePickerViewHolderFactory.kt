@@ -224,9 +224,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
       }
 
-      inner class DateTextWatcher(dateFormatSeparator: Char) : TextWatcher {
+      inner class DateTextWatcher(private val dateFormatSeparator: Char) : TextWatcher {
         private var isDeleting = false
-        private val dateFormatSeparator = dateFormatSeparator
 
         override fun beforeTextChanged(
           charSequence: CharSequence,
@@ -286,6 +285,10 @@ internal fun formatDate(localDate: LocalDate?, acceptableDateFormat: String?): S
   return ""
 }
 
+/**
+ * Format entered date to acceptable date format where 2 digits for day and month, 4 digits for
+ * year.
+ */
 internal fun handleDateFormatAfterTextChange(
   editable: Editable,
   acceptableDateFormat: String,
@@ -307,12 +310,12 @@ internal fun handleDateFormatAfterTextChange(
       // 02 is entered with dd/MM/yyyy so appending / to editable 02/
       editable.append(acceptableDateFormat[editableLength])
     }
-    if (acceptableDateFormat[editableLength - 1] == dateFormatSeparator &&
-        editable[editableLength - 1] != dateFormatSeparator
+    if (acceptableDateFormat[editable.lastIndex] == dateFormatSeparator &&
+        editable[editable.lastIndex] != dateFormatSeparator
     ) {
       // this case to handle when user deletes separator from "12/" to "12" and enter digit again
       // like "123" then it should convert to "12/3" as per format
-      editable.insert(editableLength - 1, dateFormatSeparator.toString())
+      editable.insert(editable.lastIndex, dateFormatSeparator.toString())
     }
   }
 }

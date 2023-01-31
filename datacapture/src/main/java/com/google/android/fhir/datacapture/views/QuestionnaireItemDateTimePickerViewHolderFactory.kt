@@ -359,9 +359,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         }
       }
 
-      inner class DateTextWatcher(dateFormatSeparator: Char) : TextWatcher {
+      inner class DateTextWatcher(private val dateFormatSeparator: Char) : TextWatcher {
         private var isDeleting = false
-        private val dateFormatSeparator = dateFormatSeparator
 
         override fun beforeTextChanged(
           charSequence: CharSequence,
