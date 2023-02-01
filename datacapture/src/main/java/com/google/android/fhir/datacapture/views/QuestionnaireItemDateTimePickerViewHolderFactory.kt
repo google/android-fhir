@@ -46,11 +46,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.chrono.IsoChronology
-import java.time.format.DateTimeFormatterBuilder
-import java.time.format.FormatStyle
 import java.util.Date
-import java.util.Locale
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -127,17 +123,11 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         clearPreviousState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
-        val localeDatePattern =
-          DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-            FormatStyle.SHORT,
-            null,
-            IsoChronology.INSTANCE,
-            Locale.getDefault()
-          )
+        val localeDatePattern = getLocalizedDateTimePattern()
         // Special character used in date format
         val dateFormatSeparator = getDateSeparator(localeDatePattern)
         textWatcher = DatePatternTextWatcher(dateFormatSeparator)
-        acceptableDateFormat = generateAcceptableDateFormat(localeDatePattern, dateFormatSeparator)
+        acceptableDateFormat = generateAcceptableDateFormat(localeDatePattern)
         dateInputLayout.hint = acceptableDateFormat
         dateInputEditText.removeTextChangedListener(textWatcher)
         val dateTime = questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType

@@ -106,19 +106,11 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
-        // Medium and long format styles use alphabetical month names which are difficult for the
-        // user to input. Use short format style which is always numerical.
-        val localeDatePattern =
-          DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-            FormatStyle.SHORT,
-            null,
-            IsoChronology.INSTANCE,
-            Locale.getDefault()
-          )
+        val localeDatePattern = getLocalizedDateTimePattern()
         // Special character used in date format
         val dateFormatSeparator = getDateSeparator(localeDatePattern)
         textWatcher = DatePatternTextWatcher(dateFormatSeparator)
-        acceptableDateFormat = generateAcceptableDateFormat(localeDatePattern, dateFormatSeparator)
+        acceptableDateFormat = generateAcceptableDateFormat(localeDatePattern)
         textInputLayout.hint = acceptableDateFormat
         textInputEditText.removeTextChangedListener(textWatcher)
         if (isTextUpdateRequired(
@@ -318,6 +310,19 @@ internal fun handleDateFormatAfterTextChange(
 
 internal const val TAG = "date-picker"
 internal val ZONE_ID_UTC = ZoneId.of("UTC")
+
+/**
+ * Medium and long format styles use alphabetical month names which are difficult for the user to
+ * input. Use short format style which is always numerical.
+ */
+internal fun getLocalizedDateTimePattern(): String {
+  return DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+    FormatStyle.SHORT,
+    null,
+    IsoChronology.INSTANCE,
+    Locale.getDefault()
+  )
+}
 
 /**
  * Returns the [AppCompatActivity] if there exists one wrapped inside [ContextThemeWrapper] s, or

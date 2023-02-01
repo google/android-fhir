@@ -104,8 +104,7 @@ class MoreLocalDatesTest {
         IsoChronology.INSTANCE,
         Locale.getDefault()
       )
-    assertThat(generateAcceptableDateFormat(localeDatePattern, getDateSeparator(localeDatePattern)))
-      .isEqualTo("MM/dd/yyyy")
+    assertThat(generateAcceptableDateFormat(localeDatePattern)).isEqualTo("MM/dd/yyyy")
   }
 
   @Test
@@ -118,8 +117,7 @@ class MoreLocalDatesTest {
         IsoChronology.INSTANCE,
         Locale.getDefault()
       )
-    assertThat(generateAcceptableDateFormat(localeDatePattern, getDateSeparator(localeDatePattern)))
-      .isEqualTo("yyyy.MM.dd.")
+    assertThat(generateAcceptableDateFormat(localeDatePattern)).isEqualTo("yyyy.MM.dd.")
   }
 
   @Test
@@ -132,8 +130,7 @@ class MoreLocalDatesTest {
         IsoChronology.INSTANCE,
         Locale.getDefault()
       )
-    assertThat(generateAcceptableDateFormat(localeDatePattern, getDateSeparator(localeDatePattern)))
-      .isEqualTo("yyyy-MM-dd")
+    assertThat(generateAcceptableDateFormat(localeDatePattern)).isEqualTo("yyyy-MM-dd")
   }
 
   @Test
