@@ -293,7 +293,7 @@ internal fun handleDateFormatAfterTextChange(
   }
   // handle delete text and separator
   if (editableLength < acceptableDateFormat.length) {
-    // if user is deleting separator then don't add it again. So check is added if its not deleting.
+    // Do not add the separator again if the user has just deleted it.
     if (!isDeleting && acceptableDateFormat[editableLength] == dateFormatSeparator) {
       // 02 is entered with dd/MM/yyyy so appending / to editable 02/
       editable.append(dateFormatSeparator)
