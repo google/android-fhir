@@ -207,6 +207,27 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
   }
 
   @Test
+  fun `do not clear the textField input on invalid date`() {
+    setLocale(Locale.US)
+    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    val questionnaireItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateType(2020, 10, 19))
+          ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    viewHolder.bind(questionnaireItem)
+
+    viewHolder.dateInputView.text = "11/19/"
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/")
+  }
+
+  @Test
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(

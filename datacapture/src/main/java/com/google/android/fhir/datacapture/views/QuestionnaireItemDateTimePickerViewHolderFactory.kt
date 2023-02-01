@@ -169,6 +169,11 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       fun displayDateValidationError(validationResult: ValidationResult) {
+        // When answers are cleared then it triggers [answersChangedCallback] with ValidationResult
+        // value is valid.
+        if (questionnaireItemViewItem.answers.isEmpty() && validationResult == Valid) {
+          return
+        }
         dateInputLayout.error =
           when (validationResult) {
             is NotValidated,
@@ -295,8 +300,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           } catch (e: Exception) {
             null
           }
-        if (answer == null || inputDate == null) return true
-        return answer.toLocalDate() != inputDate.toLocalDate()
+        return answer?.toLocalDate() != inputDate?.toLocalDate()
       }
 
       private fun showMaterialTimePicker(context: Context, inputMode: Int) {

@@ -168,6 +168,25 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
   }
 
   @Test
+  fun `do not clear the textField input on invalid date`() {
+    val itemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
+          ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _ -> },
+      )
+    viewHolder.bind(itemViewItem)
+    viewHolder.dateInputView.text = "2020/11/"
+
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("2020/11/")
+  }
+
+  @Test
   fun `if date input is invalid then do not enable time text input layout`() {
     val itemViewItem =
       QuestionnaireItemViewItem(

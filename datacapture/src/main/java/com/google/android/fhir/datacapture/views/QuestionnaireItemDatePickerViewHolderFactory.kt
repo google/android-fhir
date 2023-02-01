@@ -121,6 +121,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
+        // When answers are cleared then it triggers [answersChangedCallback] with ValidationResult
+        // value is valid.
+        if (questionnaireItemViewItem.answers.isEmpty() && validationResult == Valid) {
+          return
+        }
+
         textInputLayout.error =
           when (validationResult) {
             is NotValidated,
@@ -211,9 +217,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       } catch (e: Exception) {
         null
       }
-    if (inputDate == null || answer == null) {
-      return true
-    }
     return answer?.localDate != inputDate
   }
 }
