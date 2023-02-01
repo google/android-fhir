@@ -121,8 +121,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        // When answers are cleared then it triggers [answersChangedCallback] with ValidationResult
-        // value is valid.
+        // do not clear an error text if answer is cleared and validation result is valid.
         if (questionnaireItemViewItem.answers.isEmpty() && validationResult == Valid) {
           return
         }
