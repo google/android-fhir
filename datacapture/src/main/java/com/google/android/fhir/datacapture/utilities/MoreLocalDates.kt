@@ -42,7 +42,7 @@ internal fun getDateSeparator(localeDatePattern: String): Char =
 
 /**
  * Converts date pattern to acceptable date pattern where 2 digits are expected for day(dd) and
- * month(MM) and 4 digits are expected for year(yyyy). e.g. dd/mm/yyyy is returned for d/M/yy"
+ * month(MM) and 4 digits are expected for year(yyyy), e.g., dd/mm/yyyy is returned for d/M/yy"
  */
 internal fun generateAcceptableDateFormat(localDatePattern: String): String {
   val dateFormatSeparator = getDateSeparator(localDatePattern)
