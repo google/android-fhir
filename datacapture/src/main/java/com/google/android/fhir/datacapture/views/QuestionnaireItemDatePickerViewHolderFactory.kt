@@ -301,8 +301,7 @@ internal fun handleDateFormatAfterTextChange(
     if (acceptableDateFormat[editable.lastIndex] == dateFormatSeparator &&
         editable[editable.lastIndex] != dateFormatSeparator
     ) {
-      // this case to handle when user deletes separator from "12/" to "12" and enter digit again
-      // like "123" then it should convert to "12/3" as per format
+      // Add separator to break different date components, e.g. converting "123" to "12/3"
       editable.insert(editable.lastIndex, dateFormatSeparator.toString())
     }
   }
