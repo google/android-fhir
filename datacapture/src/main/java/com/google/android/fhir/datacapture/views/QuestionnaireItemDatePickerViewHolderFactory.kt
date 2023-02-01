@@ -273,13 +273,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
   }
 }
 
-internal fun formatDate(localDate: LocalDate?, acceptableDateFormat: String?): String {
+internal fun formatDate(localDate: LocalDate?, acceptableDateFormat: String?): String? {
   localDate?.let {
-    if (!acceptableDateFormat.isNullOrEmpty()) {
-      val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern(acceptableDateFormat)
-      return formatter.format(localDate)
-    } else {
+    if (acceptableDateFormat.isNullOrEmpty()) {
       return it.localizedString
+    } else {
+      return DateTimeFormatter.ofPattern(acceptableDateFormat).format(localDate)
     }
   }
   return ""
