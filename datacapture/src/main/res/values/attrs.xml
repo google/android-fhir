@@ -70,6 +70,8 @@
     <attr name="questionnaireButtonStyle" format="reference" />
     <!--   Style for submit button. -->
     <attr name="questionnaireSubmitButtonStyle" format="reference" />
+    <!--   Style for cancel button. -->
+    <attr name="questionnaireCancelButtonStyle" format="reference" />
     <!--   Style for edit button. -->
     <attr name="questionnaireEditButtonStyle" format="reference" />
     <!--   Style for validation error dialog title text in modal view. -->
@@ -86,7 +88,7 @@
     <attr
         name="questionnaireAttachmentTakePhotoButtonStyle"
         format="reference"
-    />
+        />
     <!--   Style for attachment upload button. -->
     <attr name="questionnaireAttachmentUploadButtonStyle" format="reference" />
     <!--   Style for attachment delete button. -->

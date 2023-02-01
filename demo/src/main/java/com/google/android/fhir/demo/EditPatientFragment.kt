@@ -22,6 +22,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -63,6 +64,17 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
       NavHostFragment.findNavController(this).navigateUp()
     }
     (activity as MainActivity).setDrawerEnabled(false)
+
+    /**
+     * Use the provided cancel|submit buttons from the sdc library**/
+    childFragmentManager.setFragmentResultListener(
+      QuestionnaireFragment.SUBMIT_REQUEST_KEY,
+      viewLifecycleOwner
+    ) { _, _ -> onSubmitAction() }
+    childFragmentManager.setFragmentResultListener(
+      QuestionnaireFragment.CANCEL_REQUEST_KEY,
+      viewLifecycleOwner
+    ) { _, _ -> onCancelQuestionnaireClick() }
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -100,6 +112,25 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
     val questionnaireFragment =
       childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
     viewModel.updatePatient(questionnaireFragment.getQuestionnaireResponse())
+  }
+
+  /***
+   * Confirm before exiting the page
+   * ***/
+  private fun onCancelQuestionnaireClick() {
+    val alertDialog: AlertDialog? =
+      activity?.let {
+        val builder = AlertDialog.Builder(it)
+        builder.apply {
+          setMessage(getString(R.string.cancel_questionnaire_message))
+          setPositiveButton(getString(android.R.string.yes)) { _, _ ->
+            NavHostFragment.findNavController(this@EditPatientFragment).navigateUp()
+          }
+          setNegativeButton(getString(android.R.string.no)) { _, _ -> }
+        }
+        builder.create()
+      }
+    alertDialog?.show()
   }
 
   companion object {
