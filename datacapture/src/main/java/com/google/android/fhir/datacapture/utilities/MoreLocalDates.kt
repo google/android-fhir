@@ -33,13 +33,16 @@ internal val LocalDate.localizedString: String
     return DateFormat.getDateInstance(DateFormat.SHORT).format(date)
   }
 
-/** Special character used in date format */
+/**
+ * Returns the first character that is not a letter in the given date pattern string (e.g. "/" for
+ * "dd/mm/yyyy").
+ */
 internal fun getDateSeparator(localeDatePattern: String): Char =
   localeDatePattern.filterNot { isLetter(it) }.first()
 
 /**
- * Convert date pattern to acceptable date pattern where 2 digits are expected for day(dd) and
- * month(MM), 4 digits are expected for year(yyyy).
+ * Converts date pattern to acceptable date pattern where 2 digits are expected for day(dd) and
+ * month(MM) and 4 digits are expected for year(yyyy). e.g. dd/mm/yyyy is returned for d/M/yy"
  */
 internal fun generateAcceptableDateFormat(datePattern: String, dateFormatSeparator: Char): String {
   var newDateFormat = StringBuilder()
@@ -69,22 +72,18 @@ internal fun generateAcceptableDateFormat(datePattern: String, dateFormatSeparat
   return newDateFormat.toString()
 }
 
-/** Parse date string into given date format. */
+/** Parses a date string using the given date format. */
 internal fun parseDate(text: CharSequence?, acceptableDateFormat: String?): LocalDate {
-  val localDate =
+  val dateFormat =
     if (!acceptableDateFormat.isNullOrEmpty()) {
-        SimpleDateFormat(acceptableDateFormat).apply { isLenient = false }.parse(text.toString())
-      } else {
-        DateFormat.getDateInstance(DateFormat.SHORT)
-          .apply { isLenient = false }
-          .parse(text.toString())
-      }
-      .localDate
-
-  // date/localDate with year less than 4 digit throws ParseException which force user to enter year
-  // with digit 4 from >=1000
+      SimpleDateFormat(acceptableDateFormat)
+    } else {
+      DateFormat.getDateInstance(DateFormat.SHORT)
+    }
+  val localDate = dateFormat.apply { isLenient = false }.parse(text.toString()).localDate
+  // Throw ParseException if year is less than 4 digits.
   if (localDate.year.length() < 4) {
-    throw ParseException("Year has lesss than 4 digits.", -4)
+    throw ParseException("Year has less than 4 digits.", localDate.year.length())
   }
   // date/localDate with year more than 4 digit throws data format exception if deep copy
   // operation get performed on QuestionnaireResponse,
@@ -92,7 +91,7 @@ internal fun parseDate(text: CharSequence?, acceptableDateFormat: String?): Loca
   // e.g ca.uhn.fhir.parser.DataFormatException: Invalid date/time format: "19843-12-21":
   // Expected character '-' at index 4 but found 3
   if (localDate.year.length() > 4) {
-    throw ParseException("Year has more than 4 digits.", 4)
+    throw ParseException("Year has more than 4 digits.", localDate.year.length())
   }
   return localDate
 }

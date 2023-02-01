@@ -67,7 +67,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       private var localDate: LocalDate? = null
       private var localTime: LocalTime? = null
       private lateinit var acceptableDateFormat: String
-      private lateinit var textWatcher: DateTextWatcher
+      private lateinit var textWatcher: DatePatternTextWatcher
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
@@ -136,7 +136,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           )
         // Special character used in date format
         val dateFormatSeparator = getDateSeparator(localeDatePattern)
-        textWatcher = DateTextWatcher(dateFormatSeparator)
+        textWatcher = DatePatternTextWatcher(dateFormatSeparator)
         acceptableDateFormat = generateAcceptableDateFormat(localeDatePattern, dateFormatSeparator)
         dateInputLayout.hint = acceptableDateFormat
         dateInputEditText.removeTextChangedListener(textWatcher)
@@ -197,10 +197,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       /** Update the date and time input fields in the UI. */
-      private fun updateDateTimeInput(
-        localDateTime: LocalDateTime?,
-        acceptableDateFormat: String?
-      ) {
+      private fun updateDateTimeInput(localDateTime: LocalDateTime?, acceptableDateFormat: String) {
         enableOrDisableTimePicker(enableIt = localDateTime != null)
         if (isTextUpdateRequired(
             localDateTime,
@@ -208,7 +205,9 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             acceptableDateFormat
           )
         ) {
-          dateInputEditText.setText(formatDate(localDateTime?.toLocalDate(), acceptableDateFormat))
+          val formattedDate =
+            localDateTime?.toLocalDate()?.let { formatDate(it, acceptableDateFormat) }
+          dateInputEditText.setText(formattedDate)
         }
         timeInputEditText.setText(
           localDateTime?.toLocalizedTimeString(timeInputEditText.context) ?: ""
@@ -359,7 +358,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         }
       }
 
-      inner class DateTextWatcher(private val dateFormatSeparator: Char) : TextWatcher {
+      /** Automatically appends date separator (e.g. "/") during date input. */
+      inner class DatePatternTextWatcher(private val dateFormatSeparator: Char) : TextWatcher {
         private var isDeleting = false
 
         override fun beforeTextChanged(

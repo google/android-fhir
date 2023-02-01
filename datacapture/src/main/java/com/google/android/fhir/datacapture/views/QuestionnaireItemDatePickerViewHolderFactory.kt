@@ -67,7 +67,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private lateinit var acceptableDateFormat: String
-      private lateinit var textWatcher: DateTextWatcher
+      private lateinit var textWatcher: DatePatternTextWatcher
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
@@ -117,7 +117,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           )
         // Special character used in date format
         val dateFormatSeparator = getDateSeparator(localeDatePattern)
-        textWatcher = DateTextWatcher(dateFormatSeparator)
+        textWatcher = DatePatternTextWatcher(dateFormatSeparator)
         acceptableDateFormat = generateAcceptableDateFormat(localeDatePattern, dateFormatSeparator)
         textInputLayout.hint = acceptableDateFormat
         textInputEditText.removeTextChangedListener(textWatcher)
@@ -128,14 +128,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           )
         ) {
           val formattedDate =
-            formatDate(
-              questionnaireItemViewItem.answers
-                .singleOrNull()
-                ?.takeIf { it.hasValue() }
-                ?.valueDateType
-                ?.localDate,
-              acceptableDateFormat
-            )
+            questionnaireItemViewItem.answers
+              .singleOrNull()
+              ?.takeIf { it.hasValue() }
+              ?.valueDateType
+              ?.localDate?.let { formatDate(it, acceptableDateFormat) }
+
           textInputEditText.setText(formattedDate)
         }
         textInputEditText.addTextChangedListener(textWatcher)
@@ -224,7 +222,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
       }
 
-      inner class DateTextWatcher(private val dateFormatSeparator: Char) : TextWatcher {
+      /** Automatically appends date separator (e.g. "/") during date input. */
+      inner class DatePatternTextWatcher(private val dateFormatSeparator: Char) : TextWatcher {
         private var isDeleting = false
 
         override fun beforeTextChanged(
@@ -273,15 +272,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
   }
 }
 
-internal fun formatDate(localDate: LocalDate?, acceptableDateFormat: String?): String? {
-  localDate?.let {
-    if (acceptableDateFormat.isNullOrEmpty()) {
-      return it.localizedString
-    } else {
-      return DateTimeFormatter.ofPattern(acceptableDateFormat).format(localDate)
-    }
+internal fun formatDate(localDate: LocalDate, acceptableDateFormat: String): String {
+  if (acceptableDateFormat.isEmpty()) {
+    return localDate.localizedString
+  } else {
+    return DateTimeFormatter.ofPattern(acceptableDateFormat).format(localDate)
   }
-  return ""
 }
 
 /**
@@ -305,9 +301,10 @@ internal fun handleDateFormatAfterTextChange(
   }
   // handle delete text and separator
   if (editableLength < acceptableDateFormat.length) {
+    // if user is deleting separator then don't add it again. So check is added if its not deleting.
     if (!isDeleting && acceptableDateFormat[editableLength] == dateFormatSeparator) {
       // 02 is entered with dd/MM/yyyy so appending / to editable 02/
-      editable.append(acceptableDateFormat[editableLength])
+      editable.append(dateFormatSeparator)
     }
     if (acceptableDateFormat[editable.lastIndex] == dateFormatSeparator &&
         editable[editable.lastIndex] != dateFormatSeparator
