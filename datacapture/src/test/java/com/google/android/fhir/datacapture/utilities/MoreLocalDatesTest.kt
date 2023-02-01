@@ -56,7 +56,7 @@ class MoreLocalDatesTest {
   }
 
   @Test
-  fun getDateSeparator_US() {
+  fun `get date separator for US locale`() {
     Locale.setDefault(Locale.US)
     val localeDatePattern =
       DateTimeFormatterBuilder.getLocalizedDateTimePattern(
@@ -69,7 +69,7 @@ class MoreLocalDatesTest {
   }
 
   @Test
-  fun getDateSeparator_KOREA() {
+  fun `get date separator for Korean locale`() {
     Locale.setDefault(Locale.KOREA)
     val localeDatePattern =
       DateTimeFormatterBuilder.getLocalizedDateTimePattern(
@@ -82,7 +82,7 @@ class MoreLocalDatesTest {
   }
 
   @Test
-  fun getDateSeparator_Canada() {
+  fun `get date separator for Canada locale`() {
     Locale.setDefault(Locale.CANADA)
     val localeDatePattern =
       DateTimeFormatterBuilder.getLocalizedDateTimePattern(
@@ -95,7 +95,7 @@ class MoreLocalDatesTest {
   }
 
   @Test
-  fun generateAcceptableDateFormat_US() {
+  fun `generate acceptable date pattern from US locale date pattern`() {
     Locale.setDefault(Locale.US)
     val localeDatePattern =
       DateTimeFormatterBuilder.getLocalizedDateTimePattern(
@@ -109,7 +109,7 @@ class MoreLocalDatesTest {
   }
 
   @Test
-  fun generateAcceptableDateFormat_KOREA() {
+  fun `generate acceptable date pattern from Korean locale date pattern`() {
     Locale.setDefault(Locale.KOREA)
     val localeDatePattern =
       DateTimeFormatterBuilder.getLocalizedDateTimePattern(
@@ -123,7 +123,7 @@ class MoreLocalDatesTest {
   }
 
   @Test
-  fun generateAcceptableDateFormat_Canada() {
+  fun `generate acceptable date pattern from Canada locale date pattern`() {
     Locale.setDefault(Locale.CANADA)
     val localeDatePattern =
       DateTimeFormatterBuilder.getLocalizedDateTimePattern(
@@ -137,7 +137,7 @@ class MoreLocalDatesTest {
   }
 
   @Test
-  fun parseDate_US() {
+  fun `parse date for US locale`() {
     Locale.setDefault(Locale.US)
     val localDate = parseDate("01/25/2023", "MM/dd/yyyy")
     assertThat(localDate.dayOfMonth).isEqualTo(25)
@@ -146,7 +146,7 @@ class MoreLocalDatesTest {
   }
 
   @Test
-  fun parseDate_KOREA() {
+  fun `parse date for Korean locale`() {
     Locale.setDefault(Locale.KOREA)
     val localDate = parseDate("2023.01.25.", "yyyy.MM.dd.")
     assertThat(localDate.dayOfMonth).isEqualTo(25)
@@ -155,7 +155,7 @@ class MoreLocalDatesTest {
   }
 
   @Test
-  fun parseDateUS_inCanadaFormat() {
+  fun `parse US locale date for Canada locale`() {
     Locale.setDefault(Locale.CANADA)
     assertFailsWith<ParseException> { parseDate("01/25/2023", "yyyy-MM-dd") }
   }
