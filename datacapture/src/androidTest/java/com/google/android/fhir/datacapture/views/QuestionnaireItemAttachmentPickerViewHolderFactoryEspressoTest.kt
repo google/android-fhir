@@ -377,7 +377,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shouldNotDisplayPreviewFromNullAnswer() {
+  fun doNotShowPreviewIfAnswerDoesNotHaveAttachment() {
     val questionnaireItemView =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -408,7 +408,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shouldNotDisplayPreviewFromNullAnswerAfterPreviouslyBindingNonNullAnswer() {
+  fun doNotShowPreviewOfPreviousAnswerAttachmentForCurrentAnswerItem() {
     val questionnaireItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
