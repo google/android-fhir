@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,22 +51,9 @@ internal abstract class ResourceDao {
   lateinit var iParser: IParser
 
   open suspend fun update(resource: Resource) {
-    updateResource(
-      resource.logicalId,
-      resource.resourceType,
-      iParser.encodeResourceToString(resource),
-    )
     getResourceEntity(resource.logicalId, resource.resourceType)?.let {
-      val entity =
-        ResourceEntity(
-          id = 0,
-          resourceType = resource.resourceType,
-          resourceUuid = it.resourceUuid,
-          resourceId = resource.logicalId,
-          serializedResource = iParser.encodeResourceToString(resource),
-          versionId = it.versionId,
-          lastUpdatedRemote = it.lastUpdatedRemote
-        )
+      val entity = it.copy(serializedResource = iParser.encodeResourceToString(resource))
+      insertResource(entity)
       val index = ResourceIndexer.index(resource)
       updateIndicesForResource(index, entity, it.resourceUuid)
     }
@@ -110,20 +97,6 @@ internal abstract class ResourceDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   abstract suspend fun insertPositionIndex(positionIndexEntity: PositionIndexEntity)
-
-  @Query(
-    """
-        UPDATE ResourceEntity
-        SET serializedResource = :serializedResource
-        WHERE resourceId = :resourceId
-        AND resourceType = :resourceType
-        """
-  )
-  abstract suspend fun updateResource(
-    resourceId: String,
-    resourceType: ResourceType,
-    serializedResource: String
-  )
 
   @Query(
     """

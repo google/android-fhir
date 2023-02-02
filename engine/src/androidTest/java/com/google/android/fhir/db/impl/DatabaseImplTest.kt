@@ -451,10 +451,13 @@ class DatabaseImplTest {
   fun delete_nonExistent_shouldNotInsertLocalChange() = runBlocking {
     database.delete(ResourceType.Patient, "nonexistent_patient")
     assertThat(
-        database.getAllLocalChanges().map { it }.none {
-          it.localChange.type.equals(LocalChangeEntity.Type.DELETE) &&
-            it.localChange.resourceId.equals("nonexistent_patient")
-        }
+        database
+          .getAllLocalChanges()
+          .map { it }
+          .none {
+            it.localChange.type == LocalChangeEntity.Type.DELETE &&
+              it.localChange.resourceId == "nonexistent_patient"
+          }
       )
       .isTrue()
   }
@@ -480,9 +483,10 @@ class DatabaseImplTest {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insertRemote(patient)
     assertThat(
-        database.getAllLocalChanges().map { it }.none {
-          it.localChange.resourceId.equals(patient.logicalId)
-        }
+        database
+          .getAllLocalChanges()
+          .map { it }
+          .none { it.localChange.resourceId == patient.logicalId }
       )
       .isTrue()
   }
@@ -532,15 +536,17 @@ class DatabaseImplTest {
       }
     database.insert(patient)
     services.fhirEngine.syncUpload { it ->
-      it.first { it.resourceId == "remote-patient-3" }.let {
-        flowOf(
-          it.token to
-            Patient().apply {
-              id = it.resourceId
-              meta = remoteMeta
-            }
-        )
-      }
+      it
+        .first { it.resourceId == "remote-patient-3" }
+        .let {
+          flowOf(
+            it.token to
+              Patient().apply {
+                id = it.resourceId
+                meta = remoteMeta
+              }
+          )
+        }
     }
     val selectedEntity = database.selectEntity(ResourceType.Patient, "remote-patient-3")
     assertThat(selectedEntity.versionId).isEqualTo(remoteMeta.versionId)
@@ -552,11 +558,90 @@ class DatabaseImplTest {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insertRemote(patient, TEST_PATIENT_2)
     assertThat(
-        database.getAllLocalChanges().map { it }.none {
-          it.localChange.resourceId in listOf(patient.logicalId, TEST_PATIENT_2_ID)
-        }
+        database
+          .getAllLocalChanges()
+          .map { it }
+          .none { it.localChange.resourceId in listOf(patient.logicalId, TEST_PATIENT_2_ID) }
       )
       .isTrue()
+  }
+
+  @Test
+  fun insert_should_remove_old_indexes() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "local-1"
+        addName(
+          HumanName().apply {
+            addGiven("Jane")
+            family = "Doe"
+          }
+        )
+      }
+
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+      )
+    assertThat(result.size).isEqualTo(1)
+
+    val updatedPatient =
+      Patient().apply {
+        id = "local-1"
+        addName(
+          HumanName().apply {
+            addGiven("John")
+            family = "Doe"
+          }
+        )
+      }
+
+    database.insert(updatedPatient)
+    val updatedResult =
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+      )
+    assertThat(updatedResult.size).isEqualTo(0)
+  }
+
+  @Test
+  fun insertRemote_should_remove_old_indexes() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "local-1"
+        addName(
+          HumanName().apply {
+            addGiven("Jane")
+            family = "Doe"
+          }
+        )
+      }
+
+    database.insertRemote(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+      )
+    assertThat(result.size).isEqualTo(1)
+
+    val updatedPatient =
+      Patient().apply {
+        id = "local-1"
+        addName(
+          HumanName().apply {
+            addGiven("John")
+            family = "Doe"
+          }
+        )
+      }
+
+    database.insertRemote(updatedPatient)
+    val updatedResult =
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+      )
+    assertThat(updatedResult.size).isEqualTo(0)
   }
 
   @Test
@@ -604,6 +689,45 @@ class DatabaseImplTest {
     assertThat(resourceType).isEqualTo(patient.resourceType.name)
     assertThat(versionId).isEqualTo(remoteMeta.versionId)
     testingUtils.assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
+  }
+
+  @Test
+  fun update_should_remove_old_indexes() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "local-1"
+        addName(
+          HumanName().apply {
+            addGiven("Jane")
+            family = "Doe"
+          }
+        )
+      }
+
+    database.insertRemote(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+      )
+    assertThat(result.size).isEqualTo(1)
+
+    val updatedPatient =
+      Patient().apply {
+        id = "local-1"
+        addName(
+          HumanName().apply {
+            addGiven("John")
+            family = "Doe"
+          }
+        )
+      }
+
+    database.update(updatedPatient)
+    val updatedResult =
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+      )
+    assertThat(updatedResult.size).isEqualTo(0)
   }
 
   @Test
@@ -2547,7 +2671,8 @@ class DatabaseImplTest {
     )
 
     assertThat(
-        database.search<Patient>(
+        database
+          .search<Patient>(
             Search(ResourceType.Patient)
               .apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }
               .getQuery()
@@ -2574,7 +2699,8 @@ class DatabaseImplTest {
     )
 
     assertThat(
-        database.search<Patient>(
+        database
+          .search<Patient>(
             Search(ResourceType.Patient)
               .apply { sort(Patient.BIRTHDATE, Order.ASCENDING) }
               .getQuery()
