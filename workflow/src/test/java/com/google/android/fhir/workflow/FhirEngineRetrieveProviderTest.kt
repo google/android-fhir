@@ -70,8 +70,8 @@ class FhirEngineRetrieveProviderTest : Loadable() {
   }
 
   @Test
-  fun testFilterToDataTypeDataTypeNotPresent() {
-    runBlocking { loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json")) }
+  fun testFilterToDataTypeDataTypeNotPresent() = runBlockingOnWorkerThread {
+    loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))
 
     assertThat(
         retrieveProvider
@@ -95,8 +95,8 @@ class FhirEngineRetrieveProviderTest : Loadable() {
   }
 
   @Test
-  fun testNoResultsReturnsEmptySet() {
-    runBlocking { loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json")) }
+  fun testNoResultsReturnsEmptySet() = runBlockingOnWorkerThread {
+    loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))
 
     val results: Iterable<Any> =
       retrieveProvider.retrieve(
@@ -119,8 +119,8 @@ class FhirEngineRetrieveProviderTest : Loadable() {
   }
 
   @Test
-  fun testFilterToDataType() {
-    runBlocking { loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json")) }
+  fun testFilterToDataType() = runBlockingOnWorkerThread {
+    loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))
 
     val resultList =
       retrieveProvider
@@ -146,8 +146,8 @@ class FhirEngineRetrieveProviderTest : Loadable() {
   }
 
   @Test
-  fun testFilterToContext() {
-    runBlocking { loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json")) }
+  fun testFilterToContext() = runBlockingOnWorkerThread {
+    loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))
 
     val resultList =
       retrieveProvider
@@ -175,8 +175,8 @@ class FhirEngineRetrieveProviderTest : Loadable() {
   }
 
   @Test
-  fun testFilterToContextNoContextRelation() {
-    runBlocking { loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json")) }
+  fun testFilterToContextNoContextRelation() = runBlockingOnWorkerThread {
+    loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))
 
     val resultList =
       retrieveProvider
@@ -201,8 +201,8 @@ class FhirEngineRetrieveProviderTest : Loadable() {
   }
 
   @Test
-  fun testFilterById() {
-    runBlocking { loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json")) }
+  fun testFilterById() = runBlockingOnWorkerThread {
+    loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))
 
     // Id does exist
     var codes = mutableListOf(Code().withCode("test-med"))
@@ -251,8 +251,8 @@ class FhirEngineRetrieveProviderTest : Loadable() {
   }
 
   @Test
-  fun testFilterToCodes() {
-    runBlocking { loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json")) }
+  fun testFilterToCodes() = runBlockingOnWorkerThread {
+    loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))
 
     // Code doesn't match
     var code = Code().withCode("not-a-code").withSystem("not-a-system")
@@ -301,8 +301,8 @@ class FhirEngineRetrieveProviderTest : Loadable() {
   }
 
   @Test(expected = TerminologyProviderException::class)
-  fun testFilterToValueSetNoTerminologyProvider() {
-    runBlocking { loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json")) }
+  fun testFilterToValueSetNoTerminologyProvider(): Unit = runBlockingOnWorkerThread {
+    loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))
 
     retrieveProvider.retrieve(
       context = "Patient",
@@ -321,11 +321,9 @@ class FhirEngineRetrieveProviderTest : Loadable() {
   }
 
   @Test
-  fun testFilterToValueSet() {
-    runBlocking {
-      loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))
-      loadBundle(parseJson("/retrieve-provider/TestBundleValueSets.json"))
-    }
+  fun testFilterToValueSet() = runBlockingOnWorkerThread {
+    loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))
+    loadBundle(parseJson("/retrieve-provider/TestBundleValueSets.json"))
 
     // Not in the value set
     var results: Iterable<Any> =
@@ -368,8 +366,8 @@ class FhirEngineRetrieveProviderTest : Loadable() {
   }
 
   @Test
-  fun testRetrieveByUrn() {
-    runBlocking { loadBundle(parseJson("/retrieve-provider/TestBundleUrns.json")) }
+  fun testRetrieveByUrn() = runBlockingOnWorkerThread {
+    loadBundle(parseJson("/retrieve-provider/TestBundleUrns.json"))
 
     var resultList =
       retrieveProvider
@@ -415,8 +413,8 @@ class FhirEngineRetrieveProviderTest : Loadable() {
   }
 
   @Test
-  fun testRetrieveByDate() {
-    runBlocking { loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json")) }
+  fun testRetrieveByDate() = runBlockingOnWorkerThread {
+    loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))
 
     // searching between 2020 and 2021.
     val start: OffsetDateTime = OffsetDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)
@@ -465,4 +463,24 @@ class FhirEngineRetrieveProviderTest : Loadable() {
     assertThat(resultList.size).isEqualTo(1)
     assertThat(resultList.first()).isInstanceOf(Condition::class.java)
   }
+
+  @Test(expected = BlockingMainThreadException::class)
+  fun `retrieve when called from main thread should throw BlockingMainThreadException`(): Unit =
+    runBlocking {
+      loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))
+      retrieveProvider.retrieve(
+        context = null,
+        contextPath = null,
+        contextValue = null,
+        dataType = null,
+        templateId = null,
+        codePath = null,
+        codes = null,
+        valueSet = null,
+        datePath = null,
+        dateLowPath = null,
+        dateHighPath = null,
+        dateRange = null
+      )
+    }
 }
