@@ -151,7 +151,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
     onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("40/0/-9992"))
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("Date format needs to be MM/dd/yyyy\n" + "Example: 01/01/2023")
+      .isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/01/2023)")
   }
 
   @Test
@@ -170,7 +170,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
     onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("1/100/2"))
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("Date format needs to be MM/dd/yyyy\n" + "Example: 01/01/2023")
+      .isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/01/2023)")
   }
 
   @Test
@@ -189,7 +189,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
     onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("40/1/2"))
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("Date format needs to be MM/dd/yyyy\n" + "Example: 01/01/2023")
+      .isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/01/2023)")
   }
 
   @Test
@@ -208,7 +208,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
     onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("1/1/22222"))
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("Date format needs to be MM/dd/yyyy\n" + "Example: 01/01/2023")
+      .isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/01/2023)")
   }
   @Test
   fun shouldNotSetDateInput_outsideMaxRange() {

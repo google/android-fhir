@@ -95,7 +95,7 @@ class MoreLocalDatesTest {
   }
 
   @Test
-  fun `generate acceptable date pattern from US locale date pattern`() {
+  fun `canonicalize date format from US locale date pattern`() {
     Locale.setDefault(Locale.US)
     val localeDatePattern =
       DateTimeFormatterBuilder.getLocalizedDateTimePattern(
@@ -104,11 +104,11 @@ class MoreLocalDatesTest {
         IsoChronology.INSTANCE,
         Locale.getDefault()
       )
-    assertThat(generateAcceptableDateFormat(localeDatePattern)).isEqualTo("MM/dd/yyyy")
+    assertThat(canonicalizeDateFormat(localeDatePattern)).isEqualTo("MM/dd/yyyy")
   }
 
   @Test
-  fun `generate acceptable date pattern from Korean locale date pattern`() {
+  fun `canonicalize date format from Korean locale date pattern`() {
     Locale.setDefault(Locale.KOREA)
     val localeDatePattern =
       DateTimeFormatterBuilder.getLocalizedDateTimePattern(
@@ -117,11 +117,11 @@ class MoreLocalDatesTest {
         IsoChronology.INSTANCE,
         Locale.getDefault()
       )
-    assertThat(generateAcceptableDateFormat(localeDatePattern)).isEqualTo("yyyy.MM.dd.")
+    assertThat(canonicalizeDateFormat(localeDatePattern)).isEqualTo("yyyy.MM.dd.")
   }
 
   @Test
-  fun `generate acceptable date pattern from Canada locale date pattern`() {
+  fun `canonicalize date format from Canada locale date pattern`() {
     Locale.setDefault(Locale.CANADA)
     val localeDatePattern =
       DateTimeFormatterBuilder.getLocalizedDateTimePattern(
@@ -130,7 +130,7 @@ class MoreLocalDatesTest {
         IsoChronology.INSTANCE,
         Locale.getDefault()
       )
-    assertThat(generateAcceptableDateFormat(localeDatePattern)).isEqualTo("yyyy-MM-dd")
+    assertThat(canonicalizeDateFormat(localeDatePattern)).isEqualTo("yyyy-MM-dd")
   }
 
   @Test
@@ -155,5 +155,26 @@ class MoreLocalDatesTest {
   fun `parse US locale date for Canada locale`() {
     Locale.setDefault(Locale.CANADA)
     assertFailsWith<ParseException> { parseDate("01/25/2023", "yyyy-MM-dd") }
+  }
+
+  @Test
+  fun `format ITALY locale date using its canonicalizedDatePattern`() {
+    Locale.setDefault(Locale.ITALY)
+    val localeDatePattern =
+      DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+        FormatStyle.SHORT,
+        null,
+        IsoChronology.INSTANCE,
+        Locale.getDefault()
+      )
+    val localDate = LocalDate.of(2010, 1, 1)
+    assertThat(localDate.format(canonicalizeDateFormat(localeDatePattern))).isEqualTo("01/01/2010")
+  }
+
+  @Test
+  fun `format ITALY locale date using no canonicalizedDatePattern gives localized date string`() {
+    Locale.setDefault(Locale.ITALY)
+    val localDate = LocalDate.of(2010, 1, 1)
+    assertThat(localDate.format("")).isEqualTo(localDate.localizedString)
   }
 }

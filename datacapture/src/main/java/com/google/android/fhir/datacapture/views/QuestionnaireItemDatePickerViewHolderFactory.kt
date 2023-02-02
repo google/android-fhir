@@ -24,9 +24,9 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.utilities.generateAcceptableDateFormat
+import com.google.android.fhir.datacapture.utilities.canonicalizeDateFormat
+import com.google.android.fhir.datacapture.utilities.format
 import com.google.android.fhir.datacapture.utilities.getDateSeparator
-import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.utilities.parseDate
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.MaxValueConstraintValidator.getMaxValue
@@ -47,11 +47,9 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.chrono.IsoChronology
-import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.FormatStyle
-import java.util.Date
-import java.util.Locale
+import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
 import kotlin.math.log10
@@ -66,7 +64,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-      private lateinit var acceptableDateFormat: String
+      private lateinit var canonicalizedDatePattern: String
       private lateinit var textWatcher: DatePatternTextWatcher
 
       override fun init(itemView: View) {
@@ -83,10 +81,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             .apply {
               addOnPositiveButtonClickListener { epochMilli ->
                 val formattedDate =
-                  formatDate(
-                    Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate(),
-                    acceptableDateFormat
-                  )
+                  Instant.ofEpochMilli(epochMilli)
+                    .atZone(ZONE_ID_UTC)
+                    .toLocalDate()
+                    ?.format(canonicalizedDatePattern)
                 textInputEditText.setText(formattedDate)
                 questionnaireItemViewItem.setAnswer(
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -110,13 +108,13 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         // Special character used in date format
         val dateFormatSeparator = getDateSeparator(localeDatePattern)
         textWatcher = DatePatternTextWatcher(dateFormatSeparator)
-        acceptableDateFormat = generateAcceptableDateFormat(localeDatePattern)
-        textInputLayout.hint = acceptableDateFormat
+        canonicalizedDatePattern = canonicalizeDateFormat(localeDatePattern)
+        textInputLayout.hint = canonicalizedDatePattern
         textInputEditText.removeTextChangedListener(textWatcher)
         if (isTextUpdateRequired(
             questionnaireItemViewItem.answers.singleOrNull()?.valueDateType,
             textInputEditText.text.toString(),
-            acceptableDateFormat
+            canonicalizedDatePattern
           )
         ) {
           val formattedDate =
@@ -124,7 +122,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               .singleOrNull()
               ?.takeIf { it.hasValue() }
               ?.valueDateType
-              ?.localDate?.let { formatDate(it, acceptableDateFormat) }
+              ?.localDate?.format(canonicalizedDatePattern)
 
           textInputEditText.setText(formattedDate)
         }
@@ -180,13 +178,13 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         return CalendarConstraints.Builder().setValidator(validators).build()
       }
 
-      private fun updateAnswer(text: CharSequence?) {
-        if (text == null || text.isNullOrEmpty()) {
+      private fun updateAnswer(text: String?) {
+        if (text.isNullOrEmpty()) {
           questionnaireItemViewItem.clearAnswer()
           return
         }
         try {
-          val localDate = parseDate(text, acceptableDateFormat)
+          val localDate = parseDate(text, canonicalizedDatePattern)
           questionnaireItemViewItem.setAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = localDate.dateType
@@ -198,8 +196,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               listOf(
                 textInputEditText.context.getString(
                   R.string.date_format_validation_error_msg,
-                  acceptableDateFormat,
-                  acceptableDateFormat
+                  canonicalizedDatePattern,
+                  canonicalizedDatePattern
                     .replace("dd", "01")
                     .replace("MM", "01")
                     .replace("yyyy", "2023")
@@ -237,7 +235,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         override fun afterTextChanged(editable: Editable) {
           handleDateFormatAfterTextChange(
             editable,
-            acceptableDateFormat,
+            canonicalizedDatePattern,
             dateFormatSeparator,
             isDeleting
           )
@@ -249,26 +247,21 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
   private fun isTextUpdateRequired(
     answer: DateType?,
     inputText: String?,
-    acceptableDateFormat: String
+    canonicalizedDatePattern: String
   ): Boolean {
+    if (inputText.isNullOrEmpty()) {
+      return true
+    }
     val inputDate =
       try {
-        parseDate(inputText, acceptableDateFormat)
+        parseDate(inputText, canonicalizedDatePattern)
       } catch (e: Exception) {
         null
       }
     if (inputDate == null || answer == null) {
       return true
     }
-    return answer?.localDate != inputDate
-  }
-}
-
-internal fun formatDate(localDate: LocalDate, acceptableDateFormat: String): String {
-  if (acceptableDateFormat.isEmpty()) {
-    return localDate.localizedString
-  } else {
-    return DateTimeFormatter.ofPattern(acceptableDateFormat).format(localDate)
+    return answer.localDate != inputDate
   }
 }
 
@@ -278,7 +271,7 @@ internal fun formatDate(localDate: LocalDate, acceptableDateFormat: String): Str
  */
 internal fun handleDateFormatAfterTextChange(
   editable: Editable,
-  acceptableDateFormat: String,
+  canonicalizedDatePattern: String,
   dateFormatSeparator: Char,
   isDeleting: Boolean
 ) {
@@ -287,18 +280,18 @@ internal fun handleDateFormatAfterTextChange(
     return
   }
   // restrict date entry upto acceptable date length
-  if (editableLength > acceptableDateFormat.length) {
-    editable.replace(acceptableDateFormat.length, editableLength, "")
+  if (editableLength > canonicalizedDatePattern.length) {
+    editable.replace(canonicalizedDatePattern.length, editableLength, "")
     return
   }
   // handle delete text and separator
-  if (editableLength < acceptableDateFormat.length) {
+  if (editableLength < canonicalizedDatePattern.length) {
     // Do not add the separator again if the user has just deleted it.
-    if (!isDeleting && acceptableDateFormat[editableLength] == dateFormatSeparator) {
+    if (!isDeleting && canonicalizedDatePattern[editableLength] == dateFormatSeparator) {
       // 02 is entered with dd/MM/yyyy so appending / to editable 02/
       editable.append(dateFormatSeparator)
     }
-    if (acceptableDateFormat[editable.lastIndex] == dateFormatSeparator &&
+    if (canonicalizedDatePattern[editable.lastIndex] == dateFormatSeparator &&
         editable[editable.lastIndex] != dateFormatSeparator
     ) {
       // Add separator to break different date components, e.g. converting "123" to "12/3"

@@ -25,6 +25,7 @@ import java.lang.StringBuilder
 import java.text.ParseException
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Date
 
 internal val LocalDate.localizedString: String
@@ -44,13 +45,13 @@ internal fun getDateSeparator(localeDatePattern: String): Char =
  * Converts date pattern to acceptable date pattern where 2 digits are expected for day(dd) and
  * month(MM) and 4 digits are expected for year(yyyy), e.g., dd/mm/yyyy is returned for d/M/yy"
  */
-internal fun generateAcceptableDateFormat(localDatePattern: String): String {
-  val dateFormatSeparator = getDateSeparator(localDatePattern)
+internal fun canonicalizeDateFormat(datePattern: String): String {
+  val dateFormatSeparator = getDateSeparator(datePattern)
   var hasDay = false
   var hasMonth = false
   var hasYear = false
-  var newDateFormat = StringBuilder()
-  localDatePattern.lowercase().forEach {
+  val newDateFormat = StringBuilder()
+  datePattern.lowercase().forEach {
     when (it) {
       'd' -> {
         if (!hasDay) {
@@ -80,17 +81,17 @@ internal fun generateAcceptableDateFormat(localDatePattern: String): String {
 }
 
 /** Parses a date string using the given date format. */
-internal fun parseDate(text: CharSequence?, acceptableDateFormat: String?): LocalDate {
+internal fun parseDate(text: String, canonicalizedDatePattern: String): LocalDate {
   val dateFormat =
-    if (!acceptableDateFormat.isNullOrEmpty()) {
-      SimpleDateFormat(acceptableDateFormat)
+    if (!canonicalizedDatePattern.isEmpty()) {
+      SimpleDateFormat(canonicalizedDatePattern)
     } else {
       DateFormat.getDateInstance(DateFormat.SHORT)
     }
   val localDate = dateFormat.apply { isLenient = false }.parse(text.toString()).localDate
   // Throw ParseException if year is less than 4 digits.
   if (localDate.year.length() < 4) {
-    throw ParseException("Year has less than 4 digits.", localDate.year.length())
+    throw ParseException("Year has less than 4 digits.", text.indexOf('y'))
   }
   // date/localDate with year more than 4 digit throws data format exception if deep copy
   // operation get performed on QuestionnaireResponse,
@@ -98,7 +99,19 @@ internal fun parseDate(text: CharSequence?, acceptableDateFormat: String?): Loca
   // e.g ca.uhn.fhir.parser.DataFormatException: Invalid date/time format: "19843-12-21":
   // Expected character '-' at index 4 but found 3
   if (localDate.year.length() > 4) {
-    throw ParseException("Year has more than 4 digits.", localDate.year.length())
+    throw ParseException("Year has more than 4 digits.", text.indexOf('y'))
   }
   return localDate
+}
+
+/**
+ * Returns formatted local date using canonicalizedDatePattern date pattern otherwise localized
+ * String
+ */
+internal fun LocalDate.format(canonicalizedDatePattern: String): String {
+  return if (canonicalizedDatePattern.isEmpty()) {
+    this.localizedString
+  } else {
+    DateTimeFormatter.ofPattern(canonicalizedDatePattern).format(this)
+  }
 }
