@@ -42,6 +42,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver android:name="com.google.android.fhir.demo.security.SecurityRequirementViolationReceiver" />
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

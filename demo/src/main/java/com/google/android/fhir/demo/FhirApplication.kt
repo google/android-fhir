@@ -17,15 +17,23 @@
 package com.google.android.fhir.demo
 
 import android.app.Application
+import android.app.PendingIntent
+import android.app.admin.DevicePolicyManager
 import android.content.Context
+import android.content.Intent
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.demo.data.FhirSyncWorker
+import com.google.android.fhir.demo.security.SecurityRequirementViolationReceiver
+import com.google.android.fhir.security.FhirSecurityConfiguration
+import com.google.android.fhir.security.LockScreenRequirement
+import com.google.android.fhir.security.RequirementViolationAction
 import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.remote.HttpLogger
+import java.util.EnumSet
 import timber.log.Timber
 
 class FhirApplication : Application() {
@@ -40,16 +48,30 @@ class FhirApplication : Application() {
     FhirEngineProvider.init(
       FhirEngineConfiguration(
         enableEncryptionIfSupported = true,
-        RECREATE_AT_OPEN,
-        ServerConfiguration(
-          "https://hapi.fhir.org/baseR4/",
-          httpLogger =
-            HttpLogger(
-              HttpLogger.Configuration(
-                if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC
-              )
-            ) { Timber.tag("App-HttpLog").d(it) }
-        )
+        databaseErrorStrategy = RECREATE_AT_OPEN,
+        securityConfiguration =
+          FhirSecurityConfiguration(
+            LockScreenRequirement(
+              complexity = DevicePolicyManager.PASSWORD_COMPLEXITY_HIGH,
+              EnumSet.of(RequirementViolationAction.WARN)
+            ),
+            PendingIntent.getBroadcast(
+              applicationContext,
+              /* requestCode= */ 0,
+              Intent(applicationContext, SecurityRequirementViolationReceiver::class.java),
+              /* flags= */ PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+          ),
+        serverConfiguration =
+          ServerConfiguration(
+            "https://hapi.fhir.org/baseR4/",
+            httpLogger =
+              HttpLogger(
+                HttpLogger.Configuration(
+                  if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC
+                )
+              ) { Timber.tag("App-HttpLog").d(it) },
+          )
       )
     )
     Sync.oneTimeSync<FhirSyncWorker>(this)

@@ -25,6 +25,8 @@ import com.google.android.fhir.db.impl.DatabaseConfig
 import com.google.android.fhir.db.impl.DatabaseEncryptionKeyProvider.isDatabaseEncryptionSupported
 import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
+import com.google.android.fhir.security.FhirSecurityConfiguration
+import com.google.android.fhir.security.SecurityRequirementsManager
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.remote.RemoteFhirService
 import timber.log.Timber
@@ -33,6 +35,7 @@ internal data class FhirServices(
   val fhirEngine: FhirEngine,
   val parser: IParser,
   val database: Database,
+  val securityRequirementsManager: SecurityRequirementsManager,
   val remoteDataSource: DataSource? = null
 ) {
   class Builder(private val context: Context) {
@@ -40,6 +43,7 @@ internal data class FhirServices(
     private var enableEncryption: Boolean = false
     private var databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
     private var serverConfiguration: ServerConfiguration? = null
+    private var securityConfiguration: FhirSecurityConfiguration? = null
 
     internal fun inMemory() = apply { inMemory = true }
 
@@ -59,6 +63,11 @@ internal data class FhirServices(
       this.serverConfiguration = serverConfiguration
     }
 
+    internal fun setSecurityConfiguration(securityConfiguration: FhirSecurityConfiguration) =
+      apply {
+        this.securityConfiguration = securityConfiguration
+      }
+
     fun build(): FhirServices {
       val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
       val db =
@@ -75,11 +84,13 @@ internal data class FhirServices(
             .setHttpLogger(it.httpLogger)
             .build()
         }
+      val securityRequirementsManager = SecurityRequirementsManager(context, securityConfiguration)
       return FhirServices(
         fhirEngine = engine,
         parser = parser,
         database = db,
-        remoteDataSource = remoteDataSource
+        remoteDataSource = remoteDataSource,
+        securityRequirementsManager = securityRequirementsManager,
       )
     }
   }

@@ -18,6 +18,8 @@ package com.google.android.fhir
 
 import android.content.Context
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
+import com.google.android.fhir.security.FhirSecurityConfiguration
+import com.google.android.fhir.security.SecurityRequirementsManager
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.remote.HttpLogger
@@ -58,6 +60,11 @@ object FhirEngineProvider {
   }
 
   @Synchronized
+  fun getSecurityRequirementsManager(context: Context): SecurityRequirementsManager {
+    return getOrCreateFhirService(context).securityRequirementsManager
+  }
+
+  @Synchronized
   private fun getOrCreateFhirService(context: Context): FhirServices {
     if (fhirServices == null) {
       fhirEngineConfiguration = fhirEngineConfiguration ?: FhirEngineConfiguration()
@@ -70,6 +77,9 @@ object FhirEngineProvider {
             configuration.serverConfiguration?.let { setServerConfiguration(it) }
             if (configuration.testMode) {
               inMemory()
+            }
+            if (configuration.securityConfiguration != null) {
+              setSecurityConfiguration(configuration.securityConfiguration)
             }
           }
           .build()
@@ -104,6 +114,7 @@ object FhirEngineProvider {
 data class FhirEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
   val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
+  val securityConfiguration: FhirSecurityConfiguration? = null,
   val serverConfiguration: ServerConfiguration? = null,
   val testMode: Boolean = false
 )
