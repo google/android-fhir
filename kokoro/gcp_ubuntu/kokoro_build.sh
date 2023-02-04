@@ -102,7 +102,7 @@ function build_only() {
 # for documentation on the gsutil command used in this function
 function device_tests() {
   ./gradlew packageDebugAndroidTest --scan --stacktrace
-  local lib_names=("common" "datacapture" "engine")
+  local lib_names=("datacapture" "engine")
   firebase_pids=()
   for lib_name in "${lib_names[@]}"; do
    gcloud firebase test android run --type instrumentation \
@@ -143,7 +143,7 @@ function device_tests() {
     wait $firebase_pid
   done
 
-  mkdir -p {common,datacapture,engine,workflow}/build/outputs/code_coverage/debugAndroidTest/connected/firebase
+  mkdir -p {datacapture,engine,workflow}/build/outputs/code_coverage/debugAndroidTest/connected/firebase
   for lib_name in "${lib_names[@]}"; do
     gsutil -m cp -R gs://$GCS_BUCKET/$KOKORO_BUILD_ARTIFACTS_SUBDIR/firebase/$lib_name/Pixel2-30-en_US-portrait/**/coverage.ec \
       $lib_name/build/outputs/code_coverage/debugAndroidTest/connected/firebase
