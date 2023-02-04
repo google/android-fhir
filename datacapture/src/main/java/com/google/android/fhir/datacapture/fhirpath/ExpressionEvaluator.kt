@@ -58,6 +58,12 @@ object ExpressionEvaluator {
    */
   private val variableRegex = Regex("[%]([A-Za-z0-9\\-]{1,64})")
 
+  /**
+   * Finds all the matching occurrences of FHIRPaths in x-fhir-query.
+   * See: https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
+   */
+  internal val xFhirQueryEnhancementRegex = Regex("\\{\\{(.*?)\\}\\}")
+
   internal val fhirPathEngine: FHIRPathEngine =
     with(FhirContext.forCached(FhirVersionEnum.R4)) {
       FHIRPathEngine(HapiWorkerContext(this, this.validationSupport)).apply {
