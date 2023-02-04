@@ -16,6 +16,8 @@
 
 package com.google.android.fhir.implementationguide
 
+import android.content.Context
+import androidx.room.Room
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.implementationguide.db.impl.ImplementationGuideDatabase
 import com.google.android.fhir.implementationguide.db.impl.entities.ResourceMetadataEntity
@@ -23,13 +25,12 @@ import com.google.android.fhir.implementationguide.db.impl.entities.toEntity
 import java.io.File
 import java.io.FileInputStream
 import org.hl7.fhir.instance.model.api.IBaseResource
-import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.MetadataResource
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
-/** Responsible for downloading, accessing and deleting Implementation Guides. */
+/** Responsible for importing, accessing and deleting Implementation Guides. */
 class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
 
   private val igDao = igDatabase.implementationGuideDao()
@@ -37,23 +38,27 @@ class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
 
   /**
    * * Checks if the [igDependencies] are present in DB. If necessary, downloads the dependencies
-   * from NPM and imports data from the package manager.
+   * from NPM and imports data from the package manager (populates the metadata of the FHIR
+   * Resorces)
    */
   suspend fun install(vararg igDependencies: IgDependency) {
     TODO("not implemented yet")
   }
 
   /**
-   * Checks if the [igDependency] is present in DB. If necessary, imports the IG from the provided
-   * [rootDirectory]
+   * Checks if the [igDependency] is present in DB. If necessary, populates the database with the
+   * metadata of FHIR Resource from the provided [rootDirectory].
    */
   suspend fun install(igDependency: IgDependency, rootDirectory: File) {
+    // TODO(ktarasenko) copy files to the safe space?
     val igId = igDao.insert(igDependency.toEntity(rootDirectory))
     rootDirectory.listFiles()?.forEach { file ->
       try {
-        when (val resource = jsonParser.parseResource(FileInputStream(file))) {
-          is Bundle -> importBundle(igId, resource, file)
-          is Resource -> importResource(igId, resource, file)
+        val resource = jsonParser.parseResource(FileInputStream(file))
+        if (resource is Resource) {
+          importResource(igId, resource, file)
+        } else {
+          Timber.d("Unable to import file: %file")
         }
       } catch (exception: Exception) {
         Timber.d(exception, "Unable to import file: %file")
@@ -94,17 +99,6 @@ class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
     }
   }
 
-  private suspend fun importBundle(igId: Long, resource: Bundle, file: File) {
-    // TODO: Multiple resources will point to the same file, and it needs to be accounted for while
-    // reading it.
-    // for (entry in resource.entry) {
-    //   when (val bundleResource = entry.resource) {
-    //     is Resource -> importResource(igId, bundleResource, fileUri)
-    //     else -> println("Can't import resource ${entry.resource.resourceType}")
-    //   }
-    // }
-  }
-
   private suspend fun importResource(igId: Long, resource: Resource, file: File) {
     val metadataResource = resource as? MetadataResource
     val res =
@@ -121,5 +115,21 @@ class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
 
   private fun loadResource(resourceEntity: ResourceMetadataEntity): IBaseResource {
     return jsonParser.parseResource(FileInputStream(resourceEntity.resourceFile))
+  }
+
+  companion object {
+    private const val DB_NAME = "implementationguide.db"
+
+    /** Creates an [IgManager] backed by the Room DB. */
+    fun create(context: Context) =
+      IgManager(
+        Room.databaseBuilder(context, ImplementationGuideDatabase::class.java, DB_NAME).build()
+      )
+
+    /** Creates an [IgManager] backed by the in-memory DB. */
+    fun createInMemory(context: Context) =
+      IgManager(
+        Room.inMemoryDatabaseBuilder(context, ImplementationGuideDatabase::class.java).build()
+      )
   }
 }
