@@ -37,8 +37,6 @@ fun Project.configureFirebaseTestLab() {
     )
     instrumentationApk.set(project.provider { "$buildDir/outputs/apk/androidTest/debug/*.apk" })
     flakyTestAttempts.set(3)
-    maxTestShards.set(50)
-    shardTime.set(120)
     useOrchestrator.set(false)
     environmentVariables.set(
       mapOf("coverage" to "true", "coverageFile" to "/sdcard/Download/coverage.ec")
