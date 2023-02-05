@@ -37,12 +37,13 @@ fun Project.configureFirebaseTestLab() {
       )
     )
     instrumentationApk.set(project.provider { "$buildDir/outputs/apk/androidTest/debug/*.apk" })
-    flakyTestAttempts.set(3)
     useOrchestrator.set(false)
+    flakyTestAttempts.set(3)
     environmentVariables.set(
       mapOf("coverage" to "true", "coverageFile" to "/sdcard/Download/coverage.ec")
     )
     directoriesToPull.set(listOf("/sdcard/Download"))
+    filesToDownload.set(listOf(".*/sdcard/Download/.*.ec"))
     resultsBucket.set("android-fhir-build-artifacts")
     resultsDir.set(
       if (project.providers.environmentVariable("KOKORO_BUILD_ARTIFACTS_SUBDIR").isPresent) {
@@ -51,6 +52,10 @@ fun Project.configureFirebaseTestLab() {
         "${project.name}-${UUID.randomUUID()}"
       }
     )
-    filesToDownload.set(listOf(".*/sdcard/Download/.*.ec"))
+    maxTestShards.set(50)
+    shardTime.set(120)
+    smartFlankGcsPath.set(
+      "gs://android-fhir-build-artifacts/smart-flank/${project.name}/JUnitReport.xml"
+    )
   }
 }
