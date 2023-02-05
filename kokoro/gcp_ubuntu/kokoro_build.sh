@@ -50,6 +50,10 @@ function zip_artifacts() {
   zip test-results/build.zip ./*/build -r -q
   find . -type f -regex ".*[t|androidT]est-results/.*xml" \
     -exec cp {} test-results/ \;
+
+  echo "URLs for screen capture videos:"
+  gsutil ls gs://$GCS_BUCKET/$KOKORO_BUILD_ARTIFACTS_SUBDIR/**/*.mp4 \
+    | sed 's|gs://|https://storage.googleapis.com/|'
 }
 
 # Installs dependencies to run CI pipeline. Dependencies are:
@@ -86,7 +90,16 @@ function build_only() {
 # coverage reports.
 function device_tests() {
   ./gradlew packageDebugAndroidTest --scan --stacktrace
-  ./gradlew runFlank  --scan --stacktrace
+    local lib_names=("datacapture" "engine" "workflow")
+    firebase_pids=()
+    for lib_name in "${lib_names[@]}"; do
+      ./gradlew :$lib_name:runFlank  --scan --stacktrace &
+      firebase_pids+=("$!")
+    done
+
+    for firebase_pid in ${firebase_pids[*]}; do
+        wait $firebase_pid
+    done
 }
 
 # Generates JaCoCo reports and uploads to Codecov: https://about.codecov.io/

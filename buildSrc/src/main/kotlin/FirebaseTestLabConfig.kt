@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import java.util.UUID
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
@@ -43,6 +44,13 @@ fun Project.configureFirebaseTestLab() {
     )
     directoriesToPull.set(listOf("/sdcard/Download"))
     resultsBucket.set("android-fhir-build-artifacts")
+    resultsDir.set(
+      if (project.providers.environmentVariable("KOKORO_BUILD_ARTIFACTS_SUBDIR").isPresent) {
+        "${System.getenv("KOKORO_BUILD_ARTIFACTS_SUBDIR")}/firebase/${project.name}"
+      } else {
+        "${project.name}-${UUID.randomUUID()}"
+      }
+    )
     filesToDownload.set(listOf(".*/sdcard/Download/.*.ec"))
   }
 }

@@ -35,7 +35,7 @@ subprojects {
     maxParallelForks = 1
     if (project.providers.environmentVariable("GITHUB_ACTIONS").isPresent) {
       // limit memory usage to avoid running out of memory in the docker container.
-      maxHeapSize = "1024m"
+      maxHeapSize = "512m"
     }
   }
 }
