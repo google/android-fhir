@@ -10,6 +10,8 @@ plugins {
 
 publishArtifact(Releases.DataCapture)
 
+configureFirebaseTestLab()
+
 createJacocoTestReportTask()
 
 android {

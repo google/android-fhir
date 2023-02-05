@@ -1,5 +1,6 @@
 import Dependencies.forceHapiVersion
 import Dependencies.removeIncompatibleDependencies
+import com.osacky.flank.gradle.FlankGradleExtension
 import java.net.URL
 
 plugins {
@@ -71,6 +72,17 @@ android {
   kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
 
   configureJacocoTestOptions()
+}
+
+configureFirebaseTestLab()
+
+configure<FlankGradleExtension> {
+  devices.set(
+    listOf(
+      mapOf("model" to "Nexus6P", "version" to "27", "locale" to "en_US"),
+      mapOf("model" to "Pixel2", "version" to "30", "locale" to "en_US"),
+    )
+  )
 }
 
 configurations {

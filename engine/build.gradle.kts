@@ -12,6 +12,8 @@ plugins {
 
 publishArtifact(Releases.Engine)
 
+configureFirebaseTestLab()
+
 createJacocoTestReportTask()
 
 val generateSourcesTask =
