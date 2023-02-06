@@ -41,9 +41,16 @@ import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 import kotlin.test.assertFailsWith
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
@@ -66,16 +73,33 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TestWatcher
+import org.junit.runner.Description
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.util.ReflectionHelpers
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class MainDispatcherRule(
+  val testDispatcher: TestDispatcher = UnconfinedTestDispatcher(),
+) : TestWatcher() {
+  override fun starting(description: Description) {
+    Dispatchers.setMain(testDispatcher)
+  }
+
+  override fun finished(description: Description) {
+    Dispatchers.resetMain()
+  }
+}
 
 @RunWith(RobolectricTestRunner::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 @Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
 class QuestionnaireViewModelTest {
   @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
+
+  @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
   private lateinit var fhirEngine: FhirEngine
   private lateinit var state: SavedStateHandle
@@ -2076,7 +2100,7 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    withContext(coroutineContext) { viewModel.goToNextPage() }
+    viewModel.goToNextPage()
 
     viewModel.questionnaireStateFlow.test {
       assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination)
@@ -2129,10 +2153,9 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    withContext(coroutineContext) {
-      viewModel.goToNextPage()
-      viewModel.goToPreviousPage()
-    }
+    viewModel.goToNextPage()
+    viewModel.goToPreviousPage()
+
     viewModel.questionnaireStateFlow.test {
       assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination)
         .isEqualTo(
@@ -2203,7 +2226,7 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    withContext(coroutineContext) { viewModel.goToNextPage() }
+    viewModel.goToNextPage()
     viewModel.questionnaireStateFlow.test {
       assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination)
         .isEqualTo(
@@ -2338,7 +2361,7 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    withContext(coroutineContext) { viewModel.goToNextPage() }
+    viewModel.goToNextPage()
     viewModel.questionnaireStateFlow.test {
       assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination)
         .isEqualTo(
@@ -2397,18 +2420,19 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    withContext(coroutineContext) { viewModel.goToNextPage() }
-    viewModel.questionnaireStateFlow.test {
-      assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-      assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination)
-        .isEqualTo(
-          QuestionnairePagination(
-            isPaginated = true,
-            pages = viewModel.pages!!,
-            currentPageIndex = 1
-          )
-        )
-    }
+
+    val collectJob =
+      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+
+    viewModel.goToNextPage()
+    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
+    assertThat(
+        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+      )
+      .isEqualTo(
+        QuestionnairePagination(isPaginated = true, pages = viewModel.pages!!, currentPageIndex = 1)
+      )
+    collectJob.cancel()
   }
 
   @Test
@@ -2452,21 +2476,20 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    withContext(coroutineContext) {
-      viewModel.goToNextPage()
-      viewModel.goToPreviousPage()
-    }
-    viewModel.questionnaireStateFlow.test {
-      assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-      assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination)
-        .isEqualTo(
-          QuestionnairePagination(
-            isPaginated = true,
-            pages = viewModel.pages!!,
-            currentPageIndex = 0
-          )
-        )
-    }
+    val collectJob =
+      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+    viewModel.goToNextPage()
+    viewModel.goToPreviousPage()
+
+    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
+    assertThat(
+        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+      )
+      .isEqualTo(
+        QuestionnairePagination(isPaginated = true, pages = viewModel.pages!!, currentPageIndex = 0)
+      )
+
+    collectJob.cancel()
   }
 
   @Test
@@ -2742,18 +2765,19 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    withContext(coroutineContext) { viewModel.goToNextPage() }
-    viewModel.questionnaireStateFlow.test {
-      assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
-      assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination)
-        .isEqualTo(
-          QuestionnairePagination(
-            isPaginated = true,
-            pages = viewModel.pages!!,
-            currentPageIndex = 1
-          )
-        )
-    }
+    val collectJob =
+      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+    viewModel.goToNextPage()
+
+    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
+    assertThat(
+        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+      )
+      .isEqualTo(
+        QuestionnairePagination(isPaginated = true, pages = viewModel.pages!!, currentPageIndex = 1)
+      )
+
+    collectJob.cancel()
   }
 
   @Test
@@ -2796,7 +2820,7 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    withContext(coroutineContext) { viewModel.goToNextPage() }
+    viewModel.goToNextPage()
 
     viewModel.questionnaireStateFlow.test {
       assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination)
@@ -2851,21 +2875,21 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    withContext(coroutineContext) {
-      viewModel.goToNextPage()
-      viewModel.goToPreviousPage()
-    }
 
-    viewModel.questionnaireStateFlow.test {
-      assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination)
-        .isEqualTo(
-          QuestionnairePagination(
-            isPaginated = true,
-            pages = viewModel.pages!!,
-            currentPageIndex = 1
-          )
-        )
-    }
+    val collectJob =
+      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+
+    viewModel.goToNextPage()
+    viewModel.goToPreviousPage()
+
+    assertThat(
+        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+      )
+      .isEqualTo(
+        QuestionnairePagination(isPaginated = true, pages = viewModel.pages!!, currentPageIndex = 1)
+      )
+
+    collectJob.cancel()
   }
 
   // Test cases for answer value set
@@ -3438,7 +3462,7 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
 
-      withContext(coroutineContext) { viewModel.goToNextPage() }
+      viewModel.goToNextPage()
 
       viewModel.questionnaireStateFlow.test {
         assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination.showReviewButton)
@@ -3527,7 +3551,7 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
-      withContext(coroutineContext) { viewModel.goToNextPage() }
+      viewModel.goToNextPage()
       viewModel.questionnaireStateFlow.test {
         assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination.showReviewButton)
           .isTrue()
