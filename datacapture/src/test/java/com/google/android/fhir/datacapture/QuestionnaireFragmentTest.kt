@@ -17,13 +17,17 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Build
+import android.view.View
+import android.widget.Button
 import androidx.core.os.bundleOf
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.fragment.app.testing.withFragment
 import androidx.lifecycle.Lifecycle
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
 import org.junit.Test
@@ -87,5 +91,35 @@ class QuestionnaireFragmentTest {
     scenario.withFragment {
       assertThat(calculateProgressPercentage(count = 10, totalCount = 50)).isEqualTo(20)
     }
+  }
+
+  @Test
+  fun `review page should show both edit and submit button`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+      }
+    val questionnaireJson = parser.encodeResourceToString(questionnaire)
+    val scenario =
+      launchFragmentInContainer<QuestionnaireFragment>(
+        bundleOf(
+          EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
+          EXTRA_ENABLE_REVIEW_PAGE to true,
+          EXTRA_SHOW_REVIEW_PAGE_FIRST to true
+        )
+      )
+    scenario.moveToState(Lifecycle.State.RESUMED)
+    val view = scenario.withFragment { requireView() }
+
+    assertThat(view.findViewById<Button>(R.id.review_mode_edit_button).visibility)
+      .isEqualTo(View.VISIBLE)
+    assertThat(view.findViewById<Button>(R.id.submit_questionnaire).visibility)
+      .isEqualTo(View.VISIBLE)
   }
 }
