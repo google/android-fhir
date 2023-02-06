@@ -145,7 +145,6 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         if (answer == null) {
           clearPhotoPreview()
           clearFilePreview()
-          hideDeleteButton()
           return
         }
 
