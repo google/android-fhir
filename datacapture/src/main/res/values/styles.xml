@@ -308,7 +308,7 @@
         name="Questionnaire.AttachmentDividerStyle"
         parent="Widget.Material3.MaterialDivider"
     >
-        <item name="dividerColor">#DDDDDD</item>
+        <item name="dividerColor">@color/item_border_color</item>
     </style>
 
     <style
