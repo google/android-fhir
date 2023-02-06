@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.DATABASE_PASSPHRASE_NAME
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.ENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
+import com.google.android.fhir.index.ResourceIndexer
+import com.google.android.fhir.index.SearchParamDefinitionsProviderImpl
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.getQuery
@@ -46,6 +48,7 @@ import org.junit.runner.RunWith
 class EncryptedDatabaseErrorTest {
   private val context: Context = ApplicationProvider.getApplicationContext()
   private val parser = FhirContext.forR4().newJsonParser()
+  private val resourceIndexer = ResourceIndexer(SearchParamDefinitionsProviderImpl())
 
   @After
   fun tearDown() {
@@ -65,7 +68,8 @@ class EncryptedDatabaseErrorTest {
               inMemory = false,
               enableEncryption = false,
               databaseErrorStrategy = UNSPECIFIED
-            )
+            ),
+            resourceIndexer
           )
           .let {
             it.insert(TEST_PATIENT_1)
@@ -81,7 +85,8 @@ class EncryptedDatabaseErrorTest {
               inMemory = false,
               enableEncryption = true,
               databaseErrorStrategy = UNSPECIFIED
-            )
+            ),
+            resourceIndexer
           )
           .let {
             it.search<Patient>(
@@ -110,7 +115,8 @@ class EncryptedDatabaseErrorTest {
               inMemory = false,
               enableEncryption = true,
               databaseErrorStrategy = UNSPECIFIED
-            )
+            ),
+            resourceIndexer
           )
           .let {
             it.insert(TEST_PATIENT_1)
@@ -132,7 +138,8 @@ class EncryptedDatabaseErrorTest {
               inMemory = false,
               enableEncryption = true,
               databaseErrorStrategy = UNSPECIFIED
-            )
+            ),
+            resourceIndexer
           )
           .let {
             it.search<Patient>(
@@ -160,7 +167,8 @@ class EncryptedDatabaseErrorTest {
             inMemory = false,
             enableEncryption = true,
             databaseErrorStrategy = UNSPECIFIED
-          )
+          ),
+          resourceIndexer
         )
         .let {
           it.insert(TEST_PATIENT_1)
@@ -182,7 +190,8 @@ class EncryptedDatabaseErrorTest {
             inMemory = false,
             enableEncryption = true,
             databaseErrorStrategy = RECREATE_AT_OPEN
-          )
+          ),
+          resourceIndexer
         )
         .let {
           assertThat(
@@ -213,7 +222,8 @@ class EncryptedDatabaseErrorTest {
               inMemory = false,
               enableEncryption = true,
               databaseErrorStrategy = UNSPECIFIED
-            )
+            ),
+            resourceIndexer
           )
           .let {
             it.insert(TEST_PATIENT_1)
@@ -229,7 +239,8 @@ class EncryptedDatabaseErrorTest {
               inMemory = false,
               enableEncryption = false,
               databaseErrorStrategy = UNSPECIFIED
-            )
+            ),
+            resourceIndexer
           )
           .let {
             assertThat(

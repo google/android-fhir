@@ -19,10 +19,12 @@ package com.google.android.fhir.db.impl
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.MediumTest
+import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.FhirServices
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -50,7 +52,9 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Observation
@@ -60,6 +64,8 @@ import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
+import org.hl7.fhir.r4.model.SearchParameter
+import org.hl7.fhir.r4.model.StringType
 import org.json.JSONArray
 import org.junit.After
 import org.junit.Assert.assertThrows
@@ -84,15 +90,28 @@ class DatabaseImplTest {
   @JvmField @Parameterized.Parameter(0) var encrypted: Boolean = false
 
   private val context: Context = ApplicationProvider.getApplicationContext()
-  private val services =
-    FhirServices.builder(context)
-      .inMemory()
-      .apply { if (encrypted) enableEncryptionIfSupported() }
-      .build()
-  private val testingUtils = TestingUtils(services.parser)
-  private val database = services.database
+  private lateinit var services: FhirServices
+  private lateinit var testingUtils: TestingUtils
+  private lateinit var database: Database
 
-  @Before fun setUp(): Unit = runBlocking { database.insert(TEST_PATIENT_1) }
+  @Before
+  fun setUp(): Unit = runBlocking {
+    buildFhirService()
+    database.insert(TEST_PATIENT_1)
+  }
+
+  private fun buildFhirService(customSearchParameter: List<SearchParameter>? = null) {
+    services =
+      FhirServices.builder(context)
+        .inMemory()
+        .apply {
+          if (encrypted) enableEncryptionIfSupported()
+          setSearchParameters(customSearchParameter)
+        }
+        .build()
+    database = services.database
+    testingUtils = TestingUtils(services.parser)
+  }
 
   @After
   fun tearDown() {
@@ -2956,6 +2975,129 @@ class DatabaseImplTest {
     assertThat(result.map { it.nameFirstRep.nameAsSingleString })
       .containsExactly("John Doe", "Jane Doe", "John Roe", "Jane Roe")
       .inOrder()
+  }
+
+  @Test
+  fun search_patient_with_extension_as_search_param() = runBlocking {
+    val maidenNameSearchParameter =
+      SearchParameter().apply {
+        url = "http://example.com/SearchParameter/patient-mothersMaidenName"
+        addBase("Patient")
+        name = "mothers-maiden-name"
+        code = "mothers-maiden-name"
+        type = Enumerations.SearchParamType.STRING
+        expression =
+          "Patient.extension('http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName').value.as(String)"
+        description = "search on mother's maiden name"
+      }
+    val patient =
+      Patient().apply {
+        addIdentifier(
+          Identifier().apply {
+            system = "https://custom-identifier-namespace"
+            value = "OfficialIdentifier_DarcySmith_0001"
+          }
+        )
+
+        addName(
+          HumanName().apply {
+            use = HumanName.NameUse.OFFICIAL
+            family = "Smith"
+            addGiven("Darcy")
+            gender = Enumerations.AdministrativeGender.FEMALE
+            birthDateElement = DateType("1970-01-01")
+          }
+        )
+
+        addExtension(
+          Extension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName"
+            setValue(StringType("Marca"))
+          }
+        )
+      }
+    // Get rid of the default service and create one with search params
+    tearDown()
+    buildFhirService(listOf(maidenNameSearchParameter))
+    database.insert(patient)
+
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(
+              StringClientParam("mothers-maiden-name"),
+              {
+                value = "Marca"
+                modifier = StringFilterModifier.MATCHES_EXACTLY
+              }
+            )
+          }
+          .getQuery()
+      )
+
+    assertThat(result.map { it.nameFirstRep.nameAsSingleString }).contains("Darcy Smith")
+  }
+
+  @Test
+  fun search_patient_with_custom_value_as_search_param() = runBlocking {
+    val patient =
+      Patient().apply {
+        addIdentifier(
+          Identifier().apply {
+            system = "https://custom-identifier-namespace"
+            value = "OfficialIdentifier_DarcySmith_0001"
+          }
+        )
+
+        addName(
+          HumanName().apply {
+            use = HumanName.NameUse.OFFICIAL
+            family = "Smith"
+            addGiven("Darcy")
+            gender = Enumerations.AdministrativeGender.FEMALE
+            birthDateElement = DateType("1970-01-01")
+          }
+        )
+
+        addExtension(
+          Extension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName"
+            setValue(StringType("Marca"))
+          }
+        )
+      }
+    val identifierPartialSearchParameter =
+      SearchParameter().apply {
+        url = "http://example.com/SearchParameter/patient-identifierPartial"
+        addBase("Patient")
+        name = "identifierPartial"
+        code = "identifierPartial"
+        type = Enumerations.SearchParamType.STRING
+        expression = "Patient.identifier.value"
+        description = "Search the identifier"
+      }
+    // Get rid of the default service and create one with search params
+    tearDown()
+    buildFhirService(listOf(identifierPartialSearchParameter))
+    database.insert(patient)
+
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(
+              StringClientParam("identifierPartial"),
+              {
+                value = "OfficialIdentifier_"
+                modifier = StringFilterModifier.STARTS_WITH
+              }
+            )
+          }
+          .getQuery()
+      )
+
+    assertThat(result.map { it.nameFirstRep.nameAsSingleString }).contains("Darcy Smith")
   }
 
   private companion object {

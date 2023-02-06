@@ -49,6 +49,7 @@ internal abstract class ResourceDao {
   // this is ugly but there is no way to inject these right now in Room as it is the one creating
   // the dao
   lateinit var iParser: IParser
+  lateinit var resourceIndexer: ResourceIndexer
 
   open suspend fun update(resource: Resource) {
     getResourceEntity(resource.logicalId, resource.resourceType)?.let {
@@ -164,7 +165,7 @@ internal abstract class ResourceDao {
         lastUpdatedRemote = resource.lastUpdated
       )
     insertResource(entity)
-    val index = ResourceIndexer.index(resource)
+    val index = resourceIndexer.index(resource)
     updateIndicesForResource(index, entity, resourceUuid)
 
     return resource.id
