@@ -621,7 +621,7 @@ internal val Questionnaire.QuestionnaireItemComponent.itemMedia: Attachment?
   get() =
     (getExtensionByUrl(EXTENSION_ITEM_MEDIA)?.value as? Attachment)?.takeIf { it.hasContentType() }
 
-/** Fetch the Bitmap representation of [Attachment.url]. */
+/** Fetches the Bitmap representation of [Attachment.url]. */
 internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
   if (!hasUrl() || !UrlUtil.isValid(url) || !hasContentType()) return null
 
@@ -638,7 +638,7 @@ internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
   }
 }
 
-/** Decode the Bitmap representation of [Binary.data]. */
+/** Decodes the Bitmap representation of [Binary.data]. */
 internal fun Binary.decodeToBitmap(): Bitmap? {
   if (!hasContentType() || !hasData()) return null
 
@@ -647,7 +647,7 @@ internal fun Binary.decodeToBitmap(): Bitmap? {
   return data.decodeToBitmap()
 }
 
-/** Decode the Bitmap representation of [Attachment.data]. */
+/** Decodes the Bitmap representation of [Attachment.data]. */
 internal fun Attachment.decodeToBitmap(): Bitmap? {
   if (!hasContentType() || !hasData()) return null
 
