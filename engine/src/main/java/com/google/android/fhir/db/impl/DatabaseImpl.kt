@@ -31,9 +31,9 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
+import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
-import java.lang.IllegalStateException
 import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -46,7 +46,8 @@ import org.hl7.fhir.r4.model.ResourceType
 internal class DatabaseImpl(
   private val context: Context,
   private val iParser: IParser,
-  databaseConfig: DatabaseConfig
+  databaseConfig: DatabaseConfig,
+  private val resourceIndexer: ResourceIndexer
 ) : com.google.android.fhir.db.Database {
 
   val db: ResourceDatabase
@@ -96,7 +97,12 @@ internal class DatabaseImpl(
         .build()
   }
 
-  private val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
+  private val resourceDao by lazy {
+    db.resourceDao().also {
+      it.iParser = iParser
+      it.resourceIndexer = resourceIndexer
+    }
+  }
   private val syncedResourceDao = db.syncedResourceDao()
   private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 
@@ -145,8 +151,7 @@ internal class DatabaseImpl(
         iParser.parseResource(it)
       }
         ?: throw ResourceNotFoundException(type.name, id)
-    } as
-      Resource
+    } as Resource
   }
 
   override suspend fun lastUpdate(resourceType: ResourceType): String? {
@@ -202,9 +207,12 @@ internal class DatabaseImpl(
    */
   override suspend fun getAllLocalChanges(): List<SquashedLocalChange> {
     return db.withTransaction {
-      localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
-        SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
-      }
+      localChangeDao
+        .getAllLocalChanges()
+        .groupBy { it.resourceId to it.resourceType }
+        .values.map {
+          SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
+        }
     }
   }
 
