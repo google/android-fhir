@@ -30,7 +30,6 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.decodeToBitmap
 import com.google.android.fhir.datacapture.fetchBitmapFromUrl
 import com.google.android.fhir.datacapture.itemMedia
-import com.google.android.fhir.datacapture.type
 import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,9 +48,10 @@ class QuestionnaireItemMediaView(context: Context, attrs: AttributeSet?) :
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
     clearImage()
     val attachment = questionnaireItem.itemMedia ?: return
+    val attachmentMimeType = getMimeType(attachment.contentType)
     when {
       attachment.hasData() -> {
-        when (attachment.contentType.type) {
+        when (attachmentMimeType) {
           MimeType.IMAGE.value -> {
             val image = attachment.decodeToBitmap() ?: return
             loadImage(image)
@@ -65,7 +65,7 @@ class QuestionnaireItemMediaView(context: Context, attrs: AttributeSet?) :
         }
       }
       attachment.hasUrl() -> {
-        when (attachment.contentType.type) {
+        when (attachmentMimeType) {
           MimeType.IMAGE.value -> {
             val context = context.tryUnwrapContext()!!
             context.lifecycleScope.launch(Dispatchers.Main) {
@@ -94,4 +94,7 @@ class QuestionnaireItemMediaView(context: Context, attrs: AttributeSet?) :
     Glide.with(context).clear(imageAttachment)
     imageAttachment.visibility = View.GONE
   }
+
+  /** Only usable for a String known as mime type. */
+  private fun getMimeType(mimeType: String): String = mimeType.substringBefore("/")
 }

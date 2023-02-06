@@ -208,8 +208,7 @@ internal enum class MimeType(val value: String) {
 }
 
 /** Only usable for a String known as mime type. */
-internal val String.type: String
-  get() = this.substringBefore("/")
+private fun getMimeType(mimeType: String): String = mimeType.substringBefore("/")
 
 /** Returns true if at least one mime type matches the given type. */
 internal fun Questionnaire.QuestionnaireItemComponent.hasMimeType(type: String): Boolean {
@@ -625,7 +624,7 @@ internal val Questionnaire.QuestionnaireItemComponent.itemMedia: Attachment?
 internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
   if (!hasUrl() || !UrlUtil.isValid(url) || !hasContentType()) return null
 
-  if (contentType.type != MimeType.IMAGE.value) return null
+  if (getMimeType(contentType) != MimeType.IMAGE.value) return null
 
   val attachmentResolver = DataCapture.getConfiguration(context).urlResolver ?: return null
 
@@ -642,7 +641,7 @@ internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
 internal fun Binary.decodeToBitmap(): Bitmap? {
   if (!hasContentType() || !hasData()) return null
 
-  if (contentType.type != MimeType.IMAGE.value) return null
+  if (getMimeType(contentType) != MimeType.IMAGE.value) return null
 
   return data.decodeToBitmap()
 }
@@ -651,7 +650,7 @@ internal fun Binary.decodeToBitmap(): Bitmap? {
 internal fun Attachment.decodeToBitmap(): Bitmap? {
   if (!hasContentType() || !hasData()) return null
 
-  if (contentType.type != MimeType.IMAGE.value) return null
+  if (getMimeType(contentType) != MimeType.IMAGE.value) return null
 
   return data.decodeToBitmap()
 }
