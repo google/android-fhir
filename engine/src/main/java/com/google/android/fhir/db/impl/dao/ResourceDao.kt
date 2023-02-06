@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,25 +49,17 @@ internal abstract class ResourceDao {
   // this is ugly but there is no way to inject these right now in Room as it is the one creating
   // the dao
   lateinit var iParser: IParser
+  lateinit var resourceIndexer: ResourceIndexer
 
   open suspend fun update(resource: Resource) {
-    updateResource(
-      resource.logicalId,
-      resource.resourceType,
-      iParser.encodeResourceToString(resource),
-    )
     getResourceEntity(resource.logicalId, resource.resourceType)?.let {
-      val entity =
-        ResourceEntity(
-          id = 0,
-          resourceType = resource.resourceType,
-          resourceUuid = it.resourceUuid,
-          resourceId = resource.logicalId,
-          serializedResource = iParser.encodeResourceToString(resource),
-          versionId = it.versionId,
-          lastUpdatedRemote = it.lastUpdatedRemote
-        )
-      val index = ResourceIndexer.index(resource)
+      val entity = it.copy(serializedResource = iParser.encodeResourceToString(resource))
+      // The foreign key in Index entity tables is set with cascade delete constraint and
+      // insertResource has REPLACE conflict resolution. So, when we do an insert to update the
+      // resource, it deletes old resource and corresponding index entities (based on foreign key
+      // constrain) before inserting the new resource.
+      insertResource(entity)
+      val index = resourceIndexer.index(resource)
       updateIndicesForResource(index, entity, it.resourceUuid)
     }
       ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
@@ -110,20 +102,6 @@ internal abstract class ResourceDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   abstract suspend fun insertPositionIndex(positionIndexEntity: PositionIndexEntity)
-
-  @Query(
-    """
-        UPDATE ResourceEntity
-        SET serializedResource = :serializedResource
-        WHERE resourceId = :resourceId
-        AND resourceType = :resourceType
-        """
-  )
-  abstract suspend fun updateResource(
-    resourceId: String,
-    resourceType: ResourceType,
-    serializedResource: String
-  )
 
   @Query(
     """
@@ -191,7 +169,7 @@ internal abstract class ResourceDao {
         lastUpdatedRemote = resource.lastUpdated
       )
     insertResource(entity)
-    val index = ResourceIndexer.index(resource)
+    val index = resourceIndexer.index(resource)
     updateIndicesForResource(index, entity, resourceUuid)
 
     return resource.id

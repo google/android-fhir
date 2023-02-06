@@ -76,8 +76,10 @@ fun Project.createJacocoTestReportTask() {
             // Unit test coverage report location
             "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
             // Instrumentation coverage report location
-            // "outputs/code_coverage/debugAndroidTest/connected/**/*.ec",
-            )
+            "outputs/code_coverage/debugAndroidTest/connected/**/*.ec",
+            // Instrumentation coverage report location from Firebase Test Lab
+            "fladle/results/**/*.ec",
+          )
         )
       }
     )
