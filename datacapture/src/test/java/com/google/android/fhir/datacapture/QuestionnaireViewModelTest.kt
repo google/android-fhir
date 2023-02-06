@@ -20,7 +20,6 @@ import android.app.Application
 import android.os.Build
 import androidx.lifecycle.SavedStateHandle
 import androidx.test.core.app.ApplicationProvider
-import app.cash.turbine.test
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
@@ -80,7 +79,19 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.util.ReflectionHelpers
 
-// https://developer.android.com/kotlin/coroutines/test#setting-main-dispatcher
+/**
+ * In local unit tests, the Main dispatcher that wraps the Android UI thread will be unavailable, as
+ * these tests are executed on a local JVM and not an Android device.
+ * [androidx.lifecycle.viewModelScope], which we use in [QuestionnaireViewModel], uses a hardcoded
+ * Main dispatcher under the hood, which needs to be replaced with a TestDispatcher.
+ *
+ * See: https://developer.android.com/kotlin/coroutines/test#setting-main-dispatcher
+ *
+ * The TestDispatcher we create is then used to launch a job to collect the results from
+ * [QuestionnaireViewModel.questionnaireStateFlow]
+ *
+ * See: https://developer.android.com/kotlin/flow/test#statein
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainDispatcherRule(
   val testDispatcher: TestDispatcher = UnconfinedTestDispatcher(),
@@ -1209,25 +1220,21 @@ class QuestionnaireViewModelTest {
           )
         }
 
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-      state.set(
-        EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
-        printer.encodeResourceToString(questionnaireResponse)
-      )
+      createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
       val viewModel = QuestionnaireViewModel(context, state)
-      withContext(coroutineContext) {
-        val items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
-        assertThat(items.map { it.questionnaireItem.linkId })
-          .containsExactly("question-1", "question-2", "question-3")
+      val collectJob =
+        launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
 
-        items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
-      }
+      var items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      assertThat(items.map { it.questionnaireItem.linkId })
+        .containsExactly("question-1", "question-2", "question-3")
 
-      viewModel.questionnaireStateFlow.test {
-        assertThat(awaitItem().items.map { it.asQuestion() }.map { it.questionnaireItem.linkId })
-          .containsExactly("question-1")
-      }
+      items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
+
+      items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      assertThat(items.map { it.questionnaireItem.linkId }).containsExactly("question-1")
+      collectJob.cancel()
     }
 
   @Test
@@ -1513,14 +1520,8 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `should emit questionnaire state flow with validation for modified items`() = runTest {
-    val entryModeExtension =
-      Extension().apply {
-        url = EXTENSION_ENTRY_MODE_URL
-        setValue(StringType("prior-edit"))
-      }
     val questionnaire =
       Questionnaire().apply {
-        addExtension(entryModeExtension)
         id = "a-questionnaire"
         addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
@@ -1533,16 +1534,16 @@ class QuestionnaireViewModelTest {
       }
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
+    val collectJob =
+      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
 
-    withContext(coroutineContext) {
-      val question = viewModel.getQuestionnaireItemViewItemList().single().asQuestion()
-      question.clearAnswer()
-    }
+    val question = viewModel.getQuestionnaireItemViewItemList().single().asQuestion()
+    question.clearAnswer()
 
-    viewModel.questionnaireStateFlow.test {
-      assertThat(awaitItem().items.first().asQuestion().validationResult)
-        .isEqualTo(Invalid(listOf("Missing answer for required field.")))
-    }
+    assertThat(viewModel.getQuestionnaireItemViewItemList().single().asQuestion().validationResult)
+      .isEqualTo(Invalid(listOf("Missing answer for required field.")))
+
+    collectJob.cancel()
   }
 
   @Test
@@ -2098,23 +2099,26 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
+    val collectJob =
+      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
 
     viewModel.goToNextPage()
 
-    viewModel.questionnaireStateFlow.test {
-      assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination)
-        .isEqualTo(
-          QuestionnairePagination(
-            isPaginated = true,
-            pages =
-              listOf(
-                QuestionnairePage(0, enabled = true, hidden = false),
-                QuestionnairePage(1, enabled = true, hidden = false)
-              ),
-            currentPageIndex = 1
-          )
+    assertThat(
+        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+      )
+      .isEqualTo(
+        QuestionnairePagination(
+          isPaginated = true,
+          pages =
+            listOf(
+              QuestionnairePage(0, enabled = true, hidden = false),
+              QuestionnairePage(1, enabled = true, hidden = false)
+            ),
+          currentPageIndex = 1
         )
-    }
+      )
+    collectJob.cancel()
   }
 
   @Test
@@ -2152,23 +2156,28 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
+    val collectJob =
+      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+
     viewModel.goToNextPage()
     viewModel.goToPreviousPage()
 
-    viewModel.questionnaireStateFlow.test {
-      assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination)
-        .isEqualTo(
-          QuestionnairePagination(
-            isPaginated = true,
-            pages =
-              listOf(
-                QuestionnairePage(0, enabled = true, hidden = false),
-                QuestionnairePage(1, enabled = true, hidden = false)
-              ),
-            currentPageIndex = 0
-          )
+    assertThat(
+        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+      )
+      .isEqualTo(
+        QuestionnairePagination(
+          isPaginated = true,
+          pages =
+            listOf(
+              QuestionnairePage(0, enabled = true, hidden = false),
+              QuestionnairePage(1, enabled = true, hidden = false)
+            ),
+          currentPageIndex = 0
         )
-    }
+      )
+
+    collectJob.cancel()
   }
 
   @Test
@@ -2225,22 +2234,26 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
+    val collectJob =
+      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+
     viewModel.goToNextPage()
-    viewModel.questionnaireStateFlow.test {
-      assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination)
-        .isEqualTo(
-          QuestionnairePagination(
-            isPaginated = true,
-            pages =
-              listOf(
-                QuestionnairePage(0, enabled = true, hidden = false),
-                QuestionnairePage(1, enabled = false, hidden = false),
-                QuestionnairePage(2, enabled = true, hidden = false),
-              ),
-            currentPageIndex = 2
-          )
+    assertThat(
+        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+      )
+      .isEqualTo(
+        QuestionnairePagination(
+          isPaginated = true,
+          pages =
+            listOf(
+              QuestionnairePage(0, enabled = true, hidden = false),
+              QuestionnairePage(1, enabled = false, hidden = false),
+              QuestionnairePage(2, enabled = true, hidden = false),
+            ),
+          currentPageIndex = 2
         )
-    }
+      )
+    collectJob.cancel()
   }
 
   @Test
@@ -2293,21 +2306,24 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.questionnaireStateFlow.test {
-      assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination)
-        .isEqualTo(
-          QuestionnairePagination(
-            isPaginated = true,
-            pages =
-              listOf(
-                QuestionnairePage(0, enabled = true, hidden = true),
-                QuestionnairePage(1, enabled = true, hidden = false),
-                QuestionnairePage(2, enabled = true, hidden = false)
-              ),
-            currentPageIndex = 1
-          )
+    val collectJob =
+      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+    assertThat(
+        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+      )
+      .isEqualTo(
+        QuestionnairePagination(
+          isPaginated = true,
+          pages =
+            listOf(
+              QuestionnairePage(0, enabled = true, hidden = true),
+              QuestionnairePage(1, enabled = true, hidden = false),
+              QuestionnairePage(2, enabled = true, hidden = false)
+            ),
+          currentPageIndex = 1
         )
-    }
+      )
+    collectJob.cancel()
   }
 
   @Test
@@ -2361,21 +2377,24 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.goToNextPage()
-    viewModel.questionnaireStateFlow.test {
-      assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination)
-        .isEqualTo(
-          QuestionnairePagination(
-            isPaginated = true,
-            pages =
-              listOf(
-                QuestionnairePage(0, enabled = true, hidden = false),
-                QuestionnairePage(1, enabled = true, hidden = true),
-                QuestionnairePage(2, enabled = true, hidden = false)
-              ),
-            currentPageIndex = 2
-          )
+    val collectJob =
+      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+    assertThat(
+        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+      )
+      .isEqualTo(
+        QuestionnairePagination(
+          isPaginated = true,
+          pages =
+            listOf(
+              QuestionnairePage(0, enabled = true, hidden = false),
+              QuestionnairePage(1, enabled = true, hidden = true),
+              QuestionnairePage(2, enabled = true, hidden = false)
+            ),
+          currentPageIndex = 2
         )
-    }
+      )
+    collectJob.cancel()
   }
 
   @Test
@@ -2533,16 +2552,15 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
     withContext(this.coroutineContext) { viewModel.goToNextPage() }
 
-    viewModel.questionnaireStateFlow.test {
-      assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination)
-        .isEqualTo(
-          QuestionnairePagination(
-            isPaginated = true,
-            pages = viewModel.pages!!,
-            currentPageIndex = 0
-          )
-        )
-    }
+    val collectJob =
+      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+    assertThat(
+        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+      )
+      .isEqualTo(
+        QuestionnairePagination(isPaginated = true, pages = viewModel.pages!!, currentPageIndex = 0)
+      )
+    collectJob.cancel()
   }
 
   @Test
@@ -2821,16 +2839,15 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.goToNextPage()
 
-    viewModel.questionnaireStateFlow.test {
-      assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination)
-        .isEqualTo(
-          QuestionnairePagination(
-            isPaginated = true,
-            pages = viewModel.pages!!,
-            currentPageIndex = 0
-          )
-        )
-    }
+    val collectJob =
+      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+    assertThat(
+        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+      )
+      .isEqualTo(
+        QuestionnairePagination(isPaginated = true, pages = viewModel.pages!!, currentPageIndex = 0)
+      )
+    collectJob.cancel()
   }
 
   @Test
@@ -3462,11 +3479,15 @@ class QuestionnaireViewModelTest {
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
 
       viewModel.goToNextPage()
+      val collectJob =
+        launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
 
-      viewModel.questionnaireStateFlow.test {
-        assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination.showReviewButton)
-          .isFalse()
-      }
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isFalse()
+      collectJob.cancel()
     }
 
   @Test
@@ -3551,10 +3572,14 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
       viewModel.goToNextPage()
-      viewModel.questionnaireStateFlow.test {
-        assertThat((awaitItem().displayMode as DisplayMode.EditMode).pagination.showReviewButton)
-          .isTrue()
-      }
+      val collectJob =
+        launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isTrue()
+      collectJob.cancel()
     }
 
   @Test

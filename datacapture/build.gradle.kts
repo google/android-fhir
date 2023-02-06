@@ -102,7 +102,6 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
-  testImplementation(Dependencies.turbine)
   testImplementation(project(":testing"))
 }
 
