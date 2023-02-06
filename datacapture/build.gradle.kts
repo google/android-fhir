@@ -10,8 +10,6 @@ plugins {
 
 publishArtifact(Releases.DataCapture)
 
-configureFirebaseTestLab()
-
 createJacocoTestReportTask()
 
 android {
@@ -55,6 +53,8 @@ android {
 
   testOptions { animationsDisabled = true }
 }
+
+afterEvaluate { configureFirebaseTestLab() }
 
 configurations { all { exclude(module = "xpp3") } }
 

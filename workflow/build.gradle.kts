@@ -73,7 +73,7 @@ android {
   configureJacocoTestOptions()
 }
 
-configureFirebaseTestLab()
+afterEvaluate { configureFirebaseTestLab() }
 
 configurations {
   all {
