@@ -474,8 +474,8 @@ class DatabaseImplTest {
           .getAllLocalChanges()
           .map { it }
           .none {
-            it.localChange.type.equals(LocalChangeEntity.Type.DELETE) &&
-              it.localChange.resourceId.equals("nonexistent_patient")
+            it.localChange.type == LocalChangeEntity.Type.DELETE &&
+              it.localChange.resourceId == "nonexistent_patient"
           }
       )
       .isTrue()
@@ -505,7 +505,7 @@ class DatabaseImplTest {
         database
           .getAllLocalChanges()
           .map { it }
-          .none { it.localChange.resourceId.equals(patient.logicalId) }
+          .none { it.localChange.resourceId == patient.logicalId }
       )
       .isTrue()
   }
@@ -586,6 +586,84 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun insert_should_remove_old_indexes() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "local-1"
+        addName(
+          HumanName().apply {
+            addGiven("Jane")
+            family = "Doe"
+          }
+        )
+      }
+
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+      )
+    assertThat(result.size).isEqualTo(1)
+
+    val updatedPatient =
+      Patient().apply {
+        id = "local-1"
+        addName(
+          HumanName().apply {
+            addGiven("John")
+            family = "Doe"
+          }
+        )
+      }
+
+    database.insert(updatedPatient)
+    val updatedResult =
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+      )
+    assertThat(updatedResult.size).isEqualTo(0)
+  }
+
+  @Test
+  fun insertRemote_should_remove_old_indexes() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "local-1"
+        addName(
+          HumanName().apply {
+            addGiven("Jane")
+            family = "Doe"
+          }
+        )
+      }
+
+    database.insertRemote(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+      )
+    assertThat(result.size).isEqualTo(1)
+
+    val updatedPatient =
+      Patient().apply {
+        id = "local-1"
+        addName(
+          HumanName().apply {
+            addGiven("John")
+            family = "Doe"
+          }
+        )
+      }
+
+    database.insertRemote(updatedPatient)
+    val updatedResult =
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+      )
+    assertThat(updatedResult.size).isEqualTo(0)
+  }
+
+  @Test
   fun update_remoteResource_readSquashedChanges_shouldReturnPatch() = runBlocking {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insertRemote(patient)
@@ -630,6 +708,45 @@ class DatabaseImplTest {
     assertThat(resourceType).isEqualTo(patient.resourceType.name)
     assertThat(versionId).isEqualTo(remoteMeta.versionId)
     testingUtils.assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
+  }
+
+  @Test
+  fun update_should_remove_old_indexes() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "local-1"
+        addName(
+          HumanName().apply {
+            addGiven("Jane")
+            family = "Doe"
+          }
+        )
+      }
+
+    database.insertRemote(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+      )
+    assertThat(result.size).isEqualTo(1)
+
+    val updatedPatient =
+      Patient().apply {
+        id = "local-1"
+        addName(
+          HumanName().apply {
+            addGiven("John")
+            family = "Doe"
+          }
+        )
+      }
+
+    database.update(updatedPatient)
+    val updatedResult =
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+      )
+    assertThat(updatedResult.size).isEqualTo(0)
   }
 
   @Test

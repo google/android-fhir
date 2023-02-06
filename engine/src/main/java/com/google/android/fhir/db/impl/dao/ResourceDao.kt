@@ -52,22 +52,13 @@ internal abstract class ResourceDao {
   lateinit var resourceIndexer: ResourceIndexer
 
   open suspend fun update(resource: Resource) {
-    updateResource(
-      resource.logicalId,
-      resource.resourceType,
-      iParser.encodeResourceToString(resource),
-    )
     getResourceEntity(resource.logicalId, resource.resourceType)?.let {
-      val entity =
-        ResourceEntity(
-          id = 0,
-          resourceType = resource.resourceType,
-          resourceUuid = it.resourceUuid,
-          resourceId = resource.logicalId,
-          serializedResource = iParser.encodeResourceToString(resource),
-          versionId = it.versionId,
-          lastUpdatedRemote = it.lastUpdatedRemote
-        )
+      val entity = it.copy(serializedResource = iParser.encodeResourceToString(resource))
+      // The foreign key in Index entity tables is set with cascade delete constraint and
+      // insertResource has REPLACE conflict resolution. So, when we do an insert to update the
+      // resource, it deletes old resource and corresponding index entities (based on foreign key
+      // constrain) before inserting the new resource.
+      insertResource(entity)
       val index = resourceIndexer.index(resource)
       updateIndicesForResource(index, entity, it.resourceUuid)
     }
@@ -111,20 +102,6 @@ internal abstract class ResourceDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   abstract suspend fun insertPositionIndex(positionIndexEntity: PositionIndexEntity)
-
-  @Query(
-    """
-        UPDATE ResourceEntity
-        SET serializedResource = :serializedResource
-        WHERE resourceId = :resourceId
-        AND resourceType = :resourceType
-        """
-  )
-  abstract suspend fun updateResource(
-    resourceId: String,
-    resourceType: ResourceType,
-    serializedResource: String
-  )
 
   @Query(
     """
