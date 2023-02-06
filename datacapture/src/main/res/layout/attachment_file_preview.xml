@@ -31,7 +31,7 @@
         android:layout_height="@dimen/attachment_photo_preview_max_height"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:background="@drawable/rounded_corner_preview_filled"
+        tools:background="@drawable/rounded_corner_preview_icon_bg_filled"
     />
 
     <ImageView

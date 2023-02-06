@@ -3,6 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle"
 >
-    <solid android:color="#D4E3FD" />
+    <solid android:color="?attr/colorPrimaryContainer" />
     <corners android:radius="8dp" />
 </shape>

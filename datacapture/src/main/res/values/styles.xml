@@ -334,7 +334,7 @@
     <style name="Questionnaire.AttachmentPreviewIconBackgroundStyle" parent="">
         <item
             name="android:background"
-        >@drawable/rounded_corner_preview_filled</item>
+        >@drawable/rounded_corner_preview_icon_bg_filled</item>
     </style>
 
     <style
