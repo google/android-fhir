@@ -81,6 +81,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     header.bind(questionnaireItemViewItem.questionnaireItem)
     textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
+
     textInputEditText.removeTextChangedListener(textWatcher)
     val text = getText(questionnaireItemViewItem.answers.singleOrNull())
     if (isTextUpdatesRequired(text, textInputEditText.text.toString())) {
