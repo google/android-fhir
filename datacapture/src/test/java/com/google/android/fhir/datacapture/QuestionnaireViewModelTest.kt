@@ -3996,10 +3996,10 @@ class QuestionnaireViewModelTest {
       "questionnaireResponseItem"
     )
 
-  internal companion object {
+  private companion object {
     const val CODE_SYSTEM_YES_NO = "http://terminology.hl7.org/CodeSystem/v2-0136"
 
-    internal val paginationExtension =
+    private val paginationExtension =
       Extension().apply {
         url = EXTENSION_ITEM_CONTROL_URL
         setValue(
@@ -4012,7 +4012,7 @@ class QuestionnaireViewModelTest {
         )
       }
 
-    internal val hiddenExtension =
+    private val hiddenExtension =
       Extension().apply {
         url = EXTENSION_HIDDEN_URL
         setValue(BooleanType(true))
