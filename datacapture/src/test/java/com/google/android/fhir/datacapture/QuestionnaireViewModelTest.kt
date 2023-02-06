@@ -80,6 +80,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.util.ReflectionHelpers
 
+// https://developer.android.com/kotlin/coroutines/test#setting-main-dispatcher
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainDispatcherRule(
   val testDispatcher: TestDispatcher = UnconfinedTestDispatcher(),
@@ -1302,38 +1303,37 @@ class QuestionnaireViewModelTest {
 
       val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-      val questionOne =
-        viewModel
-          .getQuestionnaireItemViewItemList()
-          .first { it.asQuestion().questionnaireItem.linkId == "question-1" }
-          .asQuestion()
+      val collectJob =
+        launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
 
-      viewModel
-        .getQuestionnaireItemViewItemList()
-        .first { it.asQuestion().questionnaireItem.linkId == "question-1" }
-        .asQuestion()
-        .clearAnswer()
+      val items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      // Clearing the answer disables question-2 that in turn disables question-3.
+      items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
 
-      assertThat(questionOne.getQuestionnaireResponseItem().answer).isEmpty()
+      assertResourceEquals(
+        viewModel.getQuestionnaireResponse(),
+        QuestionnaireResponse().apply {
+          id = "a-questionnaire-response"
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "question-1"
+            }
+          )
+        }
+      )
 
-      // Setting the answer of  "question-1" to true should enable question-2 that in turn
-      // enables question-3 and restore their previous states.
-      viewModel
-        .getQuestionnaireItemViewItemList()
-        .first { it.asQuestion().questionnaireItem.linkId == "question-1" }
-        .asQuestion()
+      // Setting the answer of  "question-1" to true should enable question-2 that in turn enables
+      // question-3 and restore their previous states.
+      items
+        .first { it.questionnaireItem.linkId == "question-1" }
         .setAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
             value = BooleanType(true)
           }
         )
 
-      assertThat(
-          (questionOne.getQuestionnaireResponseItem().answer[0].value as BooleanType).booleanValue()
-        )
-        .isEqualTo(true)
-
       assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+      collectJob.cancel()
     }
 
   // Test cases for state flow
@@ -1799,6 +1799,9 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
+    val collectJob =
+      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+
     fun repeatedGroupA() =
       viewModel.getQuestionnaireItemViewItemList().single {
         it.asQuestion().questionnaireItem.linkId == "repeated-group-a"
@@ -1808,15 +1811,12 @@ class QuestionnaireViewModelTest {
       viewModel.getQuestionnaireItemViewItemList().single {
         it.asQuestion().questionnaireItem.linkId == "repeated-group-b"
       }
-    withContext(coroutineContext) {
-      // TODO: Revert to using addAnswer out of order instead of setAnswer
+    // Calling addAnswer out of order should not result in the answers in the response being out
+    // of order; all of the answers to repeated-group-a should come before repeated-group-b.
+    repeat(times = 2) {
       repeatedGroupA()
         .asQuestion()
-        .setAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            item =
-              repeatedGroupA().asQuestion().questionnaireItem.getNestedQuestionnaireResponseItems()
-          },
+        .addAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
             item =
               repeatedGroupA().asQuestion().questionnaireItem.getNestedQuestionnaireResponseItems()
@@ -1824,113 +1824,112 @@ class QuestionnaireViewModelTest {
         )
       repeatedGroupB()
         .asQuestion()
-        .setAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            item =
-              repeatedGroupB().asQuestion().questionnaireItem.getNestedQuestionnaireResponseItems()
-          },
+        .addAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
             item =
               repeatedGroupB().asQuestion().questionnaireItem.getNestedQuestionnaireResponseItems()
           }
         )
-
-      viewModel.questionnaireStateFlow.test {
-        assertThat(awaitItem().items.map { it.asQuestion().questionnaireItem.linkId })
-          .containsExactly(
-            "repeated-group-a",
-            "nested-item-a",
-            "another-nested-item-a",
-            "nested-item-a",
-            "another-nested-item-a",
-            "repeated-group-b",
-            "nested-item-b",
-            "another-nested-item-b",
-            "nested-item-b",
-            "another-nested-item-b"
-          )
-          .inOrder()
-      }
-
-      assertResourceEquals(
-        actual = viewModel.getQuestionnaireResponse(),
-        expected =
-          QuestionnaireResponse().apply {
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "repeated-group-a"
-                text = "Group question A"
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "nested-item-a"
-                    text = "Basic question"
-                  }
-                )
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "another-nested-item-a"
-                    text = "Basic question"
-                  }
-                )
-              }
-            )
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "repeated-group-a"
-                text = "Group question A"
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "nested-item-a"
-                    text = "Basic question"
-                  }
-                )
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "another-nested-item-a"
-                    text = "Basic question"
-                  }
-                )
-              }
-            )
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "repeated-group-b"
-                text = "Group question B"
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "nested-item-b"
-                    text = "Basic question"
-                  }
-                )
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "another-nested-item-b"
-                    text = "Basic question"
-                  }
-                )
-              }
-            )
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "repeated-group-b"
-                text = "Group question B"
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "nested-item-b"
-                    text = "Basic question"
-                  }
-                )
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "another-nested-item-b"
-                    text = "Basic question"
-                  }
-                )
-              }
-            )
-          }
-      )
     }
+
+    assertThat(
+        viewModel.getQuestionnaireItemViewItemList().map {
+          it.asQuestion().questionnaireItem.linkId
+        }
+      )
+      .containsExactly(
+        "repeated-group-a",
+        "nested-item-a",
+        "another-nested-item-a",
+        "nested-item-a",
+        "another-nested-item-a",
+        "repeated-group-b",
+        "nested-item-b",
+        "another-nested-item-b",
+        "nested-item-b",
+        "another-nested-item-b"
+      )
+      .inOrder()
+
+    assertResourceEquals(
+      actual = viewModel.getQuestionnaireResponse(),
+      expected =
+        QuestionnaireResponse().apply {
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "repeated-group-a"
+              text = "Group question A"
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "nested-item-a"
+                  text = "Basic question"
+                }
+              )
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "another-nested-item-a"
+                  text = "Basic question"
+                }
+              )
+            }
+          )
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "repeated-group-a"
+              text = "Group question A"
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "nested-item-a"
+                  text = "Basic question"
+                }
+              )
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "another-nested-item-a"
+                  text = "Basic question"
+                }
+              )
+            }
+          )
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "repeated-group-b"
+              text = "Group question B"
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "nested-item-b"
+                  text = "Basic question"
+                }
+              )
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "another-nested-item-b"
+                  text = "Basic question"
+                }
+              )
+            }
+          )
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "repeated-group-b"
+              text = "Group question B"
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "nested-item-b"
+                  text = "Basic question"
+                }
+              )
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "another-nested-item-b"
+                  text = "Basic question"
+                }
+              )
+            }
+          )
+        }
+    )
+    collectJob.cancel()
   }
 
   @Test
