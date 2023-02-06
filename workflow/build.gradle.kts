@@ -73,6 +73,8 @@ android {
   configureJacocoTestOptions()
 }
 
+afterEvaluate { configureFirebaseTestLab() }
+
 configurations {
   all {
     removeIncompatibleDependencies()
