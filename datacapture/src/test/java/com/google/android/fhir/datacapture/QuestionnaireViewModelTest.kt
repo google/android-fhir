@@ -30,6 +30,7 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_READ_ONLY
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_SUBMIT_BUTTON
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -3229,7 +3230,7 @@ class QuestionnaireViewModelTest {
   // Test cases for submit button
 
   @Test
-  fun `setShowSubmitButtonFlag() to false should not show submit button`() {
+  fun `EXTRA_SHOW_SUBMIT_BUTTON set to false should not show submit button`() {
     runBlocking {
       val questionnaire =
         Questionnaire().apply {
@@ -3241,8 +3242,7 @@ class QuestionnaireViewModelTest {
             }
           )
         }
-      val viewModel = createQuestionnaireViewModel(questionnaire)
-      viewModel.setShowSubmitButtonFlag(false)
+      val viewModel = createQuestionnaireViewModel(questionnaire, showSubmitButton = false)
       assertThat(
           (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
             .pagination.showSubmitButton
@@ -3252,7 +3252,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `setShowSubmitButtonFlag() to true should show submit button`() {
+  fun `EXTRA_SHOW_SUBMIT_BUTTON set to true should show submit button`() {
     runBlocking {
       val questionnaire =
         Questionnaire().apply {
@@ -3264,8 +3264,29 @@ class QuestionnaireViewModelTest {
             }
           )
         }
-      val viewModel = createQuestionnaireViewModel(questionnaire)
-      viewModel.setShowSubmitButtonFlag(true)
+      val viewModel = createQuestionnaireViewModel(questionnaire, showSubmitButton = true)
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showSubmitButton
+        )
+        .isTrue()
+    }
+  }
+
+  @Test
+  fun `EXTRA_SHOW_SUBMIT_BUTTON not setting should show submit button`() {
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-link-id"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            }
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire, showSubmitButton = null)
       assertThat(
           (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
             .pagination.showSubmitButton
@@ -3289,8 +3310,12 @@ class QuestionnaireViewModelTest {
             }
           )
         }
-      val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
-      viewModel.setShowSubmitButtonFlag(true)
+      val viewModel =
+        createQuestionnaireViewModel(
+          questionnaire,
+          enableReviewPage = true,
+          showSubmitButton = true
+        )
       viewModel.setReviewMode(true)
       assertThat(viewModel.questionnaireStateFlow.first().displayMode)
         .isInstanceOf(DisplayMode.ReviewMode::class.java)
@@ -3975,6 +4000,7 @@ class QuestionnaireViewModelTest {
     enableReviewPage: Boolean = false,
     showReviewPageFirst: Boolean = false,
     readOnlyMode: Boolean = false,
+    showSubmitButton: Boolean? = null
   ): QuestionnaireViewModel {
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
@@ -3987,6 +4013,8 @@ class QuestionnaireViewModelTest {
     enableReviewPage.let { state.set(EXTRA_ENABLE_REVIEW_PAGE, it) }
     showReviewPageFirst.let { state.set(EXTRA_SHOW_REVIEW_PAGE_FIRST, it) }
     readOnlyMode.let { state.set(EXTRA_READ_ONLY, it) }
+    showSubmitButton?.let { state.set(EXTRA_SHOW_SUBMIT_BUTTON, it) }
+
     return QuestionnaireViewModel(context, state)
   }
 
