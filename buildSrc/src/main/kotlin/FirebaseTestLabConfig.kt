@@ -52,10 +52,5 @@ fun Project.configureFirebaseTestLab() {
         "${project.name}-${UUID.randomUUID()}"
       }
     )
-    maxTestShards.set(50)
-    shardTime.set(120)
-    smartFlankGcsPath.set(
-      "gs://android-fhir-build-artifacts/smart-flank/${project.name}/JUnitReport.xml"
-    )
   }
 }
