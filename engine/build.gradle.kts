@@ -75,6 +75,8 @@ android {
   configureJacocoTestOptions()
 }
 
+afterEvaluate { configureFirebaseTestLab() }
+
 configurations {
   all {
     exclude(module = "json")
