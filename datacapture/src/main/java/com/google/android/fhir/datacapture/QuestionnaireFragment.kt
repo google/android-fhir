@@ -34,6 +34,7 @@ import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import org.hl7.fhir.r4.model.Questionnaire
+import timber.log.Timber
 
 /**
  * A [Fragment] for displaying FHIR Questionnaires and getting user responses as FHIR
@@ -131,7 +132,7 @@ open class QuestionnaireFragment : Fragment() {
             questionnaireReviewRecyclerView.visibility = View.VISIBLE
 
             // Set button visibility
-            submitButton.visibility = View.GONE
+            submitButton.visibility = if (displayMode.showSubmitButton) View.VISIBLE else View.GONE
             reviewModeButton.visibility = View.GONE
             reviewModeEditButton.visibility =
               if (displayMode.showEditButton) {
@@ -202,7 +203,21 @@ open class QuestionnaireFragment : Fragment() {
     requireActivity().supportFragmentManager.setFragmentResultListener(
       QuestionnaireValidationErrorMessageDialogFragment.RESULT_CALLBACK,
       viewLifecycleOwner
-    ) { _, _ -> setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY) }
+    ) { _, bundle ->
+      when (bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]) {
+        QuestionnaireValidationErrorMessageDialogFragment.RESULT_VALUE_FIX -> {
+          // Go back to the Edit mode if currently in the Review mode.
+          viewModel.setReviewMode(false)
+        }
+        QuestionnaireValidationErrorMessageDialogFragment.RESULT_VALUE_SUBMIT -> {
+          setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
+        }
+        else ->
+          Timber.e(
+            "Unknown fragment result ${bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]}"
+          )
+      }
+    }
   }
 
   /** Calculates the progress percentage from given [count] and [totalCount] values. */
