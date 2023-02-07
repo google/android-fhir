@@ -77,6 +77,10 @@ open class QuestionnaireFragment : Fragment() {
     paginationPreviousButton.setOnClickListener { viewModel.goToPreviousPage() }
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
+    view.findViewById<Button>(R.id.cancel_questionnaire).setOnClickListener {
+      setFragmentResult(CANCEL_REQUEST_KEY, Bundle.EMPTY)
+    }
+
     view.findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
       viewModel.validateQuestionnaireAndUpdateUI().let { validationMap ->
         if (validationMap.values.flatten().filterIsInstance<Invalid>().isEmpty()) {
@@ -99,10 +103,15 @@ open class QuestionnaireFragment : Fragment() {
     val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
 
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
+    val cancelButton = requireView().findViewById<Button>(R.id.cancel_questionnaire)
     // Reads submit button visibility value initially defined in
     // [R.attr.submitButtonStyleQuestionnaire] style.
     val submitButtonVisibilityInStyle = submitButton.visibility
     viewModel.setShowSubmitButtonFlag(submitButtonVisibilityInStyle == View.VISIBLE)
+    // Reads submit button visibility value initially defined in
+    // [R.attr.cancelButtonStyleQuestionnaire] style.
+    val cancelButtonVisibilityInStyle = cancelButton.visibility
+    viewModel.setShowCancelButtonFlag(cancelButtonVisibilityInStyle == View.VISIBLE)
 
     val reviewModeEditButton = view.findViewById<View>(R.id.review_mode_edit_button)
     reviewModeEditButton.setOnClickListener { viewModel.setReviewMode(false) }
@@ -133,6 +142,8 @@ open class QuestionnaireFragment : Fragment() {
 
             // Set button visibility
             submitButton.visibility = if (displayMode.showSubmitButton) View.VISIBLE else View.GONE
+            cancelButton.visibility = if (displayMode.showCancelButton) View.VISIBLE else View.GONE
+
             reviewModeButton.visibility = View.GONE
             reviewModeEditButton.visibility =
               if (displayMode.showEditButton) {
@@ -155,9 +166,12 @@ open class QuestionnaireFragment : Fragment() {
             // Set button visibility
             submitButton.visibility =
               if (displayMode.pagination.showSubmitButton) View.VISIBLE else View.GONE
+            cancelButton.visibility =
+              if (displayMode.pagination.showCancelButton) View.VISIBLE else View.GONE
             reviewModeButton.visibility =
               if (displayMode.pagination.showReviewButton) View.VISIBLE else View.GONE
             reviewModeEditButton.visibility = View.GONE
+
             if (displayMode.pagination.isPaginated) {
               paginationPreviousButton.visibility = View.VISIBLE
               paginationPreviousButton.isEnabled = displayMode.pagination.hasPreviousPage
@@ -174,8 +188,8 @@ open class QuestionnaireFragment : Fragment() {
               questionnaireProgressIndicator.updateProgressIndicator(
                 calculateProgressPercentage(
                   count =
-                    (displayMode.pagination.currentPageIndex +
-                      1), // incremented by 1 due to initialPageIndex starts with 0.
+                  (displayMode.pagination.currentPageIndex +
+                    1), // incremented by 1 due to initialPageIndex starts with 0.
                   totalCount = displayMode.pagination.pages.size
                 )
               )
@@ -187,8 +201,8 @@ open class QuestionnaireFragment : Fragment() {
                     questionnaireProgressIndicator.updateProgressIndicator(
                       calculateProgressPercentage(
                         count =
-                          (linearLayoutManager.findLastVisibleItemPosition() +
-                            1), // incremented by 1 due to findLastVisiblePosition() starts with 0.
+                        (linearLayoutManager.findLastVisibleItemPosition() +
+                          1), // incremented by 1 due to findLastVisiblePosition() starts with 0.
                         totalCount = linearLayoutManager.itemCount
                       )
                     )
@@ -311,6 +325,8 @@ open class QuestionnaireFragment : Fragment() {
     const val EXTRA_READ_ONLY = "read-only"
 
     const val SUBMIT_REQUEST_KEY = "submit-request-key"
+
+    const val CANCEL_REQUEST_KEY = "cancel-request-key"
   }
 
   /**
