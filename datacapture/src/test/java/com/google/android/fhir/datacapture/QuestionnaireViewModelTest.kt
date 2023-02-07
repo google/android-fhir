@@ -3294,6 +3294,8 @@ class QuestionnaireViewModelTest {
       viewModel.setReviewMode(true)
       assertThat(viewModel.questionnaireStateFlow.first().displayMode)
         .isInstanceOf(DisplayMode.ReviewMode::class.java)
+      assertThat(viewModel.questionnaireStateFlow.first().displayMode)
+        .isEqualTo(DisplayMode.ReviewMode(showEditButton = true, showSubmitButton = true))
     }
   }
 

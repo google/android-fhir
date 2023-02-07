@@ -519,7 +519,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     if (isReadOnly || isInReviewModeFlow.value) {
       return QuestionnaireState(
         items = questionnaireItemViewItems,
-        displayMode = DisplayMode.ReviewMode(showEditButton = !isReadOnly)
+        displayMode =
+          DisplayMode.ReviewMode(
+            showEditButton = !isReadOnly,
+            showSubmitButton = !isReadOnly && shouldShowSubmitButton
+          )
       )
     }
 
@@ -806,7 +810,7 @@ internal data class QuestionnaireState(
 
 internal sealed class DisplayMode {
   class EditMode(val pagination: QuestionnairePagination) : DisplayMode()
-  class ReviewMode(val showEditButton: Boolean) : DisplayMode()
+  data class ReviewMode(val showEditButton: Boolean, val showSubmitButton: Boolean) : DisplayMode()
 }
 
 /**
