@@ -18,13 +18,11 @@ package com.google.android.fhir.datacapture
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Base64
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Attachment
-import org.hl7.fhir.r4.model.Binary
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -74,16 +72,7 @@ class MoreQuestionnaireItemComponentsInstrumentedTest {
 
   class TestUrlResolver(var testBitmap: Bitmap? = null) : UrlResolver {
 
-    override suspend fun resolveFhirServerUrl(url: String): Binary? {
-      return if (url == "https://hapi.fhir.org/Binary/f006") {
-        Binary().apply {
-          contentType = "image/png"
-          data = IMAGE_BASE64_DECODED
-        }
-      } else null
-    }
-
-    override suspend fun resolveNonFhirServerUrlBitmap(url: String): Bitmap? {
+    override suspend fun resolveBitmapUrl(url: String): Bitmap? {
       return if (url == "https://some-image-server.com/images/f0006.png") testBitmap else null
     }
   }
@@ -91,6 +80,5 @@ class MoreQuestionnaireItemComponentsInstrumentedTest {
   companion object {
     private val IMAGE_BASE64_ENCODED =
       "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7".encodeToByteArray()
-    private val IMAGE_BASE64_DECODED = Base64.decode(IMAGE_BASE64_ENCODED, Base64.DEFAULT)
   }
 }

@@ -27,7 +27,6 @@ import java.math.BigDecimal
 import java.util.Locale
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Attachment
-import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -1626,41 +1625,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `fetchBitmapFromUrl() should return Bitmap from FHIR server url`() {
-    val attachment =
-      Attachment().apply {
-        contentType = "image/png"
-        url = "https://hapi.fhir.org/Binary/f006"
-      }
-    val binary =
-      Binary().apply {
-        contentType = "image/png"
-        data = IMAGE_BASE64_DECODED
-      }
-
-    val urlResolver: UrlResolver = mock()
-    runBlocking {
-      Mockito.`when`(urlResolver.resolveFhirServerUrl("https://hapi.fhir.org/Binary/f006"))
-        .doReturn(binary)
-    }
-
-    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
-      .getDataCaptureConfig()
-      .urlResolver = urlResolver
-
-    val bitmap: Bitmap?
-    runBlocking {
-      bitmap = attachment.fetchBitmapFromUrl(ApplicationProvider.getApplicationContext())
-    }
-
-    assertThat(bitmap).isNotNull()
-    runBlocking {
-      Mockito.verify(urlResolver).resolveFhirServerUrl("https://hapi.fhir.org/Binary/f006")
-    }
-  }
-
-  @Test
-  fun `fetchBitmapFromUrl() should return Bitmap from Non-FHIR server url`() {
+  fun `fetchBitmapFromUrl() should return Bitmap from url`() {
     val attachment =
       Attachment().apply {
         contentType = "image/png"
@@ -1669,11 +1634,7 @@ class MoreQuestionnaireItemComponentsTest {
 
     val urlResolver: UrlResolver = mock()
     runBlocking {
-      Mockito.`when`(
-          urlResolver.resolveNonFhirServerUrlBitmap(
-            "https://some-image-server.com/images/f0006.png"
-          )
-        )
+      Mockito.`when`(urlResolver.resolveBitmapUrl("https://some-image-server.com/images/f0006.png"))
         .doReturn(mock())
     }
 
@@ -1688,8 +1649,7 @@ class MoreQuestionnaireItemComponentsTest {
 
     assertThat(bitmap).isNotNull()
     runBlocking {
-      Mockito.verify(urlResolver)
-        .resolveNonFhirServerUrlBitmap("https://some-image-server.com/images/f0006.png")
+      Mockito.verify(urlResolver).resolveBitmapUrl("https://some-image-server.com/images/f0006.png")
     }
   }
 
@@ -1779,44 +1739,6 @@ class MoreQuestionnaireItemComponentsTest {
     }
 
     assertThat(bitmap).isNull()
-  }
-
-  @Test
-  fun `decodeToBitmap() should return Bitmap when Binary has data and content type for image`() {
-    val binary =
-      Binary().apply {
-        contentType = "image/png"
-        data = IMAGE_BASE64_DECODED
-      }
-    assertThat(binary.decodeToBitmap()).isNotNull()
-  }
-
-  @Test
-  fun `decodeToBitmap() should return null when Binary has no content type`() {
-    val binary = Binary().apply { data = IMAGE_BASE64_DECODED }
-    assertThat(binary.decodeToBitmap()).isNull()
-  }
-
-  @Test
-  fun `decodeToBitmap() should return null when Binary has no data`() {
-    val binary = Binary().apply { contentType = "image/png" }
-    assertThat(binary.decodeToBitmap()).isNull()
-  }
-
-  @Test
-  fun `decodeToBitmap() should return null when Binary has no content type and no data`() {
-    val binary = Binary()
-    assertThat(binary.decodeToBitmap()).isNull()
-  }
-
-  @Test
-  fun `decodeToBitmap() should return null when Binary contentType is for non image`() {
-    val binary =
-      Binary().apply {
-        contentType = "document/pdf"
-        data = DOCUMENT_BASE64_DECODED
-      }
-    assertThat(binary.decodeToBitmap()).isNull()
   }
 
   @Test

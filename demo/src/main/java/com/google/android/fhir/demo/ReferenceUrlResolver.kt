@@ -19,16 +19,10 @@ package com.google.android.fhir.demo
 import android.content.Context
 import android.graphics.Bitmap
 import com.google.android.fhir.datacapture.UrlResolver
-import com.google.android.fhir.get
-import org.hl7.fhir.r4.model.Binary
 
 class ReferenceUrlResolver(val context: Context) : UrlResolver {
 
-  override suspend fun resolveFhirServerUrl(url: String): Binary? {
-    return url.id.run { FhirApplication.fhirEngine(context).get(this) }
-  }
-
-  override suspend fun resolveNonFhirServerUrlBitmap(url: String): Bitmap? {
+  override suspend fun resolveBitmapUrl(url: String): Bitmap? {
     return null
   }
 }

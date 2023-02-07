@@ -30,7 +30,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Base
-import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -628,22 +627,7 @@ internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
 
   val urlResolver = DataCapture.getConfiguration(context).urlResolver ?: return null
 
-  return withContext(Dispatchers.IO) {
-    if (url.contains("/Binary/")) {
-      urlResolver.resolveFhirServerUrl(url)?.decodeToBitmap()
-    } else {
-      urlResolver.resolveNonFhirServerUrlBitmap(url)
-    }
-  }
-}
-
-/** Decodes the Bitmap representation of [Binary.data]. */
-internal fun Binary.decodeToBitmap(): Bitmap? {
-  if (!hasContentType() || !hasData()) return null
-
-  if (getMimeType(contentType) != MimeType.IMAGE.value) return null
-
-  return data.decodeToBitmap()
+  return withContext(Dispatchers.IO) { urlResolver.resolveBitmapUrl(url) }
 }
 
 /** Decodes the Bitmap representation of [Attachment.data]. */

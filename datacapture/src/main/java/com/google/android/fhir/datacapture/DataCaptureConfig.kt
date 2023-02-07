@@ -20,7 +20,6 @@ import android.app.Application
 import android.graphics.Bitmap
 import com.google.android.fhir.datacapture.DataCaptureConfig.Provider
 import org.hl7.fhir.r4.context.SimpleWorkerContext
-import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StructureMap
@@ -104,6 +103,5 @@ fun interface XFhirQueryResolver {
  * server or Non-FHIR server.
  */
 interface UrlResolver {
-  suspend fun resolveFhirServerUrl(url: String): Binary?
-  suspend fun resolveNonFhirServerUrlBitmap(url: String): Bitmap?
+  suspend fun resolveBitmapUrl(url: String): Bitmap?
 }
