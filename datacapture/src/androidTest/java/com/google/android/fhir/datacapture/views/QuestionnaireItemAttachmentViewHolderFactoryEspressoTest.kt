@@ -362,13 +362,10 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
-    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.photo_preview).visibility)
+    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.photo_preview).visibility)
       .isEqualTo(View.GONE)
 
-    assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.file_preview).visibility)
-      .isEqualTo(View.GONE)
-
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.delete).visibility)
+    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.file_preview).visibility)
       .isEqualTo(View.GONE)
   }
 
@@ -408,10 +405,10 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItem) }
 
-    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.photo_preview).visibility)
+    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.photo_preview).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.delete).visibility)
+    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.file_preview).visibility)
       .isEqualTo(View.VISIBLE)
 
     val questionnaireItemWithNullAnswer =
@@ -433,10 +430,10 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemWithNullAnswer) }
 
-    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.photo_preview).visibility)
+    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.photo_preview).visibility)
       .isEqualTo(View.GONE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.delete).visibility)
+    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.file_preview).visibility)
       .isEqualTo(View.GONE)
   }
 
