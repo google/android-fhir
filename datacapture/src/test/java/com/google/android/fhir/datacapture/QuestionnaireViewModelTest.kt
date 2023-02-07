@@ -3760,7 +3760,8 @@ class QuestionnaireViewModelTest {
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 this.value = Quantity.fromUcum("2", "years")
               }
-            )
+            ),
+            null
           )
         }
 
@@ -3815,7 +3816,8 @@ class QuestionnaireViewModelTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               this.value = birthdateValue
             }
-          )
+          ),
+          null
         )
       }
 
@@ -3836,7 +3838,8 @@ class QuestionnaireViewModelTest {
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 this.value = Quantity.fromUcum("2", "years")
               }
-            )
+            ),
+            null
           )
         }
 

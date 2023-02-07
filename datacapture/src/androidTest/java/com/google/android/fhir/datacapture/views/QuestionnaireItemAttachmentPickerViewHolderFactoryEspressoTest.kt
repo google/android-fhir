@@ -69,7 +69,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -96,7 +96,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -120,7 +120,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -144,7 +144,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -172,7 +172,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -214,7 +214,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -259,7 +259,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -307,7 +307,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -355,7 +355,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }

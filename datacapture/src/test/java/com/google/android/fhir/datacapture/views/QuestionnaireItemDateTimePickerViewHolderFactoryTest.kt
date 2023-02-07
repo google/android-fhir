@@ -56,7 +56,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -71,7 +71,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -90,7 +90,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
               .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -110,7 +110,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
               .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, result -> answers = result },
+        answersChangedCallback = { _, _, result, _ -> answers = result },
       )
     viewHolder.bind(itemViewItem)
 
@@ -135,7 +135,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
               .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, result -> answers = result },
+        answersChangedCallback = { _, _, result, _ -> answers = result },
       )
     viewHolder.bind(itemViewItem)
 
@@ -159,7 +159,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
               .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, result -> answers = result },
+        answersChangedCallback = { _, _, result, _ -> answers = result },
       )
     viewHolder.bind(itemViewItem)
     viewHolder.dateInputView.text = "2020/11/"
@@ -178,12 +178,120 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
               .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     viewHolder.bind(itemViewItem)
     viewHolder.dateInputView.text = "2020/11/"
 
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("2020/11/")
+  }
+
+  @Test
+  fun `clear questionnaire response answer on partial answer update`() {
+    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? =
+      listOf(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
+    val questionnaireItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
+          ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, answersForCallback, _ -> answers = answersForCallback },
+      )
+
+    viewHolder.bind(questionnaireItem)
+    questionnaireItem.updatePartialAnswer("02/07")
+
+    assertThat(answers!!).isEmpty()
+  }
+
+  @Test
+  fun `clear partial value on an valid answer update`() {
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        .setValue(DateTimeType(Date(2020 - 1900, 2, 6, 2, 30, 0)))
+    var partialValue: String? = "02/07"
+    val questionnaireItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
+          ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, partialAnswer ->
+          partialValue = partialAnswer as? String
+        },
+      )
+
+    viewHolder.bind(questionnaireItem)
+    questionnaireItem.setAnswer(answer)
+
+    assertThat(partialValue).isNull()
+  }
+
+  @Test
+  fun `display partial answer in the text field of recycled items`() {
+    var questionnaireItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
+          ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    viewHolder.bind(questionnaireItem)
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("2/5/20")
+
+    questionnaireItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        partialAnswer = "02/07"
+      )
+
+    viewHolder.bind(questionnaireItem)
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("02/07")
+  }
+
+  @Test
+  fun `display an answer in the text field of partially answered recycled item`() {
+    var questionnaireItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        partialAnswer = "02/07"
+      )
+
+    viewHolder.bind(questionnaireItem)
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("02/07")
+
+    questionnaireItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
+          ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    viewHolder.bind(questionnaireItem)
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("2/5/20")
   }
 
   @Test
@@ -193,7 +301,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     viewHolder.bind(itemViewItem)
@@ -210,7 +318,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     viewHolder.bind(itemViewItem)
@@ -227,7 +335,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -256,7 +364,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
             }
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -273,7 +381,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -288,7 +396,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -308,7 +416,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
               .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -324,7 +432,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
               .setValue(DateTimeType(Date(2021 - 1900, 1, 5, 2, 30, 0)))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -336,7 +444,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 

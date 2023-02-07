@@ -102,21 +102,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         textInputLayout.hint = localeDatePattern
         textInputEditText.removeTextChangedListener(textWatcher)
 
-        if (isTextUpdateRequired(
-            textInputEditText.context,
-            questionnaireItemViewItem.answers.singleOrNull()?.valueDateType,
-            textInputEditText.text.toString()
-          )
-        ) {
-          textInputEditText.setText(
-            questionnaireItemViewItem.answers
-              .singleOrNull()
-              ?.takeIf { it.hasValue() }
-              ?.valueDateType
-              ?.localDate
-              ?.localizedString
-          )
-        }
+        updateDateTextFieldText(
+          questionnaireItemViewItem.answers.singleOrNull()?.valueDateType,
+          questionnaireItemViewItem.partialAnswer as? String
+        )
         textWatcher = textInputEditText.doAfterTextChanged { text -> updateAnswer(text.toString()) }
       }
 
@@ -197,27 +186,69 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               )
             )
           )
-
           if (questionnaireItemViewItem.answers.isNotEmpty()) {
             questionnaireItemViewItem.clearAnswer()
           }
+          questionnaireItemViewItem.updatePartialAnswer(text.toString())
         }
       }
-    }
 
-  private fun isTextUpdateRequired(
-    context: Context,
-    answer: DateType?,
-    inputText: String?
-  ): Boolean {
-    val inputDate =
-      try {
-        parseDate(inputText, context)
-      } catch (e: Exception) {
-        null
+      private fun updateDateTextFieldText(answer: DateType?, partialAnswer: String?) {
+        when {
+          // reset the recycled item textField text.
+          (partialAnswer.isNullOrEmpty() && answer == null) -> {
+            textInputEditText.text = null
+          }
+          // populate an answer.
+          (textInputEditText.text.isNullOrEmpty() &&
+            partialAnswer.isNullOrEmpty() &&
+            answer != null) -> {
+            updateTextFieldFromAnswer()
+          }
+          // update textField from an answer if answer and textField values are not same.
+          // e.g recycled item textField value and current answer are not same.
+          (!textInputEditText.text.isNullOrEmpty() &&
+            partialAnswer.isNullOrEmpty() &&
+            answer != null) -> {
+            val inputDate =
+              try {
+                parseDate(textInputEditText.text, textInputEditText.context)
+              } catch (e: Exception) {
+                null
+              }
+            if (answer?.localDate != inputDate) {
+              updateTextFieldFromAnswer()
+            }
+          }
+          // update recycled item textField with partial answer.
+          (!partialAnswer.isNullOrEmpty() &&
+            textInputEditText.text.toString() != partialAnswer) -> {
+            textInputEditText.setText(partialAnswer)
+            displayValidationResult(
+              Invalid(
+                listOf(
+                  textInputEditText.context.getString(
+                    R.string.date_format_validation_error_msg,
+                    localeDatePattern
+                  )
+                )
+              )
+            )
+          }
+        }
       }
-    return answer?.localDate != inputDate
-  }
+
+      private fun updateTextFieldFromAnswer() {
+        textInputEditText.setText(
+          questionnaireItemViewItem.answers
+            .singleOrNull()
+            ?.takeIf { it.hasValue() }
+            ?.valueDateType
+            ?.localDate
+            ?.localizedString
+        )
+      }
+    }
 }
 
 internal const val TAG = "date-picker"

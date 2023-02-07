@@ -63,7 +63,8 @@ data class QuestionnaireItemViewItem(
     (
       Questionnaire.QuestionnaireItemComponent,
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
-      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
+      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
+      Any?
     ) -> Unit,
   private val resolveAnswerValueSet:
     suspend (String) -> List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
@@ -75,7 +76,8 @@ data class QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemAnswerOptionComponent> =
     {
       emptyList()
-    }
+    },
+  internal val partialAnswer: Any? = null
 ) {
 
   /**
@@ -104,13 +106,24 @@ data class QuestionnaireItemViewItem(
     answersChangedCallback(
       questionnaireItem,
       questionnaireResponseItem,
-      questionnaireResponseItemAnswerComponent.toList()
+      questionnaireResponseItemAnswerComponent.toList(),
+      null
     )
   }
 
   /** Clears existing answers. */
-  fun clearAnswer() {
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf())
+  fun clearAnswer(partialAnswer: Any? = null) {
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), partialAnswer)
+  }
+
+  /**
+   * Updates partial answer to cache [QuestionnaireViewModel.partialAnswerCache]. It can not have
+   * answers and partial answer in cache at the same time. If partial answer are updated for
+   * [QuestionnaireResponse.QuestionnaireResponseItemComponent] in cache then answers for
+   * [QuestionnaireResponse.QuestionnaireResponseItemComponent] will not
+   */
+  fun updatePartialAnswer(partialAnswer: Any? = null) {
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), partialAnswer)
   }
 
   /** Adds an answer to the existing answers. */
@@ -124,7 +137,8 @@ data class QuestionnaireItemViewItem(
     answersChangedCallback(
       questionnaireItem,
       questionnaireResponseItem,
-      answers + questionnaireResponseItemAnswerComponent
+      answers + questionnaireResponseItemAnswerComponent,
+      null
     )
   }
 
@@ -141,7 +155,8 @@ data class QuestionnaireItemViewItem(
       questionnaireResponseItem,
       answers.toMutableList().apply {
         removeIf { it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value) }
-      }
+      },
+      null
     )
   }
 

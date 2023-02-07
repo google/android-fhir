@@ -47,7 +47,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -62,7 +62,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -79,7 +79,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(DateType())
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -101,7 +101,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
               .setValue(DateType(2020, 10, 19))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/20")
@@ -119,7 +119,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
               .setValue(DateType(2020, 10, 19))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("2020/11/19")
@@ -137,7 +137,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
               .setValue(DateType(2020, 10, 19))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/20")
@@ -152,7 +152,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, result -> answers = result },
+        answersChangedCallback = { _, _, result, _ -> answers = result },
       )
 
     viewHolder.bind(item)
@@ -174,7 +174,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, result -> answers = result },
+        answersChangedCallback = { _, _, result, _ -> answers = result },
       )
     viewHolder.bind(item)
     viewHolder.dateInputView.text = "2020/11/19"
@@ -198,7 +198,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
               .setValue(DateType(2020, 10, 19))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, result -> answers = result },
+        answersChangedCallback = { _, _, result, _ -> answers = result },
       )
     viewHolder.bind(questionnaireItem)
 
@@ -207,9 +207,8 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `do not clear the textField input on invalid date`() {
+  fun `do not clear the text field input for invalid date`() {
     setLocale(Locale.US)
-    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -219,12 +218,124 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
               .setValue(DateType(2020, 10, 19))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     viewHolder.bind(questionnaireItem)
 
     viewHolder.dateInputView.text = "11/19/"
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/")
+  }
+
+  @Test
+  fun `clear questionnaire response answer on partial answer update`() {
+    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? =
+      listOf(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
+    setLocale(Locale.US)
+    val questionnaireItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateType(2020, 10, 19))
+          ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, answersForCallback, _ -> answers = answersForCallback },
+      )
+
+    viewHolder.bind(questionnaireItem)
+    questionnaireItem.updatePartialAnswer("02/07")
+
+    assertThat(answers!!).isEmpty()
+  }
+
+  @Test
+  fun `clear partial value on an valid answer update`() {
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        .setValue(DateType(2026, 0, 1))
+    var partialValue: String? = "02/07"
+    setLocale(Locale.US)
+    val questionnaireItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateType(2020, 10, 19))
+          ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, partialAnswer ->
+          partialValue = partialAnswer as? String
+        },
+      )
+
+    viewHolder.bind(questionnaireItem)
+    questionnaireItem.setAnswer(answer)
+
+    assertThat(partialValue).isNull()
+  }
+
+  @Test
+  fun `display partial answer in the text field of recycled items`() {
+    setLocale(Locale.US)
+    var questionnaireItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateType(2020, 10, 19))
+          ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    viewHolder.bind(questionnaireItem)
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/20")
+
+    questionnaireItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        partialAnswer = "02/07"
+      )
+
+    viewHolder.bind(questionnaireItem)
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("02/07")
+  }
+
+  @Test
+  fun `display an answer in the text field of partially answered recycled item`() {
+    setLocale(Locale.US)
+    var questionnaireItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        partialAnswer = "02/07"
+      )
+
+    viewHolder.bind(questionnaireItem)
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("02/07")
+
+    questionnaireItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateType(2020, 10, 19))
+          ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    viewHolder.bind(questionnaireItem)
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/20")
   }
 
   @Test
@@ -249,7 +360,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
           )
         },
         validationResult = Invalid(listOf("Maximum value allowed is:2025-01-01")),
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -278,7 +389,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -293,7 +404,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -308,7 +419,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -328,7 +439,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
               .setValue(DateType(2020, 10, 19))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/20")
@@ -342,7 +453,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
               .setValue(DateType(2021, 10, 19))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/21")
@@ -352,7 +463,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEmpty()
