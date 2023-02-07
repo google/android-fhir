@@ -50,7 +50,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.coroutines.withContext
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -2550,7 +2549,7 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    withContext(this.coroutineContext) { viewModel.goToNextPage() }
+    viewModel.goToNextPage()
 
     val collectJob =
       launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
