@@ -99,8 +99,7 @@ fun interface XFhirQueryResolver {
 }
 
 /**
- * Resolves media based on the provided url. This allows the library to retrieve media from a FHIR
- * server or Non-FHIR server.
+ * Resolves media based on the provided url. This allows the library to retrieve media from a url.
  */
 interface UrlResolver {
   suspend fun resolveBitmapUrl(url: String): Bitmap?
