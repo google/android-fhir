@@ -145,7 +145,9 @@ class DemoQuestionnaireFragment : Fragment() {
           setReorderingAllowed(true)
           add(
             R.id.container,
-            QuestionnaireFragment.builder().setQuestionnaire(viewModel.getQuestionnaireJson()).build(),
+            QuestionnaireFragment.builder()
+              .setQuestionnaire(viewModel.getQuestionnaireJson())
+              .build(),
             QUESTIONNAIRE_FRAGMENT_TAG
           )
         }

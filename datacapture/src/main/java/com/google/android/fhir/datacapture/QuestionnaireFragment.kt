@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
 import androidx.core.os.bundleOf
@@ -52,15 +53,16 @@ class QuestionnaireFragment : Fragment() {
   /**
    * Provides a [QuestionnaireItemViewHolderFactoryMatcher]s which are used to evaluate whether a
    * custom [QuestionnaireItemViewHolderFactory] should be used to render a given questionnaire
-   * item.
-   * The provider may be provided by the application developer via [DataCaptureConfig], otherwise default no-op implementation is used.
+   * item. The provider may be provided by the application developer via [DataCaptureConfig],
+   * otherwise default no-op implementation is used.
    */
-  private val customQuestionnaireItemViewHolderFactoryMatchersProvider:
+  @VisibleForTesting
+  val questionnaireItemViewHolderFactoryMatchersProvider:
     QuestionnaireItemViewHolderFactoryMatchersProvider by lazy {
-    DataCapture.getConfiguration(requireContext())
-      .questionnaireItemViewHolderFactoryMatchersProviderFactory?.get(
-        requireArguments().getString(EXTRA_MATCHERS_FACTORY, "")
-      )
+    requireArguments().getString(EXTRA_MATCHERS_FACTORY)?.let {
+      DataCapture.getConfiguration(requireContext())
+        .questionnaireItemViewHolderFactoryMatchersProviderFactory?.get(it)
+    }
       ?: NoOpQuestionnaireItemViewHolderFactoryMatchersProviderImpl
   }
 
@@ -113,7 +115,7 @@ class QuestionnaireFragment : Fragment() {
       view.findViewById(R.id.questionnaire_progress_indicator)
     val questionnaireItemEditAdapter =
       QuestionnaireItemEditAdapter(
-        customQuestionnaireItemViewHolderFactoryMatchersProvider
+        questionnaireItemViewHolderFactoryMatchersProvider
           .getQuestionnaireItemViewHolderFactoryMatcher()
       )
     val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
@@ -251,9 +253,7 @@ class QuestionnaireFragment : Fragment() {
    */
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
-  /**
-   * Helper to create [Questionnaire] with appropriate [Bundle] arguments.
-   */
+  /** Helper to create [Questionnaire] with appropriate [Bundle] arguments. */
   class Builder {
 
     private val args = mutableListOf<Pair<String, Any>>()
@@ -330,19 +330,19 @@ class QuestionnaireFragment : Fragment() {
     /**
      * A matcher to provide [QuestionnaireItemViewHolderFactoryMatcher]s for custom
      * [Questionnaire.QuestionnaireItemType]. The application needs to provide a
-     * [QuestionnaireItemViewHolderFactoryMatchersProviderFactory] in the [DataCaptureConfig]
-     * so that the [QuestionnaireFragment] can get instance of
+     * [QuestionnaireItemViewHolderFactoryMatchersProviderFactory] in the [DataCaptureConfig] so
+     * that the [QuestionnaireFragment] can get instance of
      * [QuestionnaireItemViewHolderFactoryMatchersProvider].
      */
     fun setCustomQuestionnaireItemViewHolderFactoryMatchersProvider(
       matchersProviderFactory: String
     ) = apply { args.add(EXTRA_MATCHERS_FACTORY to matchersProviderFactory) }
 
-    /**
-     * @return A [QuestionnaireFragment] with provided [Bundle] arguments.
-     */
+    @VisibleForTesting fun buildArgs() = bundleOf(*args.toTypedArray())
+
+    /** @return A [QuestionnaireFragment] with provided [Bundle] arguments. */
     fun build(): QuestionnaireFragment {
-      return QuestionnaireFragment().apply { arguments = bundleOf(*args.toTypedArray()) }
+      return QuestionnaireFragment().apply { arguments = buildArgs() }
     }
   }
   /**
@@ -459,9 +459,7 @@ class QuestionnaireFragment : Fragment() {
       List<QuestionnaireItemViewHolderFactoryMatcher>
   }
 
-  /**
-   * No-op implementation that provides no custom [QuestionnaireItemViewHolderFactoryMatcher]s .
-   */
+  /** No-op implementation that provides no custom [QuestionnaireItemViewHolderFactoryMatcher]s . */
   private object NoOpQuestionnaireItemViewHolderFactoryMatchersProviderImpl :
     QuestionnaireItemViewHolderFactoryMatchersProvider() {
     override fun getQuestionnaireItemViewHolderFactoryMatcher() =

@@ -31,9 +31,8 @@ class CustomQuestionnaireFragment /*: QuestionnaireFragment()*/ {
       },
       QuestionnaireItemViewHolderFactoryMatcher(QuestionnaireItemBarCodeReaderViewHolderFactory) {
         questionnaireItem ->
-        questionnaireItem.getExtensionByUrl(
-            QuestionnaireItemBarCodeReaderViewHolderFactory.WIDGET_EXTENSION
-          )
+        questionnaireItem
+          .getExtensionByUrl(QuestionnaireItemBarCodeReaderViewHolderFactory.WIDGET_EXTENSION)
           .let {
             if (it == null) false
             else it.value.toString() == QuestionnaireItemBarCodeReaderViewHolderFactory.WIDGET_TYPE
