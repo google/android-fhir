@@ -32,7 +32,7 @@ import org.junit.runner.RunWith
 class MoreQuestionnaireItemComponentsInstrumentedTest {
 
   @Test
-  fun fetchBitmap_shouldReturnBitmapAndCallAttachmentResolverResolveBinaryResource() {
+  fun fetchBitmap_shouldReturnBitmapAndCallUrlResolverResolveBinaryResource() {
     val attachment =
       Attachment().apply {
         contentType = "image/png"
@@ -51,7 +51,7 @@ class MoreQuestionnaireItemComponentsInstrumentedTest {
   }
 
   @Test
-  fun fetchBitmap_shouldReturnBitmapAndCallAttachmentResolverResolveImageUrl() {
+  fun fetchBitmap_shouldReturnBitmapAndCallUrlResolverResolveImageUrl() {
     val attachment =
       Attachment().apply {
         contentType = "image/png"

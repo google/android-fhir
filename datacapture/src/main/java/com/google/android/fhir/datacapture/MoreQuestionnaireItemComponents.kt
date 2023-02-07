@@ -626,13 +626,13 @@ internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
 
   if (getMimeType(contentType) != MimeType.IMAGE.value) return null
 
-  val attachmentResolver = DataCapture.getConfiguration(context).urlResolver ?: return null
+  val urlResolver = DataCapture.getConfiguration(context).urlResolver ?: return null
 
   return withContext(Dispatchers.IO) {
     if (url.contains("/Binary/")) {
-      attachmentResolver.resolveFhirServerUrl(url)?.decodeToBitmap()
+      urlResolver.resolveFhirServerUrl(url)?.decodeToBitmap()
     } else {
-      attachmentResolver.resolveNonFhirServerUrlBitmap(url)
+      urlResolver.resolveNonFhirServerUrlBitmap(url)
     }
   }
 }
