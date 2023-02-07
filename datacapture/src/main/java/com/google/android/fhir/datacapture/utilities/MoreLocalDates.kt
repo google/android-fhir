@@ -80,7 +80,7 @@ internal fun canonicalizeDateFormat(datePattern: String): String {
   return newDateFormat.toString()
 }
 
-/** Parses a date string using the given date format. */
+/** Parses a date string using the given date format, or the default date format for the locale. */
 internal fun parseDate(text: String, canonicalizedDatePattern: String): LocalDate {
   val dateFormat =
     if (!canonicalizedDatePattern.isEmpty()) {
