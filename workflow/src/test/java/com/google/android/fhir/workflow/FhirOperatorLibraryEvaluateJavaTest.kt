@@ -98,7 +98,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
    * ```
    */
   @Test
-  fun evaluateImmunityCheck() = runBlocking {
+  fun evaluateImmunityCheck() = runBlockingOnWorkerThread {
     // Load patient
     val patientImmunizationHistory = load("/immunity-check/ImmunizationHistory.json")
     for (entry in patientImmunizationHistory.entry) {
@@ -120,7 +120,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
   }
 
   @Test
-  fun evaluateCQL() = runBlocking {
+  fun evaluateCQL() = runBlockingOnWorkerThread {
     @Language("CQL")
     val cql =
       """
@@ -140,7 +140,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
   }
 
   @Test
-  fun evaluateCQLWithParameters() = runBlocking {
+  fun evaluateCQLWithParameters() = runBlockingOnWorkerThread {
     @Language("CQL")
     val cql =
       """

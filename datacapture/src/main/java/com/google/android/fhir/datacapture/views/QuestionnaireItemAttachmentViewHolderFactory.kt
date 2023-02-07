@@ -92,7 +92,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         header.bind(questionnaireItem)
-        displayInitialPreview()
+        displayOrClearInitialPreview()
         displayTakePhotoButton(questionnaireItem)
         displayUploadButton(questionnaireItem)
         takePhotoButton.setOnClickListener { view -> onTakePhotoClicked(view, questionnaireItem) }
@@ -125,8 +125,19 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         deleteButton.isEnabled = !isReadOnly
       }
 
-      private fun displayInitialPreview() {
-        questionnaireItemViewItem.answers.firstOrNull()?.valueAttachment?.let { attachment ->
+      private fun displayOrClearInitialPreview() {
+        val answer = questionnaireItemViewItem.answers.firstOrNull()
+
+        // Clear preview if there is no answer to prevent showing old previews in views that have
+        // been recycled.
+        if (answer == null) {
+          clearPhotoPreview()
+          clearFilePreview()
+          hideDeleteButton()
+          return
+        }
+
+        answer.valueAttachment?.let { attachment ->
           displayPreview(
             attachmentType = getMimeType(attachment.contentType),
             attachmentTitle = attachment.title,
