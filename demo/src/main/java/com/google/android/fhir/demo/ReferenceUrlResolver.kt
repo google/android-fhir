@@ -26,7 +26,3 @@ class ReferenceUrlResolver(val context: Context) : UrlResolver {
     return null
   }
 }
-
-/** Only usable for url that targets FHIR server and using Binary resource. */
-private val String.id: String
-  get() = substringAfter("Binary/").substringBefore("/")
