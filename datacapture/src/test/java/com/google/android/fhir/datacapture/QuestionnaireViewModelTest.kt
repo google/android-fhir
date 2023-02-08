@@ -1803,7 +1803,6 @@ class QuestionnaireViewModelTest {
       viewModel.getQuestionnaireItemViewItemList().single {
         it.asQuestion().questionnaireItem.linkId == "repeated-group-b"
       }
-
     viewModel.runViewModelBlocking {
       // Calling addAnswer out of order should not result in the answers in the response being out
       // of order; all of the answers to repeated-group-a should come before repeated-group-b.
@@ -3565,8 +3564,8 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
-      viewModel.goToNextPage()
       viewModel.runViewModelBlocking {
+        viewModel.goToNextPage()
         assertThat(
             (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
               .pagination.showReviewButton
@@ -4080,6 +4079,10 @@ class QuestionnaireViewModelTest {
       "questionnaireResponseItem"
     )
 
+  /**
+   * Runs code that relies on the [QuestionnaireViewModel.viewModelScope]. Runs on
+   * [MainDispatcherRule.testDispatcher], so that `ShadowLooper` idle functions are not necessary.
+   */
   private suspend inline fun QuestionnaireViewModel.runViewModelBlocking(
     crossinline block: suspend () -> Unit,
   ) {
