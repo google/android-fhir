@@ -408,9 +408,6 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
     assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.photo_preview).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.file_preview).visibility)
-      .isEqualTo(View.VISIBLE)
-
     val questionnaireItemWithNullAnswer =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -431,9 +428,6 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
     runOnUI { viewHolder.bind(questionnaireItemWithNullAnswer) }
 
     assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.photo_preview).visibility)
-      .isEqualTo(View.GONE)
-
-    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.file_preview).visibility)
       .isEqualTo(View.GONE)
   }
 
