@@ -3477,9 +3477,8 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
-
-      viewModel.goToNextPage()
       viewModel.runViewModelBlocking {
+        viewModel.goToNextPage()
         assertThat(
             (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
               .pagination.showReviewButton
