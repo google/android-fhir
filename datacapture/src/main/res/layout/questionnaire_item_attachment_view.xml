@@ -119,59 +119,37 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/photo_preview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-        android:layout_marginTop="@dimen/padding_default"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/cd_photo_preview"
-        android:maxWidth="@dimen/attachment_photo_preview_max_width"
-        android:maxHeight="@dimen/attachment_photo_preview_max_height"
-    />
-
-    <LinearLayout
-        android:id="@+id/file_preview"
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider"
+        style="?attr/questionnaireAttachmentDividerStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-        android:layout_marginTop="@dimen/padding_default"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-    >
+        android:layout_marginTop="@dimen/item_margin_horizontal"
+        android:visibility="gone"
+    />
 
-        <ImageView
-            android:id="@+id/icon_file_preview"
-            style="?attr/questionnaireAttachmentPreviewIconStyle"
-            android:layout_width="@dimen/attachment_icon_file_preview_width"
-            android:layout_height="@dimen/attachment_icon_file_preview_height"
-            android:contentDescription="@string/cd_icon_file_preview"
-            app:tint="?attr/colorPrimary"
-        />
-
-        <TextView
-            android:id="@+id/title_file_preview"
-            style="?attr/questionnaireAttachmentPreviewTextStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/padding_half_size"
-            android:ellipsize="middle"
-            android:maxLines="1"
-            android:singleLine="true"
-        />
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/delete"
-        style="?attr/questionnaireAttachmentDeleteButtonStyle"
+    <TextView
+        android:id="@+id/label_uploaded"
+        style="?attr/questionnaireAttachmentUploadedLabelStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-        android:layout_marginVertical="@dimen/padding_default"
-        android:paddingHorizontal="@dimen/padding_default"
-        android:text="@string/delete"
+        android:layout_marginTop="@dimen/item_margin_horizontal"
+        android:layout_marginBottom="@dimen/attachment_uploaded_label_margin_bottom"
+        android:text="@string/uploaded"
+        android:visibility="gone"
+    />
+
+    <include
+        android:id="@+id/photo_preview"
+        layout="@layout/attachment_photo_preview"
+        android:visibility="gone"
+    />
+
+    <include
+        android:id="@+id/file_preview"
+        layout="@layout/attachment_file_preview"
         android:visibility="gone"
     />
 

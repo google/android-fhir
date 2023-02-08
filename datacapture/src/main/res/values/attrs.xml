@@ -87,14 +87,28 @@
         name="questionnaireAttachmentTakePhotoButtonStyle"
         format="reference"
     />
+    <!--   Style for attachment divider. -->
+    <attr name="questionnaireAttachmentDividerStyle" format="reference" />
+    <!--   Style for attachment uploaded label. -->
+    <attr name="questionnaireAttachmentUploadedLabelStyle" format="reference" />
     <!--   Style for attachment upload button. -->
     <attr name="questionnaireAttachmentUploadButtonStyle" format="reference" />
     <!--   Style for attachment delete button. -->
     <attr name="questionnaireAttachmentDeleteButtonStyle" format="reference" />
+    <!--   Style for attachment preview photo shape appearance. -->
+    <attr
+        name="questionnaireShapeAppearanceAttachmentPreviewPhotoStyle"
+        format="reference"
+    />
     <!--   Style for attachment preview icon. -->
     <attr name="questionnaireAttachmentPreviewIconStyle" format="reference" />
-    <!--   Style for attachment preview text. -->
-    <attr name="questionnaireAttachmentPreviewTextStyle" format="reference" />
+    <!--   Style for attachment preview icon background. -->
+    <attr
+        name="questionnaireAttachmentPreviewIconBackgroundStyle"
+        format="reference"
+    />
+    <!--   Style for attachment preview title. -->
+    <attr name="questionnaireAttachmentPreviewTitleStyle" format="reference" />
 
     <declare-styleable name="QuestionnaireTheme">
         <!-- The ID of the theme to be applied to the questionnaire. The referenced theme must
