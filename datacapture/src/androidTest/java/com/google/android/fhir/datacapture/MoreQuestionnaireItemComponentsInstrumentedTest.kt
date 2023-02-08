@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Base64
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
@@ -30,26 +31,7 @@ import org.junit.runner.RunWith
 class MoreQuestionnaireItemComponentsInstrumentedTest {
 
   @Test
-  fun fetchBitmap_shouldReturnBitmapAndCallUrlResolverResolveBinaryResource() {
-    val attachment =
-      Attachment().apply {
-        contentType = "image/png"
-        url = "https://hapi.fhir.org/Binary/f006"
-      }
-    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
-      .getDataCaptureConfig()
-      .urlResolver = TestUrlResolver()
-
-    val bitmap: Bitmap?
-    runBlocking {
-      bitmap = attachment.fetchBitmapFromUrl(ApplicationProvider.getApplicationContext())
-    }
-
-    assertThat(bitmap).isNotNull()
-  }
-
-  @Test
-  fun fetchBitmap_shouldReturnBitmapAndCallUrlResolverResolveImageUrl() {
+  fun fetchBitmapFromUrl_returnsBitmap() {
     val attachment =
       Attachment().apply {
         contentType = "image/png"
@@ -57,7 +39,7 @@ class MoreQuestionnaireItemComponentsInstrumentedTest {
       }
 
     val expectedBitmap =
-      BitmapFactory.decodeByteArray(IMAGE_BASE64_ENCODED, 0, IMAGE_BASE64_ENCODED.size)
+      BitmapFactory.decodeByteArray(IMAGE_BASE64_DECODED, 0, IMAGE_BASE64_DECODED.size)
     ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
       .getDataCaptureConfig()
       .urlResolver = TestUrlResolver(expectedBitmap)
@@ -67,6 +49,7 @@ class MoreQuestionnaireItemComponentsInstrumentedTest {
       bitmap = attachment.fetchBitmapFromUrl(ApplicationProvider.getApplicationContext())
     }
 
+    assertThat(bitmap).isNotNull()
     assertThat(bitmap).isEqualTo(expectedBitmap)
   }
 
@@ -80,5 +63,6 @@ class MoreQuestionnaireItemComponentsInstrumentedTest {
   companion object {
     private val IMAGE_BASE64_ENCODED =
       "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7".encodeToByteArray()
+    private val IMAGE_BASE64_DECODED = Base64.decode(IMAGE_BASE64_ENCODED, Base64.DEFAULT)
   }
 }
