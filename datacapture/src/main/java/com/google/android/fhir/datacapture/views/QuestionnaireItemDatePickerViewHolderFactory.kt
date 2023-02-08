@@ -85,7 +85,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                   Instant.ofEpochMilli(epochMilli)
                     .atZone(ZONE_ID_UTC)
                     .toLocalDate()
-                    ?.format(canonicalizedDatePattern)
+                    .format(canonicalizedDatePattern)
                 textInputEditText.setText(formattedDate)
                 questionnaireItemViewItem.setAnswer(
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {

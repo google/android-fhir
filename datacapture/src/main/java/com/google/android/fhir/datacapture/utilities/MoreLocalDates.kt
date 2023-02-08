@@ -28,12 +28,6 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 
-internal val LocalDate.localizedString: String
-  get() {
-    val date = Date.from(atStartOfDay(ZoneId.systemDefault())?.toInstant())
-    return DateFormat.getDateInstance(DateFormat.SHORT).format(date)
-  }
-
 /**
  * Returns the first character that is not a letter in the given date pattern string (e.g. "/" for
  * "dd/mm/yyyy").
@@ -105,13 +99,14 @@ internal fun parseDate(text: String, canonicalizedDatePattern: String): LocalDat
 }
 
 /**
- * Returns formatted local date using canonicalizedDatePattern date pattern otherwise localized
- * String
+ * Returns the local date string using the provided date format, or the default date format for the
+ * system locale if no date format is provided.
  */
-internal fun LocalDate.format(canonicalizedDatePattern: String): String {
-  return if (canonicalizedDatePattern.isEmpty()) {
-    this.localizedString
+internal fun LocalDate.format(format: String? = null): String {
+  return if (format.isNullOrEmpty()) {
+    val date = Date.from(atStartOfDay(ZoneId.systemDefault())?.toInstant())
+    return DateFormat.getDateInstance(DateFormat.SHORT).format(date)
   } else {
-    DateTimeFormatter.ofPattern(canonicalizedDatePattern).format(this)
+    DateTimeFormatter.ofPattern(format).format(this)
   }
 }
