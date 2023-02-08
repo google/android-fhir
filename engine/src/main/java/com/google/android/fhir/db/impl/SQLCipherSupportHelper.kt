@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.db.impl
 
-import androidx.annotation.WorkerThread
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.google.android.fhir.DatabaseErrorStrategy
@@ -25,7 +24,6 @@ import com.google.android.fhir.db.DatabaseEncryptionException.DatabaseEncryption
 import com.google.android.fhir.db.DatabaseEncryptionException.DatabaseEncryptionErrorCode.UNKNOWN
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import java.time.Duration
-import java.util.UUID
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.sqlcipher.database.SQLiteDatabase
@@ -102,7 +100,6 @@ class SQLCipherSupportHelper(
 
       override fun onOpen(db: SQLiteDatabase) {
         configuration.callback.onOpen(db)
-        Timber.e(itemsMatching("some").toString())
         //db.execSQL("SELECT spellfix1(?, ?, ?, ?, ?);", arrayOf("vocab", "main", "words", "word", 2))
       }
 
@@ -167,60 +164,5 @@ class SQLCipherSupportHelper(
 
     /** The time delay before retrying a database operation. */
     val retryDelay: Duration = Duration.ofSeconds(1)
-  }
-
-  data class ReadItem(
-    val id: UUID,
-    val text: String,
-    val editDistance: Int
-  )
-
-  @WorkerThread
-  fun items(search: String = ""): List<ReadItem> {
-    return readableDatabase
-      .query(
-        """
-          select *, editdist3('$search', "searchText") as "editDist" from "Test" where ("searchText" like '%$search%')
-        """.trimIndent()
-      ).run {
-        use {
-          generateSequence {
-            if (moveToNext()) {
-              ReadItem(
-                id = UUID.fromString(getString(getColumnIndex("id"))),
-                text = getString(getColumnIndex("text1")),
-                editDistance = getInt(getColumnIndex("editDist"))
-              )
-            } else null
-          }.toList()
-        }
-      }
-
-  }
-
-  @WorkerThread
-  fun itemsMatching(pattern: String): List<ReadItem> {
-    return readableDatabase
-      .query(
-        """
-			select "Test"."text1", "Demo"."score" as score
-        from "Demo" inner join "Test" on "Demo"."rowid" = "Test"."rowId"
-        where "Demo"."word" match '$pattern*' and score < 500 and top=3
-		""".trimIndent()
-      )
-      .run {
-        use {
-          generateSequence {
-            if (moveToNext()) {
-              ReadItem(
-                //									id = UUID.fromString(getString(getColumnIndex("id"))),
-                id = UUID.randomUUID(),
-                text = getString(getColumnIndex("text1")),
-                editDistance = getInt(getColumnIndex("score"))
-              )
-            } else null
-          }.toList()
-        }
-      }
   }
 }
