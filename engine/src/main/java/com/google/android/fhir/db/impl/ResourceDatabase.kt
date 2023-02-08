@@ -22,6 +22,7 @@ import androidx.room.TypeConverters
 import com.google.android.fhir.db.impl.dao.LocalChangeDao
 import com.google.android.fhir.db.impl.dao.ResourceDao
 import com.google.android.fhir.db.impl.dao.SyncedResourceDao
+import com.google.android.fhir.db.impl.dao.WordsDao
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
 import com.google.android.fhir.db.impl.entities.FullTextStringIndexEntity
@@ -35,6 +36,7 @@ import com.google.android.fhir.db.impl.entities.StringIndexEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
+import com.google.android.fhir.db.impl.entities.Word
 
 @Database(
   entities =
@@ -51,7 +53,8 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
       NumberIndexEntity::class,
       SyncedResourceEntity::class,
       LocalChangeEntity::class,
-      PositionIndexEntity::class
+      PositionIndexEntity::class,
+      Word::class
     ],
   version = 1,
   exportSchema = false
@@ -61,4 +64,5 @@ internal abstract class ResourceDatabase : RoomDatabase() {
   abstract fun resourceDao(): ResourceDao
   abstract fun syncedResourceDao(): SyncedResourceDao
   abstract fun localChangeDao(): LocalChangeDao
+  abstract fun wordsDao(): WordsDao
 }

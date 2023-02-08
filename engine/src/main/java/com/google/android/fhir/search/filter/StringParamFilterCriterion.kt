@@ -74,16 +74,16 @@ internal data class StringParamFilterCriteria(
   override fun query(type: ResourceType): SearchQuery {
     val conditionParams = filters.flatMap { it.getConditionalParams() }
 
-    return if (filters.first().modifier == StringFilterModifier.MATCHES_FTS)
+    return if (filters.first().modifier == StringFilterModifier.MATCHES_FTS) {
       if (conditionParams.size > 1) {
         var string = ""
         val arguments = mutableListOf<String>()
         conditionParams.forEachIndexed { index, element ->
           string +=
             """
-          SELECT resourceUuid FROM StringIndexEntity c JOIN FullTextStringIndexEntity d ON c.id = d.docid
-          WHERE resourceType = ? AND d.index_name = ? AND d.index_value MATCH '*' || ? || '*'
-            """.trimIndent()
+              SELECT resourceUuid FROM StringIndexEntity c JOIN FullTextStringIndexEntity d ON c.id = d.docid
+              WHERE resourceType = ? AND d.index_name = ? AND d.index_value MATCH '*' || ? || '*'
+                """.trimIndent()
           arguments +=
             listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }[index]
           if (index < conditionParams.size - 1)
@@ -97,20 +97,21 @@ internal data class StringParamFilterCriteria(
       } else {
         SearchQuery(
           """
-      SELECT resourceUuid FROM StringIndexEntity c JOIN FullTextStringIndexEntity d ON c.id = d.docid
-      WHERE resourceType = ? AND d.index_name = ? AND d.${conditionParams.toQueryString(operation, true)} 
-      """,
+          SELECT resourceUuid FROM StringIndexEntity c JOIN FullTextStringIndexEntity d ON c.id = d.docid
+          WHERE resourceType = ? AND d.index_name = ? AND d.${conditionParams.toQueryString(operation, true)} 
+          """,
           listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }
         )
       }
-    else
+    } else {
       SearchQuery(
         """
-      SELECT resourceUuid FROM StringIndexEntity
-      WHERE resourceType = ? AND index_name = ? AND ${conditionParams.toQueryString(operation)} 
-      """,
+          SELECT resourceUuid FROM StringIndexEntity
+          WHERE resourceType = ? AND index_name = ? AND ${conditionParams.toQueryString(operation)} 
+          """,
         listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }
       )
+    }
   }
 
   /**

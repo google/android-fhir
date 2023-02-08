@@ -14,15 +14,27 @@
  * limitations under the License.
  */
 
-object Sdk {
-  const val compileSdk = 33
-  const val targetSdk = 31
-  const val ndkVersion = "20.1.5948944"
+package com.google.android.fhir.db.impl.dao
 
-  // Engine and SDC must support API 24.
-  // Remove desugaring when upgrading it to 26.
-  const val minSdk = 24
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.RawQuery
+import androidx.room.Transaction
+import androidx.sqlite.db.SupportSQLiteQuery
+import com.google.android.fhir.db.impl.entities.Word
 
-  // Workflow requires minSDK 26
-  const val minSdkWorkflow = 26
+@Dao
+interface WordsDao {
+  @RawQuery
+  fun createSpellFix1Table(query: SupportSQLiteQuery): Int
+
+  @Insert
+  fun insertWord(word: Word)
+
+  @Transaction
+  fun insertWords(words: List<Word>) {
+    words.forEach {
+      insertWord(it)
+    }
+  }
 }

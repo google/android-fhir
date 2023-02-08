@@ -32,7 +32,10 @@ android {
     sourceCompatibility = Java.sourceCompatibility
     targetCompatibility = Java.targetCompatibility
   }
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
+  kotlinOptions {
+    jvmTarget = Java.kotlinJvmTarget.toString()
+    freeCompilerArgs += "-Xjvm-default=all"
+  }
   packagingOptions {
     resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
   }

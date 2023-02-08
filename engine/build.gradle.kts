@@ -70,7 +70,16 @@ android {
     resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
   }
 
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
+  repositories {
+    flatDir {
+      dirs("lib")
+    }
+  }
+
+  kotlinOptions {
+    jvmTarget = Java.kotlinJvmTarget.toString()
+    freeCompilerArgs += "-Xjvm-default=all"
+  }
 
   configureJacocoTestOptions()
 }
@@ -118,6 +127,8 @@ dependencies {
   implementation(Dependencies.jsonToolsPatch)
   implementation(Dependencies.sqlcipher)
   implementation(Dependencies.timber)
+  //implementation("net.zetetic:sqlcipher-android:4.5.3@aar")
+  implementation(project(":libspellfix"))
 
   kapt(Dependencies.Room.compiler)
 

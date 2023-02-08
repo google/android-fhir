@@ -35,7 +35,6 @@ import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
-import java.lang.IllegalStateException
 import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -77,37 +76,21 @@ internal class DatabaseImpl(
     db =
       // Initializes builder with the database file name
       when {
-          databaseConfig.inMemory ->
-            Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
-          enableEncryption ->
-            Room.databaseBuilder(context, ResourceDatabase::class.java, ENCRYPTED_DATABASE_NAME)
-          else -> {
-            val dbCallBack =
-              object : RoomDatabase.Callback() {
-                override fun onCreate(db: SupportSQLiteDatabase) {
-                  super.onCreate(db)
-                  db.execSQL(
-                    """
-                    create table "Test" (
-                      "rowId" integer primary key autoincrement not null,
-                      "id" text unique not null,
-                      "text1" text not null,
-                      "searchText" text not null
-                    )
-                  """.trimIndent()
-                  )
-
-                  db.execSQL(
-                    """
-                        create virtual table "Demo" using spellfix1
-                  """.trimIndent()
-                  )
-                }
+        databaseConfig.inMemory ->
+          Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
+        enableEncryption ->
+          Room.databaseBuilder(context, ResourceDatabase::class.java, ENCRYPTED_DATABASE_NAME)
+        else -> {
+          val dbCallBack =
+            object : RoomDatabase.Callback() {
+              override fun onCreate(db: SupportSQLiteDatabase) {
+                super.onCreate(db)
               }
-            Room.databaseBuilder(context, ResourceDatabase::class.java, UNENCRYPTED_DATABASE_NAME)
-              .addCallback(dbCallBack)
-          }
+            }
+          Room.databaseBuilder(context, ResourceDatabase::class.java, UNENCRYPTED_DATABASE_NAME)
+            .addCallback(dbCallBack)
         }
+      }
         .apply {
           // Provide the SupportSQLiteOpenHelper which enables the encryption.
           if (enableEncryption) {
@@ -120,6 +103,13 @@ internal class DatabaseImpl(
           }
         }
         .build()
+
+    /*CoroutineScope(Dispatchers.IO).launch {
+      val query = "CREATE VIRTUAL TABLE vocab USING spellfix1;"
+      val rawQuery = SimpleSQLiteQuery(query)
+      db.wordsDao().createSpellFix1Table(rawQuery)
+      db.wordsDao().insertWords(listOf(Word("String1"), Word("String2")))
+    }*/
   }
 
   private val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
@@ -320,7 +310,8 @@ internal class DatabaseImpl(
      */
     const val ENCRYPTED_DATABASE_NAME = "resources_encrypted.db"
 
-    @VisibleForTesting const val DATABASE_PASSPHRASE_NAME = "fhirEngineDbPassphrase"
+    @VisibleForTesting
+    const val DATABASE_PASSPHRASE_NAME = "fhirEngineDbPassphrase"
   }
 }
 

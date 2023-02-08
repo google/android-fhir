@@ -50,3 +50,5 @@ include(":workflow")
 include(":workflow-testing")
 
 include(":testing")
+
+include(":libspellfix")
