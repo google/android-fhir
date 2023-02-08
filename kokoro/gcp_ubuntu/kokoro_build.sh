@@ -93,6 +93,8 @@ function device_tests() {
     local lib_names=("datacapture" "engine" "workflow")
     firebase_pids=()
     for lib_name in "${lib_names[@]}"; do
+      rm -rf $lib_name/build/outputs/unit_test_code_coverage
+      rm -rf $lib_name/build/fladle/results
       ./gradlew :$lib_name:runFlank  --scan --stacktrace &
       firebase_pids+=("$!")
     done
@@ -120,6 +122,7 @@ function code_coverage() {
   # Don't write secrets to the logs
   set +x
   ./codecov  \
+    -f common/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
     -f datacapture/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
     -f engine/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
     -f workflow/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
