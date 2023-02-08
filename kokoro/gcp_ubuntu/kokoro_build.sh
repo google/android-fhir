@@ -76,7 +76,7 @@ function setup() {
 
   yes | sdkmanager --licenses > /dev/null
   sdkmanager --update > /dev/null
-  sdkmanager "platforms;android-30" "build-tools;30.0.2" > /dev/null
+  sdkmanager "platforms;android-31" "build-tools;31.0.0" > /dev/null
 }
 
 # Checks if code conforms to style guide, builds the code, then runs unit tests.
@@ -120,7 +120,6 @@ function code_coverage() {
   # Don't write secrets to the logs
   set +x
   ./codecov  \
-    -f common/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
     -f datacapture/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
     -f engine/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
     -f workflow/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
