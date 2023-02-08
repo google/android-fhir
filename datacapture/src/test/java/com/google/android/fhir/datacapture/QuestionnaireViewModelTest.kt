@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture
 import android.app.Application
 import android.os.Build
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
@@ -1219,21 +1220,18 @@ class QuestionnaireViewModelTest {
           )
         }
 
-      createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+      val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-      val viewModel = QuestionnaireViewModel(context, state)
-      val collectJob =
-        launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+      viewModel.runViewModelBlocking {
+        var items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+        assertThat(items.map { it.questionnaireItem.linkId })
+          .containsExactly("question-1", "question-2", "question-3")
 
-      var items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
-      assertThat(items.map { it.questionnaireItem.linkId })
-        .containsExactly("question-1", "question-2", "question-3")
+        items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
 
-      items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
-
-      items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
-      assertThat(items.map { it.questionnaireItem.linkId }).containsExactly("question-1")
-      collectJob.cancel()
+        items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+        assertThat(items.map { it.questionnaireItem.linkId }).containsExactly("question-1")
+      }
     }
 
   @Test
@@ -1309,37 +1307,35 @@ class QuestionnaireViewModelTest {
 
       val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-      val collectJob =
-        launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+      viewModel.runViewModelBlocking {
+        val items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+        // Clearing the answer disables question-2 that in turn disables question-3.
+        items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
 
-      val items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
-      // Clearing the answer disables question-2 that in turn disables question-3.
-      items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
-
-      assertResourceEquals(
-        viewModel.getQuestionnaireResponse(),
-        QuestionnaireResponse().apply {
-          id = "a-questionnaire-response"
-          addItem(
-            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-              linkId = "question-1"
-            }
-          )
-        }
-      )
-
-      // Setting the answer of  "question-1" to true should enable question-2 that in turn enables
-      // question-3 and restore their previous states.
-      items
-        .first { it.questionnaireItem.linkId == "question-1" }
-        .setAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = BooleanType(true)
+        assertResourceEquals(
+          viewModel.getQuestionnaireResponse(),
+          QuestionnaireResponse().apply {
+            id = "a-questionnaire-response"
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "question-1"
+              }
+            )
           }
         )
 
-      assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
-      collectJob.cancel()
+        // Setting the answer of  "question-1" to true should enable question-2 that in turn enables
+        // question-3 and restore their previous states.
+        items
+          .first { it.questionnaireItem.linkId == "question-1" }
+          .setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = BooleanType(true)
+            }
+          )
+
+        assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+      }
     }
 
   // Test cases for state flow
@@ -1533,16 +1529,15 @@ class QuestionnaireViewModelTest {
       }
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val collectJob =
-      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+    viewModel.runViewModelBlocking {
+      val question = viewModel.getQuestionnaireItemViewItemList().single().asQuestion()
+      question.clearAnswer()
 
-    val question = viewModel.getQuestionnaireItemViewItemList().single().asQuestion()
-    question.clearAnswer()
-
-    assertThat(viewModel.getQuestionnaireItemViewItemList().single().asQuestion().validationResult)
-      .isEqualTo(Invalid(listOf("Missing answer for required field.")))
-
-    collectJob.cancel()
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList().single().asQuestion().validationResult
+        )
+        .isEqualTo(Invalid(listOf("Missing answer for required field.")))
+    }
   }
 
   @Test
@@ -1799,137 +1794,139 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    val collectJob =
-      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+    viewModel.runViewModelBlocking {
+      fun repeatedGroupA() =
+        viewModel.getQuestionnaireItemViewItemList().single {
+          it.asQuestion().questionnaireItem.linkId == "repeated-group-a"
+        }
 
-    fun repeatedGroupA() =
-      viewModel.getQuestionnaireItemViewItemList().single {
-        it.asQuestion().questionnaireItem.linkId == "repeated-group-a"
+      fun repeatedGroupB() =
+        viewModel.getQuestionnaireItemViewItemList().single {
+          it.asQuestion().questionnaireItem.linkId == "repeated-group-b"
+        }
+      // Calling addAnswer out of order should not result in the answers in the response being out
+      // of order; all of the answers to repeated-group-a should come before repeated-group-b.
+      repeat(times = 2) {
+        repeatedGroupA()
+          .asQuestion()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item =
+                repeatedGroupA()
+                  .asQuestion()
+                  .questionnaireItem.getNestedQuestionnaireResponseItems()
+            }
+          )
+        repeatedGroupB()
+          .asQuestion()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item =
+                repeatedGroupB()
+                  .asQuestion()
+                  .questionnaireItem.getNestedQuestionnaireResponseItems()
+            }
+          )
       }
 
-    fun repeatedGroupB() =
-      viewModel.getQuestionnaireItemViewItemList().single {
-        it.asQuestion().questionnaireItem.linkId == "repeated-group-b"
-      }
-    // Calling addAnswer out of order should not result in the answers in the response being out
-    // of order; all of the answers to repeated-group-a should come before repeated-group-b.
-    repeat(times = 2) {
-      repeatedGroupA()
-        .asQuestion()
-        .addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            item =
-              repeatedGroupA().asQuestion().questionnaireItem.getNestedQuestionnaireResponseItems()
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList().map {
+            it.asQuestion().questionnaireItem.linkId
           }
         )
-      repeatedGroupB()
-        .asQuestion()
-        .addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            item =
-              repeatedGroupB().asQuestion().questionnaireItem.getNestedQuestionnaireResponseItems()
-          }
+        .containsExactly(
+          "repeated-group-a",
+          "nested-item-a",
+          "another-nested-item-a",
+          "nested-item-a",
+          "another-nested-item-a",
+          "repeated-group-b",
+          "nested-item-b",
+          "another-nested-item-b",
+          "nested-item-b",
+          "another-nested-item-b"
         )
+        .inOrder()
+
+      assertResourceEquals(
+        actual = viewModel.getQuestionnaireResponse(),
+        expected =
+          QuestionnaireResponse().apply {
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "repeated-group-a"
+                text = "Group question A"
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-item-a"
+                    text = "Basic question"
+                  }
+                )
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "another-nested-item-a"
+                    text = "Basic question"
+                  }
+                )
+              }
+            )
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "repeated-group-a"
+                text = "Group question A"
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-item-a"
+                    text = "Basic question"
+                  }
+                )
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "another-nested-item-a"
+                    text = "Basic question"
+                  }
+                )
+              }
+            )
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "repeated-group-b"
+                text = "Group question B"
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-item-b"
+                    text = "Basic question"
+                  }
+                )
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "another-nested-item-b"
+                    text = "Basic question"
+                  }
+                )
+              }
+            )
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "repeated-group-b"
+                text = "Group question B"
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-item-b"
+                    text = "Basic question"
+                  }
+                )
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "another-nested-item-b"
+                    text = "Basic question"
+                  }
+                )
+              }
+            )
+          }
+      )
     }
-
-    assertThat(
-        viewModel.getQuestionnaireItemViewItemList().map {
-          it.asQuestion().questionnaireItem.linkId
-        }
-      )
-      .containsExactly(
-        "repeated-group-a",
-        "nested-item-a",
-        "another-nested-item-a",
-        "nested-item-a",
-        "another-nested-item-a",
-        "repeated-group-b",
-        "nested-item-b",
-        "another-nested-item-b",
-        "nested-item-b",
-        "another-nested-item-b"
-      )
-      .inOrder()
-
-    assertResourceEquals(
-      actual = viewModel.getQuestionnaireResponse(),
-      expected =
-        QuestionnaireResponse().apply {
-          addItem(
-            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-              linkId = "repeated-group-a"
-              text = "Group question A"
-              addItem(
-                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                  linkId = "nested-item-a"
-                  text = "Basic question"
-                }
-              )
-              addItem(
-                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                  linkId = "another-nested-item-a"
-                  text = "Basic question"
-                }
-              )
-            }
-          )
-          addItem(
-            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-              linkId = "repeated-group-a"
-              text = "Group question A"
-              addItem(
-                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                  linkId = "nested-item-a"
-                  text = "Basic question"
-                }
-              )
-              addItem(
-                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                  linkId = "another-nested-item-a"
-                  text = "Basic question"
-                }
-              )
-            }
-          )
-          addItem(
-            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-              linkId = "repeated-group-b"
-              text = "Group question B"
-              addItem(
-                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                  linkId = "nested-item-b"
-                  text = "Basic question"
-                }
-              )
-              addItem(
-                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                  linkId = "another-nested-item-b"
-                  text = "Basic question"
-                }
-              )
-            }
-          )
-          addItem(
-            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-              linkId = "repeated-group-b"
-              text = "Group question B"
-              addItem(
-                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                  linkId = "nested-item-b"
-                  text = "Basic question"
-                }
-              )
-              addItem(
-                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                  linkId = "another-nested-item-b"
-                  text = "Basic question"
-                }
-              )
-            }
-          )
-        }
-    )
-    collectJob.cancel()
   }
 
   @Test
@@ -2098,26 +2095,24 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val collectJob =
-      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
 
-    viewModel.goToNextPage()
-
-    assertThat(
-        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
-      )
-      .isEqualTo(
-        QuestionnairePagination(
-          isPaginated = true,
-          pages =
-            listOf(
-              QuestionnairePage(0, enabled = true, hidden = false),
-              QuestionnairePage(1, enabled = true, hidden = false)
-            ),
-          currentPageIndex = 1
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
         )
-      )
-    collectJob.cancel()
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = false)
+              ),
+            currentPageIndex = 1
+          )
+        )
+    }
   }
 
   @Test
@@ -2155,28 +2150,25 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val collectJob =
-      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
+      viewModel.goToPreviousPage()
 
-    viewModel.goToNextPage()
-    viewModel.goToPreviousPage()
-
-    assertThat(
-        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
-      )
-      .isEqualTo(
-        QuestionnairePagination(
-          isPaginated = true,
-          pages =
-            listOf(
-              QuestionnairePage(0, enabled = true, hidden = false),
-              QuestionnairePage(1, enabled = true, hidden = false)
-            ),
-          currentPageIndex = 0
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
         )
-      )
-
-    collectJob.cancel()
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = false)
+              ),
+            currentPageIndex = 0
+          )
+        )
+    }
   }
 
   @Test
@@ -2233,26 +2225,24 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val collectJob =
-      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
-
-    viewModel.goToNextPage()
-    assertThat(
-        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
-      )
-      .isEqualTo(
-        QuestionnairePagination(
-          isPaginated = true,
-          pages =
-            listOf(
-              QuestionnairePage(0, enabled = true, hidden = false),
-              QuestionnairePage(1, enabled = false, hidden = false),
-              QuestionnairePage(2, enabled = true, hidden = false),
-            ),
-          currentPageIndex = 2
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
         )
-      )
-    collectJob.cancel()
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = false, hidden = false),
+                QuestionnairePage(2, enabled = true, hidden = false),
+              ),
+            currentPageIndex = 2
+          )
+        )
+    }
   }
 
   @Test
@@ -2305,24 +2295,23 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val collectJob =
-      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
-    assertThat(
-        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
-      )
-      .isEqualTo(
-        QuestionnairePagination(
-          isPaginated = true,
-          pages =
-            listOf(
-              QuestionnairePage(0, enabled = true, hidden = true),
-              QuestionnairePage(1, enabled = true, hidden = false),
-              QuestionnairePage(2, enabled = true, hidden = false)
-            ),
-          currentPageIndex = 1
+    viewModel.runViewModelBlocking {
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
         )
-      )
-    collectJob.cancel()
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = true),
+                QuestionnairePage(1, enabled = true, hidden = false),
+                QuestionnairePage(2, enabled = true, hidden = false)
+              ),
+            currentPageIndex = 1
+          )
+        )
+    }
   }
 
   @Test
@@ -2376,24 +2365,23 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.goToNextPage()
-    val collectJob =
-      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
-    assertThat(
-        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
-      )
-      .isEqualTo(
-        QuestionnairePagination(
-          isPaginated = true,
-          pages =
-            listOf(
-              QuestionnairePage(0, enabled = true, hidden = false),
-              QuestionnairePage(1, enabled = true, hidden = true),
-              QuestionnairePage(2, enabled = true, hidden = false)
-            ),
-          currentPageIndex = 2
+    viewModel.runViewModelBlocking {
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
         )
-      )
-    collectJob.cancel()
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = true),
+                QuestionnairePage(2, enabled = true, hidden = false)
+              ),
+            currentPageIndex = 2
+          )
+        )
+    }
   }
 
   @Test
@@ -2438,18 +2426,20 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    val collectJob =
-      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
-
-    viewModel.goToNextPage()
-    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-    assertThat(
-        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
-      )
-      .isEqualTo(
-        QuestionnairePagination(isPaginated = true, pages = viewModel.pages!!, currentPageIndex = 1)
-      )
-    collectJob.cancel()
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
+      assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+        )
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages = viewModel.pages!!,
+            currentPageIndex = 1
+          )
+        )
+    }
   }
 
   @Test
@@ -2493,20 +2483,22 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val collectJob =
-      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
-    viewModel.goToNextPage()
-    viewModel.goToPreviousPage()
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
+      viewModel.goToPreviousPage()
 
-    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-    assertThat(
-        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
-      )
-      .isEqualTo(
-        QuestionnairePagination(isPaginated = true, pages = viewModel.pages!!, currentPageIndex = 0)
-      )
-
-    collectJob.cancel()
+      assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+        )
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages = viewModel.pages!!,
+            currentPageIndex = 0
+          )
+        )
+    }
   }
 
   @Test
@@ -2551,15 +2543,18 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.goToNextPage()
 
-    val collectJob =
-      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
-    assertThat(
-        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
-      )
-      .isEqualTo(
-        QuestionnairePagination(isPaginated = true, pages = viewModel.pages!!, currentPageIndex = 0)
-      )
-    collectJob.cancel()
+    viewModel.runViewModelBlocking {
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+        )
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages = viewModel.pages!!,
+            currentPageIndex = 0
+          )
+        )
+    }
   }
 
   @Test
@@ -2781,19 +2776,21 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val collectJob =
-      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
-    viewModel.goToNextPage()
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
 
-    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
-    assertThat(
-        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
-      )
-      .isEqualTo(
-        QuestionnairePagination(isPaginated = true, pages = viewModel.pages!!, currentPageIndex = 1)
-      )
-
-    collectJob.cancel()
+      assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+        )
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages = viewModel.pages!!,
+            currentPageIndex = 1
+          )
+        )
+    }
   }
 
   @Test
@@ -2838,15 +2835,18 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.goToNextPage()
 
-    val collectJob =
-      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
-    assertThat(
-        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
-      )
-      .isEqualTo(
-        QuestionnairePagination(isPaginated = true, pages = viewModel.pages!!, currentPageIndex = 0)
-      )
-    collectJob.cancel()
+    viewModel.runViewModelBlocking {
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+        )
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages = viewModel.pages!!,
+            currentPageIndex = 0
+          )
+        )
+    }
   }
 
   @Test
@@ -2891,20 +2891,21 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    val collectJob =
-      launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
+      viewModel.goToPreviousPage()
 
-    viewModel.goToNextPage()
-    viewModel.goToPreviousPage()
-
-    assertThat(
-        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
-      )
-      .isEqualTo(
-        QuestionnairePagination(isPaginated = true, pages = viewModel.pages!!, currentPageIndex = 1)
-      )
-
-    collectJob.cancel()
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+        )
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages = viewModel.pages!!,
+            currentPageIndex = 1
+          )
+        )
+    }
   }
 
   // Test cases for answer value set
@@ -3478,15 +3479,13 @@ class QuestionnaireViewModelTest {
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
 
       viewModel.goToNextPage()
-      val collectJob =
-        launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
-
-      assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
-            .pagination.showReviewButton
-        )
-        .isFalse()
-      collectJob.cancel()
+      viewModel.runViewModelBlocking {
+        assertThat(
+            (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
+              .pagination.showReviewButton
+          )
+          .isFalse()
+      }
     }
 
   @Test
@@ -3571,14 +3570,13 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
       viewModel.goToNextPage()
-      val collectJob =
-        launch(mainDispatcherRule.testDispatcher) { viewModel.questionnaireStateFlow.collect() }
-      assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
-            .pagination.showReviewButton
-        )
-        .isTrue()
-      collectJob.cancel()
+      viewModel.runViewModelBlocking {
+        assertThat(
+            (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
+              .pagination.showReviewButton
+          )
+          .isTrue()
+      }
     }
 
   @Test
@@ -4013,6 +4011,49 @@ class QuestionnaireViewModelTest {
         )
     }
 
+  @Test
+  fun `should throw exception on invalid cast inside runViewModelBlocking`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 1"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 2"
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
+      assertFailsWith<ClassCastException> {
+        (viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination
+      }
+    }
+  }
+
   private fun createQuestionnaireViewModel(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse? = null,
@@ -4042,6 +4083,15 @@ class QuestionnaireViewModelTest {
       this,
       "questionnaireResponseItem"
     )
+
+  private suspend inline fun QuestionnaireViewModel.runViewModelBlocking(
+    crossinline block: suspend () -> Unit,
+  ) {
+    val collectJob =
+      viewModelScope.launch(mainDispatcherRule.testDispatcher) { questionnaireStateFlow.collect() }
+    block.invoke()
+    collectJob.cancel()
+  }
 
   private companion object {
     const val CODE_SYSTEM_YES_NO = "http://terminology.hl7.org/CodeSystem/v2-0136"
