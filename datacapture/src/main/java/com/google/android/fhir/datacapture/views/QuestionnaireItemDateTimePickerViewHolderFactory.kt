@@ -131,8 +131,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               localTime = it.toLocalTime()
             }
           },
-          questionnaireItemViewItem.partialAnswer as? String,
-          questionnaireItemViewItem
+          questionnaireItemViewItem.partialAnswer as? String
         )
         textWatcher =
           dateInputEditText.doAfterTextChanged { text ->
@@ -174,7 +173,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       fun displayDateValidationError(validationResult: ValidationResult) {
-        // do not clear an error text if answer is cleared and validation result is valid.
+        // Since the partial answer is still displayed in the text field, do not erase the error
+        // text if the answer is cleared and the validation result is valid.
         if (questionnaireItemViewItem.answers.isEmpty() && validationResult == Valid) {
           return
         }
@@ -223,23 +223,21 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       /** Update the date and time input fields in the UI. */
       private fun updateDateTimeInput(
         localDateTime: LocalDateTime?,
-        partialAnswer: String? = null,
-        item: QuestionnaireItemViewItem? = null
+        partialAnswer: String? = null
       ) {
         enableOrDisableTimePicker(enableIt = localDateTime != null)
         when {
-          // reset the recycled item textField text.
+          // Reset the text in the recycled item text field.
           (partialAnswer.isNullOrEmpty() && localDateTime == null) -> {
             dateInputEditText.text = null
           }
-          // populate an answer.
+          // Update the text in the text field with the answer.
           (dateInputEditText.text.isNullOrEmpty() &&
             partialAnswer.isNullOrEmpty() &&
             localDateTime != null) -> {
             dateInputEditText.setText(localDateTime?.localizedDateString ?: "")
           }
-          // update textField from an answer if answer and textField values are not same.
-          // e.g recycled item textField value and current answer are not same.
+          // Update the text in the recycled item text field with the answer.
           (!dateInputEditText.text.isNullOrEmpty() && localDateTime != null) -> {
             val inputDate =
               try {
@@ -254,10 +252,11 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               dateInputEditText.setText(localDateTime?.localizedDateString ?: "")
             }
           }
-          // update recycled item textField with partial answer.
+          // Update the text in the recycled item text field with partial answer.
           (!partialAnswer.isNullOrEmpty() &&
-            dateInputEditText.text.toString() != partialAnswer) -> {
+            partialAnswer != dateInputEditText.text.toString()) -> {
             dateInputEditText.setText(partialAnswer)
+
             try {
               localDate = parseDate(partialAnswer, dateInputEditText.context.applicationContext)
               displayDateValidationError(Valid)

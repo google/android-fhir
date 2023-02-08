@@ -54,6 +54,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * @param resolveAnswerValueSet the callback to resolve the answer value set and return the answer
  * @param resolveAnswerExpression the callback to resolve answer options when answer-expression
  * extension exists options
+ * @param partialAnswer the entered input is not a valid answer.
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -117,10 +118,10 @@ data class QuestionnaireItemViewItem(
   }
 
   /**
-   * Updates partial answer to cache [QuestionnaireViewModel.partialAnswerCache]. It can not have
-   * answers and partial answer in cache at the same time. If partial answer are updated for
-   * [QuestionnaireResponse.QuestionnaireResponseItemComponent] in cache then answers for
-   * [QuestionnaireResponse.QuestionnaireResponseItemComponent] will not
+   * Updates the partial answer in the cache [QuestionnaireViewModel.partialAnswerCache]. The cache
+   * only contain partial answers. If the partial answers for
+   * [QuestionnaireResponse.QuestionnaireResponseItemComponent] are updated in the cache, then
+   * [QuestionnaireResponse.QuestionnaireResponseItemComponent] will not have any answers.
    */
   fun updatePartialAnswer(partialAnswer: Any? = null) {
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), partialAnswer)

@@ -216,7 +216,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * Cache stores invalid input as partial answer e.g "02/02" is partial answer for date type.
    * If partial answer become valid answer then entry will be removed from cache.
    * e.g "02/02/2023" is valid answer and will not be part of cache.
-   * key [QuestionnaireResponseItemComponent] will be used to remove the partial answer.
    */
   private val partialAnswerCache = mutableMapOf<QuestionnaireResponseItemComponent, Any?>()
 
@@ -245,7 +244,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     { questionnaireItem, questionnaireResponseItem, answers, partialAnswer ->
       // TODO(jingtang10): update the questionnaire response item pre-order list and the parent map
       questionnaireResponseItem.answer = answers.toList()
-      updatePartialAnswerCache(questionnaireResponseItem, partialAnswer)
+      when {
+        (questionnaireResponseItem.answer.isNotEmpty()) -> {
+          partialAnswerCache.remove(questionnaireResponseItem)
+        }
+        else -> {
+          partialAnswerCache[questionnaireResponseItem] = partialAnswer
+        }
+      }
       if (questionnaireItem.hasNestedItemsWithinAnswers) {
         questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
       }
@@ -683,24 +689,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     if (responseItemToAnswersMapForDisabledQuestionnaireItem.contains(questionnaireResponseItem)) {
       questionnaireResponseItem.answer =
         responseItemToAnswersMapForDisabledQuestionnaireItem.remove(questionnaireResponseItem)
-    }
-  }
-
-  /**
-   * Updates partial answer in cache [partialAnswerCache], if partial answer is complete answer it
-   * removes from cache.
-   */
-  private fun updatePartialAnswerCache(
-    responseItemComponent: QuestionnaireResponseItemComponent,
-    partialAnswer: Any?
-  ) {
-    when {
-      (responseItemComponent.answer.isNotEmpty()) -> {
-        partialAnswerCache.remove(responseItemComponent)
-      }
-      else -> {
-        partialAnswerCache[responseItemComponent] = partialAnswer
-      }
     }
   }
 
