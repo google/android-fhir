@@ -1794,16 +1794,17 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    viewModel.runViewModelBlocking {
-      fun repeatedGroupA() =
-        viewModel.getQuestionnaireItemViewItemList().single {
-          it.asQuestion().questionnaireItem.linkId == "repeated-group-a"
-        }
+    fun repeatedGroupA() =
+      viewModel.getQuestionnaireItemViewItemList().single {
+        it.asQuestion().questionnaireItem.linkId == "repeated-group-a"
+      }
 
-      fun repeatedGroupB() =
-        viewModel.getQuestionnaireItemViewItemList().single {
-          it.asQuestion().questionnaireItem.linkId == "repeated-group-b"
-        }
+    fun repeatedGroupB() =
+      viewModel.getQuestionnaireItemViewItemList().single {
+        it.asQuestion().questionnaireItem.linkId == "repeated-group-b"
+      }
+
+    viewModel.runViewModelBlocking {
       // Calling addAnswer out of order should not result in the answers in the response being out
       // of order; all of the answers to repeated-group-a should come before repeated-group-b.
       repeat(times = 2) {
@@ -2364,8 +2365,8 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.goToNextPage()
     viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
       assertThat(
           (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
         )
@@ -2425,7 +2426,6 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
@@ -2541,9 +2541,8 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.goToNextPage()
-
     viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
       assertThat(
           (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
         )
@@ -2833,9 +2832,8 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.goToNextPage()
-
     viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
       assertThat(
           (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
         )
@@ -2890,7 +2888,6 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       viewModel.goToPreviousPage()
