@@ -54,6 +54,8 @@ android {
   testOptions { animationsDisabled = true }
 }
 
+afterEvaluate { configureFirebaseTestLab() }
+
 configurations { all { exclude(module = "xpp3") } }
 
 dependencies {

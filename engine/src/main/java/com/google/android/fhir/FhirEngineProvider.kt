@@ -21,6 +21,7 @@ import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.remote.HttpLogger
+import org.hl7.fhir.r4.model.SearchParameter
 
 /** The provider for [FhirEngine] instance. */
 object FhirEngineProvider {
@@ -68,6 +69,7 @@ object FhirEngineProvider {
             if (configuration.enableEncryptionIfSupported) enableEncryptionIfSupported()
             setDatabaseErrorStrategy(configuration.databaseErrorStrategy)
             configuration.serverConfiguration?.let { setServerConfiguration(it) }
+            configuration.customSearchParameters?.let { setSearchParameters(it) }
             if (configuration.testMode) {
               inMemory()
             }
@@ -105,7 +107,20 @@ data class FhirEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
   val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
   val serverConfiguration: ServerConfiguration? = null,
-  val testMode: Boolean = false
+  val testMode: Boolean = false,
+  /**
+   * Additional search parameters to be used to query FHIR engine using the search API. These are in
+   * addition to the default search parameters defined in
+   * [FHIR](https://www.hl7.org/fhir/searchparameter-registry.html). The search parameters should be
+   * unique and not change the existing/default search parameters and it may lead to unexpected
+   * search behaviour.
+   *
+   * NOTE: The engine doesn't reindex resources after a new [SearchParameter] is added to the
+   * engine. It is the responsibility of the app developer to reindex the resources by updating
+   * them. Any new CRUD operations on a resource after a new [SearchParameter] is added will result
+   * in the reindexing of the resource.
+   */
+  val customSearchParameters: List<SearchParameter>? = null
 )
 
 enum class DatabaseErrorStrategy {

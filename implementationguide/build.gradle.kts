@@ -73,9 +73,6 @@ configurations {
 }
 
 dependencies {
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
-  kapt(Dependencies.Room.compiler)
-
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
@@ -85,10 +82,14 @@ dependencies {
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.timber)
+
+  kapt(Dependencies.Room.compiler)
 }
 
 tasks.dokkaHtml.configure {

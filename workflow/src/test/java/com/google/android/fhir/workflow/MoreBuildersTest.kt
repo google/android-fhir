@@ -16,17 +16,21 @@
 
 package com.google.android.fhir.workflow
 
-import org.hl7.elm.r1.VersionedIdentifier
-import org.hl7.fhir.instance.model.api.IBaseResource
-import org.hl7.fhir.r4.model.Library
-import org.opencds.cqf.cql.evaluator.cql2elm.content.fhir.BaseFhirLibrarySourceProvider
-import org.opencds.cqf.cql.evaluator.fhir.adapter.r4.AdapterFactory
+import com.google.common.truth.Truth.assertThat
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
-internal class FhirEngineLibraryContentProvider(adapterFactory: AdapterFactory) :
-  BaseFhirLibrarySourceProvider(adapterFactory) {
-  val libs = mutableMapOf<String, Library>()
+@RunWith(RobolectricTestRunner::class)
+class MoreBuildersTest {
 
-  override fun getLibrary(libraryIdentifier: VersionedIdentifier): IBaseResource? {
-    return libs[libraryIdentifier.id]
+  @Test(expected = BlockingMainThreadException::class)
+  fun `runBlockingOrThrowMainThreadException should throw exception when called from main thread`():
+    Unit = runBlockingOrThrowMainThreadException { 1 + 1 }
+
+  @Test
+  fun `runBlockingOrThrowMainThreadException should return 2`() = runBlockingOnWorkerThread {
+    val result = runBlockingOrThrowMainThreadException { 1 + 1 }
+    assertThat(result).isEqualTo(2)
   }
 }
