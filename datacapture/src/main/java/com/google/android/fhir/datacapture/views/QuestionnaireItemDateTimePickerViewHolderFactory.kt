@@ -130,7 +130,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               localDate = it.toLocalDate()
               localTime = it.toLocalTime()
             }
-          },
+          }
         )
         textWatcher =
           dateInputEditText.doAfterTextChanged { text ->

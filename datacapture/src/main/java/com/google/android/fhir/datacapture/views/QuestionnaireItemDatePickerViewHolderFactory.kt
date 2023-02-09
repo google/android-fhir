@@ -190,17 +190,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
       }
 
-      private fun updateTextFieldFromAnswer() {
-        textInputEditText.setText(
-          questionnaireItemViewItem.answers
-            .singleOrNull()
-            ?.takeIf { it.hasValue() }
-            ?.valueDateType
-            ?.localDate
-            ?.localizedString
-        )
-      }
-
       fun updateTextFieldToDisplayDateValue() {
         val partialAnswerToDisplay = questionnaireItemViewItem.partialAnswer as? String
         val answer =

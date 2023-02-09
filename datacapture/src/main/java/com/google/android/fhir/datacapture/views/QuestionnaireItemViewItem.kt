@@ -113,8 +113,8 @@ data class QuestionnaireItemViewItem(
   }
 
   /** Clears existing answers. */
-  fun clearAnswer(partialAnswer: Any? = null) {
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), partialAnswer)
+  fun clearAnswer() {
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), null)
   }
 
   /**

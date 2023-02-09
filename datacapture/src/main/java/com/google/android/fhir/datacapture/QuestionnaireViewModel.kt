@@ -235,7 +235,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * - the reference to the [QuestionnaireResponseItemComponent] in the [QuestionnaireResponse]
    * - a [List] of [QuestionnaireResponseItemAnswerComponent] which are the new answers to the
    * question.
-   * - partial answer when input is invalid.
+   * - partial answer, the entered input is not a valid answer
    */
   private val answersChangedCallback:
     (
