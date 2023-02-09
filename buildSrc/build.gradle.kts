@@ -14,6 +14,7 @@ dependencies {
   implementation("com.android.tools.build:gradle:7.1.1")
 
   implementation("app.cash.licensee:licensee-gradle-plugin:1.3.0")
+  implementation("com.osacky.flank.gradle:fladle:0.17.4")
 
   implementation("com.spotify.ruler:ruler-gradle-plugin:1.2.1")
 

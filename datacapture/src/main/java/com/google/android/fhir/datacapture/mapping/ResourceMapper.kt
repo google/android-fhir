@@ -673,8 +673,8 @@ private fun setFieldElementValue(base: Base, field: Field, answerValue: Base) {
 private fun addAnswerToListField(base: Base, field: Field, answerValue: List<Base>) {
   base.javaClass
     .getMethod(
-      "add${field.name.capitalize(Locale.ROOT)}",
-      answerValue.first().primitiveValue().javaClass
+      "add${field.name.replaceFirstChar(Char::uppercase)}",
+      answerValue.first().fhirType().replaceFirstChar(Char::uppercase).javaClass
     )
     .let { method -> answerValue.forEach { method.invoke(base, it.primitiveValue()) } }
 }

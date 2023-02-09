@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ Copyright 2020 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/padding_default"
+    android:orientation="vertical"
+>
+
+    <com.google.android.fhir.datacapture.views.QuestionnaireItemHeaderView
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+    />
+
+    <include
+        android:id="@+id/error"
+        layout="@layout/input_error_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+        android:layout_marginTop="@dimen/attachment_error_margin_top"
+    />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+        android:layout_marginTop="@dimen/padding_default"
+        android:orientation="horizontal"
+    >
+
+        <Button
+            android:id="@+id/take_photo"
+            style="?attr/questionnaireAttachmentTakePhotoButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_half_size"
+            android:paddingHorizontal="@dimen/padding_default"
+            android:visibility="gone"
+        />
+
+        <Button
+            android:id="@+id/upload_photo"
+            style="?attr/questionnaireAttachmentUploadButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_half_size"
+            android:paddingHorizontal="@dimen/padding_default"
+            android:text="@string/upload_photo"
+            android:visibility="gone"
+            app:icon="@drawable/ic_image_file"
+        />
+
+        <Button
+            android:id="@+id/upload_audio"
+            style="?attr/questionnaireAttachmentUploadButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_half_size"
+            android:paddingHorizontal="@dimen/padding_default"
+            android:text="@string/upload_audio"
+            android:visibility="gone"
+            app:icon="@drawable/ic_audio_file"
+        />
+
+        <Button
+            android:id="@+id/upload_video"
+            style="?attr/questionnaireAttachmentUploadButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_half_size"
+            android:paddingHorizontal="@dimen/padding_default"
+            android:text="@string/upload_video"
+            android:visibility="gone"
+            app:icon="@drawable/ic_video_file"
+        />
+
+        <Button
+            android:id="@+id/upload_document"
+            style="?attr/questionnaireAttachmentUploadButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_half_size"
+            android:paddingHorizontal="@dimen/padding_default"
+            android:text="@string/upload_document"
+            android:visibility="gone"
+            app:icon="@drawable/ic_document_file"
+        />
+
+        <Button
+            android:id="@+id/upload_file"
+            style="?attr/questionnaireAttachmentUploadButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_half_size"
+            android:paddingHorizontal="@dimen/padding_default"
+            android:text="@string/upload_file"
+            android:visibility="gone"
+            app:icon="@drawable/ic_file"
+        />
+
+    </LinearLayout>
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider"
+        style="?attr/questionnaireAttachmentDividerStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+        android:layout_marginTop="@dimen/item_margin_horizontal"
+        android:visibility="gone"
+    />
+
+    <TextView
+        android:id="@+id/label_uploaded"
+        style="?attr/questionnaireAttachmentUploadedLabelStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+        android:layout_marginTop="@dimen/item_margin_horizontal"
+        android:layout_marginBottom="@dimen/attachment_uploaded_label_margin_bottom"
+        android:text="@string/uploaded"
+        android:visibility="gone"
+    />
+
+    <include
+        android:id="@+id/photo_preview"
+        layout="@layout/attachment_photo_preview"
+        android:visibility="gone"
+    />
+
+    <include
+        android:id="@+id/file_preview"
+        layout="@layout/attachment_file_preview"
+        android:visibility="gone"
+    />
+
+</LinearLayout>

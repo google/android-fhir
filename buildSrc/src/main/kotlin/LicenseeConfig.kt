@@ -145,6 +145,26 @@ fun Project.configureLicensee() {
     // Vision Common
     // https://developers.google.com/android/reference/com/google/mlkit/vision/common/package-summary
     allowDependency("com.google.mlkit", "vision-internal-vkp", "18.0.0") { because("") }
+
+    // Glide
+    allowDependency("com.github.bumptech.glide", "glide", "4.14.2") {
+      because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
+    }
+
+    // Glide Annotations
+    allowDependency("com.github.bumptech.glide", "annotations", "4.14.2") {
+      because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
+    }
+
+    // Glide Disk LRU Cache
+    allowDependency("com.github.bumptech.glide", "disklrucache", "4.14.2") {
+      because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
+    }
+
+    // Glide GIF Decoder
+    allowDependency("com.github.bumptech.glide", "gifdecoder", "4.14.2") {
+      because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
+    }
   }
 }
 
