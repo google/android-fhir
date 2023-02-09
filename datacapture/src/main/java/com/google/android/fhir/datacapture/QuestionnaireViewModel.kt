@@ -212,12 +212,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     mutableMapOf<
       QuestionnaireResponseItemComponent, List<QuestionnaireResponseItemAnswerComponent>>()
 
-  /*
-   * Cache stores invalid input as partial answer e.g "02/02" is partial answer for date type.
-   * If partial answer become valid answer then entry will be removed from cache.
-   * e.g "02/02/2023" is valid answer and will not be part of cache.
+  /**
+   * Map from QuestionnaireResponseItem to invalid input as partial answer e.g "02/02" for date type
+   * (year part missing). If the partial answer becomes valid then the entry in this map should be
+   * removed, e.g, "02/02/2023" is valid answer and should not be part of the map. This is used to
+   * maintain partial input on the screen especially when the widgets are being recycled as a result
+   * of scrolling.
    */
-  private val partialAnswerCache = mutableMapOf<QuestionnaireResponseItemComponent, Any?>()
+  private val partialAnswerMap = mutableMapOf<QuestionnaireResponseItemComponent, Any>()
 
   /**
    * Callback function to update the view model after the answer(s) to a question have been changed.
@@ -228,11 +230,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * by the UI. Subsequently it should also trigger the recalculation of any relevant expressions,
    * enablement states, and validation results throughout the questionnaire.
    *
-   * This callback function has 3 params:
+   * This callback function has 4 params:
    * - the reference to the [Questionnaire.QuestionnaireItemComponent] in the [Questionnaire]
    * - the reference to the [QuestionnaireResponseItemComponent] in the [QuestionnaireResponse]
    * - a [List] of [QuestionnaireResponseItemAnswerComponent] which are the new answers to the
    * question.
+   * - partial answer when input is invalid.
    */
   private val answersChangedCallback:
     (
@@ -246,10 +249,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       questionnaireResponseItem.answer = answers.toList()
       when {
         (questionnaireResponseItem.answer.isNotEmpty()) -> {
-          partialAnswerCache.remove(questionnaireResponseItem)
+          partialAnswerMap.remove(questionnaireResponseItem)
         }
         else -> {
-          partialAnswerCache[questionnaireResponseItem] = partialAnswer
+          if (partialAnswer == null) {
+            partialAnswerMap.remove(questionnaireResponseItem)
+          } else {
+            partialAnswerMap[questionnaireResponseItem] = partialAnswer
+          }
         }
       }
       if (questionnaireItem.hasNestedItemsWithinAnswers) {
@@ -634,7 +641,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               answersChangedCallback = answersChangedCallback,
               resolveAnswerValueSet = { resolveAnswerValueSet(it) },
               resolveAnswerExpression = { resolveAnswerExpression(it) },
-              partialAnswer = partialAnswerCache[questionnaireResponseItem]
+              partialAnswer = partialAnswerMap[questionnaireResponseItem]
             )
           )
         )

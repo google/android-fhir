@@ -101,11 +101,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = localeDatePattern
         textInputEditText.removeTextChangedListener(textWatcher)
-
-        updateTextFieldToDisplayDateValue(
-          questionnaireItemViewItem.answers.singleOrNull()?.valueDateType,
-          questionnaireItemViewItem.partialAnswer as? String
-        )
+        updateTextFieldToDisplayDateValue()
         textWatcher = textInputEditText.doAfterTextChanged { text -> updateAnswer(text.toString()) }
       }
 
@@ -194,50 +190,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
       }
 
-      private fun updateTextFieldToDisplayDateValue(answer: DateType?, partialAnswer: String?) {
-        when {
-          // Reset the text in the recycled item text field.
-          (partialAnswer.isNullOrEmpty() && answer == null) -> {
-            textInputEditText.text = null
-          }
-          // Update the text in the text field with the answer.
-          (textInputEditText.text.isNullOrEmpty() &&
-            partialAnswer.isNullOrEmpty() &&
-            answer != null) -> {
-            updateTextFieldFromAnswer()
-          }
-          // Update the text in the recycled item text field with the answer.
-          (!textInputEditText.text.isNullOrEmpty() &&
-            partialAnswer.isNullOrEmpty() &&
-            answer != null) -> {
-            val inputDate =
-              try {
-                parseDate(textInputEditText.text, textInputEditText.context)
-              } catch (e: Exception) {
-                null
-              }
-            if (answer?.localDate != inputDate) {
-              updateTextFieldFromAnswer()
-            }
-          }
-          // Update the text in the recycled item text field with partial answer.
-          (!partialAnswer.isNullOrEmpty() &&
-            textInputEditText.text.toString() != partialAnswer) -> {
-            textInputEditText.setText(partialAnswer)
-            displayValidationResult(
-              Invalid(
-                listOf(
-                  textInputEditText.context.getString(
-                    R.string.date_format_validation_error_msg,
-                    localeDatePattern
-                  )
-                )
-              )
-            )
-          }
-        }
-      }
-
       private fun updateTextFieldFromAnswer() {
         textInputEditText.setText(
           questionnaireItemViewItem.answers
@@ -248,6 +200,62 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             ?.localizedString
         )
       }
+
+      fun updateTextFieldToDisplayDateValue() {
+        val partialAnswerToDisplay = questionnaireItemViewItem.partialAnswer as? String
+        val answer =
+          questionnaireItemViewItem.answers
+            .singleOrNull()
+            ?.takeIf { it.hasValue() }
+            ?.valueDateType
+            ?.localDate
+        val textToDisplayInTheTextField = answer?.localizedString ?: partialAnswerToDisplay
+        val inputDate =
+          try { // this check is required as formatted answer is in short format
+            parseDate(textInputEditText.text, textInputEditText.context)
+          } catch (parseException: Exception) {
+            null
+          }
+
+        //        At present, there are no restrictions on the day (dd or d),
+        //        month (MM or M), or year (y, yy, or yyyy) when accepting a date input from a user
+        // through a text field.
+        //        For instance, "02/13/23", "2/03/2023", and "2/3/2" are all considered valid dates.
+        //        The date is always displayed in short format style in the text field, such as
+        // "2/1/23" for "02/01/2023".
+        //        However, this can cause issues, as the text representation of the same date may
+        // not match.
+        //        To avoid this problem, it's not enough to simply compare text field values.
+        //        You must also check the date object for the text value to ensure that equal values
+        // are not overwritten.
+        if ((answer != inputDate || (answer == null && inputDate == null)) &&
+            textInputEditText.text.toString() !== textToDisplayInTheTextField
+        ) {
+          textInputEditText.setText(textToDisplayInTheTextField)
+        }
+
+        // show validation error if textField has invalid date input.
+        if (isValidationTextUpdatesRequired()) {
+          displayValidationResult(
+            Invalid(
+              listOf(
+                textInputEditText.context.getString(
+                  R.string.date_format_validation_error_msg,
+                  localeDatePattern
+                )
+              )
+            )
+          )
+        }
+      }
+
+      private fun isValidationTextUpdatesRequired() =
+        try {
+          parseDate(textInputEditText.text, textInputEditText.context)
+          false
+        } catch (parseException: Exception) {
+          true
+        }
     }
 }
 

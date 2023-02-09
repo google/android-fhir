@@ -131,7 +131,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               localTime = it.toLocalTime()
             }
           },
-          questionnaireItemViewItem.partialAnswer as? String
         )
         textWatcher =
           dateInputEditText.doAfterTextChanged { text ->
@@ -221,65 +220,66 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       /** Update the date and time input fields in the UI. */
-      private fun updateDateTimeInput(
-        localDateTime: LocalDateTime?,
-        partialAnswer: String? = null
-      ) {
+      private fun updateDateTimeInput(localDateTime: LocalDateTime?) {
         enableOrDisableTimePicker(enableIt = localDateTime != null)
-        when {
-          // Reset the text in the recycled item text field.
-          (partialAnswer.isNullOrEmpty() && localDateTime == null) -> {
-            dateInputEditText.text = null
+        val partialAnswerToDisplay = questionnaireItemViewItem.partialAnswer as? String
+        val textToDisplayInTheTextField =
+          localDateTime?.localizedDateString ?: partialAnswerToDisplay
+        val inputDate =
+          try {
+            generateLocalDateTime(
+              parseDate(dateInputEditText.text, dateInputEditText.context.applicationContext),
+              localTime
+            )
+          } catch (parseException: Exception) {
+            null
           }
-          // Update the text in the text field with the answer.
-          (dateInputEditText.text.isNullOrEmpty() &&
-            partialAnswer.isNullOrEmpty() &&
-            localDateTime != null) -> {
-            dateInputEditText.setText(localDateTime?.localizedDateString ?: "")
-          }
-          // Update the text in the recycled item text field with the answer.
-          (!dateInputEditText.text.isNullOrEmpty() && localDateTime != null) -> {
-            val inputDate =
-              try {
-                generateLocalDateTime(
-                  parseDate(dateInputEditText.text, dateInputEditText.context.applicationContext),
-                  localTime
-                )
-              } catch (e: Exception) {
-                null
-              }
-            if (localDateTime.toLocalDate() != inputDate?.toLocalDate()) {
-              dateInputEditText.setText(localDateTime?.localizedDateString ?: "")
-            }
-          }
-          // Update the text in the recycled item text field with partial answer.
-          (!partialAnswer.isNullOrEmpty() &&
-            partialAnswer != dateInputEditText.text.toString()) -> {
-            dateInputEditText.setText(partialAnswer)
 
-            try {
-              localDate = parseDate(partialAnswer, dateInputEditText.context.applicationContext)
-              displayDateValidationError(Valid)
-              enableOrDisableTimePicker(enableIt = true)
-            } catch (exception: Exception) {
-              displayDateValidationError(
-                Invalid(
-                  listOf(
-                    dateInputEditText.context.getString(
-                      R.string.date_format_validation_error_msg,
-                      localeDatePattern
-                    )
-                  )
+        // At present, there are no restrictions on the day (dd or d),
+        //        month (MM or M), or year (y, yy, or yyyy) when accepting a date input from a user
+        // through a text field.
+        //        For instance, "02/13/23", "2/03/2023", and "2/3/2" are all considered valid dates.
+        //        The date is always displayed in short format style in the text field, such as
+        // "2/1/23" for "02/01/2023".
+        //        However, this can cause issues, as the text representation of the same date may
+        // not match.
+        //        To avoid this problem, it's not enough to simply compare text field values.
+        //        You must also check the date object for the text value to ensure that equal values
+        // are not overwritten.
+        if ((localDateTime?.toLocalDate() != inputDate?.toLocalDate() ||
+            (localDateTime?.toLocalDate() == null && inputDate?.toLocalDate() == null)) &&
+            dateInputEditText.text.toString() !== textToDisplayInTheTextField
+        ) {
+          dateInputEditText.setText(textToDisplayInTheTextField)
+          displayDateValidationError(Valid)
+          enableOrDisableTimePicker(enableIt = true)
+        }
+        // show validation error as we set previous partial input
+        if (isValidationTextUpdatesRequired()) {
+          displayValidationResult(
+            Invalid(
+              listOf(
+                dateInputEditText.context.getString(
+                  R.string.date_format_validation_error_msg,
+                  localeDatePattern
                 )
               )
-            }
-          }
+            )
+          )
         }
 
         timeInputEditText.setText(
           localDateTime?.toLocalizedTimeString(timeInputEditText.context) ?: ""
         )
       }
+
+      private fun isValidationTextUpdatesRequired() =
+        try {
+          parseDate(dateInputEditText.text, dateInputEditText.context)
+          false
+        } catch (parseException: Exception) {
+          true
+        }
 
       /** Updates the recorded answer. */
       private fun updateDateTimeAnswer(localDateTime: LocalDateTime) {
