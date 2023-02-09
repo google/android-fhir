@@ -74,19 +74,19 @@ class MoreLocalDatesTest {
   @Test
   fun `should canonicalize date format from US locale date pattern`() {
     Locale.setDefault(Locale.US)
-    assertThat(canonicalizeDateFormat(getLocalizedDateTimePattern())).isEqualTo("MM/dd/yyyy")
+    assertThat(canonicalizeDatePattern(getLocalizedDateTimePattern())).isEqualTo("MM/dd/yyyy")
   }
 
   @Test
   fun `should canonicalize date format from Korean locale date pattern`() {
     Locale.setDefault(Locale.KOREA)
-    assertThat(canonicalizeDateFormat(getLocalizedDateTimePattern())).isEqualTo("yyyy.MM.dd.")
+    assertThat(canonicalizeDatePattern(getLocalizedDateTimePattern())).isEqualTo("yyyy.MM.dd.")
   }
 
   @Test
   fun `should canonicalize date format from Canada locale date pattern`() {
     Locale.setDefault(Locale.CANADA)
-    assertThat(canonicalizeDateFormat(getLocalizedDateTimePattern())).isEqualTo("yyyy-MM-dd")
+    assertThat(canonicalizeDatePattern(getLocalizedDateTimePattern())).isEqualTo("yyyy-MM-dd")
   }
 
   @Test
@@ -117,7 +117,7 @@ class MoreLocalDatesTest {
   fun `should format ITALY locale date using its canonicalizedDatePattern`() {
     Locale.setDefault(Locale.ITALY)
     val localDate = LocalDate.of(2010, 1, 1)
-    assertThat(localDate.format(canonicalizeDateFormat(getLocalizedDateTimePattern())))
+    assertThat(localDate.format(canonicalizeDatePattern(getLocalizedDateTimePattern())))
       .isEqualTo("01/01/2010")
   }
 

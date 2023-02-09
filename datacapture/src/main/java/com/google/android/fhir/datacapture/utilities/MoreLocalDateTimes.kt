@@ -22,9 +22,6 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
 
-internal val LocalDateTime.localizedDateString: String
-  get() = toLocalDate().format()
-
 // ICU on Android does not observe the user's 24h/12h time format setting (obtained from
 // DateFormat.is24HourFormat()). In order to observe the setting, we are using DateFormat as
 // suggested in the docs. See

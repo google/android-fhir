@@ -24,7 +24,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.utilities.canonicalizeDateFormat
+import com.google.android.fhir.datacapture.utilities.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.utilities.format
 import com.google.android.fhir.datacapture.utilities.getDateSeparator
 import com.google.android.fhir.datacapture.utilities.parseDate
@@ -106,10 +106,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
         val localeDatePattern = getLocalizedDateTimePattern()
-        // Special character used in date format
-        val dateFormatSeparator = getDateSeparator(localeDatePattern)
-        textWatcher = DatePatternTextWatcher(dateFormatSeparator)
-        canonicalizedDatePattern = canonicalizeDateFormat(localeDatePattern)
+        // Special character used in date pattern
+        val datePatternSeparator = getDateSeparator(localeDatePattern)
+        textWatcher = DatePatternTextWatcher(datePatternSeparator)
+        canonicalizedDatePattern = canonicalizeDatePattern(localeDatePattern)
         textInputLayout.hint = canonicalizedDatePattern
         textInputEditText.removeTextChangedListener(textWatcher)
         if (isTextUpdateRequired(

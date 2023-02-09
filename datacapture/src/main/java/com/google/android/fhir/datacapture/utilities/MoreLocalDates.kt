@@ -39,50 +39,53 @@ internal fun getDateSeparator(localeDatePattern: String): Char =
  * Converts date pattern to acceptable date pattern where 2 digits are expected for day(dd) and
  * month(MM) and 4 digits are expected for year(yyyy), e.g., dd/mm/yyyy is returned for d/M/yy"
  */
-internal fun canonicalizeDateFormat(datePattern: String): String {
-  val dateFormatSeparator = getDateSeparator(datePattern)
+internal fun canonicalizeDatePattern(datePattern: String): String {
+  val datePatternSeparator = getDateSeparator(datePattern)
   var hasDay = false
   var hasMonth = false
   var hasYear = false
-  val newDateFormat = StringBuilder()
+  val newDatePattern = StringBuilder()
   datePattern.lowercase().forEach {
     when (it) {
       'd' -> {
         if (!hasDay) {
-          newDateFormat.append("dd")
+          newDatePattern.append("dd")
           hasDay = true
         }
       }
       'm' -> {
         if (!hasMonth) {
-          newDateFormat.append("MM")
+          newDatePattern.append("MM")
           hasMonth = true
         }
       }
       'y' -> {
         if (!hasYear) {
-          newDateFormat.append("yyyy")
+          newDatePattern.append("yyyy")
           hasYear = true
         }
       }
-      dateFormatSeparator -> {
-        newDateFormat.append(dateFormatSeparator)
+      datePatternSeparator -> {
+        newDatePattern.append(datePatternSeparator)
       }
       else -> {}
     }
   }
-  return newDateFormat.toString()
+  return newDatePattern.toString()
 }
 
-/** Parses a date string using the given date format, or the default date format for the locale. */
-internal fun parseDate(text: String, canonicalizedDatePattern: String): LocalDate {
+/**
+ * Parses a date string using the given date pattern, or the default date pattern for the device
+ * locale.
+ */
+internal fun parseDate(text: String, datePattern: String): LocalDate {
   val dateFormat =
-    if (!canonicalizedDatePattern.isEmpty()) {
-      SimpleDateFormat(canonicalizedDatePattern)
+    if (datePattern.isNotEmpty()) {
+      SimpleDateFormat(datePattern)
     } else {
       DateFormat.getDateInstance(DateFormat.SHORT)
     }
-  val localDate = dateFormat.apply { isLenient = false }.parse(text.toString()).localDate
+  val localDate = dateFormat.apply { isLenient = false }.parse(text).localDate
   // Throw ParseException if year is less than 4 digits.
   if (localDate.year.length() < 4) {
     throw ParseException("Year has less than 4 digits.", text.indexOf('y'))
@@ -99,14 +102,14 @@ internal fun parseDate(text: String, canonicalizedDatePattern: String): LocalDat
 }
 
 /**
- * Returns the local date string using the provided date format, or the default date format for the
- * system locale if no date format is provided.
+ * Returns the local date string using the provided date pattern, or the default date pattern for
+ * the system locale if no date pattern is provided.
  */
-internal fun LocalDate.format(format: String? = null): String {
-  return if (format.isNullOrEmpty()) {
+internal fun LocalDate.format(pattern: String? = null): String {
+  return if (pattern.isNullOrEmpty()) {
     val date = Date.from(atStartOfDay(ZoneId.systemDefault())?.toInstant())
     return DateFormat.getDateInstance(DateFormat.SHORT).format(date)
   } else {
-    DateTimeFormatter.ofPattern(format).format(this)
+    DateTimeFormatter.ofPattern(pattern).format(this)
   }
 }

@@ -25,7 +25,7 @@ import android.text.format.DateFormat
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.utilities.canonicalizeDateFormat
+import com.google.android.fhir.datacapture.utilities.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.utilities.format
 import com.google.android.fhir.datacapture.utilities.getDateSeparator
 import com.google.android.fhir.datacapture.utilities.parseDate
@@ -125,10 +125,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         clearPreviousState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
         val localeDatePattern = getLocalizedDateTimePattern()
-        // Special character used in date format
-        val dateFormatSeparator = getDateSeparator(localeDatePattern)
-        textWatcher = DatePatternTextWatcher(dateFormatSeparator)
-        canonicalizedDatePattern = canonicalizeDateFormat(localeDatePattern)
+        // Special character used in date pattern
+        val datePatternSeparator = getDateSeparator(localeDatePattern)
+        textWatcher = DatePatternTextWatcher(datePatternSeparator)
+        canonicalizedDatePattern = canonicalizeDatePattern(localeDatePattern)
         dateInputLayout.hint = canonicalizedDatePattern
         dateInputEditText.removeTextChangedListener(textWatcher)
         val dateTime = questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType
@@ -354,7 +354,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       /** Automatically appends date separator (e.g. "/") during date input. */
-      inner class DatePatternTextWatcher(private val dateFormatSeparator: Char) : TextWatcher {
+      inner class DatePatternTextWatcher(private val datePatternSeparator: Char) : TextWatcher {
         private var isDeleting = false
 
         override fun beforeTextChanged(
@@ -377,7 +377,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           handleDateFormatAfterTextChange(
             editable,
             canonicalizedDatePattern,
-            dateFormatSeparator,
+            datePatternSeparator,
             isDeleting
           )
           updateAnswerAfterTextChanged(editable.toString())
