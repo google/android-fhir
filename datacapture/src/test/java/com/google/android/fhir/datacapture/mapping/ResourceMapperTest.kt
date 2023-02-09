@@ -1516,8 +1516,8 @@ class ResourceMapperTest {
       assertThat((questionnaireResponse.item[0].answer[0].value as StringType).valueAsString)
         .isEqualTo("Salman")
       assertThat(
-        ((questionnaireResponse.item[1].item[0].answer[0]).value as StringType).valueAsString
-      )
+          ((questionnaireResponse.item[1].item[0].answer[0]).value as StringType).valueAsString
+        )
         .isEqualTo("Doe")
       assertThat(((questionnaireResponse.item[2].answer[0]).value as DateType).valueAsString)
         .isEqualTo("1990-05-20")
@@ -1694,8 +1694,8 @@ class ResourceMapperTest {
     assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
       .isEqualTo(AdministrativeGender.FEMALE.display)
     assertThat(
-      (questionnaireResponse.item[0].answer[0].item[0].answer[0].value as StringType).value
-    )
+        (questionnaireResponse.item[0].answer[0].item[0].answer[0].value as StringType).value
+      )
       .isEqualTo(patientId)
   }
 
