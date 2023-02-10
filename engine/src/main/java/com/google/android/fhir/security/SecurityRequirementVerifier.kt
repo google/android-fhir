@@ -21,12 +21,8 @@ internal interface SecurityRequirementVerifier<R : SecurityRequirement> {
   /** Checks if the given security requirement is fulfilled. */
   suspend fun verify(requirement: R): SecurityRequirementVerdict
 }
-/**
- * A class hierarchy for security requirement verdict.
- *
- * This sealed interface isn't exhaustive. Don't use it with `when`.
- */
-sealed interface SecurityRequirementVerdict
+/** A class hierarchy for security requirement verdict. */
+interface SecurityRequirementVerdict
 
 /** Represents a verdict, which the security requirement can't be verified. */
 object SecurityRequirementUnsupported : SecurityRequirementVerdict
@@ -35,5 +31,5 @@ object SecurityRequirementUnsupported : SecurityRequirementVerdict
 object SecurityRequirementMet : SecurityRequirementVerdict
 
 /** Represents a violation of lock screen requirement. */
-class LockScreenRequirementViolation(val requiredComplexity: Int, val currentComplexity: Int) :
+data class LockScreenRequirementViolation(val requiredComplexity: Int, val currentComplexity: Int) :
   SecurityRequirementVerdict

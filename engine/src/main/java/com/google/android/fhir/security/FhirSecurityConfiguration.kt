@@ -29,7 +29,7 @@ data class FhirSecurityConfiguration(
 )
 
 /** Sealed class hierarchy representing a security policy. */
-sealed interface SecurityRequirement
+internal sealed interface SecurityRequirement
 
 /**
  * The required lock screen policy for apps integrated with Android FHIR SDK.
@@ -50,6 +50,7 @@ data class LockScreenRequirement(
   }
 
   companion object {
+    /** A list of supported lock screen complexity policy. */
     val SUPPORTED_LOCK_SCREEN_COMPLEXITIES =
       setOf(
         PASSWORD_COMPLEXITY_HIGH,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,17 @@
 
 package com.google.android.fhir
 
+import android.app.PendingIntent
+import android.app.admin.DevicePolicyManager.PASSWORD_COMPLEXITY_HIGH
+import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.fhir.security.FhirSecurityConfiguration
+import com.google.android.fhir.security.LockScreenRequirement
+import com.google.android.fhir.security.RequirementViolationAction.WARN
 import com.google.common.truth.Truth.assertThat
 import java.lang.IllegalStateException
+import java.util.EnumSet
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -93,6 +100,32 @@ class FhirEngineProviderTest {
       assertThat(this.connectionTimeOut).isEqualTo(5)
       assertThat(this.readTimeOut).isEqualTo(4)
       assertThat(this.writeTimeOut).isEqualTo(6)
+    }
+  }
+
+  @Test
+  fun createFhirEngineConfiguration_securityConfig_shouldHaveExpectedSecurityConfiguration() {
+    val pendingIntent =
+      PendingIntent.getBroadcast(
+        ApplicationProvider.getApplicationContext(),
+        /* requestCode= */ 0,
+        Intent("TEST_ACTION"),
+        /* flags= */ 0
+      )
+
+    val config =
+      FhirEngineConfiguration(
+        securityConfiguration =
+          FhirSecurityConfiguration(
+            LockScreenRequirement(PASSWORD_COMPLEXITY_HIGH, EnumSet.of(WARN)),
+            warningCallback = pendingIntent
+          )
+      )
+
+    with(config.securityConfiguration) {
+      assertThat(this?.lockScreenRequirement)
+        .isEqualTo(LockScreenRequirement(PASSWORD_COMPLEXITY_HIGH, EnumSet.of(WARN)))
+      assertThat(this?.warningCallback).isEqualTo(pendingIntent)
     }
   }
 }

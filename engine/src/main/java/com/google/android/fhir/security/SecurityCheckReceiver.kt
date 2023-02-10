@@ -32,17 +32,17 @@ class SecurityCheckReceiver : BroadcastReceiver() {
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
         SECURITY_CHECK_WORKER_NAME,
-        ExistingPeriodicWorkPolicy.KEEP,
+        ExistingPeriodicWorkPolicy.REPLACE,
         PERIODIC_REQUEST
       )
   }
 
-  private companion object {
-    const val SECURITY_CHECK_WORKER_NAME = "FhirSecurityRequirementsCheck"
-    // TODO: Use a longer repeat interval.
-    val PERIODIC_REQUEST =
-      PeriodicWorkRequestBuilder<SecurityCheckWorker>(15, TimeUnit.MINUTES)
-        .setInitialDelay(0, TimeUnit.MINUTES)
+  companion object {
+    const val SECURITY_CHECK_WORKER_NAME =
+      "com.google.android.fhir.security.FhirSecurityRequirementsCheck"
+    private val PERIODIC_REQUEST =
+      PeriodicWorkRequestBuilder<SecurityCheckWorker>(1, TimeUnit.DAYS)
+        .setInitialDelay(10, TimeUnit.SECONDS)
         .build()
   }
 }
