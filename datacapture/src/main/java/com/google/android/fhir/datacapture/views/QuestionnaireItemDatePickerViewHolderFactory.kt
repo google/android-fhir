@@ -325,7 +325,8 @@ internal fun datePattern(questionnaireItem: Questionnaire.QuestionnaireItemCompo
     Timber.w(" date time entry format is not available in Questionnaire item")
     getLocalizedDateTimePattern()
   } else {
-    questionnaireItem.entryFormat!! // TODO IS PARSING CHECK REQUIRED parsing here for entry format validation
+    questionnaireItem
+      .entryFormat!! // TODO IS PARSING CHECK REQUIRED parsing here for entry format validation
   }
 }
 
