@@ -190,7 +190,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                   R.string.date_format_validation_error_msg,
                   canonicalizedDatePattern,
                   canonicalizedDatePattern
-                    .replace("dd", "01")
+                    .replace("dd", "31")
                     .replace("MM", "01")
                     .replace("yyyy", "2023")
                 )
