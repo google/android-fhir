@@ -238,14 +238,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         )
       }
 
-      private fun isValidationTextUpdatesRequired() =
-        try {
-          parseDate(dateInputEditText.text.toString(), canonicalizedDatePattern)
-          false
-        } catch (parseException: Exception) {
-          true
-        }
-
       /** Updates the recorded answer. */
       private fun updateDateTimeAnswer(localDateTime: LocalDateTime) {
         questionnaireItemViewItem.setAnswer(

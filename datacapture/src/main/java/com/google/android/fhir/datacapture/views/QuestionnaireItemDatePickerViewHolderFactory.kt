@@ -204,7 +204,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
       }
 
-      fun updateTextFieldToDisplayDateValue() {
+      private fun updateTextFieldToDisplayDateValue() {
         val partialAnswerToDisplay = questionnaireItemViewItem.partialAnswer as? String
         val answer =
           questionnaireItemViewItem.answers
