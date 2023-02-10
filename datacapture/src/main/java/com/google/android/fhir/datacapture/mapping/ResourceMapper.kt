@@ -362,7 +362,7 @@ object ResourceMapper {
         // 3) simply group questions (e.g. for display reasons) without altering the extraction
         // semantics
         when {
-          questionnaireItem.itemExtractionContextExtensionValue != null ->
+          questionnaireItem.extension.itemExtractionContextExtensionValue != null ->
             // Extract a new resource for a new item extraction context
             extractResourceByDefinition(
               questionnaireItem,
@@ -767,32 +767,18 @@ private fun Base.asExpectedType(): Type {
  * such extension exists in the questionnaire, or null otherwise.
  */
 private fun Questionnaire.createResource(): Resource? =
-  itemExtractionContextExtensionValue?.let {
+  this.extension.itemExtractionContextExtensionValue?.let {
     Class.forName("org.hl7.fhir.r4.model.$it").newInstance() as Resource
   }
-
-/**
- * The item extraction context extension value of type Expression or CodeType if one and only one
- * such extension exists, or null otherwise.
- */
-private val Questionnaire.itemExtractionContextExtensionValue
-  get() = this.extension.itemExtractionContextExtensionValue
 
 /**
  * Returns a newly created [Resource] from the item extraction context extension if one and only one
  * such extension exists in the questionnaire item, or null otherwise.
  */
 private fun Questionnaire.QuestionnaireItemComponent.createResource(): Resource? =
-  itemExtractionContextExtensionValue?.let {
+  this.extension.itemExtractionContextExtensionValue?.let {
     Class.forName("org.hl7.fhir.r4.model.$it").newInstance() as Resource
   }
-
-/**
- * The item extraction context extension value of type Expression or CodeType if one and only one
- * such extension exists, or null otherwise.
- */
-private val Questionnaire.QuestionnaireItemComponent.itemExtractionContextExtensionValue: String?
-  get() = this.extension.itemExtractionContextExtensionValue
 
 /**
  * The item extraction context extension value of type Expression or CodeType if one and only one
