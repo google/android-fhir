@@ -21,6 +21,7 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.views.localDate
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -608,6 +609,123 @@ class ResourceMapperTest {
   }
 
   @Test
+  fun `extract() should perform definition-based extraction for valueCode itemExtractionContext`() =
+    runBlocking {
+      // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
+      @Language("JSON")
+      val questionnaireJson =
+        """
+        {
+          "resourceType": "Questionnaire",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueCode":  "Patient"
+            }
+          ],
+          "item": [
+            {
+              "linkId": "PR",
+              "type": "group",
+              "item": [
+                {
+                  "linkId": "PR-name",
+                  "type": "group",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
+                  "item": [
+                    {
+                      "linkId": "PR-name-text",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
+                      "type": "string",
+                      "text": "First Name"
+                    },
+                    {
+                      "linkId": "PR-name-family",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#Patient.name.family",
+                      "type": "string",
+                      "text": "Family Name"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "patient-0-gender",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
+                  "type": "choice",
+                  "text": "Gender:"
+                }
+               ]
+            }
+          ]
+        }
+        """.trimIndent()
+
+      @Language("JSON")
+      val questionnaireResponseJson =
+        """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "questionnaire": "client-registration-sample",
+          "item": [
+            {
+              "linkId": "PR",
+              "item": [
+                {
+                  "linkId": "PR-name",
+                  "item": [
+                    {
+                       "linkId": "PR-name-text",
+                      "answer": [
+                        {
+                          "valueString": "John"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "PR-name-family",
+                      "answer": [
+                        {
+                          "valueString": "Doe"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "patient-0-gender",
+                  "answer": [
+                    {
+                      "valueCoding": {
+                        "code": "male",
+                        "display": "Male"
+                      }
+                    }
+                  ]
+                }
+                ]
+            }
+          ]
+        }
+        """.trimIndent()
+
+      val iParser: IParser = FhirContext.forR4().newJsonParser()
+
+      val uriTestQuestionnaire =
+        iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+
+      val uriTestQuestionnaireResponse =
+        iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+          as QuestionnaireResponse
+
+      val patient =
+        ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0].resource
+          as Patient
+
+      assertThat(patient.name.first().given.first().toString()).isEqualTo("John")
+      assertThat(patient.name.first().family).isEqualTo("Doe")
+      assertThat(patient.gender.display).isEqualTo(AdministrativeGender.MALE.display)
+    }
+
+  @Test
   fun `extract() should extract choice value fields`() = runBlocking {
     // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
     @Language("JSON")
@@ -1034,6 +1152,7 @@ class ResourceMapperTest {
           ]
         }
         """.trimIndent()
+
       @Language("JSON")
       val questionnaireResponseJson =
         """
@@ -2098,6 +2217,7 @@ class ResourceMapperTest {
           ]
         }
       """.trimIndent()
+
     @Language("JSON")
     val response =
       """
