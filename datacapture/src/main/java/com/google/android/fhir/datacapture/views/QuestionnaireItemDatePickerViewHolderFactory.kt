@@ -214,12 +214,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             ?.localDate
         val textToDisplayInTheTextField =
           answer?.format(canonicalizedDatePattern) ?: partialAnswerToDisplay
-        val inputDate =
-          try {
-            parseDate(textInputEditText.text.toString(), canonicalizedDatePattern)
-          } catch (parseException: Exception) {
-            null
-          }
 
         // Since pull request #1822 has been merged, the same date format style is now used for both
         // accepting user date input and displaying the answer in the text field. For instance, the
