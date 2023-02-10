@@ -211,27 +211,19 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             null
           }
 
-        // At present, there are no restrictions on the day (dd or d),
-        //        month (MM or M), or year (y, yy, or yyyy) when accepting a date input from a user
-        // through a text field.
-        //        For instance, "02/13/23", "2/03/2023", and "2/3/2" are all considered valid dates.
-        //        The date is always displayed in short format style in the text field, such as
-        // "2/1/23" for "02/01/2023".
-        //        However, this can cause issues, as the text representation of the same date may
-        // not match.
-        //        To avoid this problem, it's not enough to simply compare text field values.
-        //        You must also check the date object for the text value to ensure that equal values
-        // are not overwritten.
-        if ((localDateTime?.toLocalDate() != inputDate?.toLocalDate() ||
-            (localDateTime?.toLocalDate() == null && inputDate?.toLocalDate() == null)) &&
-            dateInputEditText.text.toString() != textToDisplayInTheTextField
-        ) {
+        // Since pull request #1822 has been merged, the same date format style is now used for both
+        // accepting user date input and displaying the answer in the text field. For instance, the
+        // "MM/dd/yyyy" format is employed to accept and display the date value. As a result, it is
+        // possible to simply compare the
+        // text field text to the partial or valid answer to determine whether the text field text
+        // should be overridden or not.
+        if (dateInputEditText.text.toString() != textToDisplayInTheTextField) {
           dateInputEditText.setText(textToDisplayInTheTextField)
           displayDateValidationError(Valid)
           enableOrDisableTimePicker(enableIt = true)
         }
-        // show validation error as we set previous partial input
-        if (isValidationTextUpdatesRequired()) {
+        // Show an error text
+        if (!partialAnswerToDisplay.isNullOrBlank()) {
           displayValidationResult(
             Invalid(
               listOf(
@@ -246,6 +238,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               )
             )
           )
+        } else {
+          displayValidationResult(NotValidated)
         }
 
         timeInputEditText.setText(

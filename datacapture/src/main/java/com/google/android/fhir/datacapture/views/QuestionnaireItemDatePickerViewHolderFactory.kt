@@ -221,24 +221,19 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             null
           }
 
-        //        At present, there are no restrictions on the day (dd or d),
-        //        month (MM or M), or year (y, yy, or yyyy) when accepting a date input from a user
-        // through a text field.
-        //        For instance, "02/13/23", "2/03/2023", and "2/3/2" are all considered valid dates.
-        //        The date is always displayed in short format style in the text field, such as
-        // "2/1/23" for "02/01/2023".
-        //        However, this can cause issues, as the text representation of the same date may
-        // not match.
-        //        To avoid this problem, it's not enough to simply compare text field values.
-        //        You must also check the date object for the text value to ensure that equal values
-        // are not overwritten.
+        // Since pull request #1822 has been merged, the same date format style is now used for both
+        // accepting user date input and displaying the answer in the text field. For instance, the
+        // "MM/dd/yyyy" format is employed to accept and display the date value. As a result, it is
+        // possible to simply compare
+        // the text field text to the partial or valid answer to determine whether the text field
+        // text should be overridden or not.
 
         if (textInputEditText.text.toString() != textToDisplayInTheTextField) {
           textInputEditText.setText(textToDisplayInTheTextField)
         }
 
-        // show validation error if textField has invalid date input.
-        if (isValidationTextUpdatesRequired()) {
+        // show an error text
+        if (!partialAnswerToDisplay.isNullOrBlank()) {
           displayValidationResult(
             Invalid(
               listOf(
@@ -253,16 +248,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               )
             )
           )
+        } else {
+          displayValidationResult(NotValidated)
         }
       }
-
-      private fun isValidationTextUpdatesRequired() =
-        try {
-          parseDate(textInputEditText.text.toString(), canonicalizedDatePattern)
-          false
-        } catch (parseException: Exception) {
-          true
-        }
 
       /** Automatically appends date separator (e.g. "/") during date input. */
       inner class DatePatternTextWatcher(private val dateFormatSeparator: Char) : TextWatcher {
