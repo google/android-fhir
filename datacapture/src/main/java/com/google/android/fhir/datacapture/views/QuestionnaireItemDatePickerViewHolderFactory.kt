@@ -24,6 +24,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.entryFormat
 import com.google.android.fhir.datacapture.utilities.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.utilities.format
 import com.google.android.fhir.datacapture.utilities.getDateSeparator
@@ -55,7 +56,9 @@ import kotlin.collections.ArrayList
 import kotlin.math.abs
 import kotlin.math.log10
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import timber.log.Timber
 
 internal object QuestionnaireItemDatePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_date_picker_view) {
@@ -105,7 +108,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
-        val localeDatePattern = getLocalizedDateTimePattern()
+        val localeDatePattern = datePattern(questionnaireItemViewItem.questionnaireItem)
         // Special character used in date pattern
         val datePatternSeparator = getDateSeparator(localeDatePattern)
         textWatcher = DatePatternTextWatcher(datePatternSeparator)
@@ -315,6 +318,15 @@ internal fun getLocalizedDateTimePattern(): String {
     IsoChronology.INSTANCE,
     Locale.getDefault()
   )
+}
+
+internal fun datePattern(questionnaireItem: Questionnaire.QuestionnaireItemComponent): String {
+  return if (questionnaireItem.entryFormat.isNullOrEmpty()) {
+    Timber.w(" date time entry format is not available in Questionnaire item")
+    getLocalizedDateTimePattern()
+  } else {
+    questionnaireItem.entryFormat!! // TODO IS PARSING CHECK REQUIRED parsing here for entry format validation
+  }
 }
 
 /**
