@@ -94,7 +94,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("2/5/20")
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("02/05/2020")
     assertThat(viewHolder.timeInputView.text.toString()).isEqualTo("1:30 AM")
   }
 
@@ -420,7 +420,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("2/5/20")
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("02/05/2020")
     assertThat(viewHolder.timeInputView.text.toString()).isEqualTo("1:30 AM")
 
     viewHolder.bind(
@@ -436,7 +436,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("2/5/21")
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("02/05/2021")
     assertThat(viewHolder.timeInputView.text.toString()).isEqualTo("2:30 AM")
 
     viewHolder.bind(
