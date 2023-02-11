@@ -18,15 +18,17 @@ package com.google.android.fhir.datacapture.views
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.utilities.localizedDateString
-import com.google.android.fhir.datacapture.utilities.localizedString
+import com.google.android.fhir.datacapture.utilities.canonicalizeDatePattern
+import com.google.android.fhir.datacapture.utilities.format
+import com.google.android.fhir.datacapture.utilities.getDateSeparator
+import com.google.android.fhir.datacapture.utilities.parseDate
 import com.google.android.fhir.datacapture.utilities.toLocalizedString
 import com.google.android.fhir.datacapture.utilities.toLocalizedTimeString
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -61,7 +63,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private var localDate: LocalDate? = null
       private var localTime: LocalTime? = null
-      private var textWatcher: TextWatcher? = null
+      private lateinit var canonicalizedDatePattern: String
+      private lateinit var textWatcher: DatePatternTextWatcher
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
@@ -87,10 +90,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               addOnPositiveButtonClickListener { epochMilli ->
                 with(Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()) {
                   localDate = this
-                  dateInputEditText.setText(this.localizedString)
+                  dateInputEditText.setText(localDate?.format(canonicalizedDatePattern))
                   enableOrDisableTimePicker(enableIt = true)
                   generateLocalDateTime(this, localTime)?.let {
-                    updateDateTimeInput(it)
+                    updateDateTimeInput(it, canonicalizedDatePattern)
                     updateDateTimeAnswer(it)
                   }
                 }
@@ -121,7 +124,12 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         clearPreviousState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
-        dateInputLayout.hint = localeDatePattern
+        val localeDatePattern = getLocalizedDateTimePattern()
+        // Special character used in date pattern
+        val datePatternSeparator = getDateSeparator(localeDatePattern)
+        textWatcher = DatePatternTextWatcher(datePatternSeparator)
+        canonicalizedDatePattern = canonicalizeDatePattern(localeDatePattern)
+        dateInputLayout.hint = canonicalizedDatePattern
         dateInputEditText.removeTextChangedListener(textWatcher)
         val dateTime = questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType
         updateDateTimeInput(
@@ -130,42 +138,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               localDate = it.toLocalDate()
               localTime = it.toLocalTime()
             }
-          }
+          },
+          canonicalizedDatePattern
         )
-        textWatcher =
-          dateInputEditText.doAfterTextChanged { text ->
-            if (text == null || text.isNullOrEmpty()) {
-              questionnaireItemViewItem.clearAnswer()
-              return@doAfterTextChanged
-            }
-            try {
-              localDate = parseDate(text.toString(), dateInputEditText.context.applicationContext)
-              enableOrDisableTimePicker(enableIt = true)
-              generateLocalDateTime(localDate, localTime)?.run {
-                updateDateTimeInput(this)
-                updateDateTimeAnswer(this)
-              }
-            } catch (e: ParseException) {
-              displayDateValidationError(
-                Invalid(
-                  listOf(
-                    dateInputEditText.context.getString(
-                      R.string.date_format_validation_error_msg,
-                      localeDatePattern
-                    )
-                  )
-                )
-              )
-              if (!timeInputLayout.isEnabled) {
-                displayTimeValidationError(Valid)
-              }
-              if (questionnaireItemViewItem.answers.isNotEmpty()) {
-                questionnaireItemViewItem.clearAnswer()
-              }
-              localDate = null
-              enableOrDisableTimePicker(enableIt = false)
-            }
-          }
+        dateInputEditText.addTextChangedListener(textWatcher)
       }
 
       fun displayDateValidationError(validationResult: ValidationResult) {
@@ -212,15 +188,18 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       /** Update the date and time input fields in the UI. */
-      private fun updateDateTimeInput(localDateTime: LocalDateTime?) {
+      private fun updateDateTimeInput(
+        localDateTime: LocalDateTime?,
+        canonicalizedDatePattern: String
+      ) {
         enableOrDisableTimePicker(enableIt = localDateTime != null)
         if (isTextUpdateRequired(
-            dateInputEditText.context,
             localDateTime,
-            dateInputEditText.text.toString()
+            dateInputEditText.text.toString(),
+            canonicalizedDatePattern
           )
         ) {
-          dateInputEditText.setText(localDateTime?.localizedDateString ?: "")
+          dateInputEditText.setText(localDateTime?.toLocalDate()?.format(canonicalizedDatePattern))
         }
         timeInputEditText.setText(
           localDateTime?.toLocalizedTimeString(timeInputEditText.context) ?: ""
@@ -285,13 +264,16 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       private fun isTextUpdateRequired(
-        context: Context,
         answer: LocalDateTime?,
-        inputText: String?
+        inputText: String?,
+        canonicalizedDatePattern: String
       ): Boolean {
+        if (inputText.isNullOrEmpty()) {
+          return true
+        }
         val inputDate =
           try {
-            generateLocalDateTime(parseDate(inputText, context), localTime)
+            generateLocalDateTime(parseDate(inputText, canonicalizedDatePattern), localTime)
           } catch (e: Exception) {
             null
           }
@@ -322,7 +304,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 localTime = this
                 timeInputEditText.setText(this.toLocalizedString(context))
                 generateLocalDateTime(localDate, this)?.let {
-                  updateDateTimeInput(it)
+                  updateDateTimeInput(it, canonicalizedDatePattern)
                   updateDateTimeAnswer(it)
                 }
                 timeInputEditText.clearFocus()
@@ -330,6 +312,76 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             }
           }
           .show(context.tryUnwrapContext()!!.supportFragmentManager, TAG_TIME_PICKER)
+      }
+
+      private fun updateAnswerAfterTextChanged(text: String?) {
+        if (text.isNullOrEmpty()) {
+          questionnaireItemViewItem.clearAnswer()
+          return
+        }
+        try {
+          localDate = parseDate(text, canonicalizedDatePattern)
+          displayDateValidationError(Valid)
+          enableOrDisableTimePicker(enableIt = true)
+          generateLocalDateTime(localDate, localTime)?.run {
+            updateDateTimeInput(this, canonicalizedDatePattern)
+            updateDateTimeAnswer(this)
+          }
+        } catch (e: ParseException) {
+          displayDateValidationError(
+            Invalid(
+              listOf(
+                dateInputEditText.context.getString(
+                  R.string.date_format_validation_error_msg,
+                  canonicalizedDatePattern,
+                  canonicalizedDatePattern
+                    .replace("dd", "31")
+                    .replace("MM", "01")
+                    .replace("yyyy", "2023")
+                )
+              )
+            )
+          )
+          if (!timeInputLayout.isEnabled) {
+            displayTimeValidationError(Valid)
+          }
+          if (questionnaireItemViewItem.answers.isNotEmpty()) {
+            questionnaireItemViewItem.clearAnswer()
+          }
+          localDate = null
+          enableOrDisableTimePicker(enableIt = false)
+        }
+      }
+
+      /** Automatically appends date separator (e.g. "/") during date input. */
+      inner class DatePatternTextWatcher(private val datePatternSeparator: Char) : TextWatcher {
+        private var isDeleting = false
+
+        override fun beforeTextChanged(
+          charSequence: CharSequence,
+          start: Int,
+          count: Int,
+          after: Int
+        ) {
+          isDeleting = count > after
+        }
+
+        override fun onTextChanged(
+          charSequence: CharSequence,
+          start: Int,
+          before: Int,
+          count: Int
+        ) {}
+
+        override fun afterTextChanged(editable: Editable) {
+          handleDateFormatAfterTextChange(
+            editable,
+            canonicalizedDatePattern,
+            datePatternSeparator,
+            isDeleting
+          )
+          updateAnswerAfterTextChanged(editable.toString())
+        }
       }
     }
 }

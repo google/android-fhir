@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ Copyright 2023 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+    android:layout_marginTop="@dimen/attachment_preview_base_margin"
+>
+
+    <View
+        android:id="@+id/file_icon_background"
+        style="?attr/questionnaireAttachmentPreviewIconBackgroundStyle"
+        android:layout_width="@dimen/attachment_photo_preview_max_width"
+        android:layout_height="@dimen/attachment_photo_preview_max_height"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="@drawable/rounded_corner_preview_icon_bg_filled"
+    />
+
+    <ImageView
+        android:id="@+id/file_icon"
+        style="?attr/questionnaireAttachmentPreviewIconStyle"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/item_margin_horizontal"
+        android:contentDescription="@string/cd_file_icon_preview"
+        app:layout_constraintBottom_toBottomOf="@id/file_icon_background"
+        app:layout_constraintEnd_toEndOf="@id/file_icon_background"
+        app:layout_constraintStart_toStartOf="@id/file_icon_background"
+        app:layout_constraintTop_toTopOf="@id/file_icon_background"
+        tools:src="@drawable/ic_video_file"
+        tools:tint="#1453D0"
+    />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider"
+        style="?attr/questionnaireAttachmentDividerStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/attachment_preview_base_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/file_icon_background"
+    />
+
+    <TextView
+        android:id="@+id/file_title"
+        style="?attr/questionnaireAttachmentPreviewTitleStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/attachment_preview_base_margin"
+        app:layout_constraintBottom_toBottomOf="@id/file_icon_background"
+        app:layout_constraintEnd_toStartOf="@id/file_delete"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/file_icon_background"
+        app:layout_constraintTop_toTopOf="@id/file_icon_background"
+        tools:text="sample-video.mov"
+    />
+
+    <Button
+        android:id="@+id/file_delete"
+        style="?attr/questionnaireAttachmentDeleteButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/file_icon_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/file_icon_background"
+    />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -35,13 +35,13 @@
          QuestionnaireFragment. -->
     <style
         name="Theme.Questionnaire"
-        parent="Theme.Material3.DayNight.NoActionBar"
-        >
+        parent="Theme.Material3.DayNight.NoActionBar" 
+    > 
         <item name="questionnaireGroupTypeQuestionTextStyle">
             @style/TextAppearance.Material3.TitleMedium
         </item>
         <item
-            name="questionnaireQuestionTextStyle"
+            name="questionnaireQuestionTextStyle" 
             >@style/TextAppearance.Material3.TitleMedium
         </item>
         <item
@@ -53,7 +53,19 @@
             >@style/TextAppearance.Material3.TitleSmall</item>
         <item
             name="questionnaireHelpTextStyle"
-            >@style/TextAppearance.Material3.BodyMedium</item>
+            >@style/TextAppearance.Material3.BodyMedium</item> 
+        >@style/TextAppearance.Material3.TitleMedium
+        </item>
+        <item
+            name="questionnaireSubtitleTextStyle"
+        >@style/TextAppearance.Material3.BodyMedium
+        </item>
+        <item
+            name="questionnaireHelpHeaderStyle"
+        >@style/TextAppearance.Material3.TitleSmall</item>
+        <item
+            name="questionnaireHelpTextStyle"
+        >@style/TextAppearance.Material3.BodyMedium</item> 
         <item name="questionnaireHelpButtonStyle">
             @style/Widget.MaterialComponents.Button.TextButton.Icon
         </item>
@@ -68,14 +80,16 @@
             name="questionnaireRadioButtonStyle"
             >@style/Questionnaire.RadioButtonStyle</item>
         <item
-            name="questionnaireDropDownTextStyle"
-            >@style/TextAppearance.Material3.BodyLarge</item>
+            name="questionnaireDropDownTextStyle" 
+            >@style/TextAppearance.Material3.BodyLarge</item> 
+        >@style/TextAppearance.Material3.BodyLarge</item> 
         <item name="questionnaireDropDownSelectedTextStyle">
             @style/TextAppearance.Material3.BodyLarge
         </item>
         <item
-            name="questionnaireTextInputEditTextStyle"
-            >@style/TextAppearance.Material3.BodyLarge
+            name="questionnaireTextInputEditTextStyle" 
+            >@style/TextAppearance.Material3.BodyLarge 
+        >@style/TextAppearance.Material3.BodyLarge 
         </item>
         <item
             name="questionnaireChipStyle"
@@ -130,7 +144,7 @@
         </item>
         <item name="questionnaireAttachmentTakePhotoButtonStyle">
             @style/Questionnaire.AttachmentTakePhotoButtonStyle
-        </item>
+        </item> 
         <item name="questionnaireAttachmentUploadButtonStyle">
             @style/Questionnaire.AttachmentUploadButtonStyle
         </item>
@@ -141,21 +155,44 @@
             @style/Questionnaire.AttachmentPreviewIconStyle
         </item>
         <item name="questionnaireAttachmentPreviewTextStyle">
-            @style/TextAppearance.Material3.BodySmall
+            @style/TextAppearance.Material3.BodySmall 
+        <item name="questionnaireAttachmentDividerStyle">
+            @style/Questionnaire.AttachmentDividerStyle
+        </item>
+        <item name="questionnaireAttachmentUploadedLabelStyle">
+            @style/TextAppearance.Material3.TitleSmall
+        </item>
+        <item name="questionnaireAttachmentUploadButtonStyle">
+            @style/Questionnaire.AttachmentUploadButtonStyle
+        </item>
+        <item name="questionnaireAttachmentDeleteButtonStyle">
+            @style/Questionnaire.AttachmentDeleteButtonStyle
+        </item>
+        <item name="questionnaireShapeAppearanceAttachmentPreviewPhotoStyle">
+            @style/Questionnaire.ShapeAppearance.AttachmentPreviewPhoto
+        </item>
+        <item name="questionnaireAttachmentPreviewIconStyle">
+            @style/Questionnaire.AttachmentPreviewIconStyle
+        </item>
+        <item name="questionnaireAttachmentPreviewIconBackgroundStyle">
+            @style/Questionnaire.AttachmentPreviewIconBackgroundStyle
+        </item>
+        <item name="questionnaireAttachmentPreviewTitleStyle">
+            @style/Questionnaire.AttachmentPreviewTitleStyle 
         </item>
     </style>
 
     <style
         name="Questionnaire.HelpStyle"
-        parent="TextAppearance.Material3.TitleSmall"
-        >
+        parent="TextAppearance.Material3.TitleSmall" 
+    > 
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
 
     <style
         name="Questionnaire.HelpDescriptionStyle"
-        parent="TextAppearance.Material3.BodyMedium"
-        >
+        parent="TextAppearance.Material3.BodyMedium" 
+    > 
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
 
@@ -206,8 +243,8 @@
 
     <style
         name="Questionnaire.AutoCompleteTextViewStyle"
-        parent="ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox"
-        >
+        parent="ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox" 
+    > 
         <item name="autoCompleteTextViewStyle">
             @style/Questionnaire.AutoCompleteTextViewOutlinedBoxStyle
         </item>
@@ -216,7 +253,8 @@
     <style
         name="Questionnaire.TextInputEditTextOutlinedBoxStyle"
         parent="Widget.Material3.TextInputEditText.OutlinedBox"
-        >
+ 
+        > 
         <!--        Override default theme text color to improve contrast of disabled text. -->
         <item name="android:textColor">@color/text_color</item>
     </style>
@@ -224,7 +262,8 @@
     <style
         name="Questionnaire.AutoCompleteTextViewOutlinedBoxStyle"
         parent="Widget.Material3.AutoCompleteTextView.OutlinedBox"
-        >
+ 
+    > 
         <!--        Override default theme text color to improve contrast of disabled text. -->
         <item name="android:textColor">@color/text_color</item>
     </style>
@@ -232,7 +271,8 @@
     <style
         name="Questionnaire.ChipActionStyle"
         parent="Widget.MaterialComponents.Chip.Action"
-        >
+ 
+        > 
         <!--        Override default theme text color to improve contrast of disabled text. -->
         <item
             name="android:textColor"
@@ -306,6 +346,13 @@
     </style>
 
     <style
+        name="Questionnaire.AttachmentDividerStyle"
+        parent="Widget.Material3.MaterialDivider"
+    >
+        <item name="dividerColor">@color/item_border_color</item>
+    </style>
+
+    <style
         name="Questionnaire.AttachmentUploadButtonStyle"
         parent="Widget.Material3.Button.OutlinedButton"
         >
@@ -313,8 +360,31 @@
         <item name="iconSize">@dimen/attachment_icon_button_size</item>
     </style>
 
+    <style
+        name="Questionnaire.ShapeAppearance.AttachmentPreviewPhoto"
+        parent="ShapeAppearance.MaterialComponents.SmallComponent"
+    >
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+
     <style name="Questionnaire.AttachmentPreviewIconStyle" parent="">
         <item name="android:tint">?attr/colorPrimary</item>
+    </style>
+
+    <style name="Questionnaire.AttachmentPreviewIconBackgroundStyle" parent="">
+        <item
+            name="android:background"
+        >@drawable/rounded_corner_preview_icon_bg_filled</item>
+    </style>
+
+    <style
+        name="Questionnaire.AttachmentPreviewTitleStyle"
+        parent="TextAppearance.Material3.BodyLarge"
+    >
+        <item name="android:tint">?attr/colorPrimary</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
     </style>
 
     <style
@@ -324,6 +394,10 @@
         <item name="android:drawableLeft">@drawable/ic_delete</item>
         <item name="android:drawableTint">?attr/colorError</item>
         <item name="android:textColor">?attr/colorError</item>
+        <item name="android:text">@string/delete</item>
+        <item name="android:visibility">visible</item>
+        <item name="android:paddingRight">@dimen/padding_default</item>
+        <item name="android:paddingLeft">@dimen/padding_default</item>
     </style>
 
     <string name="cancel_questionnaire">Cancel</string>
