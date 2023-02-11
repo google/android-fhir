@@ -18,7 +18,9 @@
     >Only use (.) between two numbers. Other special characters are not supported.</string>
     <string
         name="date_format_validation_error_msg"
-    >Date format needs to be <xliff:g id="locale_format">%1$s</xliff:g></string>
+    >Date format needs to be <xliff:g
+            id="locale_format"
+        >%1$s</xliff:g> (e.g. %2$s)</string>
     <string name="submit_button_text">Submit</string>
     <string name="button_pagination_next">Next</string>
     <string name="button_pagination_previous">Previous</string>
@@ -47,7 +49,7 @@
     <string name="group_header_add_item_button">Add item</string>
     <string name="take_photo">Take Photo</string>
     <string name="cd_photo_preview">Photo Preview</string>
-    <string name="cd_icon_file_preview">Icon File Preview</string>
+    <string name="cd_file_icon_preview">File Icon Preview</string>
     <string name="upload_photo">Upload Photo</string>
     <string name="upload_audio">Upload Audio</string>
     <string name="upload_video">Upload Video</string>
@@ -64,6 +66,7 @@
     <string
         name="mime_type_wrong_media_format_validation_error_msg"
     >Error: Wrong media format</string>
+    <string name="uploaded">Uploaded</string>
     <string name="image_uploaded">Image uploaded</string>
     <string name="file_uploaded">File uploaded</string>
     <string name="video_uploaded">Video uploaded</string>
