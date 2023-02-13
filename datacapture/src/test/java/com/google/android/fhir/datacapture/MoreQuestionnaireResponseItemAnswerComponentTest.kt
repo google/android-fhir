@@ -20,7 +20,7 @@ import android.app.Application
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.common.datatype.displayString
-import com.google.android.fhir.datacapture.utilities.localizedString
+import com.google.android.fhir.datacapture.utilities.format
 import com.google.android.fhir.datacapture.utilities.toLocalizedString
 import com.google.common.truth.Truth.assertThat
 import java.time.LocalDate
@@ -176,7 +176,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(DateType(Date()))
 
-    assertThat(answer.value.displayString(context)).isEqualTo(LocalDate.now().localizedString)
+    assertThat(answer.value.displayString(context)).isEqualTo(LocalDate.now().format())
   }
 
   @Test
@@ -186,7 +186,7 @@ class MoreQuestionnaireResponseItemAnswerComponentTest {
         .setValue(DateTimeType(Date()))
 
     assertThat(answer.value.displayString(context))
-      .isEqualTo("${LocalDate.now().localizedString} ${LocalTime.now().toLocalizedString(context)}")
+      .isEqualTo("${LocalDate.now().format()} ${LocalTime.now().toLocalizedString(context)}")
   }
 
   @Test
