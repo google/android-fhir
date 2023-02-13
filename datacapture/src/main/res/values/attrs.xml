@@ -32,6 +32,10 @@
     <attr name="questionnaireHelpButtonStyle" format="reference" />
     <!--   Style for answer text. -->
     <attr name="questionnaireAnswerTextStyle" format="reference" />
+    <!--   Style for bottom container. -->
+    <attr name="questionnaireBottomContainerStyle" format="reference" />
+    <!--   Style for bottom container divider. -->
+    <attr name="questionnaireBottomContainerDividerStyle" format="reference" />
 
     <!--   Style for radio buttons. -->
     <attr name="questionnaireRadioButtonStyle" format="reference" />

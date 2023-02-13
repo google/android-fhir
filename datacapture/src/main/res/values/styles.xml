@@ -55,6 +55,12 @@
       <item
             name="questionnaireHelpButtonStyle"
         >@style/Widget.MaterialComponents.Button.TextButton.Icon</item>
+      <item
+            name="questionnaireBottomContainerStyle"
+        >@style/Questionnaire.BottomContainerStyle</item>
+      <item
+            name="questionnaireBottomContainerDividerStyle"
+        >@style/Questionnaire.BottomContainerDividerStyle</item>
         <item
             name="questionnaireAnswerTextStyle"
         >@style/Questionnaire.AnswerStyle</item>
@@ -156,6 +162,21 @@
         parent="TextAppearance.Material3.BodyMedium"
     >
       <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style
+        name="Questionnaire.BottomContainerStyle"
+        parent="Widget.Material3.MaterialDivider"
+    >
+      <item name="android:background">?attr/colorSurface</item>
+    </style>
+
+    <style
+        name="Questionnaire.BottomContainerDividerStyle"
+        parent="Widget.Material3.MaterialDivider"
+    >
+      <item name="android:visibility">gone</item>
+      <item name="dividerColor">@color/item_border_color</item>
     </style>
 
     <style
