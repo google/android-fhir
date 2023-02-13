@@ -78,7 +78,8 @@ open class QuestionnaireFragment : Fragment() {
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
     view.findViewById<Button>(R.id.cancel_questionnaire).setOnClickListener {
-      setFragmentResult(CANCEL_REQUEST_KEY, Bundle.EMPTY)
+      QuestionnaireCancelDialogFragment()
+        .show(requireActivity().supportFragmentManager, QuestionnaireCancelDialogFragment.TAG)
     }
 
     view.findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
@@ -188,8 +189,8 @@ open class QuestionnaireFragment : Fragment() {
               questionnaireProgressIndicator.updateProgressIndicator(
                 calculateProgressPercentage(
                   count =
-                  (displayMode.pagination.currentPageIndex +
-                    1), // incremented by 1 due to initialPageIndex starts with 0.
+                    (displayMode.pagination.currentPageIndex +
+                      1), // incremented by 1 due to initialPageIndex starts with 0.
                   totalCount = displayMode.pagination.pages.size
                 )
               )
@@ -201,8 +202,8 @@ open class QuestionnaireFragment : Fragment() {
                     questionnaireProgressIndicator.updateProgressIndicator(
                       calculateProgressPercentage(
                         count =
-                        (linearLayoutManager.findLastVisibleItemPosition() +
-                          1), // incremented by 1 due to findLastVisiblePosition() starts with 0.
+                          (linearLayoutManager.findLastVisibleItemPosition() +
+                            1), // incremented by 1 due to findLastVisiblePosition() starts with 0.
                         totalCount = linearLayoutManager.itemCount
                       )
                     )
@@ -225,6 +226,24 @@ open class QuestionnaireFragment : Fragment() {
         }
         QuestionnaireValidationErrorMessageDialogFragment.RESULT_VALUE_SUBMIT -> {
           setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
+        }
+        else ->
+          Timber.e(
+            "Unknown fragment result ${bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]}"
+          )
+      }
+    }
+    /** Listen to Button Clicks from the Cancel Dialog */
+    requireActivity().supportFragmentManager.setFragmentResultListener(
+      QuestionnaireCancelDialogFragment.RESULT_CALLBACK,
+      viewLifecycleOwner
+    ) { _, bundle ->
+      when (bundle[QuestionnaireCancelDialogFragment.RESULT_KEY]) {
+        QuestionnaireCancelDialogFragment.RESULT_VALUE_NO -> {
+          // Do nothing [Allow the user to proceed with the questionnaire]
+        }
+        QuestionnaireCancelDialogFragment.RESULT_VALUE_YES -> {
+          setFragmentResult(CANCEL_REQUEST_KEY, Bundle.EMPTY)
         }
         else ->
           Timber.e(

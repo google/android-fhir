@@ -38,14 +38,24 @@
     <string name="layout_name_review">Review</string>
     <string name="layout_name_read_only">Read only</string>
     <string name="behavior_name_skip_logic">Skip logic</string>
-    <string name="behavior_name_skip_logic_info">If Yes is selected, a follow-up question is displayed. If No is selected, no follow-up questions are displayed.</string>
-    <string name="behavior_name_calculated_expression_info">Input age to automatically calculate birthdate until birthdate is updated manually.</string>
-    <string name="behavior_name_calculated_expression">Calculated Expression</string>
+    <string
+        name="behavior_name_skip_logic_info"
+    >If Yes is selected, a follow-up question is displayed. If No is selected, no follow-up questions are displayed.</string>
+    <string
+        name="behavior_name_calculated_expression_info"
+    >Input age to automatically calculate birthdate until birthdate is updated manually.</string>
+    <string
+        name="behavior_name_calculated_expression"
+    >Calculated Expression</string>
     <string name="toolbar_text">Structured data capture \n Catalog</string>
-    <string name="questionnaire_response_title">Default sample questionnaire</string>
+    <string
+        name="questionnaire_response_title"
+    >Default sample questionnaire</string>
     <string name="close">Close</string>
     <string name="questionnaire_submitted">Questionnaire submitted</string>
-    <string name="questionnaire_response_subtitle">Below is the JSON code</string>
+    <string
+        name="questionnaire_response_subtitle"
+    >Below is the JSON code</string>
     <string name="submit">Submit</string>
     <string name="show_error_state">Show error state</string>
     <string name="hide_error_state">Hide error state</string>
@@ -53,5 +63,7 @@
     <string name="error">Error</string>
     <string name="widgets">Widgets</string>
     <string name="misc_components">Miscellaneous components</string>
-    <string name="cancel_questionnaire_message">Are you sure you want to discard the answers?</string>
+    <string
+        name="cancel_questionnaire_message"
+    >Are you sure you want to discard the answers?</string>
 </resources>

@@ -25,26 +25,27 @@
         style="?attr/questionnaireValidationDialogTitleStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="Complete all required fields"
         android:text="@string/questionnaire_validation_error_headline"
+        tools:text="Complete all required fields"
     />
 
     <TextView
-        android:layout_marginTop="@dimen/padding_default"
         android:id="@+id/dialog_subtitle"
         style="?attr/questionnaireValidationDialogBodyStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="Fields that need to be completed:"
+        android:layout_marginTop="@dimen/padding_default"
         android:text="@string/questionnaire_validation_error_supporting_text"
+        tools:text="Fields that need to be completed:"
         tools:visibility="visible"
     />
 
     <ScrollView
-        android:layout_marginVertical="@dimen/item_margin_vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/item_margin_vertical"
     >
+
         <TextView
             android:id="@+id/body"
             style="?attr/questionnaireValidationDialogBodyStyle"

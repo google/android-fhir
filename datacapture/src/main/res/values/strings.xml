@@ -90,4 +90,9 @@
     <string
         name="questionnaire_validation_error_fix_button_text"
     >Fix questions</string>
+    <string name="questionnaire_yes_button_text">Yes</string>
+    <string name="questionnaire_no_button_text">No</string>
+    <string
+        name="questionnaire_cancel_text"
+    >Do you want to exit the questionnaire?</string>
 </resources>

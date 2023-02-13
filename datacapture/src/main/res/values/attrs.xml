@@ -87,15 +87,12 @@
     <!--   Style for attachment take photo button. -->
     <attr
         name="questionnaireAttachmentTakePhotoButtonStyle"
-        format="reference" 
-        />
- 
+        format="reference"
     />
     <!--   Style for attachment divider. -->
     <attr name="questionnaireAttachmentDividerStyle" format="reference" />
     <!--   Style for attachment uploaded label. -->
     <attr name="questionnaireAttachmentUploadedLabelStyle" format="reference" />
- 
     <!--   Style for attachment upload button. -->
     <attr name="questionnaireAttachmentUploadButtonStyle" format="reference" />
     <!--   Style for attachment delete button. -->

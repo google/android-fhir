@@ -172,15 +172,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private var shouldShowCancelButton = false
 
   /** The pages of the questionnaire, or null if the questionnaire is not paginated. */
-  @VisibleForTesting
-  var pages: List<QuestionnairePage>? = null
+  @VisibleForTesting var pages: List<QuestionnairePage>? = null
 
   /**
    * The flow representing the index of the current page. This value is meaningless if the
    * questionnaire is not paginated or in review mode.
    */
-  @VisibleForTesting
-  val currentPageIndexFlow: MutableStateFlow<Int?> = MutableStateFlow(null)
+  @VisibleForTesting val currentPageIndexFlow: MutableStateFlow<Int?> = MutableStateFlow(null)
 
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
@@ -233,11 +231,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * question.
    */
   private val answersChangedCallback:
-      (
-    Questionnaire.QuestionnaireItemComponent,
-    QuestionnaireResponseItemComponent,
-    List<QuestionnaireResponseItemAnswerComponent>,
-  ) -> Unit =
+    (
+      Questionnaire.QuestionnaireItemComponent,
+      QuestionnaireResponseItemComponent,
+      List<QuestionnaireResponseItemAnswerComponent>,
+    ) -> Unit =
     { questionnaireItem, questionnaireResponseItem, answers ->
       // TODO(jingtang10): update the questionnaire response item pre-order list and the parent map
       questionnaireResponseItem.answer = answers.toList()
@@ -278,10 +276,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    */
   internal fun validateQuestionnaireAndUpdateUI(): Map<String, List<ValidationResult>> =
     QuestionnaireResponseValidator.validateQuestionnaireResponse(
-      questionnaire,
-      questionnaireResponse,
-      getApplication()
-    )
+        questionnaire,
+        questionnaireResponse,
+        getApplication()
+      )
       .also { result ->
         if (result.values.flatten().filterIsInstance<Invalid>().isNotEmpty()) {
           hasPressedSubmitButton = true
@@ -292,8 +290,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   internal fun goToPreviousPage() {
     when (entryMode) {
       EntryMode.PRIOR_EDIT,
-      EntryMode.RANDOM,
-      -> {
+      EntryMode.RANDOM, -> {
         val previousPageIndex =
           pages!!.indexOfLast {
             it.index < currentPageIndexFlow.value!! && it.enabled && !it.hidden
@@ -312,8 +309,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   internal fun goToNextPage() {
     when (entryMode) {
       EntryMode.PRIOR_EDIT,
-      EntryMode.SEQUENTIAL,
-      -> {
+      EntryMode.SEQUENTIAL, -> {
         if (!isPaginationButtonPressed) {
           // Force update validation results for all questions on the current page. This is needed
           // when the user has not answered any questions so no validation has been done.
@@ -361,30 +357,30 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: StateFlow<QuestionnaireState> =
     combine(modificationCount, currentPageIndexFlow, isInReviewModeFlow) { _, _, _ ->
-      getQuestionnaireState()
-    }
+        getQuestionnaireState()
+      }
       .stateIn(
         viewModelScope,
         SharingStarted.Lazily,
         initialValue =
-        getQuestionnaireState()
-          .also { detectExpressionCyclicDependency(questionnaire.item) }
-          .also {
-            questionnaire.item.flattened().forEach {
-              updateDependentQuestionnaireResponseItems(it)
+          getQuestionnaireState()
+            .also { detectExpressionCyclicDependency(questionnaire.item) }
+            .also {
+              questionnaire.item.flattened().forEach {
+                updateDependentQuestionnaireResponseItems(it)
+              }
             }
-          }
       )
 
   private fun updateDependentQuestionnaireResponseItems(
     updatedQuestionnaireItem: Questionnaire.QuestionnaireItemComponent,
   ) {
     evaluateCalculatedExpressions(
-      updatedQuestionnaireItem,
-      questionnaire,
-      questionnaireResponse,
-      questionnaireItemParentMap
-    )
+        updatedQuestionnaireItem,
+        questionnaire,
+        questionnaireResponse,
+        questionnaireItemParentMap
+      )
       .forEach { (questionnaireItem, calculatedAnswers) ->
         // update all response item with updated values
         questionnaireResponse.allItems
@@ -521,11 +517,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       return QuestionnaireState(
         items = questionnaireItemViewItems,
         displayMode =
-        DisplayMode.ReviewMode(
-          showEditButton = !isReadOnly,
-          showSubmitButton = !isReadOnly && shouldShowSubmitButton,
-          showCancelButton = !isReadOnly && shouldShowCancelButton
-        )
+          DisplayMode.ReviewMode(
+            showEditButton = !isReadOnly,
+            showSubmitButton = !isReadOnly && shouldShowSubmitButton,
+            showCancelButton = !isReadOnly && shouldShowCancelButton
+          )
       )
     }
 
@@ -582,7 +578,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         // If there is an enabled questionnaire response available then we use that. Or else we
         // just use an empty questionnaireResponse Item
         if (responseIndex < questionnaireResponseItemList.size &&
-          questionnaireItem.linkId == questionnaireResponseItemList[responseIndex].linkId
+            questionnaireItem.linkId == questionnaireResponseItemList[responseIndex].linkId
         ) {
           questionnaireResponseItem = questionnaireResponseItemList[responseIndex]
           responseIndex += 1
@@ -617,8 +613,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     // Determine the validation result, which will be displayed on the item itself
     val validationResult =
       if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
-        isPaginationButtonPressed ||
-        hasPressedSubmitButton
+          isPaginationButtonPressed ||
+          hasPressedSubmitButton
       ) {
         QuestionnaireResponseItemValidator.validate(
           questionnaireItem,
@@ -657,10 +653,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               // If nested display item is identified as instructions or flyover, then do not create
               // questionnaire state for it.
               questionnaireItemList =
-              questionnaireItem.item.filterNot {
-                it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-                  (it.isInstructionsCode || it.isFlyoverCode || it.isHelpCode)
-              },
+                questionnaireItem.item.filterNot {
+                  it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+                    (it.isInstructionsCode || it.isFlyoverCode || it.isHelpCode)
+                },
               questionnaireResponseItemList = nestedResponse,
             )
           )
@@ -774,8 +770,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private fun getQuestionnairePages(): List<QuestionnairePage>? =
     if (questionnaire.isPaginated) {
       questionnaire.item.zip(questionnaireResponse.item).mapIndexed {
-          index,
-          (questionnaireItem, questionnaireResponseItem),
+        index,
+        (questionnaireItem, questionnaireResponseItem),
         ->
         QuestionnairePage(
           index,
