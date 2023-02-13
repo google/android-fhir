@@ -104,7 +104,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _ -> },
       )
     )
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/20")
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2020")
   }
 
   @Test
@@ -140,7 +140,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _ -> },
       )
     )
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/20")
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2020")
   }
 
   @Test
@@ -178,7 +178,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
       )
     viewHolder.bind(item)
     viewHolder.dateInputView.text = "2020/11/19"
-    val answer = answers!!.single()?.value as DateType
+    val answer = answers!!.single().value as DateType
 
     assertThat(answer.day).isEqualTo(19)
     assertThat(answer.month).isEqualTo(10)
@@ -310,7 +310,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _ -> },
       )
     )
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/20")
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2020")
 
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -324,7 +324,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _ -> },
       )
     )
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/21")
+    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2021")
 
     viewHolder.bind(
       QuestionnaireItemViewItem(
