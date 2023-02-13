@@ -20,9 +20,8 @@ import android.util.Base64
 import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -40,7 +39,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
+class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
 
   @Rule
   @JvmField
@@ -69,7 +68,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -96,7 +95,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -120,7 +119,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -144,7 +143,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -172,7 +171,7 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -214,22 +213,15 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.take_photo).visibility)
+    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.photo_preview).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_photo).visibility)
-      .isEqualTo(View.VISIBLE)
-
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_photo).text)
-      .isEqualTo(parent.context.getString(R.string.upload_photo))
-
-    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.photo_preview).visibility)
-      .isEqualTo(View.VISIBLE)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.photo_title).text).isEqualTo("IMG_1")
   }
 
   @Test
@@ -259,24 +251,15 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_audio).visibility)
+    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.file_preview).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_audio).text)
-      .isEqualTo(parent.context.getString(R.string.upload_audio))
-
-    assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.file_preview).visibility)
-      .isEqualTo(View.VISIBLE)
-
-    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.icon_file_preview).visibility)
-      .isEqualTo(View.VISIBLE)
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.title_file_preview).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.file_title).text)
       .isEqualTo("Audio File")
   }
 
@@ -307,24 +290,15 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_video).visibility)
+    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.file_preview).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_video).text)
-      .isEqualTo(parent.context.getString(R.string.upload_video))
-
-    assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.file_preview).visibility)
-      .isEqualTo(View.VISIBLE)
-
-    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.icon_file_preview).visibility)
-      .isEqualTo(View.VISIBLE)
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.title_file_preview).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.file_title).text)
       .isEqualTo("Video File")
   }
 
@@ -355,25 +329,106 @@ class QuestionnaireItemAttachmentPickerViewHolderFactoryEspressoTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_document).visibility)
+    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.file_preview).visibility)
       .isEqualTo(View.VISIBLE)
 
-    assertThat(viewHolder.itemView.findViewById<Button>(R.id.upload_document).text)
-      .isEqualTo(parent.context.getString(R.string.upload_document))
-
-    assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.file_preview).visibility)
-      .isEqualTo(View.VISIBLE)
-
-    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.icon_file_preview).visibility)
-      .isEqualTo(View.VISIBLE)
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.title_file_preview).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.file_title).text)
       .isEqualTo("Document File")
+  }
+
+  @Test
+  fun doNotShowPreviewIfAnswerDoesNotHaveAttachment() {
+    val questionnaireItemView =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("image/*"))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("application/pdf"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { addAnswer(null) },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemView) }
+
+    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.photo_preview).visibility)
+      .isEqualTo(View.GONE)
+
+    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.file_preview).visibility)
+      .isEqualTo(View.GONE)
+  }
+
+  @Test
+  fun doNotShowPreviewOfPreviousAnswerAttachmentForCurrentAnswerItem() {
+    val questionnaireItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("image/*"))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("application/pdf"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value =
+                Attachment().apply {
+                  title = "IMG_1.jpeg"
+                  data =
+                    Base64.decode(
+                      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+                      Base64.DEFAULT
+                    )
+                  contentType = "image/jpeg"
+                }
+            }
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItem) }
+
+    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.photo_preview).visibility)
+      .isEqualTo(View.VISIBLE)
+
+    val questionnaireItemWithNullAnswer =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("image/*"))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
+            setValue(CodeType("application/pdf"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { addAnswer(null) },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItemWithNullAnswer) }
+
+    assertThat(viewHolder.itemView.findViewById<ConstraintLayout>(R.id.photo_preview).visibility)
+      .isEqualTo(View.GONE)
   }
 
   /** Method to run code snippet on UI/main thread */
