@@ -73,7 +73,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -106,7 +106,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
         questionnaire,
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -143,7 +143,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
         questionnaire,
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -169,7 +169,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -193,7 +193,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -233,7 +233,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
@@ -261,7 +261,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
@@ -300,7 +300,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
@@ -339,7 +339,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
 
     viewHolder.bind(questionnaireItemViewItem)
@@ -386,7 +386,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           }
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
@@ -406,7 +406,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -435,7 +435,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -458,7 +458,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
