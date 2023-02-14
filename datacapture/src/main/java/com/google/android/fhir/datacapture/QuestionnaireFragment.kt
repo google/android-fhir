@@ -414,7 +414,7 @@ class QuestionnaireFragment : Fragment() {
      * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
      */
     const val EXTRA_SHOW_SUBMIT_BUTTON = "show-submit-button"
-}
+  }
 
   /**
    * Data class that holds a matcher function ([matches]) which evaluates whether a given [factory]

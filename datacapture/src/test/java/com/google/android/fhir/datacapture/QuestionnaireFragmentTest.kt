@@ -33,11 +33,12 @@ import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDateTimePickerViewHolderFactory
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
-import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import org.robolectric.util.ReflectionHelpers
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
@@ -45,10 +46,13 @@ class QuestionnaireFragmentTest {
 
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
-  @After
-  fun tearDown() {
-    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
-      .dataCaptureConfiguration = null
+  @Before
+  fun setup() {
+    check(
+      ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+        is DataCaptureConfig.Provider
+    ) { "Few tests require a custom application class that implements DataCaptureConfig.Provider" }
+    ReflectionHelpers.setStaticField(DataCapture::class.java, "configuration", null)
   }
 
   @Test
