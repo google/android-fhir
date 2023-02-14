@@ -310,21 +310,22 @@ class QuestionnaireFragment : Fragment() {
      * An [Boolean] extra to control if the questionnaire is read-only. If review page and read-only
      * are both enabled, read-only will take precedence.
      */
-    fun setIsReadOnly() = apply { args.add(EXTRA_READ_ONLY to true) }
+    fun setIsReadOnly(value: Boolean) = apply { args.add(EXTRA_READ_ONLY to value) }
 
     /**
      * A [Boolean] extra to control if a review page is shown. By default it will be shown at the
      * end of the questionnaire.
      */
-    fun showReviewPageBeforeSubmit() = apply { args.add(EXTRA_ENABLE_REVIEW_PAGE to true) }
+    fun showReviewPageBeforeSubmit(value: Boolean) = apply {
+      args.add(EXTRA_ENABLE_REVIEW_PAGE to value)
+    }
 
     /**
      * A [Boolean] extra to control if the review page is to be opened first. This has no effect if
      * review page is not enabled.
      */
-    fun showReviewPageFirst() = apply {
-      args.add(EXTRA_ENABLE_REVIEW_PAGE to true)
-      args.add(EXTRA_SHOW_REVIEW_PAGE_FIRST to true)
+    fun showReviewPageFirst(value: Boolean) = apply {
+      args.add(EXTRA_SHOW_REVIEW_PAGE_FIRST to value)
     }
 
     /**
@@ -345,6 +346,7 @@ class QuestionnaireFragment : Fragment() {
       return QuestionnaireFragment().apply { arguments = buildArgs() }
     }
   }
+
   /**
    * Extras that can be passed to [QuestionnaireFragment] to define its behavior. When you create a
    * QuestionnaireFragment, one of [EXTRA_QUESTIONNAIRE_JSON_URI] or
