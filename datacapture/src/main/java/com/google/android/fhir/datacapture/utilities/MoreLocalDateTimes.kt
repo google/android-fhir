@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,6 @@ import android.text.format.DateFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
-
-internal val LocalDateTime.localizedDateString: String
-  get() = toLocalDate().localizedString
 
 // ICU on Android does not observe the user's 24h/12h time format setting (obtained from
 // DateFormat.is24HourFormat()). In order to observe the setting, we are using DateFormat as

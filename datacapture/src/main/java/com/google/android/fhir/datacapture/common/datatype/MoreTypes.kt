@@ -18,7 +18,7 @@ package com.google.android.fhir.datacapture.common.datatype
 
 import android.content.Context
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.utilities.localizedString
+import com.google.android.fhir.datacapture.utilities.format
 import com.google.android.fhir.datacapture.utilities.toLocalizedString
 import com.google.android.fhir.datacapture.views.localDate
 import com.google.android.fhir.datacapture.views.localTime
@@ -72,9 +72,8 @@ fun Type.displayString(context: Context): String =
         this.code ?: context.getString(R.string.not_answered)
       } else display
     }
-    is DateType -> this.localDate?.localizedString ?: context.getString(R.string.not_answered)
-    is DateTimeType ->
-      "${this.localDate.localizedString} ${this.localTime.toLocalizedString(context)}"
+    is DateType -> this.localDate?.format() ?: context.getString(R.string.not_answered)
+    is DateTimeType -> "${this.localDate.format()} ${this.localTime.toLocalizedString(context)}"
     is DecimalType,
     is IntegerType -> (this as PrimitiveType<*>).valueAsString
         ?: context.getString(R.string.not_answered)

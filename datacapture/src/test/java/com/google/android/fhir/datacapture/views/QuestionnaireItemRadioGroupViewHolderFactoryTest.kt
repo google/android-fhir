@@ -68,7 +68,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -100,7 +100,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
         questionnaire,
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -136,7 +136,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
         questionnaire,
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -161,7 +161,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -185,7 +185,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -222,7 +222,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _v, _ -> },
       )
     )
 
@@ -254,7 +254,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView
@@ -288,7 +288,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
           }
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView
@@ -334,7 +334,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -371,7 +371,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     viewHolder.bind(questionnaireItemViewItem)
@@ -398,7 +398,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     viewHolder.bind(questionnaireItemViewItem)
@@ -418,7 +418,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -446,7 +446,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -468,7 +468,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     val radioButton =
