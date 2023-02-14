@@ -216,6 +216,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       QuestionnaireResponseItemComponent, List<QuestionnaireResponseItemAnswerComponent>>()
 
   /**
+   * Map from QuestionnaireResponseItem to invalid input as partial answer e.g "02/02" for date type
+   * (year part missing). If the partial answer becomes valid then the entry in this map should be
+   * removed, e.g, "02/02/2023" is valid answer and should not be part of the map. This is used to
+   * maintain partial input on the screen especially when the widgets are being recycled as a result
+   * of scrolling.
+   */
+  private val partialAnswerMap = mutableMapOf<QuestionnaireResponseItemComponent, Any>()
+
+  /**
    * Callback function to update the view model after the answer(s) to a question have been changed.
    * This is passed to the [QuestionnaireItemViewItem] in its constructor so that it can invoke this
    * callback function after the UI widget has updated the answer(s).
@@ -224,21 +233,35 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * by the UI. Subsequently it should also trigger the recalculation of any relevant expressions,
    * enablement states, and validation results throughout the questionnaire.
    *
-   * This callback function has 3 params:
+   * This callback function has 4 params:
    * - the reference to the [Questionnaire.QuestionnaireItemComponent] in the [Questionnaire]
    * - the reference to the [QuestionnaireResponseItemComponent] in the [QuestionnaireResponse]
    * - a [List] of [QuestionnaireResponseItemAnswerComponent] which are the new answers to the
    * question.
+   * - partial answer, the entered input is not a valid answer
    */
   private val answersChangedCallback:
     (
       Questionnaire.QuestionnaireItemComponent,
       QuestionnaireResponseItemComponent,
       List<QuestionnaireResponseItemAnswerComponent>,
+      Any?
     ) -> Unit =
-    { questionnaireItem, questionnaireResponseItem, answers ->
+    { questionnaireItem, questionnaireResponseItem, answers, partialAnswer ->
       // TODO(jingtang10): update the questionnaire response item pre-order list and the parent map
       questionnaireResponseItem.answer = answers.toList()
+      when {
+        (questionnaireResponseItem.answer.isNotEmpty()) -> {
+          partialAnswerMap.remove(questionnaireResponseItem)
+        }
+        else -> {
+          if (partialAnswer == null) {
+            partialAnswerMap.remove(questionnaireResponseItem)
+          } else {
+            partialAnswerMap[questionnaireResponseItem] = partialAnswer
+          }
+        }
+      }
       if (questionnaireItem.hasNestedItemsWithinAnswers) {
         questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
       }
@@ -635,7 +658,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               validationResult = validationResult,
               answersChangedCallback = answersChangedCallback,
               resolveAnswerValueSet = { resolveAnswerValueSet(it) },
-              resolveAnswerExpression = { resolveAnswerExpression(it) }
+              resolveAnswerExpression = { resolveAnswerExpression(it) },
+              partialAnswer = partialAnswerMap[questionnaireResponseItem]
             )
           )
         )
