@@ -2110,7 +2110,8 @@ class QuestionnaireViewModelTest {
                 QuestionnairePage(0, enabled = true, hidden = false),
                 QuestionnairePage(1, enabled = true, hidden = false)
               ),
-            currentPageIndex = 1
+            currentPageIndex = 1,
+            showSubmitButton = true
           )
         )
     }
@@ -2240,7 +2241,8 @@ class QuestionnaireViewModelTest {
                 QuestionnairePage(1, enabled = false, hidden = false),
                 QuestionnairePage(2, enabled = true, hidden = false),
               ),
-            currentPageIndex = 2
+            currentPageIndex = 2,
+            showSubmitButton = true
           )
         )
     }
@@ -2379,7 +2381,8 @@ class QuestionnaireViewModelTest {
                 QuestionnairePage(1, enabled = true, hidden = true),
                 QuestionnairePage(2, enabled = true, hidden = false)
               ),
-            currentPageIndex = 2
+            currentPageIndex = 2,
+            showSubmitButton = true
           )
         )
     }
@@ -2436,7 +2439,8 @@ class QuestionnaireViewModelTest {
           QuestionnairePagination(
             isPaginated = true,
             pages = viewModel.pages!!,
-            currentPageIndex = 1
+            currentPageIndex = 1,
+            showSubmitButton = true
           )
         )
     }
@@ -2786,7 +2790,8 @@ class QuestionnaireViewModelTest {
           QuestionnairePagination(
             isPaginated = true,
             pages = viewModel.pages!!,
-            currentPageIndex = 1
+            currentPageIndex = 1,
+            showSubmitButton = true
           )
         )
     }
@@ -2899,7 +2904,8 @@ class QuestionnaireViewModelTest {
           QuestionnairePagination(
             isPaginated = true,
             pages = viewModel.pages!!,
-            currentPageIndex = 1
+            currentPageIndex = 1,
+            showSubmitButton = true
           )
         )
     }
