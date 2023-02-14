@@ -165,7 +165,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val shouldShowReviewPageFirst =
     shouldEnableReviewPage && state[QuestionnaireFragment.EXTRA_SHOW_REVIEW_PAGE_FIRST] ?: false
 
-  /** Flag to show/hide submit button. */
+  /** Flag to show/hide submit button. Default is true. */
   private var shouldShowSubmitButton = state[QuestionnaireFragment.EXTRA_SHOW_SUBMIT_BUTTON] ?: true
 
   /** The pages of the questionnaire, or null if the questionnaire is not paginated. */
