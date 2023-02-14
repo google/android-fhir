@@ -68,7 +68,7 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -95,7 +95,7 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -119,7 +119,7 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -143,7 +143,7 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -171,7 +171,7 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -213,7 +213,7 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -251,7 +251,7 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -290,7 +290,7 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -329,7 +329,7 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -357,7 +357,7 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { addAnswer(null) },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -400,7 +400,7 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItem) }
@@ -422,7 +422,7 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { addAnswer(null) },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemWithNullAnswer) }

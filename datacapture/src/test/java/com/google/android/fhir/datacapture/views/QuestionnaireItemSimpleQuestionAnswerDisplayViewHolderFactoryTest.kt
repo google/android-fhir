@@ -54,7 +54,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -73,7 +73,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -108,7 +108,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -127,7 +127,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -146,7 +146,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -165,7 +165,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -191,7 +191,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
             }
           ),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -209,7 +209,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -224,7 +224,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -259,7 +259,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -282,7 +282,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
             }
           ),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -297,7 +297,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
