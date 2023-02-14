@@ -22,11 +22,11 @@ import android.provider.OpenableColumns
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import com.bumptech.glide.Glide
@@ -44,6 +44,7 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.attachment.CameraLauncherFragment
 import com.google.android.fhir.datacapture.views.attachment.OpenDocumentLauncherFragment
+import com.google.android.material.divider.MaterialDivider
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.util.Date
@@ -64,11 +65,16 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
       private lateinit var uploadVideoButton: Button
       private lateinit var uploadDocumentButton: Button
       private lateinit var uploadFileButton: Button
-      private lateinit var deleteButton: Button
-      private lateinit var photoPreview: ImageView
-      private lateinit var filePreview: LinearLayout
-      private lateinit var iconFilePreview: ImageView
-      private lateinit var titleFilePreview: TextView
+      private lateinit var divider: MaterialDivider
+      private lateinit var labelUploaded: TextView
+      private lateinit var photoPreview: ConstraintLayout
+      private lateinit var photoThumbnail: ImageView
+      private lateinit var photoTitle: TextView
+      private lateinit var photoDeleteButton: Button
+      private lateinit var filePreview: ConstraintLayout
+      private lateinit var fileIcon: ImageView
+      private lateinit var fileTitle: TextView
+      private lateinit var fileDeleteButton: Button
       private lateinit var context: AppCompatActivity
 
       override fun init(itemView: View) {
@@ -80,11 +86,16 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         uploadVideoButton = itemView.findViewById(R.id.upload_video)
         uploadDocumentButton = itemView.findViewById(R.id.upload_document)
         uploadFileButton = itemView.findViewById(R.id.upload_file)
-        deleteButton = itemView.findViewById(R.id.delete)
+        divider = itemView.findViewById(R.id.divider)
+        labelUploaded = itemView.findViewById(R.id.label_uploaded)
         photoPreview = itemView.findViewById(R.id.photo_preview)
+        photoThumbnail = itemView.findViewById(R.id.photo_thumbnail)
+        photoTitle = itemView.findViewById(R.id.photo_title)
+        photoDeleteButton = itemView.findViewById(R.id.photo_delete)
         filePreview = itemView.findViewById(R.id.file_preview)
-        iconFilePreview = itemView.findViewById(R.id.icon_file_preview)
-        titleFilePreview = itemView.findViewById(R.id.title_file_preview)
+        fileIcon = itemView.findViewById(R.id.file_icon)
+        fileTitle = itemView.findViewById(R.id.file_title)
+        fileDeleteButton = itemView.findViewById(R.id.file_delete)
         context = itemView.context.tryUnwrapContext()!!
       }
 
@@ -101,7 +112,8 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         uploadVideoButton.setOnClickListener { view -> onUploadClicked(view, questionnaireItem) }
         uploadDocumentButton.setOnClickListener { view -> onUploadClicked(view, questionnaireItem) }
         uploadFileButton.setOnClickListener { view -> onUploadClicked(view, questionnaireItem) }
-        deleteButton.setOnClickListener { view -> onDeleteClicked(view) }
+        photoDeleteButton.setOnClickListener { view -> onDeleteClicked(view) }
+        fileDeleteButton.setOnClickListener { view -> onDeleteClicked(view) }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
@@ -122,7 +134,8 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         uploadVideoButton.isEnabled = !isReadOnly
         uploadDocumentButton.isEnabled = !isReadOnly
         uploadFileButton.isEnabled = !isReadOnly
-        deleteButton.isEnabled = !isReadOnly
+        photoDeleteButton.isEnabled = !isReadOnly
+        fileDeleteButton.isEnabled = !isReadOnly
       }
 
       private fun displayOrClearInitialPreview() {
@@ -133,7 +146,6 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         if (answer == null) {
           clearPhotoPreview()
           clearFilePreview()
-          hideDeleteButton()
           return
         }
 
@@ -216,10 +228,14 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             }
           questionnaireItemViewItem.setAnswer(answer)
 
-          loadPhotoPreview(attachmentUri)
-          clearFilePreview()
-          displayDeleteButton()
-          displaySnackbarOnUpload(view, attachmentMimeType)
+          divider.visibility = View.VISIBLE
+          labelUploaded.visibility = View.VISIBLE
+          displayPreview(
+            attachmentType = attachmentMimeType.type,
+            attachmentTitle = file.name,
+            attachmentUri = attachmentUri
+          )
+          displaySnackbarOnUpload(view, attachmentMimeType.type)
           file.delete()
         }
 
@@ -272,6 +288,8 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             }
           questionnaireItemViewItem.setAnswer(answer)
 
+          divider.visibility = View.VISIBLE
+          labelUploaded.visibility = View.VISIBLE
           displayPreview(
             attachmentType = attachmentMimeType,
             attachmentTitle = attachmentTitle,
@@ -307,9 +325,9 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           }
           MimeType.IMAGE.value -> {
             if (attachmentByteArray != null) {
-              loadPhotoPreview(attachmentByteArray)
+              loadPhotoPreview(attachmentByteArray, attachmentTitle)
             } else if (attachmentUri != null) {
-              loadPhotoPreview(attachmentUri)
+              loadPhotoPreview(attachmentUri, attachmentTitle)
             }
             clearFilePreview()
           }
@@ -318,47 +336,42 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             clearPhotoPreview()
           }
         }
-        displayDeleteButton()
       }
 
       private fun loadFilePreview(@DrawableRes iconResource: Int, title: String) {
-        Glide.with(context).load(iconResource).into(iconFilePreview)
-        titleFilePreview.text = title
         filePreview.visibility = View.VISIBLE
+        Glide.with(context).load(iconResource).into(fileIcon)
+        fileTitle.text = title
       }
 
       private fun clearFilePreview() {
         filePreview.visibility = View.GONE
-        Glide.with(context).clear(iconFilePreview)
-        titleFilePreview.text = ""
+        Glide.with(context).clear(fileIcon)
+        fileTitle.text = ""
       }
 
-      private fun loadPhotoPreview(byteArray: ByteArray) {
-        Glide.with(context).load(byteArray).into(photoPreview)
+      private fun loadPhotoPreview(byteArray: ByteArray, title: String) {
         photoPreview.visibility = View.VISIBLE
+        Glide.with(context).load(byteArray).into(photoThumbnail)
+        photoTitle.text = title
       }
 
-      private fun loadPhotoPreview(uri: Uri) {
-        Glide.with(context).load(uri).into(photoPreview)
+      private fun loadPhotoPreview(uri: Uri, title: String) {
         photoPreview.visibility = View.VISIBLE
+        Glide.with(context).load(uri).into(photoThumbnail)
+        photoTitle.text = title
       }
 
       private fun clearPhotoPreview() {
         photoPreview.visibility = View.GONE
-        Glide.with(context).clear(photoPreview)
-      }
-
-      private fun displayDeleteButton() {
-        deleteButton.visibility = View.VISIBLE
-      }
-
-      private fun hideDeleteButton() {
-        deleteButton.visibility = View.GONE
+        Glide.with(context).clear(photoThumbnail)
+        photoTitle.text = ""
       }
 
       private fun onDeleteClicked(view: View) {
         questionnaireItemViewItem.clearAnswer()
-        hideDeleteButton()
+        divider.visibility = View.GONE
+        labelUploaded.visibility = View.GONE
         clearPhotoPreview()
         clearFilePreview()
         displaySnackbarOnDelete(
