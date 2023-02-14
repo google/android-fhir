@@ -49,7 +49,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -70,7 +70,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -95,7 +95,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     viewHolder.bind(
@@ -103,7 +103,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -125,7 +125,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("10")
@@ -142,7 +142,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
@@ -172,7 +172,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -202,7 +202,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
           )
         },
         validationResult = Invalid(listOf("Minimum value allowed is:2")),
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -217,7 +217,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -232,7 +232,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 

@@ -45,7 +45,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         answerOptions("Coding 1", "Coding 2"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
@@ -59,7 +59,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         answerOptions("Coding 1", "Coding 2", "Coding 3"),
         responseOptions("Coding 1", "Coding 3"),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
@@ -77,7 +77,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -109,7 +109,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -129,7 +129,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 

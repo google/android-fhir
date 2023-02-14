@@ -79,7 +79,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -101,7 +101,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -120,7 +120,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -142,7 +142,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -164,7 +164,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -184,7 +184,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -222,7 +222,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
           ),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -241,7 +241,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -273,7 +273,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         questionnaireItem,
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -305,7 +305,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         questionnaireItem,
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -338,7 +338,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         questionnaireItem,
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
@@ -360,7 +360,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         questionnaireItem,
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }

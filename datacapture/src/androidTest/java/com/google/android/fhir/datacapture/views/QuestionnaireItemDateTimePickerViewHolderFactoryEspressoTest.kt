@@ -66,7 +66,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -108,7 +108,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -150,7 +150,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -173,7 +173,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }

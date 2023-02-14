@@ -50,7 +50,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -69,7 +69,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     val selectedItem =
@@ -94,7 +94,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     val selectedItem =
@@ -115,7 +115,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     val selectedItem =
@@ -136,7 +136,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     val selectedItem =
@@ -160,7 +160,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -200,7 +200,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
           }
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -217,7 +217,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -244,7 +244,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
             }
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -259,7 +259,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -274,7 +274,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 

@@ -112,25 +112,16 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         canonicalizedDatePattern = canonicalizeDatePattern(localeDatePattern)
         textInputLayout.hint = canonicalizedDatePattern
         textInputEditText.removeTextChangedListener(textWatcher)
-        if (isTextUpdateRequired(
-            questionnaireItemViewItem.answers.singleOrNull()?.valueDateType,
-            textInputEditText.text.toString(),
-            canonicalizedDatePattern
-          )
-        ) {
-          val formattedDate =
-            questionnaireItemViewItem.answers
-              .singleOrNull()
-              ?.takeIf { it.hasValue() }
-              ?.valueDateType
-              ?.localDate?.format(canonicalizedDatePattern)
-
-          textInputEditText.setText(formattedDate)
-        }
+        updateTextFieldToDisplayDateValue()
         textInputEditText.addTextChangedListener(textWatcher)
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
+        // Since the partial answer is still displayed in the text field, do not erase the error
+        // text if the answer is cleared and the validation result is valid.
+        if (questionnaireItemViewItem.answers.isEmpty() && validationResult == Valid) {
+          return
+        }
         textInputLayout.error =
           when (validationResult) {
             is NotValidated,
@@ -199,6 +190,51 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                   R.string.date_format_validation_error_msg,
                   canonicalizedDatePattern,
                   canonicalizedDatePattern
+                    .replace("dd", "31")
+                    .replace("MM", "01")
+                    .replace("yyyy", "2023")
+                )
+              )
+            )
+          )
+          if (questionnaireItemViewItem.answers.isNotEmpty()) {
+            questionnaireItemViewItem.clearAnswer()
+          }
+          questionnaireItemViewItem.updatePartialAnswer(text.toString())
+        }
+      }
+
+      private fun updateTextFieldToDisplayDateValue() {
+        val partialAnswerToDisplay = questionnaireItemViewItem.partialAnswer as? String
+        val answer =
+          questionnaireItemViewItem.answers
+            .singleOrNull()
+            ?.takeIf { it.hasValue() }
+            ?.valueDateType
+            ?.localDate
+        val textToDisplayInTheTextField =
+          answer?.format(canonicalizedDatePattern) ?: partialAnswerToDisplay
+
+        // Since pull request #1822 has been merged, the same date format style is now used for both
+        // accepting user date input and displaying the answer in the text field. For instance, the
+        // "MM/dd/yyyy" format is employed to accept and display the date value. As a result, it is
+        // possible to simply compare
+        // the text field text to the partial or valid answer to determine whether the text field
+        // text should be overridden or not.
+
+        if (textInputEditText.text.toString() != textToDisplayInTheTextField) {
+          textInputEditText.setText(textToDisplayInTheTextField)
+        }
+
+        // show an error text
+        if (!partialAnswerToDisplay.isNullOrBlank()) {
+          displayValidationResult(
+            Invalid(
+              listOf(
+                textInputEditText.context.getString(
+                  R.string.date_format_validation_error_msg,
+                  canonicalizedDatePattern,
+                  canonicalizedDatePattern
                     .replace("dd", "01")
                     .replace("MM", "01")
                     .replace("yyyy", "2023")
@@ -206,10 +242,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               )
             )
           )
-
-          if (questionnaireItemViewItem.answers.isNotEmpty()) {
-            questionnaireItemViewItem.clearAnswer()
-          }
+        } else {
+          displayValidationResult(NotValidated)
         }
       }
 

@@ -80,7 +80,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
         answerOptions("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -99,7 +99,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
         answerOptions("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -121,7 +121,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
         answerOptions("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -159,7 +159,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
         ),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -186,7 +186,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
         createAnswerOptions("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseValueStringOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -207,7 +207,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
         createAnswerOptions("Coding 1", "Coding 2", "Coding 3", "Add", "Subtract"),
         responseValueStringOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -226,7 +226,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
         createAnswerOptions("Coding 1", "Coding 2", "Coding 3", "Add", "Subtract"),
         responseValueStringOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -247,7 +247,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
         createAnswerOptions("Coding 1", "Coding 2", "Coding 3", "Add", "Subtract"),
         responseValueStringOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
