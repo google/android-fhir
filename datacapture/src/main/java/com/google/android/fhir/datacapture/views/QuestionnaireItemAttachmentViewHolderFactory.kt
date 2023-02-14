@@ -231,11 +231,11 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           divider.visibility = View.VISIBLE
           labelUploaded.visibility = View.VISIBLE
           displayPreview(
-            attachmentType = attachmentMimeType.type,
+            attachmentType = attachmentMimeType,
             attachmentTitle = file.name,
             attachmentUri = attachmentUri
           )
-          displaySnackbarOnUpload(view, attachmentMimeType.type)
+          displaySnackbarOnUpload(view, attachmentMimeType)
           file.delete()
         }
 
