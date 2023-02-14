@@ -63,7 +63,7 @@ class QuestionnaireFragment : Fragment() {
       DataCapture.getConfiguration(requireContext())
         .questionnaireItemViewHolderFactoryMatchersProviderFactory?.get(it)
     }
-      ?: NoOpQuestionnaireItemViewHolderFactoryMatchersProviderImpl
+      ?: EmptyQuestionnaireItemViewHolderFactoryMatchersProviderImpl
   }
 
   /** @suppress */
@@ -114,10 +114,7 @@ class QuestionnaireFragment : Fragment() {
     val questionnaireProgressIndicator: LinearProgressIndicator =
       view.findViewById(R.id.questionnaire_progress_indicator)
     val questionnaireItemEditAdapter =
-      QuestionnaireItemEditAdapter(
-        questionnaireItemViewHolderFactoryMatchersProvider
-          .getQuestionnaireItemViewHolderFactoryMatcher()
-      )
+      QuestionnaireItemEditAdapter(questionnaireItemViewHolderFactoryMatchersProvider.get())
     val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
 
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
@@ -457,15 +454,13 @@ class QuestionnaireFragment : Fragment() {
      * whether a custom [QuestionnaireItemViewHolderFactory] should be used to render a given
      * questionnaire item.
      */
-    abstract fun getQuestionnaireItemViewHolderFactoryMatcher():
-      List<QuestionnaireItemViewHolderFactoryMatcher>
+    abstract fun get(): List<QuestionnaireItemViewHolderFactoryMatcher>
   }
 
   /** No-op implementation that provides no custom [QuestionnaireItemViewHolderFactoryMatcher]s . */
-  private object NoOpQuestionnaireItemViewHolderFactoryMatchersProviderImpl :
+  private object EmptyQuestionnaireItemViewHolderFactoryMatchersProviderImpl :
     QuestionnaireItemViewHolderFactoryMatchersProvider() {
-    override fun getQuestionnaireItemViewHolderFactoryMatcher() =
-      emptyList<QuestionnaireItemViewHolderFactoryMatcher>()
+    override fun get() = emptyList<QuestionnaireItemViewHolderFactoryMatcher>()
   }
 }
 

@@ -165,12 +165,7 @@ class QuestionnaireFragmentTest {
       )
     scenario.moveToState(Lifecycle.State.RESUMED)
     scenario.withFragment {
-      assertThat(
-          this.questionnaireItemViewHolderFactoryMatchersProvider
-            .getQuestionnaireItemViewHolderFactoryMatcher()
-            .size
-        )
-        .isEqualTo(1)
+      assertThat(this.questionnaireItemViewHolderFactoryMatchersProvider.get().size).isEqualTo(1)
     }
   }
 
@@ -201,11 +196,7 @@ class QuestionnaireFragmentTest {
       )
     scenario.moveToState(Lifecycle.State.RESUMED)
     scenario.withFragment {
-      assertThat(
-          this.questionnaireItemViewHolderFactoryMatchersProvider
-            .getQuestionnaireItemViewHolderFactoryMatcher()
-        )
-        .isEmpty()
+      assertThat(this.questionnaireItemViewHolderFactoryMatchersProvider.get()).isEmpty()
     }
   }
 
@@ -235,11 +226,7 @@ class QuestionnaireFragmentTest {
       )
     scenario.moveToState(Lifecycle.State.RESUMED)
     scenario.withFragment {
-      assertThat(
-          this.questionnaireItemViewHolderFactoryMatchersProvider
-            .getQuestionnaireItemViewHolderFactoryMatcher()
-        )
-        .isEmpty()
+      assertThat(this.questionnaireItemViewHolderFactoryMatchersProvider.get()).isEmpty()
     }
   }
 
@@ -254,8 +241,7 @@ class QuestionnaireFragmentTest {
 
   object QuestionnaireItemViewHolderFactoryMatchersProviderTestImpl :
     QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatchersProvider() {
-    override fun getQuestionnaireItemViewHolderFactoryMatcher():
-      List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> {
+    override fun get(): List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> {
       return listOf(
         QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher(
           factory = QuestionnaireItemDateTimePickerViewHolderFactory,
