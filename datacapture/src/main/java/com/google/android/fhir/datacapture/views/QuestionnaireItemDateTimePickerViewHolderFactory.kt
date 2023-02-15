@@ -24,6 +24,7 @@ import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.StringRes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.utilities.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.utilities.format
@@ -220,13 +221,9 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             displayValidationResult(
               Invalid(
                 listOf(
-                  dateInputEditText.context.getString(
+                  dateInputEditText.context.invalidDateErrorText(
                     R.string.date_format_validation_error_msg,
-                    canonicalizedDatePattern,
                     canonicalizedDatePattern
-                      .replace("dd", "01")
-                      .replace("MM", "01")
-                      .replace("yyyy", "2023")
                   )
                 )
               )
@@ -351,13 +348,9 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           displayDateValidationError(
             Invalid(
               listOf(
-                dateInputEditText.context.getString(
+                dateInputEditText.context.invalidDateErrorText(
                   R.string.date_format_validation_error_msg,
-                  canonicalizedDatePattern,
                   canonicalizedDatePattern
-                    .replace("dd", "31")
-                    .replace("MM", "01")
-                    .replace("yyyy", "2023")
                 )
               )
             )
@@ -435,3 +428,10 @@ internal val DateTimeType.localDateTime
       minute,
       second,
     )
+
+internal fun Context.invalidDateErrorText(@StringRes resId: Int, formatPattern: String) =
+  getString(
+    resId,
+    formatPattern,
+    formatPattern.replace("dd", "31").replace("MM", "01").replace("yyyy", "2023")
+  )
