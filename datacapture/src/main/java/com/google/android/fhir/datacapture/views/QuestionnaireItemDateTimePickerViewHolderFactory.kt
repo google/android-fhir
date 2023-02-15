@@ -91,6 +91,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 with(Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()) {
                   localDate = this
                   dateInputEditText.setText(localDate?.format(canonicalizedDatePattern))
+                  // The time layout gets enabled when a valid date input is present.
                   enableOrDisableTimePicker(enableIt = true)
                   generateLocalDateTime(this, localTime)?.let {
                     updateDateTimeInput(it, canonicalizedDatePattern)
@@ -107,7 +108,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         timeInputLayout = itemView.findViewById(R.id.time_input_layout)
         timeInputEditText = itemView.findViewById(R.id.time_input_edit_text)
         timeInputEditText.inputType = InputType.TYPE_NULL
-        // The time textField/layout only gets enabled when a valid date input is present.
         timeInputLayout.setEndIconOnClickListener {
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
@@ -198,7 +198,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         localDateTime: LocalDateTime?,
         canonicalizedDatePattern: String
       ) {
-        // The time text field only gets enabled when a valid date input is present.
         enableOrDisableTimePicker(enableIt = localDateTime != null)
         val partialAnswerToDisplay = questionnaireItemViewItem.partialAnswer as? String
         val textToDisplayInTheTextField =
@@ -342,6 +341,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           localDate = parseDate(text, canonicalizedDatePattern)
           questionnaireItemViewItem.updatePartialAnswer(text.toString())
           displayDateValidationError(NotValidated)
+          // The time layout gets enabled when a valid date input is present.
           enableOrDisableTimePicker(enableIt = true)
           generateLocalDateTime(localDate, localTime)?.run {
             updateDateTimeInput(this, canonicalizedDatePattern)
