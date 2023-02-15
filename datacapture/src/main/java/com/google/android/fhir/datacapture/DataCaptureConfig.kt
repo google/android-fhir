@@ -55,7 +55,7 @@ data class DataCaptureConfig(
    */
   var xFhirQueryResolver: XFhirQueryResolver? = null,
 
-  /** A [UrlResolver] may be set by client to resolve url to it's media representation. */
+  /** Resolves a URL to the media binary content. */
   var urlResolver: UrlResolver? = null
 ) {
 
@@ -99,7 +99,7 @@ fun interface XFhirQueryResolver {
 }
 
 /**
- * Resolves media based on the provided url. This allows the library to retrieve media from a url.
+ * Resolves media content based on the provided URL, allowing the library to render media content in its UI.
  */
 interface UrlResolver {
   suspend fun resolveBitmapUrl(url: String): Bitmap?
