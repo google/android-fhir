@@ -58,9 +58,9 @@ open class QuestionnaireItemViewHolder(
 
   open fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     delegate.questionnaireItemViewItem = questionnaireItemViewItem
+    delegate.displayValidationResult(questionnaireItemViewItem.validationResult)
     delegate.bind(questionnaireItemViewItem)
     delegate.setReadOnly(questionnaireItemViewItem.questionnaireItem.readOnly)
-    delegate.displayValidationResult(questionnaireItemViewItem.validationResult)
   }
 }
 
@@ -84,7 +84,11 @@ interface QuestionnaireItemViewHolderDelegate {
    */
   fun init(itemView: View)
 
-  /** Binds a [QuestionnaireItemViewItem] to the view. */
+  /**
+   * Binds a [QuestionnaireItemViewItem] to the view. This may update the UI to display the
+   * question, the answer, and any validation result. Note that any validation result being
+   * displayed in this function may be overwritten by [displayValidationResult].
+   */
   fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem)
 
   /** Displays validation messages on the view. */

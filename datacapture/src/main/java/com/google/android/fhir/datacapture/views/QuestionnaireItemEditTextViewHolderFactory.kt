@@ -33,7 +33,6 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal abstract class QuestionnaireItemEditTextViewHolderFactory(
   @LayoutRes override val resId: Int
@@ -44,10 +43,11 @@ internal abstract class QuestionnaireItemEditTextViewHolderFactory(
 
 abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputType: Int) :
   QuestionnaireItemViewHolderDelegate {
+  override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+
   private lateinit var header: QuestionnaireItemHeaderView
   protected lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
-  override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
   private var textWatcher: TextWatcher? = null
 
   override fun init(itemView: View) {
@@ -73,7 +73,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
 
         // Update answer even if the text box loses focus without any change. This will mark the
         // questionnaire response item as being modified in the view model and trigger validation.
-        updateAnswer(textInputEditText.editableText)
+        handleInput(textInputEditText.editableText, questionnaireItemViewItem)
       }
     }
   }
@@ -83,25 +83,13 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
 
     textInputEditText.removeTextChangedListener(textWatcher)
-    val text = getText(questionnaireItemViewItem.answers.singleOrNull())
-    if (isTextUpdatesRequired(text, textInputEditText.text.toString())) {
-      textInputEditText.setText(getText(questionnaireItemViewItem.answers.singleOrNull()))
-    }
+    updateUI(questionnaireItemViewItem, textInputEditText, textInputLayout)
 
     textWatcher =
-      textInputEditText.doAfterTextChanged { editable: Editable? -> updateAnswer(editable) }
+      textInputEditText.doAfterTextChanged { editable: Editable? ->
+        handleInput(editable!!, questionnaireItemViewItem)
+      }
   }
-
-  private fun updateAnswer(editable: Editable?) {
-    val input = getValue(editable.toString())
-    if (input != null) {
-      questionnaireItemViewItem.setAnswer(input)
-    } else {
-      questionnaireItemViewItem.clearAnswer()
-    }
-  }
-
-  open fun isTextUpdatesRequired(answerText: String, inputText: String) = (answerText != inputText)
 
   override fun displayValidationResult(validationResult: ValidationResult) {
     textInputLayout.error =
@@ -117,16 +105,13 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     textInputEditText.isEnabled = !isReadOnly
   }
 
-  /** Returns the answer that should be recorded given the text input by the user. */
-  abstract fun getValue(
-    text: String
-  ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
+  /** Handles user input from the `editable` and updates the questionnaire */
+  abstract fun handleInput(editable: Editable, questionnaireItemViewItem: QuestionnaireItemViewItem)
 
-  /**
-   * Returns the text that should be displayed in the [TextInputEditText] from the existing answer
-   * to the question (may be input by the user or previously recorded).
-   */
-  abstract fun getText(
-    answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
-  ): String
+  /** Handles the */
+  abstract fun updateUI(
+    questionnaireItemViewItem: QuestionnaireItemViewItem,
+    textInputEditText: TextInputEditText,
+    textInputLayout: TextInputLayout,
+  )
 }

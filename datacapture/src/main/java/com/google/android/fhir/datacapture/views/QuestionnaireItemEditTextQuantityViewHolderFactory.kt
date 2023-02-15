@@ -16,9 +16,12 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.text.Editable
 import android.text.InputType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -33,7 +36,19 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
   ) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemEditTextViewHolderDelegate(QUANTITY_INPUT_TYPE) {
-      override fun getValue(
+      override fun handleInput(
+        editable: Editable,
+        questionnaireItemViewItem: QuestionnaireItemViewItem
+      ) {
+        val input = getValue(editable.toString())
+        if (input != null) {
+          questionnaireItemViewItem.setAnswer(input)
+        } else {
+          questionnaireItemViewItem.clearAnswer()
+        }
+      }
+
+      private fun getValue(
         text: String
       ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
         // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
@@ -70,13 +85,19 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
         }
       }
 
-      override fun getText(
-        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
-      ): String {
-        return answer?.valueQuantity?.value?.toString() ?: ""
+      override fun updateUI(
+        questionnaireItemViewItem: QuestionnaireItemViewItem,
+        textInputEditText: TextInputEditText,
+        textInputLayout: TextInputLayout,
+      ) {
+        val text =
+          questionnaireItemViewItem.answers.singleOrNull()?.valueQuantity?.value?.toString() ?: ""
+        if (isTextUpdatesRequired(text, textInputEditText.text.toString())) {
+          textInputEditText.setText(text)
+        }
       }
 
-      override fun isTextUpdatesRequired(answerText: String, inputText: String): Boolean {
+      fun isTextUpdatesRequired(answerText: String, inputText: String): Boolean {
         if (answerText.isEmpty() && inputText.isEmpty()) {
           return false
         }

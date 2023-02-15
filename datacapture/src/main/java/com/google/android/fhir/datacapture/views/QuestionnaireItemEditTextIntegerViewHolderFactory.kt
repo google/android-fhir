@@ -16,8 +16,11 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.text.Editable
 import android.text.InputType
 import com.google.android.fhir.datacapture.R
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -30,18 +33,41 @@ internal object QuestionnaireItemEditTextIntegerViewHolderFactory :
       QuestionnaireItemEditTextViewHolderDelegate(
         InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
       ) {
-      override fun getValue(
-        text: String
-      ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
-        return text.toIntOrNull()?.let {
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(IntegerType(it))
+      override fun handleInput(
+        editable: Editable,
+        questionnaireItemViewItem: QuestionnaireItemViewItem
+      ) {
+        val input = editable.toString()
+        val inputInteger = input.toIntOrNull()
+        if (inputInteger != null) {
+          questionnaireItemViewItem.setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(IntegerType(input))
+          )
+        } else {
+          questionnaireItemViewItem.updatePartialAnswer(input)
         }
       }
 
-      override fun getText(
-        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
-      ): String {
-        return answer?.valueIntegerType?.value?.toString() ?: ""
+      override fun updateUI(
+        questionnaireItemViewItem: QuestionnaireItemViewItem,
+        textInputEditText: TextInputEditText,
+        textInputLayout: TextInputLayout,
+      ) {
+        val answer =
+          questionnaireItemViewItem.answers.singleOrNull()?.valueIntegerType?.value?.toString()
+        val partialAnswer = questionnaireItemViewItem.partialAnswer?.toString()
+
+        // Update the text
+        val text = answer ?: partialAnswer
+        if ((text != textInputEditText.text.toString())) {
+          textInputEditText.setText(text)
+        }
+
+        // Update error message if partial answer present
+        if (partialAnswer != null) {
+          textInputLayout.error = "Invalid input" // TODO(Jing): put this in xml.
+        }
       }
     }
 }
