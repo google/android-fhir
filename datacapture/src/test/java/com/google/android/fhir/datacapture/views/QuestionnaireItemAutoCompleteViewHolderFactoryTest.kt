@@ -51,7 +51,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -87,7 +87,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -135,7 +135,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryTest {
           }
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -174,7 +174,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryTest {
           }
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -189,7 +189,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -221,7 +221,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryTest {
           )
         },
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -238,7 +238,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -271,7 +271,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 

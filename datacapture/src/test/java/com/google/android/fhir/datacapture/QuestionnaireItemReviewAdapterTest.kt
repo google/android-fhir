@@ -49,7 +49,7 @@ class QuestionnaireItemReviewAdapterTest {
               .setType(Questionnaire.QuestionnaireItemType.GROUP),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = Valid,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -69,7 +69,7 @@ class QuestionnaireItemReviewAdapterTest {
               .setType(Questionnaire.QuestionnaireItemType.GROUP),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = Valid,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         ),
         QuestionnaireAdapterItem.Question(
@@ -78,7 +78,7 @@ class QuestionnaireItemReviewAdapterTest {
               .setType(Questionnaire.QuestionnaireItemType.DISPLAY),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = Valid,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         ),
       )
