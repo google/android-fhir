@@ -72,8 +72,6 @@ class QuestionnaireItemMediaViewInstrumentedTest {
 
     runOnUI { view.bind(questionnaireItem) }
 
-    delay(1000)
-
     assertThat(view.findViewById<ImageView>(R.id.image_attachment).visibility)
       .isEqualTo(View.VISIBLE)
   }
@@ -95,8 +93,6 @@ class QuestionnaireItemMediaViewInstrumentedTest {
 
     runOnUI { view.bind(questionnaireItem) }
 
-    delay(1000)
-
     assertThat(view.findViewById<ImageView>(R.id.image_attachment).visibility).isEqualTo(View.GONE)
   }
 
@@ -108,8 +104,6 @@ class QuestionnaireItemMediaViewInstrumentedTest {
       }
 
     runOnUI { view.bind(questionnaireItem) }
-
-    delay(1000)
 
     assertThat(view.findViewById<ImageView>(R.id.image_attachment).visibility).isEqualTo(View.GONE)
   }
