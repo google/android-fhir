@@ -95,6 +95,6 @@ class QuestionnaireItemMediaView(context: Context, attrs: AttributeSet?) :
     imageAttachment.visibility = View.GONE
   }
 
-  /** Only usable for a String known as mime type. */
+  /** Returns the main MIME type of a MIME type string (e.g. image/png returns image). */
   private fun getMimeType(mimeType: String): String = mimeType.substringBefore("/")
 }

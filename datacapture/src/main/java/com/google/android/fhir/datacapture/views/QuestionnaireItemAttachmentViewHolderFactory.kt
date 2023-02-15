@@ -450,7 +450,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
   const val EXTRA_SAVED_PHOTO_URI_KEY = "saved_photo_uri"
 }
 
-/** Only usable for a String known as mime type. */
+/** Returns the main MIME type of a MIME type string (e.g. image/png returns image). */
 private fun getMimeType(mimeType: String): String = mimeType.substringBefore("/")
 
 private fun Context.readBytesFromUri(uri: Uri): ByteArray {

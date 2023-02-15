@@ -206,7 +206,7 @@ internal enum class MimeType(val value: String) {
   VIDEO("video")
 }
 
-/** Only usable for a String known as mime type. */
+/** Returns the main MIME type of a MIME type string (e.g. image/png returns image). */
 private fun getMimeType(mimeType: String): String = mimeType.substringBefore("/")
 
 /** Returns true if at least one mime type matches the given type. */
