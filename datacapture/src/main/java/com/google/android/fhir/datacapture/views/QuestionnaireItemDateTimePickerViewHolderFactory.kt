@@ -107,6 +107,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         timeInputLayout = itemView.findViewById(R.id.time_input_layout)
         timeInputEditText = itemView.findViewById(R.id.time_input_edit_text)
         timeInputEditText.inputType = InputType.TYPE_NULL
+        // The time textField/layout only gets enabled when a valid date input is present.
         timeInputLayout.setEndIconOnClickListener {
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
@@ -197,12 +198,13 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         localDateTime: LocalDateTime?,
         canonicalizedDatePattern: String
       ) {
+        // The time text field only gets enabled when a valid date input is present.
         enableOrDisableTimePicker(enableIt = localDateTime != null)
         val partialAnswerToDisplay = questionnaireItemViewItem.partialAnswer as? String
         val textToDisplayInTheTextField =
           localDateTime?.toLocalDate()?.format(canonicalizedDatePattern) ?: partialAnswerToDisplay
 
-        // Since pull request #1822 has been merged, the same date format style is now used for both
+        // The same date format style is now used for both
         // accepting user date input and displaying the answer in the text field. For instance, the
         // "MM/dd/yyyy" format is employed to accept and display the date value. As a result, it is
         // possible to simply compare the
@@ -213,13 +215,9 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         }
         // Show an error text
         if (!partialAnswerToDisplay.isNullOrBlank()) {
-          val dateAsPartialInput =
-            try {
-              parseDate(partialAnswerToDisplay, canonicalizedDatePattern)
-            } catch (parseException: Exception) {
-              null
-            }
-          if (dateAsPartialInput == null) {
+          try {
+            parseDate(partialAnswerToDisplay, canonicalizedDatePattern)
+          } catch (parseException: ParseException) {
             displayValidationResult(
               Invalid(
                 listOf(
