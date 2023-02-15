@@ -211,7 +211,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         val textToDisplayInTheTextField =
           answer?.format(canonicalizedDatePattern) ?: partialAnswerToDisplay
 
-        // Since pull request #1822 has been merged, the same date format style is now used for both
+        // The same date format style is now used for both
         // accepting user date input and displaying the answer in the text field. For instance, the
         // "MM/dd/yyyy" format is employed to accept and display the date value. As a result, it is
         // possible to simply compare
