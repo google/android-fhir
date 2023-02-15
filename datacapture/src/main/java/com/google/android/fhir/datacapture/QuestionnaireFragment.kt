@@ -99,10 +99,6 @@ open class QuestionnaireFragment : Fragment() {
     val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
 
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
-    // Reads submit button visibility value initially defined in
-    // [R.attr.submitButtonStyleQuestionnaire] style.
-    val submitButtonVisibilityInStyle = submitButton.visibility
-    viewModel.setShowSubmitButtonFlag(submitButtonVisibilityInStyle == View.VISIBLE)
 
     val reviewModeEditButton = view.findViewById<View>(R.id.review_mode_edit_button)
     reviewModeEditButton.setOnClickListener { viewModel.setReviewMode(false) }
@@ -311,6 +307,11 @@ open class QuestionnaireFragment : Fragment() {
     const val EXTRA_READ_ONLY = "read-only"
 
     const val SUBMIT_REQUEST_KEY = "submit-request-key"
+
+    /**
+     * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
+     */
+    const val EXTRA_SHOW_SUBMIT_BUTTON = "show-submit-button"
   }
 
   /**
