@@ -246,7 +246,7 @@ class QuestionnaireFragment : Fragment() {
    */
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
-  /** Helper to create [Questionnaire] with appropriate [Bundle] arguments. */
+  /** Helper to create [QuestionnaireFragment] with appropriate [Bundle] arguments. */
   class Builder {
 
     private val args = mutableListOf<Pair<String, Any>>()
@@ -332,6 +332,11 @@ class QuestionnaireFragment : Fragment() {
       matchersProviderFactory: String
     ) = apply { args.add(EXTRA_MATCHERS_FACTORY to matchersProviderFactory) }
 
+    /**
+     * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
+     */
+    fun setShowSubmitButton(value: Boolean) = apply { args.add(EXTRA_SHOW_SUBMIT_BUTTON to value) }
+
     @VisibleForTesting fun buildArgs() = bundleOf(*args.toTypedArray())
 
     /** @return A [QuestionnaireFragment] with provided [Bundle] arguments. */
@@ -406,11 +411,12 @@ class QuestionnaireFragment : Fragment() {
 
     const val SUBMIT_REQUEST_KEY = "submit-request-key"
 
-    fun builder() = Builder()
     /**
      * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
      */
-    const val EXTRA_SHOW_SUBMIT_BUTTON = "show-submit-button"
+    internal const val EXTRA_SHOW_SUBMIT_BUTTON = "show-submit-button"
+
+    fun builder() = Builder()
   }
 
   /**
