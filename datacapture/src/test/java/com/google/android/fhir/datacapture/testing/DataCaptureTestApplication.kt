@@ -20,7 +20,7 @@ import android.app.Application
 import com.google.android.fhir.datacapture.DataCaptureConfig
 
 /** Application class when you want to test the [DataCaptureConfig.Provider]. */
-class DataCaptureTestApplication : Application(), DataCaptureConfig.Provider {
+internal class DataCaptureTestApplication : Application(), DataCaptureConfig.Provider {
   var dataCaptureConfiguration: DataCaptureConfig? = null
 
   override fun getDataCaptureConfig(): DataCaptureConfig {
