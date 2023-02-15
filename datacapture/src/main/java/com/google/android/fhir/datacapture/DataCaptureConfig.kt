@@ -99,7 +99,8 @@ fun interface XFhirQueryResolver {
 }
 
 /**
- * Resolves media content based on the provided URL, allowing the library to render media content in its UI.
+ * Resolves media content based on the provided URL, allowing the library to render media content in
+ * its UI.
  */
 interface UrlResolver {
   suspend fun resolveBitmapUrl(url: String): Bitmap?

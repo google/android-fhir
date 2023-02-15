@@ -27,7 +27,6 @@ import com.google.android.fhir.datacapture.EXTENSION_ITEM_MEDIA
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Extension
