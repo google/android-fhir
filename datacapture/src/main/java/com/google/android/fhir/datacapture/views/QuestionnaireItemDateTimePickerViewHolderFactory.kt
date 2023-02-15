@@ -210,25 +210,31 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         // should be overridden or not.
         if (dateInputEditText.text.toString() != textToDisplayInTheTextField) {
           dateInputEditText.setText(textToDisplayInTheTextField)
-          displayDateValidationError(Valid)
-          enableOrDisableTimePicker(enableIt = true)
         }
         // Show an error text
         if (!partialAnswerToDisplay.isNullOrBlank()) {
-          displayValidationResult(
-            Invalid(
-              listOf(
-                dateInputEditText.context.getString(
-                  R.string.date_format_validation_error_msg,
-                  canonicalizedDatePattern,
-                  canonicalizedDatePattern
-                    .replace("dd", "01")
-                    .replace("MM", "01")
-                    .replace("yyyy", "2023")
+          val dateAsPartialInput =
+            try {
+              parseDate(partialAnswerToDisplay, canonicalizedDatePattern)
+            } catch (parseException: Exception) {
+              null
+            }
+          if (dateAsPartialInput == null) {
+            displayValidationResult(
+              Invalid(
+                listOf(
+                  dateInputEditText.context.getString(
+                    R.string.date_format_validation_error_msg,
+                    canonicalizedDatePattern,
+                    canonicalizedDatePattern
+                      .replace("dd", "01")
+                      .replace("MM", "01")
+                      .replace("yyyy", "2023")
+                  )
                 )
               )
             )
-          )
+          }
         } else {
           displayValidationResult(NotValidated)
         }
@@ -337,7 +343,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         try {
           localDate = parseDate(text, canonicalizedDatePattern)
           questionnaireItemViewItem.updatePartialAnswer(text.toString())
-          displayDateValidationError(Valid)
+          displayDateValidationError(NotValidated)
           enableOrDisableTimePicker(enableIt = true)
           generateLocalDateTime(localDate, localTime)?.run {
             updateDateTimeInput(this, canonicalizedDatePattern)

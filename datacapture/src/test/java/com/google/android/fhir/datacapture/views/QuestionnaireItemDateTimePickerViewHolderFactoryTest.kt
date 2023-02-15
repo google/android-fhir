@@ -312,6 +312,22 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
   }
 
   @Test
+  fun `if the date input is empty, do not enable the time text input layout`() {
+    val itemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    viewHolder.bind(itemViewItem)
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.time_input_layout).isEnabled)
+      .isFalse()
+  }
+
+  @Test
   fun `if date input is valid then enable time text input layout`() {
     val itemViewItem =
       QuestionnaireItemViewItem(
@@ -371,6 +387,23 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
       .isNull()
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.time_input_layout).error)
+      .isNull()
+  }
+
+  @Test
+  fun `if the date input is valid, do not display the error message for a valid date input`() {
+    val itemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    viewHolder.bind(itemViewItem)
+    viewHolder.dateInputView.text = "11/19/2020"
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
       .isNull()
   }
 
