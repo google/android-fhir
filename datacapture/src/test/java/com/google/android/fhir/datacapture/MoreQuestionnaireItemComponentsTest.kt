@@ -22,6 +22,7 @@ import android.util.Base64
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.mapping.ITEM_INITIAL_EXPRESSION_URL
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
+import com.google.android.fhir.datacapture.testing.TestUrlResolver
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.util.Locale
@@ -45,9 +46,6 @@ import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.util.ReflectionHelpers
@@ -1632,11 +1630,7 @@ class MoreQuestionnaireItemComponentsTest {
         url = "https://some-image-server.com/images/f0006.png"
       }
 
-    val urlResolver: UrlResolver = mock()
-    runBlocking {
-      Mockito.`when`(urlResolver.resolveBitmapUrl("https://some-image-server.com/images/f0006.png"))
-        .doReturn(mock())
-    }
+    val urlResolver = TestUrlResolver(attachment.url, IMAGE_BASE64_DECODED)
 
     ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
       .getDataCaptureConfig()
@@ -1648,9 +1642,6 @@ class MoreQuestionnaireItemComponentsTest {
     }
 
     assertThat(bitmap).isNotNull()
-    runBlocking {
-      Mockito.verify(urlResolver).resolveBitmapUrl("https://some-image-server.com/images/f0006.png")
-    }
   }
 
   @Test
