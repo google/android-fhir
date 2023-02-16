@@ -186,7 +186,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           displayValidationResult(
             Invalid(
               listOf(
-                textInputEditText.context.invalidDateErrorText(
+                invalidDateErrorText(
+                  textInputEditText.context,
                   R.string.date_format_validation_error_msg,
                   canonicalizedDatePattern
                 )
@@ -227,7 +228,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           displayValidationResult(
             Invalid(
               listOf(
-                textInputEditText.context.invalidDateErrorText(
+                invalidDateErrorText(
+                  textInputEditText.context,
                   R.string.date_format_validation_error_msg,
                   canonicalizedDatePattern
                 )

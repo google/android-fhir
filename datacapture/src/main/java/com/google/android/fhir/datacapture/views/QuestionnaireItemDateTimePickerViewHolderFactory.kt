@@ -221,7 +221,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             displayValidationResult(
               Invalid(
                 listOf(
-                  dateInputEditText.context.invalidDateErrorText(
+                  invalidDateErrorText(
+                    dateInputEditText.context,
                     R.string.date_format_validation_error_msg,
                     canonicalizedDatePattern
                   )
@@ -348,7 +349,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           displayDateValidationError(
             Invalid(
               listOf(
-                dateInputEditText.context.invalidDateErrorText(
+                invalidDateErrorText(
+                  dateInputEditText.context,
                   R.string.date_format_validation_error_msg,
                   canonicalizedDatePattern
                 )
@@ -429,8 +431,9 @@ internal val DateTimeType.localDateTime
       second,
     )
 
-internal fun Context.invalidDateErrorText(@StringRes resId: Int, formatPattern: String) =
-  getString(
+/** Replaces 'dd' with '31', 'MM' with '01' and 'yyyy' with '2023' and returns new string. */
+internal fun invalidDateErrorText(context: Context, @StringRes resId: Int, formatPattern: String) =
+  context.getString(
     resId,
     formatPattern,
     formatPattern.replace("dd", "31").replace("MM", "01").replace("yyyy", "2023")
