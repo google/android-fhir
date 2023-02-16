@@ -58,7 +58,7 @@ data class DataCaptureConfig(
   var xFhirQueryResolver: XFhirQueryResolver? = null,
 
   /** Resolves a URL to the media binary content. */
-  var urlResolver: UrlResolver? = null
+  var urlResolver: UrlResolver? = null,
 
   /**
    * A [QuestionnaireItemViewHolderFactoryMatchersProviderFactory] may be set by the client to
