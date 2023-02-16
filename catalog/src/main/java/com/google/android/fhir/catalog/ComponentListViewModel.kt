@@ -125,12 +125,12 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_repeated_group.json",
     ),
     HELP(R.drawable.ic_help, R.string.component_name_help, "component_help.json"),
-    ITEM_MEDIA(R.drawable.ic_image, R.string.component_name_item_media, "component_item_media.json"),
-    ITEM_ANSWER_MEDIA(
+    ITEM_MEDIA(
       R.drawable.ic_image,
-      R.string.component_name_item_answer_media,
-      ""
-    )
+      R.string.component_name_item_media,
+      "component_item_media.json"
+    ),
+    ITEM_ANSWER_MEDIA(R.drawable.ic_image, R.string.component_name_item_answer_media, "")
   }
 
   val viewItemList =

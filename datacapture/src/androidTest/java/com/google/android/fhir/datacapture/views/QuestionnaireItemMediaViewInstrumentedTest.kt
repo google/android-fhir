@@ -124,7 +124,7 @@ class QuestionnaireItemMediaViewInstrumentedTest {
       }
 
     runOnUI { view.bind(questionnaireItem) }
-    
+
     assertThat(view.findViewById<ImageView>(R.id.image_attachment).contentDescription)
       .isEqualTo(attachment.title)
   }
