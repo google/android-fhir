@@ -107,6 +107,48 @@ class QuestionnaireItemMediaViewInstrumentedTest {
     assertThat(view.findViewById<ImageView>(R.id.image_attachment).visibility).isEqualTo(View.GONE)
   }
 
+  @Test
+  fun shouldHaveContentDescription_whenAttachmentTitleIsSet() = runBlocking {
+    val attachment =
+      Attachment().apply {
+        title = "Image Attachment"
+        contentType = "image/png"
+        data = IMAGE_BASE64_DECODED
+        size = IMAGE_BASE64_DECODED.size
+      }
+
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        text = "Kindly collect the reading as shown below in the figure"
+        extension = listOf(Extension(EXTENSION_ITEM_MEDIA, attachment))
+      }
+
+    runOnUI { view.bind(questionnaireItem) }
+    
+    assertThat(view.findViewById<ImageView>(R.id.image_attachment).contentDescription)
+      .isEqualTo(attachment.title)
+  }
+
+  @Test
+  fun shouldHaveNullContentDescription_whenAttachmentTitleIsNotSet() = runBlocking {
+    val attachment =
+      Attachment().apply {
+        contentType = "image/png"
+        data = IMAGE_BASE64_DECODED
+        size = IMAGE_BASE64_DECODED.size
+      }
+
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        text = "Kindly collect the reading as shown below in the figure"
+        extension = listOf(Extension(EXTENSION_ITEM_MEDIA, attachment))
+      }
+
+    runOnUI { view.bind(questionnaireItem) }
+
+    assertThat(view.findViewById<ImageView>(R.id.image_attachment).contentDescription).isNull()
+  }
+
   /** Method to run code snippet on UI/main thread */
   private fun runOnUI(action: () -> Unit) {
     activityScenarioRule.scenario.onActivity { action() }
