@@ -35,7 +35,7 @@ class MoreLocalDateTimesTest {
   fun localizedString_US() {
     Locale.setDefault(Locale.US)
     val localDateTime = LocalDateTime.of(LocalDate.of(2010, 10, 18), LocalTime.of(18, 10, 10))
-    assertThat(localDateTime.localizedDateString).isEqualTo("10/18/10")
+    assertThat(localDateTime.toLocalDate().format()).isEqualTo("10/18/10")
     assertThat(localDateTime.toLocalizedTimeString(ApplicationProvider.getApplicationContext()))
       .isEqualTo("6:10 PM")
   }
@@ -45,7 +45,7 @@ class MoreLocalDateTimesTest {
     org.robolectric.shadows.ShadowSettings.set24HourTimeFormat(true)
     Locale.setDefault(Locale.US)
     val localDateTime = LocalDateTime.of(LocalDate.of(2010, 10, 18), LocalTime.of(18, 10, 10))
-    assertThat(localDateTime.localizedDateString).isEqualTo("10/18/10")
+    assertThat(localDateTime.toLocalDate().format()).isEqualTo("10/18/10")
     assertThat(localDateTime.toLocalizedTimeString(ApplicationProvider.getApplicationContext()))
       .isEqualTo("18:10")
   }
@@ -54,7 +54,7 @@ class MoreLocalDateTimesTest {
   fun localizedString_Japan() {
     Locale.setDefault(Locale.JAPAN)
     val localDateTime = LocalDateTime.of(LocalDate.of(2010, 10, 18), LocalTime.of(18, 10, 10))
-    assertThat(localDateTime.localizedDateString).isEqualTo("2010/10/18")
+    assertThat(localDateTime.toLocalDate().format()).isEqualTo("2010/10/18")
     assertThat(localDateTime.toLocalizedTimeString(ApplicationProvider.getApplicationContext()))
       .isEqualTo("6:10 午後")
   }
@@ -64,7 +64,7 @@ class MoreLocalDateTimesTest {
     org.robolectric.shadows.ShadowSettings.set24HourTimeFormat(true)
     Locale.setDefault(Locale.JAPAN)
     val localDateTime = LocalDateTime.of(LocalDate.of(2010, 10, 18), LocalTime.of(18, 10, 10))
-    assertThat(localDateTime.localizedDateString).isEqualTo("2010/10/18")
+    assertThat(localDateTime.toLocalDate().format()).isEqualTo("2010/10/18")
     assertThat(localDateTime.toLocalizedTimeString(ApplicationProvider.getApplicationContext()))
       .isEqualTo("18:10")
   }

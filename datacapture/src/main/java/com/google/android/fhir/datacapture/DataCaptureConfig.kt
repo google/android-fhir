@@ -18,6 +18,8 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import com.google.android.fhir.datacapture.DataCaptureConfig.Provider
+import com.google.android.fhir.datacapture.QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher
+import com.google.android.fhir.datacapture.QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatchersProvider
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Resource
@@ -53,6 +55,15 @@ data class DataCaptureConfig(
    * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirquery for more details.
    */
   var xFhirQueryResolver: XFhirQueryResolver? = null,
+
+  /**
+   * A [QuestionnaireItemViewHolderFactoryMatchersProviderFactory] may be set by the client to
+   * provide [QuestionnaireItemViewHolderFactoryMatcher]s to add custom questionnaire components or
+   * override the behaviour of existing components in the sdc.
+   */
+  var questionnaireItemViewHolderFactoryMatchersProviderFactory:
+    QuestionnaireItemViewHolderFactoryMatchersProviderFactory? =
+    null
 ) {
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {
@@ -92,4 +103,18 @@ interface ExternalAnswerValueSetResolver {
  */
 fun interface XFhirQueryResolver {
   suspend fun resolve(xFhirQuery: String): List<Resource>
+}
+
+/**
+ * Factory to create [QuestionnaireItemViewHolderFactoryMatchersProvider] for the
+ * [QuestionnaireFragment] to provide [List] of [QuestionnaireItemViewHolderFactoryMatcher]. The
+ * developers may provide the factory to the library via [DataCaptureConfig] to add custom
+ * questionnaire components or override the behaviour of existing components in the sdc.
+ *
+ * See the
+ * [developer guide](https://github.com/google/android-fhir/wiki/SDCL:-Customize-how-a-Questionnaire-is-displayed#custom-questionnaire-components)
+ * for more information.
+ */
+fun interface QuestionnaireItemViewHolderFactoryMatchersProviderFactory {
+  fun get(provider: String): QuestionnaireItemViewHolderFactoryMatchersProvider
 }

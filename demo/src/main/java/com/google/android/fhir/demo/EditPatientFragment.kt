@@ -23,7 +23,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
@@ -85,14 +84,15 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
   }
 
   private fun addQuestionnaireFragment(pair: Pair<String, String>) {
-    val fragment = QuestionnaireFragment()
-    fragment.arguments =
-      bundleOf(
-        QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to pair.first,
-        QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING to pair.second
-      )
     childFragmentManager.commit {
-      add(R.id.add_patient_container, fragment, QUESTIONNAIRE_FRAGMENT_TAG)
+      add(
+        R.id.add_patient_container,
+        QuestionnaireFragment.builder()
+          .setQuestionnaire(pair.first)
+          .setQuestionnaireResponse(pair.second)
+          .build(),
+        QUESTIONNAIRE_FRAGMENT_TAG
+      )
     }
   }
 
