@@ -22,12 +22,14 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.implementationguide.db.impl.ImplementationGuideDatabase
 import com.google.common.truth.Truth.assertThat
 import java.io.File
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 internal class IgManagerTest {
   private val context: Context = ApplicationProvider.getApplicationContext()
@@ -43,7 +45,7 @@ internal class IgManagerTest {
   }
 
   @Test
-  fun `importing IG creates entries in DB`() = runBlocking {
+  fun `importing IG creates entries in DB`() = runTest {
     igManager.install(implementationGuide, dataFolder)
 
     assertThat(
@@ -61,7 +63,7 @@ internal class IgManagerTest {
   }
 
   @Test
-  fun `deleting IG deletes files and DB entries`() = runBlocking {
+  fun `deleting IG deletes files and DB entries`() = runTest {
     val igRoot = File(dataFolder.parentFile, "anc-cds.copy")
     igRoot.deleteOnExit()
     dataFolder.copyRecursively(igRoot)
@@ -74,7 +76,7 @@ internal class IgManagerTest {
   }
 
   @Test
-  fun `imported entries are readable`() = runBlocking {
+  fun `imported entries are readable`() = runTest {
     igManager.install(implementationGuide, dataFolder)
 
     assertThat(igManager.loadResources(resourceType = "Library", name = "WHOCommon")).isNotNull()

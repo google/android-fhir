@@ -101,6 +101,7 @@ dependencies {
   testImplementation(Dependencies.AndroidxTest.archCore)
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
