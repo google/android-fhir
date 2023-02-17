@@ -34,7 +34,7 @@ internal class IgManagerTest {
   private val igDb =
     Room.inMemoryDatabaseBuilder(context, ImplementationGuideDatabase::class.java).build()
   private val igManager = IgManager(igDb)
-  private val igDependency = IgDependency("anc-cds", "0.3.0", "http://url.com")
+  private val implementationGuide = ImplementationGuide("anc-cds", "0.3.0", "http://url.com")
   private val dataFolder = File(javaClass.getResource("/anc-cds")!!.file)
 
   @After
@@ -44,7 +44,7 @@ internal class IgManagerTest {
 
   @Test
   fun `importing IG creates entries in DB`() = runBlocking {
-    igManager.install(igDependency, dataFolder)
+    igManager.install(implementationGuide, dataFolder)
 
     assertThat(
         igDb
@@ -65,9 +65,9 @@ internal class IgManagerTest {
     val igRoot = File(dataFolder.parentFile, "anc-cds.copy")
     igRoot.deleteOnExit()
     dataFolder.copyRecursively(igRoot)
-    igManager.install(igDependency, igRoot)
+    igManager.install(implementationGuide, igRoot)
 
-    igManager.delete(igDependency)
+    igManager.delete(implementationGuide)
 
     assertThat(igDb.implementationGuideDao().getImplementationGuides()).isEmpty()
     assertThat(igRoot.exists()).isFalse()
@@ -75,7 +75,7 @@ internal class IgManagerTest {
 
   @Test
   fun `imported entries are readable`() = runBlocking {
-    igManager.install(igDependency, dataFolder)
+    igManager.install(implementationGuide, dataFolder)
 
     assertThat(igManager.loadResources(resourceType = "Library", name = "WHOCommon")).isNotNull()
     assertThat(igManager.loadResources(resourceType = "Library", url = "FHIRCommon")).isNotNull()

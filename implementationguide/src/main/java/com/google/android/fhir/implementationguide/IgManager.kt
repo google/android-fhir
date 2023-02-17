@@ -41,17 +41,17 @@ class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
    * from NPM and imports data from the package manager (populates the metadata of the FHIR
    * Resorces)
    */
-  suspend fun install(vararg igDependencies: IgDependency) {
+  suspend fun install(vararg igDependencies: ImplementationGuide) {
     TODO("not implemented yet")
   }
 
   /**
-   * Checks if the [igDependency] is present in DB. If necessary, populates the database with the
-   * metadata of FHIR Resource from the provided [rootDirectory].
+   * Checks if the [implementationGuide] is present in DB. If necessary, populates the database with
+   * the metadata of FHIR Resource from the provided [rootDirectory].
    */
-  suspend fun install(igDependency: IgDependency, rootDirectory: File) {
+  suspend fun install(implementationGuide: ImplementationGuide, rootDirectory: File) {
     // TODO(ktarasenko) copy files to the safe space?
-    val igId = igDao.insert(igDependency.toEntity(rootDirectory))
+    val igId = igDao.insert(implementationGuide.toEntity(rootDirectory))
     rootDirectory.listFiles()?.forEach { file ->
       try {
         val resource = jsonParser.parseResource(FileInputStream(file))
@@ -91,7 +91,7 @@ class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
   }
 
   /** Deletes Implementation Guide, cleans up files. */
-  suspend fun delete(vararg igDependencies: IgDependency) {
+  suspend fun delete(vararg igDependencies: ImplementationGuide) {
     igDependencies.forEach { igDependency ->
       val igEntity = igDao.getImplementationGuide(igDependency.packageId, igDependency.version)
       igDao.deleteImplementationGuide(igEntity)

@@ -16,5 +16,8 @@
 
 package com.google.android.fhir.implementationguide
 
-/** Holds IG parameters. Used to define dependencies, load dependencies from Package Manager */
-data class IgDependency(val packageId: String, val version: String, val uri: String)
+/**
+ * Holds Implementation Guide attributes. Used to define dependencies, load dependencies from
+ * Package Manager
+ */
+data class ImplementationGuide(val packageId: String, val version: String, val uri: String)
