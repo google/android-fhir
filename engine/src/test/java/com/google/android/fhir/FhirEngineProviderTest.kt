@@ -17,13 +17,13 @@
 package com.google.android.fhir
 
 import android.app.PendingIntent
-import android.app.admin.DevicePolicyManager.PASSWORD_COMPLEXITY_HIGH
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.security.FhirSecurityConfiguration
+import com.google.android.fhir.security.LockScreenComplexity.HIGH
 import com.google.android.fhir.security.LockScreenRequirement
-import com.google.android.fhir.security.RequirementViolationAction.WARN
+import com.google.android.fhir.security.RequirementViolationAction
 import com.google.common.truth.Truth.assertThat
 import java.lang.IllegalStateException
 import java.util.EnumSet
@@ -117,14 +117,16 @@ class FhirEngineProviderTest {
       FhirEngineConfiguration(
         securityConfiguration =
           FhirSecurityConfiguration(
-            LockScreenRequirement(PASSWORD_COMPLEXITY_HIGH, EnumSet.of(WARN)),
+            LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
             warningCallback = pendingIntent
           )
       )
 
     with(config.securityConfiguration) {
       assertThat(this?.lockScreenRequirement)
-        .isEqualTo(LockScreenRequirement(PASSWORD_COMPLEXITY_HIGH, EnumSet.of(WARN)))
+        .isEqualTo(
+          LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java))
+        )
       assertThat(this?.warningCallback).isEqualTo(pendingIntent)
     }
   }

@@ -24,6 +24,10 @@ import android.app.admin.DevicePolicyManager.PASSWORD_COMPLEXITY_LOW
 import android.content.Context
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.truth.content.IntentSubject.assertThat
+import com.google.android.fhir.security.LockScreenComplexity.HIGH
+import com.google.android.fhir.security.LockScreenComplexity.LOW
+import com.google.android.fhir.security.SecurityRequirementViolation.EXTRA_LOCK_SCREEN_REQUIREMENT_VIOLATION
 import com.google.common.truth.Truth.assertThat
 import java.util.EnumSet
 import kotlinx.coroutines.runBlocking
@@ -47,10 +51,7 @@ class SecurityRequirementsManagerTest {
       SecurityRequirementsManager(
           context,
           FhirSecurityConfiguration(
-            LockScreenRequirement(
-              PASSWORD_COMPLEXITY_LOW,
-              EnumSet.of(RequirementViolationAction.WARN)
-            ),
+            LockScreenRequirement(LOW, EnumSet.noneOf(RequirementViolationAction::class.java)),
             warningCallback = createWarningCallback(context)
           ),
         )
@@ -66,10 +67,7 @@ class SecurityRequirementsManagerTest {
       SecurityRequirementsManager(
         context,
         FhirSecurityConfiguration(
-          LockScreenRequirement(
-            PASSWORD_COMPLEXITY_LOW,
-            EnumSet.of(RequirementViolationAction.WARN)
-          ),
+          LockScreenRequirement(LOW, EnumSet.noneOf(RequirementViolationAction::class.java)),
           warningCallback = createWarningCallback(context)
         ),
       )
@@ -86,17 +84,23 @@ class SecurityRequirementsManagerTest {
       SecurityRequirementsManager(
           context,
           FhirSecurityConfiguration(
-            LockScreenRequirement(
-              PASSWORD_COMPLEXITY_HIGH,
-              EnumSet.of(RequirementViolationAction.WARN)
-            ),
+            LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
             warningCallback = createWarningCallback(context)
           )
         )
         .checkSecurityRequirements()
 
-      assertThat(shadowOf(context as Application).broadcastIntents.single().action)
-        .isEqualTo("TEST_ACTION")
+      val callbackIntent = shadowOf(context as Application).broadcastIntents.single()
+      assertThat(callbackIntent).hasAction("TEST_ACTION")
+      assertThat(callbackIntent)
+        .extras()
+        .parcelable<LockScreenRequirementViolation>(EXTRA_LOCK_SCREEN_REQUIREMENT_VIOLATION)
+        .isEqualTo(
+          LockScreenRequirementViolation(
+            requiredComplexity = PASSWORD_COMPLEXITY_HIGH,
+            currentComplexity = PASSWORD_COMPLEXITY_LOW
+          )
+        )
     }
 
   @Test
@@ -107,10 +111,7 @@ class SecurityRequirementsManagerTest {
         SecurityRequirementsManager(
           context,
           FhirSecurityConfiguration(
-            LockScreenRequirement(
-              PASSWORD_COMPLEXITY_HIGH,
-              EnumSet.of(RequirementViolationAction.WARN)
-            ),
+            LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
             warningCallback = createWarningCallback(context)
           ),
         )

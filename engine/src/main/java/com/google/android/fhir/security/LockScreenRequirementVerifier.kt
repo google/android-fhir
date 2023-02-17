@@ -32,16 +32,16 @@ internal class LockScreenRequirementVerifier(context: Context) :
       return SecurityRequirementUnsupported
     }
 
-    return if (devicePolicyManager.passwordComplexity >= requirement.complexity) {
+    return if (devicePolicyManager.passwordComplexity >= requirement.complexity.complexity) {
       Timber.i("The current lock screen satisfies the security requirement.")
       SecurityRequirementMet
     } else {
       Timber.w(
         "The current lock screen doesn't the security requirement. " +
-          "Current: ${devicePolicyManager.passwordComplexity}, required: ${requirement.complexity}."
+          "Current: ${devicePolicyManager.passwordComplexity}, required: ${requirement.complexity.complexity}."
       )
       LockScreenRequirementViolation(
-        requiredComplexity = requirement.complexity,
+        requiredComplexity = requirement.complexity.complexity,
         currentComplexity = devicePolicyManager.passwordComplexity
       )
     }

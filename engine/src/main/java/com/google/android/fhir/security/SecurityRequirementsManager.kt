@@ -17,10 +17,15 @@
 package com.google.android.fhir.security
 
 import android.content.Context
+import android.content.Intent
+import com.google.android.fhir.security.SecurityRequirementViolation.EXTRA_LOCK_SCREEN_REQUIREMENT_VIOLATION
 
 /** A centralized hub for checking all supported security requirements. */
 class SecurityRequirementsManager
-constructor(context: Context, private val securityConfiguration: FhirSecurityConfiguration?) {
+constructor(
+  private val context: Context,
+  private val securityConfiguration: FhirSecurityConfiguration?
+) {
 
   private val lockScreenRequirementVerifier = LockScreenRequirementVerifier(context)
 
@@ -35,7 +40,20 @@ constructor(context: Context, private val securityConfiguration: FhirSecurityCon
       violations.add(lockScreenRequirementVerdict)
     }
 
-    if (violations.isNotEmpty()) securityConfiguration.warningCallback?.let { it.send() }
+    if (violations.isNotEmpty())
+      securityConfiguration.warningCallback?.let { callback ->
+        val extras = Intent()
+        violations.forEach { violation ->
+          when (violation) {
+            is LockScreenRequirementViolation ->
+              extras.putExtra(EXTRA_LOCK_SCREEN_REQUIREMENT_VIOLATION, violation)
+            else -> {
+              /* Do nothing */
+            }
+          }
+        }
+        callback.send(context, /* code= */ 0, extras)
+      }
   }
 
   /** Gets the latest list of security requirement violations. */

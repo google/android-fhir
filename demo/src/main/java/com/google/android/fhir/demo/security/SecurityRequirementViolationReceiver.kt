@@ -13,24 +13,27 @@ import androidx.annotation.RequiresApi
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.demo.R
 import com.google.android.fhir.security.LockScreenRequirementViolation
+import com.google.android.fhir.security.SecurityRequirementViolation
+import com.google.android.fhir.security.SecurityRequirementViolation.EXTRA_LOCK_SCREEN_REQUIREMENT_VIOLATION
 import timber.log.Timber
 
 /** A sample receiver demonstrates the handling of password requirement violation. */
 class SecurityRequirementViolationReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent) {
-    val violations =
-      FhirEngineProvider.getSecurityRequirementsManager(context).getLatestViolations()
-    Timber.w("Violations: $violations")
-    if (violations.isEmpty()) return
-    violations.forEach {
-      if (it is LockScreenRequirementViolation) {
-        showPasswordViolationNotification(context, it.requiredComplexity)
-      }
-    }
+    val lockScreenRequirementViolation = intent.getParcelableExtra<LockScreenRequirementViolation>(
+      EXTRA_LOCK_SCREEN_REQUIREMENT_VIOLATION
+    )
+    Timber.w("Lock screen violation extra: $lockScreenRequirementViolation")
+    if (lockScreenRequirementViolation == null) return
+    showPasswordViolationNotification(context, lockScreenRequirementViolation.requiredComplexity)
   }
 
   private fun showPasswordViolationNotification(context: Context, requiredComplexity: Int) {
     val notificationManager = context.getSystemService(NotificationManager::class.java)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !notificationManager.areNotificationsEnabled()) {
+      Timber.w("Can't post notification")
+      return
+    }
 
     createNotificationChannel(notificationManager)
 

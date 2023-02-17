@@ -18,7 +18,6 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.app.PendingIntent
-import android.app.admin.DevicePolicyManager
 import android.content.Context
 import android.content.Intent
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
@@ -29,6 +28,7 @@ import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.demo.data.FhirSyncWorker
 import com.google.android.fhir.demo.security.SecurityRequirementViolationReceiver
 import com.google.android.fhir.security.FhirSecurityConfiguration
+import com.google.android.fhir.security.LockScreenComplexity
 import com.google.android.fhir.security.LockScreenRequirement
 import com.google.android.fhir.security.RequirementViolationAction
 import com.google.android.fhir.sync.Sync
@@ -52,14 +52,14 @@ class FhirApplication : Application() {
         securityConfiguration =
           FhirSecurityConfiguration(
             LockScreenRequirement(
-              complexity = DevicePolicyManager.PASSWORD_COMPLEXITY_HIGH,
-              EnumSet.of(RequirementViolationAction.WARN)
+              complexity = LockScreenComplexity.HIGH,
+              EnumSet.noneOf(RequirementViolationAction::class.java)
             ),
             PendingIntent.getBroadcast(
               applicationContext,
               /* requestCode= */ 0,
               Intent(applicationContext, SecurityRequirementViolationReceiver::class.java),
-              /* flags= */ PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+              /* flags= */ PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
           ),
         serverConfiguration =

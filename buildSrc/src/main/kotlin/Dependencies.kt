@@ -197,6 +197,7 @@ object Dependencies {
     const val core = "androidx.test:core:${Versions.AndroidxTest.core}"
     const val extJunit = "androidx.test.ext:junit:${Versions.AndroidxTest.extJunit}"
     const val extJunitKtx = "androidx.test.ext:junit-ktx:${Versions.AndroidxTest.extJunit}"
+    const val extTruth = "androidx.test.ext:truth:${Versions.AndroidxTest.extTruth}"
     const val fragmentTesting =
       "androidx.fragment:fragment-testing:${Versions.AndroidxTest.fragmentVersion}"
     const val rules = "androidx.test:rules:${Versions.AndroidxTest.rules}"
@@ -288,13 +289,14 @@ object Dependencies {
     // Test dependencies
 
     object AndroidxTest {
+      const val archCore = "2.1.0"
       const val benchmarkJUnit = "1.1.0"
       const val core = "1.4.0"
-      const val archCore = "2.1.0"
       const val extJunit = "1.1.3"
+      const val extTruth = "1.5.0"
+      const val fragmentVersion = "1.3.6"
       const val rules = "1.4.0"
       const val runner = "1.4.0"
-      const val fragmentVersion = "1.3.6"
     }
 
     const val espresso = "3.4.0"

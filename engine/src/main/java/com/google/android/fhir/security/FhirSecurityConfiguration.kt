@@ -17,19 +17,26 @@
 package com.google.android.fhir.security
 
 import android.app.PendingIntent
+import android.app.admin.DevicePolicyManager
 import android.app.admin.DevicePolicyManager.PASSWORD_COMPLEXITY_HIGH
 import android.app.admin.DevicePolicyManager.PASSWORD_COMPLEXITY_LOW
 import android.app.admin.DevicePolicyManager.PASSWORD_COMPLEXITY_MEDIUM
 import java.util.EnumSet
 
-/** Configuration for Android FHIR SDK security mechanism. */
+/**
+ * Configuration for Android FHIR SDK security mechanism.
+ *
+ * @param lockScreenRequirement The required lock screen policy for apps integrated with Android
+ * FHIR SDK
+ * @param warningCallback a callback invoked when a screen requirement violation is detected and
+ */
 data class FhirSecurityConfiguration(
   val lockScreenRequirement: LockScreenRequirement,
   val warningCallback: PendingIntent? = null
 )
 
 /** Sealed class hierarchy representing a security policy. */
-internal sealed interface SecurityRequirement
+sealed interface SecurityRequirement
 
 /**
  * The required lock screen policy for apps integrated with Android FHIR SDK.
@@ -40,28 +47,21 @@ internal sealed interface SecurityRequirement
  * lock screen policy violation.
  */
 data class LockScreenRequirement(
-  val complexity: Int,
+  val complexity: LockScreenComplexity,
   val policyViolationActions: EnumSet<RequirementViolationAction>
-) : SecurityRequirement {
-  init {
-    require(complexity in SUPPORTED_LOCK_SCREEN_COMPLEXITIES) {
-      "Unsupported lock screen complexity: $complexity"
-    }
-  }
+) : SecurityRequirement
 
-  companion object {
-    /** A list of supported lock screen complexity policy. */
-    val SUPPORTED_LOCK_SCREEN_COMPLEXITIES =
-      setOf(
-        PASSWORD_COMPLEXITY_HIGH,
-        PASSWORD_COMPLEXITY_LOW,
-        PASSWORD_COMPLEXITY_MEDIUM,
-      )
-  }
+/** Supported lock screen password complexity. */
+enum class LockScreenComplexity(val complexity: Int) {
+  /** This is equivalent to [DevicePolicyManager.PASSWORD_COMPLEXITY_HIGH]. */
+  HIGH(complexity = PASSWORD_COMPLEXITY_HIGH),
+  /** This is equivalent to [DevicePolicyManager.PASSWORD_COMPLEXITY_LOW]. */
+  LOW(complexity = PASSWORD_COMPLEXITY_LOW),
+  /** This is equivalent to [DevicePolicyManager.PASSWORD_COMPLEXITY_MEDIUM]. */
+  MEDIUM(complexity = PASSWORD_COMPLEXITY_MEDIUM)
 }
 
 /** Supported security measure when a security policy is violated. */
 enum class RequirementViolationAction {
-  /** When a security policy is violated, a callback provided in [FhirSecurityConfiguration] */
-  WARN,
+  // TODO: add block & wipe actions
 }

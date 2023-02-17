@@ -16,6 +16,9 @@
 
 package com.google.android.fhir.security
 
+import android.os.Parcel
+import android.os.Parcelable
+
 /** An interface for a security requirement verifier. */
 internal interface SecurityRequirementVerifier<R : SecurityRequirement> {
   /** Checks if the given security requirement is fulfilled. */
@@ -32,4 +35,32 @@ object SecurityRequirementMet : SecurityRequirementVerdict
 
 /** Represents a violation of lock screen requirement. */
 data class LockScreenRequirementViolation(val requiredComplexity: Int, val currentComplexity: Int) :
-  SecurityRequirementVerdict
+  SecurityRequirementVerdict, Parcelable {
+  constructor(parcel: Parcel) : this(parcel.readInt(), parcel.readInt())
+
+  override fun writeToParcel(parcel: Parcel, flags: Int) {
+    parcel.writeInt(requiredComplexity)
+    parcel.writeInt(currentComplexity)
+  }
+
+  override fun describeContents() = 0
+
+  companion object CREATOR : Parcelable.Creator<LockScreenRequirementViolation> {
+    override fun createFromParcel(parcel: Parcel): LockScreenRequirementViolation {
+      return LockScreenRequirementViolation(parcel)
+    }
+
+    override fun newArray(size: Int): Array<LockScreenRequirementViolation?> {
+      return arrayOfNulls(size)
+    }
+  }
+}
+
+/** Hosts constants used in [FhirSecurityConfiguration.warningCallback] communication. */
+object SecurityRequirementViolation {
+  /**
+   * A [LockScreenRequirementViolation] extra for [FhirSecurityConfiguration.warningCallback] when a
+   * lock screen requirement is violated.
+   */
+  const val EXTRA_LOCK_SCREEN_REQUIREMENT_VIOLATION = "lockScreenRequirementViolation"
+}

@@ -25,6 +25,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.security.LockScreenComplexity.HIGH
 import com.google.common.truth.Truth.assertThat
 import java.util.EnumSet
 import kotlinx.coroutines.runBlocking
@@ -58,10 +59,7 @@ class SecurityCheckWorkerTest {
       FhirEngineConfiguration(
         securityConfiguration =
           FhirSecurityConfiguration(
-            LockScreenRequirement(
-              DevicePolicyManager.PASSWORD_COMPLEXITY_HIGH,
-              EnumSet.of(RequirementViolationAction.WARN)
-            ),
+            LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
             warningCallback = pendingIntent
           )
       )
@@ -91,10 +89,7 @@ class SecurityCheckWorkerTest {
       FhirEngineConfiguration(
         securityConfiguration =
           FhirSecurityConfiguration(
-            LockScreenRequirement(
-              DevicePolicyManager.PASSWORD_COMPLEXITY_HIGH,
-              EnumSet.of(RequirementViolationAction.WARN)
-            ),
+            LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
             warningCallback = pendingIntent
           )
       )
@@ -125,10 +120,7 @@ class SecurityCheckWorkerTest {
       FhirEngineConfiguration(
         securityConfiguration =
           FhirSecurityConfiguration(
-            LockScreenRequirement(
-              DevicePolicyManager.PASSWORD_COMPLEXITY_HIGH,
-              EnumSet.of(RequirementViolationAction.WARN)
-            ),
+            LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
             warningCallback = pendingIntent
           )
       )
@@ -159,10 +151,7 @@ class SecurityCheckWorkerTest {
       FhirEngineConfiguration(
         securityConfiguration =
           FhirSecurityConfiguration(
-            LockScreenRequirement(
-              DevicePolicyManager.PASSWORD_COMPLEXITY_HIGH,
-              EnumSet.of(RequirementViolationAction.WARN)
-            ),
+            LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
             warningCallback = pendingIntent
           )
       )

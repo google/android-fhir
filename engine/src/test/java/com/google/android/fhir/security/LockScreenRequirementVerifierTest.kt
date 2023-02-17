@@ -22,6 +22,7 @@ import android.app.admin.DevicePolicyManager.PASSWORD_COMPLEXITY_LOW
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
+import com.google.android.fhir.security.LockScreenComplexity.HIGH
 import com.google.common.truth.Truth.assertThat
 import java.util.EnumSet
 import kotlinx.coroutines.runBlocking
@@ -45,10 +46,7 @@ class LockScreenRequirementVerifierTest {
 
     val verdict =
       lockScreenRequirementVerifier.verify(
-        LockScreenRequirement(
-          PASSWORD_COMPLEXITY_HIGH,
-          EnumSet.noneOf(RequirementViolationAction::class.java)
-        )
+        LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java))
       )
 
     assertThat(verdict)
@@ -68,10 +66,7 @@ class LockScreenRequirementVerifierTest {
 
       val verdict =
         lockScreenRequirementVerifier.verify(
-          LockScreenRequirement(
-            PASSWORD_COMPLEXITY_HIGH,
-            EnumSet.noneOf(RequirementViolationAction::class.java)
-          )
+          LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java))
         )
 
       assertThat(verdict).isEqualTo(SecurityRequirementMet)
@@ -84,10 +79,7 @@ class LockScreenRequirementVerifierTest {
 
     val verdict =
       lockScreenRequirementVerifier.verify(
-        LockScreenRequirement(
-          PASSWORD_COMPLEXITY_HIGH,
-          EnumSet.noneOf(RequirementViolationAction::class.java)
-        )
+        LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java))
       )
 
     assertThat(verdict).isEqualTo(SecurityRequirementUnsupported)
