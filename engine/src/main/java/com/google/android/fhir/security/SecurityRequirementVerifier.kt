@@ -46,13 +46,8 @@ data class LockScreenRequirementViolation(val requiredComplexity: Int, val curre
   override fun describeContents() = 0
 
   companion object CREATOR : Parcelable.Creator<LockScreenRequirementViolation> {
-    override fun createFromParcel(parcel: Parcel): LockScreenRequirementViolation {
-      return LockScreenRequirementViolation(parcel)
-    }
-
-    override fun newArray(size: Int): Array<LockScreenRequirementViolation?> {
-      return arrayOfNulls(size)
-    }
+    override fun createFromParcel(parcel: Parcel) = LockScreenRequirementViolation(parcel)
+    override fun newArray(size: Int): Array<LockScreenRequirementViolation?> = arrayOfNulls(size)
   }
 }
 
