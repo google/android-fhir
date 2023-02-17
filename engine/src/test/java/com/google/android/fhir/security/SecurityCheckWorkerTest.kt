@@ -19,13 +19,17 @@ package com.google.android.fhir.security
 import android.app.Application
 import android.app.PendingIntent
 import android.app.admin.DevicePolicyManager
+import android.app.admin.DevicePolicyManager.PASSWORD_COMPLEXITY_HIGH
+import android.app.admin.DevicePolicyManager.PASSWORD_COMPLEXITY_LOW
 import android.content.Context
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.truth.content.IntentSubject.assertThat
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.security.LockScreenComplexity.HIGH
+import com.google.android.fhir.security.SecurityRequirementViolation.EXTRA_LOCK_SCREEN_REQUIREMENT_VIOLATION
 import com.google.common.truth.Truth.assertThat
 import java.util.EnumSet
 import kotlinx.coroutines.runBlocking
@@ -65,7 +69,7 @@ class SecurityCheckWorkerTest {
       )
     FhirEngineProvider.init(config)
     shadowOf(context.getSystemService(DevicePolicyManager::class.java))
-      .setPasswordComplexity(DevicePolicyManager.PASSWORD_COMPLEXITY_HIGH)
+      .setPasswordComplexity(PASSWORD_COMPLEXITY_HIGH)
 
     TestListenableWorkerBuilder<SecurityCheckWorker>(
         context = context,
@@ -95,7 +99,7 @@ class SecurityCheckWorkerTest {
       )
     FhirEngineProvider.init(config)
     shadowOf(context.getSystemService(DevicePolicyManager::class.java))
-      .setPasswordComplexity(DevicePolicyManager.PASSWORD_COMPLEXITY_HIGH)
+      .setPasswordComplexity(PASSWORD_COMPLEXITY_HIGH)
 
     TestListenableWorkerBuilder<SecurityCheckWorker>(
         context = context,
@@ -126,7 +130,7 @@ class SecurityCheckWorkerTest {
       )
     FhirEngineProvider.init(config)
     shadowOf(context.getSystemService(DevicePolicyManager::class.java))
-      .setPasswordComplexity(DevicePolicyManager.PASSWORD_COMPLEXITY_LOW)
+      .setPasswordComplexity(PASSWORD_COMPLEXITY_LOW)
 
     TestListenableWorkerBuilder<SecurityCheckWorker>(
         context = context,
@@ -134,8 +138,17 @@ class SecurityCheckWorkerTest {
       .build()
       .doWork()
 
-    assertThat(shadowOf(context as Application).broadcastIntents.single().action)
-      .isEqualTo("TEST_ACTION")
+    val callbackIntent = shadowOf(context as Application).broadcastIntents.single()
+    assertThat(callbackIntent).hasAction("TEST_ACTION")
+    assertThat(callbackIntent)
+      .extras()
+      .parcelable<LockScreenRequirementViolation>(EXTRA_LOCK_SCREEN_REQUIREMENT_VIOLATION)
+      .isEqualTo(
+        LockScreenRequirementViolation(
+          requiredComplexity = PASSWORD_COMPLEXITY_HIGH,
+          currentComplexity = PASSWORD_COMPLEXITY_LOW
+        )
+      )
   }
 
   @Test
@@ -157,7 +170,7 @@ class SecurityCheckWorkerTest {
       )
     FhirEngineProvider.init(config)
     shadowOf(context.getSystemService(DevicePolicyManager::class.java))
-      .setPasswordComplexity(DevicePolicyManager.PASSWORD_COMPLEXITY_LOW)
+      .setPasswordComplexity(PASSWORD_COMPLEXITY_LOW)
 
     TestListenableWorkerBuilder<SecurityCheckWorker>(
         context = context,
@@ -170,8 +183,8 @@ class SecurityCheckWorkerTest {
       )
       .isEqualTo(
         LockScreenRequirementViolation(
-          requiredComplexity = DevicePolicyManager.PASSWORD_COMPLEXITY_HIGH,
-          currentComplexity = DevicePolicyManager.PASSWORD_COMPLEXITY_LOW
+          requiredComplexity = PASSWORD_COMPLEXITY_HIGH,
+          currentComplexity = PASSWORD_COMPLEXITY_LOW
         )
       )
   }
