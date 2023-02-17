@@ -362,7 +362,7 @@ object ResourceMapper {
         // 3) simply group questions (e.g. for display reasons) without altering the extraction
         // semantics
         when {
-          questionnaireItem.itemExtractionContextNameToExpressionPair != null ->
+          questionnaireItem.extension.itemExtractionContextExtensionValue != null ->
             // Extract a new resource for a new item extraction context
             extractResourceByDefinition(
               questionnaireItem,
@@ -767,44 +767,41 @@ private fun Base.asExpectedType(): Type {
  * such extension exists in the questionnaire, or null otherwise.
  */
 private fun Questionnaire.createResource(): Resource? =
-  itemExtractionContextExtensionNameToExpressionPair?.let {
-    Class.forName("org.hl7.fhir.r4.model.${it.second}").newInstance() as Resource
+  this.extension.itemExtractionContextExtensionValue?.let {
+    Class.forName("org.hl7.fhir.r4.model.$it").newInstance() as Resource
   }
-
-/**
- * [Pair] of name and expression for the item extraction context extension if one and only one such
- * extension exists, or null otherwise.
- */
-private val Questionnaire.itemExtractionContextExtensionNameToExpressionPair
-  get() = this.extension.itemExtractionContextExtensionNameToExpressionPair
 
 /**
  * Returns a newly created [Resource] from the item extraction context extension if one and only one
  * such extension exists in the questionnaire item, or null otherwise.
  */
 private fun Questionnaire.QuestionnaireItemComponent.createResource(): Resource? =
-  itemExtractionContextNameToExpressionPair?.let {
-    Class.forName("org.hl7.fhir.r4.model.${it.second}").newInstance() as Resource
+  this.extension.itemExtractionContextExtensionValue?.let {
+    Class.forName("org.hl7.fhir.r4.model.$it").newInstance() as Resource
   }
 
 /**
- * [Pair] of name and expression for the item extraction context extension if one and only one such
- * extension exists, or null otherwise.
+ * The item extraction context extension value of type Expression or CodeType if one and only one
+ * such extension exists or null otherwise. If there are multiple extensions exists, it will be
+ * ignored. See
+ * http://hl7.org/fhir/uv/sdc/STU3/StructureDefinition-sdc-questionnaire-itemExtractionContext.html
  */
-private val Questionnaire.QuestionnaireItemComponent.itemExtractionContextNameToExpressionPair:
-  Pair<String, String>?
-  get() = this.extension.itemExtractionContextExtensionNameToExpressionPair
-
-/**
- * [Pair] of name and expression for the item extraction context extension if one and only one such
- * extension exists, or null otherwise.
- */
-private val List<Extension>.itemExtractionContextExtensionNameToExpressionPair
+private val List<Extension>.itemExtractionContextExtensionValue
   get() =
     this.singleOrNull { it.url == ITEM_CONTEXT_EXTENSION_URL }
       ?.let {
-        val expression = it.value as Expression
-        expression.name to expression.expression
+        when (it.value) {
+          is Expression -> {
+            // TODO update the existing resource
+            val expression = it.value as Expression
+            expression.expression
+          }
+          is CodeType -> {
+            val code = it.value as CodeType
+            code.value
+          }
+          else -> null
+        }
       }
 
 /**

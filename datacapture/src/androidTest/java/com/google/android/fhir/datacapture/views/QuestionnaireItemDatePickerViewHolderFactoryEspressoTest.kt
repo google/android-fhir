@@ -77,7 +77,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -112,7 +112,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -142,7 +142,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -151,7 +151,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
     onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("40/0/-9992"))
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("Date format needs to be M/d/yy")
+      .isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/31/2023)")
   }
 
   @Test
@@ -161,7 +161,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -170,7 +170,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
     onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("1/100/2"))
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("Date format needs to be M/d/yy")
+      .isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/31/2023)")
   }
 
   @Test
@@ -180,7 +180,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -189,7 +189,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
     onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("40/1/2"))
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("Date format needs to be M/d/yy")
+      .isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/31/2023)")
   }
 
   @Test
@@ -199,7 +199,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -208,7 +208,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
     onView(withId(R.id.text_input_edit_text)).perform(ViewActions.typeText("1/1/22222"))
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("Date format needs to be M/d/yy")
+      .isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/31/2023)")
   }
   @Test
   fun shouldNotSetDateInput_outsideMaxRange() {
@@ -229,7 +229,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -271,7 +271,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
@@ -312,7 +312,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     runOnUI { viewHolder.bind(questionnaireItemView) }

@@ -26,11 +26,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.add
 import androidx.fragment.app.commit
-import androidx.fragment.app.replace
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -146,14 +143,12 @@ class DemoQuestionnaireFragment : Fragment() {
       if (childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) == null) {
         childFragmentManager.commit {
           setReorderingAllowed(true)
-          add<QuestionnaireFragment>(
+          add(
             R.id.container,
-            tag = QUESTIONNAIRE_FRAGMENT_TAG,
-            args =
-              bundleOf(
-                QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to
-                  viewModel.getQuestionnaireJson()
-              )
+            QuestionnaireFragment.builder()
+              .setQuestionnaire(viewModel.getQuestionnaireJson())
+              .build(),
+            QUESTIONNAIRE_FRAGMENT_TAG
           )
         }
       }
@@ -179,13 +174,10 @@ class DemoQuestionnaireFragment : Fragment() {
         }
       childFragmentManager.commit {
         setReorderingAllowed(true)
-        replace<QuestionnaireFragment>(
+        replace(
           R.id.container,
-          tag = QUESTIONNAIRE_FRAGMENT_TAG,
-          args =
-            bundleOf(
-              QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJsonString
-            )
+          QuestionnaireFragment.builder().setQuestionnaire(questionnaireJsonString).build(),
+          QUESTIONNAIRE_FRAGMENT_TAG
         )
       }
     }

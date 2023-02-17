@@ -59,7 +59,7 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -76,7 +76,7 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -91,7 +91,7 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -113,7 +113,7 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
             }
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> }
+        answersChangedCallback = { _, _, _, _ -> }
       )
     )
 

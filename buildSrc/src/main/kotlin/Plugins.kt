@@ -26,6 +26,7 @@ object Plugins {
     const val kotlinAndroid = "kotlin-android"
     const val kotlinKapt = "kotlin-kapt"
     const val mavenPublish = "maven-publish"
+    const val fladle = "com.osacky.fladle"
     const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
     const val ruler = "com.spotify.ruler"
     const val spotless = "com.diffplug.spotless"
@@ -40,6 +41,7 @@ object Plugins {
   const val navSafeArgsGradlePlugin =
     "androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.Versions.Androidx.navigation}"
   const val rulerGradlePlugin = "com.spotify.ruler:ruler-gradle-plugin:1.2.1"
+  const val flankGradlePlugin = "com.osacky.flank.gradle:fladle:0.17.4"
 
   object Versions {
     const val androidGradlePlugin = "7.2.1"
