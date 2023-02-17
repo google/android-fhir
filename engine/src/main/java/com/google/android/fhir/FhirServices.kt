@@ -27,8 +27,11 @@ import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
 import com.google.android.fhir.security.FhirSecurityConfiguration
 import com.google.android.fhir.security.SecurityRequirementsManager
+import com.google.android.fhir.index.ResourceIndexer
+import com.google.android.fhir.index.SearchParamDefinitionsProviderImpl
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.remote.RemoteFhirService
+import org.hl7.fhir.r4.model.SearchParameter
 import timber.log.Timber
 
 internal data class FhirServices(
@@ -43,6 +46,7 @@ internal data class FhirServices(
     private var enableEncryption: Boolean = false
     private var databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
     private var serverConfiguration: ServerConfiguration? = null
+    private var searchParameters: List<SearchParameter>? = null
     private var securityConfiguration: FhirSecurityConfiguration? = null
 
     internal fun inMemory() = apply { inMemory = true }
@@ -63,6 +67,10 @@ internal data class FhirServices(
       this.serverConfiguration = serverConfiguration
     }
 
+    internal fun setSearchParameters(searchParameters: List<SearchParameter>?) = apply {
+      this.searchParameters = searchParameters
+    }
+    
     internal fun setSecurityConfiguration(securityConfiguration: FhirSecurityConfiguration) =
       apply {
         this.securityConfiguration = securityConfiguration
@@ -70,11 +78,14 @@ internal data class FhirServices(
 
     fun build(): FhirServices {
       val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+      val searchParamMap =
+        searchParameters?.asMapOfResourceTypeToSearchParamDefinitions() ?: emptyMap()
       val db =
         DatabaseImpl(
           context = context,
           iParser = parser,
-          DatabaseConfig(inMemory, enableEncryption, databaseErrorStrategy)
+          DatabaseConfig(inMemory, enableEncryption, databaseErrorStrategy),
+          resourceIndexer = ResourceIndexer(SearchParamDefinitionsProviderImpl(searchParamMap))
         )
       val engine = FhirEngineImpl(database = db, context = context)
       val remoteDataSource =
