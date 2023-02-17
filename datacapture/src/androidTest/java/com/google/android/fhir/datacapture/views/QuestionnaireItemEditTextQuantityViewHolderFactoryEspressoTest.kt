@@ -71,7 +71,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
@@ -96,7 +96,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers -> answerHolder = answers },
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 

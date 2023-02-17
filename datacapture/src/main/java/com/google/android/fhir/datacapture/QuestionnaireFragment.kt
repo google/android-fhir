@@ -16,13 +16,16 @@
 
 package com.google.android.fhir.datacapture
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
@@ -44,8 +47,24 @@ import timber.log.Timber
  * [QuestionnaireFragment](https://github.com/google/android-fhir/wiki/SDCL%3A-Use-QuestionnaireFragment)
  * developer guide.
  */
-open class QuestionnaireFragment : Fragment() {
+class QuestionnaireFragment : Fragment() {
   private val viewModel: QuestionnaireViewModel by viewModels()
+
+  /**
+   * Provides a [QuestionnaireItemViewHolderFactoryMatcher]s which are used to evaluate whether a
+   * custom [QuestionnaireItemViewHolderFactory] should be used to render a given questionnaire
+   * item. The provider may be provided by the application developer via [DataCaptureConfig],
+   * otherwise default no-op implementation is used.
+   */
+  @VisibleForTesting
+  val questionnaireItemViewHolderFactoryMatchersProvider:
+    QuestionnaireItemViewHolderFactoryMatchersProvider by lazy {
+    requireArguments().getString(EXTRA_MATCHERS_FACTORY)?.let {
+      DataCapture.getConfiguration(requireContext())
+        .questionnaireItemViewHolderFactoryMatchersProviderFactory?.get(it)
+    }
+      ?: EmptyQuestionnaireItemViewHolderFactoryMatchersProviderImpl
+  }
 
   /** @suppress */
   override fun onCreateView(
@@ -95,14 +114,10 @@ open class QuestionnaireFragment : Fragment() {
     val questionnaireProgressIndicator: LinearProgressIndicator =
       view.findViewById(R.id.questionnaire_progress_indicator)
     val questionnaireItemEditAdapter =
-      QuestionnaireItemEditAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
+      QuestionnaireItemEditAdapter(questionnaireItemViewHolderFactoryMatchersProvider.get())
     val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
 
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
-    // Reads submit button visibility value initially defined in
-    // [R.attr.submitButtonStyleQuestionnaire] style.
-    val submitButtonVisibilityInStyle = submitButton.visibility
-    viewModel.setShowSubmitButtonFlag(submitButtonVisibilityInStyle == View.VISIBLE)
 
     val reviewModeEditButton = view.findViewById<View>(R.id.review_mode_edit_button)
     reviewModeEditButton.setOnClickListener { viewModel.setReviewMode(false) }
@@ -226,27 +241,109 @@ open class QuestionnaireFragment : Fragment() {
   }
 
   /**
-   * Override this method to specify when custom questionnaire components should be used. It should
-   * return a [List] of [QuestionnaireItemViewHolderFactoryMatcher]s which are used to evaluate
-   * whether a custom [QuestionnaireItemViewHolderFactory] should be used to render a given
-   * questionnaire item.
-   *
-   * User-provided custom views take precedence over canonical views provided by the library. If
-   * multiple [QuestionnaireItemViewHolderFactoryMatcher] are applicable for the same item, the
-   * behavior is undefined (any of them may be selected).
-   *
-   * See the
-   * [developer guide](https://github.com/google/android-fhir/wiki/SDCL:-Customize-how-a-Questionnaire-is-displayed#custom-questionnaire-components)
-   * for more information.
-   */
-  open fun getCustomQuestionnaireItemViewHolderFactoryMatchers() =
-    emptyList<QuestionnaireItemViewHolderFactoryMatcher>()
-
-  /**
    * Returns a [QuestionnaireResponse][org.hl7.fhir.r4.model.QuestionnaireResponse] populated with
    * any answers that are present on the rendered [QuestionnaireFragment] when it is called.
    */
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
+
+  /** Helper to create [QuestionnaireFragment] with appropriate [Bundle] arguments. */
+  class Builder {
+
+    private val args = mutableListOf<Pair<String, Any>>()
+
+    /**
+     * A JSON encoded string extra for a questionnaire. This should only be used for questionnaires
+     * with size at most 512KB. For large questionnaires, use `setQuestionnaire(questionnaireUri:
+     * Uri)`.
+     *
+     * This is required unless `setQuestionnaire(questionnaireUri: Uri)` is provided.
+     *
+     * If this and `setQuestionnaire(questionnaireUri: Uri)` are provided,
+     * [setQuestionnaire(questionnaireUri: Uri)] takes precedence.
+     */
+    fun setQuestionnaire(questionnaireJson: String) = apply {
+      args.add(EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson)
+    }
+
+    /**
+     * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire.
+     *
+     * This is required unless `setQuestionnaire(questionnaireJson: String)` is provided.
+     *
+     * If this and `setQuestionnaire(questionnaireJson: String)` are provided, this extra takes
+     * precedence.
+     */
+    fun setQuestionnaire(questionnaireUri: Uri) = apply {
+      args.add(EXTRA_QUESTIONNAIRE_JSON_URI to questionnaireUri)
+    }
+
+    /**
+     * A JSON encoded string extra for a prefilled questionnaire response. This should only be used
+     * for questionnaire response with size at most 512KB. For large questionnaire response, use
+     * `setQuestionnaireResponse(questionnaireResponseUri: Uri)`.
+     *
+     * If this and `setQuestionnaireResponse(questionnaireResponseUri: Uri)` are provided,
+     * `setQuestionnaireResponse(questionnaireResponseUri: Uri)` takes precedence.
+     */
+    fun setQuestionnaireResponse(questionnaireResponseJson: String) = apply {
+      args.add(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING to questionnaireResponseJson)
+    }
+
+    /**
+     * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.
+     *
+     * If this and `setQuestionnaireResponse(questionnaireResponseJson: String)` are provided, this
+     * extra takes precedence.
+     */
+    fun setQuestionnaireResponse(questionnaireResponseUri: Uri) = apply {
+      args.add(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI to questionnaireResponseUri)
+    }
+
+    /**
+     * An [Boolean] extra to control if the questionnaire is read-only. If review page and read-only
+     * are both enabled, read-only will take precedence.
+     */
+    fun setIsReadOnly(value: Boolean) = apply { args.add(EXTRA_READ_ONLY to value) }
+
+    /**
+     * A [Boolean] extra to control if a review page is shown. By default it will be shown at the
+     * end of the questionnaire.
+     */
+    fun showReviewPageBeforeSubmit(value: Boolean) = apply {
+      args.add(EXTRA_ENABLE_REVIEW_PAGE to value)
+    }
+
+    /**
+     * A [Boolean] extra to control if the review page is to be opened first. This has no effect if
+     * review page is not enabled.
+     */
+    fun showReviewPageFirst(value: Boolean) = apply {
+      args.add(EXTRA_SHOW_REVIEW_PAGE_FIRST to value)
+    }
+
+    /**
+     * A matcher to provide [QuestionnaireItemViewHolderFactoryMatcher]s for custom
+     * [Questionnaire.QuestionnaireItemType]. The application needs to provide a
+     * [QuestionnaireItemViewHolderFactoryMatchersProviderFactory] in the [DataCaptureConfig] so
+     * that the [QuestionnaireFragment] can get instance of
+     * [QuestionnaireItemViewHolderFactoryMatchersProvider].
+     */
+    fun setCustomQuestionnaireItemViewHolderFactoryMatchersProvider(
+      matchersProviderFactory: String
+    ) = apply { args.add(EXTRA_MATCHERS_FACTORY to matchersProviderFactory) }
+
+    /**
+     * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
+     */
+    fun setShowSubmitButton(value: Boolean) = apply { args.add(EXTRA_SHOW_SUBMIT_BUTTON to value) }
+
+    @VisibleForTesting fun buildArgs() = bundleOf(*args.toTypedArray())
+
+    /** @return A [QuestionnaireFragment] with provided [Bundle] arguments. */
+    fun build(): QuestionnaireFragment {
+      return QuestionnaireFragment().apply { arguments = buildArgs() }
+    }
+  }
 
   /**
    * Extras that can be passed to [QuestionnaireFragment] to define its behavior. When you create a
@@ -263,7 +360,7 @@ open class QuestionnaireFragment : Fragment() {
      * If this and [EXTRA_QUESTIONNAIRE_JSON_URI] are provided, [EXTRA_QUESTIONNAIRE_JSON_URI] takes
      * precedence.
      */
-    const val EXTRA_QUESTIONNAIRE_JSON_STRING = "questionnaire"
+    internal const val EXTRA_QUESTIONNAIRE_JSON_STRING = "questionnaire"
 
     /**
      * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire.
@@ -272,7 +369,7 @@ open class QuestionnaireFragment : Fragment() {
      *
      * If this and [EXTRA_QUESTIONNAIRE_JSON_STRING] are provided, this extra takes precedence.
      */
-    const val EXTRA_QUESTIONNAIRE_JSON_URI = "questionnaire-uri"
+    internal const val EXTRA_QUESTIONNAIRE_JSON_URI = "questionnaire-uri"
 
     /**
      * A JSON encoded string extra for a prefilled questionnaire response. This should only be used
@@ -282,7 +379,7 @@ open class QuestionnaireFragment : Fragment() {
      * If this and [EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI] are provided,
      * [EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI] takes precedence.
      */
-    const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
+    internal const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
 
     /**
      * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.
@@ -290,27 +387,36 @@ open class QuestionnaireFragment : Fragment() {
      * If this and [EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING] are provided, this extra takes
      * precedence.
      */
-    const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI = "questionnaire-response-uri"
+    internal const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI = "questionnaire-response-uri"
 
     /**
      * A [Boolean] extra to control if a review page is shown. By default it will be shown at the
      * end of the questionnaire.
      */
-    const val EXTRA_ENABLE_REVIEW_PAGE = "enable-review-page"
+    internal const val EXTRA_ENABLE_REVIEW_PAGE = "enable-review-page"
 
     /**
      * A [Boolean] extra to control if the review page is to be opened first. This has no effect if
      * review page is not enabled.
      */
-    const val EXTRA_SHOW_REVIEW_PAGE_FIRST = "show-review-page-first"
+    internal const val EXTRA_SHOW_REVIEW_PAGE_FIRST = "show-review-page-first"
 
     /**
      * An [Boolean] extra to control if the questionnaire is read-only. If review page and read-only
      * are both enabled, read-only will take precedence.
      */
-    const val EXTRA_READ_ONLY = "read-only"
+    internal const val EXTRA_READ_ONLY = "read-only"
+
+    internal const val EXTRA_MATCHERS_FACTORY = "matcher_factory_class"
 
     const val SUBMIT_REQUEST_KEY = "submit-request-key"
+
+    /**
+     * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
+     */
+    internal const val EXTRA_SHOW_SUBMIT_BUTTON = "show-submit-button"
+
+    fun builder() = Builder()
   }
 
   /**
@@ -330,6 +436,38 @@ open class QuestionnaireFragment : Fragment() {
      */
     val matches: (Questionnaire.QuestionnaireItemComponent) -> Boolean,
   )
+
+  /**
+   * Provides the [QuestionnaireItemViewHolderFactoryMatcher]s which are used to evaluate whether a
+   * custom [QuestionnaireItemViewHolderFactory] should be used to render a given questionnaire
+   * item.
+   *
+   * **NOTE**:
+   *
+   * User-provided custom views take precedence over canonical views provided by the library. If
+   * multiple [QuestionnaireItemViewHolderFactoryMatcher] are applicable for the same item, the
+   * behavior is undefined (any of them may be selected).
+   *
+   * See the
+   * [developer guide](https://github.com/google/android-fhir/wiki/SDCL:-Customize-how-a-Questionnaire-is-displayed#custom-questionnaire-components)
+   * for more information.
+   */
+  abstract class QuestionnaireItemViewHolderFactoryMatchersProvider {
+    /**
+     * Implementation should specify when custom questionnaire components should be used.
+     *
+     * @return A [List] of [QuestionnaireItemViewHolderFactoryMatcher]s which are used to evaluate
+     * whether a custom [QuestionnaireItemViewHolderFactory] should be used to render a given
+     * questionnaire item.
+     */
+    abstract fun get(): List<QuestionnaireItemViewHolderFactoryMatcher>
+  }
+
+  /** No-op implementation that provides no custom [QuestionnaireItemViewHolderFactoryMatcher]s . */
+  private object EmptyQuestionnaireItemViewHolderFactoryMatchersProviderImpl :
+    QuestionnaireItemViewHolderFactoryMatchersProvider() {
+    override fun get() = emptyList<QuestionnaireItemViewHolderFactoryMatcher>()
+  }
 }
 
 /**
