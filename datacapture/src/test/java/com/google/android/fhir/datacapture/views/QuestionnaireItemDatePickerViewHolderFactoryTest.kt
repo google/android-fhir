@@ -250,7 +250,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `clear darft value on an valid answer update`() {
+  fun `clear draft value on an valid answer update`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(DateType(2026, 0, 1))
