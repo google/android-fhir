@@ -173,10 +173,7 @@
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
 
-    <style
-        name="Questionnaire.BottomContainerStyle"
-        parent=""
-    >
+    <style name="Questionnaire.BottomContainerStyle" parent="">
       <item name="android:background">?attr/colorSurface</item>
       <item name="android:paddingTop">@dimen/padding_quarter_size</item>
       <item name="android:paddingBottom">@dimen/padding_quarter_size</item>
