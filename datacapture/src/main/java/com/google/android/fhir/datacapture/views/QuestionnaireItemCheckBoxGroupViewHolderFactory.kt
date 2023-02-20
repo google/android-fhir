@@ -74,16 +74,8 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           .onEach { populateViewWithAnswerOption(it.first, it.second, choiceOrientation) }
           .map { it.first }
           .let { flow.referencedIds = it.toIntArray() }
-      }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {
-        when (validationResult) {
-          is NotValidated,
-          Valid -> header.showErrorText(isErrorTextVisible = false)
-          is Invalid -> {
-            header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
-          }
-        }
+        displayValidationResult(questionnaireItemViewItem.validationResult)
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
@@ -169,6 +161,16 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           }
         checkboxGroup.addView(checkbox)
         flow.addView(checkbox)
+      }
+
+      private fun displayValidationResult(validationResult: ValidationResult) {
+        when (validationResult) {
+          is NotValidated,
+          Valid -> header.showErrorText(isErrorTextVisible = false)
+          is Invalid -> {
+            header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
+          }
+        }
       }
     }
 }
