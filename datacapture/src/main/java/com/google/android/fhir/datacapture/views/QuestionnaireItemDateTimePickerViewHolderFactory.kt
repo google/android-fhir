@@ -146,7 +146,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         displayValidationResult(questionnaireItemViewItem.validationResult)
       }
 
-      fun displayValidationResult(validationResult: ValidationResult) {
+     private fun displayValidationResult(validationResult: ValidationResult) {
         displayDateValidationError(validationResult)
         displayTimeValidationError(validationResult)
       }
