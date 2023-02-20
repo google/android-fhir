@@ -140,12 +140,6 @@ internal fun updateQuestionText(
 ) {
   val builder = SpannableStringBuilder()
   questionnaireItem.localizedTextSpanned?.let { builder.append(it) }
-  if (questionnaireItem.required) {
-    builder.appendWithSpan(
-      questionTextView.context.applicationContext.getString(R.string.space_asterisk),
-      questionTextView.context.getColorFromAttr(R.attr.colorError)
-    )
-  }
   questionTextView.updateTextAndVisibility(builder)
 }
 

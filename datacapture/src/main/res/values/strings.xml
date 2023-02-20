@@ -31,7 +31,6 @@
     <!-- 2.1 All Widgets -->
     <string name="not_answered">"Not Answered"</string>
     <string name="help">Help</string>
-    <string name="space_asterisk">\u0020\u002a</string>
 
     <!-- 2.2 Boolean -->
     <string name="no">No</string>
