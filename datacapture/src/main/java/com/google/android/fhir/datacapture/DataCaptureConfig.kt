@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture
 
 import android.app.Application
+import android.graphics.Bitmap
 import com.google.android.fhir.datacapture.DataCaptureConfig.Provider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher
 import com.google.android.fhir.datacapture.QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatchersProvider
@@ -55,6 +56,9 @@ data class DataCaptureConfig(
    * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirquery for more details.
    */
   var xFhirQueryResolver: XFhirQueryResolver? = null,
+
+  /** Resolves a URL to the media binary content. */
+  var urlResolver: UrlResolver? = null,
 
   /**
    * A [QuestionnaireItemViewHolderFactoryMatchersProviderFactory] may be set by the client to
@@ -103,6 +107,14 @@ interface ExternalAnswerValueSetResolver {
  */
 fun interface XFhirQueryResolver {
   suspend fun resolve(xFhirQuery: String): List<Resource>
+}
+
+/**
+ * Resolves media content based on the provided URL, allowing the library to render media content in
+ * its UI.
+ */
+interface UrlResolver {
+  suspend fun resolveBitmapUrl(url: String): Bitmap?
 }
 
 /**
