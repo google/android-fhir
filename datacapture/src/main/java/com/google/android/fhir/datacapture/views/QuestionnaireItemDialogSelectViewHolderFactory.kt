@@ -108,9 +108,11 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
         // views will open the dialog.
         holder.summary.setOnClickListener(onClick)
         holder.summaryHolder.setEndIconOnClickListener(onClick)
+
+        displayValidationResult(questionnaireItemViewItem.validationResult)
       }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {
+      private fun displayValidationResult(validationResult: ValidationResult) {
         holder.summaryHolder.error =
           when (validationResult) {
             is NotValidated,

@@ -22,7 +22,6 @@ import android.view.View.VISIBLE
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
-import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.divider.MaterialDivider
 import org.hl7.fhir.r4.model.Questionnaire
 
@@ -81,8 +80,6 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
             GONE
           }
       }
-
-      override fun displayValidationResult(validationResult: ValidationResult) {}
 
       override fun setReadOnly(isReadOnly: Boolean) {}
     }

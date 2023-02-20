@@ -49,7 +49,6 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.format.FormatStyle
 import java.util.Date
 import java.util.Locale
-import kotlin.collections.ArrayList
 import kotlin.math.abs
 import kotlin.math.log10
 import org.hl7.fhir.r4.model.DateType
@@ -112,10 +111,11 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         textInputEditText.removeTextChangedListener(textWatcher)
         updateTextFieldToDisplayDateValue()
         textInputEditText.addTextChangedListener(textWatcher)
+        displayValidationResult(questionnaireItemViewItem.validationResult)
       }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {
-        // Since the partial answer is still displayed in the text field, do not erase the error
+      private fun displayValidationResult(validationResult: ValidationResult) {
+        // Since the draft answer is still displayed in the text field, do not erase the error
         // text if the answer is cleared and the validation result is valid.
         if (questionnaireItemViewItem.answers.isEmpty() && validationResult == Valid) {
           return
@@ -198,12 +198,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           if (questionnaireItemViewItem.answers.isNotEmpty()) {
             questionnaireItemViewItem.clearAnswer()
           }
-          questionnaireItemViewItem.updatePartialAnswer(text.toString())
+          questionnaireItemViewItem.setDraftAnswer(text.toString())
         }
       }
 
       private fun updateTextFieldToDisplayDateValue() {
-        val partialAnswerToDisplay = questionnaireItemViewItem.partialAnswer as? String
+        val draftAnswerToDisplay = questionnaireItemViewItem.draftAnswer as? String
         val answer =
           questionnaireItemViewItem.answers
             .singleOrNull()
@@ -211,21 +211,21 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             ?.valueDateType
             ?.localDate
         val textToDisplayInTheTextField =
-          answer?.format(canonicalizedDatePattern) ?: partialAnswerToDisplay
+          answer?.format(canonicalizedDatePattern) ?: draftAnswerToDisplay
 
         // Since pull request #1822 has been merged, the same date format style is now used for both
         // accepting user date input and displaying the answer in the text field. For instance, the
         // "MM/dd/yyyy" format is employed to accept and display the date value. As a result, it is
         // possible to simply compare
-        // the text field text to the partial or valid answer to determine whether the text field
+        // the text field text to the draft or valid answer to determine whether the text field
         // text should be overridden or not.
 
         if (textInputEditText.text.toString() != textToDisplayInTheTextField) {
           textInputEditText.setText(textToDisplayInTheTextField)
         }
 
-        // show an error text
-        if (!partialAnswerToDisplay.isNullOrBlank()) {
+        // Show an error text if draft answer exists
+        if (!draftAnswerToDisplay.isNullOrBlank()) {
           displayValidationResult(
             Invalid(
               listOf(
@@ -233,7 +233,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                   R.string.date_format_validation_error_msg,
                   canonicalizedDatePattern,
                   canonicalizedDatePattern
-                    .replace("dd", "01")
+                    .replace("dd", "31")
                     .replace("MM", "01")
                     .replace("yyyy", "2023")
                 )
@@ -276,26 +276,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
       }
     }
-
-  private fun isTextUpdateRequired(
-    answer: DateType?,
-    inputText: String?,
-    canonicalizedDatePattern: String
-  ): Boolean {
-    if (inputText.isNullOrEmpty()) {
-      return true
-    }
-    val inputDate =
-      try {
-        parseDate(inputText, canonicalizedDatePattern)
-      } catch (e: Exception) {
-        null
-      }
-    if (inputDate == null || answer == null) {
-      return true
-    }
-    return answer.localDate != inputDate
-  }
 }
 
 /**

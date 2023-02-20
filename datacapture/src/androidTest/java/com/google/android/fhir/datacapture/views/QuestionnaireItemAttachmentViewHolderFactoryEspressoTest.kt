@@ -433,12 +433,12 @@ class QuestionnaireItemAttachmentViewHolderFactoryEspressoTest {
 
   /** Method to run code snippet on UI/main thread */
   private fun runOnUI(action: () -> Unit) {
-    activityScenarioRule.getScenario().onActivity { activity -> action() }
+    activityScenarioRule.scenario.onActivity { activity -> action() }
   }
 
   /** Method to set content view for test activity */
   private fun setTestLayout(view: View) {
-    activityScenarioRule.getScenario().onActivity { activity -> activity.setContentView(view) }
+    activityScenarioRule.scenario.onActivity { activity -> activity.setContentView(view) }
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
   }
 }

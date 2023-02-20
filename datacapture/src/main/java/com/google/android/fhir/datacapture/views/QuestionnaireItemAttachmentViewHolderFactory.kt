@@ -114,9 +114,10 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         uploadFileButton.setOnClickListener { view -> onUploadClicked(view, questionnaireItem) }
         photoDeleteButton.setOnClickListener { view -> onDeleteClicked(view) }
         fileDeleteButton.setOnClickListener { view -> onDeleteClicked(view) }
+        displayValidationResult(questionnaireItemViewItem.validationResult)
       }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {
+      private fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
           is NotValidated,
           Valid -> errorTextView.visibility = View.GONE
