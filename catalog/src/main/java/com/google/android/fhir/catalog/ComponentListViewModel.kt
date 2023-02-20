@@ -126,7 +126,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
     ),
     HELP(R.drawable.ic_help, R.string.component_name_help, "component_help.json"),
     ITEM_MEDIA(
-      R.drawable.ic_image,
+      R.drawable.ic_item_media,
       R.string.component_name_item_media,
       "component_item_media.json"
     ),
