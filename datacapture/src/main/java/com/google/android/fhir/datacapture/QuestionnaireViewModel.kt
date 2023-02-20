@@ -213,7 +213,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       QuestionnaireResponseItemComponent, List<QuestionnaireResponseItemAnswerComponent>>()
 
   /**
-   * Map from QuestionnaireResponseItems to draft answers, e.g "02/02" for date with missing year
+   * Map from [QuestionnaireResponseItemComponent] to draft answers, e.g "02/02" for date with missing year
    * part.
    *
    * This is used to maintain draft answers on the screen especially when the widgets are being
