@@ -213,16 +213,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       QuestionnaireResponseItemComponent, List<QuestionnaireResponseItemAnswerComponent>>()
 
   /**
-   * Map from [QuestionnaireResponseItemComponent] to draft answers, e.g "02/02" for date with missing year
-   * part.
+   * Map from [QuestionnaireResponseItemComponent] to draft answers, e.g "02/02" for date with
+   * missing year part.
    *
    * This is used to maintain draft answers on the screen especially when the widgets are being
    * recycled as a result of scrolling. Draft answers cannot be saved in [QuestionnaireResponse]
    * because they might be incomplete and unparsable. Without this map, incomplete and unparsable
    * answers would be lost.
    *
-   * When the draft answer becomes valid, its entry in the map is removed, e.g, "02/02/2023"
-   * is valid answer and should not be in this map.
+   * When the draft answer becomes valid, its entry in the map is removed, e.g, "02/02/2023" is
+   * valid answer and should not be in this map.
    */
   private val draftAnswerMap = mutableMapOf<QuestionnaireResponseItemComponent, Any>()
 

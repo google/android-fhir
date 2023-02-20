@@ -124,7 +124,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
         textInputLayout.error =
           when (validationResult) {
-            is NotValidated, Valid -> null
+            is NotValidated,
+            Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
       }
