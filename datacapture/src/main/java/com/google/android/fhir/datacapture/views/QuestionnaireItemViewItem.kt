@@ -112,7 +112,7 @@ data class QuestionnaireItemViewItem(
     )
   }
 
-  /** Clears existing answers. */
+  /** Clears existing answers and any draft answer. */
   fun clearAnswer() {
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), null)
   }
@@ -224,7 +224,8 @@ data class QuestionnaireItemViewItem(
             otherAnswer.value != null &&
             answer.value.equalsShallow(otherAnswer.value)
         }
-        .all { it }
+        .all { it } &&
+      draftAnswer == other.draftAnswer
 
   /**
    * Returns whether this [QuestionnaireItemViewItem] and the `other` [QuestionnaireItemViewItem]
