@@ -152,7 +152,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       fun displayDateValidationError(validationResult: ValidationResult) {
-        // Since the partial answer is still displayed in the text field, do not erase the error
+        // Since the draft answer is still displayed in the text field, do not erase the error
         // text if the answer is cleared and the validation result is valid.
         if (questionnaireItemViewItem.answers.isEmpty() && validationResult == Valid) {
           return
@@ -200,9 +200,9 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         canonicalizedDatePattern: String
       ) {
         enableOrDisableTimePicker(enableIt = localDateTime != null)
-        val partialAnswerToDisplay = questionnaireItemViewItem.partialAnswer as? String
+        val draftAnswerToDisplay = questionnaireItemViewItem.draftAnswer as? String
         val textToDisplayInTheTextField =
-          localDateTime?.toLocalDate()?.format(canonicalizedDatePattern) ?: partialAnswerToDisplay
+          localDateTime?.toLocalDate()?.format(canonicalizedDatePattern) ?: draftAnswerToDisplay
 
         // Since pull request #1822 has been merged, the same date format style is now used for both
         // accepting user date input and displaying the answer in the text field. For instance, the
@@ -216,7 +216,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           enableOrDisableTimePicker(enableIt = true)
         }
         // Show an error text
-        if (!partialAnswerToDisplay.isNullOrBlank()) {
+        if (!draftAnswerToDisplay.isNullOrBlank()) {
           displayValidationResult(
             Invalid(
               listOf(
@@ -333,12 +333,12 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       private fun updateAnswerAfterTextChanged(text: String?) {
         if (text.isNullOrEmpty()) {
           questionnaireItemViewItem.clearAnswer()
-          questionnaireItemViewItem.updatePartialAnswer(text.toString())
+          questionnaireItemViewItem.setDraftAnswer(text.toString())
           return
         }
         try {
           localDate = parseDate(text, canonicalizedDatePattern)
-          questionnaireItemViewItem.updatePartialAnswer(text.toString())
+          questionnaireItemViewItem.setDraftAnswer(text.toString())
           displayDateValidationError(Valid)
           enableOrDisableTimePicker(enableIt = true)
           generateLocalDateTime(localDate, localTime)?.run {
@@ -366,7 +366,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           if (questionnaireItemViewItem.answers.isNotEmpty()) {
             questionnaireItemViewItem.clearAnswer()
           }
-          questionnaireItemViewItem.updatePartialAnswer(text.toString())
+          questionnaireItemViewItem.setDraftAnswer(text.toString())
           localDate = null
           enableOrDisableTimePicker(enableIt = false)
         }

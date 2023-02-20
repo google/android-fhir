@@ -54,7 +54,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * @param resolveAnswerValueSet the callback to resolve the answer value set and return the answer
  * @param resolveAnswerExpression the callback to resolve answer options when answer-expression
  * extension exists options
- * @param partialAnswer the entered input is not a valid answer.
+ * @param draftAnswer the draft input that cannot be stored in the [QuestionnaireResponse].
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -78,7 +78,7 @@ data class QuestionnaireItemViewItem(
     {
       emptyList()
     },
-  internal val partialAnswer: Any? = null
+  internal val draftAnswer: Any? = null
 ) {
 
   /**
@@ -117,16 +117,6 @@ data class QuestionnaireItemViewItem(
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), null)
   }
 
-  /**
-   * Updates the partial answer in the cache [QuestionnaireViewModel.partialAnswerCache]. The cache
-   * only contain partial answers. If the partial answers for
-   * [QuestionnaireResponse.QuestionnaireResponseItemComponent] are updated in the cache, then
-   * [QuestionnaireResponse.QuestionnaireResponseItemComponent] will not have any answers.
-   */
-  fun updatePartialAnswer(partialAnswer: Any? = null) {
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), partialAnswer)
-  }
-
   /** Adds an answer to the existing answers. */
   internal fun addAnswer(
     questionnaireResponseItemAnswerComponent:
@@ -159,6 +149,14 @@ data class QuestionnaireItemViewItem(
       },
       null
     )
+  }
+
+  /**
+   * Updates the draft answer stored in `QuestionnaireViewModel`. This clears any actual answer for
+   * the question.
+   */
+  fun setDraftAnswer(draftAnswer: Any? = null) {
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), draftAnswer)
   }
 
   internal fun answerString(context: Context): String {

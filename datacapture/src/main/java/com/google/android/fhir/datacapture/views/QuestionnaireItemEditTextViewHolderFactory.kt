@@ -109,7 +109,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   /** Handles user input from the `editable` and updates the questionnaire */
   abstract fun handleInput(editable: Editable, questionnaireItemViewItem: QuestionnaireItemViewItem)
 
-  /** Handles the */
+  /** Handles the UI update */
   abstract fun updateUI(
     questionnaireItemViewItem: QuestionnaireItemViewItem,
     textInputEditText: TextInputEditText,

@@ -55,7 +55,7 @@ internal object QuestionnaireItemEditTextIntegerViewHolderFactory :
               .setValue(IntegerType(input))
           )
         } else {
-          questionnaireItemViewItem.updatePartialAnswer(input)
+          questionnaireItemViewItem.setDraftAnswer(input)
         }
       }
 
@@ -66,16 +66,16 @@ internal object QuestionnaireItemEditTextIntegerViewHolderFactory :
       ) {
         val answer =
           questionnaireItemViewItem.answers.singleOrNull()?.valueIntegerType?.value?.toString()
-        val partialAnswer = questionnaireItemViewItem.partialAnswer?.toString()
+        val draftAnswer = questionnaireItemViewItem.draftAnswer?.toString()
 
         // Update the text
-        val text = answer ?: partialAnswer
+        val text = answer ?: draftAnswer
         if ((text != textInputEditText.text.toString())) {
           textInputEditText.setText(text)
         }
 
-        // Update error message if partial answer present
-        if (partialAnswer != null) {
+        // Update error message if draft answer present
+        if (draftAnswer != null) {
           textInputLayout.error =
             textInputEditText.context.getString(
               R.string.integer_format_validation_error_msg,

@@ -227,7 +227,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `clear questionnaire response answer on partial answer update`() {
+  fun `clear questionnaire response answer on draft answer update`() {
     var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? =
       listOf(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
     setLocale(Locale.US)
@@ -244,13 +244,13 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
       )
 
     viewHolder.bind(questionnaireItem)
-    questionnaireItem.updatePartialAnswer("02/07")
+    questionnaireItem.setDraftAnswer("02/07")
 
     assertThat(answers!!).isEmpty()
   }
 
   @Test
-  fun `clear partial value on an valid answer update`() {
+  fun `clear darft value on an valid answer update`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(DateType(2026, 0, 1))
@@ -300,7 +300,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        partialAnswer = "02/07"
+        draftAnswer = "02/07"
       )
 
     viewHolder.bind(questionnaireItem)
@@ -316,7 +316,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        partialAnswer = "02/07"
+        draftAnswer = "02/07"
       )
 
     viewHolder.bind(questionnaireItem)
