@@ -186,7 +186,7 @@
         name="Questionnaire.BottomContainerDividerStyle"
         parent="Widget.Material3.MaterialDivider"
     >
-      <item name="android:visibility">gone</item>
+      <item name="android:visibility">visible</item>
       <item name="dividerColor">@color/item_border_color</item>
     </style>
 
