@@ -142,6 +142,13 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           canonicalizedDatePattern
         )
         dateInputEditText.addTextChangedListener(textWatcher)
+
+        displayValidationResult(questionnaireItemViewItem.validationResult)
+      }
+
+      fun displayValidationResult(validationResult: ValidationResult) {
+        displayDateValidationError(validationResult)
+        displayTimeValidationError(validationResult)
       }
 
       fun displayDateValidationError(validationResult: ValidationResult) {
@@ -170,11 +177,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 null
               }
           }
-      }
-
-      override fun displayValidationResult(validationResult: ValidationResult) {
-        displayDateValidationError(validationResult)
-        displayTimeValidationError(validationResult)
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

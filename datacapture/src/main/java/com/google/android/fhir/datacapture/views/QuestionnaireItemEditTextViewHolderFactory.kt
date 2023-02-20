@@ -81,6 +81,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     header.bind(questionnaireItemViewItem.questionnaireItem)
     textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
+    displayValidationResult(questionnaireItemViewItem.validationResult)
 
     textInputEditText.removeTextChangedListener(textWatcher)
     updateUI(questionnaireItemViewItem, textInputEditText, textInputLayout)
@@ -91,7 +92,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
       }
   }
 
-  override fun displayValidationResult(validationResult: ValidationResult) {
+  private fun displayValidationResult(validationResult: ValidationResult) {
     textInputLayout.error =
       when (validationResult) {
         is NotValidated,

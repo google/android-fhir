@@ -92,29 +92,29 @@
     <!-- 3.1 Validation -->
     <string
         name="required_constraint_validation_error_msg"
-        >Missing answer for required field.</string>
+    >Missing answer for required field.</string>
     <string
         name="min_value_validation_error_msg"
-        >Minimum value allowed is:<xliff:g id="min_value">%1$s</xliff:g> </string>
+    >Minimum value allowed is:<xliff:g id="min_value">%1$s</xliff:g> </string>
     <string
         name="max_decimal_validation_error_msg"
-        >The maximum number of decimal places that are permitted in the answer is: <xliff:g
-        id="max_value"
+    >The maximum number of decimal places that are permitted in the answer is: <xliff:g
+            id="max_value"
         >%1$s</xliff:g>  </string>
     <string
         name="max_value_validation_error_msg"
-        >Maximum value allowed is:<xliff:g id="max_value">%1$s</xliff:g> </string>
+    >Maximum value allowed is:<xliff:g id="max_value">%1$s</xliff:g> </string>
     <string
         name="number_format_validation_error_msg"
-        >Only use (.) between two numbers. Other special characters are not supported.</string>
+    >Only use (.) between two numbers. Other special characters are not supported.</string>
     <string
         name="date_format_validation_error_msg"
-        >Date format needs to be <xliff:g
-        id="locale_format"
+    >Date format needs to be <xliff:g
+            id="locale_format"
         >%1$s</xliff:g> (e.g. %2$s)</string>
     <string
         name="integer_format_validation_error_msg"
-        >Number must be between <xliff:g id="min_value">%1$s</xliff:g> and <xliff:g
-        id="max_value"
+    >Number must be between <xliff:g id="min_value">%1$s</xliff:g> and <xliff:g
+            id="max_value"
         >%2$s</xliff:g></string>
 </resources>

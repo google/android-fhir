@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.views
 import android.text.Editable
 import android.text.InputType
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import java.math.BigDecimal
@@ -73,13 +72,8 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
               }
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(quantity)
           } catch (exception: NumberFormatException) {
-            displayValidationResult(
-              Invalid(
-                listOf(
-                  textInputLayout.context.getString(R.string.number_format_validation_error_msg)
-                )
-              )
-            )
+            textInputLayout.error =
+              textInputLayout.context.getString(R.string.number_format_validation_error_msg)
             null
           }
         }

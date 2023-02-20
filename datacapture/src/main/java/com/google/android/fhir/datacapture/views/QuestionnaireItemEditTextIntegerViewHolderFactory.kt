@@ -43,6 +43,11 @@ internal object QuestionnaireItemEditTextIntegerViewHolderFactory :
         questionnaireItemViewItem: QuestionnaireItemViewItem
       ) {
         val input = editable.toString()
+        if (input.isNullOrEmpty()) {
+          questionnaireItemViewItem.clearAnswer()
+          return
+        }
+
         val inputInteger = input.toIntOrNull()
         if (inputInteger != null) {
           questionnaireItemViewItem.setAnswer(

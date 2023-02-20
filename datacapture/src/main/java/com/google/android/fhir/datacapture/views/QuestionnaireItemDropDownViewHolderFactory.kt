@@ -114,9 +114,11 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
               )
             }
           }
+
+        displayValidationResult(questionnaireItemViewItem.validationResult)
       }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {
+      private fun displayValidationResult(validationResult: ValidationResult) {
         textInputLayout.error =
           when (validationResult) {
             is NotValidated,

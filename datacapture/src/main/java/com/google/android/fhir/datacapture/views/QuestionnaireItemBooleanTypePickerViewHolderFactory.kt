@@ -117,16 +117,8 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
             )
           }
         }
-      }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {
-        when (validationResult) {
-          is NotValidated,
-          Valid -> header.showErrorText(isErrorTextVisible = false)
-          is Invalid -> {
-            header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
-          }
-        }
+        displayValidationResult(questionnaireItemViewItem.validationResult)
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
@@ -147,6 +139,16 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
             },
             ViewGroup.LayoutParams.WRAP_CONTENT
           )
+      }
+
+      private fun displayValidationResult(validationResult: ValidationResult) {
+        when (validationResult) {
+          is NotValidated,
+          Valid -> header.showErrorText(isErrorTextVisible = false)
+          is Invalid -> {
+            header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
+          }
+        }
       }
     }
 }

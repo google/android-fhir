@@ -51,7 +51,6 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.format.FormatStyle
 import java.util.Date
 import java.util.Locale
-import kotlin.collections.ArrayList
 import kotlin.math.abs
 import kotlin.math.log10
 import org.hl7.fhir.r4.model.DateType
@@ -114,9 +113,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         textInputEditText.removeTextChangedListener(textWatcher)
         updateTextFieldToDisplayDateValue()
         textInputEditText.addTextChangedListener(textWatcher)
+        displayValidationResult(questionnaireItemViewItem.validationResult)
       }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {
+      private fun displayValidationResult(validationResult: ValidationResult) {
         // Since the partial answer is still displayed in the text field, do not erase the error
         // text if the answer is cleared and the validation result is valid.
         if (questionnaireItemViewItem.answers.isEmpty() && validationResult == Valid) {
