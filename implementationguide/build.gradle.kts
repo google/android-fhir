@@ -24,6 +24,12 @@ android {
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.implementationguide"
   }
 
+  sourceSets {
+    getByName("androidTest").apply { resources.setSrcDirs(listOf("sampledata")) }
+
+    getByName("test").apply { resources.setSrcDirs(listOf("sampledata")) }
+  }
+
   buildTypes {
     getByName("release") {
       isMinifyEnabled = false
@@ -85,11 +91,21 @@ dependencies {
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.Kotlin.stdlib)
+  implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.timber)
 
   kapt(Dependencies.Room.compiler)
+
+  testImplementation(Dependencies.AndroidxTest.archCore)
+  testImplementation(Dependencies.AndroidxTest.core)
+  testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
+  testImplementation(Dependencies.mockitoInline)
+  testImplementation(Dependencies.mockitoKotlin)
+  testImplementation(Dependencies.robolectric)
+  testImplementation(Dependencies.truth)
 }
 
 tasks.dokkaHtml.configure {
