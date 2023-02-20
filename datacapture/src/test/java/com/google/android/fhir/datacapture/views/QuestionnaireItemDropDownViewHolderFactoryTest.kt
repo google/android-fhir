@@ -50,7 +50,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -69,18 +69,14 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
+    val selectedItem =
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).adapter.getItem(1)
+        as DropDownAnswerOption
 
-    assertThat(
-        viewHolder.itemView
-          .findViewById<AutoCompleteTextView>(R.id.auto_complete)
-          .adapter
-          .getItem(1)
-          .toString()
-      )
-      .isEqualTo("Test Code")
+    assertThat(selectedItem.answerOptionString).isEqualTo("Test Code")
   }
 
   @Test
@@ -98,18 +94,14 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
+    val selectedItem =
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).adapter.getItem(1)
+        as DropDownAnswerOption
 
-    assertThat(
-        viewHolder.itemView
-          .findViewById<AutoCompleteTextView>(R.id.auto_complete)
-          .adapter
-          .getItem(1)
-          .toString()
-      )
-      .isEqualTo("John Doe")
+    assertThat(selectedItem.answerOptionString).isEqualTo("John Doe")
   }
 
   @Test
@@ -123,18 +115,14 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
+    val selectedItem =
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).adapter.getItem(1)
+        as DropDownAnswerOption
 
-    assertThat(
-        viewHolder.itemView
-          .findViewById<AutoCompleteTextView>(R.id.auto_complete)
-          .adapter
-          .getItem(1)
-          .toString()
-      )
-      .isEqualTo("Patient/123")
+    assertThat(selectedItem.answerOptionString).isEqualTo("Patient/123")
   }
 
   @Test
@@ -148,18 +136,13 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
-
-    assertThat(
-        viewHolder.itemView
-          .findViewById<AutoCompleteTextView>(R.id.auto_complete)
-          .adapter
-          .getItem(1)
-          .toString()
-      )
-      .isEqualTo("test-code")
+    val selectedItem =
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).adapter.getItem(1)
+        as DropDownAnswerOption
+    assertThat(selectedItem.answerOptionString).isEqualTo("test-code")
   }
 
   @Test
@@ -177,7 +160,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -217,7 +200,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
           }
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -234,7 +217,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -261,7 +244,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
             }
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -276,7 +259,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -291,7 +274,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 

@@ -30,6 +30,7 @@ import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_URL
 import com.google.android.fhir.datacapture.INSTRUCTIONS
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.material.divider.MaterialDivider
 import com.google.common.truth.Truth.assertThat
@@ -60,7 +61,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -79,7 +80,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -114,7 +115,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -133,7 +134,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -152,7 +153,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -171,7 +172,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -197,7 +198,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
             }
           ),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -215,7 +216,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -230,7 +231,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -265,7 +266,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -288,7 +289,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
             }
           ),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -305,8 +306,8 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
           type = Questionnaire.QuestionnaireItemType.BOOLEAN
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -329,7 +330,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
             }
           ),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -344,7 +345,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -360,7 +361,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -377,7 +378,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -402,7 +403,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -426,7 +427,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -451,7 +452,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -465,7 +466,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -483,7 +484,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -498,7 +499,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -513,7 +514,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 

@@ -53,7 +53,7 @@ class QuestionnaireItemEditAdapterTest {
               .setType(Questionnaire.QuestionnaireItemType.GROUP),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -74,7 +74,7 @@ class QuestionnaireItemEditAdapterTest {
               .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -95,7 +95,7 @@ class QuestionnaireItemEditAdapterTest {
               .setType(Questionnaire.QuestionnaireItemType.DATE),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -121,7 +121,7 @@ class QuestionnaireItemEditAdapterTest {
             questionnaireItemComponent,
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -142,7 +142,7 @@ class QuestionnaireItemEditAdapterTest {
               .setType(Questionnaire.QuestionnaireItemType.DATETIME),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -163,7 +163,7 @@ class QuestionnaireItemEditAdapterTest {
               .setType(Questionnaire.QuestionnaireItemType.STRING),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -197,7 +197,7 @@ class QuestionnaireItemEditAdapterTest {
             questionnaireItem,
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -223,7 +223,7 @@ class QuestionnaireItemEditAdapterTest {
             questionnaireItemComponent,
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -244,7 +244,7 @@ class QuestionnaireItemEditAdapterTest {
               .setType(Questionnaire.QuestionnaireItemType.TEXT),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -265,7 +265,7 @@ class QuestionnaireItemEditAdapterTest {
               .setType(Questionnaire.QuestionnaireItemType.INTEGER),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -301,7 +301,7 @@ class QuestionnaireItemEditAdapterTest {
             questionnaireItem,
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -327,7 +327,7 @@ class QuestionnaireItemEditAdapterTest {
             questionnaireItemComponent,
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -348,7 +348,7 @@ class QuestionnaireItemEditAdapterTest {
               .setType(Questionnaire.QuestionnaireItemType.DECIMAL),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -369,7 +369,7 @@ class QuestionnaireItemEditAdapterTest {
               .setType(Questionnaire.QuestionnaireItemType.CHOICE),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -396,7 +396,7 @@ class QuestionnaireItemEditAdapterTest {
               .setAnswerOption(answerOptions),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -438,7 +438,7 @@ class QuestionnaireItemEditAdapterTest {
             questionnaireItem,
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -473,7 +473,7 @@ class QuestionnaireItemEditAdapterTest {
             questionnaireItem,
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _ -> },
+            answersChangedCallback = { _, _, _, _ -> },
           )
         )
       )
@@ -498,7 +498,7 @@ class QuestionnaireItemEditAdapterTest {
               questionnaireItem,
               questionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -506,7 +506,7 @@ class QuestionnaireItemEditAdapterTest {
               otherQuestionnaireItem,
               questionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
         )
@@ -526,7 +526,7 @@ class QuestionnaireItemEditAdapterTest {
               questionnaireItem,
               questionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -534,7 +534,7 @@ class QuestionnaireItemEditAdapterTest {
               questionnaireItem,
               otherQuestionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
         )
@@ -553,7 +553,7 @@ class QuestionnaireItemEditAdapterTest {
               questionnaireItem,
               questionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -561,7 +561,7 @@ class QuestionnaireItemEditAdapterTest {
               questionnaireItem,
               questionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
         )
@@ -582,7 +582,7 @@ class QuestionnaireItemEditAdapterTest {
               questionnaireItem,
               questionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -590,7 +590,7 @@ class QuestionnaireItemEditAdapterTest {
               otherQuestionnaireItem,
               questionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
         )
@@ -610,7 +610,7 @@ class QuestionnaireItemEditAdapterTest {
               questionnaireItem,
               questionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -618,7 +618,7 @@ class QuestionnaireItemEditAdapterTest {
               questionnaireItem,
               otherQuestionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
         )
@@ -637,7 +637,7 @@ class QuestionnaireItemEditAdapterTest {
               questionnaireItem,
               questionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -645,7 +645,7 @@ class QuestionnaireItemEditAdapterTest {
                 questionnaireItem,
                 questionnaireResponseItem,
                 validationResult = NotValidated,
-                answersChangedCallback = { _, _, _ -> },
+                answersChangedCallback = { _, _, _, _ -> },
               )
               .apply {
                 addAnswer(
@@ -671,7 +671,7 @@ class QuestionnaireItemEditAdapterTest {
               questionnaireItem,
               questionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -679,7 +679,7 @@ class QuestionnaireItemEditAdapterTest {
               questionnaireItem,
               questionnaireResponseItem,
               validationResult = Invalid(listOf()),
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
         )
@@ -698,7 +698,7 @@ class QuestionnaireItemEditAdapterTest {
               questionnaireItem,
               questionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -706,7 +706,7 @@ class QuestionnaireItemEditAdapterTest {
               questionnaireItem,
               questionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
         )
@@ -725,7 +725,7 @@ class QuestionnaireItemEditAdapterTest {
               questionnaireItem,
               questionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -733,7 +733,7 @@ class QuestionnaireItemEditAdapterTest {
               questionnaireItem,
               questionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _ -> },
+              answersChangedCallback = { _, _, _, _ -> },
             )
           ),
         )
@@ -777,7 +777,7 @@ class QuestionnaireItemEditAdapterTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     assertThat(expectedItemViewType)

@@ -22,7 +22,7 @@ import org.hl7.fhir.r4.model.Library
 import org.opencds.cqf.cql.evaluator.cql2elm.content.fhir.BaseFhirLibrarySourceProvider
 import org.opencds.cqf.cql.evaluator.fhir.adapter.r4.AdapterFactory
 
-class FhirEngineLibraryContentProvider(adapterFactory: AdapterFactory) :
+internal class FhirEngineLibraryContentProvider(adapterFactory: AdapterFactory) :
   BaseFhirLibrarySourceProvider(adapterFactory) {
   val libs = mutableMapOf<String, Library>()
 

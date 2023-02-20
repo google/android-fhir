@@ -18,7 +18,9 @@
     >Only use (.) between two numbers. Other special characters are not supported.</string>
     <string
         name="date_format_validation_error_msg"
-    >Date format needs to be <xliff:g id="locale_format">%1$s</xliff:g></string>
+    >Date format needs to be <xliff:g
+            id="locale_format"
+        >%1$s</xliff:g> (e.g. %2$s)</string>
     <string name="submit_button_text">Submit</string>
     <string name="button_pagination_next">Next</string>
     <string name="button_pagination_previous">Previous</string>
@@ -45,6 +47,34 @@
     <string name="help">Help</string>
     <string name="space_asterisk">\u0020\u002a</string>
     <string name="group_header_add_item_button">Add item</string>
+    <string name="take_photo">Take Photo</string>
+    <string name="cd_photo_preview">Photo Preview</string>
+    <string name="cd_file_icon_preview">File Icon Preview</string>
+    <string name="upload_photo">Upload Photo</string>
+    <string name="upload_audio">Upload Audio</string>
+    <string name="upload_video">Upload Video</string>
+    <string name="upload_document">Upload Document</string>
+    <string name="upload_file">Upload File</string>
+    <string name="delete">Delete</string>
+    <string
+        name="max_size_image_above_limit_validation_error_msg"
+    >Error: Image size is larger than %1$s MB</string>
+    <string
+        name="max_size_file_above_limit_validation_error_msg"
+    >Error: File size is larger than %1$s MB</string>
+    <string name="upload_failed">Upload failed</string>
+    <string
+        name="mime_type_wrong_media_format_validation_error_msg"
+    >Error: Wrong media format</string>
+    <string name="uploaded">Uploaded</string>
+    <string name="image_uploaded">Image uploaded</string>
+    <string name="file_uploaded">File uploaded</string>
+    <string name="video_uploaded">Video uploaded</string>
+    <string name="audio_uploaded">Audio uploaded</string>
+    <string name="image_deleted">Image deleted</string>
+    <string name="file_deleted">File deleted</string>
+    <string name="video_deleted">Video deleted</string>
+    <string name="audio_deleted">Audio deleted</string>
 
     <!-- Questionnaire validation popup texts-->
     <string name="questionnaire_validation_error_headline">Errors found</string>
