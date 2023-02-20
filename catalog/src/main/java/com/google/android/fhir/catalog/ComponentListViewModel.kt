@@ -130,7 +130,11 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       R.string.component_name_item_media,
       "component_item_media.json"
     ),
-    ITEM_ANSWER_MEDIA(R.drawable.ic_item_answer_media, R.string.component_name_item_answer_media, "")
+    ITEM_ANSWER_MEDIA(
+      R.drawable.ic_item_answer_media,
+      R.string.component_name_item_answer_media,
+      ""
+    )
   }
 
   val viewItemList =
