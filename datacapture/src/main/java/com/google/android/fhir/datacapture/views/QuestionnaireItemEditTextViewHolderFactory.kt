@@ -106,10 +106,10 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     textInputEditText.isEnabled = !isReadOnly
   }
 
-  /** Handles user input from the `editable` and updates the questionnaire */
+  /** Handles user input from the `editable` and updates the questionnaire. */
   abstract fun handleInput(editable: Editable, questionnaireItemViewItem: QuestionnaireItemViewItem)
 
-  /** Handles the UI update */
+  /** Handles the UI update. */
   abstract fun updateUI(
     questionnaireItemViewItem: QuestionnaireItemViewItem,
     textInputEditText: TextInputEditText,
