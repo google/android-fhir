@@ -165,8 +165,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val shouldShowReviewPageFirst =
     shouldEnableReviewPage && state[QuestionnaireFragment.EXTRA_SHOW_REVIEW_PAGE_FIRST] ?: false
 
-  /** Flag to show/hide submit button. */
-  private var shouldShowSubmitButton = false
+  /** Flag to show/hide submit button. Default is true. */
+  private var shouldShowSubmitButton = state[QuestionnaireFragment.EXTRA_SHOW_SUBMIT_BUTTON] ?: true
 
   /** The pages of the questionnaire, or null if the questionnaire is not paginated. */
   @VisibleForTesting var pages: List<QuestionnairePage>? = null
@@ -213,6 +213,20 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       QuestionnaireResponseItemComponent, List<QuestionnaireResponseItemAnswerComponent>>()
 
   /**
+   * Map from [QuestionnaireResponseItemComponent] to draft answers, e.g "02/02" for date with
+   * missing year part.
+   *
+   * This is used to maintain draft answers on the screen especially when the widgets are being
+   * recycled as a result of scrolling. Draft answers cannot be saved in [QuestionnaireResponse]
+   * because they might be incomplete and unparsable. Without this map, incomplete and unparsable
+   * answers would be lost.
+   *
+   * When the draft answer becomes valid, its entry in the map is removed, e.g, "02/02/2023" is
+   * valid answer and should not be in this map.
+   */
+  private val draftAnswerMap = mutableMapOf<QuestionnaireResponseItemComponent, Any>()
+
+  /**
    * Callback function to update the view model after the answer(s) to a question have been changed.
    * This is passed to the [QuestionnaireItemViewItem] in its constructor so that it can invoke this
    * callback function after the UI widget has updated the answer(s).
@@ -221,21 +235,35 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * by the UI. Subsequently it should also trigger the recalculation of any relevant expressions,
    * enablement states, and validation results throughout the questionnaire.
    *
-   * This callback function has 3 params:
+   * This callback function has 4 params:
    * - the reference to the [Questionnaire.QuestionnaireItemComponent] in the [Questionnaire]
    * - the reference to the [QuestionnaireResponseItemComponent] in the [QuestionnaireResponse]
    * - a [List] of [QuestionnaireResponseItemAnswerComponent] which are the new answers to the
    * question.
+   * - partial answer, the entered input is not a valid answer
    */
   private val answersChangedCallback:
     (
       Questionnaire.QuestionnaireItemComponent,
       QuestionnaireResponseItemComponent,
       List<QuestionnaireResponseItemAnswerComponent>,
+      Any?
     ) -> Unit =
-    { questionnaireItem, questionnaireResponseItem, answers ->
+    { questionnaireItem, questionnaireResponseItem, answers, draftAnswer ->
       // TODO(jingtang10): update the questionnaire response item pre-order list and the parent map
       questionnaireResponseItem.answer = answers.toList()
+      when {
+        (questionnaireResponseItem.answer.isNotEmpty()) -> {
+          draftAnswerMap.remove(questionnaireResponseItem)
+        }
+        else -> {
+          if (draftAnswer == null) {
+            draftAnswerMap.remove(questionnaireResponseItem)
+          } else {
+            draftAnswerMap[questionnaireResponseItem] = draftAnswer
+          }
+        }
+      }
       if (questionnaireItem.hasNestedItemsWithinAnswers) {
         questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
       }
@@ -341,10 +369,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   internal fun setReviewMode(reviewModeFlag: Boolean) {
     isInReviewModeFlow.value = reviewModeFlag
-  }
-
-  internal fun setShowSubmitButtonFlag(showSubmitButton: Boolean) {
-    this.shouldShowSubmitButton = showSubmitButton
   }
 
   /** [QuestionnaireState] to be displayed in the UI. */
@@ -509,7 +533,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     if (isReadOnly || isInReviewModeFlow.value) {
       return QuestionnaireState(
         items = questionnaireItemViewItems,
-        displayMode = DisplayMode.ReviewMode(showEditButton = !isReadOnly)
+        displayMode =
+          DisplayMode.ReviewMode(
+            showEditButton = !isReadOnly,
+            showSubmitButton = !isReadOnly && shouldShowSubmitButton
+          )
       )
     }
 
@@ -613,7 +641,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               validationResult = validationResult,
               answersChangedCallback = answersChangedCallback,
               resolveAnswerValueSet = { resolveAnswerValueSet(it) },
-              resolveAnswerExpression = { resolveAnswerExpression(it) }
+              resolveAnswerExpression = { resolveAnswerExpression(it) },
+              draftAnswer = draftAnswerMap[questionnaireResponseItem]
             )
           )
         )
@@ -777,7 +806,7 @@ internal data class QuestionnaireState(
 
 internal sealed class DisplayMode {
   class EditMode(val pagination: QuestionnairePagination) : DisplayMode()
-  class ReviewMode(val showEditButton: Boolean) : DisplayMode()
+  data class ReviewMode(val showEditButton: Boolean, val showSubmitButton: Boolean) : DisplayMode()
 }
 
 /**

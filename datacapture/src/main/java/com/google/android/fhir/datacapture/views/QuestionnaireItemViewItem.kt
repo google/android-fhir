@@ -54,6 +54,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * @param resolveAnswerValueSet the callback to resolve the answer value set and return the answer
  * @param resolveAnswerExpression the callback to resolve answer options when answer-expression
  * extension exists options
+ * @param draftAnswer the draft input that cannot be stored in the [QuestionnaireResponse].
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -63,7 +64,8 @@ data class QuestionnaireItemViewItem(
     (
       Questionnaire.QuestionnaireItemComponent,
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
-      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
+      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
+      Any?
     ) -> Unit,
   private val resolveAnswerValueSet:
     suspend (String) -> List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
@@ -75,7 +77,8 @@ data class QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemAnswerOptionComponent> =
     {
       emptyList()
-    }
+    },
+  internal val draftAnswer: Any? = null
 ) {
 
   /**
@@ -104,13 +107,14 @@ data class QuestionnaireItemViewItem(
     answersChangedCallback(
       questionnaireItem,
       questionnaireResponseItem,
-      questionnaireResponseItemAnswerComponent.toList()
+      questionnaireResponseItemAnswerComponent.toList(),
+      null
     )
   }
 
   /** Clears existing answers. */
   fun clearAnswer() {
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf())
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), null)
   }
 
   /** Adds an answer to the existing answers. */
@@ -124,7 +128,8 @@ data class QuestionnaireItemViewItem(
     answersChangedCallback(
       questionnaireItem,
       questionnaireResponseItem,
-      answers + questionnaireResponseItemAnswerComponent
+      answers + questionnaireResponseItemAnswerComponent,
+      null
     )
   }
 
@@ -141,8 +146,17 @@ data class QuestionnaireItemViewItem(
       questionnaireResponseItem,
       answers.toMutableList().apply {
         removeIf { it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value) }
-      }
+      },
+      null
     )
+  }
+
+  /**
+   * Updates the draft answer stored in `QuestionnaireViewModel`. This clears any actual answer for
+   * the question.
+   */
+  fun setDraftAnswer(draftAnswer: Any? = null) {
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), draftAnswer)
   }
 
   internal fun answerString(context: Context): String {

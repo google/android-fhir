@@ -81,7 +81,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -101,7 +101,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
             }
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -126,7 +126,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
             }
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     viewHolder.bind(
@@ -134,7 +134,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -155,7 +155,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView
@@ -173,7 +173,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     viewHolder.bind(questionnaireItemViewItem)
@@ -200,7 +200,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -225,7 +225,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
           Invalid(
             listOf("The maximum number of characters that are permitted in the answer is: 10")
           ),
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -240,7 +240,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 

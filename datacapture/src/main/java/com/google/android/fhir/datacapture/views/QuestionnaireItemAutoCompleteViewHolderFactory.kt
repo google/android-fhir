@@ -88,24 +88,8 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         // Remove chips if any from the last bindView call on this VH.
         chipContainer.removeAllViews()
         presetValuesIfAny()
-      }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {
-        // https://github.com/material-components/material-components-android/issues/1435
-        // Because of the above issue, we use separate error textview. But we still use
-        // textInputLayout to show the error icon and the box color.
-        when (validationResult) {
-          is NotValidated,
-          Valid -> {
-            errorTextView.visibility = View.GONE
-            textInputLayout.error = null
-          }
-          is Invalid -> {
-            errorTextView.text = validationResult.getSingleStringValidationMessage()
-            errorTextView.visibility = View.VISIBLE
-            textInputLayout.error = " " // non empty text
-          }
-        }
+        displayValidationResult(questionnaireItemViewItem.validationResult)
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
@@ -201,6 +185,24 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
           }
         } else {
           questionnaireItemViewItem.clearAnswer()
+        }
+      }
+
+      private fun displayValidationResult(validationResult: ValidationResult) {
+        // https://github.com/material-components/material-components-android/issues/1435
+        // Because of the above issue, we use separate error textview. But we still use
+        // textInputLayout to show the error icon and the box color.
+        when (validationResult) {
+          is NotValidated,
+          Valid -> {
+            errorTextView.visibility = View.GONE
+            textInputLayout.error = null
+          }
+          is Invalid -> {
+            errorTextView.text = validationResult.getSingleStringValidationMessage()
+            errorTextView.visibility = View.VISIBLE
+            textInputLayout.error = " " // non empty text
+          }
         }
       }
     }

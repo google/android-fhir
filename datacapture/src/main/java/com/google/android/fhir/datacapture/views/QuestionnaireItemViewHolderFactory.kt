@@ -21,7 +21,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.validation.ValidationResult
 
 /**
  * Factory for [QuestionnaireItemViewHolder].
@@ -60,7 +59,6 @@ open class QuestionnaireItemViewHolder(
     delegate.questionnaireItemViewItem = questionnaireItemViewItem
     delegate.bind(questionnaireItemViewItem)
     delegate.setReadOnly(questionnaireItemViewItem.questionnaireItem.readOnly)
-    delegate.displayValidationResult(questionnaireItemViewItem.validationResult)
   }
 }
 
@@ -84,11 +82,11 @@ interface QuestionnaireItemViewHolderDelegate {
    */
   fun init(itemView: View)
 
-  /** Binds a [QuestionnaireItemViewItem] to the view. */
+  /**
+   * Binds a [QuestionnaireItemViewItem] to the view. This should update the UI to display the
+   * question, the answer, and any validation result.
+   */
   fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem)
-
-  /** Displays validation messages on the view. */
-  fun displayValidationResult(validationResult: ValidationResult)
 
   /** Sets view read only if [isReadOnly] is true. */
   fun setReadOnly(isReadOnly: Boolean)
