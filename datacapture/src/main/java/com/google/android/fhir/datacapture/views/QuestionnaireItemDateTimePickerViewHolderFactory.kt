@@ -151,7 +151,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         displayTimeValidationError(validationResult)
       }
 
-      fun displayDateValidationError(validationResult: ValidationResult) {
+      private fun displayDateValidationError(validationResult: ValidationResult) {
         // Since the draft answer is still displayed in the text field, do not erase the error
         // text if the answer is cleared and the validation result is valid.
         if (questionnaireItemViewItem.answers.isEmpty() && validationResult == Valid) {
