@@ -124,8 +124,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
         textInputLayout.error =
           when (validationResult) {
-            is NotValidated,
-            Valid -> null
+            is NotValidated, Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
       }
@@ -226,7 +225,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           textInputEditText.setText(textToDisplayInTheTextField)
         }
 
-        // show an error text
+        // Show an error text if draft answer exists
         if (!draftAnswerToDisplay.isNullOrBlank()) {
           displayValidationResult(
             Invalid(
@@ -235,7 +234,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                   R.string.date_format_validation_error_msg,
                   canonicalizedDatePattern,
                   canonicalizedDatePattern
-                    .replace("dd", "01")
+                    .replace("dd", "31")
                     .replace("MM", "01")
                     .replace("yyyy", "2023")
                 )
@@ -278,26 +277,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
       }
     }
-
-  private fun isTextUpdateRequired(
-    answer: DateType?,
-    inputText: String?,
-    canonicalizedDatePattern: String
-  ): Boolean {
-    if (inputText.isNullOrEmpty()) {
-      return true
-    }
-    val inputDate =
-      try {
-        parseDate(inputText, canonicalizedDatePattern)
-      } catch (e: Exception) {
-        null
-      }
-    if (inputDate == null || answer == null) {
-      return true
-    }
-    return answer.localDate != inputDate
-  }
 }
 
 /**
