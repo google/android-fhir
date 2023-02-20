@@ -16,11 +16,16 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.icu.number.NumberFormatter
+import android.icu.text.DecimalFormat
+import android.os.Build
 import android.text.Editable
 import android.text.InputType
+import androidx.annotation.RequiresApi
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import java.util.Locale
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -66,8 +71,27 @@ internal object QuestionnaireItemEditTextIntegerViewHolderFactory :
 
         // Update error message if partial answer present
         if (partialAnswer != null) {
-          textInputLayout.error = "Invalid input" // TODO(Jing): put this in xml.
+          textInputLayout.error =
+            textInputEditText.context.getString(
+              R.string.integer_format_validation_error_msg,
+              formatInteger(Int.MIN_VALUE),
+              formatInteger(Int.MAX_VALUE)
+            )
         }
       }
     }
+
+  private fun formatInteger(value: Int): String {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      numberFormatter.format(value).toString()
+    } else {
+      decimalFormat.format(value)
+    }
+  }
+
+  private val numberFormatter
+    @RequiresApi(Build.VERSION_CODES.R) get() = NumberFormatter.withLocale(Locale.getDefault())
+
+  private val decimalFormat
+    get() = DecimalFormat.getInstance(Locale.getDefault())
 }
