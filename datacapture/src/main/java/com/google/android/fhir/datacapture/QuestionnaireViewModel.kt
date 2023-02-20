@@ -221,7 +221,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * because they might be incomplete and unparsable. Without this map, incomplete and unparsable
    * answers would be lost.
    *
-   * If a draft answer becomes valid then the entry in this map should be removed, e.g, "02/02/2023"
+   * When the draft answer becomes valid, its entry in the map is removed, e.g, "02/02/2023"
    * is valid answer and should not be in this map.
    */
   private val draftAnswerMap = mutableMapOf<QuestionnaireResponseItemComponent, Any>()
