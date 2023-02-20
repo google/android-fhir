@@ -24,7 +24,6 @@ import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.annotation.StringRes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.utilities.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.utilities.format
@@ -214,8 +213,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         // should be overridden or not.
         if (dateInputEditText.text.toString() != textToDisplayInTheTextField) {
           dateInputEditText.setText(textToDisplayInTheTextField)
-          displayDateValidationError(Valid)
-          enableOrDisableTimePicker(enableIt = true)
         }
         // Show an error text
         if (!draftAnswerToDisplay.isNullOrBlank()) {
@@ -342,7 +339,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         try {
           localDate = parseDate(text, canonicalizedDatePattern)
           questionnaireItemViewItem.setDraftAnswer(text.toString())
-          displayDateValidationError(Valid)
+          displayDateValidationError(NotValidated)
+          // The time layout gets enabled when a valid date input is present.
           enableOrDisableTimePicker(enableIt = true)
           generateLocalDateTime(localDate, localTime)?.run {
             updateDateTimeInput(this, canonicalizedDatePattern)
@@ -433,11 +431,3 @@ internal val DateTimeType.localDateTime
       minute,
       second,
     )
-
-/** Replaces 'dd' with '31', 'MM' with '01' and 'yyyy' with '2023' and returns new string. */
-internal fun invalidDateErrorText(context: Context, @StringRes resId: Int, formatPattern: String) =
-  context.getString(
-    resId,
-    formatPattern,
-    formatPattern.replace("dd", "31").replace("MM", "01").replace("yyyy", "2023")
-  )

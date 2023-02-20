@@ -21,6 +21,7 @@ import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import com.google.android.fhir.datacapture.R
@@ -368,3 +369,14 @@ internal fun Int.length() =
     0 -> 1
     else -> log10(abs(toDouble())).toInt() + 1
   }
+
+/**
+ * Replaces 'dd' with '31', 'MM' with '01' and 'yyyy' with '2023' and returns new string. For
+ * example, given a `formatPattern` of dd/MM/yyyy, returns 31/01/2023
+ */
+internal fun invalidDateErrorText(context: Context, @StringRes resId: Int, formatPattern: String) =
+  context.getString(
+    resId,
+    formatPattern,
+    formatPattern.replace("dd", "31").replace("MM", "01").replace("yyyy", "2023")
+  )
