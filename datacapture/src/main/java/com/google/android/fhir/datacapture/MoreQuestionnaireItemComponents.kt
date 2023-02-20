@@ -619,6 +619,7 @@ internal val Questionnaire.QuestionnaireItemComponent.itemMedia: Attachment?
   get() =
     (getExtensionByUrl(EXTENSION_ITEM_MEDIA)?.value as? Attachment)?.takeIf { it.hasContentType() }
 
+/* TODO: unify the code path from itemAnswerMedia to use fetchBitmapFromUrl (github.com/google/android-fhir/issues/1876) */
 /** Fetches the Bitmap representation of [Attachment.url]. */
 internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
   if (!hasUrl() || !UrlUtil.isValid(url) || !hasContentType()) return null
