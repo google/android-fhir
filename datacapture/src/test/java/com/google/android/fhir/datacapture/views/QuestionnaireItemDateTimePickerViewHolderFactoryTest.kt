@@ -187,7 +187,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `clear questionnaire response answer on partial answer update`() {
+  fun `clear questionnaire response answer on draft answer update`() {
     var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? =
       listOf(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
     val questionnaireItem =
@@ -203,17 +203,17 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
       )
 
     viewHolder.bind(questionnaireItem)
-    questionnaireItem.updatePartialAnswer("02/07")
+    questionnaireItem.setDraftAnswer("02/07")
 
     assertThat(answers!!).isEmpty()
   }
 
   @Test
-  fun `clear partial value on an valid answer update`() {
+  fun `clear draft answer on an valid answer update`() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(DateTimeType(Date(2020 - 1900, 2, 6, 2, 30, 0)))
-    var partialValue: String? = "02/07"
+    var draft: String? = "02/07"
     val questionnaireItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -223,19 +223,17 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
               .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, partialAnswer ->
-          partialValue = partialAnswer as? String
-        },
+        answersChangedCallback = { _, _, _, draftAnswer -> draft = draftAnswer as? String },
       )
 
     viewHolder.bind(questionnaireItem)
     questionnaireItem.setAnswer(answer)
 
-    assertThat(partialValue).isNull()
+    assertThat(draft).isNull()
   }
 
   @Test
-  fun `display partial answer in the text field of recycled items`() {
+  fun `display draft answer in the text field of recycled items`() {
     var questionnaireItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -257,7 +255,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        partialAnswer = "02/07"
+        draftAnswer = "02/07"
       )
 
     viewHolder.bind(questionnaireItem)
@@ -272,7 +270,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        partialAnswer = "02/07"
+        draftAnswer = "02/07"
       )
 
     viewHolder.bind(questionnaireItem)

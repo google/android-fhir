@@ -50,7 +50,7 @@ class TestQuestionnaireViewModel(application: Application, private val state: Sa
     }
   }
 
-  suspend fun getQuestionnaireWithValidationJson(): String {
+  private suspend fun getQuestionnaireWithValidationJson(): String {
     return withContext(backgroundContext) {
       if (questionnaireWithValidationJson == null) {
         questionnaireWithValidationJson =

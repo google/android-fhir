@@ -16,11 +16,15 @@
 
 package com.google.android.fhir.datacapture.contrib.views
 
+import android.text.Editable
 import android.text.InputType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
@@ -29,7 +33,19 @@ object QuestionnaireItemPhoneNumberViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     object : QuestionnaireItemEditTextViewHolderDelegate(InputType.TYPE_CLASS_PHONE) {
 
-      override fun getValue(
+      override fun handleInput(
+        editable: Editable,
+        questionnaireItemViewItem: QuestionnaireItemViewItem
+      ) {
+        val input = getValue(editable.toString())
+        if (input != null) {
+          questionnaireItemViewItem.setAnswer(input)
+        } else {
+          questionnaireItemViewItem.clearAnswer()
+        }
+      }
+
+      private fun getValue(
         text: String
       ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
         return text.let {
@@ -42,10 +58,16 @@ object QuestionnaireItemPhoneNumberViewHolderFactory :
         }
       }
 
-      override fun getText(
-        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
-      ): String {
-        return answer?.valueStringType?.value?.toString() ?: ""
+      override fun updateUI(
+        questionnaireItemViewItem: QuestionnaireItemViewItem,
+        textInputEditText: TextInputEditText,
+        textInputLayout: TextInputLayout,
+      ) {
+        val text =
+          questionnaireItemViewItem.answers.singleOrNull()?.valueStringType?.value?.toString() ?: ""
+        if (text != textInputEditText.text.toString()) {
+          textInputEditText.setText(text)
+        }
       }
     }
 }
