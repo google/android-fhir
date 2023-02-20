@@ -217,7 +217,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * part.
    *
    * This is used to maintain draft answers on the screen especially when the widgets are being
-   * recycled as a result of scrolling. Draft answers cannot saved in [QuestionnaireResponse]
+   * recycled as a result of scrolling. Draft answers cannot be saved in [QuestionnaireResponse]
    * because it might be incomplete and unparsable. Without this map, incomplete and unparsable
    * answers would be lost.
    *
