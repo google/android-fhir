@@ -218,7 +218,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    *
    * This is used to maintain draft answers on the screen especially when the widgets are being
    * recycled as a result of scrolling. Draft answers cannot be saved in [QuestionnaireResponse]
-   * because it might be incomplete and unparsable. Without this map, incomplete and unparsable
+   * because they might be incomplete and unparsable. Without this map, incomplete and unparsable
    * answers would be lost.
    *
    * If a draft answer becomes valid then the entry in this map should be removed, e.g, "02/02/2023"
