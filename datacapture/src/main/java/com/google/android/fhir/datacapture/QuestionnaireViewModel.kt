@@ -165,8 +165,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val shouldShowReviewPageFirst =
     shouldEnableReviewPage && state[QuestionnaireFragment.EXTRA_SHOW_REVIEW_PAGE_FIRST] ?: false
 
-  /** Flag to show/hide submit button. */
-  private var shouldShowSubmitButton = false
+  /** Flag to show/hide submit button. Default is true. */
+  private var shouldShowSubmitButton = state[QuestionnaireFragment.EXTRA_SHOW_SUBMIT_BUTTON] ?: true
 
   /** Flag to show/hide cancel button. */
   private var shouldShowCancelButton = false
@@ -368,7 +368,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   internal fun setReviewMode(reviewModeFlag: Boolean) {
     isInReviewModeFlow.value = reviewModeFlag
   }
-
+ 
   internal fun setShowSubmitButtonFlag(showSubmitButton: Boolean) {
     this.shouldShowSubmitButton = showSubmitButton
   }
@@ -376,7 +376,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   internal fun setShowCancelButtonFlag(showCancelButton: Boolean) {
     this.shouldShowCancelButton = showCancelButton
   }
-
+ 
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: StateFlow<QuestionnaireState> =
     combine(modificationCount, currentPageIndexFlow, isInReviewModeFlow) { _, _, _ ->
