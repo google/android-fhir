@@ -87,6 +87,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               addOnPositiveButtonClickListener { epochMilli ->
                 with(Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()) {
                   dateInputEditText.setText(this?.format(canonicalizedDatePattern))
+                  timeInputLayout.isEnabled = true
                 }
                 // Clear focus so that the user can refocus to open the dialog
                 dateInputEditText.clearFocus()
