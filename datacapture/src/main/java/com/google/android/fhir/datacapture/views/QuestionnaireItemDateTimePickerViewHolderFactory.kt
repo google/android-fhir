@@ -22,7 +22,6 @@ import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
 import android.text.format.DateFormat
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.google.android.fhir.datacapture.R
@@ -152,10 +151,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         )
 
         try {
-          Log.i(
-            "TEST",
-            "$textToDisplay and the link id is ${questionnaireItemViewItem.questionnaireItem.linkId}"
-          )
           if (dateInputEditText.text.toString() != textToDisplay) {
             dateInputEditText.setText(textToDisplay)
           }
@@ -188,20 +183,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             is NotValidated,
             Valid -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
-          }
-      }
-
-      fun displayTimeValidationError(validationResult: ValidationResult) {
-        timeInputLayout.error =
-          when (validationResult) {
-            is NotValidated,
-            Valid -> null
-            is Invalid ->
-              if (timeInputLayout.isEnabled) {
-                validationResult.getSingleStringValidationMessage()
-              } else {
-                null
-              }
           }
       }
 
@@ -301,15 +282,14 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           questionnaireItemViewItem.clearAnswer()
           return
         }
-        try {
-          localDate = parseDate(text, canonicalizedDatePattern)
+        localDate = try {
           questionnaireItemViewItem.setDraftAnswer(text.toString())
+          parseDate(text, canonicalizedDatePattern)
         } catch (e: ParseException) {
           if (questionnaireItemViewItem.answers.isNotEmpty()) {
             questionnaireItemViewItem.clearAnswer()
           }
-          questionnaireItemViewItem.setDraftAnswer(text.toString())
-          localDate = null
+          null
         }
       }
 
