@@ -137,7 +137,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           }
           displayDateValidationError(questionnaireItemViewItem.validationResult)
           displayTimeValidationError(questionnaireItemViewItem.validationResult)
-
         } catch (e: ParseException) {
           enableOrDisableTimePicker(enableIt = false)
           timeInputEditText.setText("")
@@ -154,7 +153,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           )
         }
         dateInputEditText.addTextChangedListener(textWatcher)
-
       }
 
       private fun displayDateValidationError(validationResult: ValidationResult) {
@@ -258,7 +256,12 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               with(LocalTime.of(this.hour, this.minute, 0)) {
                 localTime = this
                 timeInputEditText.setText(this.toLocalizedString(context))
-                localDate?.let {  updateDateTimeAnswer(LocalDateTime.of(it, localTime)) }
+                updateDateTimeAnswer(
+                  LocalDateTime.of(
+                    parseDate(dateInputEditText.text.toString(), canonicalizedDatePattern),
+                    localTime
+                  )
+                )
                 timeInputEditText.clearFocus()
               }
             }
@@ -330,4 +333,3 @@ internal val DateTimeType.localTime
       minute,
       second,
     )
-
