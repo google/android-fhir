@@ -135,8 +135,11 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             enableOrDisableTimePicker(enableIt = true)
           }
           displayDateValidationError(questionnaireItemViewItem.validationResult)
+          displayTimeValidationError(questionnaireItemViewItem.validationResult)
+
         } catch (e: ParseException) {
           enableOrDisableTimePicker(enableIt = false)
+          timeInputEditText.setText("")
           displayDateValidationError(
             Invalid(
               listOf(
