@@ -286,9 +286,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           questionnaireItemViewItem.setDraftAnswer(text.toString())
           parseDate(text, canonicalizedDatePattern)
         } catch (e: ParseException) {
-          if (questionnaireItemViewItem.answers.isNotEmpty()) {
-            questionnaireItemViewItem.clearAnswer()
-          }
           null
         }
       }
