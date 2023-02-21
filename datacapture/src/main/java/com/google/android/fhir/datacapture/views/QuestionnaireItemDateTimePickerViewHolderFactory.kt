@@ -87,8 +87,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               addOnPositiveButtonClickListener { epochMilli ->
                 with(Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()) {
                   dateInputEditText.setText(this?.format(canonicalizedDatePattern))
-                  // The time layout gets enabled when a valid date input is present.
-                  enableOrDisableTimePicker(enableIt = true)
                 }
                 // Clear focus so that the user can refocus to open the dialog
                 dateInputEditText.clearFocus()
@@ -129,36 +127,16 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         val questionnaireItemViewItemDateTimeAnswer =
           questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType?.localDateTime
 
-        val textToDisplay =
-          questionnaireItemViewItemDateTimeAnswer?.let {
-            it.toLocalDate()?.format(canonicalizedDatePattern)
-          }
+        val dateToDisplay =
+          questionnaireItemViewItemDateTimeAnswer?.toLocalDate()?.format(canonicalizedDatePattern)
             ?: questionnaireItemViewItem.draftAnswer as? String
 
-        if (dateInputEditText.text.toString() != textToDisplay) {
-          dateInputEditText.setText(textToDisplay)
+        // Determine whether the text field text should be overridden or not.
+        if (dateInputEditText.text.toString() != dateToDisplay) {
+          dateInputEditText.setText(dateToDisplay)
         }
 
-        try {
-          if (textToDisplay != null) {
-            parseDate(textToDisplay, canonicalizedDatePattern)
-            enableOrDisableTimePicker(enableIt = true)
-          }
-          displayDateValidationError(questionnaireItemViewItem.validationResult)
-        } catch (e: ParseException) {
-          enableOrDisableTimePicker(enableIt = false)
-          displayDateValidationError(
-            Invalid(
-              listOf(
-                invalidDateErrorText(
-                  dateInputEditText.context,
-                  R.string.date_format_validation_error_msg,
-                  canonicalizedDatePattern
-                )
-              )
-            )
-          )
-        }
+        enableOrDisableTimePicker(questionnaireItemViewItem, dateToDisplay)
 
         timeInputEditText.setText(
           questionnaireItemViewItemDateTimeAnswer
@@ -182,10 +160,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         // The system outside this delegate should only be able to mark it read only. Otherwise, it
         // will change the state set by this delegate in bindView().
         if (isReadOnly) {
-          timeInputEditText.isEnabled = false
           dateInputEditText.isEnabled = false
-          timeInputLayout.isEnabled = false
           dateInputLayout.isEnabled = false
+          timeInputEditText.isEnabled = false
+          timeInputLayout.isEnabled = false
         }
       }
 
@@ -224,9 +202,33 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         dateInputLayout.isEnabled = true
       }
 
-      private fun enableOrDisableTimePicker(enableIt: Boolean) {
-        timeInputLayout.isEnabled = enableIt
-      }
+      /* If the passed in date can be parsed, then enable the time picker, otherwise, keep the time
+      picker disabled and display an error
+       */
+      private fun enableOrDisableTimePicker(
+        questionnaireItemViewItem: QuestionnaireItemViewItem,
+        dateToDisplay: String?
+      ) =
+        try {
+          if (dateToDisplay != null) {
+            parseDate(dateToDisplay, canonicalizedDatePattern)
+            timeInputLayout.isEnabled = true
+          }
+          displayDateValidationError(questionnaireItemViewItem.validationResult)
+        } catch (e: ParseException) {
+          timeInputLayout.isEnabled = false
+          displayDateValidationError(
+            Invalid(
+              listOf(
+                invalidDateErrorText(
+                  dateInputEditText.context,
+                  R.string.date_format_validation_error_msg,
+                  canonicalizedDatePattern
+                )
+              )
+            )
+          )
+        }
 
       private fun showMaterialTimePicker(context: Context, inputMode: Int) {
         val selectedTime =
