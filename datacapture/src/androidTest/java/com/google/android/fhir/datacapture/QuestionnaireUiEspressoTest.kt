@@ -21,6 +21,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.add
 import androidx.fragment.app.commitNow
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
@@ -99,5 +100,39 @@ class QuestionnaireUiEspressoTest {
       val actualError = (view as TextInputLayout).error
       assertThat(actualError).isEqualTo("Number must be between -2,147,483,648 and 2,147,483,647")
     }
+  }
+
+  @Test
+  fun dateTimeTextEdit_shouldShowErrorForWrongDate_clearOnCorrect() {
+    val bundle = bundleOf(QUESTIONNAIRE_FILE_PATH_KEY to "/component_date_time_picker.json")
+    activityScenarioRule.scenario.onActivity { activity ->
+      activity.supportFragmentManager.commitNow {
+        setReorderingAllowed(true)
+        add<TestQuestionnaireFragment>(R.id.container_holder, args = bundle)
+      }
+    }
+    // Add month and day. No need to add slashes as they are added automatically
+    onView(withId(R.id.date_input_edit_text))
+      .perform(ViewActions.click())
+      .perform(ViewActions.typeTextIntoFocusedView("0105"))
+
+    onView(withId(R.id.date_input_layout)).check { view, _ ->
+      val actualError = (view as TextInputLayout).error
+      assertThat(actualError).isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/31/2023)")
+    }
+
+    onView(withId(R.id.time_input_layout)).check { view, _ -> assertThat(view.isEnabled).isFalse() }
+
+    // Add year. This should clear the error
+    onView(withId(R.id.date_input_edit_text))
+      .perform(ViewActions.click())
+      .perform(ViewActions.typeTextIntoFocusedView("2005"))
+
+    onView(withId(R.id.date_input_layout)).check { view, _ ->
+      val actualError = (view as TextInputLayout).error
+      assertThat(actualError).isEqualTo(null)
+    }
+
+    onView(withId(R.id.time_input_layout)).check { view, _ -> assertThat(view.isEnabled).isTrue() }
   }
 }

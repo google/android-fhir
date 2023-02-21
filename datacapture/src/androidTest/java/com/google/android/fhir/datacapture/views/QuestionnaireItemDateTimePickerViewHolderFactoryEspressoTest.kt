@@ -54,51 +54,9 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
   private lateinit var viewHolder: QuestionnaireItemViewHolder
   @Before
   fun setup() {
-    activityScenarioRule.getScenario().onActivity { activity -> parent = FrameLayout(activity) }
+    activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }
     viewHolder = QuestionnaireItemDateTimePickerViewHolderFactory.create(parent)
     setTestLayout(viewHolder.itemView)
-  }
-
-  @Test
-  fun shouldSetFirstDateInputThenTimeInput() {
-    val questionnaireItemView =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      )
-
-    runOnUI { viewHolder.bind(questionnaireItemView) }
-
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.date_input_edit_text).text.toString()
-      )
-      .isEmpty()
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.time_input_edit_text).text.toString()
-      )
-      .isEmpty()
-
-    onView(withId(R.id.date_input_layout)).perform(clickIcon(true))
-    onView(allOf(withText("OK")))
-      .inRoot(isDialog())
-      .check(matches(isDisplayed()))
-      .perform(ViewActions.click())
-    onView(withId(R.id.time_input_layout)).perform(clickIcon(true))
-    onView(allOf(withText("OK")))
-      .inRoot(isDialog())
-      .check(matches(isDisplayed()))
-      .perform(ViewActions.click())
-
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.date_input_edit_text).text.toString()
-      )
-      .isNotEmpty()
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.time_input_edit_text).text.toString()
-      )
-      .isNotEmpty()
   }
 
   @Test
@@ -189,12 +147,12 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
 
   /** Method to run code snippet on UI/main thread */
   private fun runOnUI(action: () -> Unit) {
-    activityScenarioRule.getScenario().onActivity { activity -> action() }
+    activityScenarioRule.scenario.onActivity { activity -> action() }
   }
 
   /** Method to set content view for test activity */
   private fun setTestLayout(view: View) {
-    activityScenarioRule.getScenario().onActivity { activity -> activity.setContentView(view) }
+    activityScenarioRule.scenario.onActivity { activity -> activity.setContentView(view) }
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
   }
 }
