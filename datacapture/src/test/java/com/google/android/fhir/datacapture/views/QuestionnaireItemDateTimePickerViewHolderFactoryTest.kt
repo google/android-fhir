@@ -389,7 +389,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `if the date input is valid, do not display the error message for a valid date input`() {
+  fun `if the date input is parsed, do not display the error message for a parsed date input`() {
     val itemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -399,8 +399,12 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
       )
 
     viewHolder.bind(itemViewItem)
-    viewHolder.dateInputView.text = "11/19/2020"
+    viewHolder.dateInputView.text = "11/19/202"
 
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
+      .isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/31/2023)")
+
+    viewHolder.dateInputView.text = "11/19/2023"
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
       .isNull()
   }
