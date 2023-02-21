@@ -117,17 +117,17 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         timeInputEditText.setOnClickListener {
           showMaterialTimePicker(itemView.context, INPUT_MODE_KEYBOARD)
         }
+        val localeDatePattern = getLocalizedDateTimePattern()
+        // Special character used in date pattern
+        val datePatternSeparator = getDateSeparator(localeDatePattern)
+        textWatcher = DatePatternTextWatcher(datePatternSeparator)
+        canonicalizedDatePattern = canonicalizeDatePattern(localeDatePattern)
       }
 
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         clearPreviousState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
-        val localeDatePattern = getLocalizedDateTimePattern()
-        // Special character used in date pattern
-        val datePatternSeparator = getDateSeparator(localeDatePattern)
-        textWatcher = DatePatternTextWatcher(datePatternSeparator)
-        canonicalizedDatePattern = canonicalizeDatePattern(localeDatePattern)
         dateInputLayout.hint = canonicalizedDatePattern
         dateInputEditText.removeTextChangedListener(textWatcher)
 
