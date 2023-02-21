@@ -134,6 +134,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           (questionnaireItemViewItem.draftAnswer as? String)?.let {
             localDate = parseDate(it, canonicalizedDatePattern)
             enableOrDisableTimePicker(enableIt = true)
+            dateInputEditText.setText(it)
           }
           displayDateValidationError(questionnaireItemViewItem.validationResult)
           displayTimeValidationError(questionnaireItemViewItem.validationResult)
