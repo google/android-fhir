@@ -22,6 +22,7 @@ import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
 import android.text.format.DateFormat
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.google.android.fhir.datacapture.R
@@ -30,6 +31,7 @@ import com.google.android.fhir.datacapture.utilities.format
 import com.google.android.fhir.datacapture.utilities.getDateSeparator
 import com.google.android.fhir.datacapture.utilities.parseDate
 import com.google.android.fhir.datacapture.utilities.toLocalizedString
+import com.google.android.fhir.datacapture.utilities.toLocalizedTimeString
 import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -130,14 +132,38 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         dateInputLayout.hint = canonicalizedDatePattern
         dateInputEditText.removeTextChangedListener(textWatcher)
 
+        val textToDisplay =
+          questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType?.let {
+            it.localDateTime
+              .also {
+                localDate = it.toLocalDate()
+                localTime = it.toLocalTime()
+              }
+              .toLocalDate()
+              ?.format(canonicalizedDatePattern)
+          }
+            ?: questionnaireItemViewItem.draftAnswer as? String
+
+        timeInputEditText.setText(
+          questionnaireItemViewItem.answers
+            .singleOrNull()
+            ?.valueDateTimeType
+            ?.localDateTime?.toLocalizedTimeString(timeInputEditText.context)
+        )
+
         try {
-          (questionnaireItemViewItem.draftAnswer as? String)?.let {
-            localDate = parseDate(it, canonicalizedDatePattern)
+          Log.i(
+            "TEST",
+            "$textToDisplay and the link id is ${questionnaireItemViewItem.questionnaireItem.linkId}"
+          )
+          if (dateInputEditText.text.toString() != textToDisplay) {
+            dateInputEditText.setText(textToDisplay)
+          }
+          if (textToDisplay != null) {
+            localDate = parseDate(textToDisplay, canonicalizedDatePattern)
             enableOrDisableTimePicker(enableIt = true)
-            dateInputEditText.setText(it)
           }
           displayDateValidationError(questionnaireItemViewItem.validationResult)
-          displayTimeValidationError(questionnaireItemViewItem.validationResult)
         } catch (e: ParseException) {
           enableOrDisableTimePicker(enableIt = false)
           timeInputEditText.setText("")
@@ -279,6 +305,9 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           localDate = parseDate(text, canonicalizedDatePattern)
           questionnaireItemViewItem.setDraftAnswer(text.toString())
         } catch (e: ParseException) {
+          if (questionnaireItemViewItem.answers.isNotEmpty()) {
+            questionnaireItemViewItem.clearAnswer()
+          }
           questionnaireItemViewItem.setDraftAnswer(text.toString())
           localDate = null
         }
@@ -330,6 +359,17 @@ internal val DateTimeType.localDate
 internal val DateTimeType.localTime
   get() =
     LocalTime.of(
+      hour,
+      minute,
+      second,
+    )
+
+internal val DateTimeType.localDateTime
+  get() =
+    LocalDateTime.of(
+      year,
+      month + 1,
+      day,
       hour,
       minute,
       second,
