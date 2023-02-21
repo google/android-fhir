@@ -30,7 +30,6 @@ import com.google.android.fhir.datacapture.utilities.format
 import com.google.android.fhir.datacapture.utilities.getDateSeparator
 import com.google.android.fhir.datacapture.utilities.parseDate
 import com.google.android.fhir.datacapture.utilities.toLocalizedString
-import com.google.android.fhir.datacapture.utilities.toLocalizedTimeString
 import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -127,16 +126,20 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         dateInputLayout.hint = canonicalizedDatePattern
         dateInputEditText.removeTextChangedListener(textWatcher)
 
+        val questionnaireItemViewItemDateTimeAnswer =
+          questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType?.localDateTime
+
         val textToDisplay =
-          questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType?.let {
-            it.localDateTime.toLocalDate()?.format(canonicalizedDatePattern)
+          questionnaireItemViewItemDateTimeAnswer?.let {
+            it.toLocalDate()?.format(canonicalizedDatePattern)
           }
             ?: questionnaireItemViewItem.draftAnswer as? String
 
+        if (dateInputEditText.text.toString() != textToDisplay) {
+          dateInputEditText.setText(textToDisplay)
+        }
+
         try {
-          if (dateInputEditText.text.toString() != textToDisplay) {
-            dateInputEditText.setText(textToDisplay)
-          }
           if (textToDisplay != null) {
             parseDate(textToDisplay, canonicalizedDatePattern)
             enableOrDisableTimePicker(enableIt = true)
@@ -144,7 +147,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           displayDateValidationError(questionnaireItemViewItem.validationResult)
         } catch (e: ParseException) {
           enableOrDisableTimePicker(enableIt = false)
-          timeInputEditText.setText("")
           displayDateValidationError(
             Invalid(
               listOf(
@@ -159,10 +161,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         }
 
         timeInputEditText.setText(
-          questionnaireItemViewItem.answers
-            .singleOrNull()
-            ?.valueDateTimeType
-            ?.localDateTime?.toLocalizedTimeString(timeInputEditText.context)
+          questionnaireItemViewItemDateTimeAnswer
+            ?.toLocalTime()
+            ?.toLocalizedString(timeInputEditText.context)
+            ?: ""
         )
         dateInputEditText.addTextChangedListener(textWatcher)
       }
@@ -260,15 +262,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           .show(context.tryUnwrapContext()!!.supportFragmentManager, TAG_TIME_PICKER)
       }
 
-      private fun updateAnswerAfterTextChanged(text: String?) {
-        if (text.isNullOrEmpty()) {
-          questionnaireItemViewItem.clearAnswer()
-          return
-        }
-        // Always set the draft answer because time is not input yet
-        questionnaireItemViewItem.setDraftAnswer(text.toString())
-      }
-
       /** Automatically appends date separator (e.g. "/") during date input. */
       inner class DatePatternTextWatcher(private val datePatternSeparator: Char) : TextWatcher {
         private var isDeleting = false
@@ -296,7 +289,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             datePatternSeparator,
             isDeleting
           )
-          updateAnswerAfterTextChanged(editable.toString())
+          // Always set the draft answer because time is not input yet
+          questionnaireItemViewItem.setDraftAnswer(editable.toString())
         }
       }
     }
