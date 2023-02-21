@@ -72,9 +72,10 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
           .onEach { populateViewWithAnswerOption(it.first, it.second, choiceOrientation) }
           .map { it.first }
           .let { flow.referencedIds = it.toIntArray() }
+        displayValidationResult(questionnaireItemViewItem.validationResult)
       }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {
+      private fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
           is NotValidated,
           Valid -> header.showErrorText(isErrorTextVisible = false)

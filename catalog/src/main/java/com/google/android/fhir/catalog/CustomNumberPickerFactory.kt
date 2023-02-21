@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.google.android.fhir.catalog
 
 import android.view.View
 import android.widget.NumberPicker
-import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
@@ -41,10 +40,6 @@ object CustomNumberPickerFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         numberPicker.minValue = 1
         numberPicker.maxValue = 100
-      }
-
-      override fun displayValidationResult(validationResult: ValidationResult) {
-        // Custom validation message
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

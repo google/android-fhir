@@ -21,13 +21,17 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.add
 import androidx.fragment.app.commitNow
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.datacapture.TestQuestionnaireFragment.Companion.QUESTIONNAIRE_FILE_PATH_KEY
 import com.google.android.fhir.datacapture.test.R
 import com.google.android.fhir.datacapture.utilities.clickOnText
+import com.google.android.material.textfield.TextInputLayout
+import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -45,14 +49,14 @@ class QuestionnaireUiEspressoTest {
 
   @Before
   fun setup() {
-    activityScenarioRule.getScenario().onActivity { activity -> parent = FrameLayout(activity) }
+    activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }
   }
 
   @Test
   fun shouldDisplayReviewButtonWhenNoMorePagesToDisplay() {
     val bundle =
       bundleOf(QUESTIONNAIRE_FILE_PATH_KEY to "/paginated_questionnaire_with_dependent_answer.json")
-    activityScenarioRule.getScenario().onActivity { activity ->
+    activityScenarioRule.scenario.onActivity { activity ->
       activity.supportFragmentManager.commitNow {
         setReorderingAllowed(true)
         add<TestQuestionnaireFragment>(R.id.container_holder, args = bundle)
@@ -79,5 +83,21 @@ class QuestionnaireUiEspressoTest {
           ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)
         )
       )
+  }
+
+  @Test
+  fun integerTextEdit_inputOutOfRange_shouldShowError() {
+    val bundle = bundleOf(QUESTIONNAIRE_FILE_PATH_KEY to "/text_questionnaire_integer.json")
+    activityScenarioRule.scenario.onActivity { activity ->
+      activity.supportFragmentManager.commitNow {
+        setReorderingAllowed(true)
+        add<TestQuestionnaireFragment>(R.id.container_holder, args = bundle)
+      }
+    }
+    onView(withId(R.id.text_input_edit_text)).perform(typeText("12345678901"))
+    onView(withId(R.id.text_input_layout)).check { view, _ ->
+      val actualError = (view as TextInputLayout).error
+      assertThat(actualError).isEqualTo("Number must be between -2,147,483,648 and 2,147,483,647")
+    }
   }
 }

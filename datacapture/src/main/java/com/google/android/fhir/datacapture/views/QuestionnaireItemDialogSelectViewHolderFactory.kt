@@ -31,6 +31,7 @@ import com.google.android.fhir.datacapture.common.datatype.displayString
 import com.google.android.fhir.datacapture.itemControl
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -107,9 +108,11 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
         // views will open the dialog.
         holder.summary.setOnClickListener(onClick)
         holder.summaryHolder.setEndIconOnClickListener(onClick)
+
+        displayValidationResult(questionnaireItemViewItem.validationResult)
       }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {
+      private fun displayValidationResult(validationResult: ValidationResult) {
         holder.summaryHolder.error =
           when (validationResult) {
             is NotValidated,

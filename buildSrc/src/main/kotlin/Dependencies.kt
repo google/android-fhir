@@ -251,7 +251,7 @@ object Dependencies {
     }
 
     object Kotlin {
-      const val kotlinCoroutinesCore = "1.6.2"
+      const val kotlinCoroutinesCore = "1.6.4"
       const val stdlib = "1.6.10"
     }
 

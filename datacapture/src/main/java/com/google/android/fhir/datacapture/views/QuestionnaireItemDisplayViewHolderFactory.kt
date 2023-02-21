@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.views
 
 import android.view.View
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.validation.ValidationResult
 
 internal object QuestionnaireItemDisplayViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_display_view) {
@@ -33,10 +32,6 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
-      }
-
-      override fun displayValidationResult(validationResult: ValidationResult) {
-        // Display type questions have no user input to be validated
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

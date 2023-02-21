@@ -87,67 +87,19 @@ function build_only() {
 }
 
 # Runs instrumentation tests using Firebase Test Lab, and retrieves the code
-# coverage reports. First, we have to create the APKs to upload to Firebase.
-# There are four APKs that we use: one for each of the libraries we want to test,
-# and one for the demo app.
-#
-# 9 tests run in total: for each library, we run against 3 different API levels.
-# The tests for each library run in parallel and as background processes, but,
-# we wait for Firebase to finish execution of all the tests before pulling the
-# code coverage results from the GCS bucket.
-#
-# See: https://cloud.google.com/sdk/gcloud/reference/firebase/test/android/run
-# for documentation on the gcloud command used in this function
-# See: https://cloud.google.com/storage/docs/gsutil/commands/cp
-# for documentation on the gsutil command used in this function
+# coverage reports.
 function device_tests() {
   ./gradlew packageDebugAndroidTest --scan --stacktrace
-  local lib_names=("datacapture" "engine")
-  firebase_pids=()
-  for lib_name in "${lib_names[@]}"; do
-   gcloud firebase test android run --type instrumentation \
-      --app demo/build/outputs/apk/androidTest/debug/demo-debug-androidTest.apk \
-      --test $lib_name/build/outputs/apk/androidTest/debug/$lib_name-debug-androidTest.apk \
-      --timeout 30m \
-      --device model=Nexus6P,version=24,locale=en_US \
-      --device model=Nexus6P,version=27,locale=en_US \
-      --device model=Pixel2,version=30,locale=en_US \
-      --environment-variables coverage=true,coverageFile="/sdcard/Download/coverage.ec" \
-      --directories-to-pull /sdcard/Download  \
-      --results-bucket=$GCS_BUCKET \
-      --results-dir=$KOKORO_BUILD_ARTIFACTS_SUBDIR/firebase/$lib_name \
-      --project=android-fhir-instrumeted-tests \
-      --num-flaky-test-attempts 3 \
-      --no-use-orchestrator &
+    local lib_names=("datacapture" "engine" "workflow")
+    firebase_pids=()
+    for lib_name in "${lib_names[@]}"; do
+      ./gradlew :$lib_name:runFlank  --scan --stacktrace &
       firebase_pids+=("$!")
-  done
+    done
 
-  local lib_names_min_sdk_26=("workflow")
-  for lib_name in "${lib_names_min_sdk_26[@]}"; do
-   gcloud firebase test android run --type instrumentation \
-      --app demo/build/outputs/apk/androidTest/debug/demo-debug-androidTest.apk \
-      --test $lib_name/build/outputs/apk/androidTest/debug/$lib_name-debug-androidTest.apk \
-      --timeout 30m \
-      --device model=Nexus6P,version=27,locale=en_US \
-      --device model=Pixel2,version=30,locale=en_US \
-      --environment-variables coverage=true,coverageFile="/sdcard/Download/coverage.ec" \
-      --directories-to-pull /sdcard/Download  \
-      --results-bucket=$GCS_BUCKET \
-      --results-dir=$KOKORO_BUILD_ARTIFACTS_SUBDIR/firebase/$lib_name \
-      --project=android-fhir-instrumeted-tests \
-      --no-use-orchestrator &
-      firebase_pids+=("$!")
-  done
-
-  for firebase_pid in ${firebase_pids[*]}; do
-    wait $firebase_pid
-  done
-
-  mkdir -p {datacapture,engine,workflow}/build/outputs/code_coverage/debugAndroidTest/connected/firebase
-  for lib_name in "${lib_names[@]}"; do
-    gsutil -m cp -R gs://$GCS_BUCKET/$KOKORO_BUILD_ARTIFACTS_SUBDIR/firebase/$lib_name/Pixel2-30-en_US-portrait/**/coverage.ec \
-      $lib_name/build/outputs/code_coverage/debugAndroidTest/connected/firebase
-  done
+    for firebase_pid in ${firebase_pids[*]}; do
+        wait $firebase_pid
+    done
 }
 
 # Generates JaCoCo reports and uploads to Codecov: https://about.codecov.io/
