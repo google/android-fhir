@@ -20,11 +20,17 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
     android:layout_marginTop="@dimen/padding_default"
-    android:orientation="horizontal"
+    android:orientation="vertical"
 >
 
     <com.google.android.fhir.datacapture.views.QuestionnaireItemHeaderView
         android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    />
+
+    <com.google.android.fhir.datacapture.views.QuestionnaireItemMediaView
+        android:id="@+id/item_media"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
     />

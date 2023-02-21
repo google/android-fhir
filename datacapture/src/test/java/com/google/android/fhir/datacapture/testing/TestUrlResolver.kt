@@ -16,18 +16,16 @@
 
 package com.google.android.fhir.datacapture.testing
 
-import android.app.Application
-import com.google.android.fhir.datacapture.DataCaptureConfig
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import com.google.android.fhir.datacapture.UrlResolver
 
-/** Application class when you want to test the [DataCaptureConfig.Provider]. */
-internal class DataCaptureTestApplication : Application(), DataCaptureConfig.Provider {
-  var dataCaptureConfiguration: DataCaptureConfig? = null
+class TestUrlResolver(private val correctUrl: String, private val decodedBase64Image: ByteArray) :
+  UrlResolver {
 
-  override fun getDataCaptureConfig(): DataCaptureConfig {
-    if (dataCaptureConfiguration == null) {
-      dataCaptureConfiguration = DataCaptureConfig()
-    }
-
-    return dataCaptureConfiguration!!
+  override suspend fun resolveBitmapUrl(url: String): Bitmap? {
+    if (url == correctUrl)
+      return BitmapFactory.decodeByteArray(decodedBase64Image, 0, decodedBase64Image.size)
+    return null
   }
 }

@@ -21,6 +21,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.R
 
 /**
  * Factory for [QuestionnaireItemViewHolder].
@@ -51,13 +52,18 @@ open class QuestionnaireItemViewHolder(
   itemView: View,
   private val delegate: QuestionnaireItemViewHolderDelegate
 ) : RecyclerView.ViewHolder(itemView) {
+
+  private var itemMediaView: QuestionnaireItemMediaView
+
   init {
     delegate.init(itemView)
+    itemMediaView = itemView.findViewById(R.id.item_media)
   }
 
   open fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     delegate.questionnaireItemViewItem = questionnaireItemViewItem
     delegate.bind(questionnaireItemViewItem)
+    itemMediaView.bind(questionnaireItemViewItem.questionnaireItem)
     delegate.setReadOnly(questionnaireItemViewItem.questionnaireItem.readOnly)
   }
 }
