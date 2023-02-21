@@ -104,6 +104,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         timeInputLayout = itemView.findViewById(R.id.time_input_layout)
         timeInputEditText = itemView.findViewById(R.id.time_input_edit_text)
         timeInputEditText.inputType = InputType.TYPE_NULL
+        timeInputLayout.isEnabled = false
         timeInputLayout.setEndIconOnClickListener {
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
@@ -227,7 +228,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       private fun clearPreviousState() {
         localDate = null
         localTime = null
-        setReadOnlyInternal(isReadOnly = false)
+        dateInputEditText.isEnabled = true
+        dateInputLayout.isEnabled = true
       }
 
       private fun enableOrDisableTimePicker(enableIt: Boolean) {
@@ -256,16 +258,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               with(LocalTime.of(this.hour, this.minute, 0)) {
                 localTime = this
                 timeInputEditText.setText(this.toLocalizedString(context))
-                if (localDate == null) {
-                  timeInputEditText.setText("")
-                  displayTimeValidationError(
-                    Invalid(
-                      listOf(
-                        "Please fill in date first"
-                      )
-                    )
-                  )
-                }
                 localDate?.let {  updateDateTimeAnswer(LocalDateTime.of(it, localTime)) }
                 timeInputEditText.clearFocus()
               }
