@@ -284,14 +284,6 @@ internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
       }
     }
   }
-
-/**
- * Whether the corresponding [QuestionnaireResponse.QuestionnaireResponseItemComponent] should have
- * nested items within [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent](s).
- */
-internal val Questionnaire.QuestionnaireItemComponent.hasNestedItemsWithinAnswers: Boolean
-  get() = item.isNotEmpty() && type != Questionnaire.QuestionnaireItemType.GROUP
-
 /** Converts Text with HTML Tag to formated text. */
 private fun String.toSpanned(): Spanned {
   return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
@@ -425,6 +417,32 @@ internal val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
   }
 
 /**
+ * Whether the corresponding [QuestionnaireResponse.QuestionnaireResponseItemComponent] should have
+ * [QuestionnaireResponse.QuestionnaireResponseItemComponent]s nested under
+ * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent](s).
+ *
+ * This is true for the following two cases:
+ * 1. Non-group questions with nested items
+ * 2. Repeated groups with nested items
+ *
+ * Non-repeated groups should have child items nested directly under the group itself.
+ *
+ * For background, see https://build.fhir.org/questionnaireresponse.html#link.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.shouldHaveNestedItemsUnderAnswers: Boolean
+  get() = item.isNotEmpty() && (type != Questionnaire.QuestionnaireItemType.GROUP || !repeats)
+
+/**
+ * Creates a list of [QuestionnaireResponse.QuestionnaireResponseItemComponent]s from the nested
+ * items in the [Questionnaire.QuestionnaireItemComponent].
+ *
+ * The hierarchy and order of child items will be retained as specified in the standard. See
+ * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
+ */
+fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
+  item.map { it.createQuestionnaireResponseItem() }
+
+/**
  * Creates a [QuestionnaireResponse.QuestionnaireResponseItemComponent] from the provided
  * [Questionnaire.QuestionnaireItemComponent].
  *
@@ -436,10 +454,10 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
   return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
     answer = createQuestionnaireResponseItemAnswers()
-    if (hasNestedItemsWithinAnswers && answer.isNotEmpty()) {
+    if (shouldHaveNestedItemsUnderAnswers && answer.isNotEmpty()) {
       this.addNestedItemsToAnswer(this@createQuestionnaireResponseItem)
     } else if (this@createQuestionnaireResponseItem.type ==
-        Questionnaire.QuestionnaireItemType.GROUP
+        Questionnaire.QuestionnaireItemType.GROUP && !repeats
     ) {
       this@createQuestionnaireResponseItem.item.forEach {
         this.addItem(it.createQuestionnaireResponseItem())
@@ -490,20 +508,6 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
       value = initial[0].value
     }
   )
-}
-
-/**
- * Add items within [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] from the
- * provided parent [Questionnaire.QuestionnaireItemComponent] with nested items. The hierarchy and
- * order of child items will be retained as specified in the standard. See
- * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
- */
-fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAnswer(
-  questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
-) {
-  if (answer.isNotEmpty()) {
-    answer.first().item = questionnaireItemComponent.getNestedQuestionnaireResponseItems()
-  }
 }
 
 internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expression?
@@ -598,16 +602,6 @@ fun List<Questionnaire.QuestionnaireItemComponent>.flattened():
   List<Questionnaire.QuestionnaireItemComponent> {
   return this + this.flatMap { it.item.flattened() }
 }
-
-/**
- * Creates a list of [QuestionnaireResponse.QuestionnaireResponseItemComponent]s from the nested
- * items in the [Questionnaire.QuestionnaireItemComponent].
- *
- * The hierarchy and order of child items will be retained as specified in the standard. See
- * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
- */
-fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
-  item.map { it.createQuestionnaireResponseItem() }
 
 val Resource.logicalId: String
   get() {
