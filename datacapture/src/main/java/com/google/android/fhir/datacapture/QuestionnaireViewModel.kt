@@ -837,6 +837,11 @@ internal val QuestionnairePagination.hasNextPage: Boolean
  * Returns a list of values built from the elements of `this` and the
  * `questionnaireResponseItemList` with the same linkId using the provided `transform` function
  * applied to each pair of questionnaire item and questionnaire response item.
+ *
+ * It is assumed that the linkIds are unique in `this` and in `questionnaireResponseItemList`.
+ *
+ * Although linkIds may appear more than once in questionnaire response, they would not appear more
+ * than once within a list of questionnaire response items sharing the same parent.
  */
 private inline fun <T> List<QuestionnaireItemComponent>.zipByLinkId(
   questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>,
