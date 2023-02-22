@@ -18,17 +18,19 @@ package com.google.android.fhir.datacapture.common.datatype
 
 import android.content.Context
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.utilities.format
-import com.google.android.fhir.datacapture.utilities.toLocalizedString
+import com.google.android.fhir.datacapture.format
+import com.google.android.fhir.datacapture.toLocalizedString
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localTime
 import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.PrimitiveType
 import org.hl7.fhir.r4.model.Quantity
@@ -91,3 +93,23 @@ fun Type.displayString(context: Context): String =
         ?: context.getString(R.string.not_answered)
     else -> context.getString(R.string.not_answered)
   }
+
+/** Converts StringType to toUriType. */
+internal fun StringType.toUriType(): UriType {
+  return UriType(value)
+}
+
+/** Converts StringType to CodeType. */
+internal fun StringType.toCodeType(): CodeType {
+  return CodeType(value)
+}
+
+/** Converts StringType to IdType. */
+internal fun StringType.toIdType(): IdType {
+  return IdType(value)
+}
+
+/** Converts Coding to CodeType. */
+internal fun Coding.toCodeType(): CodeType {
+  return CodeType(code)
+}

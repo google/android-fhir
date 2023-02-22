@@ -22,11 +22,11 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.utilities.canonicalizeDatePattern
-import com.google.android.fhir.datacapture.utilities.format
-import com.google.android.fhir.datacapture.utilities.getDateSeparator
-import com.google.android.fhir.datacapture.utilities.parseDate
-import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
+import com.google.android.fhir.datacapture.canonicalizeDatePattern
+import com.google.android.fhir.datacapture.format
+import com.google.android.fhir.datacapture.getDateSeparator
+import com.google.android.fhir.datacapture.parseDate
+import com.google.android.fhir.datacapture.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.MaxValueConstraintValidator.getMaxValue
 import com.google.android.fhir.datacapture.validation.MinValueConstraintValidator.getMinValue

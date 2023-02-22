@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.google.android.fhir.datacapture.contrib.views.PhoneNumberViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
@@ -94,7 +93,6 @@ internal class QuestionnaireEditAdapter(
         QuestionnaireViewHolderType.PHONE_NUMBER -> PhoneNumberViewHolderFactory
         QuestionnaireViewHolderType.ATTACHMENT -> AttachmentViewHolderFactory
       }
-        as QuestionnaireItemViewHolderFactory
     return viewHolderFactory.create(parent)
   }
 

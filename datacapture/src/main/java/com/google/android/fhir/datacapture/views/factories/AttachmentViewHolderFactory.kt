@@ -37,7 +37,7 @@ import com.google.android.fhir.datacapture.hasMimeTypeOnly
 import com.google.android.fhir.datacapture.isGivenSizeOverLimit
 import com.google.android.fhir.datacapture.maxSizeInMiBs
 import com.google.android.fhir.datacapture.mimeTypes
-import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
+import com.google.android.fhir.datacapture.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid

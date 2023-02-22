@@ -31,7 +31,7 @@ import com.google.android.fhir.datacapture.common.datatype.displayString
 import com.google.android.fhir.datacapture.itemControl
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
-import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
+import com.google.android.fhir.datacapture.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid

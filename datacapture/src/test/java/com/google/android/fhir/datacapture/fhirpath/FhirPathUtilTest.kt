@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.fhirpath
 
-import com.google.android.fhir.datacapture.utilities.evaluateToDisplay
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Patient

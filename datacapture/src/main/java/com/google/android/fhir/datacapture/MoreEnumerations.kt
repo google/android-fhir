@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.utilities
+package com.google.android.fhir.datacapture
 
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Enumeration
@@ -52,3 +52,18 @@ internal fun Enumeration<*>.toCoding(): Coding {
       }
   }
 }
+
+/**
+ * Invokes function specified by [functionName] on the calling object with the provided arguments
+ * [args]
+ */
+private fun Any.invokeFunction(
+  functionName: String,
+  parameterTypes: List<Class<*>> = listOf(),
+  vararg args: Any?
+): Any? =
+  this::class
+    .java
+    .getDeclaredMethod(functionName, *parameterTypes.toTypedArray())
+    .apply { isAccessible = true }
+    .invoke(this, *args)

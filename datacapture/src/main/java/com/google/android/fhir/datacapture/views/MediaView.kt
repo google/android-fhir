@@ -30,7 +30,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.decodeToBitmap
 import com.google.android.fhir.datacapture.fetchBitmapFromUrl
 import com.google.android.fhir.datacapture.itemMedia
-import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
+import com.google.android.fhir.datacapture.tryUnwrapContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
