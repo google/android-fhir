@@ -635,9 +635,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         )
       )
 
-      // Add nested questions after the parent item. We need to get the questionnaire items and the
-      // matching questionnaire response items (there could be multiple sets of them) and generate
-      // the adapter items. There are three different cases:
+      // Add nested questions after the parent item. We need to get the questionnaire items and
+      // (possibly multiple sets of) matching questionnaire response items and generate the adapter
+      // items. There are three different cases:
       // 1. Questions nested under a non-repeated group: Simply take the nested question items and
       // the nested question response items and "zip" them.
       // 2. Questions nested under a question: In this case, the nested questions are repeated for
