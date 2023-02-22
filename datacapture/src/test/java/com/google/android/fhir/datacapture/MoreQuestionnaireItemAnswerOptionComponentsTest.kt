@@ -41,7 +41,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class MoreQuestionnaireItemAnswerOptionComponent {
+class MoreQuestionnaireItemAnswerOptionComponentsTest {
 
   private val context = ApplicationProvider.getApplicationContext<Application>()
 

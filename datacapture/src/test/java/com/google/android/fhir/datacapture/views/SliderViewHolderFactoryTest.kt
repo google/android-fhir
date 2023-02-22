@@ -23,9 +23,9 @@ import com.google.android.fhir.datacapture.EXTENSION_SLIDER_STEP_VALUE_URL
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.views.factories.SliderViewHolderFactory
 import com.google.android.material.slider.Slider
 import com.google.common.truth.Truth.assertThat
-import java.lang.IllegalStateException
 import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire

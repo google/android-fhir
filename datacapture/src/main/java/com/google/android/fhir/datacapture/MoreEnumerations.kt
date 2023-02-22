@@ -57,7 +57,7 @@ internal fun Enumeration<*>.toCoding(): Coding {
  * Invokes function specified by [functionName] on the calling object with the provided arguments
  * [args]
  */
-private fun Any.invokeFunction(
+internal fun Any.invokeFunction(
   functionName: String,
   parameterTypes: List<Class<*>> = listOf(),
   vararg args: Any?

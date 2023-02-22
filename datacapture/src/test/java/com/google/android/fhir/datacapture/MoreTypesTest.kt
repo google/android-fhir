@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.common.datatype
+package com.google.android.fhir.datacapture
 
 import android.os.Build
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
+import com.google.android.fhir.datacapture.common.datatype.asStringValue
+import com.google.android.fhir.datacapture.common.datatype.toCodeType
+import com.google.android.fhir.datacapture.common.datatype.toIdType
+import com.google.android.fhir.datacapture.common.datatype.toUriType
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
 import java.time.ZoneId
@@ -27,6 +31,7 @@ import org.hl7.fhir.r4.model.Base64BinaryType
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeType
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.IdType
@@ -36,6 +41,7 @@ import org.hl7.fhir.r4.model.MarkdownType
 import org.hl7.fhir.r4.model.OidType
 import org.hl7.fhir.r4.model.PositiveIntType
 import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UnsignedIntType
@@ -168,5 +174,28 @@ class MoreTypesTest {
   fun nonPrimitive_shouldReturnEmptyString() {
     val value = Quantity(1234567.89)
     assertThat((value as Type).asStringValue()).isEqualTo("")
+  }
+  @Test
+  fun stringType_toUriType() {
+    val uri = StringType("fakeUri").toUriType()
+    assertThat(uri.equalsDeep(UriType("fakeUri"))).isTrue()
+  }
+
+  @Test
+  fun stringType_toCodeType() {
+    val code = StringType("fakeCode").toCodeType()
+    assertThat(code.equalsDeep(CodeType("fakeCode"))).isTrue()
+  }
+
+  @Test
+  fun stringType_toIdType() {
+    val id = StringType("fakeId").toIdType()
+    assertThat(id.equalsDeep(IdType("fakeId"))).isTrue()
+  }
+
+  @Test
+  fun coding_toCodeType() {
+    val code = Coding("fakeSystem", "fakeCode", "fakeDisplay").toCodeType()
+    assertThat(code.equalsDeep(CodeType("fakeCode"))).isTrue()
   }
 }

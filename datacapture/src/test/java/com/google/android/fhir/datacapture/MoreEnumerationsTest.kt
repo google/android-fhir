@@ -39,4 +39,26 @@ class MoreEnumerationTest {
       }
     assertThat(maleEnumerationCoding.equalsShallow(coding)).isTrue()
   }
+
+  @Test
+  fun invokeFunction_shouldWorkWithNoArgs() {
+    val string = "android-fhir"
+    val length = string.invokeFunction("length")
+    assertThat(length).isEqualTo(12)
+  }
+
+  @Test
+  fun invokeFunction_shouldWorkWithSingleArgs() {
+    val string = "android-fhir"
+    val subString = string.invokeFunction("substring", listOf(Int::class.java), 8)
+    assertThat(subString).isEqualTo("fhir")
+  }
+
+  @Test
+  fun invokeFunction_shouldWorkWithMultipleArgs() {
+    val string = "android-fhir"
+    val startsWith =
+      string.invokeFunction("startsWith", listOf(String::class.java, Int::class.java), "droid", 2)
+    assertThat(startsWith).isEqualTo(true)
+  }
 }
