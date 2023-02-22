@@ -17,7 +17,7 @@
 package com.google.android.fhir.catalog
 
 import com.google.android.fhir.datacapture.QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher
-import com.google.android.fhir.datacapture.contrib.views.barcode.QuestionnaireItemBarCodeReaderViewHolderFactory
+import com.google.android.fhir.datacapture.contrib.views.barcode.BarCodeReaderViewHolderFactory
 
 // TODO Remove this file and move this code to maybe a custom view in catalog app?
 class CustomQuestionnaireFragment /*: QuestionnaireFragment()*/ {
@@ -29,13 +29,13 @@ class CustomQuestionnaireFragment /*: QuestionnaireFragment()*/ {
           if (it == null) false else it.value.toString() == CustomNumberPickerFactory.WIDGET_TYPE
         }
       },
-      QuestionnaireItemViewHolderFactoryMatcher(QuestionnaireItemBarCodeReaderViewHolderFactory) {
+      QuestionnaireItemViewHolderFactoryMatcher(BarCodeReaderViewHolderFactory) {
         questionnaireItem ->
         questionnaireItem
-          .getExtensionByUrl(QuestionnaireItemBarCodeReaderViewHolderFactory.WIDGET_EXTENSION)
+          .getExtensionByUrl(BarCodeReaderViewHolderFactory.WIDGET_EXTENSION)
           .let {
             if (it == null) false
-            else it.value.toString() == QuestionnaireItemBarCodeReaderViewHolderFactory.WIDGET_TYPE
+            else it.value.toString() == BarCodeReaderViewHolderFactory.WIDGET_TYPE
           }
       }
     )

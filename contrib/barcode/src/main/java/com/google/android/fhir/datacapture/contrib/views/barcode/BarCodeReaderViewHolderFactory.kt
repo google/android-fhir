@@ -29,7 +29,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
-object QuestionnaireItemBarCodeReaderViewHolderFactory :
+object BarCodeReaderViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_bar_code_reader_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
@@ -79,7 +79,7 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
           LiveBarcodeScanningFragment()
             .show(
               context.supportFragmentManager,
-              QuestionnaireItemBarCodeReaderViewHolderFactory.javaClass.simpleName
+              BarCodeReaderViewHolderFactory.javaClass.simpleName
             )
         }
       }

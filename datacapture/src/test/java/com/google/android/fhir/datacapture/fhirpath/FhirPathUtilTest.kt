@@ -14,34 +14,32 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.utilities
+package com.google.android.fhir.datacapture.fhirpath
 
-import android.app.Application
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.ContextThemeWrapper
+import com.google.android.fhir.datacapture.utilities.evaluateToDisplay
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.Patient
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class MoreContextsTest {
+class FhirPathUtilTest {
 
   @Test
-  fun context_should_return_appCompatActivity() {
-    val context = AppCompatActivity().tryUnwrapContext()
-    assertThat(context).isInstanceOf(AppCompatActivity::class.java)
-  }
+  fun `evaluateToDisplay should return concatenated string for expressions evaluation on given resource`() {
+    val expressions = listOf("name.given", "name.family")
+    val resource =
+      Patient().apply {
+        addName(
+          HumanName().apply {
+            this.family = "Doe"
+            this.addGiven("John")
+          }
+        )
+      }
 
-  @Test
-  fun context_should_return_baseContext_as_appCompatActivity() {
-    val context = ContextThemeWrapper(AppCompatActivity(), 0).tryUnwrapContext()
-    assertThat(context).isInstanceOf(AppCompatActivity::class.java)
-  }
-
-  @Test
-  fun context_should_return_null() {
-    val context = Application().tryUnwrapContext()
-    assertThat(context).isNull()
+    assertThat(evaluateToDisplay(expressions, resource)).isEqualTo("John Doe")
   }
 }

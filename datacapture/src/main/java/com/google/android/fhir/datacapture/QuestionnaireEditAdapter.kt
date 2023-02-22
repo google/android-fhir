@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.google.android.fhir.datacapture.contrib.views.QuestionnaireItemPhoneNumberViewHolderFactory
+import com.google.android.fhir.datacapture.contrib.views.PhoneNumberViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -102,7 +102,7 @@ internal class QuestionnaireEditAdapter(
           QuestionnaireItemDialogSelectViewHolderFactory
         QuestionnaireViewHolderType.SLIDER -> SliderViewHolderFactory
         QuestionnaireViewHolderType.PHONE_NUMBER ->
-          QuestionnaireItemPhoneNumberViewHolderFactory
+          PhoneNumberViewHolderFactory
         QuestionnaireViewHolderType.ATTACHMENT -> AttachmentViewHolderFactory
       } as QuestionnaireItemViewHolderFactory
     return viewHolderFactory.create(parent)

@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.utilities
+package com.google.android.fhir.datacapture
 
 import android.os.Build
+import com.google.android.fhir.datacapture.utilities.canonicalizeDatePattern
+import com.google.android.fhir.datacapture.utilities.format
+import com.google.android.fhir.datacapture.utilities.getDateSeparator
+import com.google.android.fhir.datacapture.utilities.parseDate
 import com.google.android.fhir.datacapture.views.factories.getLocalizedDateTimePattern
 import com.google.common.truth.Truth.assertThat
 import java.text.ParseException

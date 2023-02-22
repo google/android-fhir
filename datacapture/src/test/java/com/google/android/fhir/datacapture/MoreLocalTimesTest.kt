@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.utilities
+package com.google.android.fhir.datacapture
 
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
+import com.google.android.fhir.datacapture.utilities.toLocalizedString
 import com.google.common.truth.Truth.assertThat
 import java.time.LocalTime
 import java.util.Locale

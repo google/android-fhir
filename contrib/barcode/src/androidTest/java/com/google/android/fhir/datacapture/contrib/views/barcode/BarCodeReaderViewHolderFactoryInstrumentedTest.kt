@@ -35,7 +35,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
+class BarCodeReaderViewHolderFactoryInstrumentedTest {
 
   private lateinit var context: ContextThemeWrapper
   private lateinit var parent: FrameLayout
@@ -49,7 +49,7 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
         R.style.Theme_MaterialComponents
       )
     parent = FrameLayout(context)
-    viewHolder = QuestionnaireItemBarCodeReaderViewHolderFactory.create(parent)
+    viewHolder = BarCodeReaderViewHolderFactory.create(parent)
   }
 
   @Test
