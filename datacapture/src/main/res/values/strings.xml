@@ -1,52 +1,59 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string
-        name="required_constraint_validation_error_msg"
-    >Missing answer for required field.</string>
-    <string
-        name="min_value_validation_error_msg"
-    >Minimum value allowed is:<xliff:g id="min_value">%1$s</xliff:g> </string>
-    <string
-        name="max_decimal_validation_error_msg"
-    >The maximum number of decimal places that are permitted in the answer is: <xliff:g
-            id="max_value"
-        >%1$s</xliff:g>  </string>
-    <string
-        name="max_value_validation_error_msg"
-    >Maximum value allowed is:<xliff:g id="max_value">%1$s</xliff:g> </string>
-    <string
-        name="number_format_validation_error_msg"
-    >Only use (.) between two numbers. Other special characters are not supported.</string>
-    <string
-        name="date_format_validation_error_msg"
-    >Date format needs to be <xliff:g
-            id="locale_format"
-        >%1$s</xliff:g> (e.g. %2$s)</string>
-    <string name="submit_button_text">Submit</string>
+
+    <!-- 1. The following sections include strings used for the questionnaire UI -->
+
+    <!-- 1.1 Navigation -->
     <string name="button_pagination_next">Next</string>
     <string name="button_pagination_previous">Previous</string>
     <string name="back_button_text">Back</string>
     <string name="edit_button_text">Edit</string>
     <string name="review_answers_text">Review answers</string>
+    <string name="button_review">Review</string>
+    <string name="submit_questionnaire">Submit</string>
 
+    <!-- 1.2 Submit Pop-up -->
+    <string name="questionnaire_validation_error_headline">Errors found</string>
+    <string
+        name="questionnaire_validation_error_supporting_text"
+    >Fix the following questions:</string>
+    <string
+        name="questionnaire_validation_error_item_text_with_bullet"
+    >• %s</string>
+    <string
+        name="questionnaire_validation_error_submit_button_text"
+    >Submit anyway</string>
+    <string
+        name="questionnaire_validation_error_fix_button_text"
+    >Fix questions</string>
+    
+    <!-- 2. The following sections include strings used in widgets -->
+
+    <!-- 2.1 All Widgets -->
+    <string name="not_answered">"Not Answered"</string>
+    <string name="help">Help</string>
+
+    <!-- 2.2 Boolean -->
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+
+    <!-- 2.3 Drop Down -->
+    <string name="hyphen">-</string>
+
+    <!-- 2.4 Multi Select / Open Choice -->
     <string name="open_choice_other">Other</string>
     <string name="open_choice_other_hint">Enter custom option</string>
     <string name="open_choice_other_add_another">Add another answer</string>
     <string name="multi_select_dialog_subtitle">Select all that apply</string>
-    <string name="no">No</string>
-    <string name="yes">Yes</string>
-    <string name="submit_questionnaire">Submit</string>
     <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- 2.5 Date / DateTime -->
     <string name="date">Date</string>
     <string name="time">Time</string>
     <string name="select_date">Select date</string>
     <string name="select_time">Select time</string>
-    <string name="hyphen">-</string>
-    <string name="cancel">Cancel</string>
-    <string name="button_review">Review</string>
-    <string name="not_answered">"Not Answered"</string>
-    <string name="help">Help</string>
-    <string name="space_asterisk">\u0020\u002a</string>
-    <string name="group_header_add_item_button">Add item</string>
+
+    <!-- 2.6 Attachment widget -->
     <string name="take_photo">Take Photo</string>
     <string name="cd_photo_preview">Photo Preview</string>
     <string name="cd_file_icon_preview">File Icon Preview</string>
@@ -76,18 +83,24 @@
     <string name="video_deleted">Video deleted</string>
     <string name="audio_deleted">Audio deleted</string>
 
-    <!-- Questionnaire validation popup texts-->
-    <string name="questionnaire_validation_error_headline">Errors found</string>
+    <!-- 2.7 Group -->
+    <string name="group_header_add_item_button">Add item</string>
+
+    <!-- 3. The following sections include strings used in validation -->
+
+    <!-- 3.1 Validation -->
     <string
-        name="questionnaire_validation_error_supporting_text"
-    >Fix the following questions:</string>
+        name="required_constraint_validation_error_msg"
+    >Missing answer for required field.</string>
     <string
-        name="questionnaire_validation_error_item_text_with_bullet"
-    >• %s</string>
+        name="min_value_validation_error_msg"
+    >Minimum value allowed is:<xliff:g id="min_value">%1$s</xliff:g> </string>
     <string
-        name="questionnaire_validation_error_submit_button_text"
-    >Submit anyway</string>
-    <string
+        name="max_decimal_validation_error_msg"
+    >The maximum number of decimal places that are permitted in the answer is: <xliff:g
+            id="max_value"
+        >%1$s</xliff:g>  </string>
+    <string 
         name="questionnaire_validation_error_fix_button_text"
     >Fix questions</string>
     <string name="questionnaire_yes_button_text">Yes</string>
@@ -95,4 +108,21 @@
     <string
         name="questionnaire_cancel_text"
     >Do you want to exit the questionnaire?</string>
+ 
+        name="max_value_validation_error_msg"
+    >Maximum value allowed is:<xliff:g id="max_value">%1$s</xliff:g> </string>
+    <string
+        name="number_format_validation_error_msg"
+    >Only use (.) between two numbers. Other special characters are not supported.</string>
+    <string
+        name="date_format_validation_error_msg"
+    >Date format needs to be <xliff:g
+            id="locale_format"
+        >%1$s</xliff:g> (e.g. %2$s)</string>
+    <string
+        name="integer_format_validation_error_msg"
+    >Number must be between <xliff:g id="min_value">%1$s</xliff:g> and <xliff:g
+            id="max_value"
+        >%2$s</xliff:g></string>
+ 
 </resources>

@@ -16,7 +16,10 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.text.Editable
 import android.text.InputType
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
@@ -31,7 +34,19 @@ internal class QuestionnaireItemEditTextStringViewHolderDelegate :
   QuestionnaireItemEditTextViewHolderDelegate(
     InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
   ) {
-  override fun getValue(
+  override fun handleInput(
+    editable: Editable,
+    questionnaireItemViewItem: QuestionnaireItemViewItem
+  ) {
+    val input = getValue(editable.toString())
+    if (input != null) {
+      questionnaireItemViewItem.setAnswer(input)
+    } else {
+      questionnaireItemViewItem.clearAnswer()
+    }
+  }
+
+  private fun getValue(
     text: String
   ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
     return text.let {
@@ -43,9 +58,14 @@ internal class QuestionnaireItemEditTextStringViewHolderDelegate :
     }
   }
 
-  override fun getText(
-    answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
-  ): String {
-    return answer?.valueStringType?.value ?: ""
+  override fun updateUI(
+    questionnaireItemViewItem: QuestionnaireItemViewItem,
+    textInputEditText: TextInputEditText,
+    textInputLayout: TextInputLayout,
+  ) {
+    val text = questionnaireItemViewItem.answers.singleOrNull()?.valueStringType?.value ?: ""
+    if ((text != textInputEditText.text.toString())) {
+      textInputEditText.setText(text)
+    }
   }
 }

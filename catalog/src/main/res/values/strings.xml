@@ -31,6 +31,8 @@
     <string name="component_name_dropdown">Dropdown</string>
     <string name="component_name_auto_complete">Auto Complete</string>
     <string name="component_name_help">Help</string>
+    <string name="component_name_item_media">Item Media</string>
+    <string name="component_name_item_answer_media">Item Answer Media</string>
     <string name="component_name_repeated_group">Repeated Group</string>
     <string name="component_name_attachment">Attachment</string>
     <string name="layout_name_default_text">Default</string>
