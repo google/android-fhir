@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture
 
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /**
@@ -28,3 +29,16 @@ val QuestionnaireResponse.QuestionnaireResponseItemComponent.descendant:
       this.item.flatMap { it.descendant } +
       this.answer.flatMap { answer -> answer.item.flatMap { it.descendant } }
   }
+
+/**
+ * Add nested items under the provided `questionnaireItem` to each answer in the questionnaire
+ * response item. The hierarchy and order of nested items will be retained as specified in the
+ * standard.
+ *
+ * See https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
+ */
+fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAnswer(
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent
+) {
+  answer.forEach { it.item = questionnaireItem.getNestedQuestionnaireResponseItems() }
+}
