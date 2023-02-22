@@ -1,521 +1,21 @@
 {
   "resourceType": "Questionnaire",
-  "language": "en-GB",
-  "id": "9b22f3ed-e7e1-4222-bf72-1ced42696189",
-  "title": "eCBIS New Pregnancy Registration",
-  "description": "eCBIS New Pregnancy Registration",
-  "version": "0.0.1",
-  "status": "active",
-  "publisher": "ONA",
-  "meta": {
-    "versionId": "1",
-    "lastUpdated": "2022-06-19T22:37:17.178+00:00",
-    "profile": [
-      "http://ehelse.no/fhir/StructureDefinition/sdf-Questionnaire"
-    ],
-    "tag": [
-      {
-        "system": "urn:ietf:bcp:47",
-        "code": "en-GB",
-        "display": "English"
-      }
-    ]
-  },
-  "useContext": [
-    {
-      "code": {
-        "system": "http://hl7.org/fhir/ValueSet/usage-context-type",
-        "code": "focus",
-        "display": "Clinical Focus"
-      },
-      "valueCodeableConcept": {
-        "coding": [
-          {
-            "system": "urn:oid:2.16.578.1.12.4.1.1.8655",
-            "display": "eCBIS New Pregnancy Registration"
-          }
-        ]
-      }
-    }
-  ],
-  "contact": [
-    {
-      "name": "https://www.smartregister.org/"
-    }
-  ],
-  "subjectType": [
-    "Patient"
-  ],
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap",
-      "valueCanonical": "https://fhir.labs.smartregister.org/fhir/StructureMap/ff7b22df-7645-43fe-9731-d90c3a21130b"
-    }
-  ],
-  "date": "2022-05-18T00:00:00Z",
   "item": [
     {
-      "linkId": "1aa4d0b3-8c3e-47b7-8fa5-effcb5130fac",
-      "text": "Is this an active or passive case finding?",
-      "type": "choice",
-      "required": true,
-      "answerOption": [
-        {
-          "valueCoding": {
-            "id": "b9579759-4870-476b-e95b-935ad60ad012",
-            "system": "urn:uuid:8dc97476-74cc-4c57-8cbf-f0799cfd2ba9",
-            "code": "active",
-            "display": "Active"
-          }
-        },
-        {
-          "valueCoding": {
-            "id": "63c19222-b589-449f-b371-b85ba449fdd9",
-            "system": "urn:uuid:8dc97476-74cc-4c57-8cbf-f0799cfd2ba9",
-            "code": "passive",
-            "display": "Passive"
-          }
-        }
-      ],
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-          "valueCodeableConcept": {
-            "coding": [
-              {
-                "system": "http://hl7.org/fhir/ValueSet/questionnaire-item-control",
-                "code": "radio-button"
-              }
-            ]
-          }
-        }
-      ]
+      "linkId": "1",
+      "type": "display",
+      "text": "Personal information",
+      "prefix":"1."
     },
     {
-      "linkId": "da999955-2174-4219-825e-8ae2b948b7e7",
-      "text": "Was the pregnancy confirmed in a health facility?",
-      "type": "choice",
+      "linkId": "2",
+      "type": "string",
       "required": true,
-      "answerOption": [
-        {
-          "valueCoding": {
-            "id": "30862a15-03b0-42af-8703-857e579aa2b9",
-            "system": "urn:uuid:de9ef3e8-be6b-4639-b196-63905d15c8c6",
-            "code": "yes",
-            "display": "Yes"
-          }
-        },
-        {
-          "valueCoding": {
-            "id": "87f2b421-757e-4890-8cd5-b8f3a6e277d3",
-            "system": "urn:uuid:de9ef3e8-be6b-4639-b196-63905d15c8c6",
-            "code": "no",
-            "display": "No"
-          }
-        }
-      ],
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-          "valueCodeableConcept": {
-            "coding": [
-              {
-                "system": "http://hl7.org/fhir/ValueSet/questionnaire-item-control",
-                "code": "radio-button"
-              }
-            ]
-          }
-        }
-      ],
       "item": [
         {
-          "linkId": "23b03108-c6a4-437d-947c-9a7c36e593eb",
-          "text": "Referred woman to the hospital",
-          "type": "choice",
-          "enableWhen": [
-            {
-              "question": "da999955-2174-4219-825e-8ae2b948b7e7",
-              "operator": "=",
-              "answerCoding": {
-                "system": "urn:uuid:de9ef3e8-be6b-4639-b196-63905d15c8c6",
-                "code": "no"
-              }
-            }
-          ],
-          "required": false,
-          "answerOption": [
-            {
-              "valueCoding": {
-                "id": "f2f9b173-53b6-46e1-c4ac-15d6feaa0e92",
-                "system": "urn:uuid:2fa30f6e-7d42-4c69-da0c-b3a9aa01ed9f",
-                "code": "yes",
-                "display": "Yes"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "40a0467c-83ca-4d08-86eb-8075a0265bed",
-                "system": "urn:uuid:2fa30f6e-7d42-4c69-da0c-b3a9aa01ed9f",
-                "code": "no",
-                "display": "No"
-              }
-            }
-          ]
-        },
-        {
-          "linkId": "1b5d6e5e-dd55-4b30-8f77-79da15c53269",
-          "text": "Do you have a pregnant woman booklet?",
-          "type": "choice",
-          "enableWhen": [
-            {
-              "question": "da999955-2174-4219-825e-8ae2b948b7e7",
-              "operator": "=",
-              "answerCoding": {
-                "system": "urn:uuid:de9ef3e8-be6b-4639-b196-63905d15c8c6",
-                "code": "yes"
-              }
-            }
-          ],
-          "required": true,
-          "answerOption": [
-            {
-              "valueCoding": {
-                "id": "6eb83dd3-178a-45e7-c6c9-96d9335d0072",
-                "system": "urn:uuid:1fcf2bfd-0bcb-4278-f86a-d403866a01cb",
-                "code": "yes",
-                "display": "Yes"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "9f5de919-e01f-428f-8d98-b56ee47e9488",
-                "system": "urn:uuid:1fcf2bfd-0bcb-4278-f86a-d403866a01cb",
-                "code": "no",
-                "display": "No"
-              }
-            }
-          ],
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-              "valueCodeableConcept": {
-                "coding": [
-                  {
-                    "system": "http://hl7.org/fhir/ValueSet/questionnaire-item-control",
-                    "code": "radio-button"
-                  }
-                ]
-              }
-            }
-          ],
-          "item": [
-            {
-              "linkId": "008b354b-3f6f-4402-8d6d-4de27b6e2071",
-              "type": "string",
-              "text": "Name of the facility visited. "
-            },
-            {
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
-                  "valueDate": {
-                    "extension": [
-                      {
-                        "url": "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue",
-                        "valueExpression": {
-                          "language": "text/fhirpath",
-                          "expression": "today() - 40 weeks"
-                        }
-                      }
-                    ]
-                  }
-                },
-                {
-                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
-                  "valueDate": {
-                    "extension": [
-                      {
-                        "url": "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue",
-                        "valueExpression": {
-                          "language": "text/fhirpath",
-                          "expression": "today()"
-                        }
-                      }
-                    ]
-                  }
-                }
-              ],
-              "linkId": "1272863d-8d9d-4167-86d1-38f5e074607e",
-              "text": "Date of the last visit to health facility.",
-              "type": "date",
-              "enableWhen": [
-                {
-                  "question": "da999955-2174-4219-825e-8ae2b948b7e7",
-                  "operator": "=",
-                  "answerCoding": {
-                    "system": "urn:uuid:de9ef3e8-be6b-4639-b196-63905d15c8c6",
-                    "code": "yes"
-                  }
-                }
-              ],
-              "required": true
-            },
-            {
-              "extension": [
-                {
-                  "url": "http://ehelse.no/fhir/StructureDefinition/sdf-minValue",
-                  "valueInteger": 1
-                },
-                {
-                  "url": "http://ehelse.no/fhir/StructureDefinition/sdf-maxValue",
-                  "valueInteger": 4
-                },
-                {
-                  "url": "http://ehelse.no/fhir/StructureDefinition/validationtext",
-                  "valueString": "Enter the correct number"
-                }
-              ],
-              "linkId": "92e8f830-210a-49f6-8d1a-6d01f5bc72b9",
-              "text": "Number of visits to the health facility so far",
-              "type": "integer",
-              "enableWhen": [
-                {
-                  "question": "da999955-2174-4219-825e-8ae2b948b7e7",
-                  "operator": "=",
-                  "answerCoding": {
-                    "system": "urn:uuid:de9ef3e8-be6b-4639-b196-63905d15c8c6",
-                    "code": "yes"
-                  }
-                }
-              ],
-              "required": true
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "extension": [
-        {
-          "url": "http://ehelse.no/fhir/StructureDefinition/validationtext",
-          "valueString": "Enter the correct date"
-        },
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/minValue",
-          "valueDate": {
-            "extension": [
-              {
-                "url": "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue",
-                "valueExpression": {
-                  "language": "text/fhirpath",
-                  "expression": "today() - 40 weeks"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
-          "valueDate": {
-            "extension": [
-              {
-                "url": "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue",
-                "valueExpression": {
-                  "language": "text/fhirpath",
-                  "expression": "today()"
-                }
-              }
-            ]
-          }
-        }
-      ],
-      "linkId": "245679f2-6172-456e-8ff3-425f5cea3243",
-      "text": "Last Monthly Period (LMP) date",
-      "type": "date",
-      "required": true
-    },
-    {
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
-          "valueCoding": {
-            "system": "http://unitsofmeasure.org",
-            "code": "mo",
-            "display": "month"
-          }
-        },
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces",
-          "valueInteger": 1
-        },
-        {
-          "url": "http://ehelse.no/fhir/StructureDefinition/sdf-minValue",
-          "valueInteger": 0
-        },
-        {
-          "url": "http://ehelse.no/fhir/StructureDefinition/sdf-maxValue",
-          "valueInteger": 10
-        },
-        {
-          "url": "http://ehelse.no/fhir/StructureDefinition/validationtext",
-          "valueString": "Enter a valid number of months"
-        }
-      ],
-      "linkId": "b00a7b16-e9ef-446d-daf9-fca839bae7d6",
-      "text": "Months Pregnant",
-      "type": "integer",
-      "enableWhen": [
-        {
-          "question": "245679f2-6172-456e-8ff3-425f5cea3243",
-          "operator": "exists",
-          "answerBoolean": false
-        }
-      ],
-      "required": true
-    },
-    {
-      "extension": [
-        {
-          "url": "http://ehelse.no/fhir/StructureDefinition/sdf-maxValue",
-          "valueInteger": 9
-        },
-        {
-          "url": "http://ehelse.no/fhir/StructureDefinition/sdf-minValue",
-          "valueInteger": 6
-        },
-        {
-          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression",
-          "valueExpression": {
-            "language": "text/fhirpath",
-            "expression": "((((iif(%resource.descendants().where(linkId='245679f2-6172-456e-8ff3-425f5cea3243').answer.value.toString().substring(5, 2).toInteger() > today().toString().substring(5, 2).toInteger(), ((today().toString().substring(0, 4).toInteger() - 1) - %resource.descendants().where(linkId='245679f2-6172-456e-8ff3-425f5cea3243').answer.value.toString().substring(0, 4).toInteger()).toDecimal(), (today().toString().substring(0, 4).toInteger() - %resource.descendants().where(linkId='245679f2-6172-456e-8ff3-425f5cea3243').answer.value.toString().substring(0, 4).toInteger()).toDecimal())) * 365.25) + ((iif(%resource.descendants().where(linkId='245679f2-6172-456e-8ff3-425f5cea3243').answer.value.toString().substring(5, 2).toInteger() > today().toString().substring(5, 2).toInteger(), (((iif(%resource.descendants().where(linkId='245679f2-6172-456e-8ff3-425f5cea3243').answer.value.toString().substring(8, 2).toInteger() > today().toString().substring(8, 2).toInteger(), (today().toString().substring(5, 2).toInteger() - 1).toString().replaceMatches('^0+(?!$)', '').toDecimal(), today().toString().substring(5, 2).replaceMatches('^0+(?!$)', '').toDecimal())).toString().toInteger() + 12) - %resource.descendants().where(linkId='245679f2-6172-456e-8ff3-425f5cea3243').answer.value.toString().substring(5, 2).toInteger()).toString().replaceMatches('^0+(?!$)', '').toDecimal(), ((iif(%resource.descendants().where(linkId='245679f2-6172-456e-8ff3-425f5cea3243').answer.value.toString().substring(8, 2).toInteger() > today().toString().substring(8, 2).toInteger(), (today().toString().substring(5, 2).toInteger() - 1).toString().replaceMatches('^0+(?!$)', '').toDecimal(), today().toString().substring(5, 2).replaceMatches('^0+(?!$)', '').toDecimal())).toString().toInteger() - %resource.descendants().where(linkId='245679f2-6172-456e-8ff3-425f5cea3243').answer.value.toString().substring(5, 2).toInteger()).toDecimal())) * 365.25 / 12) + (iif(%resource.descendants().where(linkId='245679f2-6172-456e-8ff3-425f5cea3243').answer.value.toString().substring(8, 2).toInteger() > today().toString().substring(8, 2).toInteger(), ((today().toString().substring(8, 2).toInteger() + 30.5) - %resource.descendants().where(linkId='245679f2-6172-456e-8ff3-425f5cea3243').answer.value.toString().substring(8, 2).toInteger()).toDecimal(), (today().toString().substring(8, 2).toInteger() - %resource.descendants().where(linkId='245679f2-6172-456e-8ff3-425f5cea3243').answer.value.toString().substring(8, 2).toInteger()).toString().replaceMatches('^0+(?!$)', '').toDecimal()))) / 7).toString().replaceMatches('[.]+[0-9]+', '').toInteger()"
-          }
-        }
-      ],
-      "linkId": "a887e708-85d8-4fb2-871a-9c9d90887a50",
-      "text": "Gestational age (GA)",
-      "type": "integer",
-      "required": false,
-      "readOnly": true,
-      "enableWhen": [
-        {
-          "question": "245679f2-6172-456e-8ff3-425f5cea3243",
-          "operator": "exists",
-          "answerBoolean": true
-        }
-      ]
-    },
-    {
-      "extension": [
-        {
-          "url": "http://ehelse.no/fhir/StructureDefinition/sdf-minvalue",
-          "valueString": "today() - 280 'days'"
-        },
-        {
-          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression",
-          "valueExpression": {
-            "language": "text/fhirpath",
-            "expression": "%resource.descendants().where(linkId='245679f2-6172-456e-8ff3-425f5cea3243').answer.value + 280 'days'"
-          }
-        }
-      ],
-      "linkId": "4f04affb-22a8-4da5-88d8-78bc6d0454e7",
-      "text": "Expected date of delivery (EDD)",
-      "type": "date",
-      "required": false
-    },
-    {
-      "linkId": "7f352f83-a1bb-4e3e-b5d2-10f14530b470",
-      "text": "Woman due for delivery?",
-      "type": "choice",
-      "enableWhen": [
-        {
-          "question": "b00a7b16-e9ef-446d-daf9-fca839bae7d6",
-          "operator": "=",
-          "answerQuantity": {
-            "value": 9,
-            "system": "http://unitsofmeasure.org",
-            "code": "mo"
-          }
-        },
-        {
-          "question": "245679f2-6172-456e-8ff3-425f5cea3243",
-          "operator": "<="
-        }
-      ],
-      "enableBehavior": "all",
-      "required": true,
-      "answerOption": [
-        {
-          "valueCoding": {
-            "id": "85b557a9-7ca4-4e5d-81b0-ef87c676eb59",
-            "system": "urn:uuid:0feb4edd-b1bf-4629-89e7-c50d46fcc3f7",
-            "code": "yes",
-            "display": "Yes"
-          }
-        },
-        {
-          "valueCoding": {
-            "id": "40feca11-0d88-4309-98e3-f6a8073491eb",
-            "system": "urn:uuid:0feb4edd-b1bf-4629-89e7-c50d46fcc3f7",
-            "code": "no",
-            "display": "No"
-          }
-        }
-      ]
-    },
-    {
-      "linkId": "91500d08-ccc9-408b-ecee-784384bf23a4",
-      "text": "Woman referred for delivery?",
-      "type": "boolean",
-      "enableWhen": [
-        {
-          "question": "b00a7b16-e9ef-446d-daf9-fca839bae7d6",
-          "operator": "=",
-          "answerQuantity": {
-            "value": 9,
-            "system": "http://unitsofmeasure.org",
-            "code": "mo"
-          }
-        },
-        {
-          "question": "a887e708-85d8-4fb2-871a-9c9d90887a50",
-          "operator": ">=",
-          "answerInteger": 9
-        },
-        {
-          "question": "4f04affb-22a8-4da5-88d8-78bc6d0454e7",
-          "operator": "=",
-          "answerDate": "2022-05-23"
-        }
-      ],
-      "enableBehavior": "all",
-      "required": true
-    },
-    {
-      "linkId": "84d77d0b-754d-48ed-800e-905cf47b9ba6",
-      "text": "Woman has danger signs?",
-      "type": "choice",
-      "required": true,
-      "answerOption": [
-        {
-          "valueCoding": {
-            "id": "fff11283-6334-4b73-858e-34dd01e199b1",
-            "system": "urn:uuid:8711d963-b2bd-445b-8fb1-e19d999dbc81",
-            "code": "yes",
-            "display": "Yes"
-          }
-        },
-        {
-          "valueCoding": {
-            "id": "befd3105-1a65-4af5-81a4-e2aae64632e7",
-            "system": "urn:uuid:8711d963-b2bd-445b-8fb1-e19d999dbc81",
-            "code": "no",
-            "display": "No"
-          }
-        }
-      ],
-      "item": [
-        {
+          "linkId": "2.1",
+          "text": "First Name",
+          "type": "display",
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -523,422 +23,458 @@
                 "coding": [
                   {
                     "system": "http://hl7.org/fhir/questionnaire-item-control",
-                    "code": "check-box"
+                    "code": "flyover",
+                    "display": "Fly-over"
                   }
-                ]
+                ],
+                "text": "Flyover"
               }
-            }
-          ],
-          "repeats": true,
-          "linkId": "d065ac2c-31af-4bbb-8706-2c6a632c5e7a",
-          "text": "Big belly woman danger signs",
-          "type": "choice",
-          "enableWhen": [
-            {
-              "question": "84d77d0b-754d-48ed-800e-905cf47b9ba6",
-              "operator": "=",
-              "answerCoding": {
-                "system": "urn:uuid:8711d963-b2bd-445b-8fb1-e19d999dbc81",
-                "code": "yes"
-              }
-            }
-          ],
-          "required": true,
-          "answerOption": [
-            {
-              "valueCoding": {
-                "id": "de626bbc-7374-43ec-bdbd-3b3cc39cdc02",
-                "system": "urn:uuid:52bafe9a-870c-48c2-cdd5-e6d880d7206a",
-                "code": "bleeding",
-                "display": "Bleeding"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "1f3e24f3-48e8-4910-8b18-860862dffb3a",
-                "system": "urn:uuid:52bafe9a-870c-48c2-cdd5-e6d880d7206a",
-                "code": "water-breaks/-excess-fluid/-contractions",
-                "display": "Water breaks/ excess fluid/ contractions"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "cd461527-8f33-4ca0-e544-7b688d35e32a",
-                "system": "urn:uuid:52bafe9a-870c-48c2-cdd5-e6d880d7206a",
-                "code": "pain-under-belly/-pain-in-belly",
-                "display": "Pain under belly/ pain in belly"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "06f91700-cec4-426c-ee40-0bcf7095fa20",
-                "system": "urn:uuid:52bafe9a-870c-48c2-cdd5-e6d880d7206a",
-                "code": "sever-pain-in-belly",
-                "display": "Sever pain in belly"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "fd6bdaeb-d57a-4d1e-836a-76d1197ce3d8",
-                "system": "urn:uuid:52bafe9a-870c-48c2-cdd5-e6d880d7206a",
-                "code": "pain/burning-while-urinating",
-                "display": "Pain/burning while urinating"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "c65d215c-7809-4637-8932-c7b7788ef421",
-                "system": "urn:uuid:52bafe9a-870c-48c2-cdd5-e6d880d7206a",
-                "code": "fever/chill",
-                "display": "Fever/chill"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "9e43a35e-6186-43ef-82ae-f3310af706bc",
-                "system": "urn:uuid:52bafe9a-870c-48c2-cdd5-e6d880d7206a",
-                "code": "abnormal-(bad-smelling-and-plenty)-vaginal-discharge",
-                "display": "Abnormal (bad smelling and plenty) vaginal discharge"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "9288d3a3-9fa5-4498-89b9-06a4e373bcdb",
-                "system": "urn:uuid:52bafe9a-870c-48c2-cdd5-e6d880d7206a",
-                "code": "excess-tiredness/fatigue-or-shortness-of-breath",
-                "display": "Excess tiredness/fatigue or shortness of breath"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "3281d1dc-5b5b-457e-dffe-3d7a417eda3f",
-                "system": "urn:uuid:52bafe9a-870c-48c2-cdd5-e6d880d7206a",
-                "code": "high-blood-pressure",
-                "display": "High blood pressure"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "94a5828e-83d4-468e-8dbe-9385b2c31584",
-                "code": "swelling-of-face-and-hands",
-                "system": "urn:uuid:52bafe9a-870c-48c2-cdd5-e6d880d7206a",
-                "display": "Swelling of face and hands"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "62cce12b-883a-4263-aa10-32100c844144",
-                "code": "headache-more-than-3-days/blurred-vision/eye-rolling",
-                "system": "urn:uuid:52bafe9a-870c-48c2-cdd5-e6d880d7206a",
-                "display": "Headache more than 3 days/blurred vision/eye rolling"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "4a661720-f3b8-4c01-b57e-dc7912e0b1fe",
-                "code": "fits/jerk",
-                "system": "urn:uuid:52bafe9a-870c-48c2-cdd5-e6d880d7206a",
-                "display": "Fits/Jerk"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "17c8289d-dfb4-46ea-8760-84b496a982ef",
-                "code": "baby-not-moving-around-or-moving-less",
-                "system": "urn:uuid:52bafe9a-870c-48c2-cdd5-e6d880d7206a",
-                "display": "Baby not moving around or moving less"
-              }
-            }
-          ],
-          "item": [
-            {
-              "linkId": "1b625d5c-d0bc-44d5-8eed-3efc37c51f84",
-              "text": "Woman referred to hospital",
-              "type": "choice",
-              "enableWhen": [
-                {
-                  "question": "d065ac2c-31af-4bbb-8706-2c6a632c5e7a",
-                  "operator": "!=",
-                  "answerCoding": {
-                    "system": "urn:uuid:52bafe9a-870c-48c2-cdd5-e6d880d7206a",
-                    "code": "none"
-                  }
-                }
-              ],
-              "required": true,
-              "answerOption": [
-                {
-                  "valueCoding": {
-                    "id": "90708b0f-de8f-4345-872e-61d9e1589047",
-                    "system": "urn:uuid:5733187d-83d0-449c-e4a6-e60f1bbe26d7",
-                    "code": "yes",
-                    "display": "Yes"
-                  }
-                },
-                {
-                  "valueCoding": {
-                    "id": "fadf1406-fe48-4b7c-83eb-0f6c1986b8e4",
-                    "system": "urn:uuid:5733187d-83d0-449c-e4a6-e60f1bbe26d7",
-                    "code": "no",
-                    "display": "No"
-                  }
-                }
-              ],
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-                  "valueCodeableConcept": {
-                    "coding": [
-                      {
-                        "system": "http://hl7.org/fhir/ValueSet/questionnaire-item-control",
-                        "code": "radio-button"
-                      }
-                    ]
-                  }
-                }
-              ]
             }
           ]
         }
       ]
     },
     {
-      "linkId": "31009ee0-a0c9-46f0-8ef6-e65b34777aa1",
-      "text": "Made plans on how to get to the hospital for birth?",
-      "type": "choice",
-      "required": true,
-      "answerOption": [
+      "linkId": "3",
+      "type": "string",
+      "item": [
         {
-          "valueCoding": {
-            "id": "0ac2b549-2300-46f4-9159-5178f9d81f85",
-            "system": "urn:uuid:11f0c610-8a18-41ef-814b-401aa71e9f0a",
-            "code": "yes",
-            "display": "Yes"
-          }
-        },
-        {
-          "valueCoding": {
-            "id": "f3781900-9527-4e78-988e-145e63d740a8",
-            "system": "urn:uuid:11f0c610-8a18-41ef-814b-401aa71e9f0a",
-            "code": "no",
-            "display": "No"
-          }
+          "linkId": "3.1",
+          "text": "Family Name",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
         }
-      ],
+      ]
+    },
+    {
+      "linkId": "4",
+      "type": "integer",
+      "item": [
+        {
+          "linkId": "4.1",
+          "text": "ID number",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "5",
+      "type": "integer",
+      "item": [
+        {
+          "linkId": "5.1",
+          "text": "Mobile number",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "6",
+      "type": "choice",
+      "repeats": true,
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
           "valueCodeableConcept": {
             "coding": [
               {
-                "system": "http://hl7.org/fhir/ValueSet/questionnaire-item-control",
-                "code": "radio-button"
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "check-box",
+                "display": "Checkbox"
               }
-            ]
+            ],
+            "text": "Checkbox"
+          }
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "code",
+            "display": "Receive SMS reminders"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "7",
+      "type": "date",
+      "text": "Date of birth",
+      "prefix":"2.",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "7.1",
+          "text": "If the real DOB is unknown, provide an estimated year.",
+          "type": "display"
+        }
+      ]
+    },
+    {
+      "linkId": "8",
+      "type": "choice",
+      "repeats": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "check-box",
+                "display": "Checkbox"
+              }
+            ],
+            "text": "Checkbox"
+          }
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "code1",
+            "display": "Unknown birthday"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "9",
+      "type": "display",
+      "text": "Address",
+      "prefix":"3."
+    },
+    {
+      "linkId": "10",
+      "type": "string",
+      "item": [
+        {
+          "linkId": "10.1",
+          "text": "House number and street",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "11",
+      "type": "string",
+      "item": [
+        {
+          "linkId": "11.1",
+          "text": "Apartment, unit",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "12",
+      "type": "string",
+      "item": [
+        {
+          "linkId": "12.1",
+          "text": "City, town or village",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "13",
+      "type": "string",
+      "item": [
+        {
+          "linkId": "13.1",
+          "text": "County",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "14",
+      "type": "string",
+      "item": [
+        {
+          "linkId": "14.1",
+          "text": "Postal Code",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "15",
+      "type": "display",
+      "text": "Alternative contact person",
+      "prefix":"4.",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "15.1",
+          "text": "The alternative contact would be used in the case of an emergency situation and could be next of kin (e.g. partner, mother, sibling.)",
+          "type": "display"
+        }
+      ]
+    },
+    {
+      "linkId": "16",
+      "type": "string",
+      "item": [
+        {
+          "linkId": "16.1",
+          "text": "Name",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "17",
+      "type": "choice",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "drop-down",
+                "display": "Drop down"
+              }
+            ],
+            "text": "Drop down"
           }
         }
       ],
       "item": [
         {
-          "linkId": "ac9e4bf3-4691-45d1-93cd-d4d5b293661e",
-          "text": "How will woman get to facility?",
-          "type": "choice",
-          "enableWhen": [
-            {
-              "question": "31009ee0-a0c9-46f0-8ef6-e65b34777aa1",
-              "operator": "=",
-              "answerCoding": {
-                "system": "urn:uuid:11f0c610-8a18-41ef-814b-401aa71e9f0a",
-                "code": "yes"
-              }
-            }
-          ],
-          "required": true,
-          "answerOption": [
-            {
-              "valueCoding": {
-                "id": "03601957-24e3-49ef-82d7-9d5483401908",
-                "system": "urn:uuid:c952513f-6cf1-4866-a909-ff273045b4c9",
-                "code": "walking",
-                "display": "Walking"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "6e26fd9d-73f0-42df-9c48-7bcefdf3e1b8",
-                "system": "urn:uuid:c952513f-6cf1-4866-a909-ff273045b4c9",
-                "code": "by-bus/taxi",
-                "display": "By bus/taxi"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "7b5b7a1d-eabc-401d-aa04-c94aa6f36f9f",
-                "system": "urn:uuid:c952513f-6cf1-4866-a909-ff273045b4c9",
-                "code": "bicycle",
-                "display": "Bicycle"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "6640a14d-137e-47b7-8ced-dcc03e5fdcb7",
-                "code": "motorbike",
-                "system": "urn:uuid:c952513f-6cf1-4866-a909-ff273045b4c9",
-                "display": "Motorbike"
-              }
-            }
-          ],
+          "linkId": "17.1",
+          "text": "Relationship",
+          "type": "display",
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
               "valueCodeableConcept": {
                 "coding": [
                   {
-                    "system": "http://hl7.org/fhir/ValueSet/questionnaire-item-control",
-                    "code": "radio-button"
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
                   }
-                ]
+                ],
+                "text": "Flyover"
               }
             }
           ]
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "child",
+            "display": "Child"
+          }
         },
         {
-          "linkId": "1f94941a-616b-432b-dca6-a5bf12c475ef",
-          "text": "Saved money to go to facility?",
-          "type": "choice",
-          "enableWhen": [
-            {
-              "question": "31009ee0-a0c9-46f0-8ef6-e65b34777aa1",
-              "operator": "=",
-              "answerCoding": {
-                "system": "urn:uuid:11f0c610-8a18-41ef-814b-401aa71e9f0a",
-                "code": "yes"
-              }
-            }
-          ],
-          "required": true,
-          "answerOption": [
-            {
-              "valueCoding": {
-                "id": "4b9a3cfe-3ba9-4e1b-e4c9-cf172d038864",
-                "system": "urn:uuid:345a5eae-ab81-4a0c-9e47-141d5d2b2b25",
-                "code": "yes",
-                "display": "Yes"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "3447623a-0a9a-43b7-85be-be7b86545b1b",
-                "system": "urn:uuid:345a5eae-ab81-4a0c-9e47-141d5d2b2b25",
-                "code": "no",
-                "display": "No"
-              }
-            }
-          ],
+          "valueCoding": {
+            "code": "father",
+            "display": "Father"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "mother",
+            "display": "Mother"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "sibling",
+            "display": "Sibling"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "other",
+            "display": "Other"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "18",
+      "type": "string",
+      "item": [
+        {
+          "linkId": "18.1",
+          "text": "Phone number",
+          "type": "display",
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
               "valueCodeableConcept": {
                 "coding": [
                   {
-                    "system": "http://hl7.org/fhir/ValueSet/questionnaire-item-control",
-                    "code": "radio-button"
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
                   }
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "linkId": "d79e1518-f96c-4268-884b-39f63950f578",
-          "text": "Saved money for the birth plan? ",
-          "type": "choice",
-          "enableWhen": [
-            {
-              "question": "31009ee0-a0c9-46f0-8ef6-e65b34777aa1",
-              "operator": "=",
-              "answerCoding": {
-                "system": "urn:uuid:11f0c610-8a18-41ef-814b-401aa71e9f0a",
-                "code": "yes"
-              }
-            }
-          ],
-          "required": true,
-          "answerOption": [
-            {
-              "valueCoding": {
-                "id": "2f768bbb-f9b3-41b3-8347-97c42c1de5c5",
-                "system": "urn:uuid:3bc0f36f-ca18-44c0-8646-a8402e6e688a",
-                "code": "yes",
-                "display": "Yes"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "d930d463-0e69-4d33-c208-c811fae4abad",
-                "system": "urn:uuid:3bc0f36f-ca18-44c0-8646-a8402e6e688a",
-                "code": "no",
-                "display": "No"
-              }
-            }
-          ],
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-              "valueCodeableConcept": {
-                "coding": [
-                  {
-                    "system": "http://hl7.org/fhir/ValueSet/questionnaire-item-control",
-                    "code": "radio-button"
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "linkId": "07736486-4e2a-4c98-ea71-e351f279ff18",
-          "text": "Have family support on birth plan? ",
-          "type": "choice",
-          "enableWhen": [
-            {
-              "question": "31009ee0-a0c9-46f0-8ef6-e65b34777aa1",
-              "operator": "=",
-              "answerCoding": {
-                "system": "urn:uuid:11f0c610-8a18-41ef-814b-401aa71e9f0a",
-                "code": "yes"
-              }
-            }
-          ],
-          "required": true,
-          "answerOption": [
-            {
-              "valueCoding": {
-                "id": "ef2d6d4c-575d-43ac-8887-ee9dc0f9dc12",
-                "system": "urn:uuid:b6aa81ee-2a24-49fd-ee5a-8c3a1018e368",
-                "code": "yes",
-                "display": "Yes"
-              }
-            },
-            {
-              "valueCoding": {
-                "id": "eba2f199-7178-46ba-9e00-54ada314bec9",
-                "system": "urn:uuid:b6aa81ee-2a24-49fd-ee5a-8c3a1018e368",
-                "code": "no",
-                "display": "No"
-              }
-            }
-          ],
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-              "valueCodeableConcept": {
-                "coding": [
-                  {
-                    "system": "http://hl7.org/fhir/ValueSet/questionnaire-item-control",
-                    "code": "radio-button"
-                  }
-                ]
+                ],
+                "text": "Flyover"
               }
             }
           ]
@@ -946,41 +482,285 @@
       ]
     },
     {
-      "linkId": "ec905b2f-7fa6-4f74-d7ae-a76539eb2632",
+      "linkId": "19",
       "type": "choice",
-      "text": "Prepared woman to plan to breastfeed exclusively for six months and immediately after birth.",
-      "required": true,
-      "answerOption": [
-        {
-          "valueCoding": {
-            "id": "a35ce029-5f37-414d-fb38-a1b79a028374",
-            "code": "yes",
-            "system": "urn:uuid:a15dbe78-da06-4079-8542-c811a2f25609",
-            "display": "Yes"
-          }
-        },
-        {
-          "valueCoding": {
-            "id": "d7c4c134-0fce-4a7a-8bae-c5a957abb2a3",
-            "code": "no",
-            "system": "urn:uuid:a15dbe78-da06-4079-8542-c811a2f25609",
-            "display": "No"
-          }
-        }
-      ],
+      "text": "What is the highest level of education achieved?",
+      "prefix":"5.",
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
           "valueCodeableConcept": {
             "coding": [
               {
-                "system": "http://hl7.org/fhir/ValueSet/questionnaire-item-control",
-                "code": "radio-button"
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "radio-button",
+                "display": "Radio Button"
               }
-            ]
+            ],
+            "text": "Radio button"
+          }
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "19.1",
+          "text": "Select one",
+          "type": "display"
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "education",
+            "display": "Does not know level of education"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "primary-school",
+            "display": "Primary school"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "secondary-school",
+            "display": "Secondary school"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "higher-education",
+            "display": "Higher education"
           }
         }
       ]
+    },
+    {
+      "linkId": "20",
+      "type": "choice",
+      "repeats": true,
+      "text": "Who does the client live with?",
+      "prefix":"6.",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "check-box",
+                "display": "Checkbox"
+              }
+            ],
+            "text": "Checkbox"
+          }
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "20.1",
+          "text": "Check all that apply",
+          "type": "display"
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "Parents",
+            "display": "Parents"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "siblings",
+            "display": "Siblings"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "extended-family",
+            "display": "Extended family"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "partner",
+            "display": "Partner"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "friends",
+            "display": "Friend(s)"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "no-one",
+            "display": "No one"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "21",
+      "type": "choice",
+      "text": "Has the client received this year’s seasonal flu vaccine?",
+      "prefix":"7.",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "radio-button",
+                "display": "Radio Button"
+              }
+            ],
+            "text": "Radio button"
+          }
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "21.1",
+          "text": "Select one",
+          "type": "display"
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "yes",
+            "display": "Yes"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "no",
+            "display": "No"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "unknown",
+            "display": "Unknown"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "22",
+      "type": "date",
+      "text": "When was their last menstrual period? (LMP)",
+      "prefix": "8.",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "22.1",
+          "text":"First day of the most recent period",
+          "type": "display"
+        }
+      ]
+    },
+    {
+      "linkId": "23",
+      "type": "integer",
+      "text": "How many times have they been pregnant?",
+      "prefix": "9.",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "slider",
+                "display": "Slider"
+              }
+            ],
+            "text": "Slider"
+          }
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "23.1",
+          "text":"Including this pregnancy. Also referred to as gravida.",
+          "type": "display"
+        }
+      ]
+    },
+    {
+      "linkId": "24",
+      "type": "dateTime",
+      "text": "What was the date and time of the ultrasound?",
+      "prefix": "10."
     }
   ]
 }
