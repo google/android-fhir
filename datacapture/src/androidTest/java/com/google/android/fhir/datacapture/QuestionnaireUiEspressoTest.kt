@@ -103,7 +103,7 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
-  fun dateTimeTextEdit_shouldShowErrorForWrongDate_clearOnCorrect() {
+  fun dateTimeTextEdit_shouldShowErrorForWrongDate_clearOnCorrect_checkAnswerExistsInQuestionnaireResponse() {
     val bundle = bundleOf(QUESTIONNAIRE_FILE_PATH_KEY to "/component_date_time_picker.json")
     activityScenarioRule.scenario.onActivity { activity ->
       activity.supportFragmentManager.commitNow {
@@ -134,5 +134,31 @@ class QuestionnaireUiEspressoTest {
     }
 
     onView(withId(R.id.time_input_layout)).check { view, _ -> assertThat(view.isEnabled).isTrue() }
+
+    // Assert that no answer has been stored, even with a valid date
+    activityScenarioRule.scenario.onActivity { activity ->
+      val testQuestionnaireFragment =
+        activity.supportFragmentManager
+          .findFragmentById(R.id.container_holder)
+          ?.childFragmentManager?.findFragmentById(R.id.container) as QuestionnaireFragment
+      val questionnaireResponse = testQuestionnaireFragment.getQuestionnaireResponse()
+      assertThat(questionnaireResponse.item.size).isEqualTo(1)
+      assertThat(questionnaireResponse.item.first().answer.size).isEqualTo(0)
+    }
+
+    // Add the time
+    onView(withId(R.id.time_input_layout)).perform(ViewActions.click())
+    clickOnText("OK")
+
+    // Check the answer exists in Questionnaire Response
+    activityScenarioRule.scenario.onActivity { activity ->
+      val testQuestionnaireFragment =
+        activity.supportFragmentManager
+          .findFragmentById(R.id.container_holder)
+          ?.childFragmentManager?.findFragmentById(R.id.container) as QuestionnaireFragment
+      val questionnaireResponse = testQuestionnaireFragment.getQuestionnaireResponse()
+      assertThat(questionnaireResponse.item.first().answer.size).isEqualTo(1)
+      assertThat(questionnaireResponse.item.first().answer.first().hasValueDateTimeType()).isTrue()
+    }
   }
 }
