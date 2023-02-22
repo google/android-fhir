@@ -36,8 +36,7 @@ class CameraLauncherFragment : DialogFragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    val uri =
-      arguments?.get(AttachmentViewHolderFactory.EXTRA_SAVED_PHOTO_URI_KEY) as Uri
+    val uri = arguments?.get(AttachmentViewHolderFactory.EXTRA_SAVED_PHOTO_URI_KEY) as Uri
 
     cameraLauncher =
       registerForActivityResult(ActivityResultContracts.TakePicture()) { isSaved ->

@@ -143,9 +143,7 @@ class GroupViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
     )
-    assertThat(
-        viewHolder.itemView.findViewById<GroupHeaderView>(R.id.header).visibility
-      )
+    assertThat(viewHolder.itemView.findViewById<GroupHeaderView>(R.id.header).visibility)
       .isEqualTo(View.VISIBLE)
   }
 
@@ -160,9 +158,7 @@ class GroupViewHolderFactoryTest {
       )
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<GroupHeaderView>(R.id.header).visibility
-      )
+    assertThat(viewHolder.itemView.findViewById<GroupHeaderView>(R.id.header).visibility)
       .isEqualTo(View.GONE)
   }
 

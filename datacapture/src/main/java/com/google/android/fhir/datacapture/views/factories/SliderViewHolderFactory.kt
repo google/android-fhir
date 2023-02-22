@@ -65,8 +65,7 @@ internal object SliderViewHolderFactory :
           valueFrom = minValue
           valueTo = maxValue
           stepSize =
-            (questionnaireViewItem.questionnaireItem.sliderStepValue
-                ?: SLIDER_DEFAULT_STEP_SIZE)
+            (questionnaireViewItem.questionnaireItem.sliderStepValue ?: SLIDER_DEFAULT_STEP_SIZE)
               .toFloat()
           value = answer?.valueIntegerType?.value?.toFloat() ?: valueFrom
 

@@ -38,9 +38,8 @@ import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
-internal abstract class EditTextViewHolderFactory(
-  @LayoutRes override val resId: Int
-) : QuestionnaireItemViewHolderFactory(resId) {
+internal abstract class EditTextViewHolderFactory(@LayoutRes override val resId: Int) :
+  QuestionnaireItemViewHolderFactory(resId) {
   abstract override fun getQuestionnaireItemViewHolderDelegate():
     QuestionnaireItemEditTextViewHolderDelegate
 }

@@ -246,10 +246,7 @@ internal object AttachmentViewHolderFactory :
 
         CameraLauncherFragment()
           .apply { arguments = bundleOf(EXTRA_SAVED_PHOTO_URI_KEY to attachmentUri) }
-          .show(
-            context.supportFragmentManager,
-            AttachmentViewHolderFactory.javaClass.simpleName
-          )
+          .show(context.supportFragmentManager, AttachmentViewHolderFactory.javaClass.simpleName)
       }
 
       private fun onUploadClicked(view: View, questionnaireItem: QuestionnaireItemComponent) {
@@ -307,10 +304,7 @@ internal object AttachmentViewHolderFactory :
           .apply {
             arguments = bundleOf(EXTRA_MIME_TYPE_KEY to questionnaireItem.mimeTypes.toTypedArray())
           }
-          .show(
-            context.supportFragmentManager,
-            AttachmentViewHolderFactory.javaClass.simpleName
-          )
+          .show(context.supportFragmentManager, AttachmentViewHolderFactory.javaClass.simpleName)
       }
 
       private fun displayPreview(

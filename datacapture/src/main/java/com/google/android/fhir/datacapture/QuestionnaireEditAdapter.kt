@@ -76,35 +76,25 @@ internal class QuestionnaireEditAdapter(
     val viewHolderFactory =
       when (QuestionnaireViewHolderType.fromInt(subtype)) {
         QuestionnaireViewHolderType.GROUP -> GroupViewHolderFactory
-        QuestionnaireViewHolderType.BOOLEAN_TYPE_PICKER ->
-          BooleanViewHolderFactory
+        QuestionnaireViewHolderType.BOOLEAN_TYPE_PICKER -> BooleanViewHolderFactory
         QuestionnaireViewHolderType.DATE_PICKER -> DatePickerViewHolderFactory
-        QuestionnaireViewHolderType.DATE_TIME_PICKER ->
-          DateTimePickerViewHolderFactory
-        QuestionnaireViewHolderType.EDIT_TEXT_SINGLE_LINE ->
-          EditTextSingleLineViewHolderFactory
-        QuestionnaireViewHolderType.EDIT_TEXT_MULTI_LINE ->
-          EditTextMultiLineViewHolderFactory
-        QuestionnaireViewHolderType.EDIT_TEXT_INTEGER ->
-          EditTextIntegerViewHolderFactory
-        QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL ->
-          EditTextDecimalViewHolderFactory
+        QuestionnaireViewHolderType.DATE_TIME_PICKER -> DateTimePickerViewHolderFactory
+        QuestionnaireViewHolderType.EDIT_TEXT_SINGLE_LINE -> EditTextSingleLineViewHolderFactory
+        QuestionnaireViewHolderType.EDIT_TEXT_MULTI_LINE -> EditTextMultiLineViewHolderFactory
+        QuestionnaireViewHolderType.EDIT_TEXT_INTEGER -> EditTextIntegerViewHolderFactory
+        QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL -> EditTextDecimalViewHolderFactory
         QuestionnaireViewHolderType.RADIO_GROUP -> RadioGroupViewHolderFactory
         QuestionnaireViewHolderType.DROP_DOWN -> DropDownViewHolderFactory
         QuestionnaireViewHolderType.DISPLAY -> DisplayViewHolderFactory
-        QuestionnaireViewHolderType.QUANTITY ->
-          EditTextQuantityViewHolderFactory
-        QuestionnaireViewHolderType.CHECK_BOX_GROUP ->
-          CheckBoxGroupViewHolderFactory
-        QuestionnaireViewHolderType.AUTO_COMPLETE ->
-          AutoCompleteViewHolderFactory
-        QuestionnaireViewHolderType.DIALOG_SELECT ->
-          QuestionnaireItemDialogSelectViewHolderFactory
+        QuestionnaireViewHolderType.QUANTITY -> EditTextQuantityViewHolderFactory
+        QuestionnaireViewHolderType.CHECK_BOX_GROUP -> CheckBoxGroupViewHolderFactory
+        QuestionnaireViewHolderType.AUTO_COMPLETE -> AutoCompleteViewHolderFactory
+        QuestionnaireViewHolderType.DIALOG_SELECT -> QuestionnaireItemDialogSelectViewHolderFactory
         QuestionnaireViewHolderType.SLIDER -> SliderViewHolderFactory
-        QuestionnaireViewHolderType.PHONE_NUMBER ->
-          PhoneNumberViewHolderFactory
+        QuestionnaireViewHolderType.PHONE_NUMBER -> PhoneNumberViewHolderFactory
         QuestionnaireViewHolderType.ATTACHMENT -> AttachmentViewHolderFactory
-      } as QuestionnaireItemViewHolderFactory
+      }
+        as QuestionnaireItemViewHolderFactory
     return viewHolderFactory.create(parent)
   }
 
@@ -162,9 +152,9 @@ internal class QuestionnaireEditAdapter(
   }
 
   /**
-   * Returns the integer value of the [QuestionnaireViewHolderType] that will be used to render
-   * the [QuestionnaireViewItem]. This is determined by a combination of the data type of the
-   * question and any additional Questionnaire Item UI Control Codes
+   * Returns the integer value of the [QuestionnaireViewHolderType] that will be used to render the
+   * [QuestionnaireViewItem]. This is determined by a combination of the data type of the question
+   * and any additional Questionnaire Item UI Control Codes
    * (http://hl7.org/fhir/R4/valueset-questionnaire-item-control.html) used in the itemControl
    * extension (http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html).
    */
@@ -286,12 +276,12 @@ internal object DiffCallbacks {
   val QUESTIONS =
     object : DiffUtil.ItemCallback<QuestionnaireAdapterItem.Question>() {
       /**
-       * [QuestionnaireViewItem] is a transient object for the UI only. Whenever the user makes
-       * any change via the UI, a new list of [QuestionnaireViewItem]s will be created, each
-       * holding references to the underlying [QuestionnaireItem] and [QuestionnaireResponseItem],
-       * both of which should be read-only, and the current answers. To help recycler view handle
-       * update and/or animations, we consider two [QuestionnaireViewItem]s to be the same if
-       * they have the same underlying [QuestionnaireItem] and [QuestionnaireResponseItem].
+       * [QuestionnaireViewItem] is a transient object for the UI only. Whenever the user makes any
+       * change via the UI, a new list of [QuestionnaireViewItem]s will be created, each holding
+       * references to the underlying [QuestionnaireItem] and [QuestionnaireResponseItem], both of
+       * which should be read-only, and the current answers. To help recycler view handle update
+       * and/or animations, we consider two [QuestionnaireViewItem]s to be the same if they have the
+       * same underlying [QuestionnaireItem] and [QuestionnaireResponseItem].
        */
       override fun areItemsTheSame(
         oldItem: QuestionnaireAdapterItem.Question,

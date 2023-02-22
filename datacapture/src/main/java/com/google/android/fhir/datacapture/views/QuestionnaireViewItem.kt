@@ -197,8 +197,8 @@ data class QuestionnaireViewItem(
       }
 
   /**
-   * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem]
-   * have the same [Questionnaire.QuestionnaireItemComponent] and
+   * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem] have the
+   * same [Questionnaire.QuestionnaireItemComponent] and
    * [QuestionnaireResponse.QuestionnaireResponseItemComponent].
    *
    * This is useful for determining if two [QuestionnaireViewItem]s are representing the same
@@ -210,8 +210,8 @@ data class QuestionnaireViewItem(
       questionnaireResponseItem === other.questionnaireResponseItem
 
   /**
-   * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem]
-   * have the same answers.
+   * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem] have the
+   * same answers.
    *
    * This is useful for determining if the [QuestionnaireViewItem] has outdated answer(s) and
    * therefore needs to be updated in the [RecyclerView] UI.
@@ -228,11 +228,11 @@ data class QuestionnaireViewItem(
       draftAnswer == other.draftAnswer
 
   /**
-   * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem]
-   * have the same [ValidationResult].
+   * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem] have the
+   * same [ValidationResult].
    *
-   * This is useful for determining if the [QuestionnaireViewItem] has outdated
-   * [ValidationResult] and therefore needs to be updated in the [RecyclerView] UI.
+   * This is useful for determining if the [QuestionnaireViewItem] has outdated [ValidationResult]
+   * and therefore needs to be updated in the [RecyclerView] UI.
    */
   internal fun hasTheSameValidationResult(other: QuestionnaireViewItem): Boolean {
     if (validationResult is NotValidated || validationResult is Valid) {

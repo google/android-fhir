@@ -55,8 +55,7 @@ internal object GroupViewHolderFactory :
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               // TODO(jingtang10): This can be removed since we already do this in the
               // answerChangedCallback in the QuestionnaireViewModel.
-              item =
-                questionnaireViewItem.questionnaireItem.getNestedQuestionnaireResponseItems()
+              item = questionnaireViewItem.questionnaireItem.getNestedQuestionnaireResponseItems()
             }
           )
         }

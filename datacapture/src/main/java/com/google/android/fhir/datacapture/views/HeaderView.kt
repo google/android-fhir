@@ -36,8 +36,7 @@ import com.google.android.material.card.MaterialCardView
 import org.hl7.fhir.r4.model.Questionnaire
 
 /** View for the prefix, question, and hint of a questionnaire item. */
-internal class HeaderView(context: Context, attrs: AttributeSet?) :
-  LinearLayout(context, attrs) {
+internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
 
   init {
     LayoutInflater.from(context).inflate(R.layout.questionnaire_item_header, this, true)

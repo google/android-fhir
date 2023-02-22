@@ -89,8 +89,8 @@ interface QuestionnaireItemViewHolderDelegate {
   fun init(itemView: View)
 
   /**
-   * Binds a [QuestionnaireViewItem] to the view. This should update the UI to display the
-   * question, the answer, and any validation result.
+   * Binds a [QuestionnaireViewItem] to the view. This should update the UI to display the question,
+   * the answer, and any validation result.
    */
   fun bind(questionnaireViewItem: QuestionnaireViewItem)
 

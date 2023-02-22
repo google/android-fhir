@@ -93,8 +93,7 @@ internal object BooleanViewHolderFactory :
         }
 
         yesRadioButton.setOnClickListener {
-          if (questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() ==
-              true
+          if (questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() == true
           ) {
             questionnaireViewItem.clearAnswer()
             yesRadioButton.isChecked = false

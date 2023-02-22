@@ -26,15 +26,10 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object EditTextDecimalViewHolderFactory :
-  EditTextViewHolderFactory(
-    R.layout.questionnaire_item_edit_text_single_line_view
-  ) {
+  EditTextViewHolderFactory(R.layout.questionnaire_item_edit_text_single_line_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemEditTextViewHolderDelegate(DECIMAL_INPUT_TYPE) {
-      override fun handleInput(
-        editable: Editable,
-        questionnaireViewItem: QuestionnaireViewItem
-      ) {
+      override fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem) {
         val input = getValue(editable.toString())
         if (input != null) {
           questionnaireViewItem.setAnswer(input)
@@ -58,8 +53,7 @@ internal object EditTextDecimalViewHolderFactory :
         textInputLayout: TextInputLayout,
       ) {
         val text =
-          questionnaireViewItem.answers.singleOrNull()?.valueDecimalType?.value?.toString()
-            ?: ""
+          questionnaireViewItem.answers.singleOrNull()?.valueDecimalType?.value?.toString() ?: ""
         if (isTextUpdatesRequired(text, textInputEditText.text.toString())) {
           textInputEditText.setText(text)
         }

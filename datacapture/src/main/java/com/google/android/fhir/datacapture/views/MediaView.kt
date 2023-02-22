@@ -36,8 +36,7 @@ import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
 import timber.log.Timber
 
-class MediaView(context: Context, attrs: AttributeSet?) :
-  LinearLayout(context, attrs) {
+class MediaView(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
 
   init {
     LayoutInflater.from(context).inflate(R.layout.questionnaire_item_media, this, true)

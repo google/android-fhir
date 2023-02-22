@@ -28,8 +28,7 @@ class OpenDocumentLauncherFragment : DialogFragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    val mimeTypes =
-      arguments?.getStringArray(AttachmentViewHolderFactory.EXTRA_MIME_TYPE_KEY)
+    val mimeTypes = arguments?.getStringArray(AttachmentViewHolderFactory.EXTRA_MIME_TYPE_KEY)
 
     registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         setFragmentResult(OPEN_DOCUMENT_RESULT_KEY, bundleOf(OPEN_DOCUMENT_RESULT_KEY to uri))

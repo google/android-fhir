@@ -33,10 +33,7 @@ object PhoneNumberViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     object : QuestionnaireItemEditTextViewHolderDelegate(InputType.TYPE_CLASS_PHONE) {
 
-      override fun handleInput(
-        editable: Editable,
-        questionnaireViewItem: QuestionnaireViewItem
-      ) {
+      override fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem) {
         val input = getValue(editable.toString())
         if (input != null) {
           questionnaireViewItem.setAnswer(input)

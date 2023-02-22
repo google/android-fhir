@@ -26,8 +26,7 @@ import org.hl7.fhir.r4.model.StringType
 
 /**
  * Implementation of [QuestionnaireItemEditTextViewHolderDelegate] used in
- * [EditTextSingleLineViewHolderFactory] and
- * [EditTextMultiLineViewHolderFactory].
+ * [EditTextSingleLineViewHolderFactory] and [EditTextMultiLineViewHolderFactory].
  *
  * Any `ViewHolder` containing a `EditText` view that collects text data should use this class.
  */
@@ -35,10 +34,7 @@ internal class EditTextStringViewHolderDelegate :
   QuestionnaireItemEditTextViewHolderDelegate(
     InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
   ) {
-  override fun handleInput(
-    editable: Editable,
-    questionnaireViewItem: QuestionnaireViewItem
-  ) {
+  override fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem) {
     val input = getValue(editable.toString())
     if (input != null) {
       questionnaireViewItem.setAnswer(input)

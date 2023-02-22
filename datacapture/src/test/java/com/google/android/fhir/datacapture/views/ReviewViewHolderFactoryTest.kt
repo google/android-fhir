@@ -45,8 +45,7 @@ class ReviewViewHolderFactoryTest {
     FrameLayout(
       RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
-  private val viewHolder =
-    ReviewViewHolderFactory.create(parent)
+  private val viewHolder = ReviewViewHolderFactory.create(parent)
 
   @Test
   fun `bind() should set question header`() {

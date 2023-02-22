@@ -29,14 +29,12 @@ class CustomQuestionnaireFragment /*: QuestionnaireFragment()*/ {
           if (it == null) false else it.value.toString() == CustomNumberPickerFactory.WIDGET_TYPE
         }
       },
-      QuestionnaireItemViewHolderFactoryMatcher(BarCodeReaderViewHolderFactory) {
-        questionnaireItem ->
-        questionnaireItem
-          .getExtensionByUrl(BarCodeReaderViewHolderFactory.WIDGET_EXTENSION)
-          .let {
-            if (it == null) false
-            else it.value.toString() == BarCodeReaderViewHolderFactory.WIDGET_TYPE
-          }
+      QuestionnaireItemViewHolderFactoryMatcher(BarCodeReaderViewHolderFactory) { questionnaireItem
+        ->
+        questionnaireItem.getExtensionByUrl(BarCodeReaderViewHolderFactory.WIDGET_EXTENSION).let {
+          if (it == null) false
+          else it.value.toString() == BarCodeReaderViewHolderFactory.WIDGET_TYPE
+        }
       }
     )
   }
