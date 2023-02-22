@@ -100,9 +100,9 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        textInputEditText.removeTextChangedListener(textWatcher)
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = canonicalizedDatePattern
-        textInputEditText.removeTextChangedListener(textWatcher)
         displayDateString()
         textInputEditText.addTextChangedListener(textWatcher)
       }
@@ -156,10 +156,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         return CalendarConstraints.Builder().setValidator(validators).build()
       }
 
-      private fun updateAnswer(text: String?) {
+      private fun updateDateAnswer(dateText: String?) {
         try {
-          text?.let {
-            val localDate = parseDate(text, canonicalizedDatePattern)
+          dateText?.let {
+            val localDate = parseDate(it, canonicalizedDatePattern)
             questionnaireItemViewItem.setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = localDate.dateType
@@ -181,7 +181,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               )
             )
           )
-          questionnaireItemViewItem.setDraftAnswer(text.toString())
+          questionnaireItemViewItem.setDraftAnswer(dateText.toString())
         }
       }
 
@@ -255,7 +255,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             dateFormatSeparator,
             isDeleting
           )
-          updateAnswer(editable.toString())
+          updateDateAnswer(editable.toString())
         }
       }
     }
