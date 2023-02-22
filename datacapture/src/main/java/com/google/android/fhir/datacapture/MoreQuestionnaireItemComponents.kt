@@ -419,11 +419,12 @@ internal val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
 /**
  * Whether the corresponding [QuestionnaireResponse.QuestionnaireResponseItemComponent] should have
  * [QuestionnaireResponse.QuestionnaireResponseItemComponent]s nested under
- * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent](s).
+ * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]s.
  *
  * This is true for the following two cases:
- * 1. Non-group questions with nested items
- * 2. Repeated groups with nested items
+ * 1. Questions with nested items
+ * 2. Repeated groups with nested items (Note that this is how repeated groups are organized in the
+ * QuestionnaireViewModel, and that they will be flattened in the final QuestionnaireResponse.)
  *
  * Non-repeated groups should have child items nested directly under the group itself.
  *
