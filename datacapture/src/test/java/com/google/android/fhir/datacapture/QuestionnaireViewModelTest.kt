@@ -1828,6 +1828,13 @@ class QuestionnaireViewModelTest {
                 linkId = "a-nested-boolean-item"
                 text = "Nested question"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                addItem(
+                  Questionnaire.QuestionnaireItemComponent().apply {
+                    linkId = "a-nested-nested-boolean-item"
+                    text = "Nested nested question"
+                    type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  }
+                )
               }
             )
           }
@@ -1850,6 +1857,16 @@ class QuestionnaireViewModelTest {
                     addAnswer(
                       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                         this.value = valueBooleanType.setValue(false)
+                        addItem(
+                          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                            linkId = "a-nested-nested-boolean-item"
+                            text = "Nested nested question"
+                            addAnswer(
+                              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                                .apply { this.value = valueBooleanType.setValue(false) }
+                            )
+                          }
+                        )
                       }
                     )
                   }
@@ -1862,7 +1879,7 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
-      val items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      var items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
       assertThat(items.map { it.questionnaireItem.linkId }).containsExactly("a-boolean-item")
 
       items
@@ -1873,11 +1890,23 @@ class QuestionnaireViewModelTest {
           }
         )
 
-      val newItems = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
-      assertThat(newItems.map { it.questionnaireItem.linkId })
+      items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      assertThat(items.map { it.questionnaireItem.linkId })
         .containsExactly("a-boolean-item", "a-nested-boolean-item")
 
-      newItems
+      items
+        .last()
+        .setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            this.value = valueBooleanType.setValue(false)
+          }
+        )
+
+      items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      assertThat(items.map { it.questionnaireItem.linkId })
+        .containsExactly("a-boolean-item", "a-nested-boolean-item", "a-nested-nested-boolean-item")
+
+      items
         .last()
         .setAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
