@@ -424,7 +424,7 @@ internal val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
  * This is true for the following two cases:
  * 1. Questions with nested items
  * 2. Repeated groups with nested items (Note that this is how repeated groups are organized in the
- * QuestionnaireViewModel, and that they will be flattened in the final QuestionnaireResponse.)
+ * [QuestionnaireViewModel], and that they will be flattened in the final [QuestionnaireResponse].)
  *
  * Non-repeated groups should have child items nested directly under the group itself.
  *
