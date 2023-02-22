@@ -25,7 +25,6 @@ import com.google.android.fhir.datacapture.utilities.toCodeType
 import com.google.android.fhir.datacapture.utilities.toCoding
 import com.google.android.fhir.datacapture.utilities.toIdType
 import com.google.android.fhir.datacapture.utilities.toUriType
-import java.lang.IllegalArgumentException
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -596,14 +595,14 @@ private fun getFieldNameByDefinition(definition: String): String {
  * `addName` function for `name`.
  */
 private fun Base.addRepeatedFieldValue(fieldName: String) =
-  javaClass.getMethod("add${fieldName.capitalize(Locale.ROOT)}").invoke(this) as Base
+  javaClass.getMethod("add${fieldName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }}").invoke(this) as Base
 
 /**
  * Invokes the function to get a value in the choice of data type field in the `Base` object, e.g.,
  * `getValueQuantity` for `valueQuantity`.
  */
 private fun Base.getChoiceFieldValue(fieldName: String) =
-  javaClass.getMethod("get${fieldName.capitalize(Locale.ROOT)}").invoke(this) as Base
+  javaClass.getMethod("get${fieldName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }}").invoke(this) as Base
 
 /**
  * Updates a field of name [field.name] on this object with the generated enum from [value] using
@@ -624,7 +623,7 @@ private fun updateFieldWithEnum(base: Base, field: Field, value: Base) {
   val stringValue = if (value is Coding) value.code else value.toString()
 
   base.javaClass
-    .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.nonParameterizedType)
+    .getMethod("set${field.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }}", field.nonParameterizedType)
     .invoke(base, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
 
@@ -666,7 +665,7 @@ private fun updateField(
 
 private fun setFieldElementValue(base: Base, field: Field, answerValue: Base) {
   base.javaClass
-    .getMethod("set${field.name.capitalize(Locale.ROOT)}Element", field.type)
+    .getMethod("set${field.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }}Element", field.type)
     .invoke(base, answerValue)
 }
 
@@ -681,7 +680,7 @@ private fun addAnswerToListField(base: Base, field: Field, answerValue: List<Bas
 
 private fun updateListFieldWithAnswer(base: Base, field: Field, answerValue: List<Base>) {
   base.javaClass
-    .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.type)
+    .getMethod("set${field.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }}", field.type)
     .invoke(base, if (field.isParameterized && field.isList) answerValue else answerValue.first())
 }
 

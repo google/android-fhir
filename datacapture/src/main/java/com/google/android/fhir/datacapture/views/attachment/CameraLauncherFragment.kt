@@ -26,7 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
-import com.google.android.fhir.datacapture.views.AttachmentViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 import timber.log.Timber
 
 /** Used for launching camera activity */

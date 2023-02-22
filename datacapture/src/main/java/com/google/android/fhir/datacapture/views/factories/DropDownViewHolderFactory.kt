@@ -48,7 +48,7 @@ internal object DropDownViewHolderFactory :
       private lateinit var header: HeaderView
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView
-      lateinit var questionnaireViewItem: QuestionnaireViewItem
+      override lateinit var questionnaireViewItem: QuestionnaireViewItem
       private lateinit var context: Context
 
       override fun init(itemView: View) {

@@ -21,7 +21,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
-import com.google.android.fhir.datacapture.views.AttachmentViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 
 /** Used for launching open document activity */
 class OpenDocumentLauncherFragment : DialogFragment() {
