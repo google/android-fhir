@@ -320,7 +320,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `if the draft answer input is null, do not enable the time text input layout`() {
+  fun `if there is no answer or draft answer, do not enable the time text input layout`() {
     val itemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },

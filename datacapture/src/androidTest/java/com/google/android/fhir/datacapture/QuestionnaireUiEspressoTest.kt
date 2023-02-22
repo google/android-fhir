@@ -30,9 +30,13 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.datacapture.TestQuestionnaireFragment.Companion.QUESTIONNAIRE_FILE_PATH_KEY
 import com.google.android.fhir.datacapture.test.R
+import com.google.android.fhir.datacapture.utilities.clickIcon
 import com.google.android.fhir.datacapture.utilities.clickOnText
+import com.google.android.fhir.datacapture.views.localDateTime
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
+import java.time.LocalDateTime
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -55,16 +59,9 @@ class QuestionnaireUiEspressoTest {
 
   @Test
   fun shouldDisplayReviewButtonWhenNoMorePagesToDisplay() {
-    val bundle =
-      bundleOf(QUESTIONNAIRE_FILE_PATH_KEY to "/paginated_questionnaire_with_dependent_answer.json")
-    activityScenarioRule.scenario.onActivity { activity ->
-      activity.supportFragmentManager.commitNow {
-        setReorderingAllowed(true)
-        add<TestQuestionnaireFragment>(R.id.container_holder, args = bundle)
-      }
-    }
+    buildFragmentFromQuestionnaire("/paginated_questionnaire_with_dependent_answer.json")
 
-    onView(ViewMatchers.withId(R.id.review_mode_button))
+    onView(withId(R.id.review_mode_button))
       .check(
         ViewAssertions.matches(
           ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)
@@ -72,13 +69,13 @@ class QuestionnaireUiEspressoTest {
       )
 
     clickOnText("Yes")
-    onView(ViewMatchers.withId(R.id.review_mode_button))
+    onView(withId(R.id.review_mode_button))
       .check(
         ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
       )
 
     clickOnText("No")
-    onView(ViewMatchers.withId(R.id.review_mode_button))
+    onView(withId(R.id.review_mode_button))
       .check(
         ViewAssertions.matches(
           ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)
@@ -88,13 +85,8 @@ class QuestionnaireUiEspressoTest {
 
   @Test
   fun integerTextEdit_inputOutOfRange_shouldShowError() {
-    val bundle = bundleOf(QUESTIONNAIRE_FILE_PATH_KEY to "/text_questionnaire_integer.json")
-    activityScenarioRule.scenario.onActivity { activity ->
-      activity.supportFragmentManager.commitNow {
-        setReorderingAllowed(true)
-        add<TestQuestionnaireFragment>(R.id.container_holder, args = bundle)
-      }
-    }
+    buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
+
     onView(withId(R.id.text_input_edit_text)).perform(typeText("12345678901"))
     onView(withId(R.id.text_input_layout)).check { view, _ ->
       val actualError = (view as TextInputLayout).error
@@ -103,14 +95,9 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
-  fun dateTimeTextEdit_shouldShowErrorForWrongDate_clearOnCorrect_checkAnswerExistsInQuestionnaireResponse() {
-    val bundle = bundleOf(QUESTIONNAIRE_FILE_PATH_KEY to "/component_date_time_picker.json")
-    activityScenarioRule.scenario.onActivity { activity ->
-      activity.supportFragmentManager.commitNow {
-        setReorderingAllowed(true)
-        add<TestQuestionnaireFragment>(R.id.container_holder, args = bundle)
-      }
-    }
+  fun dateTimePicker_shouldShowErrorForWrongDate() {
+    buildFragmentFromQuestionnaire("/component_date_time_picker.json")
+
     // Add month and day. No need to add slashes as they are added automatically
     onView(withId(R.id.date_input_edit_text))
       .perform(ViewActions.click())
@@ -120,13 +107,16 @@ class QuestionnaireUiEspressoTest {
       val actualError = (view as TextInputLayout).error
       assertThat(actualError).isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/31/2023)")
     }
-
     onView(withId(R.id.time_input_layout)).check { view, _ -> assertThat(view.isEnabled).isFalse() }
+  }
 
-    // Add year. This should clear the error
+  @Test
+  fun dateTimePicker_shouldEnableTimePickerWithCorrectDate_butNotSaveInQuestionnaireResponse() {
+    buildFragmentFromQuestionnaire("/component_date_time_picker.json")
+
     onView(withId(R.id.date_input_edit_text))
       .perform(ViewActions.click())
-      .perform(ViewActions.typeTextIntoFocusedView("2005"))
+      .perform(ViewActions.typeTextIntoFocusedView("01052005"))
 
     onView(withId(R.id.date_input_layout)).check { view, _ ->
       val actualError = (view as TextInputLayout).error
@@ -135,30 +125,46 @@ class QuestionnaireUiEspressoTest {
 
     onView(withId(R.id.time_input_layout)).check { view, _ -> assertThat(view.isEnabled).isTrue() }
 
-    // Assert that no answer has been stored, even with a valid date
-    activityScenarioRule.scenario.onActivity { activity ->
-      val testQuestionnaireFragment =
-        activity.supportFragmentManager
-          .findFragmentById(R.id.container_holder)
-          ?.childFragmentManager?.findFragmentById(R.id.container) as QuestionnaireFragment
-      val questionnaireResponse = testQuestionnaireFragment.getQuestionnaireResponse()
-      assertThat(questionnaireResponse.item.size).isEqualTo(1)
-      assertThat(questionnaireResponse.item.first().answer.size).isEqualTo(0)
-    }
+    assertThat(getQuestionnaireResponse().item.size).isEqualTo(1)
+    assertThat(getQuestionnaireResponse().item.first().answer.size).isEqualTo(0)
+  }
 
-    // Add the time
-    onView(withId(R.id.time_input_layout)).perform(ViewActions.click())
+  @Test
+  fun dateTimePicker_shouldSetAnswerWhenDateAndTimeAreFilled() {
+    buildFragmentFromQuestionnaire("/component_date_time_picker.json")
+
+    onView(withId(R.id.date_input_edit_text))
+      .perform(ViewActions.click())
+      .perform(ViewActions.typeTextIntoFocusedView("01052005"))
+
+    onView(withId(R.id.time_input_layout)).perform(clickIcon(true))
+    clickOnText("AM")
+    clickOnText("6")
+    clickOnText("10")
     clickOnText("OK")
 
-    // Check the answer exists in Questionnaire Response
+    val answer = getQuestionnaireResponse().item.first().answer.first().valueDateTimeType
+
+    assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
+  }
+
+  private fun buildFragmentFromQuestionnaire(fileName: String) {
+    val bundle = bundleOf(QUESTIONNAIRE_FILE_PATH_KEY to fileName)
     activityScenarioRule.scenario.onActivity { activity ->
-      val testQuestionnaireFragment =
+      activity.supportFragmentManager.commitNow {
+        setReorderingAllowed(true)
+        add<TestQuestionnaireFragment>(R.id.container_holder, args = bundle)
+      }
+    }
+  }
+  private fun getQuestionnaireResponse(): QuestionnaireResponse {
+    var testQuestionnaireFragment: QuestionnaireFragment? = null
+    activityScenarioRule.scenario.onActivity { activity ->
+      testQuestionnaireFragment =
         activity.supportFragmentManager
           .findFragmentById(R.id.container_holder)
           ?.childFragmentManager?.findFragmentById(R.id.container) as QuestionnaireFragment
-      val questionnaireResponse = testQuestionnaireFragment.getQuestionnaireResponse()
-      assertThat(questionnaireResponse.item.first().answer.size).isEqualTo(1)
-      assertThat(questionnaireResponse.item.first().answer.first().hasValueDateTimeType()).isTrue()
     }
+    return testQuestionnaireFragment!!.getQuestionnaireResponse()
   }
 }
