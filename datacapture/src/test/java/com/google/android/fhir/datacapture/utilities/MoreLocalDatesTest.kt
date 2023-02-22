@@ -17,7 +17,7 @@
 package com.google.android.fhir.datacapture.utilities
 
 import android.os.Build
-import com.google.android.fhir.datacapture.views.getLocalizedDateTimePattern
+import com.google.android.fhir.datacapture.views.factories.getLocalizedDateTimePattern
 import com.google.common.truth.Truth.assertThat
 import java.text.ParseException
 import java.time.LocalDate

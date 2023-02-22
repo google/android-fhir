@@ -47,15 +47,15 @@ import timber.log.Timber
 /** UI controls relevant to capturing question data. */
 internal enum class ItemControlTypes(
   val extensionCode: String,
-  val viewHolderType: QuestionnaireItemViewHolderType,
+  val viewHolderType: QuestionnaireViewHolderType,
 ) {
-  AUTO_COMPLETE("autocomplete", QuestionnaireItemViewHolderType.AUTO_COMPLETE),
-  CHECK_BOX("check-box", QuestionnaireItemViewHolderType.CHECK_BOX_GROUP),
-  DROP_DOWN("drop-down", QuestionnaireItemViewHolderType.DROP_DOWN),
-  OPEN_CHOICE("open-choice", QuestionnaireItemViewHolderType.DIALOG_SELECT),
-  RADIO_BUTTON("radio-button", QuestionnaireItemViewHolderType.RADIO_GROUP),
-  SLIDER("slider", QuestionnaireItemViewHolderType.SLIDER),
-  PHONE_NUMBER("phone-number", QuestionnaireItemViewHolderType.PHONE_NUMBER),
+  AUTO_COMPLETE("autocomplete", QuestionnaireViewHolderType.AUTO_COMPLETE),
+  CHECK_BOX("check-box", QuestionnaireViewHolderType.CHECK_BOX_GROUP),
+  DROP_DOWN("drop-down", QuestionnaireViewHolderType.DROP_DOWN),
+  OPEN_CHOICE("open-choice", QuestionnaireViewHolderType.DIALOG_SELECT),
+  RADIO_BUTTON("radio-button", QuestionnaireViewHolderType.RADIO_GROUP),
+  SLIDER("slider", QuestionnaireViewHolderType.SLIDER),
+  PHONE_NUMBER("phone-number", QuestionnaireViewHolderType.PHONE_NUMBER),
 }
 
 // Please note these URLs do not point to any FHIR Resource and are broken links. They are being

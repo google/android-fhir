@@ -22,6 +22,7 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewHolderFactory
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
@@ -40,12 +41,12 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
     FrameLayout(
       RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
-  private val viewHolder = QuestionnaireItemEditTextIntegerViewHolderFactory.create(parent)
+  private val viewHolder = EditTextIntegerViewHolderFactory.create(parent)
 
   @Test
   fun shouldSetQuestionHeader() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
@@ -60,7 +61,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
   @Test
   fun shouldSetInputText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
@@ -85,7 +86,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
   @Test
   fun shouldSetInputTextToEmpty() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
@@ -99,7 +100,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
       )
     )
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
@@ -120,40 +121,40 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
     "Needs to be moved to instrumentation tests https://github.com/google/android-fhir/issues/1494"
   )
   fun shouldSetQuestionnaireResponseItemAnswer() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("10")
 
-    val answer = questionnaireItemViewItem.answers
+    val answer = questionnaireViewItem.answers
     assertThat(answer.size).isEqualTo(1)
     assertThat(answer[0].valueIntegerType.value).isEqualTo(10)
   }
 
   @Test
   fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
-    assertThat(questionnaireItemViewItem.answers.size).isEqualTo(0)
+    assertThat(questionnaireViewItem.answers.size).isEqualTo(0)
   }
 
   @Test
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minValue"
@@ -183,7 +184,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
   @Test
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minValue"
@@ -213,7 +214,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
   @Test
   fun `hides error textview in the header`() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
@@ -228,7 +229,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
   @Test
   fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,

@@ -19,10 +19,10 @@ package com.google.android.fhir.datacapture.contrib.views
 import android.text.Editable
 import android.text.InputType
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextViewHolderDelegate
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemEditTextViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -35,13 +35,13 @@ object QuestionnaireItemPhoneNumberViewHolderFactory :
 
       override fun handleInput(
         editable: Editable,
-        questionnaireItemViewItem: QuestionnaireItemViewItem
+        questionnaireViewItem: QuestionnaireViewItem
       ) {
         val input = getValue(editable.toString())
         if (input != null) {
-          questionnaireItemViewItem.setAnswer(input)
+          questionnaireViewItem.setAnswer(input)
         } else {
-          questionnaireItemViewItem.clearAnswer()
+          questionnaireViewItem.clearAnswer()
         }
       }
 
@@ -59,12 +59,12 @@ object QuestionnaireItemPhoneNumberViewHolderFactory :
       }
 
       override fun updateUI(
-        questionnaireItemViewItem: QuestionnaireItemViewItem,
+        questionnaireViewItem: QuestionnaireViewItem,
         textInputEditText: TextInputEditText,
         textInputLayout: TextInputLayout,
       ) {
         val text =
-          questionnaireItemViewItem.answers.singleOrNull()?.valueStringType?.value?.toString() ?: ""
+          questionnaireViewItem.answers.singleOrNull()?.valueStringType?.value?.toString() ?: ""
         if (text != textInputEditText.text.toString()) {
           textInputEditText.setText(text)
         }

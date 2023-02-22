@@ -36,7 +36,7 @@ import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -229,7 +229,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /**
    * Callback function to update the view model after the answer(s) to a question have been changed.
-   * This is passed to the [QuestionnaireItemViewItem] in its constructor so that it can invoke this
+   * This is passed to the [QuestionnaireViewItem] in its constructor so that it can invoke this
    * callback function after the UI widget has updated the answer(s).
    *
    * This function updates the [QuestionnaireResponse] held in memory using the answer(s) provided
@@ -570,7 +570,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * Returns the list of [QuestionnaireItemViewItem]s generated for the questionnaire items and
+   * Returns the list of [QuestionnaireViewItem]s generated for the questionnaire items and
    * questionnaire response items.
    */
   private fun getQuestionnaireAdapterItems(
@@ -585,7 +585,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * Returns the list of [QuestionnaireItemViewItem]s generated for the questionnaire item and
+   * Returns the list of [QuestionnaireViewItem]s generated for the questionnaire item and
    * questionnaire response item.
    */
   private fun getQuestionnaireAdapterItems(
@@ -623,7 +623,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       // Add an item for the question itself
       add(
         QuestionnaireAdapterItem.Question(
-          QuestionnaireItemViewItem(
+          QuestionnaireViewItem(
             questionnaireItem,
             questionnaireResponseItem,
             validationResult = validationResult,

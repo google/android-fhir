@@ -40,6 +40,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.itemAnswerOptionImage
+import com.google.android.fhir.datacapture.views.factories.OptionSelectOption
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDialogSelectViewModel
+import com.google.android.fhir.datacapture.views.factories.SelectedOptions
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.concurrent.atomic.AtomicInteger

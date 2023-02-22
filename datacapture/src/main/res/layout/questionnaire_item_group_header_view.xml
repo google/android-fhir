@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
     >
-        <com.google.android.fhir.datacapture.views.QuestionnaireGroupTypeHeaderView
+        <com.google.android.fhir.datacapture.views.GroupHeaderView
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
         />
     </LinearLayout>
 
-    <com.google.android.fhir.datacapture.views.QuestionnaireItemMediaView
+    <com.google.android.fhir.datacapture.views.MediaView
         android:id="@+id/item_media"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -20,14 +20,14 @@ import android.view.View
 import android.widget.NumberPicker
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 
 object CustomNumberPickerFactory :
   QuestionnaireItemViewHolderFactory(R.layout.custom_number_picker_layout) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var numberPicker: NumberPicker
-      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override lateinit var questionnaireViewItem: QuestionnaireViewItem
 
       override fun init(itemView: View) {
         /**
@@ -37,7 +37,7 @@ object CustomNumberPickerFactory :
         numberPicker = itemView.findViewById(R.id.number_picker)
       }
 
-      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+      override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         numberPicker.minValue = 1
         numberPicker.maxValue = 100
       }

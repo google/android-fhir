@@ -22,13 +22,13 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.fhir.datacapture.QuestionnaireItemEditAdapter
-import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
+import com.google.android.fhir.datacapture.QuestionnaireEditAdapter
+import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
@@ -46,7 +46,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
   private lateinit var context: ContextThemeWrapper
   private lateinit var parent: FrameLayout
   private lateinit var viewHolder: QuestionnaireItemViewHolder
-  private lateinit var questionnaireItemEditAdapter: QuestionnaireItemEditAdapter
+  private lateinit var questionnaireEditAdapter: QuestionnaireEditAdapter
 
   @Before
   fun setUp() {
@@ -57,17 +57,17 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
       )
     parent = FrameLayout(context)
     viewHolder = QuestionnaireItemPhoneNumberViewHolderFactory.create(parent)
-    questionnaireItemEditAdapter = QuestionnaireItemEditAdapter()
+    questionnaireEditAdapter = QuestionnaireEditAdapter()
   }
 
   @Test
   fun createViewHolder_shouldReturn_phoneNumberViewHolder() {
     val viewHolderFromAdapter =
-      questionnaireItemEditAdapter.createViewHolder(
+      questionnaireEditAdapter.createViewHolder(
         parent,
-        QuestionnaireItemEditAdapter.ViewType.from(
-            type = QuestionnaireItemEditAdapter.ViewType.Type.QUESTION,
-            subtype = QuestionnaireItemViewHolderType.PHONE_NUMBER.value,
+        QuestionnaireEditAdapter.ViewType.from(
+            type = QuestionnaireEditAdapter.ViewType.Type.QUESTION,
+            subtype = QuestionnaireViewHolderType.PHONE_NUMBER.value,
           )
           .viewType,
       )
@@ -77,7 +77,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldSetTextViewText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
@@ -92,7 +92,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldSetInputText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
@@ -117,7 +117,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldSetInputTextToEmpty() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
@@ -130,7 +130,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
       )
     )
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
@@ -150,42 +150,42 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   @Ignore("https://github.com/google/android-fhir/issues/1494")
   fun shouldSetQuestionnaireResponseItemAnswer() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView
       .findViewById<TextInputEditText>(R.id.text_input_edit_text)
       .setText("+12345678910")
-    assertThat(questionnaireItemViewItem.answers.single().valueStringType.value)
+    assertThat(questionnaireViewItem.answers.single().valueStringType.value)
       .isEqualTo("+12345678910")
   }
 
   @Test
   @UiThreadTest
   fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
-    assertThat(questionnaireItemViewItem.answers).isEmpty()
+    assertThat(questionnaireViewItem.answers).isEmpty()
   }
   @Test
   @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minLength"
@@ -212,7 +212,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { maxLength = 10 },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
@@ -236,7 +236,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,

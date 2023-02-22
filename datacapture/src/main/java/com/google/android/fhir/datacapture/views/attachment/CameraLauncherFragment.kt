@@ -26,7 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
-import com.google.android.fhir.datacapture.views.QuestionnaireItemAttachmentViewHolderFactory
+import com.google.android.fhir.datacapture.views.AttachmentViewHolderFactory
 import timber.log.Timber
 
 /** Used for launching camera activity */
@@ -37,7 +37,7 @@ class CameraLauncherFragment : DialogFragment() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val uri =
-      arguments?.get(QuestionnaireItemAttachmentViewHolderFactory.EXTRA_SAVED_PHOTO_URI_KEY) as Uri
+      arguments?.get(AttachmentViewHolderFactory.EXTRA_SAVED_PHOTO_URI_KEY) as Uri
 
     cameraLauncher =
       registerForActivityResult(ActivityResultContracts.TakePicture()) { isSaved ->

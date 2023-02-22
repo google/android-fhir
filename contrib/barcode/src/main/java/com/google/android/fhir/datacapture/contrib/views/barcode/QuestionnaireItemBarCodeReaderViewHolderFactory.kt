@@ -25,7 +25,7 @@ import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
@@ -37,7 +37,7 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
       private lateinit var textQuestion: TextView
       private lateinit var barcodeTextView: TextView
       private lateinit var reScanView: TextView
-      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override lateinit var questionnaireViewItem: QuestionnaireViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
@@ -69,12 +69,12 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
               }
 
             if (answer == null) {
-              questionnaireItemViewItem.clearAnswer()
+              questionnaireViewItem.clearAnswer()
             } else {
-              questionnaireItemViewItem.setAnswer(answer)
+              questionnaireViewItem.setAnswer(answer)
             }
 
-            setInitial(questionnaireItemViewItem.answers.singleOrNull(), reScanView)
+            setInitial(questionnaireViewItem.answers.singleOrNull(), reScanView)
           }
           LiveBarcodeScanningFragment()
             .show(
@@ -84,16 +84,16 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
         }
       }
 
-      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        this.questionnaireItemViewItem = questionnaireItemViewItem
-        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
+      override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
+        this.questionnaireViewItem = questionnaireViewItem
+        if (!questionnaireViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
+          prefixTextView.text = questionnaireViewItem.questionnaireItem.localizedPrefixSpanned
         } else {
           prefixTextView.visibility = View.GONE
         }
-        textQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
-        setInitial(questionnaireItemViewItem.answers.singleOrNull(), reScanView)
+        textQuestion.text = questionnaireViewItem.questionnaireItem.localizedTextSpanned
+        setInitial(questionnaireViewItem.answers.singleOrNull(), reScanView)
       }
 
       private fun setInitial(

@@ -22,6 +22,7 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewHolderFactory
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
@@ -41,12 +42,12 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
     FrameLayout(
       RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
-  private val viewHolder = QuestionnaireItemEditTextDecimalViewHolderFactory.create(parent)
+  private val viewHolder = EditTextDecimalViewHolderFactory.create(parent)
 
   @Test
   fun shouldSetQuestionHeader() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
@@ -61,7 +62,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
   @Test
   fun shouldSetInputText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
@@ -86,7 +87,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
   @Test
   fun shouldSetInputTextToEmpty() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
@@ -100,7 +101,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
       )
     )
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
@@ -121,43 +122,43 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
     "Needs to be moved to instrumentation tests https://github.com/google/android-fhir/issues/1494"
   )
   fun shouldSetQuestionnaireResponseItemAnswer() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).apply {
       setText("1.1")
       clearFocus()
     }
     viewHolder.itemView.clearFocus()
 
-    assertThat(questionnaireItemViewItem.answers.single().valueDecimalType.value)
+    assertThat(questionnaireViewItem.answers.single().valueDecimalType.value)
       .isEqualTo(BigDecimal("1.1"))
   }
 
   @Test
   fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
-    assertThat(questionnaireItemViewItem.answers).isEmpty()
+    assertThat(questionnaireViewItem.answers).isEmpty()
   }
 
   @Test
   fun displayValidationResult_shouldShowNoErrorMessage() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minValue"
@@ -187,7 +188,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
   @Test
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minValue"
@@ -217,7 +218,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
   @Test
   fun `hides error textview in the header`() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
@@ -232,7 +233,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
   @Test
   fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,

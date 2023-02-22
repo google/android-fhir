@@ -22,13 +22,13 @@
     android:layout_marginTop="@dimen/item_margin_vertical"
     android:orientation="vertical"
 >
-    <com.google.android.fhir.datacapture.views.QuestionnaireItemHeaderView
+    <com.google.android.fhir.datacapture.views.HeaderView
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
     />
 
-    <com.google.android.fhir.datacapture.views.QuestionnaireItemMediaView
+    <com.google.android.fhir.datacapture.views.MediaView
         android:id="@+id/item_media"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

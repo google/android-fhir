@@ -21,7 +21,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
-import com.google.android.fhir.datacapture.views.QuestionnaireItemAttachmentViewHolderFactory
+import com.google.android.fhir.datacapture.views.AttachmentViewHolderFactory
 
 /** Used for launching open document activity */
 class OpenDocumentLauncherFragment : DialogFragment() {
@@ -29,7 +29,7 @@ class OpenDocumentLauncherFragment : DialogFragment() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val mimeTypes =
-      arguments?.getStringArray(QuestionnaireItemAttachmentViewHolderFactory.EXTRA_MIME_TYPE_KEY)
+      arguments?.getStringArray(AttachmentViewHolderFactory.EXTRA_MIME_TYPE_KEY)
 
     registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         setFragmentResult(OPEN_DOCUMENT_RESULT_KEY, bundleOf(OPEN_DOCUMENT_RESULT_KEY to uri))
