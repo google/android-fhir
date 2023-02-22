@@ -175,8 +175,8 @@
 
     <style name="Questionnaire.BottomContainerStyle" parent="">
       <item name="android:background">?attr/colorSurface</item>
-      <item name="android:paddingTop">@dimen/padding_quarter_size</item>
-      <item name="android:paddingBottom">@dimen/padding_quarter_size</item>
+      <item name="android:paddingTop">@dimen/bottom_container_padding_vertical</item>
+      <item name="android:paddingBottom">@dimen/bottom_container_padding_vertical</item>
     </style>
 
     <style
