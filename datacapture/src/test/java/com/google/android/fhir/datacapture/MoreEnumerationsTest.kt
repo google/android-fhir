@@ -25,7 +25,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class MoreEnumerationTest {
+class MoreEnumerationsTest {
 
   @Test
   fun enumeration_should_return_coding() {
