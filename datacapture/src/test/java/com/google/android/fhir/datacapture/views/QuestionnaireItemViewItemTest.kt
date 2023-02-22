@@ -679,7 +679,7 @@ class QuestionnaireItemViewItemTest {
         },
       )
 
-    questionnaireItemViewItem.updatePartialAnswer("02/02")
+    questionnaireItemViewItem.setDraftAnswer("02/02")
 
     assertThat(partialAnswer).isEqualTo("02/02")
     assertThat(answers).isEmpty()

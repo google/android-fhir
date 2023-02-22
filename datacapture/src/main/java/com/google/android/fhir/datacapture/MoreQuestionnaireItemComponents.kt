@@ -16,12 +16,19 @@
 
 package com.google.android.fhir.datacapture
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
+import ca.uhn.fhir.util.UrlUtil
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.utilities.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
 import java.math.BigDecimal
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
@@ -35,6 +42,7 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions
+import timber.log.Timber
 
 /** UI controls relevant to capturing question data. */
 internal enum class ItemControlTypes(
@@ -64,6 +72,9 @@ internal const val EXTENSION_ITEM_CONTROL_SYSTEM = "http://hl7.org/fhir/question
 
 internal const val EXTENSION_HIDDEN_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
+
+internal const val EXTENSION_ITEM_MEDIA =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemMedia"
 
 internal const val EXTENSION_CALCULATED_EXPRESSION_URL =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression"
@@ -194,6 +205,9 @@ internal enum class MimeType(val value: String) {
   IMAGE("image"),
   VIDEO("video")
 }
+
+/** Returns the main MIME type of a MIME type string (e.g. image/png returns image). */
+private fun getMimeType(mimeType: String): String = mimeType.substringBefore("/")
 
 /** Returns true if at least one mime type matches the given type. */
 internal fun Questionnaire.QuestionnaireItemComponent.hasMimeType(type: String): Boolean {
@@ -599,3 +613,38 @@ val Resource.logicalId: String
   get() {
     return this.idElement?.idPart.orEmpty()
   }
+
+/** A media that is attached to a [Questionnaire.QuestionnaireItemComponent]. */
+internal val Questionnaire.QuestionnaireItemComponent.itemMedia: Attachment?
+  get() =
+    (getExtensionByUrl(EXTENSION_ITEM_MEDIA)?.value as? Attachment)?.takeIf { it.hasContentType() }
+
+/* TODO: unify the code path from itemAnswerMedia to use fetchBitmapFromUrl (github.com/google/android-fhir/issues/1876) */
+/** Fetches the Bitmap representation of [Attachment.url]. */
+internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
+  if (!hasUrl() || !UrlUtil.isValid(url) || !hasContentType()) return null
+
+  if (getMimeType(contentType) != MimeType.IMAGE.value) return null
+
+  val urlResolver = DataCapture.getConfiguration(context).urlResolver ?: return null
+
+  return withContext(Dispatchers.IO) { urlResolver.resolveBitmapUrl(url) }
+}
+
+/** Decodes the Bitmap representation of [Attachment.data]. */
+internal fun Attachment.decodeToBitmap(): Bitmap? {
+  if (!hasContentType() || !hasData()) return null
+
+  if (getMimeType(contentType) != MimeType.IMAGE.value) return null
+
+  return data.decodeToBitmap()
+}
+
+/** Returns Bitmap if Byte Array is a valid Bitmap representation, otherwise null. */
+private fun ByteArray.decodeToBitmap(): Bitmap? {
+  val bitmap = BitmapFactory.decodeByteArray(this, 0, this.size)
+
+  if (bitmap == null) Timber.w("Image could not be decoded")
+
+  return bitmap
+}

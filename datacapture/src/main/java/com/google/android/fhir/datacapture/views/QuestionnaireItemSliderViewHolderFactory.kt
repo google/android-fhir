@@ -74,9 +74,11 @@ internal object QuestionnaireItemSliderViewHolderFactory :
             )
           }
         }
+
+        displayValidationResult(questionnaireItemViewItem.validationResult)
       }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {
+      private fun displayValidationResult(validationResult: ValidationResult) {
         error.text =
           when (validationResult) {
             is NotValidated,
