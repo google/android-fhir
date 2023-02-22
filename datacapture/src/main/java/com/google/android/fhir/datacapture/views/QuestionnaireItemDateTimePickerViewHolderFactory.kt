@@ -255,13 +255,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           timeInputLayout.isEnabled = false
           displayDateValidationError(
             Invalid(
-              listOf(
-                invalidDateErrorText(
-                  dateInputEditText.context,
-                  R.string.date_format_validation_error_msg,
-                  canonicalizedDatePattern
-                )
-              )
+              listOf(invalidDateErrorText(dateInputEditText.context, canonicalizedDatePattern))
             )
           )
         }

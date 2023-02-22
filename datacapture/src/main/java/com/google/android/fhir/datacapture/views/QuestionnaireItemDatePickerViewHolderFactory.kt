@@ -21,7 +21,6 @@ import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import androidx.annotation.StringRes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.utilities.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.utilities.format
@@ -185,13 +184,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         } catch (e: ParseException) {
           displayValidationResult(
             Invalid(
-              listOf(
-                invalidDateErrorText(
-                  textInputEditText.context,
-                  R.string.date_format_validation_error_msg,
-                  canonicalizedDatePattern
-                )
-              )
+              listOf(invalidDateErrorText(textInputEditText.context, canonicalizedDatePattern))
             )
           )
           if (questionnaireItemViewItem.answers.isNotEmpty()) {
@@ -227,13 +220,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         if (!draftAnswerToDisplay.isNullOrBlank()) {
           displayValidationResult(
             Invalid(
-              listOf(
-                invalidDateErrorText(
-                  textInputEditText.context,
-                  R.string.date_format_validation_error_msg,
-                  canonicalizedDatePattern
-                )
-              )
+              listOf(invalidDateErrorText(textInputEditText.context, canonicalizedDatePattern))
             )
           )
         } else {
@@ -352,9 +339,9 @@ internal fun Int.length() =
  * Replaces 'dd' with '31', 'MM' with '01' and 'yyyy' with '2023' and returns new string. For
  * example, given a `formatPattern` of dd/MM/yyyy, returns 31/01/2023
  */
-internal fun invalidDateErrorText(context: Context, @StringRes resId: Int, formatPattern: String) =
+internal fun invalidDateErrorText(context: Context, formatPattern: String) =
   context.getString(
-    resId,
+    R.string.date_format_validation_error_msg,
     formatPattern,
     formatPattern.replace("dd", "31").replace("MM", "01").replace("yyyy", "2023")
   )
