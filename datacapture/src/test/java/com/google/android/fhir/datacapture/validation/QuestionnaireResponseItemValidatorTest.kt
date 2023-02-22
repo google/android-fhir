@@ -109,7 +109,7 @@ class QuestionnaireResponseItemValidatorTest {
     assertThat(validationResult).isInstanceOf(Invalid::class.java)
     val invalidValidationResult = validationResult as Invalid
     assertThat(invalidValidationResult.getSingleStringValidationMessage())
-      .isEqualTo("Maximum value allowed is:500\nMinimum value allowed is:600")
+      .isEqualTo("Minimum value allowed is:600\nMaximum value allowed is:500")
   }
 
   @Test
@@ -138,7 +138,7 @@ class QuestionnaireResponseItemValidatorTest {
     val invalidValidationResult = validationResult as Invalid
     assertThat(invalidValidationResult.getSingleStringValidationMessage())
       .isEqualTo(
-        "The maximum number of characters that are permitted in the answer is: 10\nThe minimum number of characters that are permitted in the answer is: 20"
+        "The minimum number of characters that are permitted in the answer is: 20\nThe maximum number of characters that are permitted in the answer is: 10"
       )
   }
 

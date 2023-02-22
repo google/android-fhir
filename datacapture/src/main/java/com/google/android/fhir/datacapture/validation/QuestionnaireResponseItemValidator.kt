@@ -23,15 +23,21 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireResponseItemValidator {
 
-  private val validators =
+  /** Validators for [QuestionnaireResponse.QuestionnaireResponseItemComponent]. */
+  private val questionnaireResponseItemConstraintValidators =
     mutableListOf(
-      RequiredConstraintValidator,
-      MaxValueConstraintValidator,
-      MinValueConstraintValidator,
-      PrimitiveTypeAnswerMaxLengthValidator,
-      PrimitiveTypeAnswerMinLengthValidator,
+      RequiredValidator,
+    )
+
+  /** Validators for [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]. */
+  private val questionnaireResponseItemAnswerConstraintValidators =
+    mutableListOf(
+      MinValueValidator,
+      MaxValueValidator,
+      MinLengthValidator,
+      MaxLengthValidator,
       RegexValidator,
-      DecimalTypeMaxDecimalValidator
+      MaxDecimalPlacesValidator,
     )
 
   /** Validates [answers] contains valid answer(s) to [questionnaireItem]. */
@@ -42,12 +48,24 @@ internal object QuestionnaireResponseItemValidator {
   ): ValidationResult {
     if (questionnaireItem.isHidden) return NotValidated
 
-    val validationResults = validators.map { it.validate(questionnaireItem, answers, context) }
+    val questionnaireResponseItemConstraintValidationResult =
+      questionnaireResponseItemConstraintValidators.map {
+        it.validate(questionnaireItem, answers, context)
+      }
+    val questionnaireResponseItemAnswerConstraintValidationResult =
+      questionnaireResponseItemAnswerConstraintValidators.flatMap { validator ->
+        answers.map { answer -> validator.validate(questionnaireItem, answer, context) }
+      }
 
-    return if (validationResults.all { it.isValid }) {
+    return if (questionnaireResponseItemConstraintValidationResult.all { it.isValid } &&
+        questionnaireResponseItemAnswerConstraintValidationResult.all { it.isValid }
+    ) {
       Valid
     } else {
-      Invalid(validationResults.mapNotNull { it.message })
+      Invalid(
+        questionnaireResponseItemConstraintValidationResult.mapNotNull { it.message } +
+          questionnaireResponseItemAnswerConstraintValidationResult.mapNotNull { it.message }
+      )
     }
   }
 }

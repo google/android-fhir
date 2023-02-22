@@ -16,36 +16,33 @@
 
 package com.google.android.fhir.datacapture.validation
 
+/**
+ * A validator to check if the answer (a decimal value) exceeds the maximum number of permitted
+ * decimal places.
+ *
+ * Only decimal types permitted in questionnaires response are subjected to this validation. See
+ * https://www.hl7.org/fhir/extension-maxdecimalplaces.html
+ */
 import android.content.Context
-import com.google.android.fhir.compareTo
 import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.Extension
-import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.Type
 
-internal const val MAX_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/maxValue"
-
-/** A validator to check if the value of an answer exceeded the permitted value. */
-internal object MaxValueConstraintValidator :
-  ValueConstraintExtensionValidator(
-    url = MAX_VALUE_EXTENSION_URL,
+internal object MaxDecimalPlacesValidator :
+  QuestionnaireResponseItemAnswerExtensionConstraintValidator(
+    url = MAX_DECIMAL_URL,
     predicate = {
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
-      answer.value > extension.value?.valueOrCalculateValue()!!
+      val maxDecimalPlaces = (extension.value as? IntegerType)?.value
+      answer.hasValueDecimalType() &&
+        maxDecimalPlaces != null &&
+        answer.valueDecimalType.valueAsString.substringAfter(".").length > maxDecimalPlaces
     },
     { extension: Extension, context: Context ->
-      context.getString(
-        R.string.max_value_validation_error_msg,
-        extension.value?.valueOrCalculateValue()?.primitiveValue()
-      )
+      context.getString(R.string.max_decimal_validation_error_msg, extension.value.primitiveValue())
     }
-  ) {
+  )
 
-  fun getMaxValue(questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent): Type? {
-    return questionnaireItemComponent.extension
-      .firstOrNull { it.url == MAX_VALUE_EXTENSION_URL }
-      ?.let { it.value?.valueOrCalculateValue() }
-  }
-}
+private const val MAX_DECIMAL_URL = "http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces"

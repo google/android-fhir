@@ -40,7 +40,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class MinValueConstraintValidatorTest {
+class MinValueValidatorTest {
 
   lateinit var context: Context
 
@@ -60,13 +60,12 @@ class MinValueConstraintValidatorTest {
           }
         )
       }
-    val answers =
-      listOf(QuestionnaireResponseItemAnswerComponent().apply { value = IntegerType(9) })
+    val answer = QuestionnaireResponseItemAnswerComponent().apply { value = IntegerType(9) }
 
     val validationResult =
-      MinValueConstraintValidator.validate(
+      MinValueValidator.validate(
         questionnaireItem,
-        answers,
+        answer,
         InstrumentationRegistry.getInstrumentation().context
       )
 
@@ -85,13 +84,12 @@ class MinValueConstraintValidatorTest {
           }
         )
       }
-    val answers =
-      listOf(QuestionnaireResponseItemAnswerComponent().apply { value = IntegerType(501) })
+    val answer = QuestionnaireResponseItemAnswerComponent().apply { value = IntegerType(501) }
 
     val validationResult =
-      MinValueConstraintValidator.validate(
+      MinValueValidator.validate(
         questionnaireItem,
-        answers,
+        answer,
         InstrumentationRegistry.getInstrumentation().context
       )
 
@@ -135,16 +133,16 @@ class MinValueConstraintValidatorTest {
               .valueAsString)
           )
       )
-    val answers = listOf(QuestionnaireResponseItemAnswerComponent().apply { value = answerDate })
+    val answer = QuestionnaireResponseItemAnswerComponent().apply { value = answerDate }
 
     val validationResult =
-      MinValueConstraintValidator.validate(
+      MinValueValidator.validate(
         questionnaireItem,
-        answers,
+        answer,
         InstrumentationRegistry.getInstrumentation().context
       )
     val expectedDateRange =
-      (MinValueConstraintValidator.getMinValue(questionnaireItem) as? DateType)?.valueAsString
+      (MinValueValidator.getMinValue(questionnaireItem) as? DateType)?.valueAsString
     assertThat(validationResult.isValid).isFalse()
     assertThat(validationResult.message).isEqualTo("Minimum value allowed is:$expectedDateRange")
   }
@@ -174,13 +172,12 @@ class MinValueConstraintValidatorTest {
         )
       }
 
-    val answers =
-      listOf(QuestionnaireResponseItemAnswerComponent().apply { value = DateType(Date()) })
+    val answer = QuestionnaireResponseItemAnswerComponent().apply { value = DateType(Date()) }
 
     val validationResult =
-      MinValueConstraintValidator.validate(
+      MinValueValidator.validate(
         questionnaireItem,
-        answers,
+        answer,
         InstrumentationRegistry.getInstrumentation().context
       )
 
@@ -215,9 +212,7 @@ class MinValueConstraintValidatorTest {
           )
         }
       )
-    assertThat(
-        (MinValueConstraintValidator.getMinValue(questionItem.first()) as? DateType)?.valueAsString
-      )
+    assertThat((MinValueValidator.getMinValue(questionItem.first()) as? DateType)?.valueAsString)
       .isEqualTo(today)
   }
 
@@ -236,7 +231,7 @@ class MinValueConstraintValidatorTest {
         }
       )
 
-    assertThat((MinValueConstraintValidator.getMinValue(questionItem.first()) as? DateType)?.value)
+    assertThat((MinValueValidator.getMinValue(questionItem.first()) as? DateType)?.value)
       .isEqualTo(dateType.value)
   }
 }

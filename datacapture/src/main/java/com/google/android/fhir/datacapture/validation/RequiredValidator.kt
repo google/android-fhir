@@ -16,11 +16,23 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android.content.Context
+import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-/** A data class which holds the questionnaire requirement and response. */
-data class QuestionnaireTestItem(
-  val requirement: Questionnaire.QuestionnaireItemComponent,
-  val answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
-)
+internal object RequiredValidator : QuestionnaireResponseItemConstraintValidator {
+  override fun validate(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
+    context: Context
+  ): QuestionnaireResponseItemConstraintValidator.Result {
+    if (!questionnaireItem.required || answers.any { it.hasValue() }) {
+      return QuestionnaireResponseItemConstraintValidator.Result(true, null)
+    }
+    return QuestionnaireResponseItemConstraintValidator.Result(
+      false,
+      context.getString(R.string.required_constraint_validation_error_msg)
+    )
+  }
+}

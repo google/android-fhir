@@ -41,26 +41,13 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class PrimitiveTypeAnswerMaxLengthValidatorTest {
+class MaxLengthValidatorTest {
 
   lateinit var context: Context
 
   @Before
   fun setup() {
     context = ApplicationProvider.getApplicationContext()
-  }
-
-  @Test
-  fun noAnswer_shouldReturnValidResult() {
-    val validationResult =
-      PrimitiveTypeAnswerMaxLengthValidator.validate(
-        Questionnaire.QuestionnaireItemComponent().apply { this.maxLength = maxLength },
-        listOf(),
-        Companion.context
-      )
-
-    assertThat(validationResult.isValid).isTrue()
-    assertThat(validationResult.message.isNullOrBlank()).isTrue()
   }
 
   @Test
@@ -138,15 +125,12 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
   @Test
   fun nonPrimitiveOverMaxLength_shouldReturnValidResult() {
     val requirement = Questionnaire.QuestionnaireItemComponent().apply { maxLength = 5 }
-    val response =
-      listOf(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          this.value = Quantity(1234567.89)
-        }
-      )
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        this.value = Quantity(1234567.89)
+      }
 
-    val validationResult =
-      PrimitiveTypeAnswerMaxLengthValidator.validate(requirement, response, context)
+    val validationResult = MaxLengthValidator.validate(requirement, answer, context)
 
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.message.isNullOrBlank()).isTrue()
@@ -161,11 +145,7 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
       val testComponent = createMaxLengthQuestionnaireTestItem(maxLength, value)
 
       val validationResult =
-        PrimitiveTypeAnswerMaxLengthValidator.validate(
-          testComponent.requirement,
-          testComponent.response,
-          context
-        )
+        MaxLengthValidator.validate(testComponent.requirement, testComponent.answer, context)
 
       assertThat(validationResult.isValid).isFalse()
       assertThat(validationResult.message)
@@ -179,11 +159,7 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
       val testComponent = createMaxLengthQuestionnaireTestItem(maxLength, value)
 
       val validationResult =
-        PrimitiveTypeAnswerMaxLengthValidator.validate(
-          testComponent.requirement,
-          testComponent.response,
-          context
-        )
+        MaxLengthValidator.validate(testComponent.requirement, testComponent.answer, context)
 
       assertThat(validationResult.isValid).isTrue()
       assertThat(validationResult.message.isNullOrBlank()).isTrue()
@@ -196,13 +172,11 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
     ): QuestionnaireTestItem {
       val questionnaireItem =
         Questionnaire.QuestionnaireItemComponent().apply { this.maxLength = maxLength }
-      val answers =
-        listOf(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            this.value = value
-          }
-        )
-      return QuestionnaireTestItem(questionnaireItem, answers)
+      val answer =
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          this.value = value
+        }
+      return QuestionnaireTestItem(questionnaireItem, answer)
     }
   }
 }

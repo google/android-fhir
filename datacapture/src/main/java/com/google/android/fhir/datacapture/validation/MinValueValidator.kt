@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,37 @@
 
 package com.google.android.fhir.datacapture.validation
 
-/**
- * A validator to check if the answer (a decimal value) exceeds the maximum number of permitted
- * decimal places.
- *
- * Only decimal types permitted in questionnaires response are subjected to this validation. See
- * https://www.hl7.org/fhir/extension-maxdecimalplaces.html
- */
 import android.content.Context
+import com.google.android.fhir.compareTo
 import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.Extension
-import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 
-internal object DecimalTypeMaxDecimalValidator :
-  ValueConstraintExtensionValidator(
-    url = MAX_DECIMAL_URL,
+internal const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"
+/** A validator to check if the value of an answer is at least the permitted value. */
+internal object MinValueValidator :
+  QuestionnaireResponseItemAnswerExtensionConstraintValidator(
+    url = MIN_VALUE_EXTENSION_URL,
     predicate = {
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
-      val maxDecimalPlaces = (extension.value as? IntegerType)?.value
-      answer.hasValueDecimalType() &&
-        maxDecimalPlaces != null &&
-        answer.valueDecimalType.valueAsString.substringAfter(".").length > maxDecimalPlaces
+      answer.value < extension.value?.valueOrCalculateValue()!!
     },
     { extension: Extension, context: Context ->
-      context.getString(R.string.max_decimal_validation_error_msg, extension.value.primitiveValue())
+      context.getString(
+        R.string.min_value_validation_error_msg,
+        extension.value?.valueOrCalculateValue()?.primitiveValue()
+      )
     }
-  )
+  ) {
 
-private const val MAX_DECIMAL_URL = "http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces"
+  internal fun getMinValue(
+    questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
+  ): Type? {
+    return questionnaireItemComponent.extension
+      .firstOrNull { it.url == MIN_VALUE_EXTENSION_URL }
+      ?.let { it.value?.valueOrCalculateValue() }
+  }
+}

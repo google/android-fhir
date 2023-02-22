@@ -42,7 +42,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class PrimitiveTypeAnswerMinLengthValidatorTest {
+class MinLengthValidatorTest {
 
   var context: Context = ApplicationProvider.getApplicationContext()
 
@@ -134,15 +134,12 @@ class PrimitiveTypeAnswerMinLengthValidatorTest {
           }
         )
       }
-    val response =
-      listOf(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          this.value = Quantity(1234567.89)
-        }
-      )
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        this.value = Quantity(1234567.89)
+      }
 
-    val validationResult =
-      PrimitiveTypeAnswerMaxLengthValidator.validate(requirement, response, context)
+    val validationResult = MaxLengthValidator.validate(requirement, answer, context)
 
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.message.isNullOrBlank()).isTrue()
@@ -157,11 +154,7 @@ class PrimitiveTypeAnswerMinLengthValidatorTest {
       val testComponent = createMaxLengthQuestionnaireTestItem(minLength, value)
 
       val validationResult =
-        PrimitiveTypeAnswerMinLengthValidator.validate(
-          testComponent.requirement,
-          testComponent.response,
-          context
-        )
+        MinLengthValidator.validate(testComponent.requirement, testComponent.answer, context)
 
       assertThat(validationResult.isValid).isTrue()
       assertThat(validationResult.message.isNullOrBlank()).isTrue()
@@ -172,11 +165,7 @@ class PrimitiveTypeAnswerMinLengthValidatorTest {
       val testComponent = createMaxLengthQuestionnaireTestItem(minLength, value)
 
       val validationResult =
-        PrimitiveTypeAnswerMinLengthValidator.validate(
-          testComponent.requirement,
-          testComponent.response,
-          context
-        )
+        MinLengthValidator.validate(testComponent.requirement, testComponent.answer, context)
 
       assertThat(validationResult.isValid).isFalse()
       assertThat(validationResult.message)
@@ -199,13 +188,12 @@ class PrimitiveTypeAnswerMinLengthValidatorTest {
             }
           )
         }
-      val answers =
-        listOf(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            this.value = value
-          }
-        )
-      return QuestionnaireTestItem(questionnaireItem, answers)
+      val answer =
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          this.value = value
+        }
+
+      return QuestionnaireTestItem(questionnaireItem, answer)
     }
   }
 }

@@ -20,20 +20,20 @@ import android.content.Context
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-/** A interface for validating FHIR native supported constraints on a questionnaire response. */
-internal interface ConstraintValidator {
+/** Validates [QuestionnaireResponse.QuestionnaireResponseItemComponent]. */
+internal interface QuestionnaireResponseItemAnswerConstraintValidator {
   /**
-   * Validates the `answer`(s) in [answers] satisfy any constraints of the [questionnaireItem]
-   * according to the [structured data capture implementation guide]
+   * Validates whether the [answer] satisfies any constraints of the [questionnaireItem] according
+   * to the [structured data capture implementation guide]
    * (http://build.fhir.org/ig/HL7/sdc/behavior.html). This does not validate the [answers] and its
    * child items are structurally consistent with the [questionnaireItem] and its child items.
    * [Learn more](https://www.hl7.org/fhir/questionnaireresponse.html#link).
    */
   fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
+    answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
     context: Context
-  ): ConstraintValidationResult
+  ): Result
 
-  data class ConstraintValidationResult(val isValid: Boolean, val message: String?)
+  data class Result(val isValid: Boolean, val message: String?)
 }

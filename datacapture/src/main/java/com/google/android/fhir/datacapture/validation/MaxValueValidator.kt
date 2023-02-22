@@ -24,29 +24,28 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
 
-internal const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"
-/** A validator to check if the value of an answer is at least the permitted value. */
-internal object MinValueConstraintValidator :
-  ValueConstraintExtensionValidator(
-    url = MIN_VALUE_EXTENSION_URL,
+internal const val MAX_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/maxValue"
+
+/** A validator to check if the value of an answer exceeded the permitted value. */
+internal object MaxValueValidator :
+  QuestionnaireResponseItemAnswerExtensionConstraintValidator(
+    url = MAX_VALUE_EXTENSION_URL,
     predicate = {
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
-      answer.value < extension.value?.valueOrCalculateValue()!!
+      answer.value > extension.value?.valueOrCalculateValue()!!
     },
     { extension: Extension, context: Context ->
       context.getString(
-        R.string.min_value_validation_error_msg,
+        R.string.max_value_validation_error_msg,
         extension.value?.valueOrCalculateValue()?.primitiveValue()
       )
     }
   ) {
 
-  internal fun getMinValue(
-    questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
-  ): Type? {
+  fun getMaxValue(questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent): Type? {
     return questionnaireItemComponent.extension
-      .firstOrNull { it.url == MIN_VALUE_EXTENSION_URL }
+      .firstOrNull { it.url == MAX_VALUE_EXTENSION_URL }
       ?.let { it.value?.valueOrCalculateValue() }
   }
 }

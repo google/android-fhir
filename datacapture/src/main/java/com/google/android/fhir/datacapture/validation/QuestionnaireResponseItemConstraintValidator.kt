@@ -17,22 +17,23 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
-import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object RequiredConstraintValidator : ConstraintValidator {
-  override fun validate(
+/** Validates [QuestionnaireResponse.QuestionnaireResponseItemComponent]. */
+internal interface QuestionnaireResponseItemConstraintValidator {
+  /**
+   * Validates the `answer`(s) in [answers] satisfy any constraints of the [questionnaireItem]
+   * according to the [structured data capture implementation guide]
+   * (http://build.fhir.org/ig/HL7/sdc/behavior.html). This does not validate the [answers] and its
+   * child items are structurally consistent with the [questionnaireItem] and its child items.
+   * [Learn more](https://www.hl7.org/fhir/questionnaireresponse.html#link).
+   */
+  fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
     context: Context
-  ): ConstraintValidator.ConstraintValidationResult {
-    if (!questionnaireItem.required || answers.any { it.hasValue() }) {
-      return ConstraintValidator.ConstraintValidationResult(true, null)
-    }
-    return ConstraintValidator.ConstraintValidationResult(
-      false,
-      context.getString(R.string.required_constraint_validation_error_msg)
-    )
-  }
+  ): Result
+
+  data class Result(val isValid: Boolean, val message: String?)
 }

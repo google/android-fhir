@@ -36,7 +36,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class MaxValueConstraintValidatorTest {
+class MaxValueValidatorTest {
 
   lateinit var context: Context
 
@@ -56,14 +56,12 @@ class MaxValueConstraintValidatorTest {
           }
         )
       }
-    val answers =
-      listOf(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          value = IntegerType(200001)
-        }
-      )
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        value = IntegerType(200001)
+      }
 
-    val validationResult = MaxValueConstraintValidator.validate(questionnaireItem, answers, context)
+    val validationResult = MaxValueValidator.validate(questionnaireItem, answer, context)
 
     assertThat(validationResult.isValid).isFalse()
     assertThat(validationResult.message).isEqualTo("Maximum value allowed is:200000")
@@ -80,14 +78,12 @@ class MaxValueConstraintValidatorTest {
           }
         )
       }
-    val answers =
-      listOf(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          value = IntegerType(501)
-        }
-      )
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        value = IntegerType(501)
+      }
 
-    val validationResult = MaxValueConstraintValidator.validate(questionnaireItem, answers, context)
+    val validationResult = MaxValueValidator.validate(questionnaireItem, answer, context)
 
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.message.isNullOrBlank()).isTrue()
@@ -108,7 +104,7 @@ class MaxValueConstraintValidatorTest {
         }
       )
 
-    assertThat((MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)?.value)
+    assertThat((MaxValueValidator.getMaxValue(questionItem.first()) as? DateType)?.value)
       .isEqualTo(dateType.value)
   }
 
@@ -140,9 +136,7 @@ class MaxValueConstraintValidatorTest {
         }
       )
 
-    assertThat(
-        (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)?.valueAsString
-      )
+    assertThat((MaxValueValidator.getMaxValue(questionItem.first()) as? DateType)?.valueAsString)
       .isEqualTo(today)
   }
 
@@ -174,9 +168,7 @@ class MaxValueConstraintValidatorTest {
         }
       )
 
-    assertThat(
-        (MaxValueConstraintValidator.getMaxValue(questionItem.first()) as? DateType)?.valueAsString
-      )
+    assertThat((MaxValueValidator.getMaxValue(questionItem.first()) as? DateType)?.valueAsString)
       .isEqualTo(fiveDaysAhead)
   }
 }

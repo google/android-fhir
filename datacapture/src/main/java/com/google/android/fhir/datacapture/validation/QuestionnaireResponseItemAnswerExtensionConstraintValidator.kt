@@ -21,29 +21,30 @@ import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-/** A interface for validating constraints from FHIR extension on a questionnaire response. */
-internal open class ValueConstraintExtensionValidator(
+/**
+ * Validates [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] using a constraint in
+ * an extension.
+ */
+internal open class QuestionnaireResponseItemAnswerExtensionConstraintValidator(
   val url: String,
   val predicate:
     (Extension, QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> Boolean,
   val messageGenerator: (Extension, Context) -> String
-) : ConstraintValidator {
+) : QuestionnaireResponseItemAnswerConstraintValidator {
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
+    answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
     context: Context
-  ): ConstraintValidator.ConstraintValidationResult {
-    if (questionnaireItem.hasExtension(url) && answers.isNotEmpty()) {
+  ): QuestionnaireResponseItemAnswerConstraintValidator.Result {
+    if (questionnaireItem.hasExtension(url)) {
       val extension = questionnaireItem.getExtensionByUrl(url)
-      // TODO(https://github.com/google/android-fhir/issues/487): Validates all answers.
-      val answer = answers[0]
       if (predicate(extension, answer)) {
-        return ConstraintValidator.ConstraintValidationResult(
+        return QuestionnaireResponseItemAnswerConstraintValidator.Result(
           false,
           messageGenerator(extension, context)
         )
       }
     }
-    return ConstraintValidator.ConstraintValidationResult(true, null)
+    return QuestionnaireResponseItemAnswerConstraintValidator.Result(true, null)
   }
 }
