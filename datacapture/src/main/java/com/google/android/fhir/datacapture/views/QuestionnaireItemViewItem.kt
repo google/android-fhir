@@ -96,7 +96,7 @@ data class QuestionnaireItemViewItem(
   val answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
     questionnaireResponseItem.answer.map { it.copy() }
 
-  /** Updates the answers. This will override any existing answers. */
+  /** Updates the answers. This will override any existing answers and removes the draft answer. */
   fun setAnswer(
     vararg questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
@@ -112,12 +112,12 @@ data class QuestionnaireItemViewItem(
     )
   }
 
-  /** Clears existing answers. */
+  /** Clears existing answers and any draft answer. */
   fun clearAnswer() {
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), null)
   }
 
-  /** Adds an answer to the existing answers. */
+  /** Adds an answer to the existing answers and removes the draft answer. */
   internal fun addAnswer(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
@@ -133,7 +133,7 @@ data class QuestionnaireItemViewItem(
     )
   }
 
-  /** Removes an answer from the existing answers. */
+  /** Removes an answer from the existing answers, as well as any draft answer. */
   internal fun removeAnswer(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
@@ -224,7 +224,8 @@ data class QuestionnaireItemViewItem(
             otherAnswer.value != null &&
             answer.value.equalsShallow(otherAnswer.value)
         }
-        .all { it }
+        .all { it } &&
+      draftAnswer == other.draftAnswer
 
   /**
    * Returns whether this [QuestionnaireItemViewItem] and the `other` [QuestionnaireItemViewItem]

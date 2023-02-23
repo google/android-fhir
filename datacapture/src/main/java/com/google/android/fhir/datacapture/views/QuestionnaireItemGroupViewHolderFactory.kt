@@ -49,6 +49,8 @@ internal object QuestionnaireItemGroupViewHolderFactory :
         addItemButton.setOnClickListener {
           questionnaireItemViewItem.addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              // TODO(jingtang10): This can be removed since we already do this in the
+              // answerChangedCallback in the QuestionnaireViewModel.
               item =
                 questionnaireItemViewItem.questionnaireItem.getNestedQuestionnaireResponseItems()
             }

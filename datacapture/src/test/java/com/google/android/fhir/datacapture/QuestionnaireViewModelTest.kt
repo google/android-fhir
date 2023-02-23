@@ -70,7 +70,6 @@ import org.hl7.fhir.r4.model.ValueSet
 import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Assert.assertThrows
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestWatcher
@@ -1342,122 +1341,6 @@ class QuestionnaireViewModelTest {
   // Test cases for state flow
 
   @Test
-  fun stateHasQuestionnaireResponse_lessItemsInQuestionnaireResponse_shouldAddTheMissingItem() =
-    runTest {
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "a-link-id"
-              text = "Basic question"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true)))
-            }
-          )
-        }
-      val questionnaireResponse = QuestionnaireResponse().apply { id = "a-questionnaire-response" }
-      val questionnaireResponseWithMissingItem =
-        QuestionnaireResponse().apply {
-          id = "a-questionnaire-response"
-          addItem(
-            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-              linkId = "a-link-id"
-              answer =
-                listOf(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = BooleanType(true)
-                  }
-                )
-            }
-          )
-        }
-
-      val questionnaireViewModel =
-        createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-
-      val questionnaireItemViewItem = questionnaireViewModel.questionnaireStateFlow.first()
-      assertThat(questionnaireItemViewItem.items.first().asQuestion().questionnaireItem.linkId)
-        .isEqualTo(questionnaireResponseWithMissingItem.item.first().linkId)
-      assertThat(
-          questionnaireItemViewItem.items
-            .single()
-            .asQuestion()
-            .answers
-            .single()
-            .valueBooleanType.booleanValue()
-        )
-        .isTrue()
-    }
-
-  @Test
-  fun stateHasQuestionnaireResponse_lessItemsInQuestionnaireResponse_shouldCopyAnswer() = runTest {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "q1"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(false)))
-          }
-        )
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "q2"
-            text = "Another basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(false)))
-          }
-        )
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "q3"
-            text = "Another basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(false)))
-          }
-        )
-      }
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        id = "a-questionnaire-response"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "q2"
-            answer =
-              listOf(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = BooleanType(true)
-                }
-              )
-          }
-        )
-      }
-
-    val questionnaireViewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-    val questionnaireItemViewItemList = questionnaireViewModel.questionnaireStateFlow.first().items
-
-    // Answer to first question should be created from questionnaire
-    val questionnaireItemViewItem1 = questionnaireItemViewItemList[0].asQuestion()
-    assertThat(questionnaireItemViewItem1.questionnaireItem.linkId).isEqualTo("q1")
-    assertThat(questionnaireItemViewItem1.answers.single().valueBooleanType.booleanValue())
-      .isFalse()
-
-    // Answer to second question should be copied from questionnaire response
-    val questionnaireItemViewItem2 = questionnaireItemViewItemList[1].asQuestion()
-    assertThat(questionnaireItemViewItem2.questionnaireItem.linkId).isEqualTo("q2")
-    assertThat(questionnaireItemViewItem2.answers.single().valueBooleanType.booleanValue()).isTrue()
-
-    // Answer to third question should be created from questionnaire
-    val questionnaireItemViewItem3 = questionnaireItemViewItemList[2].asQuestion()
-    assertThat(questionnaireItemViewItem3.questionnaireItem.linkId).isEqualTo("q3")
-    assertThat(questionnaireItemViewItem3.answers.single().valueBooleanType.booleanValue())
-      .isFalse()
-  }
-
-  @Test
   fun `should emit questionnaire state flow`() = runTest {
     val questionnaire =
       Questionnaire().apply {
@@ -1931,7 +1814,6 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  @Ignore("https://github.com/google/android-fhir/issues/487")
   fun questionnaireHasNestedItem_notOfTypeGroup_shouldNestItemWithinAnswerItem() = runTest {
     val questionnaire =
       Questionnaire().apply {
@@ -1946,6 +1828,13 @@ class QuestionnaireViewModelTest {
                 linkId = "a-nested-boolean-item"
                 text = "Nested question"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                addItem(
+                  Questionnaire.QuestionnaireItemComponent().apply {
+                    linkId = "a-nested-nested-boolean-item"
+                    text = "Nested nested question"
+                    type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  }
+                )
               }
             )
           }
@@ -1957,15 +1846,27 @@ class QuestionnaireViewModelTest {
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-boolean-item"
+            text = "Parent question"
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 this.value = valueBooleanType.setValue(false)
                 addItem(
                   QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
                     linkId = "a-nested-boolean-item"
+                    text = "Nested question"
                     addAnswer(
                       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                         this.value = valueBooleanType.setValue(false)
+                        addItem(
+                          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                            linkId = "a-nested-nested-boolean-item"
+                            text = "Nested nested question"
+                            addAnswer(
+                              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                                .apply { this.value = valueBooleanType.setValue(false) }
+                            )
+                          }
+                        )
                       }
                     )
                   }
@@ -1977,25 +1878,44 @@ class QuestionnaireViewModelTest {
       }
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      var items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      assertThat(items.map { it.questionnaireItem.linkId }).containsExactly("a-boolean-item")
 
-    viewModel
-      .getQuestionnaireItemViewItemList()[0]
-      .asQuestion()
-      .setAnswer(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          this.value = valueBooleanType.setValue(false)
-        }
-      )
-    viewModel
-      .getQuestionnaireItemViewItemList()[1]
-      .asQuestion()
-      .setAnswer(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          this.value = valueBooleanType.setValue(false)
-        }
-      )
+      items
+        .first()
+        .setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            this.value = valueBooleanType.setValue(false)
+          }
+        )
 
-    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+      items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      assertThat(items.map { it.questionnaireItem.linkId })
+        .containsExactly("a-boolean-item", "a-nested-boolean-item")
+
+      items
+        .last()
+        .setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            this.value = valueBooleanType.setValue(false)
+          }
+        )
+
+      items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      assertThat(items.map { it.questionnaireItem.linkId })
+        .containsExactly("a-boolean-item", "a-nested-boolean-item", "a-nested-nested-boolean-item")
+
+      items
+        .last()
+        .setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            this.value = valueBooleanType.setValue(false)
+          }
+        )
+
+      assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+    }
   }
 
   // Test cases for pagination and navigation
