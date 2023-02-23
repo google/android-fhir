@@ -37,6 +37,7 @@ import com.google.android.fhir.datacapture.hasMimeTypeOnly
 import com.google.android.fhir.datacapture.isGivenSizeOverLimit
 import com.google.android.fhir.datacapture.maxSizeInMiBs
 import com.google.android.fhir.datacapture.mimeTypes
+import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -151,7 +152,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
 
         answer.valueAttachment?.let { attachment ->
           displayPreview(
-            attachmentType = attachment.contentType.type,
+            attachmentType = getMimeType(attachment.contentType),
             attachmentTitle = attachment.title,
             attachmentByteArray = attachment.data
           )
@@ -206,8 +207,9 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             return@setFragmentResultListener
           }
 
-          val attachmentMimeType = context.getMimeTypeFromUri(attachmentUri)
-          if (!questionnaireItem.hasMimeType(attachmentMimeType.type)) {
+          val attachmentMimeTypeWithSubType = context.getMimeTypeFromUri(attachmentUri)
+          val attachmentMimeType = getMimeType(attachmentMimeTypeWithSubType)
+          if (!questionnaireItem.hasMimeType(attachmentMimeType)) {
             displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
             displaySnackbar(view, R.string.upload_failed)
             file.delete()
@@ -219,7 +221,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
                 Attachment().apply {
-                  contentType = attachmentMimeType
+                  contentType = attachmentMimeTypeWithSubType
                   data = attachmentByteArray
                   title = file.name
                   creation = Date()
@@ -230,11 +232,11 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           divider.visibility = View.VISIBLE
           labelUploaded.visibility = View.VISIBLE
           displayPreview(
-            attachmentType = attachmentMimeType.type,
+            attachmentType = attachmentMimeType,
             attachmentTitle = file.name,
             attachmentUri = attachmentUri
           )
-          displaySnackbarOnUpload(view, attachmentMimeType.type)
+          displaySnackbarOnUpload(view, attachmentMimeType)
           file.delete()
         }
 
@@ -266,8 +268,9 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             return@setFragmentResultListener
           }
 
-          val attachmentMimeType = context.getMimeTypeFromUri(attachmentUri)
-          if (!questionnaireItem.hasMimeType(attachmentMimeType.type)) {
+          val attachmentMimeTypeWithSubType = context.getMimeTypeFromUri(attachmentUri)
+          val attachmentMimeType = getMimeType(attachmentMimeTypeWithSubType)
+          if (!questionnaireItem.hasMimeType(attachmentMimeType)) {
             displayError(R.string.mime_type_wrong_media_format_validation_error_msg)
             displaySnackbar(view, R.string.upload_failed)
             return@setFragmentResultListener
@@ -278,7 +281,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
                 Attachment().apply {
-                  contentType = attachmentMimeType
+                  contentType = attachmentMimeTypeWithSubType
                   data = attachmentByteArray
                   title = attachmentTitle
                   creation = Date()
@@ -289,11 +292,11 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
           divider.visibility = View.VISIBLE
           labelUploaded.visibility = View.VISIBLE
           displayPreview(
-            attachmentType = attachmentMimeType.type,
+            attachmentType = attachmentMimeType,
             attachmentTitle = attachmentTitle,
             attachmentUri = attachmentUri
           )
-          displaySnackbarOnUpload(view, attachmentMimeType.type)
+          displaySnackbarOnUpload(view, attachmentMimeType)
         }
 
         OpenDocumentLauncherFragment()
@@ -374,7 +377,7 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
         clearFilePreview()
         displaySnackbarOnDelete(
           view,
-          questionnaireItemViewItem.answers.first().valueAttachment.contentType.type
+          getMimeType(questionnaireItemViewItem.answers.first().valueAttachment.contentType)
         )
       }
 
@@ -448,9 +451,8 @@ internal object QuestionnaireItemAttachmentViewHolderFactory :
   const val EXTRA_SAVED_PHOTO_URI_KEY = "saved_photo_uri"
 }
 
-/** Only usable for a String known as mime type. */
-private val String.type: String
-  get() = this.substringBefore("/")
+/** Returns the main MIME type of a MIME type string (e.g. image/png returns image). */
+private fun getMimeType(mimeType: String): String = mimeType.substringBefore("/")
 
 private fun Context.readBytesFromUri(uri: Uri): ByteArray {
   return contentResolver.openInputStream(uri)?.use { it.buffered().readBytes() } ?: ByteArray(0)

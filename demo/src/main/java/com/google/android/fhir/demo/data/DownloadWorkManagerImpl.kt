@@ -30,7 +30,8 @@ import org.hl7.fhir.r4.model.ResourceType
 
 class DownloadWorkManagerImpl : DownloadWorkManager {
   private val resourceTypeList = ResourceType.values().map { it.name }
-  private val urls = LinkedList(listOf("Patient?address-city=NAIROBI"))
+  private val urls =
+    LinkedList(listOf("Patient?address-city=NAIROBI", "Binary?_id=android-fhir-thermometer-image"))
 
   override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? {
     var url = urls.poll() ?: return null

@@ -21,13 +21,12 @@ import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.ContextThemeWrapper
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.utilities.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.utilities.format
 import com.google.android.fhir.datacapture.utilities.getDateSeparator
 import com.google.android.fhir.datacapture.utilities.parseDate
+import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.MaxValueConstraintValidator.getMaxValue
 import com.google.android.fhir.datacapture.validation.MinValueConstraintValidator.getMinValue
@@ -185,16 +184,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         } catch (e: ParseException) {
           displayValidationResult(
             Invalid(
-              listOf(
-                textInputEditText.context.getString(
-                  R.string.date_format_validation_error_msg,
-                  canonicalizedDatePattern,
-                  canonicalizedDatePattern
-                    .replace("dd", "31")
-                    .replace("MM", "01")
-                    .replace("yyyy", "2023")
-                )
-              )
+              listOf(invalidDateErrorText(textInputEditText.context, canonicalizedDatePattern))
             )
           )
           if (questionnaireItemViewItem.answers.isNotEmpty()) {
@@ -215,7 +205,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         val textToDisplayInTheTextField =
           answer?.format(canonicalizedDatePattern) ?: draftAnswerToDisplay
 
-        // Since pull request #1822 has been merged, the same date format style is now used for both
+        // The same date format style is now used for both
         // accepting user date input and displaying the answer in the text field. For instance, the
         // "MM/dd/yyyy" format is employed to accept and display the date value. As a result, it is
         // possible to simply compare
@@ -230,16 +220,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         if (!draftAnswerToDisplay.isNullOrBlank()) {
           displayValidationResult(
             Invalid(
-              listOf(
-                textInputEditText.context.getString(
-                  R.string.date_format_validation_error_msg,
-                  canonicalizedDatePattern,
-                  canonicalizedDatePattern
-                    .replace("dd", "31")
-                    .replace("MM", "01")
-                    .replace("yyyy", "2023")
-                )
-              )
+              listOf(invalidDateErrorText(textInputEditText.context, canonicalizedDatePattern))
             )
           )
         } else {
@@ -331,27 +312,6 @@ internal fun getLocalizedDateTimePattern(): String {
   )
 }
 
-/**
- * Returns the [AppCompatActivity] if there exists one wrapped inside [ContextThemeWrapper] s, or
- * `null` otherwise.
- *
- * This function is inspired by the function with the same name in `AppCompateDelegateImpl`. See
- * https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:appcompat/appcompat/src/main/java/androidx/appcompat/app/AppCompatDelegateImpl.java;l=1615
- *
- * TODO: find a more robust way to do this as it is not guaranteed that the activity is an
- * AppCompatActivity.
- */
-fun Context.tryUnwrapContext(): AppCompatActivity? {
-  var context = this
-  while (true) {
-    when (context) {
-      is AppCompatActivity -> return context
-      is ContextThemeWrapper -> context = context.baseContext
-      else -> return null
-    }
-  }
-}
-
 internal val DateType.localDate
   get() =
     if (!this.hasValue()) null
@@ -374,3 +334,14 @@ internal fun Int.length() =
     0 -> 1
     else -> log10(abs(toDouble())).toInt() + 1
   }
+
+/**
+ * Replaces 'dd' with '31', 'MM' with '01' and 'yyyy' with '2023' and returns new string. For
+ * example, given a `formatPattern` of dd/MM/yyyy, returns 31/01/2023
+ */
+internal fun invalidDateErrorText(context: Context, formatPattern: String) =
+  context.getString(
+    R.string.date_format_validation_error_msg,
+    formatPattern,
+    formatPattern.replace("dd", "31").replace("MM", "01").replace("yyyy", "2023")
+  )

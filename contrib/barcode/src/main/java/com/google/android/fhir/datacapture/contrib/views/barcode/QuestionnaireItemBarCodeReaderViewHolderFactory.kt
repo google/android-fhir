@@ -17,17 +17,15 @@
 package com.google.android.fhir.datacapture.contrib.views.barcode
 
 import android.graphics.Typeface
-import android.os.Bundle
 import android.view.View
 import android.widget.TextView
-import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.LiveBarcodeScanningFragment
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import com.google.android.fhir.datacapture.views.tryUnwrapContext
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
@@ -56,33 +54,28 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
 
           context.supportFragmentManager.setFragmentResultListener(
             LiveBarcodeScanningFragment.RESULT_REQUEST_KEY,
-            context,
-            object : FragmentResultListener {
+            context
+          ) { _, result ->
+            val barcode = result.getString(LiveBarcodeScanningFragment.RESULT_REQUEST_KEY)?.trim()
 
-              override fun onFragmentResult(requestKey: String, result: Bundle) {
-                val barcode =
-                  result.getString(LiveBarcodeScanningFragment.RESULT_REQUEST_KEY)?.trim()
-
-                val answer =
-                  barcode.let {
-                    if (it!!.isEmpty()) {
-                      null
-                    } else {
-                      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                        .setValue(StringType(it))
-                    }
-                  }
-
-                if (answer == null) {
-                  questionnaireItemViewItem.clearAnswer()
+            val answer =
+              barcode.let {
+                if (it!!.isEmpty()) {
+                  null
                 } else {
-                  questionnaireItemViewItem.setAnswer(answer)
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(StringType(it))
                 }
-
-                setInitial(questionnaireItemViewItem.answers.singleOrNull(), reScanView)
               }
+
+            if (answer == null) {
+              questionnaireItemViewItem.clearAnswer()
+            } else {
+              questionnaireItemViewItem.setAnswer(answer)
             }
-          )
+
+            setInitial(questionnaireItemViewItem.answers.singleOrNull(), reScanView)
+          }
           LiveBarcodeScanningFragment()
             .show(
               context.supportFragmentManager,
