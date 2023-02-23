@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture
+package com.google.android.fhir.datacapture.extensions
 
+import com.google.android.fhir.datacapture.invokeFunction
+import com.google.android.fhir.datacapture.toCoding
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Enumeration

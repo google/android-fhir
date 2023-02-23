@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture
+package com.google.android.fhir.datacapture.extensions
 
 import android.os.Build
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
