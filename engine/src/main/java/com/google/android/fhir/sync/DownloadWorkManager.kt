@@ -33,6 +33,7 @@ interface DownloadWorkManager {
    */
   suspend fun getNextRequestUrl(context: SyncDownloadContext): String?
 
+  /* TODO: Generalize the DownloadWorkManager API to not sequentially download resource by type (https://github.com/google/android-fhir/issues/1884) */
   /**
    * Returns the map of resourceType and URL for summary of total count for each download request
    */

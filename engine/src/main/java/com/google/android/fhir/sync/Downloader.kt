@@ -30,6 +30,7 @@ internal interface Downloader {
   suspend fun download(context: SyncDownloadContext): Flow<DownloadState>
 }
 
+/* TODO: Generalize the Downloader API to not sequentially download resource by type (https://github.com/google/android-fhir/issues/1884) */
 internal sealed class DownloadState {
 
   data class Started(val type: ResourceType, val total: Int) : DownloadState()
