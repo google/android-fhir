@@ -49,14 +49,17 @@ internal object QuestionnaireItemGroupViewHolderFactory :
         addItemButton.setOnClickListener {
           questionnaireItemViewItem.addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              // TODO(jingtang10): This can be removed since we already do this in the
+              // answerChangedCallback in the QuestionnaireViewModel.
               item =
                 questionnaireItemViewItem.questionnaireItem.getNestedQuestionnaireResponseItems()
             }
           )
         }
+        displayValidationResult(questionnaireItemViewItem.validationResult)
       }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {
+      private fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
           is NotValidated,
           Valid -> error.visibility = View.GONE
