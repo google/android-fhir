@@ -31,7 +31,7 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object EditTextIntegerViewHolderFactory :
-  EditTextViewHolderFactory(R.layout.questionnaire_item_edit_text_single_line_view) {
+  EditTextViewHolderFactory(R.layout.edit_text_single_line_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object :
       QuestionnaireItemEditTextViewHolderDelegate(

@@ -49,7 +49,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
 internal object QuestionnaireItemDialogSelectViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_option_select_view) {
+  QuestionnaireItemViewHolderFactory(R.layout.option_select_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     @SuppressLint("StaticFieldLeak")
     object : QuestionnaireItemViewHolderDelegate {

@@ -38,7 +38,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object RadioGroupViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_radio_group_view) {
+  QuestionnaireItemViewHolderFactory(R.layout.radio_group_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: HeaderView
@@ -101,8 +101,7 @@ internal object RadioGroupViewHolderFactory :
         choiceOrientation: ChoiceOrientationTypes
       ) {
         val radioButtonItem =
-          LayoutInflater.from(radioGroup.context)
-            .inflate(R.layout.questionnaire_item_radio_button, null)
+          LayoutInflater.from(radioGroup.context).inflate(R.layout.radio_button, null)
         var isCurrentlySelected = questionnaireViewItem.isAnswerOptionSelected(answerOption)
         val radioButton =
           radioButtonItem.findViewById<RadioButton>(R.id.radio_button).apply {

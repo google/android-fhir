@@ -19,6 +19,6 @@ package com.google.android.fhir.datacapture.views.factories
 import com.google.android.fhir.datacapture.R
 
 internal object EditTextSingleLineViewHolderFactory :
-  EditTextViewHolderFactory(R.layout.questionnaire_item_edit_text_single_line_view) {
+  EditTextViewHolderFactory(R.layout.edit_text_single_line_view) {
   override fun getQuestionnaireItemViewHolderDelegate() = EditTextStringViewHolderDelegate()
 }

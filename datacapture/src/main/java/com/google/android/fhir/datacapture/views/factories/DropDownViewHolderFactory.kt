@@ -40,7 +40,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import timber.log.Timber
 
 internal object DropDownViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_drop_down_view) {
+  QuestionnaireItemViewHolderFactory(R.layout.drop_down_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: HeaderView
@@ -71,11 +71,7 @@ internal object DropDownViewHolderFactory :
             .toMutableList()
         answerOptionList.add(0, DropDownAnswerOption(context.getString(R.string.hyphen), null))
         val adapter =
-          AnswerOptionDropDownArrayAdapter(
-            context,
-            R.layout.questionnaire_item_drop_down_list_item,
-            answerOptionList
-          )
+          AnswerOptionDropDownArrayAdapter(context, R.layout.drop_down_list_item, answerOptionList)
         val selectedAnswer =
           questionnaireViewItem.answers.singleOrNull()?.value?.displayString(header.context)
         answerOptionList

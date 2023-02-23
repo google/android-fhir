@@ -39,7 +39,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
 
   init {
-    LayoutInflater.from(context).inflate(R.layout.questionnaire_item_header, this, true)
+    LayoutInflater.from(context).inflate(R.layout.header_view, this, true)
   }
 
   private var prefix: TextView = findViewById(R.id.prefix)

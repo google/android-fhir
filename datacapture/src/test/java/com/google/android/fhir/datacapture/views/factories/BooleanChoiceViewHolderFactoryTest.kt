@@ -33,12 +33,12 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
-class BooleanViewHolderFactoryTest {
+class BooleanChoiceViewHolderFactoryTest {
   private val parent =
     FrameLayout(
       RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
-  private val viewHolder = BooleanViewHolderFactory.create(parent)
+  private val viewHolder = BooleanChoiceViewHolderFactory.create(parent)
 
   @Test
   fun bind_shouldSetQuestionHeader() {

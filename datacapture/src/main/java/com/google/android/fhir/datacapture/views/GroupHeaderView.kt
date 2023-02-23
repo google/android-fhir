@@ -31,7 +31,7 @@ internal class GroupHeaderView(context: Context, attrs: AttributeSet?) :
   LinearLayout(context, attrs) {
 
   init {
-    LayoutInflater.from(context).inflate(R.layout.questionnaire_group_type_header, this, true)
+    LayoutInflater.from(context).inflate(R.layout.group_type_header_view, this, true)
   }
 
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {

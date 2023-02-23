@@ -23,7 +23,7 @@ import com.google.android.fhir.datacapture.contrib.views.PhoneNumberViewHolderFa
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
-import com.google.android.fhir.datacapture.views.factories.BooleanViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.CheckBoxGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.DatePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.DateTimePickerViewHolderFactory
@@ -75,7 +75,7 @@ internal class QuestionnaireEditAdapter(
     val viewHolderFactory =
       when (QuestionnaireViewHolderType.fromInt(subtype)) {
         QuestionnaireViewHolderType.GROUP -> GroupViewHolderFactory
-        QuestionnaireViewHolderType.BOOLEAN_TYPE_PICKER -> BooleanViewHolderFactory
+        QuestionnaireViewHolderType.BOOLEAN_TYPE_PICKER -> BooleanChoiceViewHolderFactory
         QuestionnaireViewHolderType.DATE_PICKER -> DatePickerViewHolderFactory
         QuestionnaireViewHolderType.DATE_TIME_PICKER -> DateTimePickerViewHolderFactory
         QuestionnaireViewHolderType.EDIT_TEXT_SINGLE_LINE -> EditTextSingleLineViewHolderFactory

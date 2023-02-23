@@ -33,8 +33,7 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object SliderViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_slider) {
+internal object SliderViewHolderFactory : QuestionnaireItemViewHolderFactory(R.layout.slider_view) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: HeaderView

@@ -22,7 +22,7 @@ import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 
 internal object DisplayViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_display_view) {
+  QuestionnaireItemViewHolderFactory(R.layout.display_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: HeaderView

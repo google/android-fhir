@@ -33,8 +33,8 @@ import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object BooleanViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_boolean_type_picker_view) {
+internal object BooleanChoiceViewHolderFactory :
+  QuestionnaireItemViewHolderFactory(R.layout.boolean_choice_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: HeaderView

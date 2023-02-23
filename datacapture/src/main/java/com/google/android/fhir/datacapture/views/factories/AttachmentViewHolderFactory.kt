@@ -55,7 +55,7 @@ import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object AttachmentViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_attachment_view) {
+  QuestionnaireItemViewHolderFactory(R.layout.attachment_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       override lateinit var questionnaireViewItem: QuestionnaireViewItem

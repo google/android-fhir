@@ -26,7 +26,7 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object EditTextDecimalViewHolderFactory :
-  EditTextViewHolderFactory(R.layout.questionnaire_item_edit_text_single_line_view) {
+  EditTextViewHolderFactory(R.layout.edit_text_single_line_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemEditTextViewHolderDelegate(DECIMAL_INPUT_TYPE) {
       override fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem) {

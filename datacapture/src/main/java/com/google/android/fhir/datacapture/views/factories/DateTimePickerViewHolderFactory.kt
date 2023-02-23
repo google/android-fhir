@@ -54,7 +54,7 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object DateTimePickerViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_date_time_picker_view) {
+  QuestionnaireItemViewHolderFactory(R.layout.date_time_picker_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: HeaderView

@@ -39,7 +39,7 @@ import timber.log.Timber
 class MediaView(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
 
   init {
-    LayoutInflater.from(context).inflate(R.layout.questionnaire_item_media, this, true)
+    LayoutInflater.from(context).inflate(R.layout.media_view, this, true)
   }
 
   private var imageAttachment: ImageView = findViewById(R.id.image_attachment)

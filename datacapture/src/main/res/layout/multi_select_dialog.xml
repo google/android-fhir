@@ -46,7 +46,7 @@
         android:layout_marginTop="@dimen/padding_default"
         android:scrollbars="vertical"
         android:layout_weight="1"
-        tools:listitem="@layout/questionnaire_item_option_item_multi"
+        tools:listitem="@layout/option_item_multi"
     />
 
     <LinearLayout

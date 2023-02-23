@@ -31,8 +31,7 @@ import org.hl7.fhir.r4.model.Questionnaire
  * This view is a container that contains the question and answer obtained from
  * questionnaireItemViewItem [QuestionnaireViewItem].
  */
-internal object ReviewViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_simple_question_answer_view) {
+internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.layout.review_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: HeaderView

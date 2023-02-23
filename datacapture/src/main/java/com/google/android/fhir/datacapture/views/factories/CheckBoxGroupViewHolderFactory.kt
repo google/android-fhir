@@ -38,7 +38,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object CheckBoxGroupViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_checkbox_group_view) {
+  QuestionnaireItemViewHolderFactory(R.layout.checkbox_group_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: HeaderView
@@ -94,8 +94,7 @@ internal object CheckBoxGroupViewHolderFactory :
         choiceOrientation: ChoiceOrientationTypes
       ) {
         val checkboxLayout =
-          LayoutInflater.from(checkboxGroup.context)
-            .inflate(R.layout.questionnaire_item_check_box_view, null)
+          LayoutInflater.from(checkboxGroup.context).inflate(R.layout.check_box_view, null)
         val checkbox =
           checkboxLayout.findViewById<CheckBox>(R.id.check_box).apply {
             id = viewId

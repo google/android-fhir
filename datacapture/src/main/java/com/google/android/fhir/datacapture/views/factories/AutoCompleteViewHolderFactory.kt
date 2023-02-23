@@ -38,7 +38,7 @@ import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object AutoCompleteViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_edit_text_auto_complete_view) {
+  QuestionnaireItemViewHolderFactory(R.layout.edit_text_auto_complete_view) {
 
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
@@ -80,12 +80,7 @@ internal object AutoCompleteViewHolderFactory :
 
         val answerOptionString =
           questionnaireViewItem.answerOption.map { it.value.displayString(header.context) }
-        val adapter =
-          ArrayAdapter(
-            header.context,
-            R.layout.questionnaire_item_drop_down_list_item,
-            answerOptionString
-          )
+        val adapter = ArrayAdapter(header.context, R.layout.drop_down_list_item, answerOptionString)
         autoCompleteTextView.setAdapter(adapter)
         // Remove chips if any from the last bindView call on this VH.
         chipContainer.removeAllViews()
