@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir.datacapture.views.factories
 
 import android.view.View
 import android.widget.FrameLayout
@@ -22,7 +22,8 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.views.factories.GroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.GroupHeaderView
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire

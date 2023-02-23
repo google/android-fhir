@@ -35,6 +35,7 @@ import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.utilities.showDropDown
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.factories.DropDownViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Attachment

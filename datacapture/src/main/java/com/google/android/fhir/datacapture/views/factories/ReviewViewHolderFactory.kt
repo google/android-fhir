@@ -23,8 +23,6 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.views.HeaderView
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.divider.MaterialDivider
 import org.hl7.fhir.r4.model.Questionnaire

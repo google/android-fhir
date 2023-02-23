@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir.datacapture.views.factories
 
 import android.view.ViewGroup
 import android.widget.CheckBox
@@ -29,7 +29,7 @@ import com.google.android.fhir.datacapture.EXTENSION_OPTION_EXCLUSIVE_URL
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.views.factories.CheckBoxGroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType

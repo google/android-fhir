@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir.datacapture.views.factories
 
 import android.view.View
 import android.widget.FrameLayout
@@ -22,15 +22,14 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
-import com.google.android.fhir.datacapture.views.factories.EditTextQuantityViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
-import java.math.BigDecimal
-import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,12 +37,12 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
-class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
+class EditTextMultiLineViewHolderFactoryTest {
   private val parent =
     FrameLayout(
       RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
-  private val viewHolder = EditTextQuantityViewHolderFactory.create(parent)
+  private val viewHolder = EditTextMultiLineViewHolderFactory.create(parent)
 
   @Test
   fun shouldSetQuestionHeader() {
@@ -64,11 +63,11 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
   fun shouldSetInputText() {
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Quantity().apply { value = BigDecimal("5") }
+              value = StringType("Answer")
             }
           )
         },
@@ -82,7 +81,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
           .text.toString()
       )
-      .isEqualTo("5")
+      .isEqualTo("Answer")
   }
 
   @Test
@@ -93,7 +92,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Quantity().apply { value = BigDecimal("5") }
+              value = StringType("Answer")
             }
           )
         },
@@ -130,33 +129,13 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
+
     viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("10")
-    viewHolder.itemView.clearFocus()
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("Answer")
 
     val answer = questionnaireViewItem.answers
     assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueQuantity!!.value!!.toString()).isEqualTo("10")
-  }
-
-  @Test
-  @Ignore(
-    "Needs to be moved to instrumentation tests https://github.com/google/android-fhir/issues/1494"
-  )
-  fun shouldSetQuestionnaireResponseItemAnswerOneDecimalPlace() {
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      )
-    viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("10.1")
-
-    val answer = questionnaireViewItem.answers
-    assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueQuantity!!.value.toString()).isEqualTo("10.1")
+    assertThat(answer[0].valueStringType.value).isEqualTo("Answer")
   }
 
   @Test
@@ -168,6 +147,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
+
     viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
@@ -175,39 +155,58 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
   }
 
   @Test
-  fun displayValidationResult_error_shouldShowErrorMessage() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = Invalid(listOf("Missing answer for required field.")),
-        answersChangedCallback = { _, _, _, _ -> },
-      )
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("Missing answer for required field.")
-  }
-
-  @Test
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minLength"
+            setValue(IntegerType("10"))
+          }
+        },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Quantity(22.5)
+              value = StringType("hello there")
             }
           )
         },
-        validationResult = Valid,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isNull()
+  }
+
+  @Test
+  fun displayValidationResult_error_shouldShowErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minLength"
+            setValue(IntegerType("10"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType("hello")
+            }
+          )
+        },
+        validationResult =
+          Invalid(
+            listOf("The minimum number of characters that are permitted in the answer is: 10")
+          ),
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isEqualTo("The minimum number of characters that are permitted in the answer is: 10")
   }
 
   @Test

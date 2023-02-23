@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir.datacapture.views.factories
 
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +22,8 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.views.MediaView
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 
 /**
  * Factory for [QuestionnaireItemViewHolder].

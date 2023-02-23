@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir.datacapture.views.factories
 
 import android.view.View
 import android.widget.FrameLayout
@@ -22,12 +22,11 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
-import java.math.BigDecimal
-import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Ignore
@@ -37,12 +36,12 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
-class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
+class EditTextIntegerViewHolderFactoryTest {
   private val parent =
     FrameLayout(
       RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
-  private val viewHolder = EditTextDecimalViewHolderFactory.create(parent)
+  private val viewHolder = EditTextIntegerViewHolderFactory.create(parent)
 
   @Test
   fun shouldSetQuestionHeader() {
@@ -67,7 +66,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType("1.1")
+              value = IntegerType(5)
             }
           )
         },
@@ -81,7 +80,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
           .text.toString()
       )
-      .isEqualTo("1.1")
+      .isEqualTo("5")
   }
 
   @Test
@@ -92,7 +91,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType("1.1")
+              value = IntegerType(5)
             }
           )
         },
@@ -130,14 +129,11 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
     viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).apply {
-      setText("1.1")
-      clearFocus()
-    }
-    viewHolder.itemView.clearFocus()
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("10")
 
-    assertThat(questionnaireViewItem.answers.single().valueDecimalType.value)
-      .isEqualTo(BigDecimal("1.1"))
+    val answer = questionnaireViewItem.answers
+    assertThat(answer.size).isEqualTo(1)
+    assertThat(answer[0].valueIntegerType.value).isEqualTo(10)
   }
 
   @Test
@@ -152,27 +148,27 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
     viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
-    assertThat(questionnaireViewItem.answers).isEmpty()
+    assertThat(questionnaireViewItem.answers.size).isEqualTo(0)
   }
 
   @Test
-  fun displayValidationResult_shouldShowNoErrorMessage() {
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            setValue(DecimalType("2.2"))
+            setValue(IntegerType("2"))
           }
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(DecimalType("4.4"))
+            setValue(IntegerType("4"))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType("3.3")
+              value = IntegerType("3")
             }
           )
         },
@@ -192,27 +188,27 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            setValue(DecimalType("2.1"))
+            setValue(IntegerType("2"))
           }
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(DecimalType("4.2"))
+            setValue(IntegerType("4"))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType("1.1")
+              value = IntegerType("1")
             }
           )
         },
-        validationResult = Invalid(listOf("Minimum value allowed is:2.1")),
+        validationResult = Invalid(listOf("Minimum value allowed is:2")),
         answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("Minimum value allowed is:2.1")
+      .isEqualTo("Minimum value allowed is:2")
   }
 
   @Test

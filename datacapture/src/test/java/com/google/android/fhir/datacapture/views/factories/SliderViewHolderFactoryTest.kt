@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir.datacapture.views.factories
 
 import android.view.View
 import android.widget.FrameLayout
@@ -23,7 +23,7 @@ import com.google.android.fhir.datacapture.EXTENSION_SLIDER_STEP_VALUE_URL
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.views.factories.SliderViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.slider.Slider
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertFailsWith

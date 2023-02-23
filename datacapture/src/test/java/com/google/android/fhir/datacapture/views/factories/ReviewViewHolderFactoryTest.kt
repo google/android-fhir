@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir.datacapture.views.factories
 
 import android.app.Application
 import android.view.View
@@ -27,7 +27,7 @@ import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_URL
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
-import com.google.android.fhir.datacapture.views.factories.ReviewViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.divider.MaterialDivider
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.BooleanType

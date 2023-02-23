@@ -18,7 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.ReviewViewHolderFactory
 
 /** List Adapter used to bind answers to [QuestionnaireItemViewHolder] in review mode. */

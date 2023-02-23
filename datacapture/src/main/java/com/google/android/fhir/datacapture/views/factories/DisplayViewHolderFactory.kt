@@ -19,8 +19,6 @@ package com.google.android.fhir.datacapture.views.factories
 import android.view.View
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.HeaderView
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 
 internal object DisplayViewHolderFactory :
