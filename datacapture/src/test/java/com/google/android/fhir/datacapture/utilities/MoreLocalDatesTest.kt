@@ -19,8 +19,8 @@ package com.google.android.fhir.datacapture.utilities
 import android.os.Build
 import com.google.android.fhir.datacapture.views.getLocalizedDateTimePattern
 import com.google.common.truth.Truth.assertThat
-import java.text.ParseException
 import java.time.LocalDate
+import java.time.format.DateTimeParseException
 import java.util.Locale
 import kotlin.test.assertFailsWith
 import org.junit.Test
@@ -110,7 +110,7 @@ class MoreLocalDatesTest {
   @Test
   fun `should parse US locale date for Canada locale`() {
     Locale.setDefault(Locale.CANADA)
-    assertFailsWith<ParseException> { parseDate("01/25/2023", "yyyy-MM-dd") }
+    assertFailsWith<DateTimeParseException> { parseDate("01/25/2023", "yyyy-MM-dd") }
   }
 
   @Test

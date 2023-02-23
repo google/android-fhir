@@ -17,8 +17,6 @@
 package com.google.android.fhir.datacapture
 
 import android.widget.FrameLayout
-import androidx.core.os.bundleOf
-import androidx.fragment.app.add
 import androidx.fragment.app.commitNow
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
@@ -28,7 +26,6 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.android.fhir.datacapture.TestQuestionnaireFragment.Companion.QUESTIONNAIRE_FILE_PATH_KEY
 import com.google.android.fhir.datacapture.test.R
 import com.google.android.fhir.datacapture.utilities.clickIcon
 import com.google.android.fhir.datacapture.utilities.clickOnText
@@ -61,7 +58,7 @@ class QuestionnaireUiEspressoTest {
 
   @Test
   fun shouldDisplayReviewButtonWhenNoMorePagesToDisplay() {
-    buildFragmentFromQuestionnaire("/paginated_questionnaire_with_dependent_answer.json")
+    buildFragmentFromQuestionnaire("/paginated_questionnaire_with_dependent_answer.json", true)
 
     onView(withId(R.id.review_mode_button))
       .check(
@@ -182,22 +179,29 @@ class QuestionnaireUiEspressoTest {
     assertThat(answer.localDate).isEqualTo(LocalDate.of(2005, 1, 5))
   }
 
-  private fun buildFragmentFromQuestionnaire(fileName: String) {
-    val bundle = bundleOf(QUESTIONNAIRE_FILE_PATH_KEY to fileName)
+  private fun buildFragmentFromQuestionnaire(fileName: String, isReviewMode: Boolean = false) {
+    val questionnaireJsonString = readFileFromAssets(fileName)
+    val questionnaireFragment =
+      QuestionnaireFragment.builder()
+        .setQuestionnaire(questionnaireJsonString)
+        .showReviewPageBeforeSubmit(isReviewMode)
+        .build()
     activityScenarioRule.scenario.onActivity { activity ->
       activity.supportFragmentManager.commitNow {
         setReorderingAllowed(true)
-        add<TestQuestionnaireFragment>(R.id.container_holder, args = bundle)
+        add(R.id.container_holder, questionnaireFragment)
       }
     }
   }
+
+  private fun readFileFromAssets(filename: String) =
+    javaClass.getResourceAsStream(filename)!!.bufferedReader().use { it.readText() }
   private fun getQuestionnaireResponse(): QuestionnaireResponse {
     var testQuestionnaireFragment: QuestionnaireFragment? = null
     activityScenarioRule.scenario.onActivity { activity ->
       testQuestionnaireFragment =
-        activity.supportFragmentManager
-          .findFragmentById(R.id.container_holder)
-          ?.childFragmentManager?.findFragmentById(R.id.container) as QuestionnaireFragment
+        activity.supportFragmentManager.findFragmentById(R.id.container_holder)
+          as QuestionnaireFragment
     }
     return testQuestionnaireFragment!!.getQuestionnaireResponse()
   }

@@ -65,7 +65,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryEspressoTest {
   @Before
   fun setup() {
     Locale.setDefault(Locale.US)
-    activityScenarioRule.getScenario().onActivity { activity -> parent = FrameLayout(activity) }
+    activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }
     viewHolder = QuestionnaireItemDatePickerViewHolderFactory.create(parent)
     setTestLayout(viewHolder.itemView)
   }
