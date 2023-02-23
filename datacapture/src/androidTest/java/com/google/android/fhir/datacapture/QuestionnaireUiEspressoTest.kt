@@ -22,20 +22,35 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
+import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.test.R
 import com.google.android.fhir.datacapture.utilities.clickIcon
 import com.google.android.fhir.datacapture.utilities.clickOnText
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.localDate
 import com.google.android.fhir.datacapture.views.localDateTime
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.Calendar
+import java.util.Date
+import org.hamcrest.CoreMatchers
+import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -50,6 +65,8 @@ class QuestionnaireUiEspressoTest {
     ActivityScenarioRule(TestActivity::class.java)
 
   private lateinit var parent: FrameLayout
+  private val parser: IParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+  private val context = InstrumentationRegistry.getInstrumentation().context
 
   @Before
   fun setup() {
@@ -179,11 +196,193 @@ class QuestionnaireUiEspressoTest {
     assertThat(answer.localDate).isEqualTo(LocalDate.of(2005, 1, 5))
   }
 
+  @Test
+  fun datePicker_shouldSetDateInput_withinRange() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            type = Questionnaire.QuestionnaireItemType.DATE
+            linkId = "link-1"
+            addExtension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/minValue"
+              val minDate = DateType(Date()).apply { add(Calendar.YEAR, -1) }
+              setValue(minDate)
+            }
+            addExtension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+              val maxDate = DateType(Date()).apply { add(Calendar.YEAR, 4) }
+              setValue(maxDate)
+            }
+          }
+        )
+      }
+
+    buildFragmentFromQuestionnaire(questionnaire)
+    onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
+    onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
+      .inRoot(RootMatchers.isDialog())
+      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+      .perform(ViewActions.click())
+
+    val today = DateTimeType.today().valueAsString
+    val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType.valueAsString
+
+    assertThat(answer).isEqualTo(today)
+    val validationResult =
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        getQuestionnaireResponse(),
+        context
+      )
+
+    assertThat(validationResult["link-1"]?.first()).isEqualTo(Valid)
+  }
+
+  @Test
+  fun datePicker_shouldNotSetDateInput_outsideMaxRange() {
+    val maxDate = DateType(Date()).apply { add(Calendar.YEAR, -2) }
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            type = Questionnaire.QuestionnaireItemType.DATE
+            linkId = "link-1"
+            addExtension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/minValue"
+              val minDate = DateType(Date()).apply { add(Calendar.YEAR, -4) }
+              setValue(minDate)
+            }
+            addExtension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+              setValue(maxDate)
+            }
+          }
+        )
+      }
+
+    buildFragmentFromQuestionnaire(questionnaire)
+    onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
+    onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
+      .inRoot(RootMatchers.isDialog())
+      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+      .perform(ViewActions.click())
+
+    val maxDateAllowed = maxDate.valueAsString
+    val validationResult =
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        getQuestionnaireResponse(),
+        context
+      )
+
+    assertThat((validationResult["link-1"]?.first() as Invalid).getSingleStringValidationMessage())
+      .isEqualTo("Maximum value allowed is:$maxDateAllowed")
+  }
+
+  @Test
+  fun datePicker_shouldNotSetDateInput_outsideMinRange() {
+    val minDate = DateType(Date()).apply { add(Calendar.YEAR, 1) }
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            type = Questionnaire.QuestionnaireItemType.DATE
+            linkId = "link-1"
+            addExtension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/minValue"
+              setValue(minDate)
+            }
+            addExtension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+              val maxDate = DateType(Date()).apply { add(Calendar.YEAR, 2) }
+              setValue(maxDate)
+            }
+          }
+        )
+      }
+
+    buildFragmentFromQuestionnaire(questionnaire)
+    onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
+    onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
+      .inRoot(RootMatchers.isDialog())
+      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+      .perform(ViewActions.click())
+
+    val minDateAllowed = minDate.valueAsString
+    val validationResult =
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        getQuestionnaireResponse(),
+        context
+      )
+
+    assertThat((validationResult["link-1"]?.first() as Invalid).getSingleStringValidationMessage())
+      .isEqualTo("Minimum value allowed is:$minDateAllowed")
+  }
+
+  @Test
+  fun datePicker_shouldThrowException_whenMinValueRangeIsGreaterThanMaxValueRange() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            type = Questionnaire.QuestionnaireItemType.DATE
+            linkId = "link-1"
+            addExtension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/minValue"
+              val minDate = DateType(Date()).apply { add(Calendar.YEAR, 1) }
+
+              setValue(minDate)
+            }
+            addExtension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+              val maxDate = DateType(Date()).apply { add(Calendar.YEAR, -1) }
+              setValue(maxDate)
+            }
+          }
+        )
+      }
+
+    buildFragmentFromQuestionnaire(questionnaire)
+    val exception =
+      Assert.assertThrows(IllegalArgumentException::class.java) {
+        onView(withId(com.google.android.fhir.datacapture.R.id.text_input_layout))
+          .perform(clickIcon(true))
+        onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
+          .inRoot(RootMatchers.isDialog())
+          .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+          .perform(ViewActions.click())
+      }
+    assertThat(exception.message).isEqualTo("minValue cannot be greater than maxValue")
+  }
+
   private fun buildFragmentFromQuestionnaire(fileName: String, isReviewMode: Boolean = false) {
     val questionnaireJsonString = readFileFromAssets(fileName)
     val questionnaireFragment =
       QuestionnaireFragment.builder()
         .setQuestionnaire(questionnaireJsonString)
+        .showReviewPageBeforeSubmit(isReviewMode)
+        .build()
+    activityScenarioRule.scenario.onActivity { activity ->
+      activity.supportFragmentManager.commitNow {
+        setReorderingAllowed(true)
+        add(R.id.container_holder, questionnaireFragment)
+      }
+    }
+  }
+
+  private fun buildFragmentFromQuestionnaire(
+    questionnaire: Questionnaire,
+    isReviewMode: Boolean = false
+  ) {
+    val questionnaireFragment =
+      QuestionnaireFragment.builder()
+        .setQuestionnaire(parser.encodeResourceToString(questionnaire))
         .showReviewPageBeforeSubmit(isReviewMode)
         .build()
     activityScenarioRule.scenario.onActivity { activity ->
