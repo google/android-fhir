@@ -126,7 +126,7 @@ internal object DatePickerViewHolderFactory :
           textInputEditText.setText(dateStringToDisplay)
         }
 
-        // If the draft answer is set, this means the user has yet to type a parseable answer yet,
+        // If the draft answer is set, this means the user has yet to type a parseable answer,
         // so we display an error.
         if (questionnaireViewItem.draftAnswer as? String != null) {
           displayValidationResult(

@@ -34,11 +34,11 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.test.R
 import com.google.android.fhir.datacapture.utilities.clickIcon
 import com.google.android.fhir.datacapture.utilities.clickOnText
-import com.google.android.fhir.datacapture.views.factories.localDateTime
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.factories.localDate
+import com.google.android.fhir.datacapture.views.factories.localDateTime
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.time.LocalDate
