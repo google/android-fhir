@@ -23,9 +23,9 @@ import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.LiveBa
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.tryUnwrapContext
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderDelegate
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 

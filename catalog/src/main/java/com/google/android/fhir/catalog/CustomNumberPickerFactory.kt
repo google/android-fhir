@@ -18,9 +18,9 @@ package com.google.android.fhir.catalog
 
 import android.view.View
 import android.widget.NumberPicker
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderDelegate
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 
 object CustomNumberPickerFactory :
   QuestionnaireItemViewHolderFactory(R.layout.custom_number_picker_layout) {

@@ -19,10 +19,10 @@ package com.google.android.fhir.datacapture.contrib.views
 import android.text.Editable
 import android.text.InputType
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemEditTextViewHolderDelegate
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderDelegate
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
