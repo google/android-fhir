@@ -32,9 +32,11 @@ import com.google.android.fhir.datacapture.TestQuestionnaireFragment.Companion.Q
 import com.google.android.fhir.datacapture.test.R
 import com.google.android.fhir.datacapture.utilities.clickIcon
 import com.google.android.fhir.datacapture.utilities.clickOnText
+import com.google.android.fhir.datacapture.views.localDate
 import com.google.android.fhir.datacapture.views.localDateTime
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
+import java.time.LocalDate
 import java.time.LocalDateTime
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
@@ -146,6 +148,38 @@ class QuestionnaireUiEspressoTest {
     val answer = getQuestionnaireResponse().item.first().answer.first().valueDateTimeType
 
     assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
+  }
+
+  @Test
+  fun datePicker_shouldShowErrorForWrongDate() {
+    buildFragmentFromQuestionnaire("/component_date_picker.json")
+
+    // Add month and day. No need to add slashes as they are added automatically
+    onView(withId(R.id.text_input_edit_text))
+      .perform(ViewActions.click())
+      .perform(ViewActions.typeTextIntoFocusedView("0105"))
+
+    onView(withId(R.id.text_input_layout)).check { view, _ ->
+      val actualError = (view as TextInputLayout).error
+      assertThat(actualError).isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/31/2023)")
+    }
+  }
+
+  @Test
+  fun datePicker_shouldSaveInQuestionnaireResponseWhenCorrectDateEntered() {
+    buildFragmentFromQuestionnaire("/component_date_picker.json")
+
+    onView(withId(R.id.text_input_edit_text))
+      .perform(ViewActions.click())
+      .perform(ViewActions.typeTextIntoFocusedView("01052005"))
+
+    onView(withId(R.id.text_input_layout)).check { view, _ ->
+      val actualError = (view as TextInputLayout).error
+      assertThat(actualError).isEqualTo(null)
+    }
+
+    val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType
+    assertThat(answer.localDate).isEqualTo(LocalDate.of(2005, 1, 5))
   }
 
   private fun buildFragmentFromQuestionnaire(fileName: String) {
