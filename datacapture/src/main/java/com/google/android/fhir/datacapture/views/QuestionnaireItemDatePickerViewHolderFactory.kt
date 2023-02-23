@@ -123,7 +123,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           textInputEditText.setText(dateStringToDisplay)
         }
 
-        setQuestionnaireResponseAnswerAndValidate(questionnaireItemViewItem, dateStringToDisplay)
+        parseDateAndValidate(questionnaireItemViewItem, dateStringToDisplay)
         textInputEditText.addTextChangedListener(textWatcher)
       }
 
@@ -176,9 +176,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         )
 
       /**
-       * Set the answer in the [QuestionnaireResponse]. Throw an error if the date cannot be parsed
+       * Parse the date and if it succeeds, set the answer in the [QuestionnaireResponse]. Throw an
+       * error if the date cannot be parsed
        */
-      private fun setQuestionnaireResponseAnswerAndValidate(
+      private fun parseDateAndValidate(
         questionnaireItemViewItem: QuestionnaireItemViewItem,
         dateToDisplay: String?
       ) =
