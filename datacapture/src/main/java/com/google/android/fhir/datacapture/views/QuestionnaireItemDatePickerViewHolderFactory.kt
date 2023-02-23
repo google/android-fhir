@@ -91,6 +91,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               addOnPositiveButtonClickListener { epochMilli ->
                 with(Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()) {
                   textInputEditText.setText(this?.format(canonicalizedDatePattern))
+                  setQuestionnaireItemViewItemAnswer(this)
                 }
                 // Clear focus so that the user can refocus to open the dialog
                 textInputEditText.clearFocus()
@@ -123,7 +124,17 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           textInputEditText.setText(dateStringToDisplay)
         }
 
-        parseDateAndValidate(questionnaireItemViewItem, dateStringToDisplay)
+        // If the draft answer is set, this means the user has yet to type a parseable answer yet,
+        // so we display an error.
+        if (questionnaireItemViewItem.draftAnswer as? String != null) {
+          displayValidationResult(
+            Invalid(
+              listOf(invalidDateErrorText(textInputEditText.context, canonicalizedDatePattern))
+            )
+          )
+        } else {
+          displayValidationResult(questionnaireItemViewItem.validationResult)
+        }
         textInputEditText.addTextChangedListener(textWatcher)
       }
 
@@ -176,31 +187,19 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         )
 
       /**
-       * Parse the date and if it succeeds, set the answer in the [QuestionnaireResponse]. Throw an
-       * error if the date cannot be parsed
+       * Each time the user types in a character, parse the string and if it can be parsed into a
+       * date, set the answer in the [QuestionnaireResponse], otherwise, set the draft answer.
        */
-      private fun parseDateAndValidate(
-        questionnaireItemViewItem: QuestionnaireItemViewItem,
-        dateToDisplay: String?
-      ) =
+      private fun parseDateOnTextChanged(dateToDisplay: String?) =
         try {
           dateToDisplay?.let {
             val localDate = parseDate(it, canonicalizedDatePattern)
             setQuestionnaireItemViewItemAnswer(localDate)
           }
-          displayValidationResult(questionnaireItemViewItem.validationResult)
         } catch (e: ParseException) {
-          displayValidationResult(
-            Invalid(
-              listOf(invalidDateErrorText(textInputEditText.context, canonicalizedDatePattern))
-            )
-          )
+          questionnaireItemViewItem.setDraftAnswer(dateToDisplay)
         } catch (e: DateTimeParseException) {
-          displayValidationResult(
-            Invalid(
-              listOf(invalidDateErrorText(textInputEditText.context, canonicalizedDatePattern))
-            )
-          )
+          questionnaireItemViewItem.setDraftAnswer(dateToDisplay)
         }
 
       private fun displayValidationResult(validationResult: ValidationResult) {
@@ -239,7 +238,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             dateFormatSeparator,
             isDeleting
           )
-          questionnaireItemViewItem.setDraftAnswer(editable.toString())
+          parseDateOnTextChanged(editable.toString())
         }
       }
     }

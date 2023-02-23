@@ -147,36 +147,44 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
   @Test
   fun `parse date text input in US locale`() {
     setLocale(Locale.US)
-    var draftAnswer: Any? = null
+    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val item =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, result -> draftAnswer = result },
+        answersChangedCallback = { _, _, result, _ -> answers = result },
       )
 
     viewHolder.bind(item)
     viewHolder.dateInputView.text = "11/19/2020"
 
-    assertThat(draftAnswer as String).isEqualTo("11/19/2020")
+    val answer = answers!!.single().value as DateType
+
+    assertThat(answer.day).isEqualTo(19)
+    assertThat(answer.month).isEqualTo(10)
+    assertThat(answer.year).isEqualTo(2020)
   }
 
   @Test
   fun `parse date text input in Japan locale`() {
     setLocale(Locale.JAPAN)
     val viewHolder = QuestionnaireItemDatePickerViewHolderFactory.create(parent)
-    var draftAnswer: Any? = null
+    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val item =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, result -> draftAnswer = result },
+        answersChangedCallback = { _, _, result, _ -> answers = result },
       )
     viewHolder.bind(item)
     viewHolder.dateInputView.text = "2020/11/19"
-    assertThat(draftAnswer as String).isEqualTo("2020/11/19")
+    val answer = answers!!.single().value as DateType
+
+    assertThat(answer.day).isEqualTo(19)
+    assertThat(answer.month).isEqualTo(10)
+    assertThat(answer.year).isEqualTo(2020)
   }
 
   @Test

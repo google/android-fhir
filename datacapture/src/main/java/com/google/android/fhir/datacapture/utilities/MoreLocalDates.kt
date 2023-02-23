@@ -74,7 +74,8 @@ internal fun canonicalizeDatePattern(datePattern: String): String {
 
 /**
  * Parses a date string using the given date pattern, or the default date pattern for the device
- * locale.
+ * locale. If the parsing fails, an exception is thrown. These exceptions are caught in the calling
+ * widgets.
  */
 internal fun parseDate(text: String, datePattern: String): LocalDate {
   val localDate =
