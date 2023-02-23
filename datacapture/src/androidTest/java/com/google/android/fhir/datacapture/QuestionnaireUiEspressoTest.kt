@@ -32,7 +32,7 @@ import com.google.android.fhir.datacapture.TestQuestionnaireFragment.Companion.Q
 import com.google.android.fhir.datacapture.test.R
 import com.google.android.fhir.datacapture.utilities.clickIcon
 import com.google.android.fhir.datacapture.utilities.clickOnText
-import com.google.android.fhir.datacapture.views.localDateTime
+import com.google.android.fhir.datacapture.views.factories.localDateTime
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.time.LocalDateTime
