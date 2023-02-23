@@ -48,6 +48,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.chrono.IsoChronology
 import java.time.format.DateTimeFormatterBuilder
+import java.time.format.DateTimeParseException
 import java.time.format.FormatStyle
 import java.util.Date
 import java.util.Locale
@@ -188,6 +189,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           }
           displayValidationResult(questionnaireItemViewItem.validationResult)
         } catch (e: ParseException) {
+          displayValidationResult(
+            Invalid(
+              listOf(invalidDateErrorText(textInputEditText.context, canonicalizedDatePattern))
+            )
+          )
+        } catch (e: DateTimeParseException) {
           displayValidationResult(
             Invalid(
               listOf(invalidDateErrorText(textInputEditText.context, canonicalizedDatePattern))

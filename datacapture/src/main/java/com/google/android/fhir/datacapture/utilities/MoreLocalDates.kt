@@ -17,11 +17,9 @@
 package com.google.android.fhir.datacapture.utilities
 
 import android.icu.text.DateFormat
-import android.icu.text.SimpleDateFormat
 import com.google.android.fhir.datacapture.views.length
 import com.google.android.fhir.datacapture.views.localDate
 import java.lang.Character.isLetter
-import java.lang.StringBuilder
 import java.text.ParseException
 import java.time.LocalDate
 import java.time.ZoneId
@@ -79,13 +77,13 @@ internal fun canonicalizeDatePattern(datePattern: String): String {
  * locale.
  */
 internal fun parseDate(text: String, datePattern: String): LocalDate {
-  val dateFormat =
+  val localDate =
     if (datePattern.isNotEmpty()) {
-      SimpleDateFormat(datePattern)
+      LocalDate.parse(text, DateTimeFormatter.ofPattern(datePattern))
     } else {
-      DateFormat.getDateInstance(DateFormat.SHORT)
+      DateFormat.getDateInstance(DateFormat.SHORT).apply { isLenient = false }.parse(text).localDate
     }
-  val localDate = dateFormat.apply { isLenient = false }.parse(text).localDate
+
   // Throw ParseException if year is less than 4 digits.
   if (localDate.year.length() < 4) {
     throw ParseException("Year has less than 4 digits.", text.indexOf('y'))
