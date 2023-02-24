@@ -54,7 +54,8 @@ fun Questionnaire.QuestionnaireItemAnswerOptionComponent.itemAnswerOptionImage(
         "image/jpg",
         "image/png" -> {
           val bitmap = BitmapFactory.decodeByteArray(it.data, 0, it.data.size)
-          val imageSize = context.resources.getDimensionPixelOffset(R.dimen.option_item_image_size)
+          val imageSize =
+            context.resources.getDimensionPixelOffset(R.dimen.item_answer_media_image_size)
           val drawable: Drawable = BitmapDrawable(context.resources, bitmap)
           drawable.setBounds(0, 0, imageSize, imageSize)
           drawable
