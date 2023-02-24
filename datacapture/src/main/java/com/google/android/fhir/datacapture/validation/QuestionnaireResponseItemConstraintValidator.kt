@@ -20,13 +20,19 @@ import android.content.Context
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-/** Validates [QuestionnaireResponse.QuestionnaireResponseItemComponent]. */
+/**
+ * Validates [QuestionnaireResponse.QuestionnaireResponseItemComponent] against a particular
+ * constraint.
+ */
 internal interface QuestionnaireResponseItemConstraintValidator {
   /**
-   * Validates the `answer`(s) in [answers] satisfy any constraints of the [questionnaireItem]
-   * according to the [structured data capture implementation guide]
-   * (http://build.fhir.org/ig/HL7/sdc/behavior.html). This does not validate the [answers] and its
-   * child items are structurally consistent with the [questionnaireItem] and its child items.
+   * Validates that [answers] satisfy a particular constraint of the [questionnaireItem] according
+   * to the [structured data capture implementation guide]
+   * (http://build.fhir.org/ig/HL7/sdc/behavior.html).
+   *
+   * This does not validate the consistency between the structure of the [answers] and their
+   * descendants and that of the [questionnaireItem] and its descendants.
+   *
    * [Learn more](https://www.hl7.org/fhir/questionnaireresponse.html#link).
    */
   fun validate(
@@ -35,5 +41,9 @@ internal interface QuestionnaireResponseItemConstraintValidator {
     context: Context
   ): Result
 
-  data class Result(val isValid: Boolean, val message: String?)
+  /**
+   * The validation result containing whether the response item is valid and any error message if it
+   * is not valid.
+   */
+  data class Result(val isValid: Boolean, val errorMessage: String?)
 }

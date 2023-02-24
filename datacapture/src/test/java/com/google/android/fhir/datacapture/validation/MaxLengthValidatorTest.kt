@@ -133,7 +133,7 @@ class MaxLengthValidatorTest {
     val validationResult = MaxLengthValidator.validate(requirement, answer, context)
 
     assertThat(validationResult.isValid).isTrue()
-    assertThat(validationResult.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
   }
 
   private companion object {
@@ -148,7 +148,7 @@ class MaxLengthValidatorTest {
         MaxLengthValidator.validate(testComponent.requirement, testComponent.answer, context)
 
       assertThat(validationResult.isValid).isFalse()
-      assertThat(validationResult.message)
+      assertThat(validationResult.errorMessage)
         .isEqualTo(
           "The maximum number of characters that are permitted in the answer is: $maxLength"
         )
@@ -162,7 +162,7 @@ class MaxLengthValidatorTest {
         MaxLengthValidator.validate(testComponent.requirement, testComponent.answer, context)
 
       assertThat(validationResult.isValid).isTrue()
-      assertThat(validationResult.message.isNullOrBlank()).isTrue()
+      assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
     }
 
     @JvmStatic

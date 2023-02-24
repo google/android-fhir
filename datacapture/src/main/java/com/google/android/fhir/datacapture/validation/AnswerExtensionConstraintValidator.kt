@@ -22,29 +22,33 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /**
- * Validates [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] using a constraint in
- * an extension.
+ * Validates [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] against a constraint
+ * defined in an extension.
+ *
+ * For example, an implementation may validate answers against a min value defined in the minValue
+ * extension (see http://hl7.org/fhir/R4/extension-minvalue.html).
+ *
+ * @param url the URL of the extension that defines the constraint
+ * @param predicate the predicate that determines if the answer is valid
+ * @param messageGenerator a generator of error message if the answer is not valid
  */
-internal open class QuestionnaireResponseItemAnswerExtensionConstraintValidator(
+internal open class AnswerExtensionConstraintValidator(
   val url: String,
   val predicate:
     (Extension, QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> Boolean,
   val messageGenerator: (Extension, Context) -> String
-) : QuestionnaireResponseItemAnswerConstraintValidator {
+) : AnswerConstraintValidator {
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
     context: Context
-  ): QuestionnaireResponseItemAnswerConstraintValidator.Result {
+  ): AnswerConstraintValidator.Result {
     if (questionnaireItem.hasExtension(url)) {
       val extension = questionnaireItem.getExtensionByUrl(url)
       if (predicate(extension, answer)) {
-        return QuestionnaireResponseItemAnswerConstraintValidator.Result(
-          false,
-          messageGenerator(extension, context)
-        )
+        return AnswerConstraintValidator.Result(false, messageGenerator(extension, context))
       }
     }
-    return QuestionnaireResponseItemAnswerConstraintValidator.Result(true, null)
+    return AnswerConstraintValidator.Result(true, null)
   }
 }

@@ -64,7 +64,7 @@ class MaxValueValidatorTest {
     val validationResult = MaxValueValidator.validate(questionnaireItem, answer, context)
 
     assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.message).isEqualTo("Maximum value allowed is:200000")
+    assertThat(validationResult.errorMessage).isEqualTo("Maximum value allowed is:200000")
   }
 
   @Test
@@ -86,7 +86,7 @@ class MaxValueValidatorTest {
     val validationResult = MaxValueValidator.validate(questionnaireItem, answer, context)
 
     assertThat(validationResult.isValid).isTrue()
-    assertThat(validationResult.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
   }
 
   @Test

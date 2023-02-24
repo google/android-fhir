@@ -27,7 +27,7 @@ import org.hl7.fhir.r4.model.Type
 internal const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"
 /** A validator to check if the value of an answer is at least the permitted value. */
 internal object MinValueValidator :
-  QuestionnaireResponseItemAnswerExtensionConstraintValidator(
+  AnswerExtensionConstraintValidator(
     url = MIN_VALUE_EXTENSION_URL,
     predicate = {
       extension: Extension,

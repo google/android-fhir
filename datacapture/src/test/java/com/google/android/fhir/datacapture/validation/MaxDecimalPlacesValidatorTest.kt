@@ -52,7 +52,7 @@ class MaxDecimalPlacesValidatorTest {
       )
 
     assertThat(validationResult.isValid).isTrue()
-    assertThat(validationResult.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
   }
 
   @Test
@@ -68,7 +68,7 @@ class MaxDecimalPlacesValidatorTest {
       )
 
     assertThat(validationResult.isValid).isTrue()
-    assertThat(validationResult.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
   }
 
   @Test
@@ -84,7 +84,7 @@ class MaxDecimalPlacesValidatorTest {
       )
 
     assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.message)
+    assertThat(validationResult.errorMessage)
       .isEqualTo("The maximum number of decimal places that are permitted in the answer is: 2")
   }
 

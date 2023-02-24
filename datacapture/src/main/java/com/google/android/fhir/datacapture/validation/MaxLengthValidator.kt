@@ -27,22 +27,22 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * Only primitive types permitted in questionnaires response are subjected to this validation. See
  * https://www.hl7.org/fhir/valueset-item-type.html#expansion
  */
-internal object MaxLengthValidator : QuestionnaireResponseItemAnswerConstraintValidator {
+internal object MaxLengthValidator : AnswerConstraintValidator {
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
     context: Context
-  ): QuestionnaireResponseItemAnswerConstraintValidator.Result {
+  ): AnswerConstraintValidator.Result {
     if (questionnaireItem.hasMaxLength() &&
         answer.value.isPrimitive &&
         answer.value.asStringValue().length > questionnaireItem.maxLength
     ) {
-      return QuestionnaireResponseItemAnswerConstraintValidator.Result(
+      return AnswerConstraintValidator.Result(
         false,
         "The maximum number of characters that are permitted in the answer is: " +
           questionnaireItem.maxLength
       )
     }
-    return QuestionnaireResponseItemAnswerConstraintValidator.Result(true, null)
+    return AnswerConstraintValidator.Result(true, null)
   }
 }

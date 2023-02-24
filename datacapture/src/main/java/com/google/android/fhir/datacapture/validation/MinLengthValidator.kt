@@ -34,7 +34,7 @@ import org.hl7.fhir.r4.model.PrimitiveType
  * 7. UriType
  */
 internal object MinLengthValidator :
-  QuestionnaireResponseItemAnswerExtensionConstraintValidator(
+  AnswerExtensionConstraintValidator(
     url = MIN_LENGTH_EXTENSION_URL,
     predicate = { extension, answer ->
       answer.value.isPrimitive &&

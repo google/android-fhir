@@ -28,7 +28,7 @@ internal const val MAX_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefin
 
 /** A validator to check if the value of an answer exceeded the permitted value. */
 internal object MaxValueValidator :
-  QuestionnaireResponseItemAnswerExtensionConstraintValidator(
+  AnswerExtensionConstraintValidator(
     url = MAX_VALUE_EXTENSION_URL,
     predicate = {
       extension: Extension,

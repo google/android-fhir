@@ -30,7 +30,7 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object MaxDecimalPlacesValidator :
-  QuestionnaireResponseItemAnswerExtensionConstraintValidator(
+  AnswerExtensionConstraintValidator(
     url = MAX_DECIMAL_URL,
     predicate = {
       extension: Extension,

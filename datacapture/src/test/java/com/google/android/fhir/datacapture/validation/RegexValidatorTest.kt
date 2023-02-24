@@ -163,7 +163,7 @@ class RegexValidatorTest {
     val validationResult = RegexValidator.validate(requirement, response, context)
 
     assertThat(validationResult.isValid).isTrue()
-    assertThat(validationResult.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
   }
 
   private companion object {
@@ -178,7 +178,7 @@ class RegexValidatorTest {
         RegexValidator.validate(testComponent.requirement, testComponent.answer, context)
 
       assertThat(validationResult.isValid).isTrue()
-      assertThat(validationResult.message.isNullOrBlank()).isTrue()
+      assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
     }
 
     @JvmStatic
@@ -189,7 +189,7 @@ class RegexValidatorTest {
         RegexValidator.validate(testComponent.requirement, testComponent.answer, context)
 
       assertThat(validationResult.isValid).isFalse()
-      assertThat(validationResult.message)
+      assertThat(validationResult.errorMessage)
         .isEqualTo("The answer doesn't match regular expression: $regex")
     }
 

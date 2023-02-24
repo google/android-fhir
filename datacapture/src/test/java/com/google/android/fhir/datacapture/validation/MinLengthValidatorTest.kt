@@ -142,7 +142,7 @@ class MinLengthValidatorTest {
     val validationResult = MaxLengthValidator.validate(requirement, answer, context)
 
     assertThat(validationResult.isValid).isTrue()
-    assertThat(validationResult.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
   }
 
   private companion object {
@@ -157,7 +157,7 @@ class MinLengthValidatorTest {
         MinLengthValidator.validate(testComponent.requirement, testComponent.answer, context)
 
       assertThat(validationResult.isValid).isTrue()
-      assertThat(validationResult.message.isNullOrBlank()).isTrue()
+      assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
     }
 
     @JvmStatic
@@ -168,7 +168,7 @@ class MinLengthValidatorTest {
         MinLengthValidator.validate(testComponent.requirement, testComponent.answer, context)
 
       assertThat(validationResult.isValid).isFalse()
-      assertThat(validationResult.message)
+      assertThat(validationResult.errorMessage)
         .isEqualTo(
           "The minimum number of characters that are permitted in the answer is: $minLength"
         )

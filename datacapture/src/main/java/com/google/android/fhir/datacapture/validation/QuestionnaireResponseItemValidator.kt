@@ -36,8 +36,8 @@ internal object QuestionnaireResponseItemValidator {
       MaxValueValidator,
       MinLengthValidator,
       MaxLengthValidator,
-      RegexValidator,
       MaxDecimalPlacesValidator,
+      RegexValidator,
     )
 
   /** Validates [answers] contains valid answer(s) to [questionnaireItem]. */
@@ -63,8 +63,8 @@ internal object QuestionnaireResponseItemValidator {
       Valid
     } else {
       Invalid(
-        questionnaireResponseItemConstraintValidationResult.mapNotNull { it.message } +
-          questionnaireResponseItemAnswerConstraintValidationResult.mapNotNull { it.message }
+        questionnaireResponseItemConstraintValidationResult.mapNotNull { it.errorMessage } +
+          questionnaireResponseItemAnswerConstraintValidationResult.mapNotNull { it.errorMessage }
       )
     }
   }

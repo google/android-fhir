@@ -61,7 +61,7 @@ class RequiredValidatorTest {
         InstrumentationRegistry.getInstrumentation().context
       )
     assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.message).isEqualTo("Missing answer for required field.")
+    assertThat(validationResult.errorMessage).isEqualTo("Missing answer for required field.")
   }
 
   @Test
@@ -82,6 +82,6 @@ class RequiredValidatorTest {
         InstrumentationRegistry.getInstrumentation().context
       )
     assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.message).isEqualTo("Missing answer for required field.")
+    assertThat(validationResult.errorMessage).isEqualTo("Missing answer for required field.")
   }
 }

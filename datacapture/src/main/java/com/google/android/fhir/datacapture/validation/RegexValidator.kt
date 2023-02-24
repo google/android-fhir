@@ -32,7 +32,7 @@ import timber.log.Timber
  * See https://www.hl7.org/fhir/valueset-item-type.html#expansion
  */
 internal object RegexValidator :
-  QuestionnaireResponseItemAnswerExtensionConstraintValidator(
+  AnswerExtensionConstraintValidator(
     url = REGEX_EXTENSION_URL,
     predicate =
       predicate@{

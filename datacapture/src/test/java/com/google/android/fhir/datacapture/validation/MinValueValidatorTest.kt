@@ -70,7 +70,7 @@ class MinValueValidatorTest {
       )
 
     assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.message).isEqualTo("Minimum value allowed is:10")
+    assertThat(validationResult.errorMessage).isEqualTo("Minimum value allowed is:10")
   }
 
   @Test
@@ -94,7 +94,7 @@ class MinValueValidatorTest {
       )
 
     assertThat(validationResult.isValid).isTrue()
-    assertThat(validationResult.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
   }
 
   @Test
@@ -144,7 +144,8 @@ class MinValueValidatorTest {
     val expectedDateRange =
       (MinValueValidator.getMinValue(questionnaireItem) as? DateType)?.valueAsString
     assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.message).isEqualTo("Minimum value allowed is:$expectedDateRange")
+    assertThat(validationResult.errorMessage)
+      .isEqualTo("Minimum value allowed is:$expectedDateRange")
   }
 
   @Test
@@ -182,7 +183,7 @@ class MinValueValidatorTest {
       )
 
     assertThat(validationResult.isValid).isTrue()
-    assertThat(validationResult.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
   }
 
   @Test
