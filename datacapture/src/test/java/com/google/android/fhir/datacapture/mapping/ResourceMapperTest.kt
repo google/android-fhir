@@ -22,7 +22,7 @@ import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.datacapture.views.localDate
+import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.text.SimpleDateFormat

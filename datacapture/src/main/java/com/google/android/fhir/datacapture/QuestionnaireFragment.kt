@@ -34,7 +34,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import org.hl7.fhir.r4.model.Questionnaire
 import timber.log.Timber
@@ -113,9 +113,9 @@ class QuestionnaireFragment : Fragment() {
     }
     val questionnaireProgressIndicator: LinearProgressIndicator =
       view.findViewById(R.id.questionnaire_progress_indicator)
-    val questionnaireItemEditAdapter =
-      QuestionnaireItemEditAdapter(questionnaireItemViewHolderFactoryMatchersProvider.get())
-    val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
+    val questionnaireEditAdapter =
+      QuestionnaireEditAdapter(questionnaireItemViewHolderFactoryMatchersProvider.get())
+    val questionnaireReviewAdapter = QuestionnaireReviewAdapter()
 
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
 
@@ -125,13 +125,13 @@ class QuestionnaireFragment : Fragment() {
     val reviewModeButton = view.findViewById<View>(R.id.review_mode_button)
     reviewModeButton.setOnClickListener { viewModel.setReviewMode(true) }
 
-    questionnaireEditRecyclerView.adapter = questionnaireItemEditAdapter
+    questionnaireEditRecyclerView.adapter = questionnaireEditAdapter
     val linearLayoutManager = LinearLayoutManager(view.context)
     questionnaireEditRecyclerView.layoutManager = linearLayoutManager
     // Animation does work well with views that could gain focus
     questionnaireEditRecyclerView.itemAnimator = null
 
-    questionnaireReviewRecyclerView.adapter = questionnaireItemReviewAdapter
+    questionnaireReviewRecyclerView.adapter = questionnaireReviewAdapter
     questionnaireReviewRecyclerView.layoutManager = LinearLayoutManager(view.context)
 
     // Listen to updates from the view model.
@@ -141,7 +141,7 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.ReviewMode -> {
             // Set items
             questionnaireEditRecyclerView.visibility = View.GONE
-            questionnaireItemReviewAdapter.submitList(
+            questionnaireReviewAdapter.submitList(
               state.items.filterIsInstance<QuestionnaireAdapterItem.Question>()
             )
             questionnaireReviewRecyclerView.visibility = View.VISIBLE
@@ -164,7 +164,7 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.EditMode -> {
             // Set items
             questionnaireReviewRecyclerView.visibility = View.GONE
-            questionnaireItemEditAdapter.submitList(state.items)
+            questionnaireEditAdapter.submitList(state.items)
             questionnaireEditRecyclerView.visibility = View.VISIBLE
 
             // Set button visibility
