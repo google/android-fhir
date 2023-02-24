@@ -112,9 +112,15 @@ class MoreLocalDatesTest {
   }
 
   @Test
-  fun `should parse US locale date for Canada locale`() {
+  fun `should not parse US date for Canada locale`() {
     Locale.setDefault(Locale.CANADA)
     assertFailsWith<DateTimeParseException> { parseDate("01/25/2023", "yyyy-MM-dd") }
+  }
+
+  @Test
+  fun `should not parse date when the input is valid but not the same as the date pattern`() {
+    assertFailsWith<DateTimeParseException> { parseDate("1/25/2023", "MM/dd/yyyy") }
+    assertFailsWith<DateTimeParseException> { parseDate("11/1/2023", "MM/dd/yyyy") }
   }
 
   @Test
