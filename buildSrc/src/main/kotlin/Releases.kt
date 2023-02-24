@@ -48,13 +48,13 @@ object Releases {
 
   object Engine : LibraryArtifact {
     override val artifactId = "engine"
-    override val version = "0.1.0-beta02-preview10-SNAPSHOT"
+    override val version = "0.1.0-beta02-preview11-SNAPSHOT"
     override val name = "Android FHIR Engine Library"
   }
 
   object DataCapture : LibraryArtifact {
     override val artifactId = "data-capture"
-    override val version = "1.0.0"
+    override val version = "1.0.0-preview-SNAPSHOT"
     override val name = "Android FHIR Structured Data Capture Library"
   }
 
