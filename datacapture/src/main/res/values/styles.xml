@@ -357,8 +357,12 @@
         <item name="android:textColor">?attr/colorError</item>
         <item name="android:text">@string/delete</item>
         <item name="android:visibility">visible</item>
-        <item name="android:paddingRight">@dimen/attachment_action_button_padding_horizontal</item>
-        <item name="android:paddingLeft">@dimen/attachment_action_button_padding_horizontal</item>
+        <item
+            name="android:paddingRight"
+        >@dimen/attachment_action_button_padding_horizontal</item>
+        <item
+            name="android:paddingLeft"
+        >@dimen/attachment_action_button_padding_horizontal</item>
     </style>
 
 </resources>
