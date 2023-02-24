@@ -49,6 +49,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeParseException
 import java.util.Date
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -254,6 +255,13 @@ internal object DateTimePickerViewHolderFactory :
           }
           displayDateValidationError(questionnaireViewItem.validationResult)
         } catch (e: ParseException) {
+          timeInputLayout.isEnabled = false
+          displayDateValidationError(
+            Invalid(
+              listOf(invalidDateErrorText(dateInputEditText.context, canonicalizedDatePattern))
+            )
+          )
+        } catch (e: DateTimeParseException) {
           timeInputLayout.isEnabled = false
           displayDateValidationError(
             Invalid(

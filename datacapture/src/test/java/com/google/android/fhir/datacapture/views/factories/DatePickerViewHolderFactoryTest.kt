@@ -111,6 +111,7 @@ class DatePickerViewHolderFactoryTest {
   @Test
   fun shouldSetDateInput_localeJp() {
     setLocale(Locale.JAPAN)
+    val viewHolder = DatePickerViewHolderFactory.create(parent)
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -169,6 +170,7 @@ class DatePickerViewHolderFactoryTest {
   @Test
   fun `parse date text input in Japan locale`() {
     setLocale(Locale.JAPAN)
+    val viewHolder = DatePickerViewHolderFactory.create(parent)
     var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val item =
       QuestionnaireViewItem(
