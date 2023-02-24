@@ -36,38 +36,38 @@ interface LibraryArtifact {
 }
 
 object Releases {
-  const val groupId = "com.google.android.fhir"
+  const val groupId = "org.smartregister"
 
   // Libraries
 
   object Common : LibraryArtifact {
     override val artifactId = "common"
-    override val version = "0.1.0-alpha03"
+    override val version = "0.1.0-alpha03-preview4-SNAPSHOT"
     override val name = "Android FHIR Common Library"
   }
 
   object Engine : LibraryArtifact {
     override val artifactId = "engine"
-    override val version = "0.1.0-beta02"
+    override val version = "0.1.0-beta02-preview10-SNAPSHOT"
     override val name = "Android FHIR Engine Library"
   }
 
   object DataCapture : LibraryArtifact {
     override val artifactId = "data-capture"
-    override val version = "0.1.0-beta06"
+    override val version = "0.1.0-beta06-preview8-SNAPSHOT"
     override val name = "Android FHIR Structured Data Capture Library"
   }
 
   object Workflow : LibraryArtifact {
     override val artifactId = "workflow"
-    override val version = "0.1.0-alpha02"
+    override val version = "0.1.0-alpha02-preview8-SNAPSHOT"
     override val name = "Android FHIR Workflow Library"
   }
 
   object Contrib {
     object Barcode : LibraryArtifact {
       override val artifactId = "contrib-barcode"
-      override val version = "0.1.0-beta3"
+      override val version = "0.1.0-beta3-preview3-SNAPSHOT"
       override val name = "Android FHIR Structured Data Capture - Barcode Extensions (contrib)"
     }
   }
