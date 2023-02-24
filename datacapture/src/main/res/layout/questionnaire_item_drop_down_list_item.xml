@@ -16,9 +16,9 @@
     android:id="@+id/answer_option_textview"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:drawablePadding="@dimen/item_margin_horizontal"
+    android:drawablePadding="@dimen/icon_drawable_padding"
     android:ellipsize="end"
     android:maxLines="1"
-    android:padding="@dimen/padding_drop_down"
+    android:padding="@dimen/drop_down_padding"
     android:textAppearance="?attr/questionnaireDropDownTextStyle"
 />

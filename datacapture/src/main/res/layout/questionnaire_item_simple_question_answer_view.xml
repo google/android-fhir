@@ -19,7 +19,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-    android:layout_marginTop="@dimen/item_margin_vertical"
+    android:layout_marginVertical="@dimen/item_margin_vertical"
     android:orientation="vertical"
 >
     <com.google.android.fhir.datacapture.views.QuestionnaireItemHeaderView
@@ -40,13 +40,13 @@
         style="?attr/questionnaireAnswerTextStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/item_margin_vertical"
+        android:layout_marginTop="@dimen/simple_question_view_answer_margin_top"
     />
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/text_divider"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/item_margin_vertical"
+        android:layout_marginTop="@dimen/simple_question_view_divider_margin_top"
         android:layout_width="match_parent"
     />
 </LinearLayout>
