@@ -33,6 +33,8 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
 /** View model for [MainActivity]. */
@@ -55,13 +57,16 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
             repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
           )
         )
+        .shareIn(this, SharingStarted.Eagerly, 10)
         .collect { _pollState.emit(it) }
     }
   }
 
   fun triggerOneTimeSync() {
     viewModelScope.launch {
-      Sync.oneTimeSync<FhirSyncWorker>(getApplication()).collect { _pollState.emit(it) }
+      Sync.oneTimeSync<FhirSyncWorker>(getApplication())
+        .shareIn(this, SharingStarted.Eagerly, 10)
+        .collect { _pollState.emit(it) }
     }
   }
 

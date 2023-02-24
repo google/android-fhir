@@ -30,6 +30,7 @@ import com.google.common.truth.Truth.assertThat
 import java.time.OffsetDateTime
 import java.util.Date
 import java.util.LinkedList
+import kotlin.streams.toList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
@@ -100,11 +101,20 @@ class TestingUtils constructor(private val iParser: IParser) {
   }
 
   open class TestDownloadManagerImpl(
-    queries: List<String> = listOf("Patient?address-city=NAIROBI")
+    val queries: List<String> = listOf("Patient?address-city=NAIROBI")
   ) : DownloadWorkManager {
     private val urls = LinkedList(queries)
 
     override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? = urls.poll()
+    override suspend fun getSummaryRequestUrls(
+      context: SyncDownloadContext
+    ): Map<ResourceType, String> {
+      return queries
+        .stream()
+        .map { ResourceType.fromCode(it.substringBefore("?")) to it.plus("?_summary=count") }
+        .toList()
+        .toMap()
+    }
 
     override suspend fun processResponse(response: Resource): Collection<Resource> {
       val patient = Patient().setMeta(Meta().setLastUpdated(Date()))
@@ -134,7 +144,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     override suspend fun syncUpload(
       upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
     ) {
-      upload(listOf())
+      upload(listOf(getLocalChange(ResourceType.Patient, "123")))
     }
 
     override suspend fun syncDownload(
@@ -142,12 +152,12 @@ class TestingUtils constructor(private val iParser: IParser) {
       download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
     ) {
       download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType): String {
-            return "123456788"
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType): String {
+              return "123456788"
+            }
           }
-        }
-      )
+        )
         .collect {}
     }
     override suspend fun count(search: Search): Long {
@@ -160,8 +170,14 @@ class TestingUtils constructor(private val iParser: IParser) {
 
     override suspend fun clearDatabase() {}
 
-    override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange? {
-      TODO("Not yet implemented")
+    override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange {
+      return LocalChange(
+        resourceType = type.name,
+        resourceId = id,
+        payload = "{}",
+        token = LocalChangeToken(listOf()),
+        type = LocalChange.Type.INSERT
+      )
     }
 
     override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {}
