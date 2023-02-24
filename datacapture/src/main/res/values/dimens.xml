@@ -96,6 +96,8 @@
     <dimen name="item_answer_media_image_size">48dp</dimen>
 
     <!--  Item Media  -->
+    <dimen name="item_media_image_margin_horizontal">16dp</dimen>
+    <dimen name="item_media_image_margin_vertical">8dp</dimen>
     <dimen name="item_media_image_max_height">200dp</dimen>
     <dimen name="item_media_image_max_width">200dp</dimen>
 
