@@ -37,24 +37,39 @@ internal class BundleUploader(
   private val localChangesPaginator: LocalChangesPaginator
 ) : Uploader {
 
-  override suspend fun upload(
-    localChanges: List<LocalChange>,
-  ): Flow<UploadResult> = flow {
+  override suspend fun upload(localChanges: List<LocalChange>): Flow<UploadResult> = flow {
+    val total = localChanges.size
+    var completed = 0
+
+    emit(UploadResult.Started(total))
+
     bundleGenerator.generate(localChangesPaginator.page(localChanges)).forEach {
       (bundle, localChangeTokens) ->
       try {
         val response = dataSource.upload(bundle)
-        emit(getUploadResult(response, localChangeTokens))
+
+        completed += bundle.entry.size
+        emit(getUploadResult(response, localChangeTokens, total, completed))
       } catch (e: Exception) {
         emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
       }
     }
   }
 
-  private fun getUploadResult(response: Resource, localChangeTokens: List<LocalChangeToken>) =
+  private fun getUploadResult(
+    response: Resource,
+    localChangeTokens: List<LocalChangeToken>,
+    total: Int,
+    completed: Int
+  ) =
     when {
       response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
-        UploadResult.Success(LocalChangeToken(localChangeTokens.flatMap { it.ids }), response)
+        UploadResult.Success(
+          LocalChangeToken(localChangeTokens.flatMap { it.ids }),
+          response,
+          total,
+          completed
+        )
       }
       response is OperationOutcome && response.issue.isNotEmpty() -> {
         UploadResult.Failure(

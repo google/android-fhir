@@ -25,6 +25,11 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.ResourceType
 
+enum class SyncOperation {
+  DOWNLOAD,
+  UPLOAD
+}
+
 private sealed class SyncResult {
   val timestamp: OffsetDateTime = OffsetDateTime.now()
 
@@ -97,9 +102,10 @@ internal class FhirSynchronizer(
         downloader.download(it).collect {
           when (it) {
             is DownloadState.Started -> {
-              setSyncState(SyncJobStatus.InProgress(it.type))
+              setSyncState(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, it.total))
             }
             is DownloadState.Success -> {
+              setSyncState(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, it.total, it.completed))
               emit(it.resources)
             }
             is DownloadState.Failure -> {
@@ -121,10 +127,17 @@ internal class FhirSynchronizer(
     val exceptions = mutableListOf<ResourceSyncException>()
     fhirEngine.syncUpload { list ->
       flow {
-        uploader.upload(list).collect {
-          when (it) {
-            is UploadResult.Success -> emit(it.localChangeToken to it.resource)
-            is UploadResult.Failure -> exceptions.add(it.syncError)
+        uploader.upload(list).collect { result ->
+          when (result) {
+            is UploadResult.Started ->
+              setSyncState(SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total))
+            is UploadResult.Success ->
+              emit(result.localChangeToken to result.resource).also {
+                setSyncState(
+                  SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total, result.completed)
+                )
+              }
+            is UploadResult.Failure -> exceptions.add(result.syncError)
           }
         }
       }
