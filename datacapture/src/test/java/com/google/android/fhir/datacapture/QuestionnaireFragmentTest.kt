@@ -30,7 +30,7 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
-import com.google.android.fhir.datacapture.views.QuestionnaireItemDateTimePickerViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.DateTimePickerViewHolderFactory
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
 import org.junit.Before
@@ -244,7 +244,7 @@ class QuestionnaireFragmentTest {
     override fun get(): List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> {
       return listOf(
         QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher(
-          factory = QuestionnaireItemDateTimePickerViewHolderFactory,
+          factory = DateTimePickerViewHolderFactory,
           matches = { true }
         )
       )

@@ -46,19 +46,54 @@ class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
       return urlOfTheNextPagesToDownloadForAResource.poll()
 
     return resourcesToDownloadWithSearchParams.poll()?.let { (resourceType, params) ->
-      val newParams = params.toMutableMap()
-      if (!params.containsKey(SyncDataParams.SORT_KEY)) {
-        newParams[SyncDataParams.SORT_KEY] = SyncDataParams.LAST_UPDATED_KEY
-      }
-      if (!params.containsKey(SyncDataParams.LAST_UPDATED_KEY)) {
-        val lastUpdate = context.getLatestTimestampFor(resourceType)
-        if (!lastUpdate.isNullOrEmpty()) {
-          newParams[SyncDataParams.LAST_UPDATED_KEY] = "$GREATER_THAN_PREFIX$lastUpdate"
-        }
-      }
+      val newParams =
+        params.toMutableMap().apply { putAll(getLastUpdatedParam(resourceType, params, context)) }
 
       "${resourceType.name}?${newParams.concatParams()}"
     }
+  }
+
+  /**
+   * Returns the map of resourceType and URL for summary of total count for each download request
+   */
+  override suspend fun getSummaryRequestUrls(
+    context: SyncDownloadContext
+  ): Map<ResourceType, String> {
+    return resourcesToDownloadWithSearchParams.associate { (resourceType, params) ->
+      val newParams =
+        params.toMutableMap().apply {
+          putAll(getLastUpdatedParam(resourceType, params, context))
+          putAll(getSummaryParam(params))
+        }
+
+      resourceType to "${resourceType.name}?${newParams.concatParams()}"
+    }
+  }
+
+  private suspend fun getLastUpdatedParam(
+    resourceType: ResourceType,
+    params: ParamMap,
+    context: SyncDownloadContext
+  ): MutableMap<String, String> {
+    val newParams = mutableMapOf<String, String>()
+    if (!params.containsKey(SyncDataParams.SORT_KEY)) {
+      newParams[SyncDataParams.SORT_KEY] = SyncDataParams.LAST_UPDATED_KEY
+    }
+    if (!params.containsKey(SyncDataParams.LAST_UPDATED_KEY)) {
+      val lastUpdate = context.getLatestTimestampFor(resourceType)
+      if (!lastUpdate.isNullOrEmpty()) {
+        newParams[SyncDataParams.LAST_UPDATED_KEY] = "$GREATER_THAN_PREFIX$lastUpdate"
+      }
+    }
+    return newParams
+  }
+
+  private fun getSummaryParam(params: ParamMap): MutableMap<String, String> {
+    val newParams = mutableMapOf<String, String>()
+    if (!params.containsKey(SyncDataParams.SUMMARY_KEY)) {
+      newParams[SyncDataParams.SUMMARY_KEY] = SyncDataParams.SUMMARY_COUNT_VALUE
+    }
+    return newParams
   }
 
   override suspend fun processResponse(response: Resource): Collection<Resource> {
@@ -67,9 +102,9 @@ class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
     }
 
     return if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
-      response.link.firstOrNull { component -> component.relation == "next" }?.url?.let { next ->
-        urlOfTheNextPagesToDownloadForAResource.add(next)
-      }
+      response.link
+        .firstOrNull { component -> component.relation == "next" }
+        ?.url?.let { next -> urlOfTheNextPagesToDownloadForAResource.add(next) }
 
       response.entry.map { it.resource }
     } else {

@@ -32,10 +32,13 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_SUBMIT_BUTTON
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ENTRY_MODE_URL
+import com.google.android.fhir.datacapture.extensions.EntryMode
+import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
@@ -4024,7 +4027,7 @@ class QuestionnaireViewModelTest {
   private fun QuestionnaireViewModel.getQuestionnaireItemViewItemList() =
     questionnaireStateFlow.value.items
 
-  private fun QuestionnaireItemViewItem.getQuestionnaireResponseItem() =
+  private fun QuestionnaireViewItem.getQuestionnaireResponseItem() =
     ReflectionHelpers.getField<QuestionnaireResponse.QuestionnaireResponseItemComponent>(
       this,
       "questionnaireResponseItem"
@@ -4074,10 +4077,10 @@ class QuestionnaireViewModelTest {
   }
 }
 
-private fun QuestionnaireAdapterItem.asQuestion(): QuestionnaireItemViewItem {
+private fun QuestionnaireAdapterItem.asQuestion(): QuestionnaireViewItem {
   assertThat(this).isInstanceOf(QuestionnaireAdapterItem.Question::class.java)
   return (this as QuestionnaireAdapterItem.Question).item
 }
 
-private fun QuestionnaireAdapterItem.asQuestionOrNull(): QuestionnaireItemViewItem? =
+private fun QuestionnaireAdapterItem.asQuestionOrNull(): QuestionnaireViewItem? =
   (this as? QuestionnaireAdapterItem.Question)?.item
