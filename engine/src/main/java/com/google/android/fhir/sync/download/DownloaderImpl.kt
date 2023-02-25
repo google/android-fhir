@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,9 @@ import com.google.android.fhir.sync.Downloader
 import com.google.android.fhir.sync.ResourceSyncException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ResourceType
+import timber.log.Timber
 
 /**
  * Implementation of the [Downloader]. It orchestrates the pre & post processing of resources via
@@ -40,7 +42,27 @@ internal class DownloaderImpl(
 
   override suspend fun download(context: SyncDownloadContext): Flow<DownloadState> = flow {
     var resourceTypeToDownload: ResourceType = ResourceType.Bundle
-    emit(DownloadState.Started(resourceTypeToDownload))
+
+    // download count summary of all resources for progress i.e. <type, total, completed>
+    val progressSummary =
+      downloadWorkManager
+        .getSummaryRequestUrls(context)
+        .map { summary ->
+          summary.key to
+            runCatching { dataSource.download(summary.value) }
+              .onFailure { Timber.e(it) }
+              .getOrNull()
+              .takeIf { it is Bundle }
+              ?.let { (it as Bundle).total }
+        }
+        .also { Timber.i("Download summary " + it.joinToString()) }
+        .toMap()
+
+    val total = progressSummary.values.sumOf { it ?: 0 }
+    var completed = 0
+
+    emit(DownloadState.Started(resourceTypeToDownload, total))
+
     var url = downloadWorkManager.getNextRequestUrl(context)
     while (url != null) {
       try {
@@ -48,11 +70,13 @@ internal class DownloaderImpl(
           ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
 
         emit(
-          DownloadState.Success(
-            downloadWorkManager.processResponse(dataSource.download(url!!)).toList()
-          )
+          downloadWorkManager.processResponse(dataSource.download(url!!)).toList().let {
+            completed += it.size
+            DownloadState.Success(it, total, completed)
+          }
         )
       } catch (exception: Exception) {
+        Timber.e(exception)
         emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
       }
 

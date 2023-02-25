@@ -33,7 +33,7 @@ internal open class ValueConstraintExtensionValidator(
     answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
     context: Context
   ): ConstraintValidator.ConstraintValidationResult {
-    if (questionnaireItem.hasExtension(url) && !answers.isEmpty()) {
+    if (questionnaireItem.hasExtension(url) && answers.isNotEmpty()) {
       val extension = questionnaireItem.getExtensionByUrl(url)
       // TODO(https://github.com/google/android-fhir/issues/487): Validates all answers.
       val answer = answers[0]
