@@ -25,13 +25,13 @@ internal object QuestionnaireResponseItemValidator {
 
   /** Validators for [QuestionnaireResponse.QuestionnaireResponseItemComponent]. */
   private val questionnaireResponseItemConstraintValidators =
-    mutableListOf(
+    listOf(
       RequiredValidator,
     )
 
   /** Validators for [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]. */
-  private val questionnaireResponseItemAnswerConstraintValidators =
-    mutableListOf(
+  private val answerConstraintValidators =
+    listOf(
       MinValueValidator,
       MaxValueValidator,
       MinLengthValidator,
@@ -53,7 +53,7 @@ internal object QuestionnaireResponseItemValidator {
         it.validate(questionnaireItem, answers, context)
       }
     val questionnaireResponseItemAnswerConstraintValidationResult =
-      questionnaireResponseItemAnswerConstraintValidators.flatMap { validator ->
+      answerConstraintValidators.flatMap { validator ->
         answers.map { answer -> validator.validate(questionnaireItem, answer, context) }
       }
 
