@@ -25,10 +25,10 @@ import com.google.android.fhir.db.impl.DatabaseConfig
 import com.google.android.fhir.db.impl.DatabaseEncryptionKeyProvider.isDatabaseEncryptionSupported
 import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
-import com.google.android.fhir.security.FhirSecurityConfiguration
-import com.google.android.fhir.security.SecurityRequirementsManager
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.SearchParamDefinitionsProviderImpl
+import com.google.android.fhir.security.FhirSecurityConfiguration
+import com.google.android.fhir.security.SecurityRequirementsManager
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.remote.RemoteFhirService
 import org.hl7.fhir.r4.model.SearchParameter
@@ -70,7 +70,7 @@ internal data class FhirServices(
     internal fun setSearchParameters(searchParameters: List<SearchParameter>?) = apply {
       this.searchParameters = searchParameters
     }
-    
+
     internal fun setSecurityConfiguration(securityConfiguration: FhirSecurityConfiguration) =
       apply {
         this.securityConfiguration = securityConfiguration
