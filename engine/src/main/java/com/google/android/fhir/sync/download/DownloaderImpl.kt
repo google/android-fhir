@@ -17,11 +17,13 @@
 package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.SyncDownloadContext
+import com.google.android.fhir.sync.BundleRequest
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.Downloader
 import com.google.android.fhir.sync.ResourceSyncException
+import com.google.android.fhir.sync.UrlRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.Bundle
@@ -63,24 +65,44 @@ internal class DownloaderImpl(
 
     emit(DownloadState.Started(resourceTypeToDownload, total))
 
-    var url = downloadWorkManager.getNextRequestUrl(context)
-    while (url != null) {
-      try {
-        resourceTypeToDownload =
-          ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
+    var request = downloadWorkManager.getNextRequest(context)
+    while (request != null) {
+      when (request) {
+        is UrlRequest -> {
+          try {
+            resourceTypeToDownload =
+              ResourceType.fromCode(
+                request.url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second
+              )
 
-        emit(
-          downloadWorkManager.processResponse(dataSource.download(url!!)).toList().let {
-            completed += it.size
-            DownloadState.Success(it, total, completed)
+            emit(
+              downloadWorkManager.processResponse(dataSource.download(request.url)).toList().let {
+                completed += it.size
+                DownloadState.Success(it, total, completed)
+              }
+            )
+          } catch (exception: Exception) {
+            Timber.e(exception)
+            emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
           }
-        )
-      } catch (exception: Exception) {
-        Timber.e(exception)
-        emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
+        }
+        is BundleRequest -> {
+          try {
+            resourceTypeToDownload = ResourceType.Bundle
+            emit(
+              downloadWorkManager.processResponse(dataSource.upload(request.bundle)).toList().let {
+                completed += it.size
+                DownloadState.Success(it, total, completed)
+              }
+            )
+          } catch (exception: Exception) {
+            Timber.e(exception)
+            emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
+          }
+        }
       }
 
-      url = downloadWorkManager.getNextRequestUrl(context)
+      request = downloadWorkManager.getNextRequest(context)
     }
   }
 }

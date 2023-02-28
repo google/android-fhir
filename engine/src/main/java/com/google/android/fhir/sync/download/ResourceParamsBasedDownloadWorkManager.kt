@@ -20,6 +20,7 @@ import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.GREATER_THAN_PREFIX
 import com.google.android.fhir.sync.ParamMap
+import com.google.android.fhir.sync.Request
 import com.google.android.fhir.sync.SyncDataParams
 import com.google.android.fhir.sync.concatParams
 import java.util.LinkedList
@@ -41,15 +42,15 @@ class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
   private val resourcesToDownloadWithSearchParams = LinkedList(syncParams.entries)
   private val urlOfTheNextPagesToDownloadForAResource = LinkedList<String>()
 
-  override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? {
+  override suspend fun getNextRequest(context: SyncDownloadContext): Request? {
     if (urlOfTheNextPagesToDownloadForAResource.isNotEmpty())
-      return urlOfTheNextPagesToDownloadForAResource.poll()
+      return urlOfTheNextPagesToDownloadForAResource.poll()?.let { Request.of(it) }
 
     return resourcesToDownloadWithSearchParams.poll()?.let { (resourceType, params) ->
       val newParams =
         params.toMutableMap().apply { putAll(getLastUpdatedParam(resourceType, params, context)) }
 
-      "${resourceType.name}?${newParams.concatParams()}"
+      Request.of("${resourceType.name}?${newParams.concatParams()}")
     }
   }
 

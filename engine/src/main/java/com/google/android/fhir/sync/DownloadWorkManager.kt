@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync
 
 import com.google.android.fhir.SyncDownloadContext
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -31,7 +32,7 @@ interface DownloadWorkManager {
    * Returns the URL for the next download request, or `null` if there is no more download request
    * to be issued.
    */
-  suspend fun getNextRequestUrl(context: SyncDownloadContext): String?
+  suspend fun getNextRequest(context: SyncDownloadContext): Request?
 
   /* TODO: Generalize the DownloadWorkManager API to not sequentially download resource by type (https://github.com/google/android-fhir/issues/1884) */
   /**
@@ -44,3 +45,14 @@ interface DownloadWorkManager {
    */
   suspend fun processResponse(response: Resource): Collection<Resource>
 }
+
+sealed class Request {
+  companion object {
+    fun of(url: String) = UrlRequest(url)
+    fun of(bundle: Bundle) = BundleRequest(bundle)
+  }
+}
+
+data class UrlRequest(val url: String) : Request()
+
+data class BundleRequest(val bundle: Bundle) : Request()

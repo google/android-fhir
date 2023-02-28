@@ -26,13 +26,13 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadWorkManager
+import com.google.android.fhir.sync.Request
 import com.google.common.truth.Truth.assertThat
 import java.time.OffsetDateTime
 import java.util.Date
 import java.util.LinkedList
 import kotlin.streams.toList
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
@@ -105,7 +105,8 @@ class TestingUtils constructor(private val iParser: IParser) {
   ) : DownloadWorkManager {
     private val urls = LinkedList(queries)
 
-    override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? = urls.poll()
+    override suspend fun getNextRequest(context: SyncDownloadContext): Request? =
+      urls.poll()?.let { Request.of(it) }
     override suspend fun getSummaryRequestUrls(
       context: SyncDownloadContext
     ): Map<ResourceType, String> {

@@ -18,6 +18,7 @@ package com.google.android.fhir.demo.data
 
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DownloadWorkManager
+import com.google.android.fhir.sync.Request
 import com.google.android.fhir.sync.SyncDataParams
 import java.util.LinkedList
 import org.hl7.fhir.exceptions.FHIRException
@@ -33,15 +34,15 @@ class DownloadWorkManagerImpl : DownloadWorkManager {
   private val urls =
     LinkedList(listOf("Patient?address-city=NAIROBI", "Binary?_id=android-fhir-thermometer-image"))
 
-  override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? {
+  override suspend fun getNextRequest(context: SyncDownloadContext): Request? {
     var url = urls.poll() ?: return null
 
     val resourceTypeToDownload =
       ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
     context.getLatestTimestampFor(resourceTypeToDownload)?.let {
-      url = affixLastUpdatedTimestamp(url!!, it)
+      url = affixLastUpdatedTimestamp(url, it)
     }
-    return url
+    return Request.of(url)
   }
 
   override suspend fun getSummaryRequestUrls(

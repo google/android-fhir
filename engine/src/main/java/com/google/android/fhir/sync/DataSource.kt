@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,5 +36,6 @@ internal interface DataSource {
    * [OperationOutcome] otherwise. Call this api with the [Bundle] that needs to be uploaded to the
    * server.
    */
+  // TODO: Give a generic name since Bundle can be POST-ed to ge. data as well/
   suspend fun upload(bundle: Bundle): Resource
 }

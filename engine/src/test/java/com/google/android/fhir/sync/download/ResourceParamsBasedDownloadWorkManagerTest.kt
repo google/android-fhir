@@ -19,6 +19,7 @@ package com.google.android.fhir.sync.download
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.sync.SyncDataParams
+import com.google.android.fhir.sync.UrlRequest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.exceptions.FHIRException
@@ -48,11 +49,13 @@ class ResourceParamsBasedDownloadWorkManagerTest {
     val urlsToDownload = mutableListOf<String>()
     do {
       val url =
-        downloadManager.getNextRequestUrl(
-          object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-03-20"
-          }
-        )
+        downloadManager
+          .getNextRequest(
+            object : SyncDownloadContext {
+              override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-03-20"
+            }
+          )
+          ?.let { (it as UrlRequest).url }
       if (url != null) {
         urlsToDownload.add(url)
       }
@@ -76,11 +79,13 @@ class ResourceParamsBasedDownloadWorkManagerTest {
     val urlsToDownload = mutableListOf<String>()
     do {
       val url =
-        downloadManager.getNextRequestUrl(
-          object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-03-20"
-          }
-        )
+        downloadManager
+          .getNextRequest(
+            object : SyncDownloadContext {
+              override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-03-20"
+            }
+          )
+          ?.let { (it as UrlRequest).url }
 
       if (url != null) {
         urlsToDownload.add(url)
@@ -119,11 +124,13 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       val downloadManager =
         ResourceParamsBasedDownloadWorkManager(mapOf(ResourceType.Patient to emptyMap()))
       val url =
-        downloadManager.getNextRequestUrl(
-          object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-28"
-          }
-        )
+        downloadManager
+          .getNextRequest(
+            object : SyncDownloadContext {
+              override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-28"
+            }
+          )
+          ?.let { (it as UrlRequest).url }
       assertThat(url).isEqualTo("Patient?_sort=_lastUpdated&_lastUpdated=gt2022-06-28")
     }
 
@@ -141,11 +148,13 @@ class ResourceParamsBasedDownloadWorkManagerTest {
           )
         )
       val url =
-        downloadManager.getNextRequestUrl(
-          object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-07-07"
-          }
-        )
+        downloadManager
+          .getNextRequest(
+            object : SyncDownloadContext {
+              override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-07-07"
+            }
+          )
+          ?.let { (it as UrlRequest).url }
       assertThat(url).isEqualTo("Patient?_lastUpdated=2022-06-28&_sort=status")
     }
 
@@ -157,11 +166,13 @@ class ResourceParamsBasedDownloadWorkManagerTest {
           mapOf(ResourceType.Patient to mapOf(SyncDataParams.LAST_UPDATED_KEY to "gt2022-06-28"))
         )
       val url =
-        downloadManager.getNextRequestUrl(
-          object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-07-07"
-          }
-        )
+        downloadManager
+          .getNextRequest(
+            object : SyncDownloadContext {
+              override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-07-07"
+            }
+          )
+          ?.let { (it as UrlRequest).url }
       assertThat(url).isEqualTo("Patient?_lastUpdated=gt2022-06-28&_sort=_lastUpdated")
     }
 
@@ -173,11 +184,13 @@ class ResourceParamsBasedDownloadWorkManagerTest {
           mapOf(ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"))
         )
       val actual =
-        downloadManager.getNextRequestUrl(
-          object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = null
-          }
-        )
+        downloadManager
+          .getNextRequest(
+            object : SyncDownloadContext {
+              override suspend fun getLatestTimestampFor(type: ResourceType) = null
+            }
+          )
+          ?.let { (it as UrlRequest).url }
       assertThat(actual).isEqualTo("Patient?address-city=NAIROBI&_sort=_lastUpdated")
     }
 
@@ -189,11 +202,13 @@ class ResourceParamsBasedDownloadWorkManagerTest {
           mapOf(ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"))
         )
       val actual =
-        downloadManager.getNextRequestUrl(
-          object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = ""
-          }
-        )
+        downloadManager
+          .getNextRequest(
+            object : SyncDownloadContext {
+              override suspend fun getLatestTimestampFor(type: ResourceType) = ""
+            }
+          )
+          ?.let { (it as UrlRequest).url }
       assertThat(actual).isEqualTo("Patient?address-city=NAIROBI&_sort=_lastUpdated")
     }
 
