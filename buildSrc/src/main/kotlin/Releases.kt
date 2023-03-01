@@ -67,7 +67,7 @@ object Releases {
   object Contrib {
     object Barcode : LibraryArtifact {
       override val artifactId = "contrib-barcode"
-      override val version = "0.1.0-beta3-preview3-SNAPSHOT"
+      override val version = "0.1.0-beta3-preview4-SNAPSHOT"
       override val name = "Android FHIR Structured Data Capture - Barcode Extensions (contrib)"
     }
   }
