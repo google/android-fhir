@@ -67,4 +67,5 @@
   <string name="sync_menu">Sync</string>
   <string name="last_sync">Last sync</string>
   <string name="syncing">Syncing</string>
+  <string name="sync">Sync</string>
 </resources>

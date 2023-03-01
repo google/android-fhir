@@ -22,7 +22,6 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Button
 import android.widget.TextView
-import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.hasHelpButton
 import com.google.android.fhir.datacapture.localizedHelpSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
@@ -40,9 +39,6 @@ internal fun updateQuestionText(
 ) {
   val builder = SpannableStringBuilder()
   questionnaireItem.localizedTextSpanned?.let { builder.append(it) }
-  if (questionnaireItem.required) {
-    builder.append(questionTextView.context.applicationContext.getString(R.string.space_asterisk))
-  }
   questionTextView.updateTextAndVisibility(builder)
 }
 

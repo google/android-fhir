@@ -23,14 +23,17 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.ServerConfiguration
+import com.google.android.fhir.datacapture.DataCaptureConfig
 import com.google.android.fhir.demo.data.FhirSyncWorker
 import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.remote.HttpLogger
 import timber.log.Timber
 
-class FhirApplication : Application() {
+class FhirApplication : Application(), DataCaptureConfig.Provider {
   // Only initiate the FhirEngine when used for the first time, not when the app is created.
   private val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
+
+  private var dataCaptureConfig: DataCaptureConfig? = null
 
   override fun onCreate() {
     super.onCreate()
@@ -53,6 +56,11 @@ class FhirApplication : Application() {
       )
     )
     Sync.oneTimeSync<FhirSyncWorker>(this)
+
+    dataCaptureConfig =
+      DataCaptureConfig().apply {
+        urlResolver = ReferenceUrlResolver(this@FhirApplication as Context)
+      }
   }
 
   private fun constructFhirEngine(): FhirEngine {
@@ -62,4 +70,6 @@ class FhirApplication : Application() {
   companion object {
     fun fhirEngine(context: Context) = (context.applicationContext as FhirApplication).fhirEngine
   }
+
+  override fun getDataCaptureConfig(): DataCaptureConfig = dataCaptureConfig ?: DataCaptureConfig()
 }

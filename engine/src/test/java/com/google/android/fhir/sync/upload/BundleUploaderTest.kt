@@ -52,8 +52,27 @@ class BundleUploaderTest {
         .upload(localChanges)
         .toList()
 
-    assertThat(result).hasSize(1)
-    assertThat(result.first()).isInstanceOf(UploadResult.Success::class.java)
+    assertThat(result).hasSize(2)
+    assertThat(result.first()).isInstanceOf(UploadResult.Started::class.java)
+    assertThat(result.last()).isInstanceOf(UploadResult.Success::class.java)
+
+    val success = result.last() as UploadResult.Success
+    assertThat(success.total).isEqualTo(1)
+    assertThat(success.completed).isEqualTo(1)
+  }
+
+  @Test
+  fun `upload Bundle transaction should emit Started state`() = runBlocking {
+    val result =
+      BundleUploader(
+          TestingUtils.BundleDataSource { Bundle() },
+          TransactionBundleGenerator.getDefault(),
+          LocalChangesPaginator.DEFAULT
+        )
+        .upload(localChanges)
+        .toList()
+
+    assertThat(result.first()).isInstanceOf(UploadResult.Started::class.java)
   }
 
   @Test
@@ -76,8 +95,8 @@ class BundleUploaderTest {
         .upload(localChanges)
         .toList()
 
-    assertThat(result).hasSize(1)
-    assertThat(result.first()).isInstanceOf(UploadResult.Failure::class.java)
+    assertThat(result).hasSize(2)
+    assertThat(result.last()).isInstanceOf(UploadResult.Failure::class.java)
   }
 
   @Test
@@ -91,8 +110,8 @@ class BundleUploaderTest {
         .upload(localChanges)
         .toList()
 
-    assertThat(result).hasSize(1)
-    assertThat(result.first()).isInstanceOf(UploadResult.Failure::class.java)
+    assertThat(result).hasSize(2)
+    assertThat(result.last()).isInstanceOf(UploadResult.Failure::class.java)
   }
 
   companion object {

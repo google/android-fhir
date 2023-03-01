@@ -51,6 +51,8 @@
     <dimen name="attachment_icon_button_size">24dp</dimen>
     <dimen name="attachment_uploaded_label_margin_bottom">4dp</dimen>
     <dimen name="attachment_divider_height">1dp</dimen>
+    <dimen name="item_media_image_preview_max_width">200dp</dimen>
+    <dimen name="item_media_image_preview_max_height">200dp</dimen>
     <!--  dimens for padding between text and icon in the radio button  -->
     <dimen name="padding_between_text_and_icon">16dp</dimen>
     <dimen name="padding_after_text">24dp</dimen>
