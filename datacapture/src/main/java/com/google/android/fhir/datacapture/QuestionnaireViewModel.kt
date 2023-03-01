@@ -339,26 +339,25 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     when (entryMode) {
       EntryMode.PRIOR_EDIT,
       EntryMode.SEQUENTIAL, -> {
-        if (!isPaginationButtonPressed) {
-          // Force update validation results for all questions on the current page. This is needed
-          // when the user has not answered any questions so no validation has been done.
-          isPaginationButtonPressed = true
-          modificationCount.update { it + 1 }
-        }
-
-        val allCurrentPageItemsValid =
-          currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().all {
-            it.item.validationResult is Valid
-          }
-        if (allCurrentPageItemsValid) {
-          isPaginationButtonPressed = false
-          val nextPageIndex =
-            pages!!.indexOfFirst {
-              it.index > currentPageIndexFlow.value!! && it.enabled && !it.hidden
+        validateCurrentPageItems(
+          {
+            isPaginationButtonPressed = false
+            val nextPageIndex =
+              pages!!.indexOfFirst {
+                it.index > currentPageIndexFlow.value!! && it.enabled && !it.hidden
+              }
+            check(nextPageIndex != -1) {
+              "Can't call goToNextPage() if no following page is enabled"
             }
-          check(nextPageIndex != -1) { "Can't call goToNextPage() if no following page is enabled" }
-          currentPageIndexFlow.value = nextPageIndex
-        }
+            currentPageIndexFlow.value = nextPageIndex
+          },
+          {
+            // Force update validation results for all questions on the current page. This is needed
+            // when the user has not answered any questions so no validation has been done.
+            isPaginationButtonPressed = true
+            modificationCount.update { it + 1 }
+          }
+        )
       }
       EntryMode.RANDOM -> {
         val nextPageIndex =
@@ -372,7 +371,30 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   internal fun setReviewMode(reviewModeFlag: Boolean) {
-    isInReviewModeFlow.value = reviewModeFlag
+    if (reviewModeFlag) {
+      when (entryMode) {
+        EntryMode.PRIOR_EDIT,
+        EntryMode.SEQUENTIAL, -> {
+          validateCurrentPageItems(
+            {
+              isPaginationButtonPressed = false
+              isInReviewModeFlow.value = true
+            },
+            {
+              // Force update validation results for all questions on the current page. This is
+              // needed when the user has not answered any questions so no validation has been done.
+              isPaginationButtonPressed = true
+              modificationCount.update { it + 1 }
+            }
+          )
+        }
+        EntryMode.RANDOM -> {
+          isInReviewModeFlow.value = true
+        }
+      }
+    } else {
+      isInReviewModeFlow.value = false
+    }
   }
 
   /** [QuestionnaireState] to be displayed in the UI. */
@@ -421,88 +443,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             }
           }
       }
-  }
-
-  @PublishedApi
-  internal suspend fun resolveAnswerValueSet(
-    uri: String,
-  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-    // If cache hit, return it
-    if (answerValueSetMap.contains(uri)) {
-      return answerValueSetMap[uri]!!
-    }
-
-    val options =
-      if (uri.startsWith("#")) {
-        questionnaire.contained
-          .firstOrNull { resource ->
-            resource.id.equals(uri) &&
-              resource.resourceType == ResourceType.ValueSet &&
-              (resource as ValueSet).hasExpansion()
-          }
-          ?.let { resource ->
-            val valueSet = resource as ValueSet
-            valueSet.expansion.contains
-              .filterNot { it.abstract || it.inactive }
-              .map { component ->
-                Questionnaire.QuestionnaireItemAnswerOptionComponent(
-                  Coding(component.system, component.code, component.display)
-                )
-              }
-          }
-      } else {
-        // Ask the client to provide the answers from an external expanded Valueset.
-        DataCapture.getConfiguration(getApplication())
-          .valueSetResolverExternal
-          ?.resolve(uri)
-          ?.map { coding -> Questionnaire.QuestionnaireItemAnswerOptionComponent(coding.copy()) }
-      }
-        ?: emptyList()
-    // save it so that we avoid have cache misses.
-    answerValueSetMap[uri] = options
-    return options
-  }
-
-  // TODO persist previous answers in case options are changing and new list does not have selected
-  // answer and FHIRPath in x-fhir-query
-  // https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
-  @PublishedApi
-  internal suspend fun resolveAnswerExpression(
-    item: QuestionnaireItemComponent,
-  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-    // Check cache first for database queries
-    val answerExpression = item.answerExpression ?: return emptyList()
-    if (answerExpression.isXFhirQuery && answerExpressionMap.contains(answerExpression.expression)
-    ) {
-      return answerExpressionMap[answerExpression.expression]!!
-    }
-
-    val options = loadAnswerExpressionOptions(item, answerExpression)
-
-    if (answerExpression.isXFhirQuery) answerExpressionMap[answerExpression.expression] = options
-
-    return options
-  }
-
-  private suspend fun loadAnswerExpressionOptions(
-    item: QuestionnaireItemComponent,
-    expression: Expression,
-  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-    val data =
-      if (expression.isXFhirQuery) {
-        checkNotNull(xFhirQueryResolver) {
-          "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
-        }
-        xFhirQueryResolver!!.resolve(expression.expression)
-      } else if (expression.isFhirPath) {
-        fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
-      } else {
-        throw UnsupportedOperationException(
-          "${expression.language} not supported for answer-expression yet"
-        )
-      }
-
-    return item.extractAnswerOptions(data)
   }
 
   /**
@@ -676,6 +616,86 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return items
   }
 
+  internal suspend fun resolveAnswerValueSet(
+    uri: String,
+  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+    // If cache hit, return it
+    if (answerValueSetMap.contains(uri)) {
+      return answerValueSetMap[uri]!!
+    }
+
+    val options =
+      if (uri.startsWith("#")) {
+        questionnaire.contained
+          .firstOrNull { resource ->
+            resource.id.equals(uri) &&
+              resource.resourceType == ResourceType.ValueSet &&
+              (resource as ValueSet).hasExpansion()
+          }
+          ?.let { resource ->
+            val valueSet = resource as ValueSet
+            valueSet.expansion.contains
+              .filterNot { it.abstract || it.inactive }
+              .map { component ->
+                Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                  Coding(component.system, component.code, component.display)
+                )
+              }
+          }
+      } else {
+        // Ask the client to provide the answers from an external expanded Valueset.
+        DataCapture.getConfiguration(getApplication())
+          .valueSetResolverExternal
+          ?.resolve(uri)
+          ?.map { coding -> Questionnaire.QuestionnaireItemAnswerOptionComponent(coding.copy()) }
+      }
+        ?: emptyList()
+    // save it so that we avoid have cache misses.
+    answerValueSetMap[uri] = options
+    return options
+  }
+
+  // TODO persist previous answers in case options are changing and new list does not have selected
+  // answer and FHIRPath in x-fhir-query
+  // https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
+  private suspend fun resolveAnswerExpression(
+    item: QuestionnaireItemComponent,
+  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+    // Check cache first for database queries
+    val answerExpression = item.answerExpression ?: return emptyList()
+    if (answerExpression.isXFhirQuery && answerExpressionMap.contains(answerExpression.expression)
+    ) {
+      return answerExpressionMap[answerExpression.expression]!!
+    }
+
+    val options = loadAnswerExpressionOptions(item, answerExpression)
+
+    if (answerExpression.isXFhirQuery) answerExpressionMap[answerExpression.expression] = options
+
+    return options
+  }
+
+  private suspend fun loadAnswerExpressionOptions(
+    item: QuestionnaireItemComponent,
+    expression: Expression,
+  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+    val data =
+      if (expression.isXFhirQuery) {
+        checkNotNull(xFhirQueryResolver) {
+          "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
+        }
+        xFhirQueryResolver!!.resolve(expression.expression)
+      } else if (expression.isFhirPath) {
+        fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
+      } else {
+        throw UnsupportedOperationException(
+          "${expression.language} not supported for answer-expression yet"
+        )
+      }
+
+    return item.extractAnswerOptions(data)
+  }
+
   /**
    * If the item is not enabled, clear the answers that it may have from the previous enabled state.
    * This will also prevent any questionnaire item that depends on the answer of this questionnaire
@@ -796,6 +816,21 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     } else {
       null
     }
+
+  /**
+   * Validates the current page items and invokes [valid] if they are all valid or [invalid]
+   * otherwise.
+   */
+  private fun validateCurrentPageItems(valid: () -> Unit, invalid: () -> Unit) {
+    if (currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().all {
+        it.item.validationResult is Valid
+      }
+    ) {
+      valid()
+    } else {
+      invalid()
+    }
+  }
 }
 
 typealias ItemToParentMap = MutableMap<QuestionnaireItemComponent, QuestionnaireItemComponent>
