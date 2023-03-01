@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.fhirpath
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.calculatedExpression
+import com.google.android.fhir.datacapture.extensions.findVariableExpression
 import com.google.android.fhir.datacapture.findVariableExpression
 import com.google.android.fhir.datacapture.flattened
 import com.google.android.fhir.datacapture.isReferencedBy

@@ -24,12 +24,14 @@ import com.google.android.fhir.implementationguide.db.impl.entities.Implementati
 import com.google.android.fhir.implementationguide.db.impl.entities.ResourceMetadataEntity
 import com.google.common.truth.Truth.assertThat
 import java.io.File
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 internal class ImplementationGuideDatabaseTest {
 
@@ -44,13 +46,13 @@ internal class ImplementationGuideDatabaseTest {
   }
 
   @Test
-  fun igInserted(): Unit = runBlocking {
+  fun igInserted(): Unit = runTest {
     assertThat(igDao.insert(IG_ENTITY)).isGreaterThan(0)
     assertThat(igDao.getImplementationGuides().map { it.packageId }).containsExactly(IG_PACKAGE_ID)
   }
 
   @Test
-  fun resourcesInserted() = runBlocking {
+  fun resourcesInserted() = runTest {
     val igId = igDao.insert(IG_ENTITY)
     val resource =
       ResourceMetadataEntity(
@@ -72,7 +74,7 @@ internal class ImplementationGuideDatabaseTest {
   }
 
   @Test
-  fun resourcesDeleted() = runBlocking {
+  fun resourcesDeleted() = runTest {
     val igId = igDao.insert(IG_ENTITY)
     val resource =
       ResourceMetadataEntity(
@@ -93,7 +95,7 @@ internal class ImplementationGuideDatabaseTest {
   }
 
   @Test
-  fun resourcesReused() = runBlocking {
+  fun resourcesReused() = runTest {
     val igId1 = igDao.insert(IG_ENTITY)
     val igId2 = igDao.insert(IG_ENTITY.copy(version = "2.0.0"))
     val resource =

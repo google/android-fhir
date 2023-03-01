@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
@@ -80,11 +79,12 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
   }
 
   private fun addQuestionnaireFragment() {
-    val fragment = QuestionnaireFragment()
-    fragment.arguments =
-      bundleOf(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to viewModel.questionnaire)
     childFragmentManager.commit {
-      add(R.id.add_patient_container, fragment, QUESTIONNAIRE_FRAGMENT_TAG)
+      add(
+        R.id.add_patient_container,
+        QuestionnaireFragment.builder().setQuestionnaire(viewModel.questionnaire).build(),
+        QUESTIONNAIRE_FRAGMENT_TAG
+      )
     }
   }
 
