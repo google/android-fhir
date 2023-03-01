@@ -22,14 +22,14 @@ import android.view.View.VISIBLE
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.headerViewVisibility
+import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.headerViewVisibility
-import com.google.android.fhir.datacapture.views.updateQuestionText
-import com.google.android.fhir.datacapture.views.updateTextAndVisibility
 import com.google.android.material.divider.MaterialDivider
 import org.hl7.fhir.r4.model.Questionnaire
 
@@ -65,7 +65,9 @@ internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
         prefix.updateTextAndVisibility(
           questionnaireViewItem.questionnaireItem.localizedPrefixSpanned
         )
-        updateQuestionText(question, questionnaireViewItem.questionnaireItem)
+        question.updateTextAndVisibility(
+          questionnaireViewItem.questionnaireItem.localizedTextSpanned
+        )
         hint.updateTextAndVisibility(
           questionnaireViewItem.questionnaireItem.localizedInstructionsSpanned
         )
@@ -82,7 +84,6 @@ internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
             }
           text = localizedFlyoverSpanned
         }
-
         when (questionnaireViewItem.questionnaireItem.type) {
           Questionnaire.QuestionnaireItemType.GROUP,
           Questionnaire.QuestionnaireItemType.DISPLAY -> {
@@ -91,6 +92,7 @@ internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
           }
           else -> {
             answerView.text = questionnaireViewItem.answerString(answerView.context)
+            answerView.visibility = VISIBLE
             if (questionnaireViewItem.validationResult is Invalid) {
               errorView.findViewById<TextView>(R.id.error_text_view).text =
                 questionnaireViewItem.validationResult.getSingleStringValidationMessage()
@@ -111,19 +113,6 @@ internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
           } else {
             GONE
           }
-      }
-
-      private fun showAnswerView(questionnaireItemViewItem: QuestionnaireViewItem) {
-        errorView.visibility = GONE
-        answerView.visibility = VISIBLE
-        answerView.text = questionnaireItemViewItem.answerString(answerView.context)
-      }
-
-      private fun showNotAnsweredView(questionnaireItemViewItem: QuestionnaireViewItem) {
-        answerView.visibility = GONE
-        errorView.visibility = VISIBLE
-        errorView.findViewById<TextView>(R.id.error_text_view).text =
-          questionnaireItemViewItem.answerString(answerView.context)
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {}

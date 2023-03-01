@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir.datacapture.extensions
 
-import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -24,23 +23,8 @@ import android.widget.Button
 import android.widget.TextView
 import com.google.android.fhir.datacapture.hasHelpButton
 import com.google.android.fhir.datacapture.localizedHelpSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.material.card.MaterialCardView
 import org.hl7.fhir.r4.model.Questionnaire
-
-/**
- * Updates textview [questionTextView] with
- * [Questionnaire.QuestionnaireItemComponent.localizedTextSpanned] text and `*` if
- * [Questionnaire.QuestionnaireItemComponent.required] is true.
- */
-internal fun updateQuestionText(
-  questionTextView: TextView,
-  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-) {
-  val builder = SpannableStringBuilder()
-  questionnaireItem.localizedTextSpanned?.let { builder.append(it) }
-  questionTextView.updateTextAndVisibility(builder)
-}
 
 internal fun TextView.updateTextAndVisibility(localizedText: Spanned? = null) {
   text = localizedText
