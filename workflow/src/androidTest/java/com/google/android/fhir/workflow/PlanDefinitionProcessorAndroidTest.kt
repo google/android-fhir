@@ -18,6 +18,7 @@ package com.google.android.fhir.workflow
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.workflow.testing.PlanDefinition
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -48,6 +49,7 @@ class PlanDefinitionProcessorAndroidTest {
       .isEqualsTo("/plan-definition/hello-world/hello-world-careplan.json")
 
   @Test
+  @Ignore("https://github.com/google/android-fhir/issues/1890")
   fun testOpioidRec10PatientView() =
     PlanDefinition.Assert.that(
         "opioidcds-10-patient-view",
