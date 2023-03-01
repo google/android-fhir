@@ -34,8 +34,7 @@ import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
-import com.google.android.fhir.datacapture.utilities.fhirPathEngine
-import com.google.android.fhir.datacapture.utilities.toCoding
+import com.google.android.fhir.datacapture.mapping.asExpectedType
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
@@ -51,9 +50,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
-import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -61,7 +58,6 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnsw
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.ValueSet
 import timber.log.Timber
 
@@ -522,12 +518,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             }
             .map {
               checkNotNull(it.second) { "The FHIRPath ${it.first} evaluated to null" }
-              when (val elementFromFhirPath = it.second!!) {
-                is Enumeration<*> -> it.first to elementFromFhirPath.toCoding().code
-                is IdType ->
-                  (it.first to "${elementFromFhirPath.resourceType}/${elementFromFhirPath.idPart}")
-                else -> it.first to (elementFromFhirPath as Type).asStringValue()
-              }
+              it.first to it.second!!.asExpectedType().asStringValue()
             }
             .fold(expression.expression) { acc: String, pair: Pair<String, String> ->
               acc.replace(pair.first, pair.second)

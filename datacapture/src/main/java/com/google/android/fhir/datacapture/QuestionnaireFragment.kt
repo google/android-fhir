@@ -299,6 +299,10 @@ class QuestionnaireFragment : Fragment() {
       args.add(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI to questionnaireResponseUri)
     }
 
+    fun setQuestionnaireResourceContext(questionnaireResourceContext: String) = apply {
+      args.add(EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING to questionnaireResourceContext)
+    }
+
     /**
      * An [Boolean] extra to control if the questionnaire is read-only. If review page and read-only
      * are both enabled, read-only will take precedence.

@@ -3108,7 +3108,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `resolveAnswerExpression() should return questionnaire item answer options for answer expression and choice column with x-fhir-query enhancement`() =
-    runBlocking {
+    runTest {
       val practitioner =
         Practitioner().apply {
           id = UUID.randomUUID().toString()
@@ -3210,7 +3210,7 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun `resolveAnswerExpression() should throw exception when x-fhir-query enhancement is invalid`() =
-    runBlocking {
+    runTest {
       val practitioner =
         Practitioner().apply {
           id = UUID.randomUUID().toString()
@@ -3255,12 +3255,16 @@ class QuestionnaireViewModelTest {
       )
 
       val viewModel = QuestionnaireViewModel(context, state)
-      val exception =
-        assertThrows(null, IllegalStateException::class.java) {
-          runBlocking { viewModel.resolveAnswerExpression(questionnaire.itemFirstRep) }
-        }
-      assertThat(exception.message)
-        .isEqualTo("The FHIRPath {{Practitioner.name.bamily}} evaluated to null")
+
+      viewModel.runViewModelBlocking {
+        val exception =
+          assertFailsWith<IllegalStateException> {
+              viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
+            }
+            .localizedMessage
+        assertThat(exception)
+          .isEqualTo("The FHIRPath {{Practitioner.name.bamily}} evaluated to null")
+      }
     }
 
   @Test

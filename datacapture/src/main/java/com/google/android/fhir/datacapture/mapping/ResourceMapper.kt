@@ -757,7 +757,7 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
  * objects and throws exception otherwise. This extension function takes care of the conversion
  * based on the input and expected [Type].
  */
-private fun Base.asExpectedType(): Type {
+internal fun Base.asExpectedType(): Type {
   return when (this) {
     is Enumeration<*> -> toCoding()
     is IdType -> StringType(idPart)
