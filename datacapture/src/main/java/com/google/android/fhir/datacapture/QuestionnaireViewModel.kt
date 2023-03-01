@@ -94,18 +94,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
-  //
-  //  /**
-  //   * True if the user has tapped the next/previous pagination buttons on the current page. This
-  // is
-  //   * needed to avoid spewing validation errors before any questions are answered.
-  //   */
-  //  private var isPaginationButtonPressed = false
-  //
-  //  /** Forces response validation each time [getQuestionnaireAdapterItems] is called. */
-  //  private var hasPressedSubmitButton = false
-  //
-  //  private var hasPressedReviewButton = false
 
   init {
     when {

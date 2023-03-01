@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -62,12 +61,6 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        Log.d(
-          "REVIEW",
-          (questionnaireItemViewItem.validationResult as? Invalid)
-            ?.getSingleStringValidationMessage()
-            ?: ""
-        )
         prefix.updateTextAndVisibility(
           questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
         )
@@ -96,11 +89,6 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
             answerView.visibility = GONE
           }
           else -> {
-            //            if (questionnaireItemViewItem.hasAnswer) {
-            //              showAnswerView(questionnaireItemViewItem)
-            //            } else {
-            //              showNotAnsweredView(questionnaireItemViewItem)
-            //            }
             answerView.text = questionnaireItemViewItem.answerString(answerView.context)
             if (questionnaireItemViewItem.validationResult is Invalid) {
               errorView.findViewById<TextView>(R.id.error_text_view).text =
