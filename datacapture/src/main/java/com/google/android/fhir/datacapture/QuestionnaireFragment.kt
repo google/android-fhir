@@ -108,7 +108,10 @@ open class QuestionnaireFragment : Fragment() {
     reviewModeEditButton.setOnClickListener { viewModel.setReviewMode(false) }
 
     val reviewModeButton = view.findViewById<View>(R.id.review_mode_button)
-    reviewModeButton.setOnClickListener { viewModel.setReviewMode(true) }
+    reviewModeButton.setOnClickListener {
+      viewModel.setReviewMode(true)
+      viewModel.validateQuestionnaireAndUpdateUI()
+    }
 
     questionnaireEditRecyclerView.adapter = questionnaireItemEditAdapter
     val linearLayoutManager = LinearLayoutManager(view.context)

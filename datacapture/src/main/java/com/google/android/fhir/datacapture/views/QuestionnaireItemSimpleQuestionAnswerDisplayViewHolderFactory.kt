@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -25,6 +26,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.divider.MaterialDivider
 import org.hl7.fhir.r4.model.Questionnaire
@@ -39,7 +41,7 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var flyOverTextView: TextView
-      private lateinit var notAnsweredView: View
+      private lateinit var errorView: View
       private lateinit var answerView: TextView
       private lateinit var divider: MaterialDivider
       private lateinit var prefix: TextView
@@ -55,11 +57,17 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
         prefix = itemView.findViewById(R.id.prefix)
         question = itemView.findViewById(R.id.question)
         hint = itemView.findViewById(R.id.hint)
-        notAnsweredView = itemView.findViewById(R.id.not_answered_view)
+        errorView = itemView.findViewById(R.id.error_view)
         answerView = itemView.findViewById(R.id.answer_text_view)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        Log.d(
+          "REVIEW",
+          (questionnaireItemViewItem.validationResult as? Invalid)
+            ?.getSingleStringValidationMessage()
+            ?: ""
+        )
         prefix.updateTextAndVisibility(
           questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
         )
@@ -84,14 +92,22 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
         when (questionnaireItemViewItem.questionnaireItem.type) {
           Questionnaire.QuestionnaireItemType.GROUP,
           Questionnaire.QuestionnaireItemType.DISPLAY -> {
-            notAnsweredView.visibility = GONE
+            errorView.visibility = GONE
             answerView.visibility = GONE
           }
           else -> {
-            if (questionnaireItemViewItem.hasAnswer) {
-              showAnswerView(questionnaireItemViewItem)
+            //            if (questionnaireItemViewItem.hasAnswer) {
+            //              showAnswerView(questionnaireItemViewItem)
+            //            } else {
+            //              showNotAnsweredView(questionnaireItemViewItem)
+            //            }
+            answerView.text = questionnaireItemViewItem.answerString(answerView.context)
+            if (questionnaireItemViewItem.validationResult is Invalid) {
+              errorView.findViewById<TextView>(R.id.error_text_view).text =
+                questionnaireItemViewItem.validationResult.getSingleStringValidationMessage()
+              errorView.visibility = VISIBLE
             } else {
-              showNotAnsweredView(questionnaireItemViewItem)
+              errorView.visibility = GONE
             }
           }
         }
@@ -100,7 +116,7 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
           if (header.visibility == VISIBLE ||
               flyOverTextView.visibility == VISIBLE ||
               answerView.visibility == VISIBLE ||
-              notAnsweredView.visibility == VISIBLE
+              errorView.visibility == VISIBLE
           ) {
             VISIBLE
           } else {
@@ -109,15 +125,15 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
       }
 
       private fun showAnswerView(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        notAnsweredView.visibility = GONE
+        errorView.visibility = GONE
         answerView.visibility = VISIBLE
         answerView.text = questionnaireItemViewItem.answerString(answerView.context)
       }
 
       private fun showNotAnsweredView(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         answerView.visibility = GONE
-        notAnsweredView.visibility = VISIBLE
-        notAnsweredView.findViewById<TextView>(R.id.error_text_view).text =
+        errorView.visibility = VISIBLE
+        errorView.findViewById<TextView>(R.id.error_text_view).text =
           questionnaireItemViewItem.answerString(answerView.context)
       }
 

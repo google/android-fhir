@@ -311,7 +311,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.not_answered_view).visibility)
+    assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.error_view).visibility)
       .isEqualTo(View.VISIBLE)
   }
 
@@ -334,7 +334,7 @@ class QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.not_answered_view).visibility)
+    assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.error_view).visibility)
       .isEqualTo(View.GONE)
   }
 

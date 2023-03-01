@@ -94,6 +94,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
+  //
+  //  /**
+  //   * True if the user has tapped the next/previous pagination buttons on the current page. This
+  // is
+  //   * needed to avoid spewing validation errors before any questions are answered.
+  //   */
+  //  private var isPaginationButtonPressed = false
+  //
+  //  /** Forces response validation each time [getQuestionnaireAdapterItems] is called. */
+  //  private var hasPressedSubmitButton = false
+  //
+  //  private var hasPressedReviewButton = false
 
   init {
     when {
@@ -203,6 +215,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** Forces response validation each time [getQuestionnaireAdapterItems] is called. */
   private var hasPressedSubmitButton = false
 
+  private var hasPressedReviewButton = false
+
   /**
    * Map of [QuestionnaireResponseItemAnswerComponent] for
    * [Questionnaire.QuestionnaireItemComponent]s that are disabled now. The answers will be used to
@@ -303,6 +317,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .also { result ->
         if (result.values.flatten().filterIsInstance<Invalid>().isNotEmpty()) {
           hasPressedSubmitButton = true
+          hasPressedReviewButton = true
           modificationCount.update { it + 1 }
         }
       }
@@ -619,7 +634,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val validationResult =
       if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
           isPaginationButtonPressed ||
-          hasPressedSubmitButton
+          hasPressedSubmitButton ||
+          hasPressedReviewButton
       ) {
         QuestionnaireResponseItemValidator.validate(
           questionnaireItem,
