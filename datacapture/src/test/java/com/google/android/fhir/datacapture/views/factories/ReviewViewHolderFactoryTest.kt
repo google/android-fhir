@@ -30,7 +30,7 @@ import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_URL
 import com.google.android.fhir.datacapture.INSTRUCTIONS
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.divider.MaterialDivider
@@ -176,7 +176,7 @@ class ReviewViewHolderFactoryTest {
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).text)
       .isEqualTo(
         ApplicationProvider.getApplicationContext<Application>().getString(R.string.not_answered)
       )
@@ -304,15 +304,16 @@ class ReviewViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           linkId = "parent-question"
           type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          required = true
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
+        validationResult = Invalid(listOf("Missing answer for required field")),
         answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.error_view).visibility)
-      .isEqualTo(View.VISIBLE)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
+      .isEqualTo("Missing answer for required field")
   }
 
   @Test
