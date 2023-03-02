@@ -298,7 +298,50 @@ class ReviewViewHolderFactoryTest {
   }
 
   @Test
-  fun `shows not answered view if answer is not present`() {
+  fun `shows answer text if question is answered`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          required = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = BooleanType(true)
+            }
+          ),
+        validationResult = Valid,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).text)
+      .isEqualTo("Yes")
+  }
+
+  @Test
+  fun `shows default text if question is not answered`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          required = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = Invalid(listOf("Missing answer for required field")),
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).text)
+      .isEqualTo("Not Answered")
+  }
+
+  @Test
+  fun `shows an error text if required question is not answered`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -317,7 +360,7 @@ class ReviewViewHolderFactoryTest {
   }
 
   @Test
-  fun `does not show not answered view if answer is present`() {
+  fun `hides error view if answer is present`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
