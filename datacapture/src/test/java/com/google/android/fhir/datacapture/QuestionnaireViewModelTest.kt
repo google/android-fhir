@@ -63,7 +63,6 @@ import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
-import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
@@ -131,10 +130,14 @@ class QuestionnaireViewModelTest {
     ReflectionHelpers.setStaticField(DataCapture::class.java, "configuration", null)
   }
 
-  // Test cases for initialization
+  // ==================================================================== //
+  //                                                                      //
+  //             Initialization without Questionnaire Response            //
+  //                                                                      //
+  // ==================================================================== //
 
   @Test
-  fun `init should throw an exception if no questionnaire is provided`() {
+  fun `should throw an exception if no questionnaire is provided`() {
     val errorMessage =
       assertFailsWith<IllegalStateException> { QuestionnaireViewModel(context, state) }
         .localizedMessage
@@ -429,6 +432,12 @@ class QuestionnaireViewModelTest {
       )
   }
 
+  // ==================================================================== //
+  //                                                                      //
+  //              Initialization with Questionnaire Response              //
+  //                                                                      //
+  // ==================================================================== //
+
   @Test
   fun `should not throw exception for matching URL`() {
     val questionnaire =
@@ -488,6 +497,54 @@ class QuestionnaireViewModelTest {
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-different-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> {
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo("Missing questionnaire item for questionnaire response item a-different-link-id")
+  }
+
+  @Test
+  fun `should throw an exception for extra questionnaire response items`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-different-link-id"
@@ -807,541 +864,11 @@ class QuestionnaireViewModelTest {
     createQuestionnaireViewModel(questionnaire, questionnaireResponse)
   }
 
-  @Test
-  fun stateHasQuestionnaireResponse_moreItemsInQuestionnaireResponse_shouldThrowError() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
-        )
-      }
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        id = "a-questionnaire-response"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
-          }
-        )
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-different-link-id"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
-          }
-        )
-      }
-
-    val errorMessage =
-      assertFailsWith<IllegalArgumentException> {
-          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-        }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo("Missing questionnaire item for questionnaire response item a-different-link-id")
-  }
-
-  // Test cases for getQuestionnaireResponse function
-
-  @Test
-  fun `getQuestionnaireResponse() should copy question text`() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addInitial(
-              Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(false) }
-            )
-          }
-        )
-      }
-    val viewModel = createQuestionnaireViewModel(questionnaire)
-
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(false)
-              }
-            )
-          }
-        )
-      }
-    )
-  }
-
-  @Test
-  fun `getQuestionnaireResponse() should copy translated question text`() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            textElement.apply {
-              addExtension(
-                Extension(ToolingExtensions.EXT_TRANSLATION).apply {
-                  addExtension(Extension("lang", StringType("en-US")))
-                  addExtension(Extension("content", StringType("Basic Question")))
-                }
-              )
-            }
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addInitial(
-              Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(false) }
-            )
-          }
-        )
-      }
-    val viewModel = createQuestionnaireViewModel(questionnaire)
-
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic Question"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(false)
-              }
-            )
-          }
-        )
-      }
-    )
-  }
-
-  @Test
-  fun `getQuestionnaireResponse() should copy question text for nested questions`() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.GROUP
-            addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "a.1-link-id"
-                text = "Basic Nested question"
-                type = Questionnaire.QuestionnaireItemType.STRING
-                initial =
-                  mutableListOf(
-                    Questionnaire.QuestionnaireItemInitialComponent().apply {
-                      value = StringType("Test Value")
-                    }
-                  )
-              }
-            )
-          }
-        )
-      }
-    val viewModel = createQuestionnaireViewModel(questionnaire)
-
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "a.1-link-id"
-                text = "Basic Nested question"
-                answer =
-                  listOf(
-                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                      value = StringType("Test Value")
-                    }
-                  )
-              }
-            )
-          }
-        )
-      }
-    )
-  }
-
-  @Test
-  fun `should return questionnaire response without disabled questions`() = runTest {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "question-1"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addInitial().apply { value = BooleanType(false) }
-          }
-        )
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "question-2"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addEnableWhen().apply {
-              answer = BooleanType(true)
-              question = "question-1"
-              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
-            }
-          }
-        )
-      }
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-
-    val viewModel = QuestionnaireViewModel(context, state)
-
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "question-1"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(false)
-              }
-            )
-          }
-        )
-      }
-    )
-  }
-
-  @Test
-  fun `should return questionnaire response with enabled questions`() = runTest {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "question-1"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addInitial().apply { value = BooleanType(true) }
-          }
-        )
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "question-2"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addEnableWhen().apply {
-              answer = BooleanType(true)
-              question = "question-1"
-              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
-            }
-          }
-        )
-      }
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-
-    val viewModel = QuestionnaireViewModel(context, state)
-
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "question-1"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
-          }
-        )
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "question-2" }
-        )
-      }
-    )
-  }
-
-  @Test // https://github.com/google/android-fhir/issues/1664
-  fun `should skip disabled questions`() = runTest {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "question-1"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
-        )
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "question-2"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addEnableWhen().apply {
-              answer = BooleanType(true)
-              question = "question-1"
-              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
-            }
-          }
-        )
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "question-3"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addEnableWhen().apply {
-              answer = BooleanType(false)
-              question = "question-1"
-              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
-            }
-          }
-        )
-      }
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        id = "a-questionnaire-response"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "question-1"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(false)
-              }
-            )
-          }
-        )
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "question-3"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
-          }
-        )
-      }
-    state.set(
-      EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
-      printer.encodeResourceToString(questionnaireResponse)
-    )
-
-    val viewModel = QuestionnaireViewModel(context, state)
-
-    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
-  }
-
-  @Test
-  fun `should disable all questions in a chain of dependent questions after top question is disabled`() =
-    runTest {
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "question-1"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            }
-          )
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "question-2"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              addEnableWhen().apply {
-                answer = BooleanType(true)
-                question = "question-1"
-                operator = Questionnaire.QuestionnaireItemOperator.EQUAL
-              }
-            }
-          )
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "question-3"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              addEnableWhen().apply {
-                answer = BooleanType(true)
-                question = "question-2"
-                operator = Questionnaire.QuestionnaireItemOperator.EQUAL
-              }
-            }
-          )
-        }
-
-      val questionnaireResponse =
-        QuestionnaireResponse().apply {
-          id = "a-questionnaire-response"
-          addItem(
-            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-              linkId = "question-1"
-              addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = BooleanType(true)
-                }
-              )
-            }
-          )
-          addItem(
-            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-              linkId = "question-2"
-              addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = BooleanType(true)
-                }
-              )
-            }
-          )
-          addItem(
-            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-              linkId = "question-3"
-              addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = BooleanType(true)
-                }
-              )
-            }
-          )
-        }
-
-      val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-
-      viewModel.runViewModelBlocking {
-        var items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
-        assertThat(items.map { it.questionnaireItem.linkId })
-          .containsExactly("question-1", "question-2", "question-3")
-
-        items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
-
-        items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
-        assertThat(items.map { it.questionnaireItem.linkId }).containsExactly("question-1")
-      }
-    }
-
-  @Test
-  fun `should restore previous state in a chain of dependent question items when item is disabled and enabled`() =
-    runTest {
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "question-1"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            }
-          )
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "question-2"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              addEnableWhen().apply {
-                answer = BooleanType(true)
-                question = "question-1"
-                operator = Questionnaire.QuestionnaireItemOperator.EQUAL
-              }
-            }
-          )
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "question-3"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              addEnableWhen().apply {
-                answer = BooleanType(true)
-                question = "question-2"
-                operator = Questionnaire.QuestionnaireItemOperator.EQUAL
-              }
-            }
-          )
-        }
-
-      val questionnaireResponse =
-        QuestionnaireResponse().apply {
-          id = "a-questionnaire-response"
-          addItem(
-            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-              linkId = "question-1"
-              addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = BooleanType(true)
-                }
-              )
-            }
-          )
-          addItem(
-            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-              linkId = "question-2"
-              addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = BooleanType(true)
-                }
-              )
-            }
-          )
-          addItem(
-            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-              linkId = "question-3"
-              addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = BooleanType(true)
-                }
-              )
-            }
-          )
-        }
-
-      val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-
-      viewModel.runViewModelBlocking {
-        val items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
-        // Clearing the answer disables question-2 that in turn disables question-3.
-        items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
-
-        assertResourceEquals(
-          viewModel.getQuestionnaireResponse(),
-          QuestionnaireResponse().apply {
-            id = "a-questionnaire-response"
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "question-1"
-              }
-            )
-          }
-        )
-
-        // Setting the answer of  "question-1" to true should enable question-2 that in turn enables
-        // question-3 and restore their previous states.
-        items
-          .first { it.questionnaireItem.linkId == "question-1" }
-          .setAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = BooleanType(true)
-            }
-          )
-
-        assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
-      }
-    }
-
-  // Test cases for state flow
+  // ==================================================================== //
+  //                                                                      //
+  //                       Questionnaire State Flow                       //
+  //                                                                      //
+  // ==================================================================== //
 
   @Test
   fun `should emit questionnaire state flow`() = runTest {
@@ -1381,7 +908,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should emit questionnaire state flow without initial validation`() = runTest {
+  fun `should not validate answers before modification by user`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1401,7 +928,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should emit questionnaire state flow with validation for modified items`() = runTest {
+  fun `should validate answers after modification by user`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1428,7 +955,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should emit questionnaire state flow without disabled questions`() = runTest {
+  fun `should skip disabled questions`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1460,7 +987,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should emit questionnaire state flow with enabled questions`() = runTest {
+  fun `should include enabled questions`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1495,7 +1022,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should emit questionnaire state flow without hidden questions`() = runTest {
+  fun `should skip hidden questions`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1518,7 +1045,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should emit questionnaire state flow with non-hidden questions`() = runTest {
+  fun `should include non-hidden questions`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1545,447 +1072,74 @@ class QuestionnaireViewModelTest {
       .isEqualTo("a-boolean-item-1")
   }
 
+  // ==================================================================== //
+  //                                                                      //
+  //                              Pagination                              //
+  //                                                                      //
+  // ==================================================================== //
+
   @Test
-  fun `should emit questionnaire state flow with hidden extension without valid value`() = runTest {
+  fun `should show current page`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-boolean-item-1"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addExtension().apply {
-              url = EXTENSION_HIDDEN_URL
-              setValue(IntegerType(1))
-            }
-            addInitial().apply { value = BooleanType(true) }
-          }
-        )
-      }
-    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
-
-    val viewModel = QuestionnaireViewModel(context, state)
-
-    assertThat(
-        viewModel.getQuestionnaireItemViewItemList().single().asQuestion().questionnaireItem.linkId
-      )
-      .isEqualTo("a-boolean-item-1")
-  }
-
-  // Test cases for user interaction
-
-  @Test
-  fun questionnaireHasNestedItem_ofTypeGroup_shouldNestItemWithinItem() = runTest {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-group-item"
-            text = "Group question"
+            linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
             addItem(
               Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "a-nested-item"
-                text = "Basic question"
+                linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 1"
               }
             )
           }
         )
-      }
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
         addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-group-item"
-            text = "Group question"
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
             addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "a-nested-item"
-                text = "Basic question"
-                addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    this.value = valueBooleanType.setValue(false)
-                  }
-                )
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 2"
               }
             )
           }
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-
-    viewModel
-      .getQuestionnaireItemViewItemList()[1]
-      .asQuestion()
-      .setAnswer(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          this.value = valueBooleanType.setValue(false)
-        }
+    val state = viewModel.questionnaireStateFlow.first()
+    assertThat((state.displayMode as DisplayMode.EditMode).pagination)
+      .isEqualTo(
+        QuestionnairePagination(
+          isPaginated = true,
+          pages =
+            listOf(
+              QuestionnairePage(0, enabled = true, hidden = false),
+              QuestionnairePage(1, enabled = true, hidden = false)
+            ),
+          currentPageIndex = 0
+        )
       )
-
-    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
-  }
-
-  @Test
-  fun questionnaireHasNestedItem_ofTypeRepeatedGroup_shouldNestMultipleItems() = runTest {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "repeated-group-a"
-            text = "Group question A"
-            type = Questionnaire.QuestionnaireItemType.GROUP
-            repeats = true
-            addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "nested-item-a"
-                text = "Basic question"
-                type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              }
-            )
-            addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "another-nested-item-a"
-                text = "Basic question"
-                type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              }
-            )
-          }
-        )
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "repeated-group-b"
-            text = "Group question B"
-            type = Questionnaire.QuestionnaireItemType.GROUP
-            repeats = true
-            addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "nested-item-b"
-                text = "Basic question"
-                type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              }
-            )
-            addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "another-nested-item-b"
-                text = "Basic question"
-                type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              }
-            )
-          }
-        )
-      }
-    val viewModel = createQuestionnaireViewModel(questionnaire)
-
-    fun repeatedGroupA() =
-      viewModel.getQuestionnaireItemViewItemList().single {
-        it.asQuestion().questionnaireItem.linkId == "repeated-group-a"
-      }
-
-    fun repeatedGroupB() =
-      viewModel.getQuestionnaireItemViewItemList().single {
-        it.asQuestion().questionnaireItem.linkId == "repeated-group-b"
-      }
-    viewModel.runViewModelBlocking {
-      // Calling addAnswer out of order should not result in the answers in the response being out
-      // of order; all of the answers to repeated-group-a should come before repeated-group-b.
-      repeat(times = 2) {
-        repeatedGroupA()
-          .asQuestion()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              item =
-                repeatedGroupA()
-                  .asQuestion()
-                  .questionnaireItem.getNestedQuestionnaireResponseItems()
-            }
-          )
-        repeatedGroupB()
-          .asQuestion()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              item =
-                repeatedGroupB()
-                  .asQuestion()
-                  .questionnaireItem.getNestedQuestionnaireResponseItems()
-            }
-          )
-      }
-
-      assertThat(
-          viewModel.getQuestionnaireItemViewItemList().map {
-            it.asQuestion().questionnaireItem.linkId
-          }
-        )
-        .containsExactly(
-          "repeated-group-a",
-          "nested-item-a",
-          "another-nested-item-a",
-          "nested-item-a",
-          "another-nested-item-a",
-          "repeated-group-b",
-          "nested-item-b",
-          "another-nested-item-b",
-          "nested-item-b",
-          "another-nested-item-b"
-        )
-        .inOrder()
-
-      assertResourceEquals(
-        actual = viewModel.getQuestionnaireResponse(),
-        expected =
-          QuestionnaireResponse().apply {
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "repeated-group-a"
-                text = "Group question A"
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "nested-item-a"
-                    text = "Basic question"
-                  }
-                )
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "another-nested-item-a"
-                    text = "Basic question"
-                  }
-                )
-              }
-            )
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "repeated-group-a"
-                text = "Group question A"
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "nested-item-a"
-                    text = "Basic question"
-                  }
-                )
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "another-nested-item-a"
-                    text = "Basic question"
-                  }
-                )
-              }
-            )
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "repeated-group-b"
-                text = "Group question B"
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "nested-item-b"
-                    text = "Basic question"
-                  }
-                )
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "another-nested-item-b"
-                    text = "Basic question"
-                  }
-                )
-              }
-            )
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "repeated-group-b"
-                text = "Group question B"
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "nested-item-b"
-                    text = "Basic question"
-                  }
-                )
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "another-nested-item-b"
-                    text = "Basic question"
-                  }
-                )
-              }
-            )
-          }
-      )
+    assertThat(state.items).hasSize(2)
+    state.items[0].asQuestion().questionnaireItem.let { groupItem ->
+      assertThat(groupItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.GROUP)
+      assertThat(groupItem.linkId).isEqualTo("page1")
+    }
+    state.items[1].asQuestion().questionnaireItem.let { questionItem ->
+      assertThat(questionItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.BOOLEAN)
+      assertThat(questionItem.linkId).isEqualTo("page1-1")
+      assertThat(questionItem.text).isEqualTo("Question on page 1")
     }
   }
 
   @Test
-  fun questionnaireHasNestedItem_notOfTypeGroup_shouldNestItemWithinAnswerItem() = runTest {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-boolean-item"
-            text = "Parent question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "a-nested-boolean-item"
-                text = "Nested question"
-                type = Questionnaire.QuestionnaireItemType.BOOLEAN
-                addItem(
-                  Questionnaire.QuestionnaireItemComponent().apply {
-                    linkId = "a-nested-nested-boolean-item"
-                    text = "Nested nested question"
-                    type = Questionnaire.QuestionnaireItemType.BOOLEAN
-                  }
-                )
-              }
-            )
-          }
-        )
-      }
-
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-boolean-item"
-            text = "Parent question"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                this.value = valueBooleanType.setValue(false)
-                addItem(
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                    linkId = "a-nested-boolean-item"
-                    text = "Nested question"
-                    addAnswer(
-                      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                        this.value = valueBooleanType.setValue(false)
-                        addItem(
-                          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                            linkId = "a-nested-nested-boolean-item"
-                            text = "Nested nested question"
-                            addAnswer(
-                              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                                .apply { this.value = valueBooleanType.setValue(false) }
-                            )
-                          }
-                        )
-                      }
-                    )
-                  }
-                )
-              }
-            )
-          }
-        )
-      }
-
-    val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.runViewModelBlocking {
-      var items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
-      assertThat(items.map { it.questionnaireItem.linkId }).containsExactly("a-boolean-item")
-
-      items
-        .first()
-        .setAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            this.value = valueBooleanType.setValue(false)
-          }
-        )
-
-      items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
-      assertThat(items.map { it.questionnaireItem.linkId })
-        .containsExactly("a-boolean-item", "a-nested-boolean-item")
-
-      items
-        .last()
-        .setAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            this.value = valueBooleanType.setValue(false)
-          }
-        )
-
-      items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
-      assertThat(items.map { it.questionnaireItem.linkId })
-        .containsExactly("a-boolean-item", "a-nested-boolean-item", "a-nested-nested-boolean-item")
-
-      items
-        .last()
-        .setAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            this.value = valueBooleanType.setValue(false)
-          }
-        )
-
-      assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
-    }
-  }
-
-  // Test cases for pagination and navigation
-
-  @Test
-  fun `should show questionnaire items in the active page in a paginated questionnaire`() =
-    runTest {
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "page1"
-              type = Questionnaire.QuestionnaireItemType.GROUP
-              addExtension(paginationExtension)
-              addItem(
-                Questionnaire.QuestionnaireItemComponent().apply {
-                  linkId = "page1-1"
-                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
-                  text = "Question on page 1"
-                }
-              )
-            }
-          )
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "page2"
-              type = Questionnaire.QuestionnaireItemType.GROUP
-              addExtension(paginationExtension)
-              addItem(
-                Questionnaire.QuestionnaireItemComponent().apply {
-                  linkId = "page2-1"
-                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
-                  text = "Question on page 2"
-                }
-              )
-            }
-          )
-        }
-      val viewModel = createQuestionnaireViewModel(questionnaire)
-      val state = viewModel.questionnaireStateFlow.first()
-      assertThat((state.displayMode as DisplayMode.EditMode).pagination)
-        .isEqualTo(
-          QuestionnairePagination(
-            isPaginated = true,
-            pages =
-              listOf(
-                QuestionnairePage(0, enabled = true, hidden = false),
-                QuestionnairePage(1, enabled = true, hidden = false)
-              ),
-            currentPageIndex = 0
-          )
-        )
-      assertThat(state.items).hasSize(2)
-      state.items[0].asQuestion().questionnaireItem.let { groupItem ->
-        assertThat(groupItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.GROUP)
-        assertThat(groupItem.linkId).isEqualTo("page1")
-      }
-      state.items[1].asQuestion().questionnaireItem.let { questionItem ->
-        assertThat(questionItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.BOOLEAN)
-        assertThat(questionItem.linkId).isEqualTo("page1-1")
-        assertThat(questionItem.text).isEqualTo("Question on page 1")
-      }
-    }
-
-  @Test
-  fun `should go to next page in a paginated questionnaire`() = runTest {
+  fun `should go to next page`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -2041,7 +1195,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should go to previous page in a paginated questionnaire`() = runTest {
+  fun `should go to previous page`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -2097,7 +1251,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should skip disabled page in a paginated questionnaire`() = runTest {
+  fun `should skip disabled pages`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -2172,7 +1326,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should skip first page if it is hidden in a paginated questionnaire`() = runTest {
+  fun `should skip first page if it is hidden`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -2241,7 +1395,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should skip hidden page in a paginated questionnaire`() = runTest {
+  fun `should skip hidden pages`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -2311,8 +1465,14 @@ class QuestionnaireViewModelTest {
     }
   }
 
+  // ==================================================================== //
+  //                                                                      //
+  //                             Entry Modes                              //
+  //                                                                      //
+  // ==================================================================== //
+
   @Test
-  fun `should allow user to move forward using prior entry-mode`() = runTest {
+  fun `should allow user to move forward in prior-edit entry-mode`() = runTest {
     val entryModeExtension =
       Extension().apply {
         url = EXTENSION_ENTRY_MODE_URL
@@ -2370,7 +1530,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should allow user to move forward and back using prior entry-mode`() = runTest {
+  fun `should allow user to move forward and back in prior-edit entry-mode`() = runTest {
     val entryModeExtension =
       Extension().apply {
         url = EXTENSION_ENTRY_MODE_URL
@@ -2429,7 +1589,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should not allow user to move forward using prior entry-mode`() = runTest {
+  fun `should not allow user to move forward in prior-edit entry-mode`() = runTest {
     val entryModeExtension =
       Extension().apply {
         url = EXTENSION_ENTRY_MODE_URL
@@ -2484,7 +1644,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should allow user to move forward using random entry-mode`() = runTest {
+  fun `should allow user to move forward in random entry-mode`() = runTest {
     val entryModeExtension =
       Extension().apply {
         url = EXTENSION_ENTRY_MODE_URL
@@ -2531,7 +1691,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should allow user to move forward and back using random entry-mode`() = runTest {
+  fun `should allow user to move forward and back in random entry-mode`() = runTest {
     val entryModeExtension =
       Extension().apply {
         url = EXTENSION_ENTRY_MODE_URL
@@ -2662,7 +1822,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should allow user to move forward only using sequential entry-mode`() = runTest {
+  fun `should allow user to move forward only in sequential entry-mode`() = runTest {
     val entryModeExtension =
       Extension().apply {
         url = EXTENSION_ENTRY_MODE_URL
@@ -2705,7 +1865,6 @@ class QuestionnaireViewModelTest {
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
 
-      assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
       assertThat(
           (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
         )
@@ -2776,7 +1935,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should not allow user to move backward only using sequential entry-mode`() = runTest {
+  fun `should not allow user to move backward only in sequential entry-mode`() = runTest {
     val entryModeExtension =
       Extension().apply {
         url = EXTENSION_ENTRY_MODE_URL
@@ -2834,430 +1993,11 @@ class QuestionnaireViewModelTest {
     }
   }
 
-  // Test cases for answer value set
-
-  @Test
-  fun questionnaire_resolveContainedAnswerValueSet() = runTest {
-    val valueSetId = "yesnodontknow"
-    val questionnaire =
-      Questionnaire().apply {
-        addContained(
-          ValueSet().apply {
-            id = valueSetId
-            expansion =
-              ValueSet.ValueSetExpansionComponent().apply {
-                addContains(
-                  ValueSet.ValueSetExpansionContainsComponent().apply {
-                    system = CODE_SYSTEM_YES_NO
-                    code = "Y"
-                    display = "Yes"
-                  }
-                )
-
-                addContains(
-                  ValueSet.ValueSetExpansionContainsComponent().apply {
-                    system = CODE_SYSTEM_YES_NO
-                    code = "N"
-                    display = "No"
-                  }
-                )
-
-                addContains(
-                  ValueSet.ValueSetExpansionContainsComponent().apply {
-                    system = CODE_SYSTEM_YES_NO
-                    code = "asked-unknown"
-                    display = "Don't Know"
-                  }
-                )
-              }
-          }
-        )
-      }
-
-    val viewModel = createQuestionnaireViewModel(questionnaire)
-    val codeSet = viewModel.resolveAnswerValueSet("#$valueSetId")
-
-    assertThat(codeSet.map { it.valueCoding.display })
-      .containsExactly("Yes", "No", "Don't Know")
-      .inOrder()
-  }
-
-  @Test
-  fun questionnaire_resolveAnswerValueSetExternalResolved() = runTest {
-    val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
-
-    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
-      .dataCaptureConfiguration =
-      DataCaptureConfig(
-        valueSetResolverExternal =
-          object : ExternalAnswerValueSetResolver {
-            override suspend fun resolve(uri: String): List<Coding> {
-
-              return if (uri == CODE_SYSTEM_YES_NO)
-                listOf(
-                  Coding().apply {
-                    system = CODE_SYSTEM_YES_NO
-                    code = "Y"
-                    display = "Yes"
-                  },
-                  Coding().apply {
-                    system = CODE_SYSTEM_YES_NO
-                    code = "N"
-                    display = "No"
-                  },
-                  Coding().apply {
-                    system = CODE_SYSTEM_YES_NO
-                    code = "asked-unknown"
-                    display = "Don't Know"
-                  }
-                )
-              else emptyList()
-            }
-          }
-      )
-
-    val viewModel = createQuestionnaireViewModel(questionnaire)
-    val codeSet = viewModel.resolveAnswerValueSet(CODE_SYSTEM_YES_NO)
-    assertThat(codeSet.map { it.valueCoding.display })
-      .containsExactly("Yes", "No", "Don't Know")
-      .inOrder()
-  }
-
-  // Test cases for nested display items
-
-  @Test
-  fun nestedDisplayItem_parentQuestionItemIsGroup_createQuestionnaireStateItem() = runTest {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "parent-question"
-            text = "parent question text"
-            type = Questionnaire.QuestionnaireItemType.GROUP
-            item =
-              listOf(
-                Questionnaire.QuestionnaireItemComponent().apply {
-                  linkId = "nested-display-question"
-                  text = "subtitle text"
-                  type = Questionnaire.QuestionnaireItemType.DISPLAY
-                }
-              )
-          }
-        )
-      }
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-
-    val viewModel = QuestionnaireViewModel(context, state)
-
-    assertThat(
-        viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
-      )
-      .isEqualTo("nested-display-question")
-  }
-
-  @Test
-  fun `nested display item with instructions code should not be created as questionnaire state item`() =
-    runTest {
-      val displayCategoryExtension =
-        Extension().apply {
-          url = EXTENSION_DISPLAY_CATEGORY_URL
-          setValue(
-            CodeableConcept().apply {
-              coding =
-                listOf(
-                  Coding().apply {
-                    code = INSTRUCTIONS
-                    system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-                  }
-                )
-            }
-          )
-        }
-
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "parent-question"
-              text = "parent question text"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              item =
-                listOf(
-                  Questionnaire.QuestionnaireItemComponent().apply {
-                    linkId = "nested-display-question"
-                    text = "subtitle text"
-                    type = Questionnaire.QuestionnaireItemType.DISPLAY
-                    extension = listOf(displayCategoryExtension)
-                  }
-                )
-            }
-          )
-        }
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-
-      val viewModel = QuestionnaireViewModel(context, state)
-
-      assertThat(
-          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
-        )
-        .isEqualTo("parent-question")
-    }
-
-  @Test
-  fun `nested display item with flyover code should not be created as questionnaire state item`() =
-    runTest {
-      val itemControlExtensionWithFlyOverCode =
-        Extension().apply {
-          url = EXTENSION_ITEM_CONTROL_URL
-          setValue(
-            CodeableConcept().apply {
-              coding =
-                listOf(
-                  Coding().apply {
-                    code = "flyover"
-                    system = EXTENSION_ITEM_CONTROL_SYSTEM
-                  }
-                )
-            }
-          )
-        }
-
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "parent-question"
-              text = "parent question text"
-              type = Questionnaire.QuestionnaireItemType.STRING
-              item =
-                listOf(
-                  Questionnaire.QuestionnaireItemComponent().apply {
-                    linkId = "nested-display-question"
-                    text = "flyover text"
-                    type = Questionnaire.QuestionnaireItemType.DISPLAY
-                    extension = listOf(itemControlExtensionWithFlyOverCode)
-                  }
-                )
-            }
-          )
-        }
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-
-      val viewModel = QuestionnaireViewModel(context, state)
-
-      assertThat(
-          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
-        )
-        .isEqualTo("parent-question")
-    }
-
-  @Test
-  fun `nested display item with help code should not be created as questionnaire state item`() =
-    runTest {
-      val itemControlExtensionWithHelpCode =
-        Extension().apply {
-          url = EXTENSION_ITEM_CONTROL_URL
-          setValue(
-            CodeableConcept().apply {
-              coding =
-                listOf(
-                  Coding().apply {
-                    code = DisplayItemControlType.HELP.extensionCode
-                    system = EXTENSION_ITEM_CONTROL_SYSTEM
-                  }
-                )
-            }
-          )
-        }
-
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "parent-question"
-              text = "parent question text"
-              type = Questionnaire.QuestionnaireItemType.STRING
-              item =
-                listOf(
-                  Questionnaire.QuestionnaireItemComponent().apply {
-                    linkId = "nested-display-question"
-                    text = "help description"
-                    type = Questionnaire.QuestionnaireItemType.DISPLAY
-                    extension = listOf(itemControlExtensionWithHelpCode)
-                  }
-                )
-            }
-          )
-        }
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-
-      val viewModel = QuestionnaireViewModel(context, state)
-
-      assertThat(
-          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
-        )
-        .isEqualTo("parent-question")
-    }
-
-  // Test cases for expressions
-
-  @Test
-  fun `resolveAnswerExpression() should return questionnaire item answer options for answer expression and choice column`() =
-    runTest {
-      val practitioner =
-        Practitioner().apply {
-          id = UUID.randomUUID().toString()
-          active = true
-          addName(HumanName().apply { this.family = "John" })
-        }
-      ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
-        .dataCaptureConfiguration = DataCaptureConfig(xFhirQueryResolver = { listOf(practitioner) })
-
-      val questionnaire =
-        Questionnaire().apply {
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "a"
-              text = "answer expression question text"
-              type = Questionnaire.QuestionnaireItemType.REFERENCE
-              extension =
-                listOf(
-                  Extension(
-                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
-                    Expression().apply {
-                      this.expression = "Practitioner?active=true"
-                      this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
-                    }
-                  ),
-                  Extension(
-                      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
-                    )
-                    .apply {
-                      this.addExtension(Extension("path", StringType("id")))
-                      this.addExtension(Extension("label", StringType("name")))
-                      this.addExtension(Extension("forDisplay", BooleanType(true)))
-                    }
-                )
-            }
-          )
-        }
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-
-      val viewModel = QuestionnaireViewModel(context, state)
-      val answerOptions = viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
-
-      assertThat(answerOptions.first().valueReference.reference)
-        .isEqualTo("Practitioner/${practitioner.logicalId}")
-    }
-
-  @Test
-  fun `resolveAnswerExpression() should throw exception when XFhirQueryResolver is not provided`() {
-    val questionnaire =
-      Questionnaire().apply {
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a"
-            text = "answer expression question text"
-            type = Questionnaire.QuestionnaireItemType.REFERENCE
-            extension =
-              listOf(
-                Extension(
-                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
-                  Expression().apply {
-                    this.expression = "Practitioner?active=true"
-                    this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
-                  }
-                ),
-                Extension(
-                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
-                  )
-                  .apply {
-                    this.addExtension(Extension("path", StringType("id")))
-                    this.addExtension(Extension("label", StringType("name")))
-                    this.addExtension(Extension("forDisplay", BooleanType(true)))
-                  }
-              )
-          }
-        )
-      }
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-    val viewModel = QuestionnaireViewModel(context, state)
-    val exception =
-      assertThrows(null, IllegalStateException::class.java) {
-        runTest { viewModel.resolveAnswerExpression(questionnaire.itemFirstRep) }
-      }
-    assertThat(exception.message)
-      .isEqualTo(
-        "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
-      )
-  }
-  // Test cases for submit button
-
-  @Test
-  fun `EXTRA_SHOW_SUBMIT_BUTTON set to false should not show submit button`() = runTest {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
-        )
-      }
-    val viewModel = createQuestionnaireViewModel(questionnaire, showSubmitButton = false)
-    assertThat(
-        (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
-          .pagination.showSubmitButton
-      )
-      .isFalse()
-  }
-
-  @Test
-  fun `EXTRA_SHOW_SUBMIT_BUTTON set to true should show submit button`() = runTest {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
-        )
-      }
-    val viewModel = createQuestionnaireViewModel(questionnaire, showSubmitButton = true)
-    assertThat(
-        (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
-          .pagination.showSubmitButton
-      )
-      .isTrue()
-  }
-
-  @Test
-  fun `EXTRA_SHOW_SUBMIT_BUTTON not setting should show submit button`() = runTest {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
-        )
-      }
-    val viewModel = createQuestionnaireViewModel(questionnaire, showSubmitButton = null)
-    assertThat(
-        (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
-          .pagination.showSubmitButton
-      )
-      .isTrue()
-  }
-
-  // Test cases for review mode
+  // ==================================================================== //
+  //                                                                      //
+  //                             Review Mode                              //
+  //                                                                      //
+  // ==================================================================== //
 
   @Test
   fun `state has review feature and submit button to true should move to review page`() {
@@ -3614,7 +2354,11 @@ class QuestionnaireViewModelTest {
     }
   }
 
-  // Read-only mode
+  // ==================================================================== //
+  //                                                                      //
+  //                            Read-only Mode                            //
+  //                                                                      //
+  // ==================================================================== //
 
   @Test
   fun `read-only mode should not show edit button`() {
@@ -3639,7 +2383,1109 @@ class QuestionnaireViewModelTest {
     }
   }
 
-  // Other test cases
+  // ==================================================================== //
+  //                                                                      //
+  //                            Submit Button                             //
+  //                                                                      //
+  // ==================================================================== //
+
+  @Test
+  fun `EXTRA_SHOW_SUBMIT_BUTTON set to false should not show submit button`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire, showSubmitButton = false)
+    assertThat(
+        (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+          .pagination.showSubmitButton
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun `EXTRA_SHOW_SUBMIT_BUTTON set to true should show submit button`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire, showSubmitButton = true)
+    assertThat(
+        (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+          .pagination.showSubmitButton
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun `EXTRA_SHOW_SUBMIT_BUTTON not setting should show submit button`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire, showSubmitButton = null)
+    assertThat(
+        (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+          .pagination.showSubmitButton
+      )
+      .isTrue()
+  }
+
+  // ==================================================================== //
+  //                                                                      //
+  //                        Questionnaire Response                        //
+  //                                                                      //
+  // ==================================================================== //
+
+  @Test
+  fun `getQuestionnaireResponse() should copy question text`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addInitial(
+              Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(false) }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun `getQuestionnaireResponse() should copy translated question text`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            textElement.apply {
+              addExtension(
+                Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                  addExtension(Extension("lang", StringType("en-US")))
+                  addExtension(Extension("content", StringType("Basic Question")))
+                }
+              )
+            }
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addInitial(
+              Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(false) }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic Question"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun `getQuestionnaireResponse() should copy question text for nested questions`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "a.1-link-id"
+                text = "Basic Nested question"
+                type = Questionnaire.QuestionnaireItemType.STRING
+                initial =
+                  mutableListOf(
+                    Questionnaire.QuestionnaireItemInitialComponent().apply {
+                      value = StringType("Test Value")
+                    }
+                  )
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "a.1-link-id"
+                text = "Basic Nested question"
+                answer =
+                  listOf(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = StringType("Test Value")
+                    }
+                  )
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun `getQuestionnaireResponse() should skip disabled questions`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addInitial().apply { value = BooleanType(false) }
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addEnableWhen().apply {
+              answer = BooleanType(true)
+              question = "question-1"
+              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+            }
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-1"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun `getQuestionnaireResponse() should include enabled questions`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addInitial().apply { value = BooleanType(true) }
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addEnableWhen().apply {
+              answer = BooleanType(true)
+              question = "question-1"
+              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+            }
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-1"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "question-2" }
+        )
+      }
+    )
+  }
+
+  @Test // https://github.com/google/android-fhir/issues/1664
+  fun `getQuestionnaireResponse() should skip questions without matching response`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addEnableWhen().apply {
+              answer = BooleanType(true)
+              question = "question-1"
+              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+            }
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "question-3"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addEnableWhen().apply {
+              answer = BooleanType(false)
+              question = "question-1"
+              operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+            }
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-1"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "question-3"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+      }
+    state.set(
+      EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
+      printer.encodeResourceToString(questionnaireResponse)
+    )
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+  }
+
+  @Test
+  fun `getQuestionnaireResponse() should disable all questions in a chain of dependent questions after top question is disabled`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "question-1"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "question-2"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              addEnableWhen().apply {
+                answer = BooleanType(true)
+                question = "question-1"
+                operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+              }
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "question-3"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              addEnableWhen().apply {
+                answer = BooleanType(true)
+                question = "question-2"
+                operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+              }
+            }
+          )
+        }
+
+      val questionnaireResponse =
+        QuestionnaireResponse().apply {
+          id = "a-questionnaire-response"
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "question-1"
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(true)
+                }
+              )
+            }
+          )
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "question-2"
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(true)
+                }
+              )
+            }
+          )
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "question-3"
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(true)
+                }
+              )
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+
+      viewModel.runViewModelBlocking {
+        var items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+        assertThat(items.map { it.questionnaireItem.linkId })
+          .containsExactly("question-1", "question-2", "question-3")
+
+        items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
+
+        items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+        assertThat(items.map { it.questionnaireItem.linkId }).containsExactly("question-1")
+      }
+    }
+
+  @Test
+  fun `should restore previous state in a chain of dependent question items when item is disabled and enabled`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "question-1"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "question-2"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              addEnableWhen().apply {
+                answer = BooleanType(true)
+                question = "question-1"
+                operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+              }
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "question-3"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              addEnableWhen().apply {
+                answer = BooleanType(true)
+                question = "question-2"
+                operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+              }
+            }
+          )
+        }
+
+      val questionnaireResponse =
+        QuestionnaireResponse().apply {
+          id = "a-questionnaire-response"
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "question-1"
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(true)
+                }
+              )
+            }
+          )
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "question-2"
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(true)
+                }
+              )
+            }
+          )
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "question-3"
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(true)
+                }
+              )
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+
+      viewModel.runViewModelBlocking {
+        val items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+        // Clearing the answer disables question-2 that in turn disables question-3.
+        items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
+
+        assertResourceEquals(
+          viewModel.getQuestionnaireResponse(),
+          QuestionnaireResponse().apply {
+            id = "a-questionnaire-response"
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "question-1"
+              }
+            )
+          }
+        )
+
+        // Setting the answer of  "question-1" to true should enable question-2 that in turn enables
+        // question-3 and restore their previous states.
+        items
+          .first { it.questionnaireItem.linkId == "question-1" }
+          .setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = BooleanType(true)
+            }
+          )
+
+        assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+      }
+    }
+
+  // ==================================================================== //
+  //                                                                      //
+  //               Questionnaire Response with Nested Items               //
+  //                                                                      //
+  // ==================================================================== //
+
+  @Test
+  fun questionnaireHasNestedItem_ofTypeGroup_shouldNestItemWithinItem() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-group-item"
+            text = "Group question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "a-nested-item"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-group-item"
+            text = "Group question"
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "a-nested-item"
+                text = "Basic question"
+                addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    this.value = valueBooleanType.setValue(false)
+                  }
+                )
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    viewModel
+      .getQuestionnaireItemViewItemList()[1]
+      .asQuestion()
+      .setAnswer(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          this.value = valueBooleanType.setValue(false)
+        }
+      )
+
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+  }
+
+  @Test
+  fun questionnaireHasNestedItem_ofTypeRepeatedGroup_shouldNestMultipleItems() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "repeated-group-a"
+            text = "Group question A"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            repeats = true
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-item-a"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "another-nested-item-a"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "repeated-group-b"
+            text = "Group question B"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            repeats = true
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-item-b"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "another-nested-item-b"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    fun repeatedGroupA() =
+      viewModel.getQuestionnaireItemViewItemList().single {
+        it.asQuestion().questionnaireItem.linkId == "repeated-group-a"
+      }
+
+    fun repeatedGroupB() =
+      viewModel.getQuestionnaireItemViewItemList().single {
+        it.asQuestion().questionnaireItem.linkId == "repeated-group-b"
+      }
+    viewModel.runViewModelBlocking {
+      // Calling addAnswer out of order should not result in the answers in the response being out
+      // of order; all of the answers to repeated-group-a should come before repeated-group-b.
+      repeat(times = 2) {
+        repeatedGroupA()
+          .asQuestion()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item =
+                repeatedGroupA()
+                  .asQuestion()
+                  .questionnaireItem.getNestedQuestionnaireResponseItems()
+            }
+          )
+        repeatedGroupB()
+          .asQuestion()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item =
+                repeatedGroupB()
+                  .asQuestion()
+                  .questionnaireItem.getNestedQuestionnaireResponseItems()
+            }
+          )
+      }
+
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList().map {
+            it.asQuestion().questionnaireItem.linkId
+          }
+        )
+        .containsExactly(
+          "repeated-group-a",
+          "nested-item-a",
+          "another-nested-item-a",
+          "nested-item-a",
+          "another-nested-item-a",
+          "repeated-group-b",
+          "nested-item-b",
+          "another-nested-item-b",
+          "nested-item-b",
+          "another-nested-item-b"
+        )
+        .inOrder()
+
+      assertResourceEquals(
+        actual = viewModel.getQuestionnaireResponse(),
+        expected =
+          QuestionnaireResponse().apply {
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "repeated-group-a"
+                text = "Group question A"
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-item-a"
+                    text = "Basic question"
+                  }
+                )
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "another-nested-item-a"
+                    text = "Basic question"
+                  }
+                )
+              }
+            )
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "repeated-group-a"
+                text = "Group question A"
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-item-a"
+                    text = "Basic question"
+                  }
+                )
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "another-nested-item-a"
+                    text = "Basic question"
+                  }
+                )
+              }
+            )
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "repeated-group-b"
+                text = "Group question B"
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-item-b"
+                    text = "Basic question"
+                  }
+                )
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "another-nested-item-b"
+                    text = "Basic question"
+                  }
+                )
+              }
+            )
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "repeated-group-b"
+                text = "Group question B"
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-item-b"
+                    text = "Basic question"
+                  }
+                )
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "another-nested-item-b"
+                    text = "Basic question"
+                  }
+                )
+              }
+            )
+          }
+      )
+    }
+  }
+
+  @Test
+  fun questionnaireHasNestedItem_notOfTypeGroup_shouldNestItemWithinAnswerItem() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-boolean-item"
+            text = "Parent question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "a-nested-boolean-item"
+                text = "Nested question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                addItem(
+                  Questionnaire.QuestionnaireItemComponent().apply {
+                    linkId = "a-nested-nested-boolean-item"
+                    text = "Nested nested question"
+                    type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  }
+                )
+              }
+            )
+          }
+        )
+      }
+
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-boolean-item"
+            text = "Parent question"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                this.value = valueBooleanType.setValue(false)
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "a-nested-boolean-item"
+                    text = "Nested question"
+                    addAnswer(
+                      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                        this.value = valueBooleanType.setValue(false)
+                        addItem(
+                          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                            linkId = "a-nested-nested-boolean-item"
+                            text = "Nested nested question"
+                            addAnswer(
+                              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                                .apply { this.value = valueBooleanType.setValue(false) }
+                            )
+                          }
+                        )
+                      }
+                    )
+                  }
+                )
+              }
+            )
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      var items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      assertThat(items.map { it.questionnaireItem.linkId }).containsExactly("a-boolean-item")
+
+      items
+        .first()
+        .setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            this.value = valueBooleanType.setValue(false)
+          }
+        )
+
+      items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      assertThat(items.map { it.questionnaireItem.linkId })
+        .containsExactly("a-boolean-item", "a-nested-boolean-item")
+
+      items
+        .last()
+        .setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            this.value = valueBooleanType.setValue(false)
+          }
+        )
+
+      items = viewModel.getQuestionnaireItemViewItemList().map { it.asQuestion() }
+      assertThat(items.map { it.questionnaireItem.linkId })
+        .containsExactly("a-boolean-item", "a-nested-boolean-item", "a-nested-nested-boolean-item")
+
+      items
+        .last()
+        .setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            this.value = valueBooleanType.setValue(false)
+          }
+        )
+
+      assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+    }
+  }
+
+  // ==================================================================== //
+  //                                                                      //
+  //                          Answer Value Sets                           //
+  //                                                                      //
+  // ==================================================================== //
+
+  @Test
+  fun questionnaire_resolveContainedAnswerValueSet() = runTest {
+    val valueSetId = "yesnodontknow"
+    val questionnaire =
+      Questionnaire().apply {
+        addContained(
+          ValueSet().apply {
+            id = valueSetId
+            expansion =
+              ValueSet.ValueSetExpansionComponent().apply {
+                addContains(
+                  ValueSet.ValueSetExpansionContainsComponent().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "Y"
+                    display = "Yes"
+                  }
+                )
+
+                addContains(
+                  ValueSet.ValueSetExpansionContainsComponent().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "N"
+                    display = "No"
+                  }
+                )
+
+                addContains(
+                  ValueSet.ValueSetExpansionContainsComponent().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "asked-unknown"
+                    display = "Don't Know"
+                  }
+                )
+              }
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val codeSet = viewModel.resolveAnswerValueSet("#$valueSetId")
+
+    assertThat(codeSet.map { it.valueCoding.display })
+      .containsExactly("Yes", "No", "Don't Know")
+      .inOrder()
+  }
+
+  @Test
+  fun questionnaire_resolveAnswerValueSetExternalResolved() = runTest {
+    val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
+
+    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+      .dataCaptureConfiguration =
+      DataCaptureConfig(
+        valueSetResolverExternal =
+          object : ExternalAnswerValueSetResolver {
+            override suspend fun resolve(uri: String): List<Coding> {
+
+              return if (uri == CODE_SYSTEM_YES_NO)
+                listOf(
+                  Coding().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "Y"
+                    display = "Yes"
+                  },
+                  Coding().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "N"
+                    display = "No"
+                  },
+                  Coding().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "asked-unknown"
+                    display = "Don't Know"
+                  }
+                )
+              else emptyList()
+            }
+          }
+      )
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val codeSet = viewModel.resolveAnswerValueSet(CODE_SYSTEM_YES_NO)
+    assertThat(codeSet.map { it.valueCoding.display })
+      .containsExactly("Yes", "No", "Don't Know")
+      .inOrder()
+  }
+
+  // ==================================================================== //
+  //                                                                      //
+  //                          Answer Expression                           //
+  //                                                                      //
+  // ==================================================================== //
+
+  @Test
+  fun `resolveAnswerExpression() should return questionnaire item answer options for answer expression and choice column`() =
+    runTest {
+      val practitioner =
+        Practitioner().apply {
+          id = UUID.randomUUID().toString()
+          active = true
+          addName(HumanName().apply { this.family = "John" })
+        }
+      ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+        .dataCaptureConfiguration = DataCaptureConfig(xFhirQueryResolver = { listOf(practitioner) })
+
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              text = "answer expression question text"
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              extension =
+                listOf(
+                  Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                    Expression().apply {
+                      this.expression = "Practitioner?active=true"
+                      this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                    }
+                  ),
+                  Extension(
+                      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
+                    )
+                    .apply {
+                      this.addExtension(Extension("path", StringType("id")))
+                      this.addExtension(Extension("label", StringType("name")))
+                      this.addExtension(Extension("forDisplay", BooleanType(true)))
+                    }
+                )
+            }
+          )
+        }
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+      val viewModel = QuestionnaireViewModel(context, state)
+      val answerOptions = viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
+
+      assertThat(answerOptions.first().valueReference.reference)
+        .isEqualTo("Practitioner/${practitioner.logicalId}")
+    }
+
+  @Test
+  fun `resolveAnswerExpression() should throw exception when XFhirQueryResolver is not provided`() {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a"
+            text = "answer expression question text"
+            type = Questionnaire.QuestionnaireItemType.REFERENCE
+            extension =
+              listOf(
+                Extension(
+                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                  Expression().apply {
+                    this.expression = "Practitioner?active=true"
+                    this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                  }
+                ),
+                Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
+                  )
+                  .apply {
+                    this.addExtension(Extension("path", StringType("id")))
+                    this.addExtension(Extension("label", StringType("name")))
+                    this.addExtension(Extension("forDisplay", BooleanType(true)))
+                  }
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    val viewModel = QuestionnaireViewModel(context, state)
+    val exception =
+      assertThrows(null, IllegalStateException::class.java) {
+        runTest { viewModel.resolveAnswerExpression(questionnaire.itemFirstRep) }
+      }
+    assertThat(exception.message)
+      .isEqualTo(
+        "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
+      )
+  }
+
+  // ==================================================================== //
+  //                                                                      //
+  //                        Calculated Expression                         //
+  //                                                                      //
+  // ==================================================================== //
 
   @Test
   fun `should calculate value on start for questionnaire item with calculated expression extension`() =
@@ -3956,6 +3802,196 @@ class QuestionnaireViewModelTest {
           "a-birthdate and a-age-years have cyclic dependency in expression based extension"
         )
     }
+
+  // ==================================================================== //
+  //                                                                      //
+  //                           Display Category                           //
+  //                                                                      //
+  // ==================================================================== //
+
+  @Test
+  fun nestedDisplayItem_parentQuestionItemIsGroup_createQuestionnaireStateItem() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "parent-question"
+            text = "parent question text"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            item =
+              listOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "nested-display-question"
+                  text = "subtitle text"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                }
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(
+        viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
+      )
+      .isEqualTo("nested-display-question")
+  }
+
+  @Test
+  fun `nested display item with instructions code should not be created as questionnaire state item`() =
+    runTest {
+      val displayCategoryExtension =
+        Extension().apply {
+          url = EXTENSION_DISPLAY_CATEGORY_URL
+          setValue(
+            CodeableConcept().apply {
+              coding =
+                listOf(
+                  Coding().apply {
+                    code = INSTRUCTIONS
+                    system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+                  }
+                )
+            }
+          )
+        }
+
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "parent-question"
+              text = "parent question text"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              item =
+                listOf(
+                  Questionnaire.QuestionnaireItemComponent().apply {
+                    linkId = "nested-display-question"
+                    text = "subtitle text"
+                    type = Questionnaire.QuestionnaireItemType.DISPLAY
+                    extension = listOf(displayCategoryExtension)
+                  }
+                )
+            }
+          )
+        }
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+      val viewModel = QuestionnaireViewModel(context, state)
+
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
+        )
+        .isEqualTo("parent-question")
+    }
+
+  @Test
+  fun `nested display item with flyover code should not be created as questionnaire state item`() =
+    runTest {
+      val itemControlExtensionWithFlyOverCode =
+        Extension().apply {
+          url = EXTENSION_ITEM_CONTROL_URL
+          setValue(
+            CodeableConcept().apply {
+              coding =
+                listOf(
+                  Coding().apply {
+                    code = "flyover"
+                    system = EXTENSION_ITEM_CONTROL_SYSTEM
+                  }
+                )
+            }
+          )
+        }
+
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "parent-question"
+              text = "parent question text"
+              type = Questionnaire.QuestionnaireItemType.STRING
+              item =
+                listOf(
+                  Questionnaire.QuestionnaireItemComponent().apply {
+                    linkId = "nested-display-question"
+                    text = "flyover text"
+                    type = Questionnaire.QuestionnaireItemType.DISPLAY
+                    extension = listOf(itemControlExtensionWithFlyOverCode)
+                  }
+                )
+            }
+          )
+        }
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+      val viewModel = QuestionnaireViewModel(context, state)
+
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
+        )
+        .isEqualTo("parent-question")
+    }
+
+  @Test
+  fun `nested display item with help code should not be created as questionnaire state item`() =
+    runTest {
+      val itemControlExtensionWithHelpCode =
+        Extension().apply {
+          url = EXTENSION_ITEM_CONTROL_URL
+          setValue(
+            CodeableConcept().apply {
+              coding =
+                listOf(
+                  Coding().apply {
+                    code = DisplayItemControlType.HELP.extensionCode
+                    system = EXTENSION_ITEM_CONTROL_SYSTEM
+                  }
+                )
+            }
+          )
+        }
+
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "parent-question"
+              text = "parent question text"
+              type = Questionnaire.QuestionnaireItemType.STRING
+              item =
+                listOf(
+                  Questionnaire.QuestionnaireItemComponent().apply {
+                    linkId = "nested-display-question"
+                    text = "help description"
+                    type = Questionnaire.QuestionnaireItemType.DISPLAY
+                    extension = listOf(itemControlExtensionWithHelpCode)
+                  }
+                )
+            }
+          )
+        }
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+      val viewModel = QuestionnaireViewModel(context, state)
+
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
+        )
+        .isEqualTo("parent-question")
+    }
+
+  // ==================================================================== //
+  //                                                                      //
+  //                               Testing                                //
+  //                                                                      //
+  // ==================================================================== //
 
   @Test
   fun `should throw exception on invalid cast inside runViewModelBlocking`() = runTest {

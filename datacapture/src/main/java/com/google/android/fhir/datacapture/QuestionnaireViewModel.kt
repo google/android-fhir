@@ -658,7 +658,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   // TODO persist previous answers in case options are changing and new list does not have selected
   // answer and FHIRPath in x-fhir-query
   // https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
-  private suspend fun resolveAnswerExpression(
+  internal suspend fun resolveAnswerExpression(
     item: QuestionnaireItemComponent,
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     // Check cache first for database queries
