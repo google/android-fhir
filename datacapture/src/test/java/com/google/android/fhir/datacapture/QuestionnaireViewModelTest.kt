@@ -1644,6 +1644,63 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
+  fun `should not allow user to go to review page in prior-edit entry-mode`() = runTest {
+    val entryModeExtension =
+      Extension().apply {
+        url = EXTENSION_ENTRY_MODE_URL
+        setValue(StringType("prior-edit"))
+      }
+    val questionnaire =
+      Questionnaire().apply {
+        addExtension(entryModeExtension)
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                required = true
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
+      viewModel.setReviewMode(true)
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+        )
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages = viewModel.pages!!,
+            currentPageIndex = 1,
+            showReviewButton = true
+          )
+        )
+    }
+  }
+
+  @Test
   fun `should allow user to move forward in random entry-mode`() = runTest {
     val entryModeExtension =
       Extension().apply {
@@ -2012,7 +2069,78 @@ class QuestionnaireViewModelTest {
   // ==================================================================== //
 
   @Test
-  fun `state has review feature and submit button to true should move to review page`() {
+  fun `should not show review button if review mode is not enabled`() {
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-link-id"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            }
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isFalse()
+    }
+  }
+
+  @Test
+  fun `should not show review button even if show review page first is enabled`() {
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-link-id"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            }
+          )
+        }
+      val viewModel =
+        createQuestionnaireViewModel(
+          questionnaire,
+          enableReviewPage = false,
+          showReviewPageFirst = true
+        )
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isFalse()
+    }
+  }
+
+  @Test
+  fun `should show review button if review mode is enabled`() {
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-link-id"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            }
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination.showReviewButton
+        )
+        .isTrue()
+    }
+  }
+
+  @Test
+  fun `should move to review page if review mode is enabled`() {
     runTest {
       val questionnaire =
         Questionnaire().apply {
@@ -2039,51 +2167,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `state has no review feature should not show review button`() {
-    runTest {
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "a-link-id"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            }
-          )
-        }
-      val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
-      assertThat(
-          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
-            .pagination.showReviewButton
-        )
-        .isFalse()
-    }
-  }
-
-  @Test
-  fun `state has review feature should show review button`() {
-    runTest {
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "a-link-id"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            }
-          )
-        }
-      val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
-      assertThat(
-          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
-            .pagination.showReviewButton
-        )
-        .isTrue()
-    }
-  }
-
-  @Test
-  fun `state has review feature and show review page first should be in review mode`() {
+  fun `should show review page first`() {
     runTest {
       val questionnaire =
         Questionnaire().apply {
@@ -2107,33 +2191,6 @@ class QuestionnaireViewModelTest {
             .showEditButton
         )
         .isTrue()
-    }
-  }
-
-  @Test
-  fun `state has no review feature but show review page first should not show review button`() {
-    runTest {
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "a-link-id"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            }
-          )
-        }
-      val viewModel =
-        createQuestionnaireViewModel(
-          questionnaire,
-          enableReviewPage = false,
-          showReviewPageFirst = true
-        )
-      assertThat(
-          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
-            .pagination.showReviewButton
-        )
-        .isFalse()
     }
   }
 

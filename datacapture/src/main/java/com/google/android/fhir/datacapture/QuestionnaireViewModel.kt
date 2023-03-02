@@ -361,7 +361,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       when (entryMode) {
         EntryMode.PRIOR_EDIT,
         EntryMode.SEQUENTIAL, -> {
-          validateCurrentPageItems() { isInReviewModeFlow.value = true }
+          validateCurrentPageItems { isInReviewModeFlow.value = true }
         }
         EntryMode.RANDOM -> {
           isInReviewModeFlow.value = true
