@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
-import com.google.android.fhir.datacapture.validation.ConstraintValidator.ConstraintValidationResult
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -28,25 +27,22 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * Only primitive types permitted in questionnaires response are subjected to this validation. See
  * https://www.hl7.org/fhir/valueset-item-type.html#expansion
  */
-internal object PrimitiveTypeAnswerMaxLengthValidator : ConstraintValidator {
+internal object MaxLengthValidator : AnswerConstraintValidator {
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
+    answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
     context: Context
-  ): ConstraintValidationResult {
-    // TODO(https://github.com/google/android-fhir/issues/487): Validate all answers.
-    val answer = answers.singleOrNull() ?: return ConstraintValidationResult(true, null)
-
+  ): AnswerConstraintValidator.Result {
     if (questionnaireItem.hasMaxLength() &&
         answer.value.isPrimitive &&
         answer.value.asStringValue().length > questionnaireItem.maxLength
     ) {
-      return ConstraintValidationResult(
+      return AnswerConstraintValidator.Result(
         false,
         "The maximum number of characters that are permitted in the answer is: " +
           questionnaireItem.maxLength
       )
     }
-    return ConstraintValidationResult(true, null)
+    return AnswerConstraintValidator.Result(true, null)
   }
 }
