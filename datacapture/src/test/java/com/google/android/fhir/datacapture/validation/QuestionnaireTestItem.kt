@@ -22,5 +22,5 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 /** A data class which holds the questionnaire requirement and response. */
 data class QuestionnaireTestItem(
   val requirement: Questionnaire.QuestionnaireItemComponent,
-  val response: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
+  val answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
 )
