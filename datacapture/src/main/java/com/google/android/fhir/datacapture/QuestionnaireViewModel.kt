@@ -207,8 +207,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** Forces response validation each time [getQuestionnaireAdapterItems] is called. */
   private var hasPressedSubmitButton = false
 
-  private var hasPressedReviewButton = false
-
   /**
    * Map of [QuestionnaireResponseItemAnswerComponent] for
    * [Questionnaire.QuestionnaireItemComponent]s that are disabled now. The answers will be used to
@@ -314,7 +312,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .also { result ->
         if (result.values.flatten().filterIsInstance<Invalid>().isNotEmpty()) {
           hasPressedSubmitButton = true
-          hasPressedReviewButton = true
           modificationCount.update { it + 1 }
         }
       }
@@ -616,7 +613,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
           isPaginationButtonPressed ||
           hasPressedSubmitButton ||
-          hasPressedReviewButton
+          isInReviewModeFlow.value
       ) {
         QuestionnaireResponseItemValidator.validate(
           questionnaireItem,

@@ -36,14 +36,19 @@ internal fun TextView.updateTextAndVisibility(localizedText: Spanned? = null) {
     }
 }
 
-/** Returns [VISIBLE] if any of the [view] is visible, else returns [GONE]. */
-internal fun headerViewVisibility(vararg view: TextView): Int {
+/** Returns [VISIBLE] if any of the [view] is visible, [GONE] otherwise. */
+internal fun getHeaderViewVisibility(vararg view: TextView): Int {
   if (view.any { it.visibility == VISIBLE }) {
     return VISIBLE
   }
   return GONE
 }
 
+/**
+ * Initializes the text for [helpTextView] with instructions on how to use the feature, and sets the
+ * visibility and click listener for the [helpButton] to allow users to access the help information
+ * and toggles the visibility for view [helpCardView].
+ */
 internal fun initHelpViews(
   helpButton: Button,
   helpCardView: MaterialCardView,

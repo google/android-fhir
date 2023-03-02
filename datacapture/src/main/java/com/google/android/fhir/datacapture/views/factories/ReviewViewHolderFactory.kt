@@ -22,7 +22,7 @@ import android.view.View.VISIBLE
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.extensions.headerViewVisibility
+import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.localizedInstructionsSpanned
@@ -71,7 +71,7 @@ internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
         hint.updateTextAndVisibility(
           questionnaireViewItem.questionnaireItem.localizedInstructionsSpanned
         )
-        header.visibility = headerViewVisibility(prefix, question, hint)
+        header.visibility = getHeaderViewVisibility(prefix, question, hint)
 
         val localizedFlyoverSpanned =
           questionnaireViewItem.questionnaireItem.localizedFlyoverSpanned

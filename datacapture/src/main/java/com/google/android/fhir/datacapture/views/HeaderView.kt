@@ -22,7 +22,7 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.extensions.headerViewVisibility
+import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
 import com.google.android.fhir.datacapture.extensions.initHelpViews
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 import com.google.android.fhir.datacapture.localizedInstructionsSpanned
@@ -54,7 +54,7 @@ internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout
     )
     //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
-    visibility = headerViewVisibility(prefix, question, hint)
+    visibility = getHeaderViewVisibility(prefix, question, hint)
   }
 
   /**
