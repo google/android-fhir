@@ -202,10 +202,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * True if the user has tapped the next/previous pagination buttons on the current page. This is
    * needed to avoid spewing validation errors before any questions are answered.
    */
-  private var isPaginationButtonPressed = false
-
-  /** Forces response validation each time [getQuestionnaireAdapterItems] is called. */
-  private var hasPressedSubmitButton = false
+  private var forceValidation = false
 
   /**
    * Map of [QuestionnaireResponseItemAnswerComponent] for
@@ -311,8 +308,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       )
       .also { result ->
         if (result.values.flatten().filterIsInstance<Invalid>().isNotEmpty()) {
-          hasPressedSubmitButton = true
-          modificationCount.update { it + 1 }
+          // Update UI of current page if necessary
+          validateCurrentPageItems {}
         }
       }
 
@@ -339,25 +336,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     when (entryMode) {
       EntryMode.PRIOR_EDIT,
       EntryMode.SEQUENTIAL, -> {
-        validateCurrentPageItems(
-          {
-            isPaginationButtonPressed = false
-            val nextPageIndex =
-              pages!!.indexOfFirst {
-                it.index > currentPageIndexFlow.value!! && it.enabled && !it.hidden
-              }
-            check(nextPageIndex != -1) {
-              "Can't call goToNextPage() if no following page is enabled"
+        validateCurrentPageItems() {
+          val nextPageIndex =
+            pages!!.indexOfFirst {
+              it.index > currentPageIndexFlow.value!! && it.enabled && !it.hidden
             }
-            currentPageIndexFlow.value = nextPageIndex
-          },
-          {
-            // Force update validation results for all questions on the current page. This is needed
-            // when the user has not answered any questions so no validation has been done.
-            isPaginationButtonPressed = true
-            modificationCount.update { it + 1 }
-          }
-        )
+          check(nextPageIndex != -1) { "Can't call goToNextPage() if no following page is enabled" }
+          currentPageIndexFlow.value = nextPageIndex
+        }
       }
       EntryMode.RANDOM -> {
         val nextPageIndex =
@@ -375,18 +361,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       when (entryMode) {
         EntryMode.PRIOR_EDIT,
         EntryMode.SEQUENTIAL, -> {
-          validateCurrentPageItems(
-            {
-              isPaginationButtonPressed = false
-              isInReviewModeFlow.value = true
-            },
-            {
-              // Force update validation results for all questions on the current page. This is
-              // needed when the user has not answered any questions so no validation has been done.
-              isPaginationButtonPressed = true
-              modificationCount.update { it + 1 }
-            }
-          )
+          validateCurrentPageItems() { isInReviewModeFlow.value = true }
         }
         EntryMode.RANDOM -> {
           isInReviewModeFlow.value = true
@@ -551,8 +526,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     // Determine the validation result, which will be displayed on the item itself
     val validationResult =
       if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
-          isPaginationButtonPressed ||
-          hasPressedSubmitButton
+          forceValidation
       ) {
         QuestionnaireResponseItemValidator.validate(
           questionnaireItem,
@@ -818,17 +792,26 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
 
   /**
-   * Validates the current page items and invokes [valid] if they are all valid or [invalid]
-   * otherwise.
+   * Validates the current page items if any is unvalidated and invokes [block] if they are all
+   * valid.
    */
-  private fun validateCurrentPageItems(valid: () -> Unit, invalid: () -> Unit) {
+  private fun validateCurrentPageItems(block: () -> Unit) {
+    if (currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().any {
+        it.item.validationResult is NotValidated
+      }
+    ) {
+      // Force update validation results for all questions on the current page. This is needed
+      // when the user has not answered any questions so no validation has been done.
+      forceValidation = true
+      modificationCount.update { it + 1 }
+      forceValidation = false
+    }
+
     if (currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().all {
         it.item.validationResult is Valid
       }
     ) {
-      valid()
-    } else {
-      invalid()
+      block()
     }
   }
 }

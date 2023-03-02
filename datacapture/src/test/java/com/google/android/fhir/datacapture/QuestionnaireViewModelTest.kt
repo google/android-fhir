@@ -1977,6 +1977,18 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+        )
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages = viewModel.pages!!,
+            currentPageIndex = 1,
+            showSubmitButton = true
+          )
+        )
+
       viewModel.goToPreviousPage()
 
       assertThat(
