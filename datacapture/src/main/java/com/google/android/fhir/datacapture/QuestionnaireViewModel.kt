@@ -420,6 +420,86 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
   }
 
+  internal suspend fun resolveAnswerValueSet(
+    uri: String,
+  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+    // If cache hit, return it
+    if (answerValueSetMap.contains(uri)) {
+      return answerValueSetMap[uri]!!
+    }
+
+    val options =
+      if (uri.startsWith("#")) {
+        questionnaire.contained
+          .firstOrNull { resource ->
+            resource.id.equals(uri) &&
+              resource.resourceType == ResourceType.ValueSet &&
+              (resource as ValueSet).hasExpansion()
+          }
+          ?.let { resource ->
+            val valueSet = resource as ValueSet
+            valueSet.expansion.contains
+              .filterNot { it.abstract || it.inactive }
+              .map { component ->
+                Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                  Coding(component.system, component.code, component.display)
+                )
+              }
+          }
+      } else {
+        // Ask the client to provide the answers from an external expanded Valueset.
+        DataCapture.getConfiguration(getApplication())
+          .valueSetResolverExternal
+          ?.resolve(uri)
+          ?.map { coding -> Questionnaire.QuestionnaireItemAnswerOptionComponent(coding.copy()) }
+      }
+        ?: emptyList()
+    // save it so that we avoid have cache misses.
+    answerValueSetMap[uri] = options
+    return options
+  }
+
+  // TODO persist previous answers in case options are changing and new list does not have selected
+  // answer and FHIRPath in x-fhir-query
+  // https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
+  internal suspend fun resolveAnswerExpression(
+    item: QuestionnaireItemComponent,
+  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+    // Check cache first for database queries
+    val answerExpression = item.answerExpression ?: return emptyList()
+    if (answerExpression.isXFhirQuery && answerExpressionMap.contains(answerExpression.expression)
+    ) {
+      return answerExpressionMap[answerExpression.expression]!!
+    }
+
+    val options = loadAnswerExpressionOptions(item, answerExpression)
+
+    if (answerExpression.isXFhirQuery) answerExpressionMap[answerExpression.expression] = options
+
+    return options
+  }
+
+  private suspend fun loadAnswerExpressionOptions(
+    item: QuestionnaireItemComponent,
+    expression: Expression,
+  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+    val data =
+      if (expression.isXFhirQuery) {
+        checkNotNull(xFhirQueryResolver) {
+          "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
+        }
+        xFhirQueryResolver!!.resolve(expression.expression)
+      } else if (expression.isFhirPath) {
+        fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
+      } else {
+        throw UnsupportedOperationException(
+          "${expression.language} not supported for answer-expression yet"
+        )
+      }
+
+    return item.extractAnswerOptions(data)
+  }
+
   /**
    * Traverses through the list of questionnaire items, the list of questionnaire response items and
    * the list of items in the questionnaire response answer list and populates
@@ -588,86 +668,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
     currentPageItems = items
     return items
-  }
-
-  internal suspend fun resolveAnswerValueSet(
-    uri: String,
-  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-    // If cache hit, return it
-    if (answerValueSetMap.contains(uri)) {
-      return answerValueSetMap[uri]!!
-    }
-
-    val options =
-      if (uri.startsWith("#")) {
-        questionnaire.contained
-          .firstOrNull { resource ->
-            resource.id.equals(uri) &&
-              resource.resourceType == ResourceType.ValueSet &&
-              (resource as ValueSet).hasExpansion()
-          }
-          ?.let { resource ->
-            val valueSet = resource as ValueSet
-            valueSet.expansion.contains
-              .filterNot { it.abstract || it.inactive }
-              .map { component ->
-                Questionnaire.QuestionnaireItemAnswerOptionComponent(
-                  Coding(component.system, component.code, component.display)
-                )
-              }
-          }
-      } else {
-        // Ask the client to provide the answers from an external expanded Valueset.
-        DataCapture.getConfiguration(getApplication())
-          .valueSetResolverExternal
-          ?.resolve(uri)
-          ?.map { coding -> Questionnaire.QuestionnaireItemAnswerOptionComponent(coding.copy()) }
-      }
-        ?: emptyList()
-    // save it so that we avoid have cache misses.
-    answerValueSetMap[uri] = options
-    return options
-  }
-
-  // TODO persist previous answers in case options are changing and new list does not have selected
-  // answer and FHIRPath in x-fhir-query
-  // https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
-  internal suspend fun resolveAnswerExpression(
-    item: QuestionnaireItemComponent,
-  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-    // Check cache first for database queries
-    val answerExpression = item.answerExpression ?: return emptyList()
-    if (answerExpression.isXFhirQuery && answerExpressionMap.contains(answerExpression.expression)
-    ) {
-      return answerExpressionMap[answerExpression.expression]!!
-    }
-
-    val options = loadAnswerExpressionOptions(item, answerExpression)
-
-    if (answerExpression.isXFhirQuery) answerExpressionMap[answerExpression.expression] = options
-
-    return options
-  }
-
-  private suspend fun loadAnswerExpressionOptions(
-    item: QuestionnaireItemComponent,
-    expression: Expression,
-  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-    val data =
-      if (expression.isXFhirQuery) {
-        checkNotNull(xFhirQueryResolver) {
-          "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
-        }
-        xFhirQueryResolver!!.resolve(expression.expression)
-      } else if (expression.isFhirPath) {
-        fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
-      } else {
-        throw UnsupportedOperationException(
-          "${expression.language} not supported for answer-expression yet"
-        )
-      }
-
-    return item.extractAnswerOptions(data)
   }
 
   /**
