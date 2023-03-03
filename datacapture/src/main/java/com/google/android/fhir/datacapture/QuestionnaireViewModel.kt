@@ -792,8 +792,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
 
   /**
-   * Validates the current page items if any are [NotValidated], otherwise, invokes [block] if they are [Valid]
-   * valid.
+   * Validates the current page items if any are [NotValidated], and then, invokes [block] if they
+   * are all [Valid].
    */
   private fun validateCurrentPageItems(block: () -> Unit) {
     if (currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().any {
@@ -803,6 +803,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       // Force update validation results for all questions on the current page. This is needed
       // when the user has not answered any questions so no validation has been done.
       forceValidation = true
+      // Results in a new questionnaire state being generated synchronously, i.e., the current
+      // thread will be suspended until the new state is generated.
       modificationCount.update { it + 1 }
       forceValidation = false
     }
