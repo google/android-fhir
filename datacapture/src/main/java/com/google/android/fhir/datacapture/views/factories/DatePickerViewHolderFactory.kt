@@ -24,6 +24,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.canonicalizeDatePattern
+import com.google.android.fhir.datacapture.entryFormat
 import com.google.android.fhir.datacapture.format
 import com.google.android.fhir.datacapture.getDateSeparator
 import com.google.android.fhir.datacapture.parseDate
@@ -57,7 +58,9 @@ import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.log10
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import timber.log.Timber
 
 internal object DatePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.date_picker_view) {
@@ -101,17 +104,17 @@ internal object DatePickerViewHolderFactory :
             }
             .show(context.supportFragmentManager, TAG)
         }
-        val localeDatePattern = getLocalizedDateTimePattern()
-        // Special character used in date pattern
-        val datePatternSeparator = getDateSeparator(localeDatePattern)
-        textWatcher = DatePatternTextWatcher(datePatternSeparator)
-        canonicalizedDatePattern = canonicalizeDatePattern(localeDatePattern)
       }
 
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         clearPreviousState()
         header.bind(questionnaireViewItem.questionnaireItem)
+        val localeDatePattern = datePattern(questionnaireViewItem.questionnaireItem)
+        // Special character used in date pattern
+        val datePatternSeparator = getDateSeparator(localeDatePattern)
+        textWatcher = DatePatternTextWatcher(datePatternSeparator)
+        canonicalizedDatePattern = canonicalizeDatePattern(localeDatePattern)
         textInputLayout.hint = canonicalizedDatePattern
         textInputEditText.removeTextChangedListener(textWatcher)
 
@@ -128,7 +131,8 @@ internal object DatePickerViewHolderFactory :
 
         // If the draft answer is set, this means the user has yet to type a parseable answer,
         // so we display an error.
-        if (questionnaireViewItem.draftAnswer as? String != null) {
+        val draftAnswer = questionnaireViewItem.draftAnswer as? String
+        if (!draftAnswer.isNullOrEmpty()) {
           displayValidationResult(
             Invalid(
               listOf(invalidDateErrorText(textInputEditText.context, canonicalizedDatePattern))
@@ -190,12 +194,10 @@ internal object DatePickerViewHolderFactory :
        * Each time the user types in a character, parse the string and if it can be parsed into a
        * date, set the answer in the [QuestionnaireResponse], otherwise, set the draft answer.
        */
-      private fun parseDateOnTextChanged(dateToDisplay: String?) =
+      private fun parseDateOnTextChanged(dateToDisplay: String) =
         try {
-          dateToDisplay?.let {
-            val localDate = parseDate(it, canonicalizedDatePattern)
-            setQuestionnaireItemViewItemAnswer(localDate)
-          }
+          val localDate = parseDate(dateToDisplay, canonicalizedDatePattern)
+          setQuestionnaireItemViewItemAnswer(localDate)
         } catch (e: ParseException) {
           questionnaireViewItem.setDraftAnswer(dateToDisplay)
         } catch (e: DateTimeParseException) {
@@ -229,7 +231,8 @@ internal object DatePickerViewHolderFactory :
           start: Int,
           before: Int,
           count: Int
-        ) {}
+        ) {
+        }
 
         override fun afterTextChanged(editable: Editable) {
           handleDateFormatAfterTextChange(
@@ -271,7 +274,7 @@ internal fun handleDateFormatAfterTextChange(
       editable.append(dateFormatSeparator)
     }
     if (canonicalizedDatePattern[editable.lastIndex] == dateFormatSeparator &&
-        editable[editable.lastIndex] != dateFormatSeparator
+      editable[editable.lastIndex] != dateFormatSeparator
     ) {
       // Add separator to break different date components, e.g. converting "123" to "12/3"
       editable.insert(editable.lastIndex, dateFormatSeparator.toString())
@@ -281,6 +284,17 @@ internal fun handleDateFormatAfterTextChange(
 
 internal const val TAG = "date-picker"
 internal val ZONE_ID_UTC = ZoneId.of("UTC")
+
+
+internal fun datePattern(questionnaireItem: Questionnaire.QuestionnaireItemComponent): String {
+  return if (questionnaireItem.entryFormat.isNullOrEmpty()) {
+    Timber.w(" date time entry format is not available in Questionnaire item")
+    getLocalizedDateTimePattern()
+  } else {
+    questionnaireItem
+      .entryFormat!! // TODO IS PARSING CHECK REQUIRED parsing here for entry format validation
+  }
+}
 
 /**
  * Medium and long format styles use alphabetical month names which are difficult for the user to
