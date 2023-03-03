@@ -63,28 +63,28 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         cleanupOldState()
-        holder.summaryHolder.hint = questionnaireViewItem.questionnaireItem.localizedFlyoverSpanned
+        holder.summaryHolder.hint =
+          questionnaireViewItem.enabledDisplayItems?.localizedFlyoverSpanned
         val activity =
           requireNotNull(holder.header.context.tryUnwrapContext()) {
             "Can only use dialog select in an AppCompatActivity context"
           }
         val viewModel: QuestionnaireItemDialogSelectViewModel by activity.viewModels()
 
-        val item = questionnaireViewItem.questionnaireItem
-
         // Bind static data
-        holder.header.bind(item)
+        holder.header.bind(questionnaireViewItem)
 
+        val questionnaireItem = questionnaireViewItem.questionnaireItem
         selectedOptionsJob =
           activity.lifecycleScope.launch {
             // Set the initial selected options state from the FHIR data model
             viewModel.updateSelectedOptions(
-              item.linkId,
+              questionnaireItem.linkId,
               questionnaireViewItem.extractInitialOptions(holder.header.context)
             )
 
             // Listen for changes to selected options to update summary + FHIR data model
-            viewModel.getSelectedOptionsFlow(item.linkId).collect { selectedOptions ->
+            viewModel.getSelectedOptionsFlow(questionnaireItem.linkId).collect { selectedOptions ->
               holder.summary.text = selectedOptions.selectedSummary
               updateAnswers(selectedOptions)
             }
@@ -95,12 +95,12 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
           View.OnClickListener {
             val fragment =
               OptionSelectDialogFragment(
-                title = item.localizedTextSpanned ?: "",
-                config = item.buildConfig(),
+                title = questionnaireItem.localizedTextSpanned ?: "",
+                config = questionnaireItem.buildConfig(),
               )
             fragment.arguments =
               bundleOf(
-                OptionSelectDialogFragment.KEY_QUESTION_LINK_ID to item.linkId,
+                OptionSelectDialogFragment.KEY_QUESTION_LINK_ID to questionnaireItem.linkId,
               )
             fragment.show(activity.supportFragmentManager, null)
           }

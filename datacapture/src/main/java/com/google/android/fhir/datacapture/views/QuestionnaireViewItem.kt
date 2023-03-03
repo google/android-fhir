@@ -78,7 +78,8 @@ data class QuestionnaireViewItem(
     {
       emptyList()
     },
-  internal val draftAnswer: Any? = null
+  internal val draftAnswer: Any? = null,
+  internal val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent>? = null
 ) {
 
   /**

@@ -55,10 +55,10 @@ internal object BooleanChoiceViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         this.questionnaireViewItem = questionnaireViewItem
-        val questionnaireItem = questionnaireViewItem.questionnaireItem
-        header.bind(questionnaireItem)
+        header.bind(questionnaireViewItem)
         val choiceOrientation =
-          questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
+          questionnaireViewItem.questionnaireItem.choiceOrientation
+            ?: ChoiceOrientationTypes.VERTICAL
         with(flow) {
           when (choiceOrientation) {
             ChoiceOrientationTypes.HORIZONTAL -> {

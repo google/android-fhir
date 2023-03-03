@@ -48,9 +48,9 @@ internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        header.bind(questionnaireViewItem.questionnaireItem)
+        header.bind(questionnaireViewItem)
         val localizedFlyoverSpanned =
-          questionnaireViewItem.questionnaireItem.localizedFlyoverSpanned
+          questionnaireViewItem.enabledDisplayItems?.localizedFlyoverSpanned
         flyOverTextView.apply {
           visibility =
             if (localizedFlyoverSpanned.isNullOrEmpty()) {

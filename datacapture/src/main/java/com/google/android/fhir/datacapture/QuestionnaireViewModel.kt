@@ -627,7 +627,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             answersChangedCallback = answersChangedCallback,
             resolveAnswerValueSet = { resolveAnswerValueSet(it) },
             resolveAnswerExpression = { resolveAnswerExpression(it) },
-            draftAnswer = draftAnswerMap[questionnaireResponseItem]
+            draftAnswer = draftAnswerMap[questionnaireResponseItem],
+            enabledDisplayItems =
+              questionnaireItem.item.filter {
+                it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+                  (it.isInstructionsCode || it.isFlyoverCode || it.isHelpCode) &&
+                  EnablementEvaluator(questionnaireResponse).evaluate(it, questionnaireResponseItem)
+              }
           )
         )
       )

@@ -53,11 +53,10 @@ internal object CheckBoxGroupViewHolderFactory :
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        val questionnaireItem = questionnaireViewItem.questionnaireItem
+        header.bind(questionnaireViewItem)
         val choiceOrientation =
-          questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
-
-        header.bind(questionnaireItem)
+          questionnaireViewItem.questionnaireItem.choiceOrientation
+            ?: ChoiceOrientationTypes.VERTICAL
 
         // Keep the Flow layout which is always the first child
         checkboxGroup.removeViews(1, checkboxGroup.childCount - 1)

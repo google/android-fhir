@@ -103,8 +103,8 @@ internal object AttachmentViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         this.questionnaireViewItem = questionnaireViewItem
+        header.bind(questionnaireViewItem)
         val questionnaireItem = questionnaireViewItem.questionnaireItem
-        header.bind(questionnaireItem)
         displayOrClearInitialPreview()
         displayTakePhotoButton(questionnaireItem)
         displayUploadButton(questionnaireItem)

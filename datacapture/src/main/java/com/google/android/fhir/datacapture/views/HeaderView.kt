@@ -33,7 +33,6 @@ import com.google.android.fhir.datacapture.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.material.card.MaterialCardView
-import org.hl7.fhir.r4.model.Questionnaire
 
 /** View for the prefix, question, and hint of a questionnaire item. */
 internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
@@ -47,11 +46,13 @@ internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout
   private var hint: TextView = findViewById(R.id.hint)
   private var errorTextView: TextView = findViewById(R.id.error_text_at_header)
 
-  fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
-    prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
-    question.updateTextAndVisibility(questionnaireItem.localizedTextSpanned)
-    hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
-    initHelpButton(this, questionnaireItem)
+  fun bind(questionnaireViewItem: QuestionnaireViewItem) {
+    prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
+    question.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedTextSpanned)
+    hint.updateTextAndVisibility(
+      questionnaireViewItem.enabledDisplayItems?.localizedInstructionsSpanned
+    )
+    initHelpButton(this, questionnaireViewItem)
     //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
     visibility = getViewGroupVisibility(prefix, question, hint)
@@ -93,13 +94,10 @@ internal fun getViewGroupVisibility(vararg view: TextView): Int {
   return GONE
 }
 
-internal fun initHelpButton(
-  view: View,
-  questionnaireItem: Questionnaire.QuestionnaireItemComponent
-) {
+internal fun initHelpButton(view: View, questionnaireViewItem: QuestionnaireViewItem) {
   val helpButton = view.findViewById<Button>(R.id.helpButton)
   helpButton.visibility =
-    if (questionnaireItem.hasHelpButton) {
+    if (questionnaireViewItem.questionnaireItem.hasHelpButton) {
       VISIBLE
     } else {
       GONE
@@ -118,5 +116,5 @@ internal fun initHelpButton(
 
   view
     .findViewById<TextView>(R.id.helpText)
-    .updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
+    .updateTextAndVisibility(questionnaireViewItem.enabledDisplayItems?.localizedHelpSpanned)
 }

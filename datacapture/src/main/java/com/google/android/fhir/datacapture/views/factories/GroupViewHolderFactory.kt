@@ -45,7 +45,7 @@ internal object GroupViewHolderFactory :
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        header.bind(questionnaireViewItem.questionnaireItem)
+        header.bind(questionnaireViewItem)
         addItemButton.visibility =
           if (questionnaireViewItem.questionnaireItem.repeats) View.VISIBLE else View.GONE
         addItemButton.setOnClickListener {

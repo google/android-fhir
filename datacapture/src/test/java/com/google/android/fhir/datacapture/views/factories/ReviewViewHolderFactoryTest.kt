@@ -83,32 +83,34 @@ class ReviewViewHolderFactoryTest {
 
   @Test
   fun `bind() should set fly over text`() {
+    val itemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          text = "flyover text"
+          type = Questionnaire.QuestionnaireItemType.DISPLAY
+          addExtension(
+            EXTENSION_ITEM_CONTROL_URL,
+            CodeableConcept().apply {
+              addCoding().apply {
+                system = EXTENSION_ITEM_CONTROL_SYSTEM
+                code = DisplayItemControlType.FLYOVER.extensionCode
+              }
+            }
+          )
+        }
+      )
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           linkId = "parent-question"
           text = "parent question text"
           type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          item =
-            listOf(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                text = "flyover text"
-                type = Questionnaire.QuestionnaireItemType.DISPLAY
-                addExtension(
-                  EXTENSION_ITEM_CONTROL_URL,
-                  CodeableConcept().apply {
-                    addCoding().apply {
-                      system = EXTENSION_ITEM_CONTROL_SYSTEM
-                      code = DisplayItemControlType.FLYOVER.extensionCode
-                    }
-                  }
-                )
-              }
-            )
+          item = itemList
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        enabledDisplayItems = itemList
       )
     )
 

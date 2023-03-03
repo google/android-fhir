@@ -25,7 +25,6 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
-import org.hl7.fhir.r4.model.Questionnaire
 
 internal class GroupHeaderView(context: Context, attrs: AttributeSet?) :
   LinearLayout(context, attrs) {
@@ -34,14 +33,16 @@ internal class GroupHeaderView(context: Context, attrs: AttributeSet?) :
     LayoutInflater.from(context).inflate(R.layout.group_type_header_view, this, true)
   }
 
-  fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
+  fun bind(questionnaireViewItem: QuestionnaireViewItem) {
     val prefix = findViewById<TextView>(R.id.prefix)
     val question = findViewById<TextView>(R.id.question)
     val hint = findViewById<TextView>(R.id.hint)
-    initHelpButton(this, questionnaireItem)
-    prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
-    question.updateTextAndVisibility(questionnaireItem.localizedTextSpanned)
-    hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
+    initHelpButton(this, questionnaireViewItem)
+    prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
+    question.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedTextSpanned)
+    hint.updateTextAndVisibility(
+      questionnaireViewItem.enabledDisplayItems?.localizedInstructionsSpanned
+    )
     visibility = getViewGroupVisibility(prefix, question, hint)
   }
 }

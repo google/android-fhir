@@ -58,8 +58,8 @@ internal object DropDownViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         cleanupOldState()
-        header.bind(questionnaireViewItem.questionnaireItem)
-        textInputLayout.hint = questionnaireViewItem.questionnaireItem.localizedFlyoverSpanned
+        header.bind(questionnaireViewItem)
+        textInputLayout.hint = questionnaireViewItem.enabledDisplayItems?.localizedFlyoverSpanned
         val answerOptionList =
           this.questionnaireViewItem.answerOption
             .map {

@@ -111,7 +111,7 @@ internal object DatePickerViewHolderFactory :
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         clearPreviousState()
-        header.bind(questionnaireViewItem.questionnaireItem)
+        header.bind(questionnaireViewItem)
         textInputLayout.hint = canonicalizedDatePattern
         textInputEditText.removeTextChangedListener(textWatcher)
 
