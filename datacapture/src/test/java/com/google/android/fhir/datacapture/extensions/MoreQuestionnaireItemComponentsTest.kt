@@ -1274,10 +1274,10 @@ class MoreQuestionnaireItemComponentsTest {
   fun `isHidden should return false`() {
     assertThat(
         Questionnaire.QuestionnaireItemComponent()
-          .apply { addExtension(EXTENSION_HIDDEN_URL, BooleanType(true)) }
+          .apply { addExtension(EXTENSION_HIDDEN_URL, BooleanType(false)) }
           .isHidden
       )
-      .isTrue()
+      .isFalse()
   }
 
   @Test
