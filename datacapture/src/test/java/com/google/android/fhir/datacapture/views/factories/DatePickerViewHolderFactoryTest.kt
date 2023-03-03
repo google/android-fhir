@@ -494,7 +494,7 @@ class DatePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `set local date input format from when entryFormat extension has empty string in Questionnaire`() {
+  fun `set local date input format when entryFormat extension has empty string in Questionnaire`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -516,7 +516,7 @@ class DatePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `set local date input format from when no entryFormat extension in Questionnaire`() {
+  fun `set local date input format when no entryFormat extension in Questionnaire`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),

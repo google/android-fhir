@@ -231,8 +231,7 @@ internal object DatePickerViewHolderFactory :
           start: Int,
           before: Int,
           count: Int
-        ) {
-        }
+        ) {}
 
         override fun afterTextChanged(editable: Editable) {
           handleDateFormatAfterTextChange(
@@ -274,7 +273,7 @@ internal fun handleDateFormatAfterTextChange(
       editable.append(dateFormatSeparator)
     }
     if (canonicalizedDatePattern[editable.lastIndex] == dateFormatSeparator &&
-      editable[editable.lastIndex] != dateFormatSeparator
+        editable[editable.lastIndex] != dateFormatSeparator
     ) {
       // Add separator to break different date components, e.g. converting "123" to "12/3"
       editable.insert(editable.lastIndex, dateFormatSeparator.toString())
@@ -284,7 +283,6 @@ internal fun handleDateFormatAfterTextChange(
 
 internal const val TAG = "date-picker"
 internal val ZONE_ID_UTC = ZoneId.of("UTC")
-
 
 internal fun datePattern(questionnaireItem: Questionnaire.QuestionnaireItemComponent): String {
   return if (questionnaireItem.entryFormat.isNullOrEmpty()) {
