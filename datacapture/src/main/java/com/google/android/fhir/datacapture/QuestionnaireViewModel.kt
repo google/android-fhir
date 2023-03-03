@@ -508,21 +508,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
         }
 
-        val xFhirExpressionString =
-          ExpressionEvaluator.xFhirQueryEnhancementRegex
-            .findAll(expression.expression)
-            .map {
-              val (fhirPathWithParentheses, fhirPath) = it.groupValues
-              fhirPathWithParentheses to
-                fhirPathEngine.evaluate(questionnaireResourceContext, fhirPath).singleOrNull()
-            }
-            .map {
-              checkNotNull(it.second) { "The FHIRPath ${it.first} evaluated to null" }
-              it.first to it.second!!.asExpectedType().asStringValue()
-            }
-            .fold(expression.expression) { acc: String, pair: Pair<String, String> ->
-              acc.replace(pair.first, pair.second)
-            }
+        val xFhirExpressionString = createXFhirQueryFromExpression(expression)
 
         xFhirQueryResolver!!.resolve(xFhirExpressionString)
       } else if (expression.isFhirPath) {
@@ -535,6 +521,25 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
     return item.extractAnswerOptions(data)
   }
+
+  /**
+   * TODO
+   *
+   * @param expression 
+   * @return
+   */
+  private fun createXFhirQueryFromExpression(expression: Expression): String =
+    questionnaireResourceContext?.let { resource ->
+      ExpressionEvaluator.evaluateXFhirEnhancement(expression, resource)
+        .map {
+          checkNotNull(it.second) { "The FHIRPath ${it.first} evaluated to null" }
+          it.first to it.second!!.asExpectedType().asStringValue()
+        }
+        .fold(expression.expression) { acc: String, pair: Pair<String, String> ->
+          acc.replace(pair.first, pair.second)
+        }
+    }
+      ?: expression.expression
 
   /**
    * Traverses through the list of questionnaire items, the list of questionnaire response items and

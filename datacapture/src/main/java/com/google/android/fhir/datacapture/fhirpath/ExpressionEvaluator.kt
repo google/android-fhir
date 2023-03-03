@@ -30,6 +30,7 @@ import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 import timber.log.Timber
@@ -262,6 +263,14 @@ object ExpressionEvaluator {
 
     return evaluateVariable(expression, questionnaireResponse, variablesMap)
   }
+
+  internal fun evaluateXFhirEnhancement(expression: Expression, resource: Resource) =
+    xFhirQueryEnhancementRegex
+      .findAll(expression.expression)
+      .map { it.groupValues }
+      .map { (fhirPathWithParentheses, fhirPath) ->
+        fhirPathWithParentheses to fhirPathEngine.evaluate(resource, fhirPath).singleOrNull()
+      }
 
   private fun findDependentVariables(expression: Expression) =
     variableRegex
