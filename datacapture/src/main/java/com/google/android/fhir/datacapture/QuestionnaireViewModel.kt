@@ -792,7 +792,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
 
   /**
-   * Validates the current page items if any is unvalidated and invokes [block] if they are all
+   * Validates the current page items if any are [NotValidated], otherwise, invokes [block] if they are [Valid]
    * valid.
    */
   private fun validateCurrentPageItems(block: () -> Unit) {
