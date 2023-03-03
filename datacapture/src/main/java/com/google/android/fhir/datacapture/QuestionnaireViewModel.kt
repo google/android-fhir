@@ -525,7 +525,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /**
    * TODO
    *
-   * @param expression 
+   * @param expression
    * @return
    */
   private fun createXFhirQueryFromExpression(expression: Expression): String =

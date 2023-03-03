@@ -64,7 +64,7 @@ object ExpressionEvaluator {
    * Finds all the matching occurrences of FHIRPaths in x-fhir-query. See:
    * https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
    */
-  internal val xFhirQueryEnhancementRegex = Regex("\\{\\{(.*?)\\}\\}")
+  private val xFhirQueryEnhancementRegex = Regex("\\{\\{(.*?)\\}\\}")
 
   internal val fhirPathEngine: FHIRPathEngine =
     with(FhirContext.forCached(FhirVersionEnum.R4)) {
