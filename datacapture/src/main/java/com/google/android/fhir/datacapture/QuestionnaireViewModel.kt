@@ -336,7 +336,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     when (entryMode) {
       EntryMode.PRIOR_EDIT,
       EntryMode.SEQUENTIAL, -> {
-        validateCurrentPageItems() {
+        validateCurrentPageItems {
           val nextPageIndex =
             pages!!.indexOfFirst {
               it.index > currentPageIndexFlow.value!! && it.enabled && !it.hidden
