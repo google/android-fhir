@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.datacapture.fhirpath
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.calculatedExpression
 import com.google.android.fhir.datacapture.extensions.findVariableExpression
 import com.google.android.fhir.datacapture.findVariableExpression
@@ -25,14 +23,12 @@ import com.google.android.fhir.datacapture.flattened
 import com.google.android.fhir.datacapture.isReferencedBy
 import com.google.android.fhir.datacapture.variableExpressions
 import org.hl7.fhir.exceptions.FHIRException
-import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.Type
-import org.hl7.fhir.r4.utils.FHIRPathEngine
 import timber.log.Timber
 
 /**
@@ -65,13 +61,6 @@ object ExpressionEvaluator {
    * https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
    */
   private val xFhirQueryEnhancementRegex = Regex("\\{\\{(.*?)\\}\\}")
-
-  internal val fhirPathEngine: FHIRPathEngine =
-    with(FhirContext.forCached(FhirVersionEnum.R4)) {
-      FHIRPathEngine(HapiWorkerContext(this, this.validationSupport)).apply {
-        hostServices = FHIRPathEngineHostServices
-      }
-    }
 
   /** Detects if any item into list is referencing a dependent item in its calculated expression */
   internal fun detectExpressionCyclicDependency(
