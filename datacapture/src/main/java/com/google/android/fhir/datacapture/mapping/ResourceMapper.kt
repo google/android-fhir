@@ -19,13 +19,12 @@ package com.google.android.fhir.datacapture.mapping
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.DataCapture
+import com.google.android.fhir.datacapture.common.datatype.toCodeType
+import com.google.android.fhir.datacapture.common.datatype.toIdType
+import com.google.android.fhir.datacapture.common.datatype.toUriType
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
-import com.google.android.fhir.datacapture.targetStructureMap
-import com.google.android.fhir.datacapture.utilities.toCodeType
-import com.google.android.fhir.datacapture.utilities.toCoding
-import com.google.android.fhir.datacapture.utilities.toIdType
-import com.google.android.fhir.datacapture.utilities.toUriType
-import java.lang.IllegalArgumentException
+import com.google.android.fhir.datacapture.extensions.targetStructureMap
+import com.google.android.fhir.datacapture.toCoding
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -362,7 +361,7 @@ object ResourceMapper {
         // 3) simply group questions (e.g. for display reasons) without altering the extraction
         // semantics
         when {
-          questionnaireItem.itemExtractionContextNameToExpressionPair != null ->
+          questionnaireItem.extension.itemExtractionContextExtensionValue != null ->
             // Extract a new resource for a new item extraction context
             extractResourceByDefinition(
               questionnaireItem,
@@ -596,14 +595,14 @@ private fun getFieldNameByDefinition(definition: String): String {
  * `addName` function for `name`.
  */
 private fun Base.addRepeatedFieldValue(fieldName: String) =
-  javaClass.getMethod("add${fieldName.capitalize(Locale.ROOT)}").invoke(this) as Base
+  javaClass.getMethod("add${fieldName.capitalize()}").invoke(this) as Base
 
 /**
  * Invokes the function to get a value in the choice of data type field in the `Base` object, e.g.,
  * `getValueQuantity` for `valueQuantity`.
  */
 private fun Base.getChoiceFieldValue(fieldName: String) =
-  javaClass.getMethod("get${fieldName.capitalize(Locale.ROOT)}").invoke(this) as Base
+  javaClass.getMethod("get${fieldName.capitalize()}").invoke(this) as Base
 
 /**
  * Updates a field of name [field.name] on this object with the generated enum from [value] using
@@ -624,7 +623,7 @@ private fun updateFieldWithEnum(base: Base, field: Field, value: Base) {
   val stringValue = if (value is Coding) value.code else value.toString()
 
   base.javaClass
-    .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.nonParameterizedType)
+    .getMethod("set${field.name.capitalize()}", field.nonParameterizedType)
     .invoke(base, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
 
@@ -666,23 +665,27 @@ private fun updateField(
 
 private fun setFieldElementValue(base: Base, field: Field, answerValue: Base) {
   base.javaClass
-    .getMethod("set${field.name.capitalize(Locale.ROOT)}Element", field.type)
+    .getMethod("set${field.name.capitalize()}Element", field.type)
     .invoke(base, answerValue)
 }
 
 private fun addAnswerToListField(base: Base, field: Field, answerValue: List<Base>) {
   base.javaClass
     .getMethod(
-      "add${field.name.capitalize(Locale.ROOT)}",
-      answerValue.first().primitiveValue().javaClass
+      "add${field.name.replaceFirstChar(Char::uppercase)}",
+      answerValue.first().fhirType().replaceFirstChar(Char::uppercase).javaClass
     )
     .let { method -> answerValue.forEach { method.invoke(base, it.primitiveValue()) } }
 }
 
 private fun updateListFieldWithAnswer(base: Base, field: Field, answerValue: List<Base>) {
   base.javaClass
-    .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.type)
+    .getMethod("set${field.name.capitalize()}", field.type)
     .invoke(base, if (field.isParameterized && field.isList) answerValue else answerValue.first())
+}
+
+private fun String.capitalize() = replaceFirstChar {
+  if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
 }
 
 /**
@@ -767,44 +770,41 @@ private fun Base.asExpectedType(): Type {
  * such extension exists in the questionnaire, or null otherwise.
  */
 private fun Questionnaire.createResource(): Resource? =
-  itemExtractionContextExtensionNameToExpressionPair?.let {
-    Class.forName("org.hl7.fhir.r4.model.${it.second}").newInstance() as Resource
+  this.extension.itemExtractionContextExtensionValue?.let {
+    Class.forName("org.hl7.fhir.r4.model.$it").newInstance() as Resource
   }
-
-/**
- * [Pair] of name and expression for the item extraction context extension if one and only one such
- * extension exists, or null otherwise.
- */
-private val Questionnaire.itemExtractionContextExtensionNameToExpressionPair
-  get() = this.extension.itemExtractionContextExtensionNameToExpressionPair
 
 /**
  * Returns a newly created [Resource] from the item extraction context extension if one and only one
  * such extension exists in the questionnaire item, or null otherwise.
  */
 private fun Questionnaire.QuestionnaireItemComponent.createResource(): Resource? =
-  itemExtractionContextNameToExpressionPair?.let {
-    Class.forName("org.hl7.fhir.r4.model.${it.second}").newInstance() as Resource
+  this.extension.itemExtractionContextExtensionValue?.let {
+    Class.forName("org.hl7.fhir.r4.model.$it").newInstance() as Resource
   }
 
 /**
- * [Pair] of name and expression for the item extraction context extension if one and only one such
- * extension exists, or null otherwise.
+ * The item extraction context extension value of type Expression or CodeType if one and only one
+ * such extension exists or null otherwise. If there are multiple extensions exists, it will be
+ * ignored. See
+ * http://hl7.org/fhir/uv/sdc/STU3/StructureDefinition-sdc-questionnaire-itemExtractionContext.html
  */
-private val Questionnaire.QuestionnaireItemComponent.itemExtractionContextNameToExpressionPair:
-  Pair<String, String>?
-  get() = this.extension.itemExtractionContextExtensionNameToExpressionPair
-
-/**
- * [Pair] of name and expression for the item extraction context extension if one and only one such
- * extension exists, or null otherwise.
- */
-private val List<Extension>.itemExtractionContextExtensionNameToExpressionPair
+private val List<Extension>.itemExtractionContextExtensionValue
   get() =
     this.singleOrNull { it.url == ITEM_CONTEXT_EXTENSION_URL }
       ?.let {
-        val expression = it.value as Expression
-        expression.name to expression.expression
+        when (it.value) {
+          is Expression -> {
+            // TODO update the existing resource
+            val expression = it.value as Expression
+            expression.expression
+          }
+          is CodeType -> {
+            val code = it.value as CodeType
+            code.value
+          }
+          else -> null
+        }
       }
 
 /**

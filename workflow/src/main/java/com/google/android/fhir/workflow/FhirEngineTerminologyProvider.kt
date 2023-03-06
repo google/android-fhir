@@ -20,7 +20,6 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.search.search
-import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.CodeSystem
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -32,7 +31,7 @@ import org.opencds.cqf.cql.engine.terminology.TerminologyProvider
 import org.opencds.cqf.cql.engine.terminology.ValueSetInfo
 import org.opencds.cqf.cql.evaluator.engine.util.ValueSetUtil
 
-class FhirEngineTerminologyProvider(
+internal class FhirEngineTerminologyProvider(
   private val fhirContext: FhirContext,
   private val fhirEngine: FhirEngine
 ) : TerminologyProvider {
@@ -45,6 +44,8 @@ class FhirEngineTerminologyProvider(
   override fun `in`(code: Code, valueSet: ValueSetInfo): Boolean {
     try {
       return expand(valueSet).any { it.code == code.code && it.system == code.system }
+    } catch (b: BlockingMainThreadException) {
+      throw b
     } catch (e: Exception) {
       throw TerminologyProviderException(
         "Error performing membership check of Code: $code in ValueSet: ${valueSet.id}",
@@ -53,63 +54,62 @@ class FhirEngineTerminologyProvider(
     }
   }
 
-  override fun expand(valueSetInfo: ValueSetInfo): MutableIterable<Code> {
-    try {
-      val valueSet = resolveValueSet(valueSetInfo)
-      return ValueSetUtil.getCodesInExpansion(fhirContext, valueSet)
-        ?: ValueSetUtil.getCodesInCompose(fhirContext, valueSet)
-    } catch (e: Exception) {
-      throw TerminologyProviderException(
-        "Error performing expansion of ValueSet: ${valueSetInfo.id}",
-        e
-      )
-    }
-  }
-
-  override fun lookup(code: Code, codeSystem: CodeSystemInfo): Code {
-    try {
-      val codeSystems = runBlocking {
-        fhirEngine.search<CodeSystem> {
-          filter(CodeSystem.CODE, { value = of(code.code) })
-          filter(CodeSystem.SYSTEM, { value = codeSystem.id })
+  override fun expand(valueSetInfo: ValueSetInfo): MutableIterable<Code> =
+    runBlockingOrThrowMainThreadException {
+      try {
+        resolveValueSet(valueSetInfo).let {
+          ValueSetUtil.getCodesInExpansion(fhirContext, it)
+            ?: ValueSetUtil.getCodesInCompose(fhirContext, it)
         }
+      } catch (e: Exception) {
+        throw TerminologyProviderException(
+          "Error performing expansion of ValueSet: ${valueSetInfo.id}",
+          e
+        )
       }
-
-      val concept = codeSystems.first().concept.first { it.code == code.code }
-
-      return Code().apply {
-        this.code = code.code
-        display = concept.display
-        system = codeSystem.id
-      }
-    } catch (e: Exception) {
-      throw TerminologyProviderException(
-        "Error performing lookup of Code: $code in CodeSystem: ${codeSystem.id}",
-        e
-      )
     }
-  }
 
-  private fun searchByUrl(url: String?): List<ValueSet> {
+  override fun lookup(code: Code, codeSystem: CodeSystemInfo): Code =
+    runBlockingOrThrowMainThreadException {
+      try {
+        fhirEngine
+          .search<CodeSystem> {
+            filter(CodeSystem.CODE, { value = of(code.code) })
+            filter(CodeSystem.SYSTEM, { value = codeSystem.id })
+          }
+          .first()
+          .concept
+          .first { it.code == code.code }
+          .let {
+            Code().apply {
+              this.code = code.code
+              display = it.display
+              system = codeSystem.id
+            }
+          }
+      } catch (e: Exception) {
+        throw TerminologyProviderException(
+          "Error performing lookup of Code: $code in CodeSystem: ${codeSystem.id}",
+          e
+        )
+      }
+    }
+
+  private suspend fun searchByUrl(url: String?): List<ValueSet> {
     if (url == null) return emptyList()
-    return runBlocking { fhirEngine.search { filter(ValueSet.URL, { value = url }) } }
+    return fhirEngine.search { filter(ValueSet.URL, { value = url }) }
   }
 
-  private fun searchByIdentifier(identifier: String?): List<ValueSet> {
+  private suspend fun searchByIdentifier(identifier: String?): List<ValueSet> {
     if (identifier == null) return emptyList()
-    return runBlocking {
-      fhirEngine.search { filter(ValueSet.IDENTIFIER, { value = of(identifier) }) }
-    }
+    return fhirEngine.search { filter(ValueSet.IDENTIFIER, { value = of(identifier) }) }
   }
 
-  private fun searchById(id: String): List<ValueSet> {
-    return runBlocking {
-      listOfNotNull(
-        safeGet(fhirEngine, ResourceType.ValueSet, id.removePrefix(URN_OID).removePrefix(URN_UUID))
-          as? ValueSet
-      )
-    }
-  }
+  private suspend fun searchById(id: String): List<ValueSet> =
+    listOfNotNull(
+      safeGet(fhirEngine, ResourceType.ValueSet, id.removePrefix(URN_OID).removePrefix(URN_UUID))
+        as? ValueSet
+    )
 
   private suspend fun safeGet(fhirEngine: FhirEngine, type: ResourceType, id: String): Resource? {
     return try {
@@ -119,7 +119,7 @@ class FhirEngineTerminologyProvider(
     }
   }
 
-  fun resolveValueSet(valueSet: ValueSetInfo): ValueSet {
+  private suspend fun resolveValueSet(valueSet: ValueSetInfo): ValueSet {
     if (valueSet.version != null ||
         (valueSet.codeSystems != null && valueSet.codeSystems.isNotEmpty())
     ) {
@@ -146,7 +146,7 @@ class FhirEngineTerminologyProvider(
     }
   }
 
-  fun resolveValueSetId(valueSet: ValueSetInfo): String {
+  suspend fun resolveValueSetId(valueSet: ValueSetInfo): String {
     return resolveValueSet(valueSet).idElement.idPart
   }
 }

@@ -115,86 +115,114 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
   @Test
   fun getNextRequestUrl_withLastUpdatedTimeProvidedInContext_ShouldAppendGtPrefixToLastUpdatedSearchParam() =
-      runBlockingTest {
-    val downloadManager =
-      ResourceParamsBasedDownloadWorkManager(mapOf(ResourceType.Patient to emptyMap()))
-    val url =
-      downloadManager.getNextRequestUrl(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-28"
-        }
-      )
-    assertThat(url).isEqualTo("Patient?_sort=_lastUpdated&_lastUpdated=gt2022-06-28")
-  }
+    runBlockingTest {
+      val downloadManager =
+        ResourceParamsBasedDownloadWorkManager(mapOf(ResourceType.Patient to emptyMap()))
+      val url =
+        downloadManager.getNextRequestUrl(
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-28"
+          }
+        )
+      assertThat(url).isEqualTo("Patient?_sort=_lastUpdated&_lastUpdated=gt2022-06-28")
+    }
 
   @Test
   fun getNextRequestUrl_withLastUpdatedSyncParamProvided_shouldReturnUrlWithExactProvidedLastUpdatedSyncParam() =
-      runBlockingTest {
-    val downloadManager =
-      ResourceParamsBasedDownloadWorkManager(
-        mapOf(
-          ResourceType.Patient to
-            mapOf(
-              SyncDataParams.LAST_UPDATED_KEY to "2022-06-28",
-              SyncDataParams.SORT_KEY to "status"
-            )
+    runBlockingTest {
+      val downloadManager =
+        ResourceParamsBasedDownloadWorkManager(
+          mapOf(
+            ResourceType.Patient to
+              mapOf(
+                SyncDataParams.LAST_UPDATED_KEY to "2022-06-28",
+                SyncDataParams.SORT_KEY to "status"
+              )
+          )
         )
-      )
-    val url =
-      downloadManager.getNextRequestUrl(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-07-07"
-        }
-      )
-    assertThat(url).isEqualTo("Patient?_lastUpdated=2022-06-28&_sort=status")
-  }
+      val url =
+        downloadManager.getNextRequestUrl(
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-07-07"
+          }
+        )
+      assertThat(url).isEqualTo("Patient?_lastUpdated=2022-06-28&_sort=status")
+    }
 
   @Test
   fun getNextRequestUrl_withLastUpdatedSyncParamHavingGtPrefix_shouldReturnUrlWithExactProvidedLastUpdatedSyncParam() =
-      runBlockingTest {
-    val downloadManager =
-      ResourceParamsBasedDownloadWorkManager(
-        mapOf(ResourceType.Patient to mapOf(SyncDataParams.LAST_UPDATED_KEY to "gt2022-06-28"))
-      )
-    val url =
-      downloadManager.getNextRequestUrl(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-07-07"
-        }
-      )
-    assertThat(url).isEqualTo("Patient?_lastUpdated=gt2022-06-28&_sort=_lastUpdated")
-  }
+    runBlockingTest {
+      val downloadManager =
+        ResourceParamsBasedDownloadWorkManager(
+          mapOf(ResourceType.Patient to mapOf(SyncDataParams.LAST_UPDATED_KEY to "gt2022-06-28"))
+        )
+      val url =
+        downloadManager.getNextRequestUrl(
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-07-07"
+          }
+        )
+      assertThat(url).isEqualTo("Patient?_lastUpdated=gt2022-06-28&_sort=_lastUpdated")
+    }
 
   @Test
   fun getNextRequestUrl_withNullUpdatedTimeStamp_shouldReturnUrlWithoutLastUpdatedQueryParam() =
-      runBlockingTest {
-    val downloadManager =
-      ResourceParamsBasedDownloadWorkManager(
-        mapOf(ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"))
-      )
-    val actual =
-      downloadManager.getNextRequestUrl(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = null
-        }
-      )
-    assertThat(actual).isEqualTo("Patient?address-city=NAIROBI&_sort=_lastUpdated")
-  }
+    runBlockingTest {
+      val downloadManager =
+        ResourceParamsBasedDownloadWorkManager(
+          mapOf(ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"))
+        )
+      val actual =
+        downloadManager.getNextRequestUrl(
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType) = null
+          }
+        )
+      assertThat(actual).isEqualTo("Patient?address-city=NAIROBI&_sort=_lastUpdated")
+    }
 
   @Test
   fun getNextRequestUrl_withEmptyUpdatedTimeStamp_shouldReturnUrlWithoutLastUpdatedQueryParam() =
-      runBlockingTest {
+    runBlockingTest {
+      val downloadManager =
+        ResourceParamsBasedDownloadWorkManager(
+          mapOf(ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"))
+        )
+      val actual =
+        downloadManager.getNextRequestUrl(
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType) = ""
+          }
+        )
+      assertThat(actual).isEqualTo("Patient?address-city=NAIROBI&_sort=_lastUpdated")
+    }
+
+  @Test
+  fun `getSummaryRequestUrls should return resource summary urls`() = runBlockingTest {
     val downloadManager =
       ResourceParamsBasedDownloadWorkManager(
-        mapOf(ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"))
+        mapOf(
+          ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"),
+          ResourceType.Immunization to emptyMap(),
+          ResourceType.Observation to emptyMap(),
+        )
       )
-    val actual =
-      downloadManager.getNextRequestUrl(
+
+    val urls =
+      downloadManager.getSummaryRequestUrls(
         object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = ""
+          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-03-20"
         }
       )
-    assertThat(actual).isEqualTo("Patient?address-city=NAIROBI&_sort=_lastUpdated")
+
+    assertThat(urls.map { it.key })
+      .containsExactly(ResourceType.Patient, ResourceType.Immunization, ResourceType.Observation)
+    assertThat(urls.map { it.value })
+      .containsExactly(
+        "Patient?address-city=NAIROBI&_sort=_lastUpdated&_lastUpdated=gt2022-03-20&_summary=count",
+        "Immunization?_sort=_lastUpdated&_lastUpdated=gt2022-03-20&_summary=count",
+        "Observation?_sort=_lastUpdated&_lastUpdated=gt2022-03-20&_summary=count"
+      )
   }
 
   @Test
