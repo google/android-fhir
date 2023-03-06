@@ -119,14 +119,18 @@ class QuestionnaireFragment : Fragment() {
 
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
 
-    val reviewModeEditButton = view.findViewById<View>(R.id.review_mode_edit_button)
-    reviewModeEditButton.setOnClickListener { viewModel.setReviewMode(false) }
+    val reviewModeEditButton =
+      view.findViewById<View>(R.id.review_mode_edit_button).apply {
+        setOnClickListener { viewModel.setReviewMode(false) }
+      }
 
-    val reviewModeButton = view.findViewById<View>(R.id.review_mode_button)
-    reviewModeButton.setOnClickListener {
-      viewModel.setReviewMode(true)
-      viewModel.validateQuestionnaireAndUpdateUI()
-    }
+    val reviewModeButton =
+      view.findViewById<View>(R.id.review_mode_button).apply {
+        setOnClickListener {
+          viewModel.setReviewMode(true)
+          viewModel.validateQuestionnaireAndUpdateUI()
+        }
+      }
 
     questionnaireEditRecyclerView.adapter = questionnaireEditAdapter
     val linearLayoutManager = LinearLayoutManager(view.context)

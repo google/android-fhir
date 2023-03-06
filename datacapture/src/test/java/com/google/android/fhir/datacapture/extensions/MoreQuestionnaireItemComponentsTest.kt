@@ -62,6 +62,7 @@ import com.google.android.fhir.datacapture.hasMimeTypeOnly
 import com.google.android.fhir.datacapture.isFlyoverCode
 import com.google.android.fhir.datacapture.isGivenSizeOverLimit
 import com.google.android.fhir.datacapture.isHelpCode
+import com.google.android.fhir.datacapture.isHidden
 import com.google.android.fhir.datacapture.isInstructionsCode
 import com.google.android.fhir.datacapture.isReferencedBy
 import com.google.android.fhir.datacapture.itemControl
@@ -1257,6 +1258,36 @@ class MoreQuestionnaireItemComponentsTest {
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
     assertThat(questionItemList.first().localizedHelpSpanned.toString()).isEqualTo("phụ đề")
+  }
+
+  @Test
+  fun `isHidden should return true`() {
+    assertThat(
+        Questionnaire.QuestionnaireItemComponent()
+          .apply { addExtension(EXTENSION_HIDDEN_URL, BooleanType(true)) }
+          .isHidden
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun `isHidden should return false`() {
+    assertThat(
+        Questionnaire.QuestionnaireItemComponent()
+          .apply { addExtension(EXTENSION_HIDDEN_URL, BooleanType(false)) }
+          .isHidden
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun `isHidden should return false for invalid value`() {
+    assertThat(
+        Questionnaire.QuestionnaireItemComponent()
+          .apply { addExtension(EXTENSION_HIDDEN_URL, IntegerType(1)) }
+          .isHidden
+      )
+      .isFalse()
   }
 
   @Test
