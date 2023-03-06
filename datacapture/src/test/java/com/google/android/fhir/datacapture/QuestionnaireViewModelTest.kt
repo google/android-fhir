@@ -3617,7 +3617,7 @@ class QuestionnaireViewModelTest {
             }
             .localizedMessage
         assertThat(exception)
-          .isEqualTo("The FHIRPath {{Practitioner.name.bamily}} evaluated to null")
+          .isEqualTo("The FHIRPath {{Practitioner.name.bamily}} evaluates to null")
       }
     }
 
