@@ -83,13 +83,14 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
     }
   }
 
-  private fun addQuestionnaireFragment(pair: Pair<String, String>) {
+  private fun addQuestionnaireFragment(triple: Triple<String, String, String>) {
     childFragmentManager.commit {
       add(
         R.id.add_patient_container,
         QuestionnaireFragment.builder()
-          .setQuestionnaire(pair.first)
-          .setQuestionnaireResponse(pair.second)
+          .setQuestionnaire(triple.first)
+          .setQuestionnaireResponse(triple.second)
+          .setQuestionnaireResourceContext(triple.third)
           .build(),
         QUESTIONNAIRE_FRAGMENT_TAG
       )

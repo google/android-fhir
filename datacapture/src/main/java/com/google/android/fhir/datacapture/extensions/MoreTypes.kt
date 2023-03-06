@@ -47,15 +47,13 @@ import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
-/**
- * Returns the string representation of a [PrimitiveType].
- *
- * <p>If the type isn't a [PrimitiveType], an empty string is returned.
- */
-fun Type.asStringValue(): String {
-  if (!isPrimitive) return ""
-  return (this as PrimitiveType<*>).asStringValue()
-}
+/** Returns the string representation of a [Type]. */
+fun Type.asStringValue(): String =
+  when (this) {
+    is PrimitiveType<*> -> this.asStringValue()
+    is Coding -> this.toCodeType().asStringValue()
+    else -> ""
+  }
 
 /**
  * Returns what to display on the UI depending on the [Type]. Used to get the display representation

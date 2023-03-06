@@ -741,7 +741,6 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
   }
 }
 
-
 /**
  * Returns a newly created [Resource] from the item extraction context extension if one and only one
  * such extension exists in the questionnaire, or null otherwise.

@@ -200,6 +200,11 @@ class MoreTypesTest {
   }
 
   @Test
+  fun coding_asStringValue() {
+    val code = Coding("fakeSystem", "fakeCode", "fakeDisplay")
+    assertThat(code.asStringValue()).isEqualTo("fakeCode")
+  }
+  @Test
   fun `should return calculated value for cqf expression`() {
     val today = LocalDate.now().toString()
     val type =

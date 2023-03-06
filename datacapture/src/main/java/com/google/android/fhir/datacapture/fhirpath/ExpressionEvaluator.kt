@@ -253,7 +253,19 @@ object ExpressionEvaluator {
     return evaluateVariable(expression, questionnaireResponse, variablesMap)
   }
 
-  internal fun evaluateXFhirEnhancement(expression: Expression, resource: Resource) =
+  /**
+   * Evaluates an x-fhir-query that contains fhir-paths, returning a sequence of String/Base pairs.
+   * The String is the FhirPath expression surrounded by curly brackets {{ fhir.path }}, and the
+   * Base is the matched element from evaluating the resource passed in.
+   *
+   * @param expression x-fhir-query expression containing a FHIRpath, e.g.
+   * Practitioner?active=true&{{Practitioner.name.family}}
+   * @param resource the resource context to evaluate the expression against
+   */
+  internal fun evaluateXFhirEnhancement(
+    expression: Expression,
+    resource: Resource
+  ): Sequence<Pair<String, Base?>> =
     xFhirQueryEnhancementRegex
       .findAll(expression.expression)
       .map { it.groupValues }

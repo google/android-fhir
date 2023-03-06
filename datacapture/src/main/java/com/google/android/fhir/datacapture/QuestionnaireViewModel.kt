@@ -504,6 +504,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
 
         val xFhirExpressionString = createXFhirQueryFromExpression(expression)
+        println("The evaluated xFhirExpression will be $xFhirExpressionString")
 
         xFhirQueryResolver!!.resolve(xFhirExpressionString)
       } else if (expression.isFhirPath) {
@@ -518,10 +519,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * TODO
-   *
-   * @param expression
-   * @return
+   * Creates an x-fhir-query from an [Expression]. If the questionnaire resource context is set, the
+   * expression is first checked for any FHIR Path expressions to evaluate first. See:
+   * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirquery
    */
   private fun createXFhirQueryFromExpression(expression: Expression): String =
     questionnaireResourceContext?.let { resource ->

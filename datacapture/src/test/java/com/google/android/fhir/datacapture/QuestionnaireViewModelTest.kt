@@ -3484,7 +3484,7 @@ class QuestionnaireViewModelTest {
                   Extension(
                     "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
                     Expression().apply {
-                      this.expression = "Practitioner?active=true&{{Practitioner.name.family}} "
+                      this.expression = "Practitioner?active=true&{{Practitioner.name.family}}"
                       this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
                     }
                   ),

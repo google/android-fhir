@@ -390,7 +390,7 @@ class QuestionnaireFragment : Fragment() {
     internal const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
 
     /** A JSON encoded string extra for questionnaire context. */
-    const val EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING =
+    internal const val EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING =
       "questionnaire-resource-id-for-context"
     /**
      * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.
