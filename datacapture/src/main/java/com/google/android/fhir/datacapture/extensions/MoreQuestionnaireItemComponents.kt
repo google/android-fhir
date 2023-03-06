@@ -284,7 +284,7 @@ internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
       }
     }
   }
-/** Converts Text with HTML Tag to formated text. */
+/** Converts Text with HTML Tag to formatted text. */
 private fun String.toSpanned(): Spanned {
   return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
 }
@@ -367,7 +367,7 @@ val Questionnaire.QuestionnaireItemComponent.entryFormat: String?
 
 internal const val INSTRUCTIONS = "instructions"
 
-/** Returns [true] if extension is display category extension and contains 'instructions' code. */
+/** Returns `true` if extension is display category extension and contains 'instructions' code. */
 internal val Questionnaire.QuestionnaireItemComponent.isInstructionsCode: Boolean
   get() {
     return when (type) {
@@ -389,7 +389,7 @@ internal val Questionnaire.QuestionnaireItemComponent.isInstructionsCode: Boolea
   }
 
 /**
- * Returns [true] if item type is display and [displayItemControl] is
+ * Returns `true` if item type is display and [displayItemControl] is
  * [DisplayItemControlType.FLYOVER].
  */
 internal val Questionnaire.QuestionnaireItemComponent.isFlyoverCode: Boolean
@@ -531,13 +531,15 @@ internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expressi
  */
 internal val Questionnaire.QuestionnaireItemComponent.choiceColumn: List<ChoiceColumn>?
   get() =
-    ToolingExtensions.getExtensions(this, EXTENSION_CHOICE_COLUMN_URL)?.map {
-      it.extension.let {
+    ToolingExtensions.getExtensions(this, EXTENSION_CHOICE_COLUMN_URL)?.map { extension ->
+      extension.extension.let { nestedExtensions ->
         ChoiceColumn(
-          path = it.find { it.url == "path" }!!.value.asStringValue(),
-          label = it.find { it.url == "label" }?.value?.asStringValue(),
+          path = nestedExtensions.find { it.url == "path" }!!.value.asStringValue(),
+          label = nestedExtensions.find { it.url == "label" }?.value?.asStringValue(),
           forDisplay =
-            it.any { it.url == "forDisplay" && it.castToBoolean(it.value).booleanValue() }
+            nestedExtensions.any {
+              it.url == "forDisplay" && it.castToBoolean(it.value).booleanValue()
+            }
         )
       }
     }
