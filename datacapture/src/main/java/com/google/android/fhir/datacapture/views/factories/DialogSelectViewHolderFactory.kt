@@ -26,8 +26,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.ItemControlTypes
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.common.datatype.asStringValue
-import com.google.android.fhir.datacapture.common.datatype.displayString
+import com.google.android.fhir.datacapture.extensions.asStringValue
+import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.itemControl
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned

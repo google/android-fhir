@@ -25,9 +25,9 @@ import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.extensions.EntryMode
+import com.google.android.fhir.datacapture.extensions.asStringValue
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator

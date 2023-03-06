@@ -20,6 +20,7 @@ import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.fhir.datacapture.extensions.CQF_CALCULATED_EXPRESSION_URL
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
