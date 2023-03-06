@@ -524,10 +524,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private fun createXFhirQueryFromExpression(expression: Expression): String =
     questionnaireResourceContext?.let { resource ->
       ExpressionEvaluator.evaluateXFhirEnhancement(expression, resource)
-        .map {
-          checkNotNull(it.second) { "The FHIRPath ${it.first} evaluated to null" }
-          it.first to it.second!!.asExpectedType().asStringValue()
-        }
+        .map { it.first to it.second.asExpectedType().asStringValue() }
         .fold(expression.expression) { acc: String, pair: Pair<String, String> ->
           acc.replace(pair.first, pair.second)
         }

@@ -26,10 +26,15 @@ import com.google.android.fhir.datacapture.variableExpressions
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
 import java.util.Date
+import java.util.UUID
+import kotlin.test.assertFailsWith
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -665,5 +670,96 @@ class ExpressionEvaluatorTest {
       }
     assertThat(exception.message)
       .isEqualTo("a-birthdate and a-age-years have cyclic dependency in expression based extension")
+  }
+
+  @Test
+  fun `xFhirQueryEnhancementRegex should capture all FHIR paths`() {
+
+    val expression =
+      Expression().apply {
+        this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+        this.expression =
+          "Practitioner?var1={{random}}&var2={{  random   }}&var3={{ random}}&var4={{random }}"
+      }
+
+    val stringBasePairsSequence =
+      ExpressionEvaluator.evaluateXFhirEnhancement(expression, Practitioner())
+
+    val fhirPathsWithParentheses = stringBasePairsSequence.map { it.first }.toList()
+    assertThat(fhirPathsWithParentheses.size).isEqualTo(4)
+    assertThat(fhirPathsWithParentheses)
+      .containsExactly("{{random}}", "{{  random   }}", "{{ random}}", "{{random }}")
+  }
+
+  @Test
+  fun `evaluateXFhirEnhancement() should throw exception as expression is not valid`() {
+
+    val practitioner =
+      Practitioner().apply {
+        id = UUID.randomUUID().toString()
+        active = true
+        gender = Enumerations.AdministrativeGender.MALE
+        addName(HumanName().apply { this.family = "John" })
+      }
+
+    val expression =
+      Expression().apply {
+        this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+        this.expression = "Practitioner?active={{random}}"
+      }
+
+    val exception =
+      assertFailsWith<IllegalStateException> {
+        ExpressionEvaluator.evaluateXFhirEnhancement(expression, practitioner).toList()
+      }
+    assertThat(exception.localizedMessage).isEqualTo("The FHIRPath {{random}} evaluates to null")
+  }
+
+  @Test
+  fun `evaluateXFhirEnhancement() should throw exception as resource does not contain required field`() {
+
+    val practitioner =
+      Practitioner().apply {
+        id = UUID.randomUUID().toString()
+        active = true
+        addName(HumanName().apply { this.family = "John" })
+      }
+
+    val expression =
+      Expression().apply {
+        this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+        this.expression = "Practitioner?gender={{Practitioner.gender}}"
+      }
+
+    val exception =
+      assertFailsWith<IllegalStateException> {
+        ExpressionEvaluator.evaluateXFhirEnhancement(expression, practitioner).toList()
+      }
+    assertThat(exception.localizedMessage)
+      .isEqualTo("The FHIRPath {{Practitioner.gender}} evaluates to null")
+  }
+  @Test
+  fun `evaluateXFhirEnhancement() should  return one pair`() {
+
+    val practitioner =
+      Practitioner().apply {
+        id = UUID.randomUUID().toString()
+        active = true
+        gender = Enumerations.AdministrativeGender.MALE
+        addName(HumanName().apply { this.family = "John" })
+      }
+
+    val expression =
+      Expression().apply {
+        this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+        this.expression = "Practitioner?gender={{Practitioner.gender}}"
+      }
+
+    val stringBasePairsSequence =
+      ExpressionEvaluator.evaluateXFhirEnhancement(expression, practitioner)
+
+    val matchingElements = stringBasePairsSequence.map { it.second }.toList()
+    assertThat(matchingElements.size).isEqualTo(1)
+    assertThat(matchingElements.first().primitiveValue()).isEqualTo("male")
   }
 }
