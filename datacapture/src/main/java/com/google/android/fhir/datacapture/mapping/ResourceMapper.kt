@@ -16,21 +16,19 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
+import com.google.android.fhir.datacapture.extensions.asExpectedType
 import com.google.android.fhir.datacapture.extensions.targetStructureMap
 import com.google.android.fhir.datacapture.extensions.toCodeType
 import com.google.android.fhir.datacapture.extensions.toIdType
 import com.google.android.fhir.datacapture.extensions.toUriType
-import com.google.android.fhir.datacapture.toCoding
+import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.util.Locale
 import org.hl7.fhir.r4.context.IWorkerContext
-import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CanonicalType
@@ -39,7 +37,6 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.DomainResource
-import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IdType
@@ -52,7 +49,6 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.StructureDefinition
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
-import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 import timber.log.Timber
 
@@ -76,11 +72,6 @@ import timber.log.Timber
  * for more information.
  */
 object ResourceMapper {
-
-  private val fhirPathEngine: FHIRPathEngine =
-    with(FhirContext.forCached(FhirVersionEnum.R4)) {
-      FHIRPathEngine(HapiWorkerContext(this, this.validationSupport))
-    }
 
   /**
    * Extract FHIR resources from a [questionnaire] and [questionnaireResponse].
@@ -750,20 +741,6 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
   }
 }
 
-/**
- * Returns the [Base] object as a [Type] as expected by
- * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue]. Also,
- * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue] only takes a certain [Type]
- * objects and throws exception otherwise. This extension function takes care of the conversion
- * based on the input and expected [Type].
- */
-internal fun Base.asExpectedType(): Type {
-  return when (this) {
-    is Enumeration<*> -> toCoding()
-    is IdType -> StringType(idPart)
-    else -> this as Type
-  }
-}
 
 /**
  * Returns a newly created [Resource] from the item extraction context extension if one and only one

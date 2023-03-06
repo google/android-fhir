@@ -20,17 +20,20 @@ import android.content.Context
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import com.google.android.fhir.datacapture.format
+import com.google.android.fhir.datacapture.toCoding
 import com.google.android.fhir.datacapture.toLocalizedString
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localTime
 import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.Attachment
+import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.IntegerType
@@ -114,6 +117,21 @@ internal fun StringType.toIdType(): IdType {
 /** Converts Coding to CodeType. */
 internal fun Coding.toCodeType(): CodeType {
   return CodeType(code)
+}
+
+/**
+ * Returns the [Base] object as a [Type] as expected by
+ * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue]. Also,
+ * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue] only takes a certain [Type]
+ * objects and throws exception otherwise. This extension function takes care of the conversion
+ * based on the input and expected [Type].
+ */
+internal fun Base.asExpectedType(): Type {
+  return when (this) {
+    is Enumeration<*> -> toCoding()
+    is IdType -> StringType(idPart)
+    else -> this as Type
+  }
 }
 
 fun Type.valueOrCalculateValue(): Type? {
