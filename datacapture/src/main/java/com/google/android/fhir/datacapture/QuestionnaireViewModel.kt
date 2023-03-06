@@ -504,8 +504,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
 
         val xFhirExpressionString = createXFhirQueryFromExpression(expression)
-        println("The evaluated xFhirExpression will be $xFhirExpressionString")
-
         xFhirQueryResolver!!.resolve(xFhirExpressionString)
       } else if (expression.isFhirPath) {
         fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
