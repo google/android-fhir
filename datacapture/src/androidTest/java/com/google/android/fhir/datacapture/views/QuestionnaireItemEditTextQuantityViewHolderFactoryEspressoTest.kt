@@ -28,6 +28,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.views.factories.EditTextQuantityViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Quantity
@@ -49,15 +51,15 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
   @Before
   fun setup() {
     activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }
-    viewHolder = QuestionnaireItemEditTextQuantityViewHolderFactory.create(parent)
+    viewHolder = EditTextQuantityViewHolderFactory.create(parent)
     setTestLayout(viewHolder.itemView)
   }
 
   @Test
   fun getValue_WithInitial_shouldReturn_Quantity_With_UnitAndSystem() {
     var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           required = true
           addInitial(
@@ -73,7 +75,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
-    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+    runOnUI { viewHolder.bind(questionnaireViewItem) }
 
     onView(withId(R.id.text_input_edit_text)).perform(click())
     onView(withId(R.id.text_input_edit_text)).perform(typeText("22"))
@@ -91,14 +93,14 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
   @Test
   fun getValue_WithoutInitial_shouldReturn_Quantity_Without_UnitAndSystem() {
     var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
-    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+    runOnUI { viewHolder.bind(questionnaireViewItem) }
 
     onView(withId(R.id.text_input_edit_text)).perform(click())
     onView(withId(R.id.text_input_edit_text)).perform(typeText("22"))

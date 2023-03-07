@@ -43,7 +43,7 @@ class QuestionnaireResponseItemValidatorTest {
   }
 
   @Test
-  fun shouldReturnValidResult() {
+  fun `should return valid result`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -79,28 +79,35 @@ class QuestionnaireResponseItemValidatorTest {
   }
 
   @Test
-  fun exceededMaxMinValue_shouldReturnInvalidResultWithMessages() {
+  fun `should validate individual answers and combine results`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         linkId = "a-question"
+        type = Questionnaire.QuestionnaireItemType.INTEGER
         addExtension(
           Extension().apply {
             url = MIN_VALUE_EXTENSION_URL
-            this.setValue(IntegerType(600))
+            this.setValue(IntegerType(100))
           }
         )
         addExtension(
           Extension().apply {
             url = MAX_VALUE_EXTENSION_URL
-            this.setValue(IntegerType(500))
+            this.setValue(IntegerType(200))
           }
         )
       }
     val answers =
       listOf(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          value = IntegerType(550)
-        }
+          value = IntegerType(50)
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = IntegerType(150)
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = IntegerType(250)
+        },
       )
 
     val validationResult =
@@ -109,27 +116,17 @@ class QuestionnaireResponseItemValidatorTest {
     assertThat(validationResult).isInstanceOf(Invalid::class.java)
     val invalidValidationResult = validationResult as Invalid
     assertThat(invalidValidationResult.getSingleStringValidationMessage())
-      .isEqualTo("Maximum value allowed is:500\nMinimum value allowed is:600")
+      .isEqualTo("Minimum value allowed is:100\nMaximum value allowed is:200")
   }
 
   @Test
-  fun exceededMaxMinLength_shouldReturnInvalidResultWithMessages() {
+  fun `should validate all answers`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
-        maxLength = 10
-        addExtension(
-          Extension().apply {
-            url = MIN_LENGTH_EXTENSION_URL
-            this.setValue(IntegerType(20))
-          }
-        )
+        type = Questionnaire.QuestionnaireItemType.INTEGER
+        required = true
       }
-    val answers =
-      listOf(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          value = StringType("Length: 15chars")
-        }
-      )
+    val answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
 
     val validationResult =
       QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
@@ -137,36 +134,6 @@ class QuestionnaireResponseItemValidatorTest {
     assertThat(validationResult).isInstanceOf(Invalid::class.java)
     val invalidValidationResult = validationResult as Invalid
     assertThat(invalidValidationResult.getSingleStringValidationMessage())
-      .isEqualTo(
-        "The maximum number of characters that are permitted in the answer is: 10\nThe minimum number of characters that are permitted in the answer is: 20"
-      )
-  }
-
-  @Test
-  fun notMatchingRegex_shouldReturnInvalidResultWithMessages() {
-    val regex = "[0-9]+\\.[0-9]+"
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        addExtension(
-          Extension().apply {
-            url = REGEX_EXTENSION_URL
-            this.setValue(StringType(regex))
-          }
-        )
-      }
-    val answers =
-      listOf(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          value = IntegerType("3141516")
-        }
-      )
-
-    val validationResult =
-      QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
-
-    assertThat(validationResult).isInstanceOf(Invalid::class.java)
-    val invalidValidationResult = validationResult as Invalid
-    assertThat(invalidValidationResult.getSingleStringValidationMessage())
-      .isEqualTo("The answer doesn't match regular expression: $regex")
+      .isEqualTo("Missing answer for required field.")
   }
 }

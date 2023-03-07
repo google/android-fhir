@@ -34,7 +34,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import org.hl7.fhir.r4.model.Questionnaire
 import timber.log.Timber
@@ -113,25 +113,29 @@ class QuestionnaireFragment : Fragment() {
     }
     val questionnaireProgressIndicator: LinearProgressIndicator =
       view.findViewById(R.id.questionnaire_progress_indicator)
-    val questionnaireItemEditAdapter =
-      QuestionnaireItemEditAdapter(questionnaireItemViewHolderFactoryMatchersProvider.get())
-    val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
+    val questionnaireEditAdapter =
+      QuestionnaireEditAdapter(questionnaireItemViewHolderFactoryMatchersProvider.get())
+    val questionnaireReviewAdapter = QuestionnaireReviewAdapter()
 
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
 
-    val reviewModeEditButton = view.findViewById<View>(R.id.review_mode_edit_button)
-    reviewModeEditButton.setOnClickListener { viewModel.setReviewMode(false) }
+    val reviewModeEditButton =
+      view.findViewById<View>(R.id.review_mode_edit_button).apply {
+        setOnClickListener { viewModel.setReviewMode(false) }
+      }
 
-    val reviewModeButton = view.findViewById<View>(R.id.review_mode_button)
-    reviewModeButton.setOnClickListener { viewModel.setReviewMode(true) }
+    val reviewModeButton =
+      view.findViewById<View>(R.id.review_mode_button).apply {
+        setOnClickListener { viewModel.setReviewMode(true) }
+      }
 
-    questionnaireEditRecyclerView.adapter = questionnaireItemEditAdapter
+    questionnaireEditRecyclerView.adapter = questionnaireEditAdapter
     val linearLayoutManager = LinearLayoutManager(view.context)
     questionnaireEditRecyclerView.layoutManager = linearLayoutManager
     // Animation does work well with views that could gain focus
     questionnaireEditRecyclerView.itemAnimator = null
 
-    questionnaireReviewRecyclerView.adapter = questionnaireItemReviewAdapter
+    questionnaireReviewRecyclerView.adapter = questionnaireReviewAdapter
     questionnaireReviewRecyclerView.layoutManager = LinearLayoutManager(view.context)
 
     // Listen to updates from the view model.
@@ -141,7 +145,7 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.ReviewMode -> {
             // Set items
             questionnaireEditRecyclerView.visibility = View.GONE
-            questionnaireItemReviewAdapter.submitList(
+            questionnaireReviewAdapter.submitList(
               state.items.filterIsInstance<QuestionnaireAdapterItem.Question>()
             )
             questionnaireReviewRecyclerView.visibility = View.VISIBLE
@@ -164,7 +168,7 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.EditMode -> {
             // Set items
             questionnaireReviewRecyclerView.visibility = View.GONE
-            questionnaireItemEditAdapter.submitList(state.items)
+            questionnaireEditAdapter.submitList(state.items)
             questionnaireEditRecyclerView.visibility = View.VISIBLE
 
             // Set button visibility
@@ -246,7 +250,7 @@ class QuestionnaireFragment : Fragment() {
    */
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
-  /** Helper to create [Questionnaire] with appropriate [Bundle] arguments. */
+  /** Helper to create [QuestionnaireFragment] with appropriate [Bundle] arguments. */
   class Builder {
 
     private val args = mutableListOf<Pair<String, Any>>()
@@ -332,6 +336,11 @@ class QuestionnaireFragment : Fragment() {
       matchersProviderFactory: String
     ) = apply { args.add(EXTRA_MATCHERS_FACTORY to matchersProviderFactory) }
 
+    /**
+     * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
+     */
+    fun setShowSubmitButton(value: Boolean) = apply { args.add(EXTRA_SHOW_SUBMIT_BUTTON to value) }
+
     @VisibleForTesting fun buildArgs() = bundleOf(*args.toTypedArray())
 
     /** @return A [QuestionnaireFragment] with provided [Bundle] arguments. */
@@ -406,11 +415,12 @@ class QuestionnaireFragment : Fragment() {
 
     const val SUBMIT_REQUEST_KEY = "submit-request-key"
 
-    fun builder() = Builder()
     /**
      * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
      */
-    const val EXTRA_SHOW_SUBMIT_BUTTON = "show-submit-button"
+    internal const val EXTRA_SHOW_SUBMIT_BUTTON = "show-submit-button"
+
+    fun builder() = Builder()
   }
 
   /**
