@@ -265,18 +265,13 @@ object ExpressionEvaluator {
   internal fun evaluateXFhirEnhancement(
     expression: Expression,
     resource: Resource
-  ): Sequence<Pair<String, Base>> =
+  ): Sequence<Pair<String, Base?>> =
     xFhirQueryEnhancementRegex
       .findAll(expression.expression)
       .map { it.groupValues }
       .map { (fhirPathWithParentheses, fhirPath) ->
         fhirPathWithParentheses to fhirPathEngine.evaluate(resource, fhirPath).singleOrNull()
       }
-      .map {
-        checkNotNull(it.second) { "The FHIRPath ${it.first} evaluates to null" }
-        it.first to it.second!!
-      }
-
   private fun findDependentVariables(expression: Expression) =
     variableRegex
       .findAll(expression.expression)

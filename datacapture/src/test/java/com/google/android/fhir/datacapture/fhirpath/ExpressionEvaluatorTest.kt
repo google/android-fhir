@@ -27,7 +27,6 @@ import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
 import java.util.Date
 import java.util.UUID
-import kotlin.test.assertFailsWith
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
@@ -692,7 +691,7 @@ class ExpressionEvaluatorTest {
   }
 
   @Test
-  fun `evaluateXFhirEnhancement() should throw exception as expression is not valid`() {
+  fun `evaluateXFhirEnhancement() should evaluate to null for incorrect fhir path`() {
 
     val practitioner =
       Practitioner().apply {
@@ -708,15 +707,15 @@ class ExpressionEvaluatorTest {
         this.expression = "Practitioner?active={{random}}"
       }
 
-    val exception =
-      assertFailsWith<IllegalStateException> {
-        ExpressionEvaluator.evaluateXFhirEnhancement(expression, practitioner).toList()
-      }
-    assertThat(exception.localizedMessage).isEqualTo("The FHIRPath {{random}} evaluates to null")
+    val stringBasePairsSequence =
+      ExpressionEvaluator.evaluateXFhirEnhancement(expression, practitioner)
+    assertThat(stringBasePairsSequence.map { it.first }.toList()).containsExactly("{{random}}")
+
+    assertThat(stringBasePairsSequence.map { it.second }.toList()).containsExactly(null)
   }
 
   @Test
-  fun `evaluateXFhirEnhancement() should throw exception as resource does not contain required field`() {
+  fun `evaluateXFhirEnhancement() should evaluate to null for field that does not exist in resource`() {
 
     val practitioner =
       Practitioner().apply {
@@ -731,12 +730,12 @@ class ExpressionEvaluatorTest {
         this.expression = "Practitioner?gender={{Practitioner.gender}}"
       }
 
-    val exception =
-      assertFailsWith<IllegalStateException> {
-        ExpressionEvaluator.evaluateXFhirEnhancement(expression, practitioner).toList()
-      }
-    assertThat(exception.localizedMessage)
-      .isEqualTo("The FHIRPath {{Practitioner.gender}} evaluates to null")
+    val stringBasePairsSequence =
+      ExpressionEvaluator.evaluateXFhirEnhancement(expression, practitioner)
+    assertThat(stringBasePairsSequence.map { it.first }.toList())
+      .containsExactly("{{Practitioner.gender}}")
+
+    assertThat(stringBasePairsSequence.map { it.second }.toList()).containsExactly(null)
   }
   @Test
   fun `evaluateXFhirEnhancement() should  return one pair`() {
@@ -760,6 +759,6 @@ class ExpressionEvaluatorTest {
 
     val matchingElements = stringBasePairsSequence.map { it.second }.toList()
     assertThat(matchingElements.size).isEqualTo(1)
-    assertThat(matchingElements.first().primitiveValue()).isEqualTo("male")
+    assertThat(matchingElements.first()!!.primitiveValue()).isEqualTo("male")
   }
 }
