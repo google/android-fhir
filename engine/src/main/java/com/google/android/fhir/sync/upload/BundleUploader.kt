@@ -23,15 +23,12 @@ import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.UploadResult
 import com.google.android.fhir.sync.Uploader
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import retrofit2.HttpException
-import timber.log.Timber
 
 /** [Uploader] implementation to work with Fhir [Bundle]. */
 internal class BundleUploader(
@@ -40,31 +37,39 @@ internal class BundleUploader(
   private val localChangesPaginator: LocalChangesPaginator
 ) : Uploader {
 
-  override suspend fun upload(
-    localChanges: List<LocalChange>,
-  ): Flow<UploadResult> =
-    flow {
-        bundleGenerator.generate(localChangesPaginator.page(localChanges)).forEach {
-          (bundle, localChangeTokens) ->
-          val response = dataSource.upload(bundle)
-          emit(getUploadResult(response, localChangeTokens))
-        }
-      }
-      .catch { exception ->
-        Timber.i("exception stacktrace ${exception.stackTraceToString()}")
-        Timber.i("exception localised message ${exception.localizedMessage}")
-        if (exception.cause is HttpException) {
-          Timber.i("exception cause ${(exception as HttpException).response()}")
-        }
-        emit(
-          UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, exception as Exception))
-        )
-      }
+  override suspend fun upload(localChanges: List<LocalChange>): Flow<UploadResult> = flow {
+    val total = localChanges.size
+    var completed = 0
 
-  private fun getUploadResult(response: Resource, localChangeTokens: List<LocalChangeToken>) =
+    emit(UploadResult.Started(total))
+
+    bundleGenerator.generate(localChangesPaginator.page(localChanges)).forEach {
+      (bundle, localChangeTokens) ->
+      try {
+        val response = dataSource.upload(bundle)
+
+        completed += bundle.entry.size
+        emit(getUploadResult(response, localChangeTokens, total, completed))
+      } catch (e: Exception) {
+        emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
+      }
+    }
+  }
+
+  private fun getUploadResult(
+    response: Resource,
+    localChangeTokens: List<LocalChangeToken>,
+    total: Int,
+    completed: Int
+  ) =
     when {
       response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
-        UploadResult.Success(LocalChangeToken(localChangeTokens.flatMap { it.ids }), response)
+        UploadResult.Success(
+          LocalChangeToken(localChangeTokens.flatMap { it.ids }),
+          response,
+          total,
+          completed
+        )
       }
       response is OperationOutcome && response.issue.isNotEmpty() -> {
         UploadResult.Failure(

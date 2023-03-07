@@ -9,7 +9,7 @@ plugins {
   id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
 }
 
-publishArtifact(Releases.ImplmentationGuide)
+publishArtifact(Releases.ImplementationGuide)
 
 createJacocoTestReportTask()
 
@@ -22,6 +22,12 @@ android {
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.implementationguide"
+  }
+
+  sourceSets {
+    getByName("androidTest").apply { resources.setSrcDirs(listOf("sampledata")) }
+
+    getByName("test").apply { resources.setSrcDirs(listOf("sampledata")) }
   }
 
   buildTypes {
@@ -73,9 +79,6 @@ configurations {
 }
 
 dependencies {
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
-  kapt(Dependencies.Room.compiler)
-
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
@@ -85,21 +88,37 @@ dependencies {
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+
   implementation(Dependencies.Kotlin.stdlib)
+  implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.timber)
+
+  kapt(Dependencies.Room.compiler)
+
+  testImplementation(Dependencies.AndroidxTest.archCore)
+  testImplementation(Dependencies.AndroidxTest.core)
+  testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
+  testImplementation(Dependencies.mockitoInline)
+  testImplementation(Dependencies.mockitoKotlin)
+  testImplementation(Dependencies.robolectric)
+  testImplementation(Dependencies.truth)
 }
 
 tasks.dokkaHtml.configure {
   outputDirectory.set(
-    file("../docs/${Releases.ImplmentationGuide.artifactId}/${Releases.ImplmentationGuide.version}")
+    file(
+      "../docs/${Releases.ImplementationGuide.artifactId}/${Releases.ImplementationGuide.version}"
+    )
   )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
-      moduleName.set(Releases.ImplmentationGuide.artifactId)
-      moduleVersion.set(Releases.ImplmentationGuide.version)
+      moduleName.set(Releases.ImplementationGuide.artifactId)
+      moduleVersion.set(Releases.ImplementationGuide.version)
       noAndroidSdkLink.set(false)
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))

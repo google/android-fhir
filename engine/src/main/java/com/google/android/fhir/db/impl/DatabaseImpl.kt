@@ -32,6 +32,7 @@ import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ReferenceIndexEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
+import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
@@ -47,7 +48,8 @@ import org.hl7.fhir.r4.model.ResourceType
 internal class DatabaseImpl(
   private val context: Context,
   private val iParser: IParser,
-  databaseConfig: DatabaseConfig
+  databaseConfig: DatabaseConfig,
+  private val resourceIndexer: ResourceIndexer
 ) : com.google.android.fhir.db.Database {
 
   val db: ResourceDatabase
@@ -100,7 +102,12 @@ internal class DatabaseImpl(
         .build()
   }
 
-  private val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
+  private val resourceDao by lazy {
+    db.resourceDao().also {
+      it.iParser = iParser
+      it.resourceIndexer = resourceIndexer
+    }
+  }
   private val syncedResourceDao = db.syncedResourceDao()
   private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 

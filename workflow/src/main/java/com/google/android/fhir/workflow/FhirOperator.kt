@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.workflow
 
+import androidx.annotation.WorkerThread
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
@@ -55,6 +56,11 @@ import org.opencds.cqf.cql.evaluator.measure.r4.R4MeasureProcessor
 import org.opencds.cqf.cql.evaluator.plandefinition.OperationParametersParser
 import org.opencds.cqf.cql.evaluator.plandefinition.r4.PlanDefinitionProcessor
 
+// Uses the already cached FhirContext instead of creating a new one
+// on the default protected R4FhirModelResolver() constructor.
+// This is a heavy object to load. Avoid having to create a new one.
+object cachedR4FhirModelResolver : R4FhirModelResolver(FhirContext.forR4Cached())
+
 class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   // Initialize the measure processor
   private val fhirEngineTerminologyProvider = FhirEngineTerminologyProvider(fhirContext, fhirEngine)
@@ -68,7 +74,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     }
   private val dataProvider =
     CompositeDataProvider(
-      CachingModelResolverDecorator(R4FhirModelResolver()),
+      CachingModelResolverDecorator(cachedR4FhirModelResolver),
       fhirEngineRetrieveProvider
     )
   private val fhirEngineDal = FhirEngineDal(fhirEngine)
@@ -185,22 +191,30 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   }
 
   /**
-   * The function evaluates a FHIR library against the database
+   * The function evaluates a FHIR library against the database.
+   *
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
+   * from a worker thread or it may throw [BlockingMainThreadException] exception.
    * @param libraryUrl the url of the Library to evaluate
    * @param expressions names of expressions in the Library to evaluate.
-   * @return a Parameters resource that contains an evaluation result for each expression requested
+   * @return a Parameters resource that contains an evaluation result for each expression requested.
    */
+  @WorkerThread
   fun evaluateLibrary(libraryUrl: String, expressions: Set<String>): IBaseParameters {
     return evaluateLibrary(libraryUrl, null, null, expressions)
   }
 
   /**
    * The function evaluates a FHIR library against a patient's records.
+   *
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
+   * from a worker thread or it may throw [BlockingMainThreadException] exception.
    * @param libraryUrl the url of the Library to evaluate
    * @param patientId the Id of the patient to be evaluated
    * @param expressions names of expressions in the Library to evaluate.
    * @return a Parameters resource that contains an evaluation result for each expression requested
    */
+  @WorkerThread
   fun evaluateLibrary(
     libraryUrl: String,
     patientId: String,
@@ -210,12 +224,16 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   }
 
   /**
-   * The function evaluates a FHIR library against the database
+   * The function evaluates a FHIR library against the database.
+   *
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
+   * from a worker thread or it may throw [BlockingMainThreadException] exception.
    * @param libraryUrl the url of the Library to evaluate
    * @param parameters list of parameters to be passed to the CQL library
    * @param expressions names of expressions in the Library to evaluate.
    * @return a Parameters resource that contains an evaluation result for each expression requested
    */
+  @WorkerThread
   fun evaluateLibrary(
     libraryUrl: String,
     parameters: Parameters,
@@ -225,13 +243,17 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   }
 
   /**
-   * The function evaluates a FHIR library against the database
+   * The function evaluates a FHIR library against the database.
+   *
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
+   * from a worker thread or it may throw [BlockingMainThreadException] exception.
    * @param libraryUrl the url of the Library to evaluate
    * @param patientId the Id of the patient to be evaluated, if applicable
    * @param parameters list of parameters to be passed to the CQL library, if applicable
    * @param expressions names of expressions in the Library to evaluate.
    * @return a Parameters resource that contains an evaluation result for each expression requested
    */
+  @WorkerThread
   fun evaluateLibrary(
     libraryUrl: String,
     patientId: String?,
@@ -255,14 +277,20 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     )
   }
 
+  /**
+   * Generates a [MeasureReport] based on the provided inputs.
+   *
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
+   * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   */
+  @WorkerThread
   fun evaluateMeasure(
     measureUrl: String,
     start: String,
     end: String,
     reportType: String,
     subject: String?,
-    practitioner: String?,
-    lastReceivedOn: String?
+    practitioner: String?
   ): MeasureReport {
     return measureProcessor.evaluateMeasure(
       measureUrl,
@@ -271,7 +299,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       reportType,
       subject,
       practitioner,
-      lastReceivedOn,
+      /* lastReceivedOn= */ null,
       /* contentEndpoint= */ null,
       /* terminologyEndpoint= */ null,
       /* dataEndpoint= */ null,
@@ -279,10 +307,24 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     )
   }
 
+  /**
+   * Generates a [CarePlan] based on the provided inputs.
+   *
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
+   * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   */
+  @WorkerThread
   fun generateCarePlan(planDefinitionId: String, patientId: String): IBaseResource {
     return generateCarePlan(planDefinitionId, patientId, encounterId = null)
   }
 
+  /**
+   * Generates a [CarePlan] based on the provided inputs.
+   *
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
+   * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   */
+  @WorkerThread
   fun generateCarePlan(
     planDefinitionId: String,
     patientId: String,

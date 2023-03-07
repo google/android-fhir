@@ -26,14 +26,19 @@ internal interface Uploader {
 
   /**
    * Uploads the local changes to the [DataSource]. Particular implementations should take care of
-   * transforming the [SquashedLocalChange]s to particular network operations.
+   * transforming the [SquashedLocalChange]s to particular network operations. If [ProgressCallback]
+   * is provided it also reports the intermediate progress
    */
-  suspend fun upload(
-    localChanges: List<LocalChange>,
-  ): Flow<UploadResult>
+  suspend fun upload(localChanges: List<LocalChange>): Flow<UploadResult>
 }
 
 internal sealed class UploadResult {
-  data class Success(val localChangeToken: LocalChangeToken, val resource: Bundle) : UploadResult()
+  data class Started(val total: Int) : UploadResult()
+  data class Success(
+    val localChangeToken: LocalChangeToken,
+    val resource: Bundle,
+    val total: Int,
+    val completed: Int
+  ) : UploadResult()
   data class Failure(val syncError: ResourceSyncException) : UploadResult()
 }

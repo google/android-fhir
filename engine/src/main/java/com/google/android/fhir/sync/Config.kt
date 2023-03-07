@@ -44,6 +44,8 @@ object SyncDataParams {
   const val SORT_KEY = "_sort"
   const val LAST_UPDATED_KEY = "_lastUpdated"
   const val ADDRESS_COUNTRY_KEY = "address-country"
+  const val SUMMARY_KEY = "_summary"
+  const val SUMMARY_COUNT_VALUE = "count"
 }
 
 /** Configuration for period synchronisation */

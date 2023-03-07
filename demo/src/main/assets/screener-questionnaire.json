@@ -601,35 +601,35 @@
               "valueCoding": {
                 "code": "35489007",
                 "display": "Depression",
-                "system" : "http://snomed.info/sct"
+                "system": "http://snomed.info/sct"
               }
             },
             {
               "valueCoding": {
                 "code": "161445009",
                 "display": "Diabetes",
-                "system" : "http://snomed.info/sct"
+                "system": "http://snomed.info/sct"
               }
             },
             {
               "valueCoding": {
                 "code": "161501007",
                 "display": "Hypertension",
-                "system" : "http://snomed.info/sct"
+                "system": "http://snomed.info/sct"
               }
             },
             {
               "valueCoding": {
                 "code": "56265001",
                 "display": "Heart disease",
-                "system" : "http://snomed.info/sct"
+                "system": "http://snomed.info/sct"
               }
             },
             {
               "valueCoding": {
                 "code": "161450003",
                 "display": "High blood lipids",
-                "system" : "http://snomed.info/sct"
+                "system": "http://snomed.info/sct"
               }
             }
           ]
@@ -989,21 +989,21 @@
               "valueCoding": {
                 "code": "NV",
                 "display": "Not vaccinated",
-                "system" : "custom"
+                "system": "custom"
               }
             },
             {
               "valueCoding": {
                 "code": "PV",
                 "display": "Partially vaccinated",
-                "system" : "custom"
+                "system": "custom"
               }
             },
             {
               "valueCoding": {
                 "code": "FV",
                 "display": "Fully vaccinated",
-                "system" : "custom"
+                "system": "custom"
               }
             }
           ]
@@ -1017,7 +1017,7 @@
               "question": "4.1.0",
               "operator": "=",
               "answerCoding": {
-                "system" : "custom",
+                "system": "custom",
                 "code": "PV"
               }
             }
@@ -1027,21 +1027,21 @@
               "valueCoding": {
                 "code": "AZ",
                 "display": "AstraZeneca",
-                "system" : "custom"
+                "system": "custom"
               }
             },
             {
               "valueCoding": {
                 "code": "Pfizer",
                 "display": "Pfizer BioNTech",
-                "system" : "custom"
+                "system": "custom"
               }
             },
             {
               "valueCoding": {
                 "code": "Moderna",
                 "display": "Moderna",
-                "system" : "custom"
+                "system": "custom"
               }
             }
           ]
@@ -1055,7 +1055,7 @@
               "question": "4.1.0",
               "operator": "=",
               "answerCoding": {
-                "system" : "custom",
+                "system": "custom",
                 "code": "PV"
               }
             }
@@ -1070,7 +1070,7 @@
               "question": "4.1.0",
               "operator": "=",
               "answerCoding": {
-                "system" : "custom",
+                "system": "custom",
                 "code": "FV"
               }
             }
@@ -1105,7 +1105,7 @@
               "question": "4.1.0",
               "operator": "=",
               "answerCoding": {
-                "system" : "custom",
+                "system": "custom",
                 "code": "FV"
               }
             }
@@ -1144,7 +1144,16 @@
         {
           "text": "Add instructions for capturing temperature",
           "type": "display",
-          "linkId": "5.1.0"
+          "linkId": "5.1.0",
+          "extension": [
+            {
+              "url" : "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemMedia",
+              "valueAttachment" : {
+                "contentType": "image/png",
+                "url": "https://hapi.fhir.org/baseR4/Binary/android-fhir-thermometer-image"
+              }
+            }
+          ]
         },
         {
           "linkId": "5.2.0",
