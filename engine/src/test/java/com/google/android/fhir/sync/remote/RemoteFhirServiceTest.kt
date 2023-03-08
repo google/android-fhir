@@ -54,7 +54,7 @@ class RemoteFhirServiceTest {
     mockWebServer.shutdown()
   }
 
-  @Test
+  @Test  // https://github.com/google/android-fhir/issues/1892
   fun `should assemble download request correctly`() = runTest {
     // checks that a download request can be made successfully with parameters without exception
     val mockResponse =
