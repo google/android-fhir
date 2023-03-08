@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync.remote
 
 import ca.uhn.fhir.context.FhirContext
+import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.logicalId
 import com.google.common.truth.Truth.assertThat
 import java.net.HttpURLConnection
@@ -31,20 +32,16 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 @RunWith(RobolectricTestRunner::class)
 class RemoteFhirServiceTest {
+
   private val mockWebServer = MockWebServer()
+
   private val apiService by lazy {
-    Retrofit.Builder()
-      .baseUrl(mockWebServer.url("/"))
-      .addConverterFactory(FhirConverterFactory.create())
-      .addConverterFactory(GsonConverterFactory.create())
-      .build()
-      .create(RemoteFhirService::class.java)
+    RemoteFhirService.Builder(mockWebServer.url("/").toString(), NetworkConfiguration()).build()
   }
+
   private val parser = FhirContext.forR4Cached().newJsonParser()
 
   @Before
@@ -56,8 +53,10 @@ class RemoteFhirServiceTest {
   fun shutdown() {
     mockWebServer.shutdown()
   }
+
   @Test
-  fun download() = runTest {
+  fun `should assemble download request correctly`() = runTest {
+    // checks that a download request can be made successfully with parameters without exception
     val mockResponse =
       MockResponse().apply {
         setResponseCode(HttpURLConnection.HTTP_OK)
@@ -79,12 +78,13 @@ class RemoteFhirServiceTest {
 
     val result = apiService.download("Patient/patient-001")
 
+    // No exception should occur
     assertThat(result).isInstanceOf(Patient::class.java)
-    assertThat((result as Patient).logicalId).isEqualTo("patient-001")
   }
 
   @Test
-  fun upload() = runTest {
+  fun `should assemble upload request correctly`() = runTest {
+    // checks that a upload request can be made successfully with parameters without exception
     val mockResponse =
       MockResponse().apply {
         setResponseCode(HttpURLConnection.HTTP_OK)
@@ -103,10 +103,39 @@ class RemoteFhirServiceTest {
         id = "transaction-1"
         type = Bundle.BundleType.TRANSACTION
       }
+
     val result = apiService.upload(request)
 
+    // No exception has occurred
     assertThat(result).isInstanceOf(Bundle::class.java)
-    assertThat((result as Bundle).type).isEqualTo(Bundle.BundleType.TRANSACTIONRESPONSE)
-    assertThat((result).logicalId).isEqualTo("transaction-response-1")
   }
+
+  @Test
+  fun `should use fhir converter to serialize and deserialize request and response for fhir resources`() =
+    runTest {
+      val mockResponse =
+        MockResponse().apply {
+          setResponseCode(HttpURLConnection.HTTP_OK)
+          setBody(
+            parser.encodeResourceToString(
+              Bundle().apply {
+                id = "transaction-response-1"
+                type = Bundle.BundleType.TRANSACTIONRESPONSE
+              }
+            )
+          )
+        }
+      mockWebServer.enqueue(mockResponse)
+      val request =
+        Bundle().apply {
+          id = "transaction-1"
+          type = Bundle.BundleType.TRANSACTION
+        }
+
+      val result = apiService.upload(request)
+
+      assertThat(result).isInstanceOf(Bundle::class.java)
+      assertThat((result as Bundle).type).isEqualTo(Bundle.BundleType.TRANSACTIONRESPONSE)
+      assertThat((result).logicalId).isEqualTo("transaction-response-1")
+    }
 }
