@@ -175,7 +175,7 @@ class QuestionnaireUiEspressoTest {
 
     onView(withId(R.id.text_input_layout)).check { view, _ ->
       val actualError = (view as TextInputLayout).error
-      assertThat(actualError).isEqualTo("Date format needs to be yyyy-MM-dd (e.g. 2023-01-31)")
+      assertThat(actualError).isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/31/2023)")
     }
   }
 
@@ -185,7 +185,7 @@ class QuestionnaireUiEspressoTest {
 
     onView(withId(R.id.text_input_edit_text))
       .perform(ViewActions.click())
-      .perform(ViewActions.typeTextIntoFocusedView("20230303"))
+      .perform(ViewActions.typeTextIntoFocusedView("01052005"))
 
     onView(withId(R.id.text_input_layout)).check { view, _ ->
       val actualError = (view as TextInputLayout).error
@@ -193,7 +193,7 @@ class QuestionnaireUiEspressoTest {
     }
 
     val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType
-    assertThat(answer.localDate).isEqualTo(LocalDate.of(2023, 3, 3))
+    assertThat(answer.localDate).isEqualTo(LocalDate.of(2005, 1, 5))
   }
 
   @Test

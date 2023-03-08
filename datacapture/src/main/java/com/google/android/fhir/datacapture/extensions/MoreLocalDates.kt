@@ -31,7 +31,7 @@ import java.util.Date
  * "dd/mm/yyyy").
  */
 internal fun getDateSeparator(localeDatePattern: String): Char =
-  localeDatePattern.filterNot { isLetter(it) }.first()
+  localeDatePattern.filterNot { isLetter(it) }.firstOrNull() ?: ' '
 
 /**
  * Converts date pattern to acceptable date pattern where 2 digits are expected for day(dd) and

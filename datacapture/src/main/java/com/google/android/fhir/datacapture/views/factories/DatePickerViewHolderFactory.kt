@@ -50,6 +50,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.chrono.IsoChronology
+import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.DateTimeParseException
 import java.time.format.FormatStyle
@@ -60,7 +61,6 @@ import kotlin.math.log10
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import timber.log.Timber
 
 internal object DatePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.date_picker_view) {
@@ -110,11 +110,11 @@ internal object DatePickerViewHolderFactory :
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         clearPreviousState()
         header.bind(questionnaireViewItem.questionnaireItem)
-        val localeDatePattern = datePattern(questionnaireViewItem.questionnaireItem)
+        val datePattern = datePattern(questionnaireViewItem.questionnaireItem)
         // Special character used in date pattern
-        val datePatternSeparator = getDateSeparator(localeDatePattern)
+        val datePatternSeparator = getDateSeparator(datePattern)
         textWatcher = DatePatternTextWatcher(datePatternSeparator)
-        canonicalizedDatePattern = canonicalizeDatePattern(localeDatePattern)
+        canonicalizedDatePattern = canonicalizeDatePattern(datePattern)
         textInputLayout.hint = canonicalizedDatePattern
         textInputEditText.removeTextChangedListener(textWatcher)
 
@@ -285,13 +285,22 @@ internal const val TAG = "date-picker"
 internal val ZONE_ID_UTC = ZoneId.of("UTC")
 
 internal fun datePattern(questionnaireItem: Questionnaire.QuestionnaireItemComponent): String {
-  return if (questionnaireItem.entryFormat.isNullOrEmpty()) {
-    Timber.w(" date time entry format is not available in Questionnaire item")
-    getLocalizedDateTimePattern()
-  } else {
-    questionnaireItem
-      .entryFormat!! // TODO IS PARSING CHECK REQUIRED parsing here for entry format validation
-  }
+  val str =
+    questionnaireItem.entryFormat?.let {
+      try {
+        val text = LocalDate.now().format(DateTimeFormatter.ofPattern(it))
+        LocalDate.parse(text, DateTimeFormatter.ofPattern(it))
+        it
+      } catch (e: ParseException) {
+        getLocalizedDateTimePattern()
+      } catch (e: DateTimeParseException) {
+        getLocalizedDateTimePattern()
+      } catch (e: Exception) {
+        getLocalizedDateTimePattern()
+      }
+    }
+      ?: getLocalizedDateTimePattern()
+  return str
 }
 
 /**

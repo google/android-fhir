@@ -479,11 +479,11 @@ class DatePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `set canonicalized date input format from entryFormat extension in Questionnaire`() {
+  fun `should use date format in the entryFormat extension`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType("yyyy-mm-dd"))
+          addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType("yyyy-MM-dd"))
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
@@ -494,7 +494,22 @@ class DatePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `set local date input format when entryFormat extension has empty string in Questionnaire`() {
+  fun `should set local date input format when entryFormat extension has incorrect format string in Questionnaire`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType("yMyd"))
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+    assertThat(viewHolder.dateInputView.hint).isEqualTo("MM/dd/yyyy")
+  }
+
+  @Test
+  fun `should set local date input format when entryFormat extension has empty string in Questionnaire`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -516,7 +531,7 @@ class DatePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `set local date input format when no entryFormat extension in Questionnaire`() {
+  fun `should set local date input format when no entryFormat extension in Questionnaire`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
