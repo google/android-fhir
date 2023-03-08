@@ -40,6 +40,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.itemAnswerOptionImage
+import com.google.android.fhir.datacapture.views.factories.OptionSelectOption
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDialogSelectViewModel
+import com.google.android.fhir.datacapture.views.factories.SelectedOptions
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.concurrent.atomic.AtomicInteger
@@ -76,9 +79,7 @@ internal class OptionSelectDialogFragment(
       }
 
     val dialogThemeContext = ContextThemeWrapper(requireContext(), themeId)
-    val view =
-      LayoutInflater.from(dialogThemeContext)
-        .inflate(R.layout.questionnaire_item_multi_select_dialog, null)
+    val view = LayoutInflater.from(dialogThemeContext).inflate(R.layout.multi_select_dialog, null)
 
     val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
     recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -376,13 +377,13 @@ private sealed class OptionSelectViewHolder(parent: ViewGroup, layout: Int) :
   RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(layout, parent, false)) {
   /** Radio button option. */
   class OptionSingle(parent: ViewGroup) :
-    OptionSelectViewHolder(parent, R.layout.questionnaire_item_option_item_single) {
+    OptionSelectViewHolder(parent, R.layout.option_item_single) {
     val radioButton: RadioButton = itemView.findViewById(R.id.radio_button)
   }
 
   /** Checkbox option. */
   class OptionMulti(parent: ViewGroup) :
-    OptionSelectViewHolder(parent, R.layout.questionnaire_item_option_item_multi) {
+    OptionSelectViewHolder(parent, R.layout.option_item_multi) {
     val checkbox: CheckBox = itemView.findViewById(R.id.checkbox)
   }
 
@@ -390,7 +391,7 @@ private sealed class OptionSelectViewHolder(parent: ViewGroup, layout: Int) :
    * Freeform option, only shown if [OptionSelectDialogFragment.Config.otherOptionsAllowed] is true.
    */
   class OtherEditText(parent: ViewGroup) :
-    OptionSelectViewHolder(parent, R.layout.questionnaire_item_option_item_other_text) {
+    OptionSelectViewHolder(parent, R.layout.option_item_other_text) {
     val editText: EditText = itemView.findViewById(R.id.edit_text)
     val delete: View = itemView.findViewById(R.id.delete_button)
 
@@ -408,7 +409,7 @@ private sealed class OptionSelectViewHolder(parent: ViewGroup, layout: Int) :
    * Freeform option, only shown if [OptionSelectDialogFragment.Config.otherOptionsAllowed] is true.
    */
   class OtherAddAnother(parent: ViewGroup) :
-    OptionSelectViewHolder(parent, R.layout.questionnaire_item_option_item_other_add_another) {
+    OptionSelectViewHolder(parent, R.layout.option_item_other_add_another) {
     val addAnother: Button = itemView.findViewById(R.id.add_another)
   }
 }

@@ -25,6 +25,8 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDialogSelectViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
@@ -41,11 +43,11 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   @Test
   fun emptyResponseOptions_showNoneSelected() = withViewHolder { holder ->
     holder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         answerOptions("Coding 1", "Coding 2"),
         responseOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
@@ -55,11 +57,11 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   @Test
   fun selectedResponseOptions_showSelectedOptions() = withViewHolder { holder ->
     holder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         answerOptions("Coding 1", "Coding 2", "Coding 3"),
         responseOptions("Coding 1", "Coding 3"),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
     assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
@@ -70,14 +72,14 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() = withViewHolder { viewHolder ->
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           linkId = "1"
           required = true
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -91,7 +93,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() = withViewHolder { viewHolder ->
     viewHolder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           linkId = "1"
           required = true
@@ -109,7 +111,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 
@@ -122,14 +124,14 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   @Test
   fun bind_readOnly_shouldDisableView() = withViewHolder { holder ->
     holder.bind(
-      QuestionnaireItemViewItem(
+      QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           linkId = "1"
           readOnly = true
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _ -> },
+        answersChangedCallback = { _, _, _, _ -> },
       )
     )
 

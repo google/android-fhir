@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.google.android.fhir.demo.data
 
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DownloadWorkManager
+import com.google.android.fhir.sync.SyncDataParams
 import java.util.LinkedList
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
@@ -29,7 +30,8 @@ import org.hl7.fhir.r4.model.ResourceType
 
 class DownloadWorkManagerImpl : DownloadWorkManager {
   private val resourceTypeList = ResourceType.values().map { it.name }
-  private val urls = LinkedList(listOf("Patient?address-city=NAIROBI"))
+  private val urls =
+    LinkedList(listOf("Patient?address-city=NAIROBI", "Binary?_id=android-fhir-thermometer-image"))
 
   override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? {
     var url = urls.poll() ?: return null
@@ -40,6 +42,15 @@ class DownloadWorkManagerImpl : DownloadWorkManager {
       url = affixLastUpdatedTimestamp(url!!, it)
     }
     return url
+  }
+
+  override suspend fun getSummaryRequestUrls(
+    context: SyncDownloadContext
+  ): Map<ResourceType, String> {
+    return urls.associate {
+      ResourceType.fromCode(it.substringBefore("?")) to
+        it.plus("&${SyncDataParams.SUMMARY_KEY}=${SyncDataParams.SUMMARY_COUNT_VALUE}")
+    }
   }
 
   override suspend fun processResponse(response: Resource): Collection<Resource> {
