@@ -18,6 +18,7 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.content.Context
+import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
@@ -32,6 +33,7 @@ import timber.log.Timber
 class FhirApplication : Application(), DataCaptureConfig.Provider {
   // Only initiate the FhirEngine when used for the first time, not when the app is created.
   private val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
+  private val fhirOperator: FhirOperator by lazy { constructFhirOperator() }
 
   private var dataCaptureConfig: DataCaptureConfig? = null
 
@@ -67,8 +69,15 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
     return FhirEngineProvider.getInstance(this)
   }
 
+  private fun constructFhirOperator(): FhirOperator {
+    return FhirOperator(FhirContext.forR4(), fhirEngine)
+  }
+
   companion object {
     fun fhirEngine(context: Context) = (context.applicationContext as FhirApplication).fhirEngine
+
+    fun fhirOperator(context: Context) =
+      (context.applicationContext as ReferenceApplication).fhirOperator
   }
 
   override fun getDataCaptureConfig(): DataCaptureConfig = dataCaptureConfig ?: DataCaptureConfig()

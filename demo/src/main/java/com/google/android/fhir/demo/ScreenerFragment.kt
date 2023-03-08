@@ -136,5 +136,6 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
   companion object {
     const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
+    const val TASK_STATUS_MODIFIED = "TASK_MODIFIED"
   }
 }

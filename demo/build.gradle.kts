@@ -23,7 +23,10 @@ android {
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
   }
-  buildFeatures { viewBinding = true }
+  buildFeatures {
+    viewBinding = true
+    dataBinding = true
+  }
   compileOptions {
     // Flag to enable support for the new language APIs
     // See https://developer.android.com/studio/write/java8-support
@@ -64,6 +67,7 @@ dependencies {
     exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
   }
   implementation(project(":engine"))
+  implementation(project(":workflow"))
 
   testImplementation(Dependencies.junit)
 }
