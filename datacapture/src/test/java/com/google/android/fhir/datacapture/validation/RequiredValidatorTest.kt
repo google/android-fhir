@@ -29,7 +29,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class RequiredConstraintValidatorTest {
+class RequiredValidatorTest {
 
   @Test
   fun shouldReturnValidResult() {
@@ -42,7 +42,7 @@ class RequiredConstraintValidatorTest {
       )
 
     val validationResult =
-      RequiredConstraintValidator.validate(
+      RequiredValidator.validate(
         questionnaireItem,
         response,
         InstrumentationRegistry.getInstrumentation().context
@@ -55,13 +55,13 @@ class RequiredConstraintValidatorTest {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
 
     val validationResult =
-      RequiredConstraintValidator.validate(
+      RequiredValidator.validate(
         questionnaireItem,
         listOf(),
         InstrumentationRegistry.getInstrumentation().context
       )
     assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.message).isEqualTo("Missing answer for required field.")
+    assertThat(validationResult.errorMessage).isEqualTo("Missing answer for required field.")
   }
 
   @Test
@@ -76,12 +76,12 @@ class RequiredConstraintValidatorTest {
       )
 
     val validationResult =
-      RequiredConstraintValidator.validate(
+      RequiredValidator.validate(
         questionnaireItem,
         response,
         InstrumentationRegistry.getInstrumentation().context
       )
     assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.message).isEqualTo("Missing answer for required field.")
+    assertThat(validationResult.errorMessage).isEqualTo("Missing answer for required field.")
   }
 }
