@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.google.android.fhir.db.impl.dao.LocalChangeDao
 import com.google.android.fhir.db.impl.dao.ResourceDao
-import com.google.android.fhir.db.impl.dao.SyncedResourceDao
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -31,7 +30,6 @@ import com.google.android.fhir.db.impl.entities.QuantityIndexEntity
 import com.google.android.fhir.db.impl.entities.ReferenceIndexEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.StringIndexEntity
-import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
 
@@ -47,15 +45,14 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
       DateIndexEntity::class,
       DateTimeIndexEntity::class,
       NumberIndexEntity::class,
-      SyncedResourceEntity::class,
       LocalChangeEntity::class,
-      PositionIndexEntity::class],
+      PositionIndexEntity::class
+    ],
   version = 1,
   exportSchema = false
 )
 @TypeConverters(DbTypeConverters::class)
 internal abstract class ResourceDatabase : RoomDatabase() {
   abstract fun resourceDao(): ResourceDao
-  abstract fun syncedResourceDao(): SyncedResourceDao
   abstract fun localChangeDao(): LocalChangeDao
 }

@@ -19,6 +19,7 @@ package com.google.android.fhir.demo
 import android.app.Application
 import android.content.Context
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
+import com.google.android.fhir.DemoDataStore
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
@@ -34,6 +35,8 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
   private val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
 
   private var dataCaptureConfig: DataCaptureConfig? = null
+
+  private val dataStore by lazy { DemoDataStore(this) }
 
   override fun onCreate() {
     super.onCreate()
@@ -69,6 +72,8 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
 
   companion object {
     fun fhirEngine(context: Context) = (context.applicationContext as FhirApplication).fhirEngine
+
+    fun dataStore(context: Context) = (context.applicationContext as FhirApplication).dataStore
   }
 
   override fun getDataCaptureConfig(): DataCaptureConfig = dataCaptureConfig ?: DataCaptureConfig()
