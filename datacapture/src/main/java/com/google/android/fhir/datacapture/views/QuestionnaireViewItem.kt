@@ -32,8 +32,9 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 /**
  * Data item for [QuestionnaireItemViewHolder] in [RecyclerView].
  *
- * The view should use [questionnaireItem], [answers], [answerOption], and [validationResult] to
- * render the data item in the UI. The view SHOULD NOT mutate the data using these properties.
+ * The view should use [questionnaireItem], [answers], [answerOption], [validationResult] and
+ * [enabledDisplayItems] to render the data item in the UI. The view SHOULD NOT mutate the data
+ * using these properties.
  *
  * The view should use the following answer APIs to update the answer(s):
  * - [setAnswer] (for single and repeated answers)
@@ -55,6 +56,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * @param resolveAnswerExpression the callback to resolve answer options when answer-expression
  * extension exists options
  * @param draftAnswer the draft input that cannot be stored in the [QuestionnaireResponse].
+ * @param enabledDisplayItems the enabled display items in the given [questionnaireItem]
  */
 data class QuestionnaireViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -79,7 +81,7 @@ data class QuestionnaireViewItem(
       emptyList()
     },
   internal val draftAnswer: Any? = null,
-  internal val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent>? = null
+  internal val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList()
 ) {
 
   /**

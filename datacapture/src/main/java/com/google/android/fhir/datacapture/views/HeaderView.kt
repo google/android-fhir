@@ -47,13 +47,15 @@ internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout
   private var errorTextView: TextView = findViewById(R.id.error_text_at_header)
 
   fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-    prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
-    question.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedTextSpanned)
+    questionnaireViewItem.questionnaireItem.let {
+      prefix.updateTextAndVisibility(it.localizedPrefixSpanned)
+      question.updateTextAndVisibility(it.localizedTextSpanned)
+    }
     hint.updateTextAndVisibility(
-      questionnaireViewItem.enabledDisplayItems?.localizedInstructionsSpanned
+      questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
     )
     initHelpButton(this, questionnaireViewItem)
-    //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
+    // Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
     visibility = getViewGroupVisibility(prefix, question, hint)
   }
@@ -116,5 +118,5 @@ internal fun initHelpButton(view: View, questionnaireViewItem: QuestionnaireView
 
   view
     .findViewById<TextView>(R.id.helpText)
-    .updateTextAndVisibility(questionnaireViewItem.enabledDisplayItems?.localizedHelpSpanned)
+    .updateTextAndVisibility(questionnaireViewItem.enabledDisplayItems.localizedHelpSpanned)
 }

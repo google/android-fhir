@@ -272,18 +272,6 @@ internal val Questionnaire.QuestionnaireItemComponent.hasHelpButton: Boolean
     return item.any { it.isHelpCode }
   }
 
-/** Whether item type is display and [displayItemControl] is [DisplayItemControlType.HELP]. */
-internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
-  get() {
-    return when (type) {
-      Questionnaire.QuestionnaireItemType.DISPLAY -> {
-        displayItemControl == DisplayItemControlType.HELP
-      }
-      else -> {
-        false
-      }
-    }
-  }
 /** Converts Text with HTML Tag to formatted text. */
 private fun String.toSpanned(): Spanned {
   return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
@@ -409,6 +397,24 @@ internal val Questionnaire.QuestionnaireItemComponent.isFlyoverCode: Boolean
       }
     }
   }
+
+/** Whether item type is display and [displayItemControl] is [DisplayItemControlType.HELP]. */
+internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.DISPLAY -> {
+        displayItemControl == DisplayItemControlType.HELP
+      }
+      else -> {
+        false
+      }
+    }
+  }
+
+internal val Questionnaire.QuestionnaireItemComponent.isDisplayItem: Boolean
+  get() =
+    (type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+      (isInstructionsCode || isFlyoverCode || isHelpCode))
 
 /** Slider step extension value. */
 internal val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?

@@ -41,7 +41,7 @@ internal class GroupHeaderView(context: Context, attrs: AttributeSet?) :
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
     question.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedTextSpanned)
     hint.updateTextAndVisibility(
-      questionnaireViewItem.enabledDisplayItems?.localizedInstructionsSpanned
+      questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
     )
     visibility = getViewGroupVisibility(prefix, question, hint)
   }

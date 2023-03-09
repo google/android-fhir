@@ -630,8 +630,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             draftAnswer = draftAnswerMap[questionnaireResponseItem],
             enabledDisplayItems =
               questionnaireItem.item.filter {
-                it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-                  (it.isInstructionsCode || it.isFlyoverCode || it.isHelpCode) &&
+                it.isDisplayItem &&
                   EnablementEvaluator(questionnaireResponse).evaluate(it, questionnaireResponseItem)
               }
           )
@@ -662,11 +661,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             getQuestionnaireAdapterItems(
               // If nested display item is identified as instructions or flyover, then do not create
               // questionnaire state for it.
-              questionnaireItemList =
-                questionnaireItem.item.filterNot {
-                  it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-                    (it.isInstructionsCode || it.isFlyoverCode || it.isHelpCode)
-                },
+              questionnaireItemList = questionnaireItem.item.filterNot { it.isDisplayItem },
               questionnaireResponseItemList = nestedResponseItemList,
             )
           )
