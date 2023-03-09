@@ -149,7 +149,6 @@ object Dependencies {
 
   object Retrofit {
     const val coreRetrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
-    const val gsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
   }
 
   object Room {
@@ -180,6 +179,7 @@ object Dependencies {
   const val guava = "com.google.guava:guava:${Versions.guava}"
   const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.http}"
   const val http = "com.squareup.okhttp3:okhttp:${Versions.http}"
+  const val mockWebServer = "com.squareup.okhttp3:mockwebserver:${Versions.http}"
 
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
   const val kotlinPoet = "com.squareup:kotlinpoet:${Versions.kotlinPoet}"

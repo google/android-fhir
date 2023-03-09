@@ -26,7 +26,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Url
@@ -36,7 +36,7 @@ internal interface RemoteFhirService : DataSource {
 
   @GET override suspend fun download(@Url path: String): Resource
 
-  @POST(".") override suspend fun upload(bundle: Bundle): Resource
+  @POST(".") override suspend fun upload(@Body bundle: Bundle): Resource
 
   class Builder(
     private val baseUrl: String,
@@ -81,7 +81,6 @@ internal interface RemoteFhirService : DataSource {
         .baseUrl(baseUrl)
         .client(client)
         .addConverterFactory(FhirConverterFactory.create())
-        .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(RemoteFhirService::class.java)
     }

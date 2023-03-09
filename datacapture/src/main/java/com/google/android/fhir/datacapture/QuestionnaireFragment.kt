@@ -135,11 +135,15 @@ class QuestionnaireFragment : Fragment() {
     viewModel.setShowCancelButtonFlag(cancelButtonVisibilityInStyle == View.VISIBLE)
  
 
-    val reviewModeEditButton = view.findViewById<View>(R.id.review_mode_edit_button)
-    reviewModeEditButton.setOnClickListener { viewModel.setReviewMode(false) }
+    val reviewModeEditButton =
+      view.findViewById<View>(R.id.review_mode_edit_button).apply {
+        setOnClickListener { viewModel.setReviewMode(false) }
+      }
 
-    val reviewModeButton = view.findViewById<View>(R.id.review_mode_button)
-    reviewModeButton.setOnClickListener { viewModel.setReviewMode(true) }
+    val reviewModeButton =
+      view.findViewById<View>(R.id.review_mode_button).apply {
+        setOnClickListener { viewModel.setReviewMode(true) }
+      }
 
     questionnaireEditRecyclerView.adapter = questionnaireEditAdapter
     val linearLayoutManager = LinearLayoutManager(view.context)
