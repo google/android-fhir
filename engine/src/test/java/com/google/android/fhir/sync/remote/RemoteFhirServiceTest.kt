@@ -54,7 +54,7 @@ class RemoteFhirServiceTest {
     mockWebServer.shutdown()
   }
 
-  @Test  // https://github.com/google/android-fhir/issues/1892
+  @Test // https://github.com/google/android-fhir/issues/1892
   fun `should assemble download request correctly`() = runTest {
     // checks that a download request can be made successfully with parameters without exception
     val mockResponse =
@@ -82,7 +82,7 @@ class RemoteFhirServiceTest {
     assertThat(result).isInstanceOf(Patient::class.java)
   }
 
-  @Test  // https://github.com/google/android-fhir/issues/1892
+  @Test // https://github.com/google/android-fhir/issues/1892
   fun `should assemble upload request correctly`() = runTest {
     // checks that a upload request can be made successfully with parameters without exception
     val mockResponse =
