@@ -62,6 +62,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
+        val isFirstTimeOperation = selectedOptionsJob == null
         cleanupOldState()
         holder.summaryHolder.hint = questionnaireViewItem.questionnaireItem.localizedFlyoverSpanned
         val activity =
@@ -86,7 +87,12 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
             // Listen for changes to selected options to update summary + FHIR data model
             viewModel.getSelectedOptionsFlow(item.linkId).collect { selectedOptions ->
               holder.summary.text = selectedOptions.selectedSummary
-              updateAnswers(selectedOptions)
+              when {
+                isFirstTimeOperation && selectedOptions.options.none { it.selected } -> {}
+                else -> {
+                  updateAnswers(selectedOptions)
+                }
+              }
             }
           }
 
