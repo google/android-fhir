@@ -392,7 +392,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun multipleChoice_showErrorWhenAnswerIsUnselected() {
+  fun multipleChoice_unselectSelectedAnswer_showErrorWhenNoAnswerIsSelected() {
     val questionnaireViewItem =
       QuestionnaireViewItem(
         answerOptions(false, "Coding 1", "Coding 2").apply { required = true },
