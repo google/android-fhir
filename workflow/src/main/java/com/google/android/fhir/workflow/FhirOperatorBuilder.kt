@@ -27,21 +27,25 @@ import com.google.android.fhir.implementationguide.ImplementationGuide
 class FhirOperatorBuilder(private val applicationContext: Context) {
   private var fhirContext: FhirContext? = null
   private var fhirEngine: FhirEngine? = null
-  private var igDependencies: List<ImplementationGuide> = emptyList()
-  private val igManager: IgManager? = null
+  private var implementationGuides: List<ImplementationGuide> = emptyList()
+  private var igManager: IgManager? = null
 
   fun withFhirEngine(fhirEngine: FhirEngine): FhirOperatorBuilder {
     this.fhirEngine = fhirEngine
     return this
   }
 
+  fun withIgManager(igManager: IgManager): FhirOperatorBuilder {
+    this.igManager = igManager
+    return this
+  }
   fun withFhirContext(fhirContext: FhirContext): FhirOperatorBuilder {
     this.fhirContext = fhirContext
     return this
   }
 
   fun withDependencies(vararg igDependencies: ImplementationGuide): FhirOperatorBuilder {
-    this.igDependencies = igDependencies.toList()
+    this.implementationGuides = igDependencies.toList()
     return this
   }
 
