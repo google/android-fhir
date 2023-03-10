@@ -33,7 +33,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class ValidationUtilTest {
+class MoreTypesTest {
   lateinit var context: Context
 
   @Before

@@ -29,6 +29,7 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import timber.log.Timber
 
 /** [Uploader] implementation to work with Fhir [Bundle]. */
 internal class BundleUploader(
@@ -51,6 +52,7 @@ internal class BundleUploader(
         completed += bundle.entry.size
         emit(getUploadResult(response, localChangeTokens, total, completed))
       } catch (e: Exception) {
+        Timber.e(e)
         emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
       }
     }
