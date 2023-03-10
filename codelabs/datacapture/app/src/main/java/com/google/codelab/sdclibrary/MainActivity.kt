@@ -30,7 +30,6 @@ class MainActivity : AppCompatActivity() {
     setContentView(R.layout.activity_main)
 
     // 4.2 Replace with code from the codelab to add a questionnaire fragment.
-
   }
 
   private fun submitQuestionnaire() {
