@@ -23,11 +23,11 @@ import android.widget.RadioButton
 import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
-import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.choiceOrientation
-import com.google.android.fhir.datacapture.common.datatype.displayString
-import com.google.android.fhir.datacapture.itemAnswerOptionImage
+import com.google.android.fhir.datacapture.extensions.ChoiceOrientationTypes
+import com.google.android.fhir.datacapture.extensions.choiceOrientation
+import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid

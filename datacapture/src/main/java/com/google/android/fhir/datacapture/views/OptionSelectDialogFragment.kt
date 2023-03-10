@@ -39,7 +39,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.itemAnswerOptionImage
+import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.views.factories.OptionSelectOption
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDialogSelectViewModel
 import com.google.android.fhir.datacapture.views.factories.SelectedOptions

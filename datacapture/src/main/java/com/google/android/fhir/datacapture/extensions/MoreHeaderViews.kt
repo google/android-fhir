@@ -21,8 +21,6 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Button
 import android.widget.TextView
-import com.google.android.fhir.datacapture.hasHelpButton
-import com.google.android.fhir.datacapture.localizedHelpSpanned
 import com.google.android.material.card.MaterialCardView
 import org.hl7.fhir.r4.model.Questionnaire
 
