@@ -270,6 +270,12 @@ object ExpressionEvaluator {
       .findAll(expression.expression)
       .map { it.groupValues }
       .map { (fhirPathWithParentheses, fhirPath) ->
+        fhirPathEngine.check(
+          resource,
+          resource.resourceType.name,
+          resource.resourceType.name,
+          fhirPath
+        )
         fhirPathWithParentheses to fhirPathEngine.evaluate(resource, fhirPath).singleOrNull()
       }
   private fun findDependentVariables(expression: Expression) =

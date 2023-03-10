@@ -16,18 +16,24 @@
 
 package com.google.android.fhir.datacapture.fhirpath
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
-import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
+import org.hl7.fhir.r4.context.SimpleWorkerContext
+import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.utils.FHIRPathEngine
+import org.hl7.fhir.utilities.npm.FilesystemPackageCacheManager
+import org.hl7.fhir.utilities.npm.ToolsVersion
+
+const val R4_CORE_PACKAGE_NAME = "hl7.fhir.r4.core"
 
 internal val fhirPathEngine: FHIRPathEngine =
-  with(FhirContext.forCached(FhirVersionEnum.R4)) {
-    FHIRPathEngine(HapiWorkerContext(this, this.validationSupport)).apply {
-      hostServices = FHIRPathEngineHostServices
-    }
-  }
+  FHIRPathEngine(
+      SimpleWorkerContext.fromPackage(
+          FilesystemPackageCacheManager(true, ToolsVersion.TOOLS_VERSION)
+            .loadPackage(R4_CORE_PACKAGE_NAME)
+        )
+        .apply { setExpansionProfile(Parameters()) }
+    )
+    .apply { hostServices = FHIRPathEngineHostServices }
 
 /**
  * Evaluates the expressions over list of resources [Resource] and joins to space separated string

@@ -56,6 +56,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.hl7.fhir.exceptions.PathEngineException
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -3612,12 +3613,14 @@ class QuestionnaireViewModelTest {
 
       viewModel.runViewModelBlocking {
         val exception =
-          assertFailsWith<IllegalStateException> {
+          assertFailsWith<PathEngineException> {
               viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
             }
             .localizedMessage
         assertThat(exception)
-          .isEqualTo("The FHIRPath {{Practitioner.name.bamily}} evaluates to null")
+          .isEqualTo(
+            "The name bamily is not valid for any of the possible types: [http://hl7.org/fhir/StructureDefinition/HumanName] (@char 1)"
+          )
       }
     }
 
