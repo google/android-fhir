@@ -22,6 +22,9 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
+import com.google.android.fhir.datacapture.extensions.initHelpViews
+import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 import com.google.android.fhir.datacapture.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
@@ -38,10 +41,15 @@ internal class GroupHeaderView(context: Context, attrs: AttributeSet?) :
     val prefix = findViewById<TextView>(R.id.prefix)
     val question = findViewById<TextView>(R.id.question)
     val hint = findViewById<TextView>(R.id.hint)
-    initHelpButton(this, questionnaireItem)
+    initHelpViews(
+      helpButton = findViewById(R.id.helpButton),
+      helpCardView = findViewById(R.id.helpCardView),
+      helpTextView = findViewById(R.id.helpText),
+      questionnaireItem
+    )
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
     question.updateTextAndVisibility(questionnaireItem.localizedTextSpanned)
     hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
-    visibility = getViewGroupVisibility(prefix, question, hint)
+    visibility = getHeaderViewVisibility(prefix, question, hint)
   }
 }
