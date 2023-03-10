@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.google.android.fhir.datacapture.contrib.views.PhoneNumberViewHolderFactory
+import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
