@@ -116,6 +116,7 @@ internal class FhirSynchronizer(
       }
     }
     return if (exceptions.isEmpty()) {
+      setSyncState(SyncJobStatus.Finished())
       SyncResult.Success()
     } else {
       setSyncState(SyncJobStatus.Glitch(exceptions))
