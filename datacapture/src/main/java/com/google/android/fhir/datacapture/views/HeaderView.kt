@@ -17,22 +17,17 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
-import android.text.Spanned
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.hasHelpButton
-import com.google.android.fhir.datacapture.localizedHelpSpanned
-import com.google.android.fhir.datacapture.localizedInstructionsSpanned
-import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
-import com.google.android.material.card.MaterialCardView
+import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
+import com.google.android.fhir.datacapture.extensions.initHelpViews
+import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpanned
+import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
+import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 import org.hl7.fhir.r4.model.Questionnaire
 
 /** View for the prefix, question, and hint of a questionnaire item. */
@@ -51,10 +46,15 @@ internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout
     prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
     question.updateTextAndVisibility(questionnaireItem.localizedTextSpanned)
     hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
-    initHelpButton(this, questionnaireItem)
+    initHelpViews(
+      helpButton = findViewById(R.id.helpButton),
+      helpCardView = findViewById(R.id.helpCardView),
+      helpTextView = findViewById(R.id.helpText),
+      questionnaireItem
+    )
     //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
-    visibility = getViewGroupVisibility(prefix, question, hint)
+    visibility = getHeaderViewVisibility(prefix, question, hint)
   }
 
   /**
@@ -73,50 +73,4 @@ internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout
       }
     errorTextView.text = errorText
   }
-}
-
-internal fun TextView.updateTextAndVisibility(localizedText: Spanned? = null) {
-  text = localizedText
-  visibility =
-    if (localizedText.isNullOrEmpty()) {
-      GONE
-    } else {
-      VISIBLE
-    }
-}
-
-/** Returns [VISIBLE] if any of the [view] is visible, else returns [GONE]. */
-internal fun getViewGroupVisibility(vararg view: TextView): Int {
-  if (view.any { it.visibility == VISIBLE }) {
-    return VISIBLE
-  }
-  return GONE
-}
-
-internal fun initHelpButton(
-  view: View,
-  questionnaireItem: Questionnaire.QuestionnaireItemComponent
-) {
-  val helpButton = view.findViewById<Button>(R.id.helpButton)
-  helpButton.visibility =
-    if (questionnaireItem.hasHelpButton) {
-      VISIBLE
-    } else {
-      GONE
-    }
-  val helpCardView = view.findViewById<MaterialCardView>(R.id.helpCardView)
-  var isHelpCardViewVisible = false
-  helpButton.setOnClickListener {
-    if (isHelpCardViewVisible) {
-      isHelpCardViewVisible = false
-      helpCardView.visibility = GONE
-    } else {
-      isHelpCardViewVisible = true
-      helpCardView.visibility = VISIBLE
-    }
-  }
-
-  view
-    .findViewById<TextView>(R.id.helpText)
-    .updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
 }

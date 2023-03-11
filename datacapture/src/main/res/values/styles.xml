@@ -42,8 +42,11 @@
         </item>
         <item
             name="questionnaireQuestionTextStyle"
-        >@style/TextAppearance.Material3.TitleMedium
-        </item>
+        >@style/TextAppearance.Material3.TitleMedium</item>
+
+      <item
+            name="questionnaireReviewModeQuestionTextStyle"
+        >@style/TextAppearance.Material3.TitleMedium</item>
         <item
             name="questionnaireSubtitleTextStyle"
         >@style/TextAppearance.Material3.BodyMedium
@@ -58,8 +61,14 @@
             @style/Widget.MaterialComponents.Button.TextButton.Icon
         </item>
         <item
-            name="questionnaireAnswerTextStyle"
-        >@style/Questionnaire.AnswerStyle</item>
+            name="questionnaireReviewModeAnswerTextStyle"
+        >@style/Questionnaire.ReviewModeAnswerStyle</item>
+      <item
+            name="questionnaireReviewModeNotAnsweredTextStyle"
+        >@style/Questionnaire.ReviewModeNotAnsweredTextStyle</item>
+      <item
+            name="questionnaireReviewModeItemDividerStyle"
+        >@style/Questionnaire.ReviewModeMaterialDividerStyle</item>
         <item
             name="questionnaireCheckBoxStyle"
         >@style/Questionnaire.CheckBoxStyle
@@ -168,10 +177,24 @@
     </style>
 
     <style
-        name="Questionnaire.AnswerStyle"
+        name="Questionnaire.ReviewModeAnswerStyle"
         parent="TextAppearance.Material3.BodyMedium"
     >
-        <item name="android:alpha">0.5</item>
+      <item name="android:alpha">0.5</item>
+    </style>
+
+    <style
+        name="Questionnaire.ReviewModeNotAnsweredTextStyle"
+        parent="TextAppearance.Material3.BodyMedium"
+    >
+         <item name="android:textColor">?attr/colorError</item>
+    </style>
+
+    <style
+        name="Questionnaire.ReviewModeMaterialDividerStyle"
+        parent="Widget.Material3.MaterialDivider"
+    >
+      <item name="android:alpha">0.5</item>
     </style>
 
     <style

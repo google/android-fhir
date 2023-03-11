@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.datacapture.EXTENSION_HIDDEN_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_HIDDEN_URL
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Attachment
