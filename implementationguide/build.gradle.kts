@@ -9,7 +9,7 @@ plugins {
   id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
 }
 
-publishArtifact(Releases.ImplmentationGuide)
+publishArtifact(Releases.ImplementationGuide)
 
 createJacocoTestReportTask()
 
@@ -110,13 +110,15 @@ dependencies {
 
 tasks.dokkaHtml.configure {
   outputDirectory.set(
-    file("../docs/${Releases.ImplmentationGuide.artifactId}/${Releases.ImplmentationGuide.version}")
+    file(
+      "../docs/${Releases.ImplementationGuide.artifactId}/${Releases.ImplementationGuide.version}"
+    )
   )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
-      moduleName.set(Releases.ImplmentationGuide.artifactId)
-      moduleVersion.set(Releases.ImplmentationGuide.version)
+      moduleName.set(Releases.ImplementationGuide.artifactId)
+      moduleVersion.set(Releases.ImplementationGuide.version)
       noAndroidSdkLink.set(false)
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))

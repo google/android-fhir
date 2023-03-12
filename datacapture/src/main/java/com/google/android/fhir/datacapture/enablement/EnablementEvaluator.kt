@@ -17,9 +17,9 @@
 package com.google.android.fhir.datacapture.enablement
 
 import com.google.android.fhir.compareTo
-import com.google.android.fhir.datacapture.allItems
-import com.google.android.fhir.datacapture.enableWhenExpression
-import com.google.android.fhir.datacapture.utilities.fhirPathEngine
+import com.google.android.fhir.datacapture.extensions.allItems
+import com.google.android.fhir.datacapture.extensions.enableWhenExpression
+import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import com.google.android.fhir.equals
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse

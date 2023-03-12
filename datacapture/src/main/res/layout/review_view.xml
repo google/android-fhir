@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ Copyright 2020 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+    android:layout_marginTop="@dimen/item_margin_vertical"
+    android:orientation="vertical"
+>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    >
+        <TextView
+            android:id="@+id/prefix"
+            style="?attr/questionnaireReviewModeQuestionTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingEnd="@dimen/prefix_padding_end"
+            app:layout_constraintEnd_toStartOf="@+id/question"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+        />
+        <TextView
+            android:id="@+id/question"
+            style="?attr/questionnaireReviewModeQuestionTextStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/prefix"
+            app:layout_constraintTop_toTopOf="parent"
+        />
+        <TextView
+            android:id="@+id/hint"
+            style="?attr/questionnaireSubtitleTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/instructions_top_margin"
+            android:layout_gravity="center_vertical"
+            tools:text="Sample helper text"
+            app:layout_constraintTop_toBottomOf="@id/question"
+            app:layout_constraintStart_toStartOf="parent"
+        />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.fhir.datacapture.views.MediaView
+        android:id="@+id/item_media"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    />
+
+    <TextView
+        android:id="@+id/flyover_text_view"
+        style="?attr/questionnaireSubtitleTextStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    />
+    <TextView
+        android:id="@+id/answer_text_view"
+        style="?attr/questionnaireReviewModeAnswerTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+    />
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/error_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/item_margin_vertical"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:visibility="gone"
+    >
+        <View
+            android:layout_width="@dimen/error_icon_width"
+            android:layout_height="@dimen/error_icon_height"
+            android:layout_marginEnd="@dimen/error_icon_margin_end"
+            android:background="@drawable/ic_error_48px"
+            android:backgroundTint="?attr/colorError"
+        />
+
+        <TextView
+            android:id="@+id/error_text_view"
+            style="?attr/questionnaireReviewModeNotAnsweredTextStyle"
+            android:textColor="?attr/colorError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+        />
+    </LinearLayout>
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/text_divider"
+        style="?attr/questionnaireReviewModeItemDividerStyle"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/item_margin_vertical"
+        android:layout_width="match_parent"
+    />
+</LinearLayout>

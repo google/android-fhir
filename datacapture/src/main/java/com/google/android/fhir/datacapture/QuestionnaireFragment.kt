@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.use
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -34,10 +33,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
-import com.google.android.material.divider.MaterialDivider
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import org.hl7.fhir.r4.model.Questionnaire
 import timber.log.Timber
@@ -91,8 +88,6 @@ class QuestionnaireFragment : Fragment() {
 
   /** @suppress */
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    val bottomContainer = view.findViewById<ConstraintLayout>(R.id.bottom_container)
-    val bottomContainerDivider = view.findViewById<MaterialDivider>(R.id.container_divider)
     val questionnaireEditRecyclerView =
       view.findViewById<RecyclerView>(R.id.questionnaire_edit_recycler_view)
     val questionnaireReviewRecyclerView =
@@ -118,32 +113,30 @@ class QuestionnaireFragment : Fragment() {
     }
     val questionnaireProgressIndicator: LinearProgressIndicator =
       view.findViewById(R.id.questionnaire_progress_indicator)
-    val questionnaireItemEditAdapter =
-      QuestionnaireItemEditAdapter(questionnaireItemViewHolderFactoryMatchersProvider.get())
-    val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
+    val questionnaireEditAdapter =
+      QuestionnaireEditAdapter(questionnaireItemViewHolderFactoryMatchersProvider.get())
+    val questionnaireReviewAdapter = QuestionnaireReviewAdapter()
 
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
 
-    val reviewModeEditButton = view.findViewById<View>(R.id.review_mode_edit_button)
-    reviewModeEditButton.setOnClickListener { viewModel.setReviewMode(false) }
+    val reviewModeEditButton =
+      view.findViewById<View>(R.id.review_mode_edit_button).apply {
+        setOnClickListener { viewModel.setReviewMode(false) }
+      }
 
-    val reviewModeButton = view.findViewById<View>(R.id.review_mode_button)
-    reviewModeButton.setOnClickListener { viewModel.setReviewMode(true) }
+    val reviewModeButton =
+      view.findViewById<View>(R.id.review_mode_button).apply {
+        setOnClickListener { viewModel.setReviewMode(true) }
+      }
 
-    questionnaireEditRecyclerView.adapter = questionnaireItemEditAdapter
+    questionnaireEditRecyclerView.adapter = questionnaireEditAdapter
     val linearLayoutManager = LinearLayoutManager(view.context)
     questionnaireEditRecyclerView.layoutManager = linearLayoutManager
-    questionnaireEditRecyclerView.addOnScrollListener(
-      onScrollListener(bottomContainer, bottomContainerDivider)
-    )
     // Animation does work well with views that could gain focus
     questionnaireEditRecyclerView.itemAnimator = null
 
-    questionnaireReviewRecyclerView.adapter = questionnaireItemReviewAdapter
+    questionnaireReviewRecyclerView.adapter = questionnaireReviewAdapter
     questionnaireReviewRecyclerView.layoutManager = LinearLayoutManager(view.context)
-    questionnaireReviewRecyclerView.addOnScrollListener(
-      onScrollListener(bottomContainer, bottomContainerDivider)
-    )
 
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
@@ -152,7 +145,7 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.ReviewMode -> {
             // Set items
             questionnaireEditRecyclerView.visibility = View.GONE
-            questionnaireItemReviewAdapter.submitList(
+            questionnaireReviewAdapter.submitList(
               state.items.filterIsInstance<QuestionnaireAdapterItem.Question>()
             )
             questionnaireReviewRecyclerView.visibility = View.VISIBLE
@@ -175,7 +168,7 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.EditMode -> {
             // Set items
             questionnaireReviewRecyclerView.visibility = View.GONE
-            questionnaireItemEditAdapter.submitList(state.items)
+            questionnaireEditAdapter.submitList(state.items)
             questionnaireEditRecyclerView.visibility = View.VISIBLE
 
             // Set button visibility
@@ -256,14 +249,6 @@ class QuestionnaireFragment : Fragment() {
    * any answers that are present on the rendered [QuestionnaireFragment] when it is called.
    */
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
-
-  /** Override this method to add a custom behavior to Bottom Container on scrolling. */
-  open fun onScrollListener(
-    bottomContainer: ConstraintLayout,
-    bottomContainerDivider: MaterialDivider
-  ): OnScrollListener {
-    return object : OnScrollListener() {}
-  }
 
   /** Helper to create [QuestionnaireFragment] with appropriate [Bundle] arguments. */
   class Builder {

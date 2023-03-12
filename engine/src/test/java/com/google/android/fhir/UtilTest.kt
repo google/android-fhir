@@ -101,6 +101,16 @@ class UtilTest : TestCase() {
     assertThat(isValidDateOnly("33-33-33")).isFalse()
   }
 
+  @Test
+  fun `percentOf() should return 0 when total is zero`() {
+    assertThat(percentOf(0, 0)).isEqualTo(0)
+  }
+
+  @Test
+  fun `percentOf() should return percentage`() {
+    assertThat(percentOf(25, 50)).isEqualTo(0.5)
+  }
+
   companion object {
     val TEST_OPERATION_OUTCOME_ERROR = OperationOutcome()
     val TEST_OPERATION_OUTCOME_INFO = OperationOutcome()
