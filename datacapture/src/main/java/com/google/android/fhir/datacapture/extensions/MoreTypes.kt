@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.common.datatype
+package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.format
-import com.google.android.fhir.datacapture.toLocalizedString
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localTime
 import com.google.android.fhir.getLocalizedText

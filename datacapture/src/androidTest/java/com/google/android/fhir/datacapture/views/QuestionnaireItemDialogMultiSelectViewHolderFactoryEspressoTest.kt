@@ -31,12 +31,12 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.fhir.datacapture.DisplayItemControlType
-import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_SYSTEM
-import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_URL
-import com.google.android.fhir.datacapture.ItemControlTypes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
+import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.extensions.ItemControlTypes
 import com.google.android.fhir.datacapture.utilities.assertQuestionnaireResponseAtIndex
 import com.google.android.fhir.datacapture.utilities.clickOnText
 import com.google.android.fhir.datacapture.utilities.clickOnTextInDialog

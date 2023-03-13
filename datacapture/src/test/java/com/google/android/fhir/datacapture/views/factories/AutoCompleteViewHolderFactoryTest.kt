@@ -21,7 +21,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.view.get
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.common.datatype.displayString
+import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
