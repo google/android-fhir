@@ -78,7 +78,7 @@ data class QuestionnaireViewItem(
     {
       emptyList()
     },
-  internal val draftAnswer: Any? = null
+  val draftAnswer: Any? = null
 ) {
 
   /**

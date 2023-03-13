@@ -101,7 +101,7 @@ internal object DatePickerViewHolderFactory :
             }
             .show(context.supportFragmentManager, TAG)
         }
-        val localeDatePattern = getLocalizedDateTimePattern()
+        val localeDatePattern = "dd-MM-YYYY" // getLocalizedDateTimePattern()
         // Special character used in date pattern
         val datePatternSeparator = getDateSeparator(localeDatePattern)
         textWatcher = DatePatternTextWatcher(datePatternSeparator)
