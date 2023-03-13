@@ -61,11 +61,11 @@
             @style/Widget.MaterialComponents.Button.TextButton.Icon
         </item>
       <item
-            name="questionnaireBottomContainerStyle"
-        >@style/Questionnaire.BottomContainerStyle</item>
+            name="questionnaireBottomNavContainerStyle"
+        >@style/Questionnaire.BottomNavContainerStyle</item>
       <item
-            name="questionnaireBottomContainerDividerStyle"
-        >@style/Questionnaire.BottomContainerDividerStyle</item>
+            name="questionnaireBottomNavContainerDividerStyle"
+        >@style/Questionnaire.BottomNavContainerDividerStyle</item>
         <item
             name="questionnaireReviewModeAnswerTextStyle"
         >@style/Questionnaire.ReviewModeAnswerStyle</item>
@@ -182,7 +182,7 @@
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
 
-    <style name="Questionnaire.BottomContainerStyle" parent="">
+    <style name="Questionnaire.BottomNavContainerStyle" parent="">
       <item name="android:background">?attr/colorSurface</item>
       <item
             name="android:paddingTop"
@@ -193,7 +193,7 @@
     </style>
 
     <style
-        name="Questionnaire.BottomContainerDividerStyle"
+        name="Questionnaire.BottomNavContainerDividerStyle"
         parent="Widget.Material3.MaterialDivider"
     >
       <item name="android:visibility">visible</item>
