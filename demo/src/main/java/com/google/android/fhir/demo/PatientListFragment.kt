@@ -43,7 +43,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
+import com.google.android.fhir.demo.care.CarePlanManager
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
+import com.google.android.fhir.demo.util.setProgressDialog
 import com.google.android.fhir.sync.SyncJobStatus
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
@@ -57,6 +59,8 @@ class PatientListFragment : Fragment() {
   private lateinit var syncStatus: TextView
   private lateinit var syncPercent: TextView
   private lateinit var syncProgress: ProgressBar
+  private lateinit var workflowBanner: LinearLayout
+  private lateinit var workflowProgress: ProgressBar
   private var _binding: FragmentPatientListBinding? = null
   private val binding
     get() = _binding!!
@@ -103,10 +107,12 @@ class PatientListFragment : Fragment() {
     }
 
     searchView = binding.search
-    topBanner = binding.syncStatusContainer.linearLayoutSyncStatus
-    syncStatus = binding.syncStatusContainer.tvSyncingStatus
-    syncPercent = binding.syncStatusContainer.tvSyncingPercent
-    syncProgress = binding.syncStatusContainer.progressSyncing
+    topBanner = binding.syncStatusContainer.linearLayoutProgressStatus
+    syncStatus = binding.syncStatusContainer.progressStatus
+    syncPercent = binding.syncStatusContainer.progressPercent
+    syncProgress = binding.syncStatusContainer.progressBar
+    workflowBanner = binding.workflowApplicationStatusContainer.linearLayoutProgressStatus
+    workflowProgress = binding.workflowApplicationStatusContainer.progressBar
     searchView.setOnQueryTextListener(
       object : SearchView.OnQueryTextListener {
         override fun onQueryTextChange(newText: String): Boolean {
@@ -166,6 +172,7 @@ class PatientListFragment : Fragment() {
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
+            applyWorkflow()
           }
           is SyncJobStatus.Failed -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
@@ -245,5 +252,15 @@ class PatientListFragment : Fragment() {
       topBanner.startAnimation(animation)
       Handler(Looper.getMainLooper()).postDelayed({ topBanner.visibility = View.GONE }, 2000)
     }
+  }
+
+  private fun applyWorkflow(){
+    workflowBanner.visibility = View.VISIBLE
+    workflowProgress.visibility = View.VISIBLE
+    workflowProgress.progress = 0
+    val dialog = setProgressDialog(requireContext(), "Executing Workflow(s)..")
+    dialog.show()
+    patientListViewModel.applyWorkflowForAll()
+    dialog.dismiss()
   }
 }

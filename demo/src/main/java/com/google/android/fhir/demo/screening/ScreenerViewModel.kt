@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.demo
+package com.google.android.fhir.demo.screening
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -25,6 +25,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
+import com.google.android.fhir.demo.FhirApplication
 import java.math.BigDecimal
 import java.util.UUID
 import kotlinx.coroutines.launch
@@ -45,16 +46,13 @@ import org.hl7.fhir.r4.model.codesystems.RiskProbability
 /** ViewModel for screener questionnaire screen {@link ScreenerEncounterFragment}. */
 class ScreenerViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
-  val questionnaire: String
-    get() = getQuestionnaireJson()
-  val isResourcesSaved = MutableLiveData<Boolean>()
-
+  lateinit var questionnaireString: String
   private val questionnaireResource: Questionnaire
     get() =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire) as
+      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaireString) as
         Questionnaire
-  private var questionnaireJson: String? = null
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
+  val isResourcesSaved = MutableLiveData<Boolean>()
 
   /**
    * Saves screener encounter questionnaire response into the application database.
@@ -126,20 +124,6 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
 
   private suspend fun saveResourceToDatabase(resource: Resource) {
     fhirEngine.create(resource)
-  }
-
-  private fun getQuestionnaireJson(): String {
-    questionnaireJson?.let {
-      return it!!
-    }
-    questionnaireJson = readFileFromAssets(state[ScreenerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
-    return questionnaireJson!!
-  }
-
-  private fun readFileFromAssets(filename: String): String {
-    return getApplication<Application>().assets.open(filename).bufferedReader().use {
-      it.readText()
-    }
   }
 
   private fun generateUuid(): String {

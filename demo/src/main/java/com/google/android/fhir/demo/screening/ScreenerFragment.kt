@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.demo
+package com.google.android.fhir.demo.screening
 
 import android.os.Bundle
 import android.view.Menu
@@ -31,6 +31,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.demo.R
 
 /** A fragment class to show screener questionnaire screen. */
 class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
@@ -42,8 +43,8 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
     super.onViewCreated(view, savedInstanceState)
     setUpActionBar()
     setHasOptionsMenu(true)
-    updateArguments()
     onBackPressed()
+    setViewModelQuestionnaire()
     observeResourcesSaveAction()
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
@@ -75,15 +76,15 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
     }
   }
 
-  private fun updateArguments() {
-    requireArguments().putString(QUESTIONNAIRE_FILE_PATH_KEY, "screener-questionnaire.json")
+  private fun setViewModelQuestionnaire() {
+    viewModel.questionnaireString = args.questionnaireString
   }
 
   private fun addQuestionnaireFragment() {
     childFragmentManager.commit {
       add(
-        R.id.add_patient_container,
-        QuestionnaireFragment.builder().setQuestionnaire(viewModel.questionnaire).build(),
+          R.id.add_patient_container,
+        QuestionnaireFragment.builder().setQuestionnaire(viewModel.questionnaireString).build(),
         QUESTIONNAIRE_FRAGMENT_TAG
       )
     }
@@ -134,7 +135,7 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
   }
 
   companion object {
-    const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
+    const val EXTRA_QUESTIONNAIRE_JSON_STRING = "questionnaire-json-string"
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
     const val TASK_STATUS_MODIFIED = "TASK_MODIFIED"
   }

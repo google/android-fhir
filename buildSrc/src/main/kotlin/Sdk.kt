@@ -20,8 +20,8 @@ object Sdk {
 
   // Engine and SDC must support API 24.
   // Remove desugaring when upgrading it to 26.
-  const val minSdk = 24
+  const val minSdk = 28
 
   // Workflow requires minSDK 26
-  const val minSdkWorkflow = 26
+  const val minSdkWorkflow = 28
 }

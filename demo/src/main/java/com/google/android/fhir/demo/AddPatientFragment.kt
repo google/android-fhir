@@ -22,18 +22,21 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.demo.util.setProgressDialog
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /** A fragment class to show patient registration screen. */
 class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
 
   private val viewModel: AddPatientViewModel by viewModels()
+  private lateinit var workflowDialog: AlertDialog
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -43,7 +46,9 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
     }
+    workflowDialog = setProgressDialog(requireContext(), "Executing Workflow(s)..")
     observePatientSaveAction()
+    observeWorkflowExecution()
     (activity as MainActivity).setDrawerEnabled(false)
   }
 
@@ -105,7 +110,16 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
         return@observe
       }
       Toast.makeText(requireContext(), "Patient is saved.", Toast.LENGTH_SHORT).show()
-      NavHostFragment.findNavController(this).navigateUp()
+      workflowDialog.show()
+    }
+  }
+
+  private fun observeWorkflowExecution(){
+    viewModel.isWorkFlowExecuted.observe(viewLifecycleOwner){
+      if(it){
+        workflowDialog.dismiss()
+        NavHostFragment.findNavController(this).navigateUp()
+      }
     }
   }
 

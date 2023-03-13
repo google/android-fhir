@@ -1,4 +1,4 @@
-package com.google.android.fhir.demo.care.listscreening
+package com.google.android.fhir.demo.screening
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,11 +6,11 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.demo.R
-import com.google.android.fhir.demo.care.CareUtil
+import com.google.android.fhir.demo.care.TaskManager
 import com.google.android.fhir.demo.databinding.ItemScreeningViewBinding
 import org.hl7.fhir.r4.model.Task
 
-class ScreeningLandingAdapter(private val clickHandle: ClickHandle) :
+class ScreeningLandingAdapter(private val screeningClickHandler: ScreeningClickHandler) :
     RecyclerView.Adapter<ScreeningLandingAdapter.ScreeningLandingViewHolder>() {
 
     private val taskList = mutableListOf<Task>()
@@ -25,7 +25,7 @@ class ScreeningLandingAdapter(private val clickHandle: ClickHandle) :
         private val itemScreeningViewBinding: ItemScreeningViewBinding
     ) : RecyclerView.ViewHolder(itemScreeningViewBinding.root) {
         fun bind(task: Task) {
-            itemScreeningViewBinding.title = CareUtil.getTaskName(task)
+            itemScreeningViewBinding.title = TaskManager.getTaskName(task)
 //            itemScreeningViewBinding.icon =
             itemScreeningViewBinding.status = task.status.display
 //            itemScreeningViewBinding.statusColor =
@@ -41,7 +41,7 @@ class ScreeningLandingAdapter(private val clickHandle: ClickHandle) :
                 parent,
                 false
             )
-        ).listen { view, position, type -> clickHandle.onClick(position) }
+        ).listen { view, position, type -> screeningClickHandler.onClick(taskList[position]) }
     }
 
     override fun onBindViewHolder(holder: ScreeningLandingViewHolder, position: Int) {
@@ -51,8 +51,8 @@ class ScreeningLandingAdapter(private val clickHandle: ClickHandle) :
     override fun getItemCount() = taskList.size
 }
 
-interface ClickHandle {
-    fun onClick(position: Int)
+interface ScreeningClickHandler {
+    fun onClick(task: Task)
 }
 
 fun <T : RecyclerView.ViewHolder> T.listen(

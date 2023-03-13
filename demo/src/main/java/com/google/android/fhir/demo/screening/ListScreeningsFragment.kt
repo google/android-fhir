@@ -1,7 +1,6 @@
-package com.google.android.fhir.demo.care.listscreening
+package com.google.android.fhir.demo.screening
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,16 +11,19 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.demo.R
-import com.google.android.fhir.demo.ScreenerFragment
 
-class ListScreeningsFragment: Fragment(R.layout.list_screenings), ClickHandle {
+class ListScreeningsFragment(screeningClickHandler: ScreeningClickHandler): Fragment(R.layout.list_screenings) {
     private val viewModel by viewModels<ListScreeningsViewModel>()
-    private val screeningLandingAdapter = ScreeningLandingAdapter(this)
+    private val screeningLandingAdapter = ScreeningLandingAdapter(screeningClickHandler)
     private lateinit var args: Bundle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         args = requireArguments()
+        viewModel.getTasksForPatient(
+            args.getString(PATIENT_ID_KEY)!!,
+            args.getInt(TAB_POSITION)
+        )
     }
 
     override fun onCreateView(
@@ -55,9 +57,8 @@ class ListScreeningsFragment: Fragment(R.layout.list_screenings), ClickHandle {
             }
         }
 
-    override fun onClick(position: Int) {
-        viewModel.taskPosition = position
-        val task = viewModel.taskList.value!![position]
-        //in nav graph pass task to ScreenerFragment (optionally ????)
+    companion object{
+        const val PATIENT_ID_KEY = "patient_id"
+        const val TAB_POSITION = "tab_position"
     }
 }

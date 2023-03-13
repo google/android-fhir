@@ -86,7 +86,7 @@ class PatientDetailsFragment : Fragment() {
   private fun onAddScreenerClick() {
     findNavController()
       .navigate(
-        PatientDetailsFragmentDirections.actionPatientDetailsToScreenEncounterFragment(
+        PatientDetailsFragmentDirections.actionPatientDetailsToScreeningsViewPagerFragment(
           args.patientId
         )
       )

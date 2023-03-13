@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.demo.util.setProgressDialog
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
@@ -129,6 +130,35 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
         .sortedByDescending { it.occurrenceDateTimeType.value }
         .firstOrNull()
     }
+  }
+
+  fun applyWorkflowForAll(){
+    // collect flow returned by following function
+    viewModelScope.launch {
+      FhirApplication.carePlanManager(getApplication<Application>().applicationContext).generateCarePlanForAllPatients()
+      //set flow variable here and observe/collect in fragment
+    }
+    // foloowing lines of code in fragment
+//      .collect{
+//      // it should be a workflowApplicationStatus(completed, total)
+//      state ->
+//      {
+//        val progress =
+//          state
+//            .let { it.completed.toDouble().div(it.total) }
+//            .let { if (it.isNaN()) 0.0 else it }
+//            .times(100)
+//            .roundToInt()
+//        "$progress% ${state.syncOperation.name.lowercase()}ed".also { syncPercent.text = it }
+//        syncProgress.progress = progress
+//        if(state.completed == state.total){
+//          syncProgress.visibility = View.GONE
+//          val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_out)
+//          topBanner.startAnimation(animation)
+//          Handler(Looper.getMainLooper()).postDelayed({ topBanner.visibility = View.GONE }, 2000)
+//        }
+//      }
+//    }
   }
 
   /** The Patient's details for display purposes. */
