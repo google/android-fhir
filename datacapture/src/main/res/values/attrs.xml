@@ -57,7 +57,10 @@
     <attr name="questionnaireBottomNavContainerStyle" format="reference" />
 
     <!--   Style for bottom navigation container divider. -->
-    <attr name="questionnaireBottomNavContainerDividerStyle" format="reference" />
+    <attr
+        name="questionnaireBottomNavContainerDividerStyle"
+        format="reference"
+    />
 
     <!--   Style for radio buttons. -->
     <attr name="questionnaireRadioButtonStyle" format="reference" />
