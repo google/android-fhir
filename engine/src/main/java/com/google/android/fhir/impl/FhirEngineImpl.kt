@@ -27,6 +27,7 @@ import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
+import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
@@ -61,6 +62,10 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun <R : Resource> search(search: Search): List<R> {
     return search.execute(database)
+  }
+
+  override suspend fun <R : Resource> search(searchQuery: SearchQuery): List<R> {
+    return database.search(searchQuery)
   }
 
   override suspend fun count(search: Search): Long {
