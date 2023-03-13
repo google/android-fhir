@@ -25,12 +25,12 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.google.android.fhir.datacapture.MimeType
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.decodeToBitmap
-import com.google.android.fhir.datacapture.fetchBitmapFromUrl
-import com.google.android.fhir.datacapture.itemMedia
-import com.google.android.fhir.datacapture.tryUnwrapContext
+import com.google.android.fhir.datacapture.extensions.MimeType
+import com.google.android.fhir.datacapture.extensions.decodeToBitmap
+import com.google.android.fhir.datacapture.extensions.fetchBitmapFromUrl
+import com.google.android.fhir.datacapture.extensions.itemMedia
+import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire

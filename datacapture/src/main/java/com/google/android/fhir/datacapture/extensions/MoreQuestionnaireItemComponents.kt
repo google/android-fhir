@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture
+package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -22,7 +22,8 @@ import android.graphics.BitmapFactory
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import ca.uhn.fhir.util.UrlUtil
-import com.google.android.fhir.datacapture.common.datatype.asStringValue
+import com.google.android.fhir.datacapture.DataCapture
+import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.android.fhir.datacapture.fhirpath.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
 import java.math.BigDecimal
@@ -298,6 +299,7 @@ val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
 internal val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spanned?
   get() = item.localizedInstructionsSpanned
 
+/** [localizedInstructionsSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
 internal val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionsSpanned: Spanned?
   get() {
     return this.firstOrNull { questionnaireItem ->
@@ -314,6 +316,7 @@ internal val List<Questionnaire.QuestionnaireItemComponent>.localizedInstruction
 internal val Questionnaire.QuestionnaireItemComponent.localizedFlyoverSpanned: Spanned?
   get() = item.localizedFlyoverSpanned
 
+/** [localizedFlyoverSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
 internal val List<Questionnaire.QuestionnaireItemComponent>.localizedFlyoverSpanned: Spanned?
   get() =
     this.firstOrNull { questionnaireItem ->
@@ -329,6 +332,7 @@ internal val List<Questionnaire.QuestionnaireItemComponent>.localizedFlyoverSpan
 internal val Questionnaire.QuestionnaireItemComponent.localizedHelpSpanned: Spanned?
   get() = item.localizedHelpSpanned
 
+/** [localizedHelpSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
 internal val List<Questionnaire.QuestionnaireItemComponent>.localizedHelpSpanned: Spanned?
   get() {
     return this.firstOrNull { questionnaireItem -> questionnaireItem.isHelpCode }
@@ -411,6 +415,7 @@ internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
     }
   }
 
+/** Whether item type is display. */
 internal val Questionnaire.QuestionnaireItemComponent.isDisplayItem: Boolean
   get() =
     (type == Questionnaire.QuestionnaireItemType.DISPLAY &&
