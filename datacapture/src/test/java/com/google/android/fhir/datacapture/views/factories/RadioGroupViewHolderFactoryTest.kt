@@ -22,10 +22,10 @@ import android.widget.RadioButton
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
-import com.google.android.fhir.datacapture.ChoiceOrientationTypes
-import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
-import com.google.android.fhir.datacapture.EXTENSION_ITEM_ANSWER_MEDIA
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.ChoiceOrientationTypes
+import com.google.android.fhir.datacapture.extensions.EXTENSION_CHOICE_ORIENTATION_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_ANSWER_MEDIA
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
