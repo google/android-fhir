@@ -271,7 +271,7 @@ internal object DateTimePickerViewHolderFactory :
         }
 
       /** Automatically appends date separator (e.g. "/") during date input. */
-      inner class DatePatternTextWatcher(private val datePatternSeparator: Char) : TextWatcher {
+      inner class DatePatternTextWatcher(private val datePatternSeparator: Char?) : TextWatcher {
         private var isDeleting = false
 
         override fun beforeTextChanged(

@@ -61,6 +61,7 @@ import kotlin.math.log10
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import timber.log.Timber
 
 internal object DatePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.date_picker_view) {
@@ -214,7 +215,7 @@ internal object DatePickerViewHolderFactory :
       }
 
       /** Automatically appends date separator (e.g. "/") during date input. */
-      inner class DatePatternTextWatcher(private val dateFormatSeparator: Char) : TextWatcher {
+      inner class DatePatternTextWatcher(private val dateFormatSeparator: Char?) : TextWatcher {
         private var isDeleting = false
 
         override fun beforeTextChanged(
@@ -253,7 +254,7 @@ internal object DatePickerViewHolderFactory :
 internal fun handleDateFormatAfterTextChange(
   editable: Editable,
   canonicalizedDatePattern: String,
-  dateFormatSeparator: Char,
+  dateFormatSeparator: Char?,
   isDeleting: Boolean
 ) {
   val editableLength = editable.length
@@ -285,22 +286,25 @@ internal const val TAG = "date-picker"
 internal val ZONE_ID_UTC = ZoneId.of("UTC")
 
 internal fun datePattern(questionnaireItem: Questionnaire.QuestionnaireItemComponent): String {
-  val str =
-    questionnaireItem.entryFormat?.let {
-      try {
-        val text = LocalDate.now().format(DateTimeFormatter.ofPattern(it))
-        LocalDate.parse(text, DateTimeFormatter.ofPattern(it))
-        it
-      } catch (e: ParseException) {
-        getLocalizedDateTimePattern()
-      } catch (e: DateTimeParseException) {
-        getLocalizedDateTimePattern()
-      } catch (e: Exception) {
-        getLocalizedDateTimePattern()
-      }
+  if (isValidDateEntryFormat(questionnaireItem.entryFormat)) {
+    return questionnaireItem.entryFormat!!
+  } else {
+    return getLocalizedDateTimePattern()
+  }
+}
+
+internal fun isValidDateEntryFormat(entryFormat: String?): Boolean {
+  return entryFormat?.let {
+    try {
+      val text = LocalDate.now().format(DateTimeFormatter.ofPattern(entryFormat))
+      LocalDate.parse(text, DateTimeFormatter.ofPattern(entryFormat))
+      true
+    } catch (e: Exception) {
+      Timber.w(e.message)
+      false
     }
-      ?: getLocalizedDateTimePattern()
-  return str
+  }
+    ?: false
 }
 
 /**

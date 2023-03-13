@@ -28,10 +28,10 @@ import java.util.Date
 
 /**
  * Returns the first character that is not a letter in the given date pattern string (e.g. "/" for
- * "dd/mm/yyyy").
+ * "dd/mm/yyyy") otherwise null.
  */
-internal fun getDateSeparator(localeDatePattern: String): Char =
-  localeDatePattern.filterNot { isLetter(it) }.firstOrNull() ?: ' '
+internal fun getDateSeparator(localeDatePattern: String): Char? =
+  localeDatePattern.filterNot { isLetter(it) }.firstOrNull()
 
 /**
  * Converts date pattern to acceptable date pattern where 2 digits are expected for day(dd) and
