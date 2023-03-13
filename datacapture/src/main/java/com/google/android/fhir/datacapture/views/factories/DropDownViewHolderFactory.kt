@@ -26,8 +26,8 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
-import com.google.android.fhir.datacapture.itemAnswerOptionImage
-import com.google.android.fhir.datacapture.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
+import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid

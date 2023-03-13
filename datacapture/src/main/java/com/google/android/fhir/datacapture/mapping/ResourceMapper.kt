@@ -17,8 +17,8 @@
 package com.google.android.fhir.datacapture.mapping
 
 import com.google.android.fhir.datacapture.DataCapture
-import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.asExpectedType
+import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.targetStructureMap
 import com.google.android.fhir.datacapture.extensions.toCodeType
 import com.google.android.fhir.datacapture.extensions.toIdType

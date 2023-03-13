@@ -16,12 +16,11 @@
 
 package com.google.android.fhir.datacapture.fhirpath
 
-import com.google.android.fhir.datacapture.calculatedExpression
+import com.google.android.fhir.datacapture.extensions.calculatedExpression
 import com.google.android.fhir.datacapture.extensions.findVariableExpression
-import com.google.android.fhir.datacapture.findVariableExpression
-import com.google.android.fhir.datacapture.flattened
-import com.google.android.fhir.datacapture.isReferencedBy
-import com.google.android.fhir.datacapture.variableExpressions
+import com.google.android.fhir.datacapture.extensions.flattened
+import com.google.android.fhir.datacapture.extensions.isReferencedBy
+import com.google.android.fhir.datacapture.extensions.variableExpressions
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Expression

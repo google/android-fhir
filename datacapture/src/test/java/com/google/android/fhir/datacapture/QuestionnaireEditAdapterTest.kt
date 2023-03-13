@@ -17,6 +17,11 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Build
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR
+import com.google.android.fhir.datacapture.extensions.ItemControlTypes
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem

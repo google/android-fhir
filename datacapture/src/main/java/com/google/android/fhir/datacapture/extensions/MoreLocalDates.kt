@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture
+package com.google.android.fhir.datacapture.extensions
 
 import android.icu.text.DateFormat
 import com.google.android.fhir.datacapture.views.factories.length

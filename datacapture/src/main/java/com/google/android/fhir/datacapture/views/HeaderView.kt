@@ -24,10 +24,10 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
 import com.google.android.fhir.datacapture.extensions.initHelpViews
+import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpanned
+import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
-import com.google.android.fhir.datacapture.localizedInstructionsSpanned
-import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
 import org.hl7.fhir.r4.model.Questionnaire
 
 /** View for the prefix, question, and hint of a questionnaire item. */
