@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture
+package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -22,7 +22,8 @@ import android.graphics.BitmapFactory
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import ca.uhn.fhir.util.UrlUtil
-import com.google.android.fhir.datacapture.common.datatype.asStringValue
+import com.google.android.fhir.datacapture.DataCapture
+import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.android.fhir.datacapture.fhirpath.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
 import java.math.BigDecimal

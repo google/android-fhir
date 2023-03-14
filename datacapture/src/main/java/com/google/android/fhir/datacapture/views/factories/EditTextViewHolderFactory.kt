@@ -26,7 +26,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.annotation.LayoutRes
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid

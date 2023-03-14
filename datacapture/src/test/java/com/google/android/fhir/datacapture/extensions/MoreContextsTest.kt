@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.extensions
 import android.app.Application
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
-import com.google.android.fhir.datacapture.tryUnwrapContext
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
