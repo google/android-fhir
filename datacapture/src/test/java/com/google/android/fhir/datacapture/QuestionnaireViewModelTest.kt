@@ -4207,12 +4207,33 @@ class QuestionnaireViewModelTest {
 
     viewModel = QuestionnaireViewModel(context, state)
     assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
-    val enabledDisplayItems =
+    var enabledDisplayItems =
       viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems
     assertThat(enabledDisplayItems.size).isEqualTo(1)
     assertThat(enabledDisplayItems[0].type).isEqualTo(Questionnaire.QuestionnaireItemType.DISPLAY)
     assertThat(enabledDisplayItems[0].linkId).isEqualTo("1.1")
     assertThat(enabledDisplayItems[0].text).isEqualTo("Text when no is selected")
+
+    // initial value is set to true
+    state.set(
+      EXTRA_QUESTIONNAIRE_JSON_STRING,
+      printer.encodeResourceToString(
+        questionnaire(
+          listOf(
+            Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(true) }
+          )
+        )
+      )
+    )
+
+    viewModel = QuestionnaireViewModel(context, state)
+    assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
+    enabledDisplayItems =
+      viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems
+    assertThat(enabledDisplayItems.size).isEqualTo(1)
+    assertThat(enabledDisplayItems[0].type).isEqualTo(Questionnaire.QuestionnaireItemType.DISPLAY)
+    assertThat(enabledDisplayItems[0].linkId).isEqualTo("1.2")
+    assertThat(enabledDisplayItems[0].text).isEqualTo("Text when yes is selected")
   }
 
   private fun createQuestionnaireViewModel(

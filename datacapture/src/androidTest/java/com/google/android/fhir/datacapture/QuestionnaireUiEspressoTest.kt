@@ -376,7 +376,7 @@ class QuestionnaireUiEspressoTest {
 
     onView(withId(R.id.hint)).check { view, _ ->
       val hintVisibility = (view as TextView).visibility
-      val hintText = (view as TextView).text.toString()
+      val hintText = view.text.toString()
       assertThat(hintVisibility).isEqualTo(View.VISIBLE)
       assertThat(hintText).isEqualTo("Text when yes is selected")
     }
@@ -385,7 +385,7 @@ class QuestionnaireUiEspressoTest {
 
     onView(withId(R.id.hint)).check { view, _ ->
       val hintVisibility = (view as TextView).visibility
-      val hintText = (view as TextView).text.toString()
+      val hintText = view.text.toString()
       assertThat(hintVisibility).isEqualTo(View.VISIBLE)
       assertThat(hintText).isEqualTo("Text when no is selected")
     }
