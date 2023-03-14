@@ -1,14 +1,13 @@
 {
   "resourceType": "Questionnaire",
   "id": "questionnaire.enabled.display",
-  "url": "https://fhir.dk.swisstph-mis.ch/matchbox/fhir/Questionnaire/questionnaire.enabled.display",
   "name": "Questionnaire Enabled Display",
   "title": "Questionnaire Enabled Display",
   "status": "active",
   "item": [
     {
       "linkId": "1",
-      "text": "Severe Pneumonia or Very Severe Disease",
+      "text": "Questionnaire Text",
       "type": "boolean",
       "item": [
         {
