@@ -45,7 +45,7 @@ internal class GroupHeaderView(context: Context, attrs: AttributeSet?) :
       helpButton = findViewById(R.id.helpButton),
       helpCardView = findViewById(R.id.helpCardView),
       helpTextView = findViewById(R.id.helpText),
-      questionnaireViewItem.questionnaireItem
+      questionnaireItem = questionnaireViewItem.questionnaireItem
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
     question.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedTextSpanned)
