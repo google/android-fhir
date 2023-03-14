@@ -46,7 +46,8 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
     }
-    workflowDialog = setProgressDialog(requireContext(), "Executing Workflow(s)..")
+    workflowDialog =
+      setProgressDialog(requireContext(), resources.getString(R.string.executing_workflow))
     observePatientSaveAction()
     observeWorkflowExecution()
     (activity as MainActivity).setDrawerEnabled(false)
@@ -111,12 +112,13 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
       }
       Toast.makeText(requireContext(), "Patient is saved.", Toast.LENGTH_SHORT).show()
       workflowDialog.show()
+      viewModel.applyWorkflow()
     }
   }
 
-  private fun observeWorkflowExecution(){
-    viewModel.isWorkFlowExecuted.observe(viewLifecycleOwner){
-      if(it){
+  private fun observeWorkflowExecution() {
+    viewModel.isWorkFlowExecuted.observe(viewLifecycleOwner) {
+      if (it) {
         workflowDialog.dismiss()
         NavHostFragment.findNavController(this).navigateUp()
       }

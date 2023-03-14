@@ -43,11 +43,11 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
-import com.google.android.fhir.demo.care.CarePlanManager
+import com.google.android.fhir.demo.care.WorkflowExecutionStatus
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
-import com.google.android.fhir.demo.util.setProgressDialog
 import com.google.android.fhir.sync.SyncJobStatus
 import kotlin.math.roundToInt
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -60,6 +60,8 @@ class PatientListFragment : Fragment() {
   private lateinit var syncPercent: TextView
   private lateinit var syncProgress: ProgressBar
   private lateinit var workflowBanner: LinearLayout
+  private lateinit var workflowStatus: TextView
+  private lateinit var workflowPercent: TextView
   private lateinit var workflowProgress: ProgressBar
   private var _binding: FragmentPatientListBinding? = null
   private val binding
@@ -112,6 +114,8 @@ class PatientListFragment : Fragment() {
     syncPercent = binding.syncStatusContainer.progressPercent
     syncProgress = binding.syncStatusContainer.progressBar
     workflowBanner = binding.workflowApplicationStatusContainer.linearLayoutProgressStatus
+    workflowStatus = binding.workflowApplicationStatusContainer.progressStatus
+    workflowPercent = binding.workflowApplicationStatusContainer.progressPercent
     workflowProgress = binding.workflowApplicationStatusContainer.progressBar
     searchView.setOnQueryTextListener(
       object : SearchView.OnQueryTextListener {
@@ -171,8 +175,8 @@ class PatientListFragment : Fragment() {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
+            //            mainActivityViewModel.applyWorkflowForAll()
             fadeOutTopBanner(it)
-            applyWorkflow()
           }
           is SyncJobStatus.Failed -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
@@ -189,6 +193,7 @@ class PatientListFragment : Fragment() {
         }
       }
     }
+    observeWorkflowState()
   }
 
   override fun onDestroyView() {
@@ -254,13 +259,50 @@ class PatientListFragment : Fragment() {
     }
   }
 
-  private fun applyWorkflow(){
-    workflowBanner.visibility = View.VISIBLE
-    workflowProgress.visibility = View.VISIBLE
-    workflowProgress.progress = 0
-    val dialog = setProgressDialog(requireContext(), "Executing Workflow(s)..")
-    dialog.show()
-    patientListViewModel.applyWorkflowForAll()
-    dialog.dismiss()
+  private fun observeWorkflowState() {
+    var total = 0
+    lifecycleScope.launch {
+      mainActivityViewModel.workflowExecutionState.collect { state ->
+        when (state) {
+          is WorkflowExecutionStatus.Started -> {
+            total = state.total
+            if (workflowBanner.visibility != View.VISIBLE) {
+              workflowStatus.text = resources.getString(R.string.executing_workflow).uppercase()
+              workflowStatus.text = ""
+              workflowProgress.progress = 0
+              workflowProgress.visibility = View.VISIBLE
+              workflowBanner.visibility = View.VISIBLE
+              val animation = AnimationUtils.loadAnimation(workflowBanner.context, R.anim.fade_in)
+              workflowBanner.startAnimation(animation)
+            }
+          }
+          is WorkflowExecutionStatus.InProgress -> {
+            val progress =
+              state
+                .let { it.completed.toDouble().div(total) }
+                .let { if (it.isNaN()) 0.0 else it }
+                .times(100)
+                .roundToInt()
+            "${state.completed} / $total".also { syncPercent.text = it }
+            syncProgress.progress = progress
+          }
+          is WorkflowExecutionStatus.Finished,
+          is WorkflowExecutionStatus.Failed -> {
+            if (state is WorkflowExecutionStatus.Finished) workflowPercent.text = ""
+            workflowProgress.visibility = View.GONE
+
+            if (workflowBanner.visibility == View.VISIBLE) {
+              "${resources.getString(R.string.executing_workflow).uppercase()} ${state::class.java.simpleName.uppercase()}".also {
+                workflowStatus.text = it
+              }
+              val animation = AnimationUtils.loadAnimation(workflowBanner.context, R.anim.fade_out)
+              workflowBanner.startAnimation(animation)
+              Handler(Looper.getMainLooper())
+                .postDelayed({ workflowBanner.visibility = View.GONE }, 2000)
+            }
+          }
+        }
+      }
+    }
   }
 }

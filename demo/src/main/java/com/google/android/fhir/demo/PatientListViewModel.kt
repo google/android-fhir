@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.demo.util.setProgressDialog
 import com.google.android.fhir.search.Order
-import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
@@ -83,7 +81,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
           }
         )
       }
-      filterCity(this)
     }
   }
 
@@ -100,7 +97,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
             }
           )
         }
-        filterCity(this)
         sort(Patient.GIVEN, Order.ASCENDING)
         count = 100
         from = 0
@@ -117,48 +113,16 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     return patients
   }
 
-  private fun filterCity(search: Search) {
-    search.filter(Patient.ADDRESS_CITY, { value = "NAIROBI" })
-  }
-
   private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {
-    return fhirEngine.search<RiskAssessment> {}.groupBy { it.subject.reference }.mapValues { entry
-      ->
-      entry
-        .value
-        .filter { it.hasOccurrence() }
-        .sortedByDescending { it.occurrenceDateTimeType.value }
-        .firstOrNull()
-    }
-  }
-
-  fun applyWorkflowForAll(){
-    // collect flow returned by following function
-    viewModelScope.launch {
-      FhirApplication.carePlanManager(getApplication<Application>().applicationContext).generateCarePlanForAllPatients()
-      //set flow variable here and observe/collect in fragment
-    }
-    // foloowing lines of code in fragment
-//      .collect{
-//      // it should be a workflowApplicationStatus(completed, total)
-//      state ->
-//      {
-//        val progress =
-//          state
-//            .let { it.completed.toDouble().div(it.total) }
-//            .let { if (it.isNaN()) 0.0 else it }
-//            .times(100)
-//            .roundToInt()
-//        "$progress% ${state.syncOperation.name.lowercase()}ed".also { syncPercent.text = it }
-//        syncProgress.progress = progress
-//        if(state.completed == state.total){
-//          syncProgress.visibility = View.GONE
-//          val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_out)
-//          topBanner.startAnimation(animation)
-//          Handler(Looper.getMainLooper()).postDelayed({ topBanner.visibility = View.GONE }, 2000)
-//        }
-//      }
-//    }
+    return fhirEngine
+      .search<RiskAssessment> {}
+      .groupBy { it.subject.reference }
+      .mapValues { entry ->
+        entry.value
+          .filter { it.hasOccurrence() }
+          .sortedByDescending { it.occurrenceDateTimeType.value }
+          .firstOrNull()
+      }
   }
 
   /** The Patient's details for display purposes. */

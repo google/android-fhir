@@ -17,7 +17,6 @@
 package com.google.android.fhir.demo
 
 import android.app.Application
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -41,6 +40,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
   val questionnaire: String
     get() = getQuestionnaireJson()
   val isPatientSaved = MutableLiveData<Boolean>()
+  lateinit var savedPatient: Patient
   val isWorkFlowExecuted = MutableLiveData<Boolean>()
 
   private val questionnaireResource: Questionnaire
@@ -69,7 +69,6 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
         isPatientSaved.value = false
         return@launch
       }
-
       val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
       if (entry.resource !is Patient) {
         return@launch
@@ -77,9 +76,16 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
       val patient = entry.resource as Patient
       patient.id = generateUuid()
       fhirEngine.create(patient)
+      savedPatient = patient
       isPatientSaved.value = true
+    }
+  }
+
+  fun applyWorkflow() {
+    viewModelScope.launch {
+      isWorkFlowExecuted.value = false
       FhirApplication.carePlanManager(getApplication<Application>().applicationContext)
-        .generateCarePlanForPatient(patient)
+        .generateCarePlanForPatient(savedPatient)
       isWorkFlowExecuted.value = true
     }
   }

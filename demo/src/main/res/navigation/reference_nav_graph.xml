@@ -8,62 +8,71 @@
 >
 
   <fragment
-    android:id="@+id/patient_list"
-    android:label="Patient List"
-    android:name="com.google.android.fhir.demo.PatientListFragment"
-    tools:layout="@layout/patient_list_view">
+        android:id="@+id/patient_list"
+        android:label="Patient List"
+        android:name="com.google.android.fhir.demo.PatientListFragment"
+        tools:layout="@layout/patient_list_view"
+    >
     <action
-      android:id="@+id/navigate_to_product_detail"
-      app:destination="@id/patient_details" />
+            android:id="@+id/navigate_to_product_detail"
+            app:destination="@id/patient_details"
+        />
     <action
-      android:id="@+id/action_patient_list_to_addPatientFragment"
-      app:destination="@id/addPatientFragment" />
+            android:id="@+id/action_patient_list_to_addPatientFragment"
+            app:destination="@id/addPatientFragment"
+        />
   </fragment>
 
   <fragment
-    android:id="@+id/patient_details"
-    android:label="Patient Details"
-    android:name="com.google.android.fhir.demo.PatientDetailsFragment"
-    tools:layout="@layout/patient_detail">
+        android:id="@+id/patient_details"
+        android:label="Patient Details"
+        android:name="com.google.android.fhir.demo.PatientDetailsFragment"
+        tools:layout="@layout/patient_detail"
+    >
     <action
-      android:id="@+id/navigate_to_edit_patient"
-      app:destination="@id/editPatientFragment" />
+            android:id="@+id/navigate_to_edit_patient"
+            app:destination="@id/editPatientFragment"
+        />
     <action
-      android:id="@+id/action_patient_details_to_screeningsViewPagerFragment"
-      app:destination="@id/screeningsViewPagerFragment" />
+            android:id="@+id/action_patient_details_to_screeningsViewPagerFragment"
+            app:destination="@id/screeningsViewPagerFragment"
+        />
     <argument android:name="patient_id" app:argType="string" />
   </fragment>
 
   <fragment
-    android:id="@+id/addPatientFragment"
-    android:label="@string/add_patient"
-    android:name="com.google.android.fhir.demo.AddPatientFragment"
-    tools:layout="@layout/add_patient_fragment" />
+        android:id="@+id/addPatientFragment"
+        android:label="@string/add_patient"
+        android:name="com.google.android.fhir.demo.AddPatientFragment"
+        tools:layout="@layout/add_patient_fragment"
+    />
 
   <fragment
-    android:id="@+id/editPatientFragment"
-    android:label="Edit Patient"
-    android:name="com.google.android.fhir.demo.EditPatientFragment"
-    tools:layout="@layout/add_patient_fragment">
+        android:id="@+id/editPatientFragment"
+        android:label="Edit Patient"
+        android:name="com.google.android.fhir.demo.EditPatientFragment"
+        tools:layout="@layout/add_patient_fragment"
+    >
     <argument android:name="patient_id" app:argType="string" />
   </fragment>
 
   <fragment
-      android:id="@+id/screeningsViewPagerFragment"
-      android:name="com.google.android.fhir.demo.screening.ScreeningsViewPagerFragment"
-      android:label="ScreeningsViewPagerFragment" >
+        android:id="@+id/screeningsViewPagerFragment"
+        android:name="com.google.android.fhir.demo.screening.ScreeningsViewPagerFragment"
+        android:label="ScreeningsViewPagerFragment"
+    >
     <argument android:name="patient_id" app:argType="string" />
     <action
-        android:id="@+id/action_patient_details_to_screenEncounterFragment"
-        app:destination="@id/screenerEncounterFragment"
+            android:id="@+id/action_patient_details_to_screenEncounterFragment"
+            app:destination="@id/screenerEncounterFragment"
         />
   </fragment>
   <fragment
-      android:id="@+id/screenerEncounterFragment"
-      android:label="Screen Encounter"
-      android:name="com.google.android.fhir.demo.screening.ScreenerFragment"
-      tools:layout="@layout/screener_encounter_fragment"
-      >
+        android:id="@+id/screenerEncounterFragment"
+        android:label="Screen Encounter"
+        android:name="com.google.android.fhir.demo.screening.ScreenerFragment"
+        tools:layout="@layout/screener_encounter_fragment"
+    >
     <argument android:name="patient_id" app:argType="string" />
     <argument android:name="questionnaire_string" app:argType="string" />
   </fragment>

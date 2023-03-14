@@ -40,14 +40,15 @@ android {
   }
   kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
   packagingOptions {
-    resources.excludes.addAll(listOf(
-      "META-INF/ASL-2.0.txt",
-      "META-INF/LGPL-3.0.txt",
-      "META-INF/LICENSE.md",
-      "META-INF/NOTICE.md",
-      "META-INF/sun-jaxb.episode",
-      "META-INF/DEPENDENCIES"
-    )
+    resources.excludes.addAll(
+      listOf(
+        "META-INF/ASL-2.0.txt",
+        "META-INF/LGPL-3.0.txt",
+        "META-INF/LICENSE.md",
+        "META-INF/NOTICE.md",
+        "META-INF/sun-jaxb.episode",
+        "META-INF/DEPENDENCIES"
+      )
     )
   }
 }

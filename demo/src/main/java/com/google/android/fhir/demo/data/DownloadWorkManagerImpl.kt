@@ -23,7 +23,6 @@ import com.google.android.fhir.sync.SyncDataParams
 import java.util.LinkedList
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.ListResource
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.PlanDefinition
@@ -34,7 +33,16 @@ import org.hl7.fhir.r4.model.ResourceType
 class DownloadWorkManagerImpl(private val carePlanManager: CarePlanManager) : DownloadWorkManager {
   private val resourceTypeList = ResourceType.values().map { it.name }
   private val urls =
-    LinkedList(listOf("Patient", "Organization", "Location", "Practitioner", "PractitionerRole", "PlanDefinition"))
+    LinkedList(
+      listOf(
+        "Patient",
+        "Organization",
+        "Location",
+        "Practitioner",
+        "PractitionerRole",
+        "PlanDefinition"
+      )
+    )
 
   override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? {
     var url = urls.poll() ?: return null

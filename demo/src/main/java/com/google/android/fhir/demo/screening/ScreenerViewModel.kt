@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,8 +49,8 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   lateinit var questionnaireString: String
   private val questionnaireResource: Questionnaire
     get() =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaireString) as
-        Questionnaire
+      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaireString)
+        as Questionnaire
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
   val isResourcesSaved = MutableLiveData<Boolean>()
 
@@ -182,8 +182,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   }
 
   private fun getSpO2(bundle: Bundle): BigDecimal? {
-    return bundle
-      .entry
+    return bundle.entry
       .asSequence()
       .filter { it.resource is Observation }
       .map { it.resource as Observation }
@@ -194,8 +193,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
 
   private fun isSymptomPresent(bundle: Bundle): Boolean {
     val count =
-      bundle
-        .entry
+      bundle.entry
         .filter { it.resource is Observation }
         .map { it.resource as Observation }
         .filter { it.hasCode() && it.code.hasCoding() }
@@ -212,8 +210,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
 
   private fun isComorbidityPresent(bundle: Bundle): Boolean {
     val count =
-      bundle
-        .entry
+      bundle.entry
         .filter { it.resource is Condition }
         .map { it.resource as Condition }
         .filter { it.hasCode() && it.code.hasCoding() }

@@ -14,14 +14,6 @@
  * limitations under the License.
  */
 
-object Sdk {
-  const val compileSdk = 31
-  const val targetSdk = 31
+package com.google.android.fhir.demo.care
 
-  // Engine and SDC must support API 24.
-  // Remove desugaring when upgrading it to 26.
-  const val minSdk = 28
-
-  // Workflow requires minSDK 26
-  const val minSdkWorkflow = 28
-}
+data class WorkflowExecutionException(val patientId: String, val exception: Exception)

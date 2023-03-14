@@ -83,7 +83,7 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
   private fun addQuestionnaireFragment() {
     childFragmentManager.commit {
       add(
-          R.id.add_patient_container,
+        R.id.add_patient_container,
         QuestionnaireFragment.builder().setQuestionnaire(viewModel.questionnaireString).build(),
         QUESTIONNAIRE_FRAGMENT_TAG
       )
