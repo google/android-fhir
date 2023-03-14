@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.datacapture.fhirpath
 
-import com.google.android.fhir.datacapture.common.datatype.asStringValue
+import com.google.android.fhir.datacapture.extensions.asStringValue
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.StringType

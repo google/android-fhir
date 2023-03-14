@@ -20,10 +20,6 @@ import android.app.Application
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.common.datatype.displayString
-import com.google.android.fhir.datacapture.format
-import com.google.android.fhir.datacapture.hasDifferentAnswerSet
-import com.google.android.fhir.datacapture.toLocalizedString
 import com.google.common.truth.Truth.assertThat
 import java.time.LocalDate
 import java.time.LocalTime

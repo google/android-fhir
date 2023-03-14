@@ -16,9 +16,6 @@
 
 package com.google.android.fhir.datacapture.extensions
 
-import com.google.android.fhir.datacapture.DisplayItemControlType
-import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_SYSTEM
-import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_URL
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeableConcept
