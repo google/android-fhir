@@ -110,12 +110,13 @@ internal object DatePickerViewHolderFactory :
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         clearPreviousState()
-        header.bind(questionnaireViewItem.questionnaireItem)
+        header.bind(questionnaireViewItem)
         val datePattern = datePattern(questionnaireViewItem.questionnaireItem)
         // Special character used in date pattern
         val datePatternSeparator = getDateSeparator(datePattern)
         textWatcher = DatePatternTextWatcher(datePatternSeparator)
         canonicalizedDatePattern = canonicalizeDatePattern(datePattern)
+
         textInputLayout.hint = canonicalizedDatePattern
         textInputEditText.removeTextChangedListener(textWatcher)
 
