@@ -269,6 +269,11 @@ object ExpressionEvaluator {
       .findAll(expression.expression)
       .map { it.groupValues }
       .map { (fhirPathWithParentheses, fhirPath) ->
+        // TODO Remove for fhirPathEngine.check() for //If the result of evaluating the FHIRPath
+        // expressions is an invalid query, that is an error. Systems SHOULD log it and continue
+        // with extraction as if the query had returned no data.
+        // TODO see : 
+        // http://build.fhir.org/ig/HL7/sdc/extraction.html#structuremap-based-extraction
         fhirPathEngine.check(
           resource,
           resource.resourceType.name,
@@ -277,6 +282,7 @@ object ExpressionEvaluator {
         )
         fhirPathWithParentheses to fhirPathEngine.evaluate(resource, fhirPath).singleOrNull()
       }
+
   private fun findDependentVariables(expression: Expression) =
     variableRegex
       .findAll(expression.expression)

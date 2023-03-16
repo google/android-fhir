@@ -795,7 +795,7 @@ private suspend fun Questionnaire.QuestionnaireItemComponent.getOrCreateResource
   resourceContext: Resource?
 ): Resource? = getOrCreateResourceFromExtension(this.extension, xFhirQueryResolver, resourceContext)
 
-private suspend fun getOrCreateResourceFromExtension(
+/*private suspend fun getOrCreateResourceFromExtension(
   extensions: List<Extension>,
   xFhirQueryResolver: XFhirQueryResolver?,
   resourceContext: Resource?
@@ -808,17 +808,16 @@ private suspend fun getOrCreateResourceFromExtension(
     resource =
       extensions.itemExtractionContextExtensionValue?.let {
         Class.forName("org.hl7.fhir.r4.model.$it").newInstance()
-          as Resource // TODO handle if there is CNFE if expression is invalid and return null for
-        // esisting resource
+          as Resource
       }
   }
   return resource
-}
+}*/
 
-private suspend fun getExistingResource(
+private suspend fun getOrCreateResourceFromExtension(
   extensionList: List<Extension>,
-  xFhirQueryResolver: XFhirQueryResolver,
-  resourceContext: Resource
+  xFhirQueryResolver: XFhirQueryResolver?,
+  resourceContext: Resource?
 ): Resource? =
   extensionList
     .singleOrNull { it.url == ITEM_CONTEXT_EXTENSION_URL }
@@ -827,15 +826,53 @@ private suspend fun getExistingResource(
         is Expression -> {
           val expression = it.value as Expression
           if (expression.isXFhirQuery) {
-            val xFhirExpressionString = expression.createXFhirQueryFromExpression(resourceContext)
-            xFhirQueryResolver.resolve(xFhirExpressionString).singleOrNull()
+            if (expression.expression.contains("?")) { // has fhirpath
+              if (resourceContext != null && xFhirQueryResolver != null) {
+                val xFhirExpressionString =
+                  expression.createXFhirQueryFromExpression(resourceContext)
+                // If the result of evaluating the FHIRPath expressions is an invalid query, that is
+                // an error. Systems SHOULD log it and continue with extraction as if the query had
+                // returned no data.
+                if (xFhirExpressionString.isEmpty()
+                ) { // invalid path return empty string, create new resource
+                  var resourceClassName: String
+                  if (expression.expression.contains("?")) {
+                    resourceClassName =
+                      expression.expression.substring(0, expression.expression.indexOf("?"))
+                  } else {
+                    resourceClassName = expression.expression
+                  }
+                  getResourceFromClassName(resourceClassName)
+                } else if (xFhirExpressionString.contains("?")
+                ) { // xFhirExpressionString = "Patient?active=true" //TODO CHEck if what is
+                  // requirement if {{}} not exists
+                  val resourceClassName =
+                    expression.expression.substring(0, expression.expression.indexOf("?"))
+                  getResourceFromClassName(resourceClassName)
+                } else {
+                  xFhirQueryResolver.resolve(xFhirExpressionString).singleOrNull()
+                }
+              } else {
+                // TODO handle this case when resourceContext OR xFhirQueryResolver is null
+                null
+              }
+            } else { // "expression": "Patient"
+              getResourceFromClassName(expression.expression)
+            }
           } else {
             null
           }
         }
+        is CodeType -> {
+          val code = it.value as CodeType
+          getResourceFromClassName(code.value)
+        }
         else -> null
       }
     }
+
+private fun getResourceFromClassName(className: String): Resource? =
+  Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Resource
 
 /**
  * The item extraction context extension value of type Expression or CodeType if one and only one
