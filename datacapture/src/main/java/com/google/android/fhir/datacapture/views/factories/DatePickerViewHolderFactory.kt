@@ -111,6 +111,7 @@ internal object DatePickerViewHolderFactory :
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         clearPreviousState()
         header.bind(questionnaireViewItem)
+        if (textWatcher != null) textInputEditText.removeTextChangedListener(textWatcher)
         val datePattern = datePattern(questionnaireViewItem.questionnaireItem)
         // Special character used in date pattern
         val datePatternSeparator = getDateSeparator(datePattern)
@@ -118,7 +119,6 @@ internal object DatePickerViewHolderFactory :
         canonicalizedDatePattern = canonicalizeDatePattern(datePattern)
 
         textInputLayout.hint = canonicalizedDatePattern
-        textInputEditText.removeTextChangedListener(textWatcher)
 
         val questionnaireItemViewItemDateAnswer =
           questionnaireViewItem.answers.singleOrNull()?.valueDateType?.localDate
