@@ -17,8 +17,11 @@
 package com.google.android.fhir.datacapture.mapping
 
 import com.google.android.fhir.datacapture.DataCapture
+import com.google.android.fhir.datacapture.XFhirQueryResolver
 import com.google.android.fhir.datacapture.extensions.asExpectedType
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
+import com.google.android.fhir.datacapture.extensions.createXFhirQueryFromExpression
+import com.google.android.fhir.datacapture.extensions.isXFhirQuery
 import com.google.android.fhir.datacapture.extensions.targetStructureMap
 import com.google.android.fhir.datacapture.extensions.toCodeType
 import com.google.android.fhir.datacapture.extensions.toIdType
@@ -90,7 +93,10 @@ object ResourceMapper {
    * @param questionnaireResponse A [QuestionnaireResponse] with answers for [questionnaire].
    * @param structureMapExtractionContext The [IWorkerContext] may be used along with
    * [StructureMapUtilities] to parse the script and convert it into [StructureMap].
-   *
+   * @param profileLoader A[ProfileLoader] loads `StructureDefinition` for profile based on
+   * canonical URL.
+   * @param xFhirQueryResolver A [XFhirQueryResolver] to resolve x-fhir-query for the library.
+   * @param resourceContext A [Resource] to update
    * @return [Bundle] containing the extracted [Resource]s or empty Bundle if the extraction fails.
    * An exception might also be thrown in a few cases
    *
@@ -102,7 +108,9 @@ object ResourceMapper {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     structureMapExtractionContext: StructureMapExtractionContext? = null,
-    profileLoader: ProfileLoader? = null
+    profileLoader: ProfileLoader? = null,
+    xFhirQueryResolver: XFhirQueryResolver? = null,
+    resourceContext: Resource? = null
   ): Bundle {
 
     return when {
@@ -131,7 +139,9 @@ object ResourceMapper {
                 structureDefinitionMap[url.toString()] = it
               }
             }
-          }
+          },
+          xFhirQueryResolver,
+          resourceContext
         )
       structureMapExtractionContext != null -> {
         extractByStructureMap(questionnaire, questionnaireResponse, structureMapExtractionContext)
@@ -149,12 +159,15 @@ object ResourceMapper {
    * See http://build.fhir.org/ig/HL7/sdc/extraction.html#definition-based-extraction for more on
    * Definition-based extraction.
    */
-  private fun extractByDefinition(
+  private suspend fun extractByDefinition(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    profileLoader: ProfileLoader
+    profileLoader: ProfileLoader,
+    xFhirQueryResolver: XFhirQueryResolver?,
+    resourceContext: Resource?
   ): Bundle {
-    val rootResource: Resource? = questionnaire.createResource()
+    val rootResource: Resource? =
+      questionnaire.getOrCreateResource(xFhirQueryResolver, resourceContext)
     val extractedResources = mutableListOf<Resource>()
 
     extractByDefinition(
@@ -162,7 +175,9 @@ object ResourceMapper {
       questionnaireResponse.item,
       rootResource,
       extractedResources,
-      profileLoader
+      profileLoader,
+      xFhirQueryResolver,
+      resourceContext
     )
 
     if (rootResource != null) {
@@ -294,12 +309,14 @@ object ResourceMapper {
    * Handles nested questionnaire items recursively. New extraction contexts may be defined in the
    * recursion.
    */
-  private fun extractByDefinition(
+  private suspend fun extractByDefinition(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     extractionContext: Base?,
     extractionResult: MutableList<Resource>,
-    profileLoader: ProfileLoader
+    profileLoader: ProfileLoader,
+    xFhirQueryResolver: XFhirQueryResolver?,
+    resourceContext: Resource?
   ) {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
@@ -320,7 +337,9 @@ object ResourceMapper {
           currentQuestionnaireResponseItem,
           extractionContext,
           extractionResult,
-          profileLoader
+          profileLoader,
+          xFhirQueryResolver,
+          resourceContext
         )
       }
     }
@@ -335,12 +354,14 @@ object ResourceMapper {
    * Handles nested questionnaire items recursively. New extraction contexts may be defined in the
    * recursion.
    */
-  private fun extractByDefinition(
+  private suspend fun extractByDefinition(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     extractionContext: Base?,
     extractionResult: MutableList<Resource>,
-    profileLoader: ProfileLoader
+    profileLoader: ProfileLoader,
+    xFhirQueryResolver: XFhirQueryResolver?,
+    resourceContext: Resource?
   ) {
     when (questionnaireItem.type) {
       Questionnaire.QuestionnaireItemType.GROUP ->
@@ -358,7 +379,9 @@ object ResourceMapper {
               questionnaireItem,
               questionnaireResponseItem,
               extractionResult,
-              profileLoader
+              profileLoader,
+              xFhirQueryResolver,
+              resourceContext
             )
           questionnaireItem.definition != null -> {
             // Extract a new element (which is not a resource) e.g. HumanName, Quantity, etc
@@ -370,7 +393,9 @@ object ResourceMapper {
               questionnaireResponseItem,
               extractionContext,
               extractionResult,
-              profileLoader
+              profileLoader,
+              xFhirQueryResolver,
+              resourceContext
             )
           }
           else ->
@@ -380,7 +405,9 @@ object ResourceMapper {
               questionnaireResponseItem.item,
               extractionContext,
               extractionResult,
-              profileLoader
+              profileLoader,
+              xFhirQueryResolver,
+              resourceContext
             )
         }
       else ->
@@ -404,19 +431,24 @@ object ResourceMapper {
    * populates it with the answers nested in [questionnaireResponseItem], and append it to
    * [extractionResult].
    */
-  private fun extractResourceByDefinition(
+  private suspend fun extractResourceByDefinition(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     extractionResult: MutableList<Resource>,
-    profileLoader: ProfileLoader
+    profileLoader: ProfileLoader,
+    xFhirQueryResolver: XFhirQueryResolver?,
+    resourceContext: Resource?
   ) {
-    val resource = questionnaireItem.createResource() as Resource
+    val resource =
+      questionnaireItem.getOrCreateResource(xFhirQueryResolver, resourceContext) as Resource
     extractByDefinition(
       questionnaireItem.item,
       questionnaireResponseItem.item,
       resource,
       extractionResult,
-      profileLoader
+      profileLoader,
+      xFhirQueryResolver,
+      resourceContext
     )
     extractionResult += resource
   }
@@ -426,12 +458,14 @@ object ResourceMapper {
    * answers nested in [questionnaireResponseItem], and update the corresponding field in [base]
    * with it.
    */
-  private fun extractComplexTypeValueByDefinition(
+  private suspend fun extractComplexTypeValueByDefinition(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     base: Base,
     extractionResult: MutableList<Resource>,
-    profileLoader: ProfileLoader
+    profileLoader: ProfileLoader,
+    xFhirQueryResolver: XFhirQueryResolver?,
+    resourceContext: Resource?
   ) {
     val fieldName = getFieldNameByDefinition(questionnaireItem.definition)
     val value =
@@ -448,7 +482,9 @@ object ResourceMapper {
       questionnaireResponseItem.item,
       value,
       extractionResult,
-      profileLoader
+      profileLoader,
+      xFhirQueryResolver,
+      resourceContext
     )
   }
 
@@ -745,19 +781,61 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
  * Returns a newly created [Resource] from the item extraction context extension if one and only one
  * such extension exists in the questionnaire, or null otherwise.
  */
-private fun Questionnaire.createResource(): Resource? =
-  this.extension.itemExtractionContextExtensionValue?.let {
-    Class.forName("org.hl7.fhir.r4.model.$it").newInstance() as Resource
-  }
+private suspend fun Questionnaire.getOrCreateResource(
+  xFhirQueryResolver: XFhirQueryResolver?,
+  resourceContext: Resource?
+): Resource? = getOrCreateResourceFromExtension(this.extension, xFhirQueryResolver, resourceContext)
 
 /**
  * Returns a newly created [Resource] from the item extraction context extension if one and only one
  * such extension exists in the questionnaire item, or null otherwise.
  */
-private fun Questionnaire.QuestionnaireItemComponent.createResource(): Resource? =
-  this.extension.itemExtractionContextExtensionValue?.let {
-    Class.forName("org.hl7.fhir.r4.model.$it").newInstance() as Resource
+private suspend fun Questionnaire.QuestionnaireItemComponent.getOrCreateResource(
+  xFhirQueryResolver: XFhirQueryResolver?,
+  resourceContext: Resource?
+): Resource? = getOrCreateResourceFromExtension(this.extension, xFhirQueryResolver, resourceContext)
+
+private suspend fun getOrCreateResourceFromExtension(
+  extensions: List<Extension>,
+  xFhirQueryResolver: XFhirQueryResolver?,
+  resourceContext: Resource?
+): Resource? {
+  var resource: Resource? = null
+  if (xFhirQueryResolver != null && resourceContext != null) {
+    resource = getExistingResource(extensions, xFhirQueryResolver, resourceContext)
   }
+  if (resource == null) {
+    resource =
+      extensions.itemExtractionContextExtensionValue?.let {
+        Class.forName("org.hl7.fhir.r4.model.$it").newInstance()
+          as Resource // TODO handle if there is CNFE if expression is invalid and return null for
+        // esisting resource
+      }
+  }
+  return resource
+}
+
+private suspend fun getExistingResource(
+  extensionList: List<Extension>,
+  xFhirQueryResolver: XFhirQueryResolver,
+  resourceContext: Resource
+): Resource? =
+  extensionList
+    .singleOrNull { it.url == ITEM_CONTEXT_EXTENSION_URL }
+    ?.let {
+      when (it.value) {
+        is Expression -> {
+          val expression = it.value as Expression
+          if (expression.isXFhirQuery) {
+            val xFhirExpressionString = expression.createXFhirQueryFromExpression(resourceContext)
+            xFhirQueryResolver.resolve(xFhirExpressionString).singleOrNull()
+          } else {
+            null
+          }
+        }
+        else -> null
+      }
+    }
 
 /**
  * The item extraction context extension value of type Expression or CodeType if one and only one
@@ -771,7 +849,6 @@ private val List<Extension>.itemExtractionContextExtensionValue
       ?.let {
         when (it.value) {
           is Expression -> {
-            // TODO update the existing resource
             val expression = it.value as Expression
             expression.expression
           }

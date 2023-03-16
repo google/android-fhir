@@ -31,6 +31,7 @@ import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
 import com.google.android.fhir.datacapture.extensions.answerExpression
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
+import com.google.android.fhir.datacapture.extensions.createXFhirQueryFromExpression
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.extractAnswerOptions
 import com.google.android.fhir.datacapture.extensions.flattened
@@ -44,7 +45,6 @@ import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.extensions.isXFhirQuery
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
-import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
@@ -516,7 +516,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
         }
 
-        val xFhirExpressionString = createXFhirQueryFromExpression(expression)
+        val xFhirExpressionString =
+          expression.createXFhirQueryFromExpression(questionnaireResourceContext)
         xFhirQueryResolver!!.resolve(xFhirExpressionString)
       } else if (expression.isFhirPath) {
         fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
@@ -528,21 +529,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
     return item.extractAnswerOptions(data)
   }
-
-  /**
-   * Creates an x-fhir-query from an [Expression]. If the questionnaire resource context is set, the
-   * expression is first checked for any FHIR Path expressions to evaluate first. See:
-   * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirquery
-   */
-  private fun createXFhirQueryFromExpression(expression: Expression): String =
-    questionnaireResourceContext?.let { resource ->
-      ExpressionEvaluator.evaluateXFhirEnhancement(expression, resource)
-        .map { it.first to (it.second?.asExpectedType()?.asStringValue() ?: "") }
-        .fold(expression.expression) { acc: String, pair: Pair<String, String> ->
-          acc.replace(pair.first, pair.second)
-        }
-    }
-      ?: expression.expression
 
   /**
    * Traverses through the list of questionnaire items, the list of questionnaire response items and

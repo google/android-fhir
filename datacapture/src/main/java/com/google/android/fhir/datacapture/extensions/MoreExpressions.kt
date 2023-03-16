@@ -16,10 +16,29 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.Resource
 
 internal val Expression.isXFhirQuery: Boolean
   get() = this.language == Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
 
 internal val Expression.isFhirPath: Boolean
   get() = this.language == Expression.ExpressionLanguage.TEXT_FHIRPATH.toCode()
+
+/**
+ * Creates an x-fhir-query from an [Expression]. If the questionnaire resource context is set, the
+ * expression is first checked for any FHIR Path expressions to evaluate first. See:
+ * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirquery
+ */
+internal fun Expression.createXFhirQueryFromExpression(
+  questionnaireResourceContext: Resource?
+): String =
+  questionnaireResourceContext?.let { resource ->
+    ExpressionEvaluator.evaluateXFhirEnhancement(this, resource)
+      .map { it.first to (it.second?.asExpectedType()?.asStringValue() ?: "") }
+      .fold(this.expression) { acc: String, pair: Pair<String, String> ->
+        acc.replace(pair.first, pair.second)
+      }
+  }
+    ?: this.expression
