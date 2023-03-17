@@ -99,19 +99,18 @@ internal class FhirEngineTerminologyProvider(
 
   private suspend fun searchByUrl(url: String?): List<ValueSet> {
     if (url == null) return emptyList()
-    return igManager.loadResources(resourceType = ResourceType.ValueSet.name, url = url)
-      .map { it as ValueSet } + fhirEngine.search { filter(ValueSet.URL, { value = url }) }
+    return igManager.loadResources(resourceType = ResourceType.ValueSet.name, url = url).map {
+      it as ValueSet
+    } + fhirEngine.search { filter(ValueSet.URL, { value = url }) }
   }
 
   private suspend fun searchByIdentifier(identifier: String?): List<ValueSet> {
     if (identifier == null) return emptyList()
-    //TODO: add ig manager?
     return fhirEngine.search { filter(ValueSet.IDENTIFIER, { value = of(identifier) }) }
   }
 
   private suspend fun searchById(id: String): List<ValueSet> =
     listOfNotNull(
-      //TODO: add ig manager?
       safeGet(fhirEngine, ResourceType.ValueSet, id.removePrefix(URN_OID).removePrefix(URN_UUID))
         as? ValueSet
     )
@@ -126,7 +125,7 @@ internal class FhirEngineTerminologyProvider(
 
   private suspend fun resolveValueSet(valueSet: ValueSetInfo): ValueSet {
     if (valueSet.version != null ||
-      (valueSet.codeSystems != null && valueSet.codeSystems.isNotEmpty())
+        (valueSet.codeSystems != null && valueSet.codeSystems.isNotEmpty())
     ) {
       // Cannot do both at the same time yet.
       throw UnsupportedOperationException(

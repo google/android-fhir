@@ -60,6 +60,8 @@ internal class FhirEngineDal(
     runBlockingOrThrowMainThreadException {
       val search = Search(type = ResourceType.fromCode(resourceType))
       search.filter(UriClientParam("url"), { value = url })
+      // Workaround for https://github.com/google/android-fhir/issues/1920, remove when the issue is
+      // resolved.
       igManager.loadResources(resourceType = resourceType, url = url) + fhirEngine.search(search)
     }
 

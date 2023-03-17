@@ -45,7 +45,9 @@ class FhirOperatorBuilder(private val applicationContext: Context) {
     return this
   }
 
-  fun withImplementationGuides(vararg implementationGuides: ImplementationGuide): FhirOperatorBuilder {
+  fun withImplementationGuides(
+    vararg implementationGuides: ImplementationGuide
+  ): FhirOperatorBuilder {
     this.implementationGuides = implementationGuides.toList()
     return this
   }
