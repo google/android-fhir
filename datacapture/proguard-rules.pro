@@ -20,4 +20,13 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep class com.google.android.fhir.catalog.WorkflowType
+## hapi libs starts
+-keep class ca.uhn.fhir.** { *; }
+-keep class org.hl7.fhir.r4.hapi.ctx.*  { *; }
+-keep class org.hl7.fhir.r4.**  { *; }
+-keep class org.hl7.fhir.utilities.**  { *; }
+-keep class org.hl7.fhir.exceptions.*  { *; }
+-keep class org.hl7.fhir.instance.model.api.*  { *; }
+# Used by HapiWorkerContext (fhirpath engine in QuestionnaireViewModel)
+-keep class com.github.benmanes.caffeine.cache.**  { *; }
+## hapi libs ends
