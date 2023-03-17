@@ -54,8 +54,7 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
    */
   fun fetchQuestionnaireString(taskItem: TaskItem): String = runBlocking {
     iParser.encodeResourceToString(
-      FhirApplication.taskManager(getApplication<Application>().applicationContext)
-        .fetchQuestionnaireFromTaskLogicalId(taskItem.resourceId)
+      taskManager.fetchQuestionnaireFromTaskLogicalId(taskItem.resourceId)
     )
   }
 

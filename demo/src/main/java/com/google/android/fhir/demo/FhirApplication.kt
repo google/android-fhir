@@ -73,11 +73,11 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
   }
 
   private fun constructCarePlanManager(): CarePlanManager {
-    return CarePlanManager(fhirEngine, taskManager)
+    TODO()
   }
 
   private fun constructTaskManager(): TaskManager {
-    return TaskManager(fhirEngine)
+    TODO()
   }
 
   companion object {

@@ -34,5 +34,5 @@ class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
 
   override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)
 
-  fun getCarePlanManager() = FhirApplication.carePlanManager(applicationContext)
+  private fun getCarePlanManager() = FhirApplication.carePlanManager(applicationContext)
 }

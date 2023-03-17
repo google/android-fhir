@@ -16,78 +16,25 @@
 
 package com.google.android.fhir.demo.care
 
-import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.Search
-import com.google.android.fhir.search.search
-import org.hl7.fhir.r4.model.CarePlan
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.Task
 
 /** We could also have APIs like getCompletedTasks, getReadyTasks, getTasksWithStatus */
-class TaskManager(private val fhirEngine: FhirEngine) {
-  suspend fun createTasks(resourceList: List<Resource>): List<Task> {
-    val taskList = ArrayList<Task>()
-    for (resource in resourceList) {
-      if (resource is Task) {
-        val task = resource
-        task.id = null // purge any temporary id that might exist
-        task.status = Task.TaskStatus.READY
-        task.basedOn = null
-        task.intent = Task.TaskIntent.ORDER
-
-        fhirEngine.create(task)
-        taskList.add(task)
-      }
-    }
-    return taskList
-  }
+interface TaskManager {
+  suspend fun createTasks(resourceList: List<Resource>): List<Task>
 
   /**
    * Returns [Questionnaire] resource given [Task]'s logicalId. Reason is currently the resource
    * being manipulated by this task is a Questionnaire and stored in task.focus. Consider returning
    * questionnaireId only ?
    */
-  suspend fun fetchQuestionnaireFromTaskLogicalId(taskResourceId: String): Questionnaire? {
-    val task = fhirEngine.get(ResourceType.Task, taskResourceId) as Task
-
-    val questionnaires =
-      fhirEngine.search<Questionnaire> {
-        // The format of task.focus.reference = "Questionnaire/<ID>"
-        filter(
-          Questionnaire.IDENTIFIER,
-          { value = of(task.focus.reference.substring("Questionnaire/".length)) }
-        )
-      }
-    return questionnaires.firstOrNull()
-  }
-
-  suspend fun getTasksForPatient(patientId: String, extraFilter: Search.() -> Unit): List<Task> {
-    return fhirEngine.search<Task> {
-      filter(Task.SUBJECT, { value = "Patient/$patientId" })
-      extraFilter()
-    }
-  }
-
+  suspend fun fetchQuestionnaireFromTaskLogicalId(taskResourceId: String): Questionnaire?
+  suspend fun getTasksForPatient(patientId: String, extraFilter: Search.() -> Unit): List<Task>
   suspend fun updateTaskStatus(
     task: Task,
     status: Task.TaskStatus,
     updateCarePlanStatus: Boolean = true
-  ) {
-    task.status = status
-    fhirEngine.update(task)
-    if (updateCarePlanStatus) {
-      val carePlan =
-        fhirEngine.get(ResourceType.CarePlan, task.basedOnFirstRep.reference.substring(9))
-          as CarePlan
-      for (activity in carePlan.activity) {
-        if (activity.reference.reference.equals(task.id)) {
-          activity.detail.status = CarePlanManager.mapTaskStatusToCarePlanStatus(status)
-          fhirEngine.update(carePlan)
-          break
-        }
-      }
-    }
-  }
+  )
 }

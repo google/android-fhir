@@ -167,7 +167,7 @@ class PatientListFragment : Fragment() {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
-            workflowExecutionViewModel.applyWorkflowForAll()
+            //            workflowExecutionViewModel.applyWorkflowForAll()
             fadeOutTopBanner(it)
           }
           is SyncJobStatus.Failed -> {

@@ -36,8 +36,8 @@ class WorkflowExecutionViewModel(application: Application) : AndroidViewModel(ap
   private val _workflowExecutionState = MutableSharedFlow<WorkflowExecutionStatus>()
   val workflowExecutionState: Flow<WorkflowExecutionStatus>
     get() = _workflowExecutionState
-  var totalWorkflowToBeExecuted = AtomicInteger(0)
-  var completedWorkflows = AtomicInteger(0)
+  private var totalWorkflowToBeExecuted = AtomicInteger(0)
+  private var completedWorkflows = AtomicInteger(0)
 
   private val fhirEngine =
     FhirApplication.fhirEngine(getApplication<Application>().applicationContext)
