@@ -16,7 +16,9 @@
 
 package com.google.android.fhir.datacapture
 
+import android.view.View
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.fragment.app.commitNow
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
@@ -359,6 +361,41 @@ class QuestionnaireUiEspressoTest {
           .perform(ViewActions.click())
       }
     assertThat(exception.message).isEqualTo("minValue cannot be greater than maxValue")
+  }
+
+  @Test
+  fun displayItems_shouldGetEnabled_withAnswerChoice() {
+    buildFragmentFromQuestionnaire("/questionnaire_with_enabled_display_items.json")
+
+    onView(withId(R.id.hint)).check { view, _ ->
+      val hintVisibility = (view as TextView).visibility
+      assertThat(hintVisibility).isEqualTo(View.GONE)
+    }
+
+    onView(withId(R.id.yes_radio_button)).perform(ViewActions.click())
+
+    onView(withId(R.id.hint)).check { view, _ ->
+      val hintVisibility = (view as TextView).visibility
+      val hintText = view.text.toString()
+      assertThat(hintVisibility).isEqualTo(View.VISIBLE)
+      assertThat(hintText).isEqualTo("Text when yes is selected")
+    }
+
+    onView(withId(R.id.no_radio_button)).perform(ViewActions.click())
+
+    onView(withId(R.id.hint)).check { view, _ ->
+      val hintVisibility = (view as TextView).visibility
+      val hintText = view.text.toString()
+      assertThat(hintVisibility).isEqualTo(View.VISIBLE)
+      assertThat(hintText).isEqualTo("Text when no is selected")
+    }
+
+    onView(withId(R.id.no_radio_button)).perform(ViewActions.click())
+
+    onView(withId(R.id.hint)).check { view, _ ->
+      val hintVisibility = (view as TextView).visibility
+      assertThat(hintVisibility).isEqualTo(View.GONE)
+    }
   }
 
   private fun buildFragmentFromQuestionnaire(fileName: String, isReviewMode: Boolean = false) {
