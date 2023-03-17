@@ -34,8 +34,8 @@
             app:destination="@id/editPatientFragment"
         />
     <action
-            android:id="@+id/action_patient_details_to_screeningsViewPagerFragment"
-            app:destination="@id/screeningsViewPagerFragment"
+            android:id="@+id/action_patient_details_to_tasksViewPagerFragment"
+            app:destination="@id/tasksViewPagerFragment"
         />
     <argument android:name="patient_id" app:argType="string" />
   </fragment>
@@ -57,8 +57,8 @@
   </fragment>
 
   <fragment
-        android:id="@+id/screeningsViewPagerFragment"
-        android:name="com.google.android.fhir.demo.screening.ScreeningsViewPagerFragment"
+        android:id="@+id/tasksViewPagerFragment"
+        android:name="com.google.android.fhir.demo.screening.TasksViewPagerFragment"
         android:label="ScreeningsViewPagerFragment"
     >
     <argument android:name="patient_id" app:argType="string" />
@@ -74,6 +74,7 @@
         tools:layout="@layout/screener_encounter_fragment"
     >
     <argument android:name="patient_id" app:argType="string" />
+    <argument android:name="task_logical_id" app:argType="string" />
     <argument android:name="questionnaire_string" app:argType="string" />
   </fragment>
 

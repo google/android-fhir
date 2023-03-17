@@ -34,13 +34,7 @@ package com.google.android.fhir.demo.care
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.logicalId
-import com.google.android.fhir.search.search
 import com.google.android.fhir.workflow.FhirOperator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CarePlan
@@ -51,6 +45,7 @@ import org.hl7.fhir.r4.model.PlanDefinition
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.Task
+import timber.log.Timber
 
 /** CarePlanManager draft version currently in app side. TODO(mjajoo@): Move it to workflow lib` */
 class CarePlanManager(
@@ -75,37 +70,26 @@ class CarePlanManager(
     return bundleCollection
   }
 
-  suspend fun generateCarePlanForAllPatients(): Flow<WorkflowExecutionStatus> = flow {
-    var count = 0
-    fhirEngine
-      .search<Patient> {}
-      .also { emit(WorkflowExecutionStatus.Started(it.size)) }
-      .forEach {
-        generateCarePlanForPatient(it)
-        emit(WorkflowExecutionStatus.InProgress(++count))
-      }
-    emit(WorkflowExecutionStatus.Finished())
+  suspend fun generateCarePlanForPatient(patient: Patient) {
+    val patientId = IdType(patient.id).idPart
+    // currently 1 PD hard-coded.
+    // TODO to move to a list of PD in-memory
+    val planDefinitionId = "Configurable-Screenings-Milestone-1-Master-Plan-Definition"
+    Timber.i("PlanDefinition ID = $planDefinitionId")
+    val carePlanTmp =
+      fhirOperator.generateCarePlan(planDefinitionId = planDefinitionId, patientId = patientId)
+
+    // The workaround below is done because the CarePlan generated above has duplicated resources
+    // within contained. This issue does not exist in the newer version of the workflow library
+    val carePlanTransient =
+      jsonParser.parseResource(jsonParser.encodeResourceToString(carePlanTmp)) as CarePlan
+
+    // Create a new CarePlan of record for the Patient
+    val carePlanOfRecord = createCarePlanOfRecordForPatient(patient)
+
+    // Accept the proposed (transient) CarePlan by default and add tasks to the CarePlan of record
+    acceptCarePlan(carePlanTransient, carePlanOfRecord)
   }
-
-  suspend fun generateCarePlanForPatient(patient: Patient) =
-    runBlocking(Dispatchers.IO) {
-      val patientId = IdType(patient.id).idPart
-      // currently 1 PD only
-      val planDefinitionId = fhirEngine.search<PlanDefinition> {}[2].logicalId
-      val carePlanTmp =
-        fhirOperator.generateCarePlan(planDefinitionId = planDefinitionId, patientId = patientId)
-
-      // The workaround below is done because the CarePlan generated above has duplicated resources
-      // within contained. This issue does not exist in the newer version of the workflow library
-      val carePlanTransient =
-        jsonParser.parseResource(jsonParser.encodeResourceToString(carePlanTmp)) as CarePlan
-
-      // Create a new CarePlan of record for the Patient
-      val carePlanOfRecord = createCarePlanOfRecordForPatient(patient)
-
-      // Accept the proposed (transient) CarePlan by default and add tasks to the CarePlan of record
-      acceptCarePlan(carePlanTransient, carePlanOfRecord)
-    }
 
   private suspend fun createCarePlanOfRecordForPatient(patient: Patient): CarePlan {
     val carePlanOfRecord = CarePlan()

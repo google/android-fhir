@@ -19,12 +19,6 @@
             layout="@layout/progress_status_layout"
         />
 
-        <include
-            android:id="@+id/workflow_application_status_container"
-            layout="@layout/progress_status_layout"
-            android:visibility="gone"
-        />
-
         <androidx.appcompat.widget.SearchView
             android:id="@+id/search"
             android:layout_width="match_parent"

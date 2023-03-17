@@ -26,17 +26,21 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.demo.R
+import com.google.android.fhir.demo.care.WorkflowExecutionViewModel
+import org.hl7.fhir.r4.model.Task
 
 /** A fragment class to show screener questionnaire screen. */
 class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
 
   private val viewModel: ScreenerViewModel by viewModels()
+  private val workflowExecutionViewModel: WorkflowExecutionViewModel by activityViewModels()
   private val args: ScreenerFragmentArgs by navArgs()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -130,6 +134,11 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
       }
       Toast.makeText(requireContext(), getString(R.string.resources_saved), Toast.LENGTH_SHORT)
         .show()
+      workflowExecutionViewModel.updateTaskStatus(
+        args.taskLogicalId,
+        Task.TaskStatus.COMPLETED,
+        true
+      )
       NavHostFragment.findNavController(this).navigateUp()
     }
   }
@@ -137,6 +146,7 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
   companion object {
     const val EXTRA_QUESTIONNAIRE_JSON_STRING = "questionnaire-json-string"
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
-    const val TASK_STATUS_MODIFIED = "TASK_MODIFIED"
+    const val CURRENT_TASK_ID = "CURRENT_TASK_ID"
+    const val MODIFIED_TASK_ID = "MODIFIED_TASK_ID"
   }
 }

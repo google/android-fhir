@@ -25,6 +25,7 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.Task
 
+/** We could also have APIs like getCompletedTasks, getReadyTasks, getTasksWithStatus */
 class TaskManager(private val fhirEngine: FhirEngine) {
   suspend fun createTasks(resourceList: List<Resource>): List<Task> {
     val taskList = ArrayList<Task>()
@@ -43,10 +44,17 @@ class TaskManager(private val fhirEngine: FhirEngine) {
     return taskList
   }
 
-  suspend fun fetchQuestionnaireFromTask(task: Task): Questionnaire? {
+  /**
+   * Returns [Questionnaire] resource given [Task]'s logicalId. Reason is currently the resource
+   * being manipulated by this task is a Questionnaire and stored in task.focus. Consider returning
+   * questionnaireId only ?
+   */
+  suspend fun fetchQuestionnaireFromTaskLogicalId(taskResourceId: String): Questionnaire? {
+    val task = fhirEngine.get(ResourceType.Task, taskResourceId) as Task
+
     val questionnaires =
       fhirEngine.search<Questionnaire> {
-        // task.focus.reference = "Questionnaire/<ID>"
+        // The format of task.focus.reference = "Questionnaire/<ID>"
         filter(
           Questionnaire.IDENTIFIER,
           { value = of(task.focus.reference.substring("Questionnaire/".length)) }
@@ -80,12 +88,6 @@ class TaskManager(private val fhirEngine: FhirEngine) {
           break
         }
       }
-    }
-  }
-
-  companion object {
-    fun getTaskName(task: Task): String {
-      return task.identifier[0].value
     }
   }
 }

@@ -22,21 +22,21 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.fhir.datacapture.QuestionnaireFragment
-import com.google.android.fhir.demo.util.setProgressDialog
+import com.google.android.fhir.demo.care.WorkflowExecutionViewModel
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /** A fragment class to show patient registration screen. */
 class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
 
   private val viewModel: AddPatientViewModel by viewModels()
-  private lateinit var workflowDialog: AlertDialog
+  private val workflowExecutionViewModel: WorkflowExecutionViewModel by activityViewModels()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -46,10 +46,7 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
     }
-    workflowDialog =
-      setProgressDialog(requireContext(), resources.getString(R.string.executing_workflow))
-    observePatientSaveAction()
-    observeWorkflowExecution()
+    observeSavedPatient()
     (activity as MainActivity).setDrawerEnabled(false)
   }
 
@@ -104,24 +101,16 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
     viewModel.savePatient(questionnaireResponse)
   }
 
-  private fun observePatientSaveAction() {
-    viewModel.isPatientSaved.observe(viewLifecycleOwner) {
-      if (!it) {
+  private fun observeSavedPatient() {
+    viewModel.savedPatient.observe(viewLifecycleOwner) {
+      if (it == null) {
         Toast.makeText(requireContext(), "Inputs are missing.", Toast.LENGTH_SHORT).show()
         return@observe
       }
       Toast.makeText(requireContext(), "Patient is saved.", Toast.LENGTH_SHORT).show()
-      workflowDialog.show()
-      viewModel.applyWorkflow()
-    }
-  }
-
-  private fun observeWorkflowExecution() {
-    viewModel.isWorkFlowExecuted.observe(viewLifecycleOwner) {
-      if (it) {
-        workflowDialog.dismiss()
-        NavHostFragment.findNavController(this).navigateUp()
-      }
+      // workflow execution in mainActivityViewModel is necessary
+      workflowExecutionViewModel.executeWorkflowForPatient(it)
+      NavHostFragment.findNavController(this).navigateUp()
     }
   }
 
