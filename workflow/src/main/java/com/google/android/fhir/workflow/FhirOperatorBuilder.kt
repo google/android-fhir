@@ -39,6 +39,7 @@ class FhirOperatorBuilder(private val applicationContext: Context) {
     this.igManager = igManager
     return this
   }
+
   fun withFhirContext(fhirContext: FhirContext): FhirOperatorBuilder {
     this.fhirContext = fhirContext
     return this
