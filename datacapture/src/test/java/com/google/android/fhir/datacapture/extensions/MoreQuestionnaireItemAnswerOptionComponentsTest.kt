@@ -19,9 +19,6 @@ package com.google.android.fhir.datacapture.extensions
 import android.app.Application
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.datacapture.EXTENSION_OPTION_EXCLUSIVE_URL
-import com.google.android.fhir.datacapture.common.datatype.displayString
-import com.google.android.fhir.datacapture.optionExclusive
 import com.google.common.truth.Truth.assertThat
 import java.util.Locale
 import kotlin.test.assertFailsWith
