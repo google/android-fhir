@@ -16,9 +16,6 @@
 
 package com.google.android.fhir.datacapture.extensions
 
-import com.google.android.fhir.datacapture.DisplayItemControlType
-import com.google.android.fhir.datacapture.EXTENSION_VARIABLE_URL
-import com.google.android.fhir.datacapture.displayItemControl
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire

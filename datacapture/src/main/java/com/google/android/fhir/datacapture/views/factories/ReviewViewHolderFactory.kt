@@ -23,11 +23,11 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
+import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpanned
+import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
-import com.google.android.fhir.datacapture.localizedFlyoverSpanned
-import com.google.android.fhir.datacapture.localizedInstructionsSpanned
-import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.divider.MaterialDivider
@@ -69,12 +69,12 @@ internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
           questionnaireViewItem.questionnaireItem.localizedTextSpanned
         )
         hint.updateTextAndVisibility(
-          questionnaireViewItem.questionnaireItem.localizedInstructionsSpanned
+          questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
         )
         header.visibility = getHeaderViewVisibility(prefix, question, hint)
 
         val localizedFlyoverSpanned =
-          questionnaireViewItem.questionnaireItem.localizedFlyoverSpanned
+          questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
         flyOverTextView.apply {
           visibility =
             if (localizedFlyoverSpanned.isNullOrEmpty()) {

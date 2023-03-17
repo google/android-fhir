@@ -27,8 +27,21 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.extensions.EntryMode
+import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
+import com.google.android.fhir.datacapture.extensions.allItems
+import com.google.android.fhir.datacapture.extensions.answerExpression
+import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
+import com.google.android.fhir.datacapture.extensions.extractAnswerOptions
+import com.google.android.fhir.datacapture.extensions.flattened
+import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
+import com.google.android.fhir.datacapture.extensions.isDisplayItem
+import com.google.android.fhir.datacapture.extensions.isFhirPath
+import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
+import com.google.android.fhir.datacapture.extensions.isXFhirQuery
+import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
+import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
@@ -628,7 +641,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             answersChangedCallback = answersChangedCallback,
             resolveAnswerValueSet = { resolveAnswerValueSet(it) },
             resolveAnswerExpression = { resolveAnswerExpression(it) },
-            draftAnswer = draftAnswerMap[questionnaireResponseItem]
+            draftAnswer = draftAnswerMap[questionnaireResponseItem],
+            enabledDisplayItems =
+              questionnaireItem.item.filter {
+                it.isDisplayItem &&
+                  EnablementEvaluator(questionnaireResponse).evaluate(it, questionnaireResponseItem)
+              }
           )
         )
       )
@@ -657,11 +675,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             getQuestionnaireAdapterItems(
               // If nested display item is identified as instructions or flyover, then do not create
               // questionnaire state for it.
-              questionnaireItemList =
-                questionnaireItem.item.filterNot {
-                  it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-                    (it.isInstructionsCode || it.isFlyoverCode || it.isHelpCode)
-                },
+              questionnaireItemList = questionnaireItem.item.filterNot { it.isDisplayItem },
               questionnaireResponseItemList = nestedResponseItemList,
             )
           )
