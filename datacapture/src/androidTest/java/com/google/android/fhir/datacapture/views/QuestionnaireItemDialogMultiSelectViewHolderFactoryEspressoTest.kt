@@ -31,12 +31,12 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.fhir.datacapture.DisplayItemControlType
-import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_SYSTEM
-import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_URL
-import com.google.android.fhir.datacapture.ItemControlTypes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
+import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.extensions.ItemControlTypes
 import com.google.android.fhir.datacapture.utilities.assertQuestionnaireResponseAtIndex
 import com.google.android.fhir.datacapture.utilities.clickOnText
 import com.google.android.fhir.datacapture.utilities.clickOnTextInDialog
@@ -200,31 +200,32 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
   @Test
   fun bindView_setHintText() {
+    val hintItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1.1"
+        text = "Select code"
+        type = Questionnaire.QuestionnaireItemType.DISPLAY
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(DisplayItemControlType.FLYOVER.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
+            )
+        )
+      }
     val questionnaireViewItem =
       QuestionnaireViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5")
-          .addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "1.1"
-              text = "Select code"
-              type = Questionnaire.QuestionnaireItemType.DISPLAY
-              addExtension(
-                Extension()
-                  .setUrl(EXTENSION_ITEM_CONTROL_URL)
-                  .setValue(
-                    CodeableConcept()
-                      .addCoding(
-                        Coding()
-                          .setCode(DisplayItemControlType.FLYOVER.extensionCode)
-                          .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                      )
-                  )
-              )
-            }
-          ),
+          .addItem(hintItem),
         responseOptions(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        enabledDisplayItems = listOf(hintItem)
       )
     runOnUI { viewHolder.bind(questionnaireViewItem) }
 

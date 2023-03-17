@@ -31,10 +31,21 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_READ_ONLY
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_SUBMIT_BUTTON
-import com.google.android.fhir.datacapture.common.datatype.asStringValue
+import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
+import com.google.android.fhir.datacapture.extensions.EXTENSION_CALCULATED_EXPRESSION_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
+import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ENABLE_WHEN_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ENTRY_MODE_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_HIDDEN_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
 import com.google.android.fhir.datacapture.extensions.EntryMode
+import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
+import com.google.android.fhir.datacapture.extensions.asStringValue
 import com.google.android.fhir.datacapture.extensions.entryMode
+import com.google.android.fhir.datacapture.extensions.getNestedQuestionnaireResponseItems
+import com.google.android.fhir.datacapture.extensions.logicalId
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -60,6 +71,7 @@ import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
@@ -4103,6 +4115,125 @@ class QuestionnaireViewModelTest {
         (viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination
       }
     }
+  }
+
+  @Test
+  fun `display item should be enabled when initial value is set`() = runTest {
+    val enableWhenExpressionExtension: (Boolean) -> Extension = {
+      Extension().apply {
+        url = EXTENSION_ENABLE_WHEN_EXPRESSION_URL
+        setValue(
+          Expression().apply {
+            language = Expression.ExpressionLanguage.TEXT_FHIRPATH.toCode()
+            expression =
+              "%resource.repeat(item).where(linkId='1' and answer.empty().not()).select(answer.value) = ${if (it) "true" else "false"}"
+          }
+        )
+      }
+    }
+    val displayCategoryExtension =
+      Extension().apply {
+        url = EXTENSION_DISPLAY_CATEGORY_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = INSTRUCTIONS
+                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+                }
+              )
+          }
+        )
+      }
+    val questionnaire: (List<Questionnaire.QuestionnaireItemInitialComponent>) -> Questionnaire = {
+      Questionnaire().apply {
+        id = "questionnaire.enabled.display"
+        name = "Questionnaire Enabled Display"
+        title = "Questionnaire Enabled Display"
+        status = Enumerations.PublicationStatus.ACTIVE
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "1"
+            text = "Questionnaire Text"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            initial = it
+            addItem(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  extension = listOf(displayCategoryExtension, enableWhenExpressionExtension(false))
+                  linkId = "1.1"
+                  text = "Text when no is selected"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                }
+              )
+              .addItem(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  extension = listOf(displayCategoryExtension, enableWhenExpressionExtension(true))
+                  linkId = "1.2"
+                  text = "Text when yes is selected"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                }
+              )
+          }
+        )
+      }
+    }
+
+    state.set(
+      EXTRA_QUESTIONNAIRE_JSON_STRING,
+      printer.encodeResourceToString(questionnaire(emptyList()))
+    )
+
+    // empty initial value
+    var viewModel = QuestionnaireViewModel(context, state)
+    assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
+    // enabledDisplayItems is 0 when no choice is present
+    assertThat(
+        viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems.size
+      )
+      .isEqualTo(0)
+
+    // initial value is set to false
+    state.set(
+      EXTRA_QUESTIONNAIRE_JSON_STRING,
+      printer.encodeResourceToString(
+        questionnaire(
+          listOf(
+            Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(false) }
+          )
+        )
+      )
+    )
+
+    viewModel = QuestionnaireViewModel(context, state)
+    assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
+    var enabledDisplayItems =
+      viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems
+    assertThat(enabledDisplayItems.size).isEqualTo(1)
+    assertThat(enabledDisplayItems[0].type).isEqualTo(Questionnaire.QuestionnaireItemType.DISPLAY)
+    assertThat(enabledDisplayItems[0].linkId).isEqualTo("1.1")
+    assertThat(enabledDisplayItems[0].text).isEqualTo("Text when no is selected")
+
+    // initial value is set to true
+    state.set(
+      EXTRA_QUESTIONNAIRE_JSON_STRING,
+      printer.encodeResourceToString(
+        questionnaire(
+          listOf(
+            Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(true) }
+          )
+        )
+      )
+    )
+
+    viewModel = QuestionnaireViewModel(context, state)
+    assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
+    enabledDisplayItems =
+      viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems
+    assertThat(enabledDisplayItems.size).isEqualTo(1)
+    assertThat(enabledDisplayItems[0].type).isEqualTo(Questionnaire.QuestionnaireItemType.DISPLAY)
+    assertThat(enabledDisplayItems[0].linkId).isEqualTo("1.2")
+    assertThat(enabledDisplayItems[0].text).isEqualTo("Text when yes is selected")
   }
 
   private fun createQuestionnaireViewModel(

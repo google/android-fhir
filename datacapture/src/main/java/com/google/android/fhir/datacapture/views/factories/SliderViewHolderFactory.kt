@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture.views.factories
 import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.sliderStepValue
+import com.google.android.fhir.datacapture.extensions.sliderStepValue
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.MaxValueValidator
 import com.google.android.fhir.datacapture.validation.MinValueValidator
@@ -49,7 +49,7 @@ internal object SliderViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         this.questionnaireViewItem = questionnaireViewItem
-        header.bind(questionnaireViewItem.questionnaireItem)
+        header.bind(questionnaireViewItem)
         val answer = questionnaireViewItem.answers.singleOrNull()
         val minValue = getMinValue(questionnaireViewItem.questionnaireItem)
         val maxValue = getMaxValue(questionnaireViewItem.questionnaireItem)

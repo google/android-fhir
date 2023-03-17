@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import com.example.foodallergy.R
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,16 +29,14 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
 
-    // 5.2 Replace with code from the codelab to configure a questionnaire fragment.
-
-    // 5.3 Replace with code from the codelab to add the questionnaire to the FragmentContainerView.
+    // 4.2 Replace with code from the codelab to add a questionnaire fragment.
   }
 
   private fun submitQuestionnaire() {
 
-    // 6 Replace with code from the codelab to get a questionnaire response.
+    // 5 Replace with code from the codelab to get a questionnaire response.
 
-    // 7 Replace with code from the codelab to extract FHIR resources from QuestionnaireResponse.
+    // 6 Replace with code from the codelab to extract FHIR resources from QuestionnaireResponse.
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {

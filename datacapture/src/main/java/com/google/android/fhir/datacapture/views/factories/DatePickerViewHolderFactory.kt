@@ -23,11 +23,11 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.canonicalizeDatePattern
-import com.google.android.fhir.datacapture.format
-import com.google.android.fhir.datacapture.getDateSeparator
-import com.google.android.fhir.datacapture.parseDate
-import com.google.android.fhir.datacapture.tryUnwrapContext
+import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
+import com.google.android.fhir.datacapture.extensions.format
+import com.google.android.fhir.datacapture.extensions.getDateSeparator
+import com.google.android.fhir.datacapture.extensions.parseDate
+import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.MaxValueValidator.getMaxValue
 import com.google.android.fhir.datacapture.validation.MinValueValidator.getMinValue
@@ -111,7 +111,7 @@ internal object DatePickerViewHolderFactory :
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         clearPreviousState()
-        header.bind(questionnaireViewItem.questionnaireItem)
+        header.bind(questionnaireViewItem)
         textInputLayout.hint = canonicalizedDatePattern
         textInputEditText.removeTextChangedListener(textWatcher)
 

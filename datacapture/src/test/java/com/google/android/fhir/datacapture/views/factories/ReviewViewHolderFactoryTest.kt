@@ -23,13 +23,13 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.datacapture.DisplayItemControlType
-import com.google.android.fhir.datacapture.EXTENSION_DISPLAY_CATEGORY_SYSTEM
-import com.google.android.fhir.datacapture.EXTENSION_DISPLAY_CATEGORY_URL
-import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_SYSTEM
-import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_URL
-import com.google.android.fhir.datacapture.INSTRUCTIONS
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
+import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
+import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -90,32 +90,34 @@ class ReviewViewHolderFactoryTest {
 
   @Test
   fun `bind() should set fly over text`() {
+    val itemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          text = "flyover text"
+          type = Questionnaire.QuestionnaireItemType.DISPLAY
+          addExtension(
+            EXTENSION_ITEM_CONTROL_URL,
+            CodeableConcept().apply {
+              addCoding().apply {
+                system = EXTENSION_ITEM_CONTROL_SYSTEM
+                code = DisplayItemControlType.FLYOVER.extensionCode
+              }
+            }
+          )
+        }
+      )
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           linkId = "parent-question"
           text = "parent question text"
           type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          item =
-            listOf(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                text = "flyover text"
-                type = Questionnaire.QuestionnaireItemType.DISPLAY
-                addExtension(
-                  EXTENSION_ITEM_CONTROL_URL,
-                  CodeableConcept().apply {
-                    addCoding().apply {
-                      system = EXTENSION_ITEM_CONTROL_SYSTEM
-                      code = DisplayItemControlType.FLYOVER.extensionCode
-                    }
-                  }
-                )
-              }
-            )
+          item = itemList
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        enabledDisplayItems = itemList
       )
     )
 
@@ -432,22 +434,22 @@ class ReviewViewHolderFactoryTest {
 
   @Test
   fun `shows instructions`() {
+    val itemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "nested-display-question"
+          text = "subtitle text"
+          extension = listOf(displayCategoryExtensionWithInstructionsCode)
+          type = Questionnaire.QuestionnaireItemType.DISPLAY
+        }
+      )
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          item =
-            listOf(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "nested-display-question"
-                text = "subtitle text"
-                extension = listOf(displayCategoryExtensionWithInstructionsCode)
-                type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
-            )
-        },
+        Questionnaire.QuestionnaireItemComponent().apply { item = itemList },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        enabledDisplayItems = itemList
       )
     )
 
