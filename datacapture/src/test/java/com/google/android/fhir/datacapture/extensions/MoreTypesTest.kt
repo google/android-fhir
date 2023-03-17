@@ -18,10 +18,6 @@ package com.google.android.fhir.datacapture.extensions
 
 import android.os.Build
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
-import com.google.android.fhir.datacapture.common.datatype.asStringValue
-import com.google.android.fhir.datacapture.common.datatype.toCodeType
-import com.google.android.fhir.datacapture.common.datatype.toIdType
-import com.google.android.fhir.datacapture.common.datatype.toUriType
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
 import java.time.ZoneId

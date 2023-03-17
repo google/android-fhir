@@ -21,9 +21,9 @@ import android.view.ViewGroup
 import android.widget.RadioButton
 import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.choiceOrientation
+import com.google.android.fhir.datacapture.extensions.ChoiceOrientationTypes
+import com.google.android.fhir.datacapture.extensions.choiceOrientation
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -55,10 +55,10 @@ internal object BooleanChoiceViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         this.questionnaireViewItem = questionnaireViewItem
-        val questionnaireItem = questionnaireViewItem.questionnaireItem
-        header.bind(questionnaireItem)
+        header.bind(questionnaireViewItem)
         val choiceOrientation =
-          questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
+          questionnaireViewItem.questionnaireItem.choiceOrientation
+            ?: ChoiceOrientationTypes.VERTICAL
         with(flow) {
           when (choiceOrientation) {
             ChoiceOrientationTypes.HORIZONTAL -> {

@@ -17,7 +17,7 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
-import com.google.android.fhir.datacapture.common.datatype.asStringValue
+import com.google.android.fhir.datacapture.extensions.asStringValue
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
 import org.hl7.fhir.r4.model.Extension

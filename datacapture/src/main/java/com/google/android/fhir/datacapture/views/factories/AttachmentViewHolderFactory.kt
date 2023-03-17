@@ -30,14 +30,14 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import com.bumptech.glide.Glide
-import com.google.android.fhir.datacapture.MimeType
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.hasMimeType
-import com.google.android.fhir.datacapture.hasMimeTypeOnly
-import com.google.android.fhir.datacapture.isGivenSizeOverLimit
-import com.google.android.fhir.datacapture.maxSizeInMiBs
-import com.google.android.fhir.datacapture.mimeTypes
-import com.google.android.fhir.datacapture.tryUnwrapContext
+import com.google.android.fhir.datacapture.extensions.MimeType
+import com.google.android.fhir.datacapture.extensions.hasMimeType
+import com.google.android.fhir.datacapture.extensions.hasMimeTypeOnly
+import com.google.android.fhir.datacapture.extensions.isGivenSizeOverLimit
+import com.google.android.fhir.datacapture.extensions.maxSizeInMiBs
+import com.google.android.fhir.datacapture.extensions.mimeTypes
+import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -103,8 +103,8 @@ internal object AttachmentViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         this.questionnaireViewItem = questionnaireViewItem
+        header.bind(questionnaireViewItem)
         val questionnaireItem = questionnaireViewItem.questionnaireItem
-        header.bind(questionnaireItem)
         displayOrClearInitialPreview()
         displayTakePhotoButton(questionnaireItem)
         displayUploadButton(questionnaireItem)

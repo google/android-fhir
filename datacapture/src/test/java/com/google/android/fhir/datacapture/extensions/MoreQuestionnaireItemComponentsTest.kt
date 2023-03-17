@@ -20,62 +20,8 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.util.Base64
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.datacapture.ChoiceColumn
-import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.DataCapture
-import com.google.android.fhir.datacapture.DisplayItemControlType
-import com.google.android.fhir.datacapture.EXTENSION_ANSWER_EXPRESSION_URL
-import com.google.android.fhir.datacapture.EXTENSION_CALCULATED_EXPRESSION_URL
-import com.google.android.fhir.datacapture.EXTENSION_CHOICE_COLUMN_URL
-import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
-import com.google.android.fhir.datacapture.EXTENSION_DISPLAY_CATEGORY_SYSTEM
-import com.google.android.fhir.datacapture.EXTENSION_DISPLAY_CATEGORY_URL
-import com.google.android.fhir.datacapture.EXTENSION_ENABLE_WHEN_EXPRESSION_URL
-import com.google.android.fhir.datacapture.EXTENSION_ENTRY_FORMAT_URL
-import com.google.android.fhir.datacapture.EXTENSION_HIDDEN_URL
-import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_SYSTEM
-import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR
-import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_URL
-import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR
-import com.google.android.fhir.datacapture.EXTENSION_MAX_SIZE
-import com.google.android.fhir.datacapture.EXTENSION_MIME_TYPE
-import com.google.android.fhir.datacapture.EXTENSION_SLIDER_STEP_VALUE_URL
-import com.google.android.fhir.datacapture.INSTRUCTIONS
-import com.google.android.fhir.datacapture.ItemControlTypes
-import com.google.android.fhir.datacapture.MimeType
-import com.google.android.fhir.datacapture.answerExpression
-import com.google.android.fhir.datacapture.calculatedExpression
-import com.google.android.fhir.datacapture.choiceColumn
-import com.google.android.fhir.datacapture.choiceOrientation
-import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
-import com.google.android.fhir.datacapture.decodeToBitmap
-import com.google.android.fhir.datacapture.displayItemControl
-import com.google.android.fhir.datacapture.enableWhenExpression
-import com.google.android.fhir.datacapture.entryFormat
-import com.google.android.fhir.datacapture.expressionBasedExtensions
-import com.google.android.fhir.datacapture.extractAnswerOptions
-import com.google.android.fhir.datacapture.fetchBitmapFromUrl
-import com.google.android.fhir.datacapture.flattened
-import com.google.android.fhir.datacapture.hasHelpButton
-import com.google.android.fhir.datacapture.hasMimeType
-import com.google.android.fhir.datacapture.hasMimeTypeOnly
-import com.google.android.fhir.datacapture.isFlyoverCode
-import com.google.android.fhir.datacapture.isGivenSizeOverLimit
-import com.google.android.fhir.datacapture.isHelpCode
-import com.google.android.fhir.datacapture.isInstructionsCode
-import com.google.android.fhir.datacapture.isReferencedBy
-import com.google.android.fhir.datacapture.itemControl
-import com.google.android.fhir.datacapture.localizedFlyoverSpanned
-import com.google.android.fhir.datacapture.localizedHelpSpanned
-import com.google.android.fhir.datacapture.localizedInstructionsSpanned
-import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.mapping.ITEM_INITIAL_EXPRESSION_URL
-import com.google.android.fhir.datacapture.maxSizeInBytes
-import com.google.android.fhir.datacapture.maxSizeInKiBs
-import com.google.android.fhir.datacapture.maxSizeInMiBs
-import com.google.android.fhir.datacapture.mimeTypes
-import com.google.android.fhir.datacapture.sliderStepValue
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.testing.TestUrlResolver
 import com.google.common.truth.Truth.assertThat
@@ -1257,6 +1203,36 @@ class MoreQuestionnaireItemComponentsTest {
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
     assertThat(questionItemList.first().localizedHelpSpanned.toString()).isEqualTo("phụ đề")
+  }
+
+  @Test
+  fun `isHidden should return true`() {
+    assertThat(
+        Questionnaire.QuestionnaireItemComponent()
+          .apply { addExtension(EXTENSION_HIDDEN_URL, BooleanType(true)) }
+          .isHidden
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun `isHidden should return false`() {
+    assertThat(
+        Questionnaire.QuestionnaireItemComponent()
+          .apply { addExtension(EXTENSION_HIDDEN_URL, BooleanType(false)) }
+          .isHidden
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun `isHidden should return false for invalid value`() {
+    assertThat(
+        Questionnaire.QuestionnaireItemComponent()
+          .apply { addExtension(EXTENSION_HIDDEN_URL, IntegerType(1)) }
+          .isHidden
+      )
+      .isFalse()
   }
 
   @Test
