@@ -70,7 +70,7 @@ internal class DownloaderImpl(
           ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
 
         emit(
-          downloadWorkManager.processResponse(dataSource.download(url)).toList().let {
+          downloadWorkManager.processResponse(dataSource.download(url!!)).toList().let {
             completed += it.size
             DownloadState.Success(it, total, completed)
           }
