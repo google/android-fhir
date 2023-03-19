@@ -1,5 +1,6 @@
 import Dependencies.forceHapiVersion
 import Dependencies.removeIncompatibleDependencies
+import java.lang.Integer.max
 
 plugins {
   id(Plugins.BuildPlugins.application)
@@ -14,7 +15,7 @@ android {
   compileSdk = Sdk.compileSdk
   defaultConfig {
     applicationId = Releases.Demo.applicationId
-    minSdk = Sdk.minSdk
+    minSdk = max(Sdk.minSdk, Sdk.minSdkWorkflow)
     targetSdk = Sdk.targetSdk
     versionCode = Releases.Demo.versionCode
     versionName = Releases.Demo.versionName
