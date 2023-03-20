@@ -56,6 +56,11 @@ import org.opencds.cqf.cql.evaluator.measure.r4.R4MeasureProcessor
 import org.opencds.cqf.cql.evaluator.plandefinition.OperationParametersParser
 import org.opencds.cqf.cql.evaluator.plandefinition.r4.PlanDefinitionProcessor
 
+// Uses the already cached FhirContext instead of creating a new one
+// on the default protected R4FhirModelResolver() constructor.
+// This is a heavy object to load. Avoid having to create a new one.
+object cachedR4FhirModelResolver : R4FhirModelResolver(FhirContext.forR4Cached())
+
 class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   // Initialize the measure processor
   private val fhirEngineTerminologyProvider = FhirEngineTerminologyProvider(fhirContext, fhirEngine)
@@ -69,7 +74,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     }
   private val dataProvider =
     CompositeDataProvider(
-      CachingModelResolverDecorator(R4FhirModelResolver()),
+      CachingModelResolverDecorator(cachedR4FhirModelResolver),
       fhirEngineRetrieveProvider
     )
   private val fhirEngineDal = FhirEngineDal(fhirEngine)
@@ -285,8 +290,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     end: String,
     reportType: String,
     subject: String?,
-    practitioner: String?,
-    lastReceivedOn: String?
+    practitioner: String?
   ): MeasureReport {
     return measureProcessor.evaluateMeasure(
       measureUrl,
@@ -295,7 +299,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       reportType,
       subject,
       practitioner,
-      lastReceivedOn,
+      /* lastReceivedOn= */ null,
       /* contentEndpoint= */ null,
       /* terminologyEndpoint= */ null,
       /* dataEndpoint= */ null,
