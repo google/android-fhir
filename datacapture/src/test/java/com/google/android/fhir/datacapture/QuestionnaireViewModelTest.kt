@@ -67,7 +67,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.hl7.fhir.exceptions.PathEngineException
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -3576,7 +3575,7 @@ class QuestionnaireViewModelTest {
     }
 
   @Test
-  fun `resolveAnswerExpression() should throw exception when x-fhir-query enhancement is invalid`() =
+  fun `resolveAnswerExpression() should return resource even with invalid FHIRPath in x-fhir-query enhancement`() =
     runTest {
       val practitioner =
         Practitioner().apply {
@@ -3599,7 +3598,7 @@ class QuestionnaireViewModelTest {
                   Extension(
                     "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
                     Expression().apply {
-                      this.expression = "Practitioner?active=true&{{Practitioner.name.bamily}} "
+                      this.expression = "Practitioner?active=true&{{Invalid.expression.here}} "
                       this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
                     }
                   ),
@@ -3622,18 +3621,10 @@ class QuestionnaireViewModelTest {
       )
 
       val viewModel = QuestionnaireViewModel(context, state)
+      val answerOptions = viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
 
-      viewModel.runViewModelBlocking {
-        val exception =
-          assertFailsWith<PathEngineException> {
-              viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
-            }
-            .localizedMessage
-        assertThat(exception)
-          .isEqualTo(
-            "The name bamily is not valid for any of the possible types: [http://hl7.org/fhir/StructureDefinition/HumanName] (@char 1)"
-          )
-      }
+      assertThat(answerOptions.first().valueReference.reference)
+        .isEqualTo("Practitioner/${practitioner.logicalId}")
     }
 
   @Test

@@ -190,7 +190,7 @@ object ExpressionEvaluator {
    * @param variablesMap the [Map<String, Base>] of variables, the default value is empty map is
    * defined
    */
-  internal fun extractDependentVariables(
+  private fun extractDependentVariables(
     expression: Expression,
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
@@ -269,12 +269,8 @@ object ExpressionEvaluator {
       .findAll(expression.expression)
       .map { it.groupValues }
       .map { (fhirPathWithParentheses, fhirPath) ->
-        fhirPathEngine.check(
-          resource,
-          resource.resourceType.name,
-          resource.resourceType.name,
-          fhirPath
-        )
+        // TODO(omarismail94): See if FHIRPathEngine.check() can be used to distinguish invalid
+        // expression vs an expression that is valid, but does not return one resource only.
         fhirPathWithParentheses to fhirPathEngine.evaluate(resource, fhirPath).singleOrNull()
       }
   private fun findDependentVariables(expression: Expression) =
