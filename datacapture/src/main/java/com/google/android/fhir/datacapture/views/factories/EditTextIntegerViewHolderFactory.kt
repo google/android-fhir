@@ -66,7 +66,7 @@ internal object EditTextIntegerViewHolderFactory :
 
         // Update the text
         val text = answer ?: draftAnswer
-        if ((text != textInputEditText.text.toString())) {
+        if ((text?.toIntOrNull() != textInputEditText.text.toString().toIntOrNull())) {
           textInputEditText.setText(text)
         }
 
