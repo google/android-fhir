@@ -1,6 +1,5 @@
 import Dependencies.forceHapiVersion
 import Dependencies.removeIncompatibleDependencies
-import java.lang.Integer.max
 
 plugins {
   id(Plugins.BuildPlugins.application)
@@ -15,7 +14,7 @@ android {
   compileSdk = Sdk.compileSdk
   defaultConfig {
     applicationId = Releases.Demo.applicationId
-    minSdk = max(Sdk.minSdk, Sdk.minSdkWorkflow)
+    minSdk = Sdk.minSdk
     targetSdk = Sdk.targetSdk
     versionCode = Releases.Demo.versionCode
     versionName = Releases.Demo.versionName
@@ -34,7 +33,7 @@ android {
   compileOptions {
     // Flag to enable support for the new language APIs
     // See https://developer.android.com/studio/write/java8-support
-    isCoreLibraryDesugaringEnabled = true
+    isCoreLibraryDesugaringEnabled = false
 
     sourceCompatibility = Java.sourceCompatibility
     targetCompatibility = Java.targetCompatibility
