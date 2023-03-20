@@ -16,35 +16,33 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
+import android.icu.text.DecimalFormat
 import android.text.Editable
 import android.text.InputType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import java.util.Locale
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object EditTextDecimalViewHolderFactory :
   EditTextViewHolderFactory(R.layout.edit_text_single_line_view) {
+
+  private val decimalFormat
+    get() = DecimalFormat.getInstance(Locale.getDefault()).apply { maximumIntegerDigits = 5 }
+
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemEditTextViewHolderDelegate(DECIMAL_INPUT_TYPE) {
       override fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem) {
-        val input = getValue(editable.toString())
-        if (input != null) {
-          questionnaireViewItem.setAnswer(input)
-        } else {
-          questionnaireViewItem.clearAnswer()
+        editable.toString().toDoubleOrNull()?.let {
+          questionnaireViewItem.setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DecimalType(it.toString()))
+          )
         }
-      }
-
-      private fun getValue(
-        text: String
-      ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
-        return text.toDoubleOrNull()?.let {
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-            .setValue(DecimalType(it.toString()))
-        }
+          ?: questionnaireViewItem.setDraftAnswer(editable.toString())
       }
 
       override fun updateUI(
@@ -52,22 +50,23 @@ internal object EditTextDecimalViewHolderFactory :
         textInputEditText: TextInputEditText,
         textInputLayout: TextInputLayout,
       ) {
-        val text =
-          questionnaireViewItem.answers.singleOrNull()?.valueDecimalType?.value?.toString() ?: ""
-        if (isTextUpdatesRequired(text, textInputEditText.text.toString())) {
-          textInputEditText.setText(text)
-        }
-      }
+        val questionnaireItemViewItemDecimalAnswer =
+          questionnaireViewItem.answers.singleOrNull()?.valueDecimalType?.value?.toString()
 
-      fun isTextUpdatesRequired(answerText: String, inputText: String): Boolean {
-        if (answerText.isEmpty() && inputText.isEmpty()) {
-          return false
+        val draftAnswer = questionnaireViewItem.draftAnswer?.toString()
+
+        val decimalStringToDisplay = questionnaireItemViewItemDecimalAnswer ?: draftAnswer
+
+        if (decimalStringToDisplay?.toDoubleOrNull() !=
+            textInputEditText.text.toString().toDoubleOrNull()
+        ) {
+          textInputEditText.setText(decimalStringToDisplay)
         }
-        if (answerText.isEmpty() || inputText.isEmpty()) {
-          return true
+        // Update error message if draft answer present
+        if (draftAnswer != null) {
+          textInputLayout.error =
+            textInputEditText.context.getString(R.string.decimal_format_validation_error_msg)
         }
-        // Avoid shifting focus by updating text field if the values are the same
-        return answerText.toDouble() != inputText.toDouble()
       }
     }
 }

@@ -30,7 +30,6 @@ import java.math.BigDecimal
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -118,16 +117,14 @@ class EditTextDecimalViewHolderFactoryTest {
   }
 
   @Test
-  @Ignore(
-    "Needs to be moved to instrumentation tests https://github.com/google/android-fhir/issues/1494"
-  )
   fun shouldSetQuestionnaireResponseItemAnswer() {
+    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
+        answersChangedCallback = { _, _, result, _ -> answers = result },
       )
     viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).apply {
@@ -135,9 +132,26 @@ class EditTextDecimalViewHolderFactoryTest {
       clearFocus()
     }
     viewHolder.itemView.clearFocus()
+    assertThat(answers!!.single().valueDecimalType.value).isEqualTo(BigDecimal.valueOf(1.1))
+  }
 
-    assertThat(questionnaireViewItem.answers.single().valueDecimalType.value)
-      .isEqualTo(BigDecimal("1.1"))
+  @Test
+  fun shouldSetDraftAnswerForInvalidInput() {
+    var draftAnswer: Any? = null
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, result -> draftAnswer = result },
+      )
+    viewHolder.bind(questionnaireViewItem)
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).apply {
+      setText("1.1.1.1")
+      clearFocus()
+    }
+    viewHolder.itemView.clearFocus()
+    assertThat(draftAnswer as? String).isEqualTo("1.1.1.1")
   }
 
   @Test
