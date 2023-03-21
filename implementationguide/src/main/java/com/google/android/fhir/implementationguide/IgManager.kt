@@ -40,11 +40,11 @@ class IgManager internal constructor(private val igDatabase: ImplementationGuide
   private var defaultIgId: Long = -1L
 
   /**
-   * * Checks if the [igDependencies] are present in DB. If necessary, downloads the dependencies
-   * from NPM and imports data from the package manager (populates the metadata of the FHIR
-   * Resorces)
+   * * Checks if the [implementationGuides] are present in DB. If necessary, downloads the
+   * dependencies from NPM and imports data from the package manager (populates the metadata of the
+   * FHIR Resorces)
    */
-  suspend fun install(vararg igDependencies: ImplementationGuide) {
+  suspend fun install(vararg implementationGuides: ImplementationGuide) {
     TODO("not implemented yet")
   }
 
