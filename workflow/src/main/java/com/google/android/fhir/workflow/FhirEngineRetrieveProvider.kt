@@ -217,7 +217,7 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
 
   private suspend fun safeGet(fhirEngine: FhirEngine, type: ResourceType, id: String): Resource? {
     return try {
-      fhirEngine.get(type, id)
+      fhirEngine.get(type.name, id)
     } catch (e: ResourceNotFoundException) {
       null
     }

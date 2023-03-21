@@ -73,7 +73,7 @@ class FhirEngineDalTest {
       }
 
     fhirEngineDal.create(patient)
-    val result = fhirEngine.get(ResourceType.Patient, "2") as Patient
+    val result = fhirEngine.get(ResourceType.Patient.name, "2") as Patient
 
     assertThat(result.nameFirstRep.givenAsSingleString)
       .isEqualTo(patient.nameFirstRep.givenAsSingleString)
@@ -112,7 +112,8 @@ class FhirEngineDalTest {
       fhirEngineDal.delete(testPatient.idElement)
     }
 
-  @After fun fhirEngine() = runBlocking { fhirEngine.delete(ResourceType.Patient, "Patient/1") }
+  @After
+  fun fhirEngine() = runBlocking { fhirEngine.delete(ResourceType.Patient.name, "Patient/1") }
 
   companion object {
     val testPatient =

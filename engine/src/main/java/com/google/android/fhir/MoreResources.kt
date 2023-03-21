@@ -28,9 +28,9 @@ internal const val R4_RESOURCE_PACKAGE_PREFIX = "org.hl7.fhir.r4.model."
  *
  * @throws IllegalArgumentException if class name cannot be mapped to valid resource type
  */
-fun <R : Resource> getResourceType(clazz: Class<R>): ResourceType {
+fun <R : Resource> getResourceType(clazz: Class<R>): String {
   try {
-    return clazz.getConstructor().newInstance().resourceType
+    return clazz.getConstructor().newInstance().resourceType.name
   } catch (e: NoSuchMethodException) {
     throw IllegalArgumentException("Cannot resolve resource type for " + clazz.name, e)
   } catch (e: IllegalAccessException) {

@@ -31,7 +31,7 @@ import org.robolectric.annotation.Config
 class MoreResourcesTest {
   @Test
   fun getResourceType() {
-    assertThat(getResourceType(Patient::class.java)).isEqualTo(ResourceType.Patient)
+    assertThat(getResourceType(Patient::class.java)).isEqualTo(ResourceType.Patient.name)
   }
 
   @Test

@@ -101,7 +101,7 @@ class TestingUtils constructor(private val iParser: IParser) {
   }
 
   open class TestDownloadManagerImpl(
-    val queries: List<String> = listOf("Patient?address-city=NAIROBI")
+    private val queries: List<String> = listOf("Patient?address-city=NAIROBI")
   ) : DownloadWorkManager {
     private val urls = LinkedList(queries)
 
@@ -122,20 +122,16 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
   }
 
-  class TestDownloadManagerImplWithQueue(
-    queries: List<String> = listOf("Patient/bob", "Encounter/doc")
-  ) : TestDownloadManagerImpl(queries)
-
   object TestFhirEngineImpl : FhirEngine {
     override suspend fun create(vararg resource: Resource) = emptyList<String>()
 
     override suspend fun update(vararg resource: Resource) {}
 
-    override suspend fun get(type: ResourceType, id: String): Resource {
+    override suspend fun get(resourceType: String, id: String): Resource {
       return Patient()
     }
 
-    override suspend fun delete(type: ResourceType, id: String) {}
+    override suspend fun delete(resourceType: String, id: String) {}
 
     override suspend fun <R : Resource> search(search: Search): List<R> {
       return emptyList()
@@ -144,7 +140,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     override suspend fun syncUpload(
       upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
     ) {
-      upload(listOf(getLocalChange(ResourceType.Patient, "123")))
+      upload(listOf(getLocalChange(ResourceType.Patient.name, "123")))
     }
 
     override suspend fun syncDownload(
@@ -153,7 +149,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     ) {
       download(
           object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType): String {
+            override suspend fun getLatestTimestampFor(resourceType: String): String {
               return "123456788"
             }
           }
@@ -170,9 +166,9 @@ class TestingUtils constructor(private val iParser: IParser) {
 
     override suspend fun clearDatabase() {}
 
-    override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange {
+    override suspend fun getLocalChange(resourceType: String, id: String): LocalChange {
       return LocalChange(
-        resourceType = type.name,
+        resourceType = resourceType,
         resourceId = id,
         payload = "{}",
         token = LocalChangeToken(listOf()),
@@ -180,7 +176,7 @@ class TestingUtils constructor(private val iParser: IParser) {
       )
     }
 
-    override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {}
+    override suspend fun purge(resourceType: String, id: String, forcePurge: Boolean) {}
   }
 
   object TestFailingDatasource : DataSource {

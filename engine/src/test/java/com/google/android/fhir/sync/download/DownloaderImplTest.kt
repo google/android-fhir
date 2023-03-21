@@ -112,7 +112,7 @@ class DownloaderImplTest {
     downloader
       .download(
         object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
+          override suspend fun getLatestTimestampFor(resourceType: String): String? = null
         }
       )
       .collect { result.add(it) }
@@ -174,7 +174,7 @@ class DownloaderImplTest {
       downloader
         .download(
           object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = null
+            override suspend fun getLatestTimestampFor(resourceType: String) = null
           }
         )
         .collect { result.add(it) }
@@ -240,7 +240,7 @@ class DownloaderImplTest {
       downloader
         .download(
           object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = null
+            override suspend fun getLatestTimestampFor(resourceType: String) = null
           }
         )
         .collect { result.add(it) }
@@ -288,10 +288,10 @@ class DownloaderImplTest {
     downloader
       .download(
         object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
+          override suspend fun getLatestTimestampFor(resourceType: String): String? = null
         }
       )
-      .collectIndexed { index, value -> result.add(value) }
+      .collectIndexed { _, value -> result.add(value) }
 
     assertThat(result.first()).isInstanceOf(DownloadState.Started::class.java)
   }
@@ -322,10 +322,10 @@ class DownloaderImplTest {
     downloader
       .download(
         object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
+          override suspend fun getLatestTimestampFor(resourceType: String): String? = null
         }
       )
-      .collectIndexed { index, value -> result.add(value) }
+      .collectIndexed { _, value -> result.add(value) }
 
     assertThat(result.first()).isInstanceOf(DownloadState.Started::class.java)
     assertThat(result.elementAt(1)).isInstanceOf(DownloadState.Success::class.java)

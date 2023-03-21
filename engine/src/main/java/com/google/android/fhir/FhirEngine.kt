@@ -23,7 +23,6 @@ import com.google.android.fhir.sync.ConflictResolver
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface FhirEngine {
@@ -35,13 +34,13 @@ interface FhirEngine {
   suspend fun create(vararg resource: Resource): List<String>
 
   /** Loads a FHIR resource given the class and the logical ID. */
-  suspend fun get(type: ResourceType, id: String): Resource
+  suspend fun get(resourceType: String, id: String): Resource
 
   /** Updates a FHIR [resource] in the local storage. */
   suspend fun update(vararg resource: Resource)
 
   /** Removes a FHIR resource given the class and the logical ID. */
-  suspend fun delete(type: ResourceType, id: String)
+  suspend fun delete(resourceType: String, id: String)
 
   /**
    * Searches the database and returns a list resources according to the [search] specifications.
@@ -90,24 +89,24 @@ interface FhirEngine {
    * [LocalChange](multiple
    * changes are squashed). If there is no local change for given
    * [resourceType] and [Resource.id], return `null`.
-   * @param type The [ResourceType]
+   * @param resourceType The resource type name
    * @param id The resource id [Resource.id]
    * @return [LocalChange] A squashed local changes for given [resourceType] and [Resource.id] . If
    * there is no local change for given [resourceType] and [Resource.id], return `null`.
    */
-  suspend fun getLocalChange(type: ResourceType, id: String): LocalChange?
+  suspend fun getLocalChange(resourceType: String, id: String): LocalChange?
 
   /**
    * Purges a resource from the database based on resource type and id without any deletion of data
    * from the server.
-   * @param type The [ResourceType]
+   * @param resourceType The resource type name
    * @param id The resource id [Resource.id]
-   * @param isLocalPurge default value is false here resource will not be deleted from
+   * @param forcePurge default value is false here resource will not be deleted from
    * LocalChangeEntity table but it will throw IllegalStateException("Resource has local changes
    * either sync with server or FORCE_PURGE required") if local change exists. If true this API will
    * delete resource entry from LocalChangeEntity table.
    */
-  suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
+  suspend fun purge(resourceType: String, id: String, forcePurge: Boolean = false)
 }
 
 /**
@@ -129,5 +128,5 @@ suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
 }
 
 interface SyncDownloadContext {
-  suspend fun getLatestTimestampFor(type: ResourceType): String?
+  suspend fun getLatestTimestampFor(resourceType: String): String?
 }

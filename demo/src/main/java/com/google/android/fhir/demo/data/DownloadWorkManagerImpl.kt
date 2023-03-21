@@ -38,7 +38,7 @@ class DownloadWorkManagerImpl : DownloadWorkManager {
 
     val resourceTypeToDownload =
       ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
-    context.getLatestTimestampFor(resourceTypeToDownload)?.let {
+    context.getLatestTimestampFor(resourceTypeToDownload.name)?.let {
       url = affixLastUpdatedTimestamp(url!!, it)
     }
     return url

@@ -50,7 +50,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       val url =
         downloadManager.getNextRequestUrl(
           object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-03-20"
+            override suspend fun getLatestTimestampFor(resourceType: String) = "2022-03-20"
           }
         )
       if (url != null) {
@@ -78,7 +78,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       val url =
         downloadManager.getNextRequestUrl(
           object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-03-20"
+            override suspend fun getLatestTimestampFor(resourceType: String) = "2022-03-20"
           }
         )
 
@@ -121,7 +121,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       val url =
         downloadManager.getNextRequestUrl(
           object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-28"
+            override suspend fun getLatestTimestampFor(resourceType: String) = "2022-06-28"
           }
         )
       assertThat(url).isEqualTo("Patient?_sort=_lastUpdated&_lastUpdated=gt2022-06-28")
@@ -143,7 +143,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       val url =
         downloadManager.getNextRequestUrl(
           object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-07-07"
+            override suspend fun getLatestTimestampFor(resourceType: String) = "2022-07-07"
           }
         )
       assertThat(url).isEqualTo("Patient?_lastUpdated=2022-06-28&_sort=status")
@@ -159,7 +159,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       val url =
         downloadManager.getNextRequestUrl(
           object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-07-07"
+            override suspend fun getLatestTimestampFor(resourceType: String) = "2022-07-07"
           }
         )
       assertThat(url).isEqualTo("Patient?_lastUpdated=gt2022-06-28&_sort=_lastUpdated")
@@ -175,7 +175,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       val actual =
         downloadManager.getNextRequestUrl(
           object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = null
+            override suspend fun getLatestTimestampFor(resourceType: String) = null
           }
         )
       assertThat(actual).isEqualTo("Patient?address-city=NAIROBI&_sort=_lastUpdated")
@@ -191,7 +191,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       val actual =
         downloadManager.getNextRequestUrl(
           object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = ""
+            override suspend fun getLatestTimestampFor(resourceType: String) = ""
           }
         )
       assertThat(actual).isEqualTo("Patient?address-city=NAIROBI&_sort=_lastUpdated")
@@ -211,7 +211,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
     val urls =
       downloadManager.getSummaryRequestUrls(
         object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-03-20"
+          override suspend fun getLatestTimestampFor(resourceType: String) = "2022-03-20"
         }
       )
 
