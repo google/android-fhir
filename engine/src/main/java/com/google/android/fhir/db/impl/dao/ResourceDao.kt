@@ -157,7 +157,7 @@ internal abstract class ResourceDao {
     val entity =
       ResourceEntity(
         id = 0,
-        resourceType = resource.resourceType,
+        resourceType = resource.resourceType.name,
         resourceUuid = resourceUuid,
         resourceId = resource.logicalId,
         serializedResource = iParser.encodeResourceToString(resource),

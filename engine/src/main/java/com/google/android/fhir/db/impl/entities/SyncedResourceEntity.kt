@@ -18,7 +18,6 @@ package com.google.android.fhir.db.impl.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Class that models a table that holds all resource types that were synced and the highest
@@ -27,7 +26,7 @@ import org.hl7.fhir.r4.model.ResourceType
 @Entity
 internal data class SyncedResourceEntity(
   /** Resource synced */
-  @PrimaryKey val resourceType: ResourceType,
+  @PrimaryKey val resourceType: String,
   /** The highest `_lastUpdate` value of the resources synced of a specific type */
   val lastUpdate: String
 )

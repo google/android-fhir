@@ -119,7 +119,10 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       resources
         .groupBy { it.resourceType }
         .entries.map {
-          SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+          SyncedResourceEntity(
+            it.key.name,
+            it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString()
+          )
         }
     database.insertSyncedResources(timeStamps, resources)
   }
