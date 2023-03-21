@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    compileSdk = Sdk.compileSdk
+    compileSdk = 31
 
     defaultConfig {
         applicationId = "com.google.android.fhir.codelabs.datacapture"
-        minSdk = Sdk.minSdk
-        targetSdk = Sdk.targetSdk
+        minSdk = 24
+        targetSdk = 31
         versionCode = 1
         versionName = "1.0"
 
@@ -23,11 +23,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = Java.sourceCompatibility
-        targetCompatibility = Java.targetCompatibility
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = Java.kotlinJvmTarget.toString()
+        jvmTarget = "1.8"
     }
 }
 

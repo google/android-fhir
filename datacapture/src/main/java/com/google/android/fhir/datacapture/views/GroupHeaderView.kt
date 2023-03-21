@@ -22,10 +22,12 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedInstructionsSpanned
-import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
-import org.hl7.fhir.r4.model.Questionnaire
+import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
+import com.google.android.fhir.datacapture.extensions.initHelpViews
+import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpanned
+import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
+import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 
 internal class GroupHeaderView(context: Context, attrs: AttributeSet?) :
   LinearLayout(context, attrs) {
@@ -34,14 +36,22 @@ internal class GroupHeaderView(context: Context, attrs: AttributeSet?) :
     LayoutInflater.from(context).inflate(R.layout.group_type_header_view, this, true)
   }
 
-  fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
-    val prefix = findViewById<TextView>(R.id.prefix)
-    val question = findViewById<TextView>(R.id.question)
-    val hint = findViewById<TextView>(R.id.hint)
-    initHelpButton(this, questionnaireItem)
-    prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
-    question.updateTextAndVisibility(questionnaireItem.localizedTextSpanned)
-    hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
-    visibility = getViewGroupVisibility(prefix, question, hint)
+  private val prefix = findViewById<TextView>(R.id.prefix)
+  private val question = findViewById<TextView>(R.id.question)
+  private val hint = findViewById<TextView>(R.id.hint)
+
+  fun bind(questionnaireViewItem: QuestionnaireViewItem) {
+    initHelpViews(
+      helpButton = findViewById(R.id.helpButton),
+      helpCardView = findViewById(R.id.helpCardView),
+      helpTextView = findViewById(R.id.helpText),
+      questionnaireItem = questionnaireViewItem.questionnaireItem
+    )
+    prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
+    question.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedTextSpanned)
+    hint.updateTextAndVisibility(
+      questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
+    )
+    visibility = getHeaderViewVisibility(prefix, question, hint)
   }
 }

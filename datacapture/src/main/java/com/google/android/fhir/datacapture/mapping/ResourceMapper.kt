@@ -19,12 +19,12 @@ package com.google.android.fhir.datacapture.mapping
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.DataCapture
-import com.google.android.fhir.datacapture.common.datatype.toCodeType
-import com.google.android.fhir.datacapture.common.datatype.toIdType
-import com.google.android.fhir.datacapture.common.datatype.toUriType
-import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
+import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.targetStructureMap
-import com.google.android.fhir.datacapture.toCoding
+import com.google.android.fhir.datacapture.extensions.toCodeType
+import com.google.android.fhir.datacapture.extensions.toCoding
+import com.google.android.fhir.datacapture.extensions.toIdType
+import com.google.android.fhir.datacapture.extensions.toUriType
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
