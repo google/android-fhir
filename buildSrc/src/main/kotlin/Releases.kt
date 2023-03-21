@@ -15,11 +15,13 @@
  */
 
 import org.gradle.api.Project
+import org.gradle.api.artifacts.repositories.PasswordCredentials
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.credentials
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
@@ -131,6 +133,11 @@ fun Project.publishArtifact(artifact: LibraryArtifact) {
                 } else {
                   artifact.version
                 }
+            }
+            maven {
+              credentials(PasswordCredentials::class)
+              url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+              name = "sonatype"
             }
           }
         }
