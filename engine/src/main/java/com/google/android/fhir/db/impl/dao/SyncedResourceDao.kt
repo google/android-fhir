@@ -39,5 +39,5 @@ internal interface SyncedResourceDao {
     """SELECT lastUpdate FROM SyncedResourceEntity 
         WHERE resourceType = :resourceType LIMIT 1"""
   )
-  suspend fun getLastUpdate(resourceType: ResourceType): String?
+  suspend fun getLastUpdate(resourceType: String): String?
 }

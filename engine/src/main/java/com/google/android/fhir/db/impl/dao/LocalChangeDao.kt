@@ -29,7 +29,6 @@ import com.google.android.fhir.toTimeZoneString
 import com.google.android.fhir.versionId
 import java.util.Date
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
 /**
@@ -50,7 +49,7 @@ internal abstract class LocalChangeDao {
     resources.forEach { resource -> addInsert(resource) }
   }
 
-  suspend fun addInsert(resource: Resource) {
+  private suspend fun addInsert(resource: Resource) {
     val resourceId = resource.logicalId
     val resourceType = resource.resourceType
     val timestamp = Date().toTimeZoneString()
@@ -71,11 +70,11 @@ internal abstract class LocalChangeDao {
 
   suspend fun addUpdate(oldEntity: ResourceEntity, resource: Resource) {
     val resourceId = resource.logicalId
-    val resourceType = resource.resourceType
+    val resourceType = resource.resourceType.name
     val timestamp = Date().toTimeZoneString()
 
     if (!localChangeIsEmpty(resourceId, resourceType) &&
-        lastChangeType(resourceId, resourceType)!!.equals(Type.DELETE)
+        lastChangeType(resourceId, resourceType)!! == Type.DELETE
     ) {
       throw InvalidLocalChangeException(
         "Unexpected DELETE when updating $resourceType/$resourceId. UPDATE failed."
@@ -97,7 +96,7 @@ internal abstract class LocalChangeDao {
     addLocalChange(
       LocalChangeEntity(
         id = 0,
-        resourceType = resourceType.name,
+        resourceType = resourceType,
         resourceId = resourceId,
         timestamp = timestamp,
         type = Type.UPDATE,
@@ -107,12 +106,12 @@ internal abstract class LocalChangeDao {
     )
   }
 
-  suspend fun addDelete(resourceId: String, resourceType: ResourceType, remoteVersionId: String?) {
+  suspend fun addDelete(resourceId: String, resourceType: String, remoteVersionId: String?) {
     val timestamp = Date().toTimeZoneString()
     addLocalChange(
       LocalChangeEntity(
         id = 0,
-        resourceType = resourceType.name,
+        resourceType = resourceType,
         resourceId = resourceId,
         timestamp = timestamp,
         type = Type.DELETE,
@@ -132,7 +131,7 @@ internal abstract class LocalChangeDao {
         LIMIT 1
     """
   )
-  abstract suspend fun lastChangeType(resourceId: String, resourceType: ResourceType): Type?
+  abstract suspend fun lastChangeType(resourceId: String, resourceType: String): Type?
 
   @Query(
     """
@@ -143,9 +142,9 @@ internal abstract class LocalChangeDao {
         LIMIT 1
     """
   )
-  abstract suspend fun countLastChange(resourceId: String, resourceType: ResourceType): Int
+  abstract suspend fun countLastChange(resourceId: String, resourceType: String): Int
 
-  private suspend fun localChangeIsEmpty(resourceId: String, resourceType: ResourceType): Boolean =
+  private suspend fun localChangeIsEmpty(resourceId: String, resourceType: String): Boolean =
     countLastChange(resourceId, resourceType) == 0
 
   @Query(
@@ -176,10 +175,10 @@ internal abstract class LocalChangeDao {
         AND resourceType = :resourceType
     """
   )
-  abstract suspend fun discardLocalChanges(resourceId: String, resourceType: ResourceType)
+  abstract suspend fun discardLocalChanges(resourceId: String, resourceType: String)
 
   suspend fun discardLocalChanges(resources: List<Resource>) {
-    resources.forEach { discardLocalChanges(it.logicalId, it.resourceType) }
+    resources.forEach { discardLocalChanges(it.logicalId, it.resourceType.name) }
   }
 
   @Query(
@@ -190,7 +189,7 @@ internal abstract class LocalChangeDao {
     """
   )
   abstract suspend fun getLocalChanges(
-    resourceType: ResourceType,
+    resourceType: String,
     resourceId: String
   ): List<LocalChangeEntity>
 

@@ -36,7 +36,6 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * The implementation for the persistence layer using Room. See docs for
@@ -44,7 +43,7 @@ import org.hl7.fhir.r4.model.ResourceType
  */
 @Suppress("UNCHECKED_CAST")
 internal class DatabaseImpl(
-  private val context: Context,
+  context: Context,
   private val iParser: IParser,
   databaseConfig: DatabaseConfig,
   private val resourceIndexer: ResourceIndexer
@@ -122,7 +121,7 @@ internal class DatabaseImpl(
   override suspend fun update(vararg resources: Resource) {
     db.withTransaction {
       resources.forEach {
-        val oldResourceEntity = selectEntity(it.resourceType, it.logicalId)
+        val oldResourceEntity = selectEntity(it.resourceType.name, it.logicalId)
         resourceDao.update(it)
         localChangeDao.addUpdate(oldResourceEntity, it)
       }
@@ -131,7 +130,7 @@ internal class DatabaseImpl(
 
   override suspend fun updateVersionIdAndLastUpdated(
     resourceId: String,
-    resourceType: ResourceType,
+    resourceType: String,
     versionId: String,
     lastUpdated: Instant
   ) {
@@ -145,16 +144,16 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun select(type: ResourceType, id: String): Resource {
+  override suspend fun select(resourceType: String, id: String): Resource {
     return db.withTransaction {
-      resourceDao.getResource(resourceId = id, resourceType = type)?.let {
+      resourceDao.getResource(resourceId = id, resourceType = resourceType)?.let {
         iParser.parseResource(it)
       }
-        ?: throw ResourceNotFoundException(type.name, id)
+        ?: throw ResourceNotFoundException(resourceType, id)
     } as Resource
   }
 
-  override suspend fun lastUpdate(resourceType: ResourceType): String? {
+  override suspend fun lastUpdate(resourceType: String): String? {
     return db.withTransaction { syncedResourceDao.getLastUpdate(resourceType) }
   }
 
@@ -168,19 +167,19 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun delete(type: ResourceType, id: String) {
+  override suspend fun delete(resourceType: String, id: String) {
     db.withTransaction {
       val remoteVersionId: String? =
         try {
-          selectEntity(type, id).versionId
+          selectEntity(resourceType, id).versionId
         } catch (e: ResourceNotFoundException) {
           null
         }
-      val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
+      val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = resourceType)
       if (rowsDeleted > 0)
         localChangeDao.addDelete(
           resourceId = id,
-          resourceType = type,
+          resourceType = resourceType,
           remoteVersionId = remoteVersionId
         )
     }
@@ -220,10 +219,10 @@ internal class DatabaseImpl(
     db.withTransaction { localChangeDao.discardLocalChanges(token) }
   }
 
-  override suspend fun selectEntity(type: ResourceType, id: String): ResourceEntity {
+  override suspend fun selectEntity(resourceType: String, id: String): ResourceEntity {
     return db.withTransaction {
-      resourceDao.getResourceEntity(resourceId = id, resourceType = type)
-        ?: throw ResourceNotFoundException(type.name, id)
+      resourceDao.getResourceEntity(resourceId = id, resourceType = resourceType)
+        ?: throw ResourceNotFoundException(resourceType, id)
     }
   }
 
@@ -243,10 +242,10 @@ internal class DatabaseImpl(
     db.clearAllTables()
   }
 
-  override suspend fun getLocalChange(type: ResourceType, id: String): SquashedLocalChange? {
+  override suspend fun getLocalChange(resourceType: String, id: String): SquashedLocalChange? {
     return db.withTransaction {
       val localChangeEntityList =
-        localChangeDao.getLocalChanges(resourceType = type, resourceId = id)
+        localChangeDao.getLocalChanges(resourceType = resourceType, resourceId = id)
       if (localChangeEntityList.isEmpty()) {
         return@withTransaction null
       }
@@ -257,26 +256,26 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
+  override suspend fun purge(resourceType: String, id: String, forcePurge: Boolean) {
     db.withTransaction {
       // To check resource is present in DB else throw ResourceNotFoundException()
-      selectEntity(type, id)
-      val localChangeEntityList = localChangeDao.getLocalChanges(type, id)
+      selectEntity(resourceType, id)
+      val localChangeEntityList = localChangeDao.getLocalChanges(resourceType, id)
       // If local change is not available simply delete resource
       if (localChangeEntityList.isEmpty()) {
-        resourceDao.deleteResource(resourceId = id, resourceType = type)
+        resourceDao.deleteResource(resourceId = id, resourceType = resourceType)
       } else {
         // local change is available with FORCE_PURGE the delete resource and discard changes from
         // localChangeEntity table
         if (forcePurge) {
-          resourceDao.deleteResource(resourceId = id, resourceType = type)
+          resourceDao.deleteResource(resourceId = id, resourceType = resourceType)
           localChangeDao.discardLocalChanges(
             token = LocalChangeToken(localChangeEntityList.map { it.id })
           )
         } else {
           // local change is available but FORCE_PURGE = false then throw exception
           throw IllegalStateException(
-            "Resource with type $type and id $id has local changes, either sync with server or FORCE_PURGE required"
+            "Resource with type $resourceType and id $id has local changes, either sync with server or FORCE_PURGE required"
           )
         }
       }

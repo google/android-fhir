@@ -42,7 +42,6 @@ import com.google.android.fhir.versionId
 import java.time.Instant
 import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 
 @Dao
 internal abstract class ResourceDao {
@@ -52,7 +51,7 @@ internal abstract class ResourceDao {
   lateinit var resourceIndexer: ResourceIndexer
 
   open suspend fun update(resource: Resource) {
-    getResourceEntity(resource.logicalId, resource.resourceType)?.let {
+    getResourceEntity(resource.logicalId, resource.resourceType.name)?.let {
       val entity = it.copy(serializedResource = iParser.encodeResourceToString(resource))
       // The foreign key in Index entity tables is set with cascade delete constraint and
       // insertResource has REPLACE conflict resolution. So, when we do an insert to update the
@@ -114,7 +113,7 @@ internal abstract class ResourceDao {
   )
   abstract suspend fun updateRemoteVersionIdAndLastUpdate(
     resourceId: String,
-    resourceType: ResourceType,
+    resourceType: String,
     versionId: String?,
     lastUpdatedRemote: Instant?
   )
@@ -124,7 +123,7 @@ internal abstract class ResourceDao {
         DELETE FROM ResourceEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType"""
   )
-  abstract suspend fun deleteResource(resourceId: String, resourceType: ResourceType): Int
+  abstract suspend fun deleteResource(resourceId: String, resourceType: String): Int
 
   @Query(
     """
@@ -132,7 +131,7 @@ internal abstract class ResourceDao {
         FROM ResourceEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType"""
   )
-  abstract suspend fun getResource(resourceId: String, resourceType: ResourceType): String?
+  abstract suspend fun getResource(resourceId: String, resourceType: String): String?
 
   @Query(
     """
@@ -141,10 +140,7 @@ internal abstract class ResourceDao {
         WHERE resourceId = :resourceId AND resourceType = :resourceType
     """
   )
-  abstract suspend fun getResourceEntity(
-    resourceId: String,
-    resourceType: ResourceType
-  ): ResourceEntity?
+  abstract suspend fun getResourceEntity(resourceId: String, resourceType: String): ResourceEntity?
 
   @RawQuery abstract suspend fun getResources(query: SupportSQLiteQuery): List<String>
 

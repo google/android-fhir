@@ -48,7 +48,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun get(type: ResourceType, id: String): Resource {
-    return database.select(type, id)
+    return database.select(type.name, id)
   }
 
   override suspend fun update(vararg resource: Resource) {
@@ -56,7 +56,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun delete(type: ResourceType, id: String) {
-    database.delete(type, id)
+    database.delete(type.name, id)
   }
 
   override suspend fun <R : Resource> search(search: Search): List<R> {
@@ -76,11 +76,11 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange? {
-    return database.getLocalChange(type, id)?.toLocalChange()
+    return database.getLocalChange(type.name, id)?.toLocalChange()
   }
 
   override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
-    database.purge(type, id, forcePurge)
+    database.purge(type.name, id, forcePurge)
   }
 
   override suspend fun syncDownload(
@@ -88,10 +88,11 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
   ) {
     download(
-      object : SyncDownloadContext {
-        override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
-      }
-    )
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) =
+            database.lastUpdate(type.name)
+        }
+      )
       .collect { resources ->
         database.withTransaction {
           val resolved =
@@ -115,9 +116,11 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   private suspend fun saveRemoteResourcesToDatabase(resources: List<Resource>) {
     val timeStamps =
-      resources.groupBy { it.resourceType }.entries.map {
-        SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
-      }
+      resources
+        .groupBy { it.resourceType }
+        .entries.map {
+          SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+        }
     database.insertSyncedResources(timeStamps, resources)
   }
 
@@ -128,7 +131,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   ) =
     resources
       .filter { conflictingResourceIds.contains(it.logicalId) }
-      .map { conflictResolver.resolve(database.select(it.resourceType, it.logicalId), it) }
+      .map { conflictResolver.resolve(database.select(it.resourceType.name, it.logicalId), it) }
       .filterIsInstance<Resolved>()
       .map { it.resolved }
       .takeIf { it.isNotEmpty() }
@@ -176,7 +179,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       response.resourceIdAndType?.let { (id, type) ->
         database.updateVersionIdAndLastUpdated(
           id,
-          type,
+          type.name,
           response.etag,
           response.lastModified.toInstant()
         )
@@ -188,7 +191,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
       database.updateVersionIdAndLastUpdated(
         resource.id,
-        resource.resourceType,
+        resource.resourceType.name,
         resource.meta.versionId,
         resource.meta.lastUpdated.toInstant()
       )
@@ -207,7 +210,8 @@ internal class FhirEngineImpl(private val database: Database, private val contex
    */
   private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
     get() =
-      location?.split("/")?.takeIf { it.size > 3 }?.let {
-        it[it.size - 3] to ResourceType.fromCode(it[it.size - 4])
-      }
+      location
+        ?.split("/")
+        ?.takeIf { it.size > 3 }
+        ?.let { it[it.size - 3] to ResourceType.fromCode(it[it.size - 4]) }
 }
