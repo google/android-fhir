@@ -28,7 +28,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.N])
+@Config(sdk = [Build.VERSION_CODES.O])
 class MoreLocalTimesTest {
 
   @Before
