@@ -51,6 +51,30 @@ inline fun <reified R : Resource> Search.has(
 }
 
 /**
+ * Provide limited support for reverse chaining on [Search]
+ * (See [this](https://www.hl7.org/fhir/search.html#has)).
+ *
+ * Example usage (Search for all Patients with Condition - Diabetes):
+ *
+ * ```
+ *   fhirEngine.search<Patient> {
+ *        has(resourceType = ResourceType.Condition, referenceParam = (Condition.SUBJECT) {
+ *          filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+ *        }
+ *     }
+ * ```
+ */
+fun Search.has(
+  resourceType: ResourceType,
+  referenceParam: ReferenceClientParam,
+  init: Search.() -> Unit
+) {
+  nestedSearches.add(
+    NestedSearch(referenceParam, Search(type = resourceType)).apply { search.init() }
+  )
+}
+
+/**
  * Generates the complete nested query going to several depths depending on the [Search] dsl
  * specified by the user .
  */
