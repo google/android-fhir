@@ -29,9 +29,12 @@ import java.io.File
 import java.io.InputStream
 import java.util.TimeZone
 import org.hl7.fhir.instance.model.api.IBaseResource
+import org.hl7.fhir.r4.model.ActivityDefinition
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Measure
+import org.hl7.fhir.r4.model.MetadataResource
+import org.hl7.fhir.r4.model.PlanDefinition
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.After
@@ -41,7 +44,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.opencds.cqf.cql.evaluator.measure.common.MeasureEvalType
 import org.robolectric.RobolectricTestRunner
-import org.skyscreamer.jsonassert.JSONAssert
+import org.skyscreamer.jsonassert.JSONAssert.assertEquals
 
 @RunWith(RobolectricTestRunner::class)
 class FhirOperatorTest {
@@ -104,7 +107,7 @@ class FhirOperatorTest {
 
     println(jsonParser.encodeResourceToString(carePlan))
 
-    JSONAssert.assertEquals(
+    assertEquals(
       readResourceAsString("/plan-definition/med-request/med_request_careplan.json"),
       jsonParser.encodeResourceToString(carePlan),
       true
@@ -130,7 +133,7 @@ class FhirOperatorTest {
 
     measureReport.date = null
 
-    JSONAssert.assertEquals(
+    assertEquals(
       readResourceAsString("/first-contact/04-results/population-report.json"),
       jsonParser.setPrettyPrint(true).encodeResourceToString(measureReport),
       true
@@ -165,7 +168,7 @@ class FhirOperatorTest {
 
     measureReport.date = null
 
-    JSONAssert.assertEquals(
+    assertEquals(
       readResourceAsString("/group-measure/Results-Measure-report.json"),
       jsonParser.setPrettyPrint(true).encodeResourceToString(measureReport),
       true
@@ -190,7 +193,7 @@ class FhirOperatorTest {
 
     measureReport.date = null
 
-    JSONAssert.assertEquals(
+    assertEquals(
       readResourceAsString("/first-contact/04-results/subject-report.json"),
       jsonParser.setPrettyPrint(true).encodeResourceToString(measureReport),
       true
@@ -212,15 +215,20 @@ class FhirOperatorTest {
       val resource = entry.resource
       when (resource.resourceType) {
         ResourceType.Library -> igManager.install(writeToFile(entry.resource as Library))
+        ResourceType.Measure -> igManager.install(writeToFile(entry.resource as Measure))
+        ResourceType.ActivityDefinition ->
+          igManager.install(writeToFile(entry.resource as ActivityDefinition))
+        ResourceType.PlanDefinition ->
+          igManager.install(writeToFile(entry.resource as PlanDefinition))
         ResourceType.Bundle -> Unit
         else -> fhirEngine.create(entry.resource)
       }
     }
   }
 
-  private fun writeToFile(library: Library): File {
-    return File(context.filesDir, library.name).apply {
-      writeText(jsonParser.encodeResourceToString(library))
+  private fun writeToFile(resource: MetadataResource): File {
+    return File(context.filesDir, resource.name ?: resource.idElement.idPart).apply {
+      writeText(jsonParser.encodeResourceToString(resource))
     }
   }
 

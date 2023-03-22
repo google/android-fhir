@@ -87,6 +87,7 @@ class IgManager internal constructor(private val igDatabase: ImplementationGuide
   suspend fun loadResources(
     resourceType: String,
     url: String? = null,
+    id: String? = null,
     name: String? = null,
     version: String? = null,
   ): Iterable<IBaseResource> {
@@ -94,6 +95,7 @@ class IgManager internal constructor(private val igDatabase: ImplementationGuide
     val resourceEntities =
       when {
         url != null -> listOfNotNull(igDao.getResourceWithUrl(url))
+        id != null -> listOfNotNull(igDao.getResourceWithUrlLike("%$id"))
         name != null && version != null ->
           listOfNotNull(igDao.getResourcesWithNameAndVersion(resType, name, version))
         name != null -> igDao.getResourcesWithName(resType, name)

@@ -18,6 +18,7 @@ package com.google.android.fhir.workflow
 
 import ca.uhn.fhir.rest.gclient.UriClientParam
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.getResourceType
 import com.google.android.fhir.implementationguide.IgManager
 import com.google.android.fhir.search.Search
@@ -34,7 +35,25 @@ internal class FhirEngineDal(
 
   override fun read(id: IIdType): IBaseResource = runBlockingOrThrowMainThreadException {
     val clazz = id.getResourceClass()
-    fhirEngine.get(getResourceType(clazz), id.idPart)
+    if (id.isAbsolute) {
+      igManager
+        .loadResources(
+          resourceType = id.resourceType,
+          url = "${id.baseUrl}/${id.resourceType}/${id.idPart}"
+        )
+        .first()
+    } else {
+      try {
+        fhirEngine.get(getResourceType(clazz), id.idPart)
+      } catch (resourceNotFoundException: ResourceNotFoundException) {
+        // Searching by resourceType and Id to workaround
+        // https://github.com/google/android-fhir/issues/1920
+        // remove when the issue is resolved.
+        val searchByNameWorkaround =
+          igManager.loadResources(resourceType = id.resourceType, id = id.toString()).firstOrNull()
+        searchByNameWorkaround ?: throw resourceNotFoundException
+      }
+    }
   }
 
   override fun create(resource: IBaseResource): Unit = runBlockingOrThrowMainThreadException {
@@ -60,9 +79,8 @@ internal class FhirEngineDal(
     runBlockingOrThrowMainThreadException {
       val search = Search(type = ResourceType.fromCode(resourceType))
       search.filter(UriClientParam("url"), { value = url })
-      // Workaround for https://github.com/google/android-fhir/issues/1920, remove when the issue is
-      // resolved.
-      igManager.loadResources(resourceType = resourceType, url = url) + fhirEngine.search(search)
+      // Searching for knowledge artifact, no need to lookup for fhirEngine
+      igManager.loadResources(resourceType = resourceType, url = url)
     }
 
   @Suppress("UNCHECKED_CAST")

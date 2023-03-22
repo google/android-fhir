@@ -165,7 +165,6 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine, igManager: 
     ActivityDefinitionProcessor(fhirContext, fhirEngineDal, libraryProcessor)
   private val operationParametersParser =
     OperationParametersParser(adapterFactory, fhirTypeConverter)
-
   private val planDefinitionProcessor =
     PlanDefinitionProcessor(
       fhirContext,
