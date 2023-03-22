@@ -86,14 +86,14 @@ internal fun List<NestedSearch>.nestedQuery(
     null
   } else {
     map { it.nestedQuery(type) }
-      .let {
+      .let { searchQueries ->
         SearchQuery(
           query =
-            it.joinToString(
+            searchQueries.joinToString(
               prefix = "AND a.resourceUuid IN ",
               separator = " ${operation.logicalOperator} a.resourceUuid IN"
-            ) { "(\n${it.query}\n) " },
-          args = it.flatMap { it.args }
+            ) { searchQuery -> "(\n${searchQuery.query}\n) " },
+          args = searchQueries.flatMap { it.args }
         )
       }
   }
