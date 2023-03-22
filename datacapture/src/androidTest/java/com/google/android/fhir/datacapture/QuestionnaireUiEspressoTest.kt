@@ -116,6 +116,9 @@ class QuestionnaireUiEspressoTest {
 
   @Test
   fun integerTextEdit_typingZeroBeforeAnyIntegerShouldKeepZeroDisplayed() {
+    // Do not skip cursor when typing on the numeric field if the initial value is set to 0
+    // as from an integer comparison, leading zeros do not change how the answer is saved.
+    // e.g whether 000001 or 1 is input, the answer saved will be 1.
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
 
     onView(withId(R.id.text_input_edit_text)).perform(typeText("0"))
