@@ -34,7 +34,7 @@ internal interface DataSource {
 
   /**
    * @return [Bundle] on a successful operation, [OperationOutcome] otherwise. Call this api with
-   * the [Bundle] that contains individual requests bundled together to be downloaded from to the
+   * the [Bundle] that contains individual requests bundled together to be downloaded from the
    * server. (e.g. https://www.hl7.org/fhir/bundle-request-medsallergies.json.html)
    */
   suspend fun download(bundle: Bundle): Resource

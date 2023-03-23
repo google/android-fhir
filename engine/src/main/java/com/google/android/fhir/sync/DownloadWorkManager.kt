@@ -36,7 +36,7 @@ interface DownloadWorkManager {
 
   /* TODO: Generalize the DownloadWorkManager API to not sequentially download resource by type (https://github.com/google/android-fhir/issues/1884) */
   /**
-   * Returns the map of resourceType and URL for summary of total count for each download request
+   * Returns the map of resourceType and URL for summary of total count for each download request.
    */
   suspend fun getSummaryRequestUrls(context: SyncDownloadContext): Map<ResourceType, String>
 
@@ -48,10 +48,10 @@ interface DownloadWorkManager {
 
 sealed class Request {
   companion object {
-    /** @return [UrlRequest] for a Fhir search [url] */
+    /** @return [UrlRequest] for a FHIR search [url]. */
     fun of(url: String) = UrlRequest(url)
 
-    /** @return [BundleRequest] for a Fhir search [bundle] */
+    /** @return [BundleRequest] for a FHIR search [bundle]. */
     fun of(bundle: Bundle) = BundleRequest(bundle)
   }
 }
