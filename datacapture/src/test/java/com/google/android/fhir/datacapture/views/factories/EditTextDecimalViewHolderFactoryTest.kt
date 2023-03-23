@@ -117,7 +117,7 @@ class EditTextDecimalViewHolderFactoryTest {
   }
 
   @Test
-  fun shouldSetQuestionnaireResponseItemAnswer() {
+  fun shouldSetQuestionnaireResponseItemAnswerIfValidText() {
     var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireViewItem =
       QuestionnaireViewItem(
@@ -136,37 +136,18 @@ class EditTextDecimalViewHolderFactoryTest {
   }
 
   @Test
-  fun shouldSetDraftAnswerForInvalidInput() {
-    var draftAnswer: Any? = null
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, result -> draftAnswer = result },
-      )
-    viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).apply {
-      setText("1.1.1.1")
-      clearFocus()
-    }
-    viewHolder.itemView.clearFocus()
-    assertThat(draftAnswer as? String).isEqualTo("1.1.1.1")
-  }
-
-  @Test
   fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
+    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
+        answersChangedCallback = { _, _, result, _ -> answers = result },
       )
     viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
-
-    assertThat(questionnaireViewItem.answers).isEmpty()
+    assertThat(answers).isEmpty()
   }
 
   @Test
