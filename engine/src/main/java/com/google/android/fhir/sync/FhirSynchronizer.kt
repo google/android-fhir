@@ -106,7 +106,6 @@ internal class FhirSynchronizer(
           .onEach {
             when (it) {
               is DownloadState.Started -> {
-                datastoreUtil.readLastSyncTimestamp()
                 setSyncState(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, it.total, 0))
               }
               is DownloadState.Success -> {
