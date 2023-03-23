@@ -48,11 +48,23 @@ interface DownloadWorkManager {
 
 sealed class Request {
   companion object {
+    /** @return [UrlRequest] for a Fhir search [url] */
     fun of(url: String) = UrlRequest(url)
+
+    /** @return [BundleRequest] for a Fhir search [bundle] */
     fun of(bundle: Bundle) = BundleRequest(bundle)
   }
 }
 
+/**
+ * A [url] based FHIR request to download resources from the server. e.g.
+ * `Patient?given=valueGiven&family=valueFamily`
+ */
 data class UrlRequest(val url: String) : Request()
 
+/**
+ * A [bundle] based FHIR request to download resources from the server. For an example, see
+ * [bundle-request-medsallergies.json](https://www.hl7.org/fhir/bundle-request-medsallergies.json.html)
+ * .
+ */
 data class BundleRequest(val bundle: Bundle) : Request()

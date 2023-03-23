@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync
 
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Bundle.BundleType
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 
@@ -32,10 +33,16 @@ internal interface DataSource {
   suspend fun download(path: String): Resource
 
   /**
+   * @return [Bundle] on a successful operation, [OperationOutcome] otherwise. Call this api with
+   * the [Bundle] that contains individual requests bundled together to be downloaded from to the
+   * server. (e.g. https://www.hl7.org/fhir/bundle-request-medsallergies.json.html)
+   */
+  suspend fun download(bundle: Bundle): Resource
+
+  /**
    * @return [Bundle] of type [BundleType.TRANSACTIONRESPONSE] for a successful operation,
    * [OperationOutcome] otherwise. Call this api with the [Bundle] that needs to be uploaded to the
    * server.
    */
-  // TODO: Give a generic name since Bundle can be POST-ed to ge. data as well/
   suspend fun upload(bundle: Bundle): Resource
 }

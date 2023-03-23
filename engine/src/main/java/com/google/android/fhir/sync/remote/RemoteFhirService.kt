@@ -36,6 +36,8 @@ internal interface RemoteFhirService : DataSource {
 
   @GET override suspend fun download(@Url path: String): Resource
 
+  @POST(".") override suspend fun download(@Body bundle: Bundle): Resource
+
   @POST(".") override suspend fun upload(@Body bundle: Bundle): Resource
 
   class Builder(

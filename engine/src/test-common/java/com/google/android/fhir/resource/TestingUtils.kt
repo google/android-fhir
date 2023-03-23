@@ -95,6 +95,10 @@ class TestingUtils constructor(private val iParser: IParser) {
       return Bundle().apply { type = Bundle.BundleType.SEARCHSET }
     }
 
+    override suspend fun download(bundle: Bundle): Resource {
+      return Bundle().apply { type = Bundle.BundleType.BATCHRESPONSE }
+    }
+
     override suspend fun upload(bundle: Bundle): Resource {
       return Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
     }
@@ -194,14 +198,22 @@ class TestingUtils constructor(private val iParser: IParser) {
       throw Exception(hugeStackTraceMessage)
     }
 
+    override suspend fun download(bundle: Bundle): Resource {
+      throw Exception("Posting Download Bundle failed...")
+    }
+
     override suspend fun upload(bundle: Bundle): Resource {
-      throw Exception("Posting Bundle failed...")
+      throw Exception("Posting Upload Bundle failed...")
     }
   }
 
   class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSource {
 
     override suspend fun download(path: String): Resource {
+      TODO("Not yet implemented")
+    }
+
+    override suspend fun download(bundle: Bundle): Resource {
       TODO("Not yet implemented")
     }
 
