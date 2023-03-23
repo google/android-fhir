@@ -69,12 +69,12 @@ internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
           questionnaireViewItem.questionnaireItem.localizedTextSpanned
         )
         hint.updateTextAndVisibility(
-          questionnaireViewItem.questionnaireItem.localizedInstructionsSpanned
+          questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
         )
         header.visibility = getHeaderViewVisibility(prefix, question, hint)
 
         val localizedFlyoverSpanned =
-          questionnaireViewItem.questionnaireItem.localizedFlyoverSpanned
+          questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
         flyOverTextView.apply {
           visibility =
             if (localizedFlyoverSpanned.isNullOrEmpty()) {
