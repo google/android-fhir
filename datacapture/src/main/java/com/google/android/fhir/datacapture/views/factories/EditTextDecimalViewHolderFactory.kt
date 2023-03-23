@@ -16,14 +16,12 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.icu.text.DecimalFormat
 import android.text.Editable
 import android.text.InputType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import java.util.Locale
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
