@@ -30,9 +30,6 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal object EditTextDecimalViewHolderFactory :
   EditTextViewHolderFactory(R.layout.edit_text_single_line_view) {
 
-  private val decimalFormat
-    get() = DecimalFormat.getInstance(Locale.getDefault()).apply { maximumIntegerDigits = 5 }
-
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemEditTextViewHolderDelegate(DECIMAL_INPUT_TYPE) {
       override fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem) {
