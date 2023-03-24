@@ -91,10 +91,13 @@ dependencies {
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.Kotlin.stdlib)
+  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.timber)
+  implementation(Dependencies.HapiFhir.fhirCoreConvertors)
+  implementation(Dependencies.apacheCommonsCompress)
 
   kapt(Dependencies.Room.compiler)
 
@@ -106,12 +109,6 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
-
-  // remove me
-  implementation("org.apache.commons:commons-compress:1.20")
-  implementation("com.google.code.gson:gson:2.10")
-  implementation("ca.uhn.hapi.fhir:org.hl7.fhir.convertors:5.6.36")
-  implementation(Dependencies.Cql.engineJackson) // Necessary to import Executable XML/JSON CQL libs
 }
 
 tasks.dokkaHtml.configure {
