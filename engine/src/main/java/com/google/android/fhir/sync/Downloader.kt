@@ -31,7 +31,7 @@ internal interface Downloader {
 }
 
 /* TODO: Generalize the Downloader API to not sequentially download resource by type (https://github.com/google/android-fhir/issues/1884) */
-internal sealed class DownloadState {
+sealed class DownloadState {
 
   data class Started(val type: ResourceType, val total: Int) : DownloadState()
 

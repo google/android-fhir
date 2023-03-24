@@ -30,11 +30,13 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
+import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.Resolved
 import com.google.android.fhir.toTimeZoneString
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -85,26 +87,27 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
-  ) {
+    download: suspend (SyncDownloadContext) -> Flow<DownloadState>
+  ): Flow<DownloadState> =
     download(
-      object : SyncDownloadContext {
-        override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
-      }
-    )
-      .collect { resources ->
-        database.withTransaction {
-          val resolved =
-            resolveConflictingResources(
-              resources,
-              getConflictingResourceIds(resources),
-              conflictResolver
-            )
-          saveRemoteResourcesToDatabase(resources)
-          saveResolvedResourcesToDatabase(resolved)
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
+        }
+      )
+      .onEach {
+        if (it is DownloadState.Success) {
+          database.withTransaction {
+            val resolved =
+              resolveConflictingResources(
+                it.resources,
+                getConflictingResourceIds(it.resources),
+                conflictResolver
+              )
+            saveRemoteResourcesToDatabase(it.resources)
+            saveResolvedResourcesToDatabase(resolved)
+          }
         }
       }
-  }
 
   private suspend fun saveResolvedResourcesToDatabase(resolved: List<Resource>?) {
     resolved?.let {
@@ -115,9 +118,11 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   private suspend fun saveRemoteResourcesToDatabase(resources: List<Resource>) {
     val timeStamps =
-      resources.groupBy { it.resourceType }.entries.map {
-        SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
-      }
+      resources
+        .groupBy { it.resourceType }
+        .entries.map {
+          SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+        }
     database.insertSyncedResources(timeStamps, resources)
   }
 
@@ -207,7 +212,8 @@ internal class FhirEngineImpl(private val database: Database, private val contex
    */
   private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
     get() =
-      location?.split("/")?.takeIf { it.size > 3 }?.let {
-        it[it.size - 3] to ResourceType.fromCode(it[it.size - 4])
-      }
+      location
+        ?.split("/")
+        ?.takeIf { it.size > 3 }
+        ?.let { it[it.size - 3] to ResourceType.fromCode(it[it.size - 4]) }
 }

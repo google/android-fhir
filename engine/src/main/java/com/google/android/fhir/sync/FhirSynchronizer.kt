@@ -99,30 +99,24 @@ internal class FhirSynchronizer(
 
   private suspend fun download(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
-    fhirEngine.syncDownload(conflictResolver) {
-      flow {
-        downloader
-          .download(it)
-          .onEach {
-            when (it) {
-              is DownloadState.Started -> {
-                setSyncState(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, it.total, 0))
-              }
-              is DownloadState.Success -> {
-                setSyncState(
-                  SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, it.total, it.completed)
-                )
-                emit(it.resources)
-              }
-              is DownloadState.Failure -> {
-                exceptions.add(it.syncError)
-              }
+    fhirEngine
+      .syncDownload(conflictResolver) { syncDownloadContext ->
+        downloader.download(syncDownloadContext).onEach {
+          when (it) {
+            is DownloadState.Started -> {
+              setSyncState(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, it.total))
+            }
+            is DownloadState.Success -> {
+              setSyncState(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, it.total, it.completed))
+            }
+            is DownloadState.Failure -> {
+              exceptions.add(it.syncError)
             }
           }
-          .catch { exceptions.add(ResourceSyncException(ResourceType.Bundle, Exception(it))) }
-          .collect()
+        }
       }
-    }
+      .catch { exceptions.add(ResourceSyncException(ResourceType.Bundle, Exception(it))) }
+      .collect()
     return if (exceptions.isEmpty()) {
       SyncResult.Success()
     } else {

@@ -28,14 +28,19 @@ import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
+import com.google.android.fhir.sync.DownloadState
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
@@ -274,8 +279,35 @@ class FhirEngineImplTest {
   }
 
   @Test
+  fun `syncDownload catch invalid resource downloaded`() = runBlocking {
+    val exception = mutableListOf<Exception>()
+
+    val testEncounterId = "encounter-1"
+    val invalidEncounter =
+      Encounter().apply {
+        id = testEncounterId
+        class_ = Coding()
+        meta = Meta().apply { lastUpdated = Date() }
+      }
+
+    fhirEngine
+      .syncDownload(AcceptLocalConflictResolver) {
+        flow { emit(DownloadState.Success((listOf((invalidEncounter))), 1, 1)) }
+      }
+      .catch { exception.add(Exception(it)) }
+      .collect()
+
+    assertThat(exception.first().localizedMessage)
+      .isEqualTo("java.lang.NullPointerException: coding.code must not be null")
+  }
+
+  @Test
   fun syncDownload_downloadResources() = runBlocking {
-    fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf((TEST_PATIENT_2)))) }
+    fhirEngine
+      .syncDownload(AcceptLocalConflictResolver) {
+        flow { emit(DownloadState.Success((listOf((TEST_PATIENT_2))), 1, 1)) }
+      }
+      .collect()
 
     testingUtils.assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
   }
@@ -386,16 +418,16 @@ class FhirEngineImplTest {
 
   @Test
   fun `purge() with local change and force purge false should throw IllegalStateException`() =
-      runBlocking {
-    val resourceIllegalStateException =
-      assertThrows(IllegalStateException::class.java) {
-        runBlocking { fhirEngine.purge(ResourceType.Patient, TEST_PATIENT_1_ID) }
-      }
-    assertThat(resourceIllegalStateException.message)
-      .isEqualTo(
-        "Resource with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID has local changes, either sync with server or FORCE_PURGE required"
-      )
-  }
+    runBlocking {
+      val resourceIllegalStateException =
+        assertThrows(IllegalStateException::class.java) {
+          runBlocking { fhirEngine.purge(ResourceType.Patient, TEST_PATIENT_1_ID) }
+        }
+      assertThat(resourceIllegalStateException.message)
+        .isEqualTo(
+          "Resource with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID has local changes, either sync with server or FORCE_PURGE required"
+        )
+    }
 
   @Test
   fun `purge() resource not available should throw ResourceNotFoundException`() = runBlocking {
@@ -424,7 +456,9 @@ class FhirEngineImplTest {
           }
         )
       }
-    fhirEngine.syncDownload(AcceptRemoteConflictResolver) { flowOf((listOf((originalPatient)))) }
+    fhirEngine.syncDownload(AcceptRemoteConflictResolver) {
+      flowOf(DownloadState.Success(listOf((originalPatient)), 1, 1))
+    }
 
     val localChange =
       originalPatient.copy().apply { addAddress(Address().apply { city = "Malibu" }) }
@@ -440,7 +474,9 @@ class FhirEngineImplTest {
         addAddress(Address().apply { country = "USA" })
       }
 
-    fhirEngine.syncDownload(AcceptRemoteConflictResolver) { flowOf((listOf(remoteChange))) }
+    fhirEngine.syncDownload(AcceptRemoteConflictResolver) {
+      flowOf(DownloadState.Success(listOf(remoteChange), 1, 1))
+    }
 
     assertThat(
         services.database.getAllLocalChanges().filter {
@@ -453,63 +489,68 @@ class FhirEngineImplTest {
 
   @Test
   fun syncDownload_conflictResolution_acceptLocal_shouldHaveLocalChangeCreatedAgainstRemoteVersion() =
-      runBlocking {
-    val originalPatient =
-      Patient().apply {
-        id = "original-002"
-        meta =
-          Meta().apply {
-            versionId = "1"
-            lastUpdated = Date()
-          }
-        addName(
-          HumanName().apply {
-            family = "Stark"
-            addGiven("Tony")
-          }
+    runBlocking {
+      val originalPatient =
+        Patient().apply {
+          id = "original-002"
+          meta =
+            Meta().apply {
+              versionId = "1"
+              lastUpdated = Date()
+            }
+          addName(
+            HumanName().apply {
+              family = "Stark"
+              addGiven("Tony")
+            }
+          )
+        }
+      fhirEngine
+        .syncDownload(AcceptLocalConflictResolver) {
+          flowOf(DownloadState.Success(listOf((originalPatient)), 1, 1))
+        }
+        .collect()
+      var localChange =
+        originalPatient.copy().apply { addAddress(Address().apply { city = "Malibu" }) }
+      fhirEngine.update(localChange)
+      localChange =
+        localChange.copy().apply {
+          addAddress(
+            Address().apply {
+              city = "Malibu"
+              state = "California"
+            }
+          )
+        }
+      fhirEngine.update(localChange)
+
+      val remoteChange =
+        originalPatient.copy().apply {
+          meta =
+            Meta().apply {
+              versionId = "2"
+              lastUpdated = Date()
+            }
+          addAddress(Address().apply { country = "USA" })
+        }
+
+      fhirEngine
+        .syncDownload(AcceptLocalConflictResolver) {
+          flowOf(DownloadState.Success(listOf(remoteChange), 1, 1))
+        }
+        .collect()
+
+      val localChangeDiff =
+        """[{"op":"remove","path":"\/address\/0\/country"},{"op":"add","path":"\/address\/0\/city","value":"Malibu"},{"op":"add","path":"\/address\/-","value":{"city":"Malibu","state":"California"}}]"""
+      assertThat(
+          services.database
+            .getAllLocalChanges()
+            .first { it.localChange.resourceId == "original-002" }
+            .localChange.payload
         )
-      }
-    fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf((originalPatient)))) }
-    var localChange =
-      originalPatient.copy().apply { addAddress(Address().apply { city = "Malibu" }) }
-    fhirEngine.update(localChange)
-
-    localChange =
-      localChange.copy().apply {
-        addAddress(
-          Address().apply {
-            city = "Malibu"
-            state = "California"
-          }
-        )
-      }
-    fhirEngine.update(localChange)
-
-    val remoteChange =
-      originalPatient.copy().apply {
-        meta =
-          Meta().apply {
-            versionId = "2"
-            lastUpdated = Date()
-          }
-        addAddress(Address().apply { country = "USA" })
-      }
-
-    fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf(remoteChange))) }
-
-    val localChangeDiff =
-      """[{"op":"remove","path":"\/address\/0\/country"},{"op":"add","path":"\/address\/0\/city","value":"Malibu"},{"op":"add","path":"\/address\/-","value":{"city":"Malibu","state":"California"}}]"""
-    assertThat(
-        services
-          .database
-          .getAllLocalChanges()
-          .first { it.localChange.resourceId == "original-002" }
-          .localChange
-          .payload
-      )
-      .isEqualTo(localChangeDiff)
-    testingUtils.assertResourceEquals(fhirEngine.get<Patient>("original-002"), localChange)
-  }
+        .isEqualTo(localChangeDiff)
+      testingUtils.assertResourceEquals(fhirEngine.get<Patient>("original-002"), localChange)
+    }
 
   companion object {
     private const val TEST_PATIENT_1_ID = "test_patient_1"
