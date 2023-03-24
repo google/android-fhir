@@ -33,6 +33,7 @@ import java.util.Date
 import java.util.LinkedList
 import kotlin.streams.toList
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
@@ -163,7 +164,7 @@ class TestingUtils constructor(private val iParser: IParser) {
             }
           }
         )
-        .collect {}
+        .collect()
     }
     override suspend fun count(search: Search): Long {
       return 0
