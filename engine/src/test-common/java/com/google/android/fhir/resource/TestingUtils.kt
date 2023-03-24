@@ -32,13 +32,11 @@ import java.util.Date
 import java.util.LinkedList
 import kotlin.streams.toList
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import org.json.JSONArray
 import org.json.JSONObject
 
 /** Utilities for testing. */
@@ -56,19 +54,6 @@ class TestingUtils constructor(private val iParser: IParser) {
       .isNotEqualTo(iParser.encodeResourceToString(expected))
   }
 
-  fun assertJsonArrayEqualsIgnoringOrder(actual: JSONArray, expected: JSONArray) {
-    assertThat(actual.length()).isEqualTo(expected.length())
-    val actuals = mutableListOf<String>()
-    val expecteds = mutableListOf<String>()
-    for (i in 0 until actual.length()) {
-      actuals.add(actual.get(i).toString())
-      expecteds.add(expected.get(i).toString())
-    }
-    actuals.sorted()
-    expecteds.sorted()
-    assertThat(actuals).containsExactlyElementsIn(expecteds)
-  }
-
   /** Reads a [Resource] from given file in the `sampledata` dir */
   fun <R : Resource> readFromFile(clazz: Class<R>, filename: String): R {
     val resourceJson = readJsonFromFile(filename)
@@ -80,13 +65,6 @@ class TestingUtils constructor(private val iParser: IParser) {
     val inputStream = javaClass.getResourceAsStream(filename)
     val content = inputStream!!.bufferedReader(Charsets.UTF_8).readText()
     return JSONObject(content)
-  }
-
-  /** Reads a [JSONArray] from given file in the `sampledata` dir */
-  fun readJsonArrayFromFile(filename: String): JSONArray {
-    val inputStream = javaClass.getResourceAsStream(filename)
-    val content = inputStream!!.bufferedReader(Charsets.UTF_8).readText()
-    return JSONArray(content)
   }
 
   object TestDataSourceImpl : DataSource {
@@ -121,10 +99,6 @@ class TestingUtils constructor(private val iParser: IParser) {
       return listOf(patient)
     }
   }
-
-  class TestDownloadManagerImplWithQueue(
-    queries: List<String> = listOf("Patient/bob", "Encounter/doc")
-  ) : TestDownloadManagerImpl(queries)
 
   object TestFhirEngineImpl : FhirEngine {
     override suspend fun create(vararg resource: Resource) = emptyList<String>()
