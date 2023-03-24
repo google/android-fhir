@@ -310,28 +310,21 @@ object ResourceMapper {
     extractionResult: MutableList<Resource>,
     profileLoader: ProfileLoader
   ) {
-    val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-    while (questionnaireItemListIterator.hasNext() &&
-      questionnaireResponseItemListIterator.hasNext()) {
+    while (questionnaireResponseItemListIterator.hasNext()) {
       val currentQuestionnaireResponseItem = questionnaireResponseItemListIterator.next()
-      var currentQuestionnaireItem = questionnaireItemListIterator.next()
-      // Find the next questionnaire item with the same link ID. This is necessary because some
-      // questionnaire items that are disabled might not have corresponding questionnaire response
-      // items.
-      while (questionnaireItemListIterator.hasNext() &&
-        currentQuestionnaireItem.linkId != currentQuestionnaireResponseItem.linkId) {
-        currentQuestionnaireItem = questionnaireItemListIterator.next()
+      val currentQuestionnaireItem =
+        questionnaireItemList.find { it.linkId == currentQuestionnaireResponseItem.linkId }
+      check(currentQuestionnaireItem != null) {
+        "Missing questionnaire item for questionnaire response item ${currentQuestionnaireResponseItem.linkId}"
       }
-      if (currentQuestionnaireItem.linkId == currentQuestionnaireResponseItem.linkId) {
-        extractByDefinition(
-          currentQuestionnaireItem,
-          currentQuestionnaireResponseItem,
-          extractionContext,
-          extractionResult,
-          profileLoader
-        )
-      }
+      extractByDefinition(
+        currentQuestionnaireItem,
+        currentQuestionnaireResponseItem,
+        extractionContext,
+        extractionResult,
+        profileLoader
+      )
     }
   }
 

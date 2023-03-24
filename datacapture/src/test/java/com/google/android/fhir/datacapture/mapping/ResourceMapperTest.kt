@@ -1050,27 +1050,6 @@ class ResourceMapperTest {
                   ]
                 },
                 {
-                  "linkId": "PR-address",
-                  "item": [
-                    {
-                      "linkId": "PR-address-city",
-                      "answer": [
-                        {
-                          "valueString": "Nairobi"
-                        }
-                      ]
-                    },
-                    {
-                      "linkId": "PR-address-country",
-                      "answer": [
-                        {
-                          "valueString": "Kenya"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
                   "linkId": "PR-active"
                 }
               ]
