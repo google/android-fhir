@@ -22,36 +22,58 @@
 
     <!--   Style for question text. -->
     <attr name="questionnaireQuestionTextStyle" format="reference" />
+
     <!--   Style for subtitle text. -->
     <attr name="questionnaireSubtitleTextStyle" format="reference" />
+
     <!--   Style for help header. -->
     <attr name="questionnaireHelpHeaderStyle" format="reference" />
+
     <!--   Style for help text. -->
     <attr name="questionnaireHelpTextStyle" format="reference" />
+
     <!--   Style for help button -->
     <attr name="questionnaireHelpButtonStyle" format="reference" />
+
     <!--   Style for question text in review mode -->
     <attr name="questionnaireReviewModeQuestionTextStyle" format="reference" />
 
     <!--   Style for answer text in review mode -->
     <attr name="questionnaireReviewModeAnswerTextStyle" format="reference" />
+
     <!--   Style for not answered text in review mode -->
     <attr
         name="questionnaireReviewModeNotAnsweredTextStyle"
         format="reference"
     />
+
     <!--   Style for item divider in review mode -->
     <attr name="questionnaireReviewModeItemDividerStyle" format="reference" />
 
+    <!--   Style for answer text. -->
+    <attr name="questionnaireAnswerTextStyle" format="reference" />
+
+    <!--   Style for bottom navigation container. -->
+    <attr name="questionnaireBottomNavContainerStyle" format="reference" />
+
+    <!--   Style for bottom navigation container divider. -->
+    <attr
+        name="questionnaireBottomNavContainerDividerStyle"
+        format="reference"
+    />
+
     <!--   Style for radio buttons. -->
     <attr name="questionnaireRadioButtonStyle" format="reference" />
+
     <!--   Style for checkbox buttons. -->
     <attr name="questionnaireCheckBoxStyle" format="reference" />
 
     <!--   Style for item text appears in dropDown view list. -->
     <attr name="questionnaireDropDownTextStyle" format="reference" />
+
     <!--   Style for text appears in dropDown autocomplete textView. -->
     <attr name="questionnaireDropDownSelectedTextStyle" format="reference" />
+
     <!--   Style for dropDown view layout. -->
     <attr name="questionnaireDropdownLayoutStyle" format="reference" />
 
@@ -66,8 +88,10 @@
 
     <!--   Style for dialog title text in modal view. -->
     <attr name="questionnaireDialogTitleStyle" format="reference" />
+
     <!--   Style for positive and negative dialog buttons in modal view. -->
     <attr name="questionnaireDialogButtonStyle" format="reference" />
+
     <!--   Style for add another answer button in modal view. -->
     <attr name="questionnaireAddAnotherAnswerButtonStyle" format="reference" />
 
@@ -78,14 +102,19 @@
 
     <!--   Style for previous and next buttons in paginated layout. -->
     <attr name="questionnaireButtonStyle" format="reference" />
+
     <!--   Style for submit button. -->
     <attr name="questionnaireSubmitButtonStyle" format="reference" />
+
     <!--   Style for edit button. -->
     <attr name="questionnaireEditButtonStyle" format="reference" />
+
     <!--   Style for validation error dialog title text in modal view. -->
     <attr name="questionnaireValidationDialogTitleStyle" format="reference" />
+
     <!--   Style for validation error dialog body text in modal view. -->
     <attr name="questionnaireValidationDialogBodyStyle" format="reference" />
+
     <!--   Style for validation error positive and negative dialog buttons in modal view. -->
     <attr name="questionnaireValidationDialogButtonStyle" format="reference" />
 
@@ -97,26 +126,34 @@
         name="questionnaireAttachmentTakePhotoButtonStyle"
         format="reference"
     />
+
     <!--   Style for attachment divider. -->
     <attr name="questionnaireAttachmentDividerStyle" format="reference" />
+
     <!--   Style for attachment uploaded label. -->
     <attr name="questionnaireAttachmentUploadedLabelStyle" format="reference" />
+
     <!--   Style for attachment upload button. -->
     <attr name="questionnaireAttachmentUploadButtonStyle" format="reference" />
+
     <!--   Style for attachment delete button. -->
     <attr name="questionnaireAttachmentDeleteButtonStyle" format="reference" />
+
     <!--   Style for attachment preview photo shape appearance. -->
     <attr
         name="questionnaireShapeAppearanceAttachmentPreviewPhotoStyle"
         format="reference"
     />
+
     <!--   Style for attachment preview icon. -->
     <attr name="questionnaireAttachmentPreviewIconStyle" format="reference" />
+
     <!--   Style for attachment preview icon background. -->
     <attr
         name="questionnaireAttachmentPreviewIconBackgroundStyle"
         format="reference"
     />
+
     <!--   Style for attachment preview title. -->
     <attr name="questionnaireAttachmentPreviewTitleStyle" format="reference" />
 
