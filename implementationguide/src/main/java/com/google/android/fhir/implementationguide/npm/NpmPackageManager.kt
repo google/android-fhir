@@ -1,311 +1,243 @@
-package com.google.android.fhir.implementationguide.npm;
+package com.google.android.fhir.implementationguide.npm
 
-import android.content.Context;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
-import org.hl7.fhir.convertors.advisors.impl.BaseAdvisor_40_50;
-import org.hl7.fhir.convertors.conv40_50.VersionConvertor_40_50;
-import org.hl7.fhir.exceptions.FHIRException;
-import org.hl7.fhir.r4.formats.FormatUtilities;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r5.context.IWorkerContext;
-import org.hl7.fhir.r5.model.Constants;
-import org.hl7.fhir.r5.model.ImplementationGuide;
-import org.hl7.fhir.utilities.Utilities;
-import org.hl7.fhir.utilities.VersionUtilities;
-import org.hl7.fhir.utilities.json.JsonTrackingParser;
-import org.hl7.fhir.utilities.npm.NpmPackage;
-import timber.log.Timber;
+import org.json.JSONObject
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
+import org.hl7.fhir.convertors.advisors.impl.BaseAdvisor_40_50
+import org.hl7.fhir.convertors.conv40_50.VersionConvertor_40_50
+import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r5.context.IWorkerContext
+import org.hl7.fhir.r5.model.Constants
+import org.hl7.fhir.r5.model.ImplementationGuide
+import org.hl7.fhir.utilities.Utilities
+import org.hl7.fhir.utilities.VersionUtilities
+import org.hl7.fhir.utilities.npm.NpmPackage
+import timber.log.Timber
 
 /**
  * The copy of [Cqf
  * NpmPackageManager](https://github.com/cqframework/clinical_quality_language/blob/master/Src/java/cqf-fhir-npm/src/main/java/org/cqframework/fhir/npm/NpmPackageManager.java)
  * Fixes the nested dependency issue, uses android-friendly loggers and CacheManagers.
  */
-public class NpmPackageManager implements IWorkerContext.ILoggingService {
+class NpmPackageManager(
+  cacheFolder: String, sourceIg: ImplementationGuide, private val version: String,
+  vararg packageServers: String,
+) : IWorkerContext.ILoggingService {
+  private val pcm: FilesystemPackageCacheManager
+  private val npmList: MutableList<NpmPackage> = ArrayList()
 
-  private final String[] packageServers;
-  private FilesystemCacheManager pcm;
-  private List<NpmPackage> npmList = new ArrayList<>();
-
-  public List<NpmPackage> getNpmList() {
-    return npmList;
-  }
-
-  private String version; // FHIR version as a string, e.g. 4.0.1
-
-  public String getVersion() {
-    return version;
-  }
-
-  private ImplementationGuide sourceIg;
-
-  public ImplementationGuide getSourceIg() {
-    return sourceIg;
-  }
-
-  /*
-  @param igPath Fully qualified path to the IG resource
-   */
-  public static NpmPackageManager fromPath(String cacheFolder, String igPath, String version,
-      String... packageServers) throws IOException {
-    if (igPath == null || igPath.equals("")) {
-      throw new IllegalArgumentException("igPath is required");
-    }
-    VersionConvertor_40_50 versionConvertor_40_50 = new VersionConvertor_40_50(
-        new BaseAdvisor_40_50());
-    return new NpmPackageManager(cacheFolder,
-        (ImplementationGuide) versionConvertor_40_50.convertResource(
-            FormatUtilities.loadFile(igPath)), version,
-        packageServers);
-  }
-
-  public static NpmPackageManager fromStream(String cacheFolder, InputStream is, String version,
-      String... packageServers) throws IOException {
-    VersionConvertor_40_50 versionConvertor_40_50 = new VersionConvertor_40_50(
-        new BaseAdvisor_40_50());
-    return new NpmPackageManager(cacheFolder,
-        (ImplementationGuide) versionConvertor_40_50.convertResource(FormatUtilities.loadFile(is)),
-        version,
-        packageServers);
-  }
-
-  public static NpmPackageManager fromResource(String cacheFolder, Resource resource, String version,
-      String... packageServers) throws IOException {
-    VersionConvertor_40_50 versionConvertor_40_50 = new VersionConvertor_40_50(
-        new BaseAdvisor_40_50());
-    return new NpmPackageManager(cacheFolder,
-        (ImplementationGuide) versionConvertor_40_50.convertResource(resource), version,
-        packageServers);
-  }
-
-  public NpmPackageManager(String cacheFolder, ImplementationGuide sourceIg, String version,
-      String[] packageServers) throws IOException {
-    if (version == null || version.equals("")) {
-      throw new IllegalArgumentException("version is required");
-    }
-
-    this.version = version;
-
-    if (sourceIg == null) {
-      throw new IllegalArgumentException("sourceIg is required");
-    }
-
-    this.sourceIg = sourceIg;
-    this.packageServers = packageServers;
-
-    try {
+  init {
+    pcm = try {
       // userMode indicates whether the packageCache is within the working directory or in the user home
-      pcm = new FilesystemCacheManager(cacheFolder, this.packageServers);
-    } catch (IOException e) {
-      String message = "error creating the FilesystemPackageCacheManager";
-      logMessage(message);
-      throw new NpmPackageManagerException(message, e);
+      FilesystemPackageCacheManager(cacheFolder, *packageServers)
+    } catch (e: IOException) {
+      val message = "error creating the FilesystemPackageCacheManager"
+      logMessage(message)
+      throw NpmPackageManagerException(message, e)
     }
-
-    loadCorePackage();
-
-    int i = 0;
-    for (ImplementationGuide.ImplementationGuideDependsOnComponent dep : sourceIg.getDependsOn()) {
-      loadIg(dep, i);
-      i++;
-    }
+    loadCorePackage()
+    sourceIg.dependsOn.forEach(::loadIg)
   }
 
-  private void loadCorePackage() {
-    NpmPackage pi = null;
+  private fun loadCorePackage() {
+    val v = if (version == Constants.VERSION) "current" else version
+    logMessage("Core Package ${VersionUtilities.packageForVersion(v)} #$v")
 
-    String v = version.equals(Constants.VERSION) ? "current" : version;
-
-    logMessage("Core Package " + VersionUtilities.packageForVersion(v) + "#" + v);
-    try {
-      pi = pcm.loadPackage(VersionUtilities.packageForVersion(v), v);
-    } catch (Exception e) {
+    val pi: NpmPackage = try {
+      pcm.loadPackage(VersionUtilities.packageForVersion(v), v)
+    } catch (e: Exception) {
       try {
         // Appears to be race condition in FHIR core where they are
         // loading a custom cert provider.
-        pi = pcm.loadPackage(VersionUtilities.packageForVersion(v), v);
-      } catch (Exception ex) {
-        throw new NpmPackageManagerException("Error loading core package", e);
+        pcm.loadPackage(VersionUtilities.packageForVersion(v), v)
+      } catch (ex: Exception) {
+        throw NpmPackageManagerException("Error loading core package", e)
       }
     }
-
-    if (pi == null) {
-      throw new NpmPackageManagerException("Could not load core package");
-    }
-    if (v.equals("current")) {
-      throw new IllegalArgumentException("Current core package not supported");
-    }
-    npmList.add(pi);
+    require(v != "current") { "Current core package not supported" }
+    npmList.add(pi)
   }
 
-  private void loadIg(ImplementationGuide.ImplementationGuideDependsOnComponent dep, int index)
-      throws IOException {
-    String name = dep.getId();
-    if (!dep.hasId()) {
-      logMessage("Dependency '" + idForDep(dep)
-          + "' has no id, so can't be referred to in markdown in the IG");
-      name = "u" + Utilities.makeUuidLC().replace("-", "");
+  @Throws(IOException::class)
+  private fun loadIg(dep: ImplementationGuide.ImplementationGuideDependsOnComponent) {
+    val name = if (!dep.hasId()) {
+      logMessage("Dependency '${idForDep(dep)}' has no id, so can't be referred to in markdown in the IG")
+      "u${Utilities.makeUuidLC().replace("-", "")}"
+    } else {
+      dep.id
     }
-    if (!isValidIGToken(name)) {
-      throw new IllegalArgumentException("IG Name must be a valid token (" + name + ")");
+    require(isValidIGToken(name)) { "IG Name must be a valid token ($name)" }
+    var canonical = determineCanonical(dep.uri)
+    var packageId = dep.packageId
+    if (packageId.isNullOrEmpty()) {
+      packageId = pcm.getPackageId(canonical)
     }
-    String canonical = determineCanonical(dep.getUri(),
-        "ImplementationGuide.dependency[" + index + "].url");
-    String packageId = dep.getPackageId();
-    if (Utilities.noString(packageId)) {
-      packageId = pcm.getPackageId(canonical);
+    if (canonical.isNullOrEmpty() && packageId.isNotEmpty()) {
+      canonical = pcm.getPackageUrl(packageId)
     }
-    if (Utilities.noString(canonical) && !Utilities.noString(packageId)) {
-      canonical = pcm.getPackageUrl(packageId);
-    }
-    if (Utilities.noString(canonical)) {
-      throw new IllegalArgumentException("You must specify a canonical URL for the IG " + name);
-    }
-    String igver = dep.getVersion();
-    if (Utilities.noString(igver)) {
-      throw new IllegalArgumentException(
-          "You must specify a version for the IG " + packageId + " (" + canonical + ")");
-    }
-
-    NpmPackage pi = packageId == null ? null : pcm.loadPackageFromCacheOnly(packageId, igver);
+    require(!canonical.isNullOrEmpty()) { "You must specify a canonical URL for the IG $name" }
+    val igver = dep.version
+    require(!igver.isNullOrEmpty()) { "You must specify a version for the IG $packageId ($canonical)" }
+    var pi = if (packageId == null) null else pcm.loadPackageFromCacheOnly(packageId, igver)
     if (pi != null) {
-      npmList.add(pi);
+      npmList.add(pi)
     }
     if (pi == null) {
-      pi = resolveDependency(canonical, packageId, igver);
+      pi = resolveDependency(canonical, packageId, igver)
       if (pi == null) {
-        if (Utilities.noString(packageId)) {
-          throw new IllegalArgumentException("Package Id for guide at " + canonical
-              + " is unknown (contact FHIR Product Director");
-        } else {
-          throw new IllegalArgumentException("Unknown Package " + packageId + "#" + igver);
+        require(!packageId.isNullOrEmpty()) {
+          ("Package Id for guide at $canonical is unknown (contact FHIR Product Director")
         }
+        throw IllegalArgumentException("Unknown Package $packageId#$igver")
       }
-      npmList.add(pi);
+      npmList.add(pi)
     }
-    logDebugMessage(IWorkerContext.ILoggingService.LogCategory.INIT,
-        "Load " + name + " (" + canonical + ") from " + packageId + "#" + igver);
-
-    if (dep.hasUri() && !dep.getUri().contains("/ImplementationGuide/")) {
-      String cu = getIgUri(pi);
+    logDebugMessage(
+      IWorkerContext.ILoggingService.LogCategory.INIT,
+      "Load $name ($canonical) from $packageId#$igver"
+    )
+    if (dep.hasUri() && !dep.uri.contains("/ImplementationGuide/")) {
+      val cu = getIgUri(pi)
       if (cu != null) {
-        logMessage("The correct canonical URL for this dependency is " + cu);
+        logMessage("The correct canonical URL for this dependency is $cu")
       }
     }
   }
 
-  private String determineCanonical(String url, String path) throws FHIRException {
+  private fun determineCanonical(url: String?): String? {
     if (url == null) {
-      return url;
+      return null
     }
     if (url.contains("/ImplementationGuide/")) {
-      return url.substring(0, url.indexOf("/ImplementationGuide/"));
+      return url.substring(0, url.indexOf("/ImplementationGuide/"))
     }
-    if (path != null) {
-      logMessage(
-          "The canonical URL for an Implementation Guide must point directly to the implementation guide resource, not to the Implementation Guide as a whole");
-    }
-    return url;
+    logMessage(
+      "The canonical URL for an Implementation Guide must point directly to the implementation guide resource, not to the Implementation Guide as a whole"
+    )
+    return url
   }
 
-  private boolean isValidIGToken(String tail) {
-    if (tail == null || tail.length() == 0) {
-      return false;
+  private fun isValidIGToken(tail: String?): Boolean {
+    if (tail.isNullOrEmpty()) {
+      return false
     }
-    boolean result = Utilities.isAlphabetic(tail.charAt(0));
-    for (int i = 1; i < tail.length(); i++) {
-      result =
-          result && (Utilities.isAlphabetic(tail.charAt(i)) || Utilities.isDigit(tail.charAt(i))
-              || (tail.charAt(i) == '_'));
+    return tail.drop(1).fold(tail[0].isLetter()) { acc, tailChar ->
+      acc && (tailChar.isLetterOrDigit() || tailChar == '_')
     }
-    return result;
-
   }
 
-  private String idForDep(ImplementationGuide.ImplementationGuideDependsOnComponent dep) {
-    if (dep.hasPackageId()) {
-      return dep.getPackageId();
+  private fun idForDep(dep: ImplementationGuide.ImplementationGuideDependsOnComponent): String {
+    return when {
+      dep.hasPackageId() -> dep.packageId
+      dep.hasUri() -> dep.uri
+      else -> "{no id}"
     }
-    if (dep.hasUri()) {
-      return dep.getUri();
-    }
-    return "{no id}";
   }
 
-  private String getIgUri(NpmPackage pi) throws IOException {
-    for (String rs : pi.listResources("ImplementationGuide")) {
-      JsonObject json = JsonTrackingParser.parseJson(pi.loadResource(rs));
-      if (json.has("packageId") && json.get("packageId").getAsString().equals(pi.name())
-          && json.has("url")) {
-        return json.get("url").getAsString();
+  @Throws(IOException::class)
+  private fun getIgUri(pi: NpmPackage): String? {
+    for (rs in pi.listResources("ImplementationGuide")) {
+      val json = parseJson(pi.loadResource(rs))
+      if (json.optString("packageId") == pi.name()) {
+        return json.optString("url")
       }
     }
-    return null;
+    return null
   }
 
-  private NpmPackage resolveDependency(String canonical, String packageId, String igver)
-      throws IOException {
+  @Throws(IOException::class)
+  private fun resolveDependency(
+    canonical: String?,
+    packageId: String?,
+    igver: String,
+  ): NpmPackage? {
     if (packageId != null) {
-      return pcm.loadPackage(packageId, igver);
+      return pcm.loadPackage(packageId, igver)
     }
-
-    JsonObject pl;
-    logDebugMessage(IWorkerContext.ILoggingService.LogCategory.INIT,
-        "Fetch Package history from " + Utilities.pathURL(canonical, "package-list.json"));
-    try {
-      pl = fetchJson(Utilities.pathURL(canonical, "package-list.json"));
-    } catch (Exception e) {
-      return null;
+    logDebugMessage(
+      IWorkerContext.ILoggingService.LogCategory.INIT,
+      "Fetch Package history from " + Utilities.pathURL(canonical, "package-list.json")
+    )
+    val pl: JSONObject = try {
+      fetchJson(Utilities.pathURL(canonical, "package-list.json"))
+    } catch (e: Exception) {
+      Timber.e(e,"Error parsing package-list.json")
+      return null
     }
-    if (!canonical.equals(pl.get("canonical").getAsString())) {
-      throw new IllegalArgumentException(
-          "Canonical mismatch fetching package list for " + canonical + "#" + igver
-              + ", package-list.json says " + pl.get("canonical"));
+    require(canonical == pl.getString("canonical")) {
+      ("Canonical mismatch fetching package list for $canonical #$igver, package-list.json says ${pl["canonical"]}")
     }
-    for (JsonElement e : pl.getAsJsonArray("list")) {
-      JsonObject o = (JsonObject) e;
-      if (igver.equals(o.get("version").getAsString())) {
-        InputStream src = fetchFromSource(pl.get("package-id").getAsString() + "-" + igver,
-            Utilities.pathURL(o.get("path").getAsString(), "package.tgz"));
-        return pcm.addPackageToCache(pl.get("package-id").getAsString(), igver, src,
-            Utilities.pathURL(o.get("path").getAsString(), "package.tgz"));
+    val array = pl.getJSONArray("list")
+    for (i in 0..array.length()) {
+      val o = array[i] as JSONObject
+      if (igver == o.getString("version")) {
+        val src = fetchFromSource(
+          "${pl.getString("package-id")}-$igver",
+          Utilities.pathURL(o.getString("path"), "package.tgz")
+        )
+        return pcm.addPackageToCache(
+          pl.getString("package-id"), igver, src,
+          Utilities.pathURL(o.getString("path"), "package.tgz")
+        )
       }
     }
-    return null;
+    return null
   }
 
-  private JsonObject fetchJson(String source) throws IOException {
-    URL url = new URL(source + "?nocache=" + System.currentTimeMillis());
-    HttpURLConnection c = (HttpURLConnection) url.openConnection();
-    c.setInstanceFollowRedirects(true);
-    return JsonTrackingParser.parseJson(c.getInputStream());
+  @Throws(IOException::class)
+  private fun fetchJson(source: String): JSONObject {
+    val url = URL(source + "?nocache=" + System.currentTimeMillis())
+    val c = url.openConnection() as HttpURLConnection
+    c.instanceFollowRedirects = true
+    return parseJson(c.inputStream)
   }
 
-  private InputStream fetchFromSource(String id, String source) throws IOException {
-    logDebugMessage(IWorkerContext.ILoggingService.LogCategory.INIT,
-        "Fetch " + id + " package from " + source);
-    URL url = new URL(source + "?nocache=" + System.currentTimeMillis());
-    URLConnection c = url.openConnection();
-    return c.getInputStream();
+  @Throws(IOException::class)
+  private fun parseJson(inputStream: InputStream): JSONObject {
+    return JSONObject(InputStreamReader(inputStream).readText())
   }
 
-  @Override
-  public void logMessage(String msg) {
-    Timber.d(msg);
+
+  @Throws(IOException::class)
+  private fun fetchFromSource(id: String, source: String): InputStream {
+    logDebugMessage(
+      IWorkerContext.ILoggingService.LogCategory.INIT,
+      "Fetch $id package from $source"
+    )
+    val url = URL(source + "?nocache=" + System.currentTimeMillis())
+    val c = url.openConnection()
+    return c.getInputStream()
   }
 
-  @Override
-  public void logDebugMessage(IWorkerContext.ILoggingService.LogCategory category, String msg) {
-    logMessage(msg);
+  override fun logMessage(msg: String) {
+    Timber.d(msg)
+  }
+
+  override fun logDebugMessage(category: IWorkerContext.ILoggingService.LogCategory, msg: String) {
+    logMessage(msg)
+  }
+
+  override fun isDebugLogging(): Boolean = false
+
+  companion object {
+
+    @Throws(IOException::class)
+    fun fromResource(
+      cacheFolder: String, resource: Resource, version: String,
+      vararg packageServers: String,
+    ): NpmPackageManager {
+      val versionConvertor40to50 = VersionConvertor_40_50(BaseAdvisor_40_50())
+      return NpmPackageManager(
+        cacheFolder,
+        versionConvertor40to50.convertResource(
+          resource
+        ) as ImplementationGuide,
+        version,
+        *packageServers
+      )
+    }
   }
 }

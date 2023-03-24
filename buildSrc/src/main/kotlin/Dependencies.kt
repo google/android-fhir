@@ -175,6 +175,8 @@ object Dependencies {
     "$androidFhirGroup:$androidFhirEngineModule:${Versions.androidFhirEngine}"
   const val androidFhirKnowledge = "$androidFhirGroup:knowledge:${Versions.androidFhirKnowledge}"
 
+  const val apacheCommonsCompress = "org.apache.commons:commons-compress:${Versions.apacheCommonsCompress}"
+
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
   const val gson = "com.google.code.gson:gson:${Versions.gson}"
@@ -259,6 +261,7 @@ object Dependencies {
     const val androidFhirCommon = "0.1.0-alpha04"
     const val androidFhirEngine = "0.1.0-beta03"
     const val androidFhirKnowledge = "0.1.0-alpha01"
+    const val apacheCommonsCompress = "1.20"
     const val desugarJdkLibs = "2.0.3"
     const val caffeine = "2.9.1"
     const val fhirUcum = "1.0.3"
@@ -268,11 +271,10 @@ object Dependencies {
     // Hapi FHIR and HL7 Core Components are interlinked.
     // Newer versions of HapiFhir don't work on Android due to the use of Caffeine 3+
     // Wait for this to release (6.3): https://github.com/hapifhir/hapi-fhir/pull/4196
-    const val hapiFhir = "6.0.1"
-
+    const val hapiFhir = "6.4.4"
     // Newer versions don't work on Android due to Apache Commons Codec:
     // Wait for this fix: https://github.com/hapifhir/org.hl7.fhir.core/issues/1046
-    const val hapiFhirCore = "5.6.36"
+    const val hapiFhirCore = "5.6.114"
 
     const val http = "4.11.0"
     // Maximum version that supports Android API Level 24:

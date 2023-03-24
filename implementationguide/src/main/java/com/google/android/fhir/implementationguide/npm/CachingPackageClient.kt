@@ -8,7 +8,7 @@ import java.util.Date
 import org.hl7.fhir.utilities.TextFile
 import org.hl7.fhir.utilities.Utilities
 import org.hl7.fhir.utilities.npm.PackageClient
-import org.hl7.fhir.utilities.npm.PackageInfo
+import org.hl7.fhir.utilities.npm.PackageServer
 
 /**
  * Implementation of a package client that keeps a local disk cache of downloaded artifacts
@@ -16,8 +16,8 @@ import org.hl7.fhir.utilities.npm.PackageInfo
  *
  * This version is modified from the original to support injecting the folder path instead of hardcoded one
  */
-internal class CachingPackageClient(cacheFolderRoot: String, address: String) :
-  PackageClient(address) {
+internal class CachingPackageClient(cacheFolderRoot: String, server: PackageServer) :
+  PackageClient(server) {
   private val cacheFolder = Utilities.path(cacheFolderRoot, ".fhir", "package-client")
 
   init {
