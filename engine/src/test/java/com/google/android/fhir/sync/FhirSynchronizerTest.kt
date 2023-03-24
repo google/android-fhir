@@ -19,7 +19,6 @@ package com.google.android.fhir.sync
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirServices
-import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.sync.upload.BundleUploader
 import com.google.android.fhir.sync.upload.LocalChangesPaginator
@@ -78,7 +77,7 @@ class FhirSynchronizerTest {
         uploader = bundleUploader,
         downloader =
           object : Downloader {
-            override suspend fun download(context: SyncDownloadContext): Flow<DownloadState> =
+            override suspend fun download(): Flow<DownloadState> =
               flow {
                 emit(DownloadState.Success(listOf(invalidEncounter), 1, 1))
               }
@@ -117,7 +116,7 @@ class FhirSynchronizerTest {
         uploader = bundleUploader,
         downloader =
           object : Downloader {
-            override suspend fun download(context: SyncDownloadContext): Flow<DownloadState> =
+            override suspend fun download(): Flow<DownloadState> =
               flow {
                 emit(DownloadState.Success(listOf(encounter), 1, 1))
               }

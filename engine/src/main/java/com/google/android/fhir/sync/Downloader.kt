@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync
 
-import com.google.android.fhir.SyncDownloadContext
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -27,7 +26,7 @@ internal interface Downloader {
    * @return Flow of the [DownloadState] which keeps emitting [Resource]s or Error based on the
    * response of each page download request. It also updates progress if [ProgressCallback] exists
    */
-  suspend fun download(context: SyncDownloadContext): Flow<DownloadState>
+  suspend fun download(): Flow<DownloadState>
 }
 
 /* TODO: Generalize the Downloader API to not sequentially download resource by type (https://github.com/google/android-fhir/issues/1884) */

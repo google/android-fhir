@@ -64,7 +64,7 @@ interface FhirEngine {
    */
   suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend (SyncDownloadContext) -> Flow<DownloadState>
+    download: suspend () -> Flow<DownloadState>
   ): Flow<DownloadState>
 
   /**
@@ -127,8 +127,4 @@ suspend inline fun <reified R : Resource> FhirEngine.get(id: String): R {
  */
 suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
   delete(getResourceType(R::class.java), id)
-}
-
-interface SyncDownloadContext {
-  suspend fun getLatestTimestampFor(type: ResourceType): String?
 }

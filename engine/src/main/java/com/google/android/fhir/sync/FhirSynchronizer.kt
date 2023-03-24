@@ -100,8 +100,8 @@ internal class FhirSynchronizer(
   private suspend fun download(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
     fhirEngine
-      .syncDownload(conflictResolver) { syncDownloadContext ->
-        downloader.download(syncDownloadContext).onEach {
+      .syncDownload(conflictResolver) {
+        downloader.download().onEach {
           when (it) {
             is DownloadState.Started -> {
               setSyncState(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, it.total))
