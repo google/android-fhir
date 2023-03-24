@@ -53,12 +53,12 @@ internal object RadioGroupViewHolderFactory :
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        val questionnaireItem = questionnaireViewItem.questionnaireItem
-        header.bind(questionnaireItem)
+        header.bind(questionnaireViewItem)
         // Keep the Flow layout which is the first child
         radioGroup.removeViews(1, radioGroup.childCount - 1)
         val choiceOrientation =
-          questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
+          questionnaireViewItem.questionnaireItem.choiceOrientation
+            ?: ChoiceOrientationTypes.VERTICAL
         when (choiceOrientation) {
           ChoiceOrientationTypes.HORIZONTAL -> {
             flow.setOrientation(Flow.HORIZONTAL)
