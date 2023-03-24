@@ -86,21 +86,20 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     conflictResolver: ConflictResolver,
     download: suspend () -> Flow<DownloadState>
   ): Flow<DownloadState> =
-    download(
-        ).onEach {
-        if (it is DownloadState.Success) {
-          database.withTransaction {
-            val resolved =
-              resolveConflictingResources(
-                it.resources,
-                getConflictingResourceIds(it.resources),
-                conflictResolver
-              )
-            database.insertSyncedResources(it.resources)
-            saveResolvedResourcesToDatabase(resolved)
-          }
+    download().onEach {
+      if (it is DownloadState.Success) {
+        database.withTransaction {
+          val resolved =
+            resolveConflictingResources(
+              it.resources,
+              getConflictingResourceIds(it.resources),
+              conflictResolver
+            )
+          database.insertSyncedResources(it.resources)
+          saveResolvedResourcesToDatabase(resolved)
         }
       }
+    }
 
   private suspend fun saveResolvedResourcesToDatabase(resolved: List<Resource>?) {
     resolved?.let {

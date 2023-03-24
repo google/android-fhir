@@ -77,10 +77,9 @@ class FhirSynchronizerTest {
         uploader = bundleUploader,
         downloader =
           object : Downloader {
-            override suspend fun download(): Flow<DownloadState> =
-              flow {
-                emit(DownloadState.Success(listOf(invalidEncounter), 1, 1))
-              }
+            override suspend fun download(): Flow<DownloadState> = flow {
+              emit(DownloadState.Success(listOf(invalidEncounter), 1, 1))
+            }
           },
         conflictResolver = AcceptLocalConflictResolver
       )
@@ -116,10 +115,9 @@ class FhirSynchronizerTest {
         uploader = bundleUploader,
         downloader =
           object : Downloader {
-            override suspend fun download(): Flow<DownloadState> =
-              flow {
-                emit(DownloadState.Success(listOf(encounter), 1, 1))
-              }
+            override suspend fun download(): Flow<DownloadState> = flow {
+              emit(DownloadState.Success(listOf(encounter), 1, 1))
+            }
           },
         conflictResolver = AcceptLocalConflictResolver
       )
