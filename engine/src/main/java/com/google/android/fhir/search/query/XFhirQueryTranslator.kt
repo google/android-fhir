@@ -182,7 +182,20 @@ object XFhirQueryTranslator {
     type: ResourceType
   ): List<Pair<SearchParamDefinition, String>> {
     return this.map { (paramKey, paramValue) ->
-      val paramDefinition = paramKey.toSearchParamDefinition(type)
+      val paramDefinition =
+        when (paramKey) {
+          "_tag" ->
+            SearchParamDefinition("_tag", Enumerations.SearchParamType.TOKEN, "$type.meta.tag")
+          "_profile" ->
+            SearchParamDefinition(
+              "_profile",
+              Enumerations.SearchParamType.REFERENCE,
+              "$type.meta.profile"
+            )
+          else -> {
+            paramKey.toSearchParamDefinition(type)
+          }
+        }
       Pair(paramDefinition, paramValue)
     }
   }
