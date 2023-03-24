@@ -92,7 +92,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
             getConflictingResourceIds(resources),
             conflictResolver
           )
-        saveRemoteResourcesToDatabase(resources)
+        database.insertSyncedResources(resources)
         saveResolvedResourcesToDatabase(resolved)
       }
     }
@@ -103,10 +103,6 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       database.deleteUpdates(it)
       database.update(*it.toTypedArray())
     }
-  }
-
-  private suspend fun saveRemoteResourcesToDatabase(resources: List<Resource>) {
-    database.insertSyncedResources(resources)
   }
 
   private suspend fun resolveConflictingResources(
