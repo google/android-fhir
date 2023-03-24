@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,9 +105,7 @@ private fun unpackRepeatedGroups(
   questionnaireResponseItem.answer.forEach {
     it.item = unpackRepeatedGroups(questionnaireItem.item, it.item)
   }
-  return if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
-      questionnaireItem.repeats
-  ) {
+  return if (questionnaireItem.isRepeatedGroup) {
     questionnaireResponseItem.answer.map {
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
         linkId = questionnaireItem.linkId
@@ -119,3 +117,6 @@ private fun unpackRepeatedGroups(
     listOf(questionnaireResponseItem)
   }
 }
+
+internal val Questionnaire.QuestionnaireItemComponent.isRepeatedGroup: Boolean
+  get() = type == Questionnaire.QuestionnaireItemType.GROUP && repeats

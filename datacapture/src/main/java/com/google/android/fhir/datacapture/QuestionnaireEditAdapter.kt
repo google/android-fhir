@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,14 @@
 
 package com.google.android.fhir.datacapture
 
+import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.contrib.views.PhoneNumberViewHolderFactory
+import com.google.android.fhir.datacapture.extensions.inflate
 import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
@@ -46,16 +50,23 @@ internal class QuestionnaireEditAdapter(
   private val questionnaireItemViewHolderMatchers:
     List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> =
     emptyList(),
-) : ListAdapter<QuestionnaireAdapterItem, QuestionnaireItemViewHolder>(DiffCallbacks.ITEMS) {
+) :
+  ListAdapter<QuestionnaireAdapterItem, QuestionnaireEditAdapter.ViewHolder>(DiffCallbacks.ITEMS) {
   /**
    * @param viewType the integer value of the [QuestionnaireViewHolderType] used to render the
    * [QuestionnaireViewItem].
    */
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
     val typedViewType = ViewType.parse(viewType)
     val subtype = typedViewType.subtype
     return when (typedViewType.type) {
-      ViewType.Type.QUESTION -> onCreateViewHolderQuestion(parent = parent, subtype = subtype)
+      ViewType.Type.QUESTION ->
+        ViewHolder.QuestionHolder(onCreateViewHolderQuestion(parent = parent, subtype = subtype))
+      ViewType.Type.REPEATED_GROUP_HEADER -> {
+        ViewHolder.RepeatedGroupHeaderHolder(
+          parent.inflate(R.layout.repeated_group_instance_header_view)
+        )
+      }
     }
   }
 
@@ -97,10 +108,16 @@ internal class QuestionnaireEditAdapter(
     return viewHolderFactory.create(parent)
   }
 
-  override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
+  override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     when (val item = getItem(position)) {
       is QuestionnaireAdapterItem.Question -> {
-        holder.bind(item.item)
+        holder as ViewHolder.QuestionHolder
+        holder.holder.bind(item.item)
+      }
+      is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+        holder as ViewHolder.RepeatedGroupHeaderHolder
+        holder.header.text = "Group ${item.index + 1}"
+        holder.delete.setOnClickListener { item.onDeleteClicked() }
       }
     }
   }
@@ -117,6 +134,11 @@ internal class QuestionnaireEditAdapter(
       is QuestionnaireAdapterItem.Question -> {
         type = ViewType.Type.QUESTION
         subtype = getItemViewTypeForQuestion(item.item)
+      }
+      is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+        type = ViewType.Type.REPEATED_GROUP_HEADER
+        // All of the repeated group headers will be rendered identically
+        subtype = 0
       }
     }
     return ViewType.from(type = type, subtype = subtype).viewType
@@ -147,6 +169,7 @@ internal class QuestionnaireEditAdapter(
 
     enum class Type {
       QUESTION,
+      REPEATED_GROUP_HEADER,
     }
   }
 
@@ -237,6 +260,14 @@ internal class QuestionnaireEditAdapter(
       ?: QuestionnaireViewHolderType.EDIT_TEXT_SINGLE_LINE
   }
 
+  internal sealed class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class QuestionHolder(val holder: QuestionnaireItemViewHolder) : ViewHolder(holder.itemView)
+    class RepeatedGroupHeaderHolder(itemView: View) : ViewHolder(itemView) {
+      val header: TextView = itemView.findViewById(R.id.repeated_group_instance_header_title)
+      val delete: View = itemView.findViewById(R.id.repeated_group_instance_header_delete_button)
+    }
+  }
+
   internal companion object {
     // Choice questions are rendered as dialogs if they have at least this many options
     const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG = 10
@@ -258,6 +289,10 @@ internal object DiffCallbacks {
             newItem is QuestionnaireAdapterItem.Question &&
               QUESTIONS.areItemsTheSame(oldItem, newItem)
           }
+          is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+            newItem is QuestionnaireAdapterItem.RepeatedGroupHeader &&
+              oldItem.index == newItem.index
+          }
         }
 
       override fun areContentsTheSame(
@@ -268,6 +303,10 @@ internal object DiffCallbacks {
           is QuestionnaireAdapterItem.Question -> {
             newItem is QuestionnaireAdapterItem.Question &&
               QUESTIONS.areContentsTheSame(oldItem, newItem)
+          }
+          is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+            newItem is QuestionnaireAdapterItem.RepeatedGroupHeader &&
+              oldItem.responses == newItem.responses
           }
         }
     }

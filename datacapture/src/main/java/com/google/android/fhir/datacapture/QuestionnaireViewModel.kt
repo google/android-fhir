@@ -40,6 +40,7 @@ import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isFhirPath
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
+import com.google.android.fhir.datacapture.extensions.isRepeatedGroup
 import com.google.android.fhir.datacapture.extensions.isXFhirQuery
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
@@ -309,7 +310,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       QuestionnaireItemComponent,
       QuestionnaireResponseItemComponent,
       List<QuestionnaireResponseItemAnswerComponent>,
-      Any?
+      Any?,
     ) -> Unit =
     { questionnaireItem, questionnaireResponseItem, answers, draftAnswer ->
       // TODO(jingtang10): update the questionnaire response item pre-order list and the parent map
@@ -761,7 +762,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
     val items = buildList {
       // Add an item for the question itself
-      add(
+      val question =
         QuestionnaireAdapterItem.Question(
           QuestionnaireViewItem(
             questionnaireItem,
@@ -784,7 +785,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               )
           )
         )
-      )
+      add(question)
 
       // Add nested questions after the parent item. We need to get the questionnaire items and
       // (possibly multiple sets of) matching questionnaire response items and generate the adapter
@@ -801,11 +802,23 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       // For background, see https://build.fhir.org/questionnaireresponse.html#link.
       buildList {
           // Case 1
-          add(questionnaireResponseItem.item)
+          if (!questionnaireItem.isRepeatedGroup) {
+            add(questionnaireResponseItem.item)
+          }
           // Case 2 and 3
           addAll(questionnaireResponseItem.answer.map { it.item })
         }
-        .forEach { nestedResponseItemList ->
+        .forEachIndexed { index, nestedResponseItemList ->
+          if (questionnaireItem.isRepeatedGroup) {
+            // Case 3
+            add(
+              QuestionnaireAdapterItem.RepeatedGroupHeader(
+                index = index,
+                onDeleteClicked = { question.item.removeAnswerAt(index) },
+                responses = nestedResponseItemList,
+              )
+            )
+          }
           addAll(
             getQuestionnaireAdapterItems(
               // If nested display item is identified as instructions or flyover, then do not create
@@ -826,7 +839,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * item to be wrongly evaluated as well.
    */
   private fun cacheDisabledQuestionnaireItemAnswers(
-    questionnaireResponseItem: QuestionnaireResponseItemComponent
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
   ) {
     if (questionnaireResponseItem.hasAnswer()) {
       responseItemToAnswersMapForDisabledQuestionnaireItem[questionnaireResponseItem] =
@@ -839,7 +852,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * If the questionnaire item was previously disabled, check the cache to restore previous answers.
    */
   private fun restoreFromDisabledQuestionnaireItemAnswersCache(
-    questionnaireResponseItem: QuestionnaireResponseItemComponent
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
   ) {
     if (responseItemToAnswersMapForDisabledQuestionnaireItem.contains(questionnaireResponseItem)) {
       questionnaireResponseItem.answer =
