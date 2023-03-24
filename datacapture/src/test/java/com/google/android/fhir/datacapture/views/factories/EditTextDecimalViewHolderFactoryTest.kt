@@ -44,7 +44,7 @@ class EditTextDecimalViewHolderFactoryTest {
   private val viewHolder = EditTextDecimalViewHolderFactory.create(parent)
 
   @Test
-  fun `should set Questionnaire Header`() {
+  fun `should set questionnaire header`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -117,7 +117,7 @@ class EditTextDecimalViewHolderFactoryTest {
   }
 
   @Test
-  fun `should set QuestionnaireResponseItemAnswer if valid text`() {
+  fun `should set QuestionnaireResponseItemAnswer if text is valid`() {
     var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireViewItem =
       QuestionnaireViewItem(
@@ -150,6 +150,24 @@ class EditTextDecimalViewHolderFactoryTest {
     assertThat(answers).isEmpty()
   }
 
+  @Test
+  fun `should set draftAnswer if text is invalid`() {
+    var draftAnswer: Any? = null
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, result -> draftAnswer = result },
+      )
+    viewHolder.bind(questionnaireViewItem)
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).apply {
+      setText("1.1.1.1")
+      clearFocus()
+    }
+    viewHolder.itemView.clearFocus()
+    assertThat(draftAnswer as String).isEqualTo("1.1.1.1")
+  }
   @Test
   fun `displayValidationResult should show no error message`() {
     viewHolder.bind(

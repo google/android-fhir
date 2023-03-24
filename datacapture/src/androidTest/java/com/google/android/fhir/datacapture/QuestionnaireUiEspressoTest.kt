@@ -158,6 +158,17 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
+  fun decimalTextEdit_typingInvalidTextShouldShowError() {
+    buildFragmentFromQuestionnaire("/text_questionnaire_decimal.json")
+
+    onView(withId(R.id.text_input_edit_text)).perform(typeText("1.1.1.1"))
+
+    onView(withId(R.id.text_input_layout)).check { view, _ ->
+      assertThat((view as TextInputLayout).error).isEqualTo("Invalid number")
+    }
+  }
+
+  @Test
   fun dateTimePicker_shouldShowErrorForWrongDate() {
     buildFragmentFromQuestionnaire("/component_date_time_picker.json")
 
