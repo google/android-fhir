@@ -71,6 +71,7 @@ internal object DateTimePickerViewHolderFactory :
         header = itemView.findViewById(R.id.header)
         dateInputLayout = itemView.findViewById(R.id.date_input_layout)
         dateInputEditText = itemView.findViewById(R.id.date_input_edit_text)
+        dateInputEditText.inputType = InputType.TYPE_CLASS_PHONE
         dateInputEditText.setOnFocusChangeListener { view, hasFocus ->
           if (!hasFocus) {
             (view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)

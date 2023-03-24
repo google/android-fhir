@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views.factories
 import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -74,6 +75,7 @@ internal object DatePickerViewHolderFactory :
         header = itemView.findViewById(R.id.header)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
+        textInputEditText.inputType = InputType.TYPE_CLASS_PHONE
         textInputEditText.setOnFocusChangeListener { view, hasFocus ->
           if (!hasFocus) {
             (view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
