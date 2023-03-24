@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir
+package com.google.android.fhir.demo
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -22,25 +22,25 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import java.time.OffsetDateTime
+import com.google.android.fhir.sync.DownloadWorkManager
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.ResourceType
 
-private val Context.dataStore: DataStore<Preferences> by
-  preferencesDataStore(name = "FHIR_ENGINE_PREF_DATASTORE")
+private val Context.dataStorage: DataStore<Preferences> by
+  preferencesDataStore(name = "demo_app_storage")
 
-internal class DatastoreUtil(private val context: Context) {
-  private val lastSyncTimestampKey by lazy { stringPreferencesKey("LAST_SYNC_TIMESTAMP") }
+/**
+ * Stores the lastUpdated timestamp per resource to be used by [DownloadWorkManager]'s
+ * implementation for optimal sync. See
+ * [_lastUpdated](https://build.fhir.org/search.html#_lastUpdated).
+ */
+class DemoDataStore(private val context: Context) {
 
-  fun readLastSyncTimestamp(): OffsetDateTime? {
-    val millis = runBlocking { context.dataStore.data.first()[lastSyncTimestampKey] } ?: return null
-
-    return OffsetDateTime.parse(millis)
+  suspend fun saveLastUpdatedTimestamp(resourceType: ResourceType, timestamp: String) {
+    context.dataStorage.edit { pref -> pref[stringPreferencesKey(resourceType.name)] = timestamp }
   }
 
-  fun writeLastSyncTimestamp(datetime: OffsetDateTime) {
-    runBlocking {
-      context.dataStore.edit { pref -> pref[lastSyncTimestampKey] = datetime.toString() }
-    }
+  suspend fun getLasUpdateTimestamp(resourceType: ResourceType): String? {
+    return context.dataStorage.data.first()[stringPreferencesKey(resourceType.name)]
   }
 }
