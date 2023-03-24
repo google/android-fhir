@@ -38,7 +38,7 @@ typealias ResourceSearchParams = Map<ResourceType, ParamMap>
  */
 class ResourceParamsBasedDownloadWorkManager(
   syncParams: ResourceSearchParams,
-  val context: Context
+  val context: TimestampContext
 ) : DownloadWorkManager {
   private val resourcesToDownloadWithSearchParams = LinkedList(syncParams.entries)
   private val urlOfTheNextPagesToDownloadForAResource = LinkedList<String>()
@@ -73,7 +73,7 @@ class ResourceParamsBasedDownloadWorkManager(
   private suspend fun getLastUpdatedParam(
     resourceType: ResourceType,
     params: ParamMap,
-    context: Context
+    context: TimestampContext
   ): MutableMap<String, String> {
     val newParams = mutableMapOf<String, String>()
     if (!params.containsKey(SyncDataParams.SORT_KEY)) {
@@ -127,7 +127,7 @@ class ResourceParamsBasedDownloadWorkManager(
     }
   }
 
-  interface Context {
+  interface TimestampContext {
     suspend fun saveLastUpdatedTimestamp(resourceType: ResourceType, timestamp: String?)
     suspend fun getLasUpdateTimestamp(resourceType: ResourceType): String?
   }

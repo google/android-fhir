@@ -19,7 +19,6 @@ package com.google.android.fhir.demo
 import android.app.Application
 import android.content.Context
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
-import com.google.android.fhir.DemoDataStore
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider

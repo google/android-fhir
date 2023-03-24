@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir
+package com.google.android.fhir.demo
 
 import android.content.Context
 import androidx.datastore.core.DataStore

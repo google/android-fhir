@@ -272,7 +272,7 @@ val NoOpResourceParamsBasedDownloadWorkManagerContext =
   TestResourceParamsBasedDownloadWorkManagerContext(null)
 
 class TestResourceParamsBasedDownloadWorkManagerContext(private val lastUpdatedTimeStamp: String?) :
-  ResourceParamsBasedDownloadWorkManager.Context {
+  ResourceParamsBasedDownloadWorkManager.TimestampContext {
   override suspend fun saveLastUpdatedTimestamp(resourceType: ResourceType, timestamp: String?) {}
   override suspend fun getLasUpdateTimestamp(resourceType: ResourceType): String? =
     lastUpdatedTimeStamp
