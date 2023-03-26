@@ -27,14 +27,12 @@ import com.google.android.fhir.workflow.testing.CqlBuilder
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import java.io.InputStream
+import java.lang.IllegalArgumentException
 import java.util.TimeZone
-import org.hl7.fhir.instance.model.api.IBaseResource
-import org.hl7.fhir.r4.model.ActivityDefinition
+import kotlin.reflect.KSuspendFunction1
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Library
-import org.hl7.fhir.r4.model.Measure
 import org.hl7.fhir.r4.model.MetadataResource
-import org.hl7.fhir.r4.model.PlanDefinition
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.After
@@ -64,6 +62,8 @@ class FhirOperatorTest {
     TimeZone.setDefault(TimeZone.getTimeZone("GMT"))
     fhirEngine = FhirEngineProvider.getInstance(context)
     fhirOperator = FhirOperator(fhirContext, fhirEngine, igManager)
+
+    // Installing ANC CDS to the IGManager
     val rootDirectory = File(javaClass.getResource("/anc-cds")!!.file)
     igManager.install(IgManager.DEFAULT_DEPENDENCY, rootDirectory)
   }
@@ -75,14 +75,23 @@ class FhirOperatorTest {
 
   @Test
   fun generateCarePlan() = runBlockingOnWorkerThread {
-    loadBundle(parseJson("/plan-definition/rule-filters/RuleFilters-1.0.0-bundle.json"))
-    loadBundle(parseJson("/plan-definition/rule-filters/tests-Reportable-bundle.json"))
-    loadBundle(parseJson("/plan-definition/rule-filters/tests-NotReportable-bundle.json"))
+    loadFile("/plan-definition/rule-filters/RuleFilters-1.0.0-bundle.json", ::importToFhirEngine)
+    loadFile("/plan-definition/rule-filters/tests-Reportable-bundle.json", ::importToFhirEngine)
+    loadFile("/plan-definition/rule-filters/tests-NotReportable-bundle.json", ::importToFhirEngine)
 
-    loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
-    loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
-    loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
-    loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
+    loadFile("/first-contact/01-registration/patient-charity-otala-1.json", ::importToFhirEngine)
+    loadFile(
+      "/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml",
+      ::importToFhirEngine
+    )
+    loadFile(
+      "/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml",
+      ::importToFhirEngine
+    )
+    loadFile(
+      "/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml",
+      ::importToFhirEngine
+    )
 
     assertThat(
         fhirOperator.generateCarePlan(
@@ -96,8 +105,8 @@ class FhirOperatorTest {
 
   @Test
   fun generateCarePlanWithoutEncounter() = runBlockingOnWorkerThread {
-    loadBundle(parseJson("/plan-definition/med-request/med_request_patient.json"))
-    loadBundle(parseJson("/plan-definition/med-request/med_request_plan_definition.json"))
+    loadFile("/plan-definition/med-request/med_request_patient.json", ::importToFhirEngine)
+    loadFile("/plan-definition/med-request/med_request_plan_definition.json", ::installToIgManager)
 
     val carePlan =
       fhirOperator.generateCarePlan(
@@ -116,10 +125,19 @@ class FhirOperatorTest {
 
   @Test
   fun evaluatePopulationMeasure() = runBlockingOnWorkerThread {
-    loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
-    loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
-    loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
-    loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
+    loadFile("/first-contact/01-registration/patient-charity-otala-1.json", ::importToFhirEngine)
+    loadFile(
+      "/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml",
+      ::importToFhirEngine
+    )
+    loadFile(
+      "/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml",
+      ::importToFhirEngine
+    )
+    loadFile(
+      "/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml",
+      ::importToFhirEngine
+    )
 
     val measureReport =
       fhirOperator.evaluateMeasure(
@@ -142,19 +160,11 @@ class FhirOperatorTest {
 
   @Test
   fun evaluateGroupPopulationMeasure() = runBlockingOnWorkerThread {
-    val resourceBundle =
-      Bundle().apply {
-        addEntry().apply {
-          resource = toFhirLibrary(open("/group-measure/PatientGroups-1.0.0.cql"))
-        }
-        addEntry().apply {
-          resource = parseResource<Measure>("/group-measure/PatientGroupsMeasure.json")
-        }
-      }
+    loadFile("/group-measure/PatientGroups-1.0.0.cql", ::installToIgManager)
+    loadFile("/group-measure/PatientGroupsMeasure.json", ::installToIgManager)
 
-    loadBundle(resourceBundle)
-    loadBundle(parseJson("/group-measure/Data-Patients-bundle.json"))
-    loadBundle(parseJson("/group-measure/Data-Groups-bundle.json"))
+    loadFile("/group-measure/Data-Patients-bundle.json", ::importToFhirEngine)
+    loadFile("/group-measure/Data-Groups-bundle.json", ::importToFhirEngine)
 
     val measureReport =
       fhirOperator.evaluateMeasure(
@@ -177,10 +187,19 @@ class FhirOperatorTest {
 
   @Test
   fun evaluateIndividualSubjectMeasure() = runBlockingOnWorkerThread {
-    loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
-    loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
-    loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
-    loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
+    loadFile("/first-contact/01-registration/patient-charity-otala-1.json", ::importToFhirEngine)
+    loadFile(
+      "/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml",
+      ::importToFhirEngine
+    )
+    loadFile(
+      "/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml",
+      ::importToFhirEngine
+    )
+    loadFile(
+      "/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml",
+      ::importToFhirEngine
+    )
     val measureReport =
       fhirOperator.evaluateMeasure(
         measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
@@ -200,34 +219,48 @@ class FhirOperatorTest {
     )
   }
 
-  private suspend fun loadFile(path: String) {
-    if (path.endsWith(suffix = ".xml")) {
-      val resource = xmlParser.parseResource(open(path)) as Resource
-      fhirEngine.create(resource)
-    } else if (path.endsWith(".json")) {
-      val resource = jsonParser.parseResource(open(path)) as Resource
-      fhirEngine.create(resource)
+  private suspend fun loadFile(path: String, importFunction: KSuspendFunction1<Resource, Unit>) {
+    val resource =
+      if (path.endsWith(suffix = ".xml")) {
+        xmlParser.parseResource(open(path)) as Resource
+      } else if (path.endsWith(".json")) {
+        jsonParser.parseResource(open(path)) as Resource
+      } else if (path.endsWith(".cql")) {
+        toFhirLibrary(open(path))
+      } else {
+        throw IllegalArgumentException("Only xml and json and cql files are supported")
+      }
+    loadResource(resource, importFunction)
+  }
+
+  private suspend fun loadResource(
+    resource: Resource,
+    importFunction: KSuspendFunction1<Resource, Unit>
+  ) {
+    when (resource.resourceType) {
+      ResourceType.Bundle -> loadBundle(resource as Bundle, importFunction)
+      else -> importFunction(resource)
     }
   }
 
-  private suspend fun loadBundle(bundle: Bundle) {
+  private suspend fun loadBundle(
+    bundle: Bundle,
+    importFunction: KSuspendFunction1<Resource, Unit>
+  ) {
     for (entry in bundle.entry) {
       val resource = entry.resource
-      when (resource.resourceType) {
-        ResourceType.Library -> igManager.install(writeToFile(entry.resource as Library))
-        ResourceType.Measure -> igManager.install(writeToFile(entry.resource as Measure))
-        ResourceType.ActivityDefinition ->
-          igManager.install(writeToFile(entry.resource as ActivityDefinition))
-        ResourceType.PlanDefinition ->
-          igManager.install(writeToFile(entry.resource as PlanDefinition))
-        ResourceType.Bundle -> Unit
-        else -> fhirEngine.create(entry.resource)
-      }
+      loadResource(resource, importFunction)
     }
   }
 
-  private fun writeToFile(resource: MetadataResource): File {
-    return File(context.filesDir, resource.name ?: resource.idElement.idPart).apply {
+  private fun writeToFile(resource: Resource): File {
+    val fileName =
+      if (resource is MetadataResource && resource.name != null) {
+        resource.name
+      } else {
+        resource.idElement.idPart
+      }
+    return File(context.filesDir, fileName).apply {
       writeText(jsonParser.encodeResourceToString(resource))
     }
   }
@@ -238,10 +271,13 @@ class FhirOperatorTest {
 
   private fun open(path: String) = javaClass.getResourceAsStream(path)!!
 
-  private fun parseJson(path: String): Bundle = jsonParser.parseResource(open(path)) as Bundle
-
   private fun readResourceAsString(path: String) = open(path).readBytes().decodeToString()
 
-  private fun <T : IBaseResource> parseResource(path: String) =
-    jsonParser.parseResource(readResourceAsString(path)) as T
+  private suspend fun importToFhirEngine(resource: Resource) {
+    fhirEngine.create(resource)
+  }
+
+  private suspend fun installToIgManager(resource: Resource) {
+    igManager.install(writeToFile(resource))
+  }
 }

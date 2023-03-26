@@ -58,9 +58,10 @@ import org.opencds.cqf.cql.evaluator.plandefinition.r4.PlanDefinitionProcessor
 // Uses the already cached FhirContext instead of creating a new one
 // on the default protected R4FhirModelResolver() constructor.
 // This is a heavy object to load. Avoid having to create a new one.
-object cachedR4FhirModelResolver : R4FhirModelResolver(FhirContext.forR4Cached())
+object CachedR4FhirModelResolver : R4FhirModelResolver(FhirContext.forR4Cached())
 
-class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine, igManager: IgManager) {
+class FhirOperator
+internal constructor(fhirContext: FhirContext, fhirEngine: FhirEngine, igManager: IgManager) {
   // Initialize the measure processor
   private val fhirEngineTerminologyProvider =
     FhirEngineTerminologyProvider(fhirContext, fhirEngine, igManager)
@@ -75,7 +76,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine, igManager: 
 
   private val dataProvider =
     CompositeDataProvider(
-      CachingModelResolverDecorator(cachedR4FhirModelResolver),
+      CachingModelResolverDecorator(CachedR4FhirModelResolver),
       fhirEngineRetrieveProvider
     )
   private val fhirEngineDal = FhirEngineDal(fhirEngine, igManager)

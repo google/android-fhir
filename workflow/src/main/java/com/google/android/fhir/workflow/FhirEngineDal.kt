@@ -27,6 +27,7 @@ import org.hl7.fhir.instance.model.api.IIdType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.opencds.cqf.cql.evaluator.fhir.dal.FhirDal
+import timber.log.Timber
 
 internal class FhirEngineDal(
   private val fhirEngine: FhirEngine,
@@ -41,7 +42,7 @@ internal class FhirEngineDal(
           resourceType = id.resourceType,
           url = "${id.baseUrl}/${id.resourceType}/${id.idPart}"
         )
-        .first()
+        .single()
     } else {
       try {
         fhirEngine.get(getResourceType(clazz), id.idPart)
@@ -50,8 +51,11 @@ internal class FhirEngineDal(
         // https://github.com/google/android-fhir/issues/1920
         // remove when the issue is resolved.
         val searchByNameWorkaround =
-          igManager.loadResources(resourceType = id.resourceType, id = id.toString()).firstOrNull()
-        searchByNameWorkaround ?: throw resourceNotFoundException
+          igManager.loadResources(resourceType = id.resourceType, id = id.toString())
+        if (searchByNameWorkaround.count() > 1) {
+          Timber.w("Found more than one value in the IgManager for the id $id")
+        }
+        searchByNameWorkaround.firstOrNull() ?: throw resourceNotFoundException
       }
     }
   }

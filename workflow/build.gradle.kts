@@ -116,6 +116,7 @@ dependencies {
   implementation(Dependencies.Cql.translatorElmJackson) // Necessary to import XML/JSON CQL Libs
   implementation(Dependencies.Cql.translatorModel) // Overrides HAPI's old versions
   implementation(Dependencies.Cql.translatorModelJackson) // Necessary to import XML/JSON ModelInfos
+  implementation(Dependencies.timber)
 
   // Forces the most recent version of jackson, ignoring what dependencies use.
   // Remove these lines when HAPI 6.4 becomes available.

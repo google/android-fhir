@@ -37,15 +37,14 @@ class IgManager internal constructor(private val igDatabase: ImplementationGuide
 
   private val igDao = igDatabase.implementationGuideDao()
   private val jsonParser = FhirContext.forR4().newJsonParser()
-  private var defaultIgId: Long = -1L
 
   /**
    * * Checks if the [implementationGuides] are present in DB. If necessary, downloads the
    * dependencies from NPM and imports data from the package manager (populates the metadata of the
-   * FHIR Resorces)
+   * FHIR Resources)
    */
   suspend fun install(vararg implementationGuides: ImplementationGuide) {
-    TODO("not implemented yet")
+    TODO("[1937]Not implemented yet ")
   }
 
   /**
@@ -71,15 +70,12 @@ class IgManager internal constructor(private val igDatabase: ImplementationGuide
 
   /** Imports the IG from the provided [file] to the default dependency. */
   suspend fun install(file: File) {
-    // lazy suspend initialization
-    defaultIgId =
+    val defaultIgId =
       igDao
         .getImplementationGuide(DEFAULT_DEPENDENCY.packageId, DEFAULT_DEPENDENCY.version)
         ?.implementationGuideId
-        ?: -1
-    if (defaultIgId == -1L) {
-      defaultIgId = igDao.insert(DEFAULT_DEPENDENCY.toEntity(File("NotARealDirectory")))
-    }
+        ?: igDao.insert(DEFAULT_DEPENDENCY.toEntity(File("NotARealDirectory")))
+
     importFile(defaultIgId, file)
   }
 
@@ -121,7 +117,7 @@ class IgManager internal constructor(private val igDatabase: ImplementationGuide
         try {
           FileInputStream(file).use(jsonParser::parseResource)
         } catch (exception: Exception) {
-          Timber.d(exception, "Unable to import file: %file")
+          Timber.d(exception, "Unable to import file: $file. Parsing to FhirResource failed.")
         }
       }
     when (resource) {
