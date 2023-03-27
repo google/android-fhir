@@ -19,18 +19,19 @@ package com.google.android.fhir.demo.care
 import java.time.OffsetDateTime
 
 /** Currently only Started and Finished statuses are being used. */
-sealed class WorkflowExecutionStatus {
+sealed class CareWorkflowExecutionStatus {
   val timestamp: OffsetDateTime = OffsetDateTime.now()
 
   /** Workflow execution has been started on the client. */
-  class Started(val total: Int) : WorkflowExecutionStatus()
+  class Started(val total: Int) : CareWorkflowExecutionStatus()
 
   /** Workflow execution in progress. */
-  class InProgress : WorkflowExecutionStatus()
+  class InProgress : CareWorkflowExecutionStatus()
 
   /** Workflow execution finished successfully. */
-  class Finished(val completed: Int = 0, val total: Int = 0) : WorkflowExecutionStatus()
+  class Finished(val completed: Int = 0, val total: Int = 0) : CareWorkflowExecutionStatus()
 
   /** Workflow execution failed. */
-  data class Failed(val exceptions: List<WorkflowExecutionException>) : WorkflowExecutionStatus()
+  data class Failed(val exceptions: List<CareWorkflowExecutionException>) :
+    CareWorkflowExecutionStatus()
 }

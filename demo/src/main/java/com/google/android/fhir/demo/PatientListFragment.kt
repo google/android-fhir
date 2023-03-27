@@ -43,7 +43,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
-import com.google.android.fhir.demo.care.WorkflowExecutionViewModel
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
 import com.google.android.fhir.sync.SyncJobStatus
 import kotlin.math.roundToInt
@@ -62,7 +61,6 @@ class PatientListFragment : Fragment() {
   private val binding
     get() = _binding!!
   private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
-  private val workflowExecutionViewModel: WorkflowExecutionViewModel by activityViewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -167,7 +165,6 @@ class PatientListFragment : Fragment() {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
-            //            workflowExecutionViewModel.applyWorkflowForAll()
             fadeOutTopBanner(it)
           }
           is SyncJobStatus.Failed -> {

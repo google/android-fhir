@@ -27,8 +27,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
-import com.google.android.fhir.demo.care.WorkflowExecutionStatus
-import com.google.android.fhir.demo.care.WorkflowExecutionViewModel
+import com.google.android.fhir.demo.care.CareWorkflowExecutionStatus
+import com.google.android.fhir.demo.care.CareWorkflowExecutionViewModel
 import com.google.android.fhir.demo.databinding.FragmentListTasksBinding
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -39,7 +39,7 @@ class ListTasksFragment(private val navigateToQuestionnaireCallback: (String, St
   private val binding
     get() = _binding!!
   private val viewModel by viewModels<ListScreeningsViewModel>()
-  private val workflowExecutionViewModel by activityViewModels<WorkflowExecutionViewModel>()
+  private val careWorkflowExecutionViewModel by activityViewModels<CareWorkflowExecutionViewModel>()
   private lateinit var args: Bundle
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,8 +83,8 @@ class ListTasksFragment(private val navigateToQuestionnaireCallback: (String, St
 
   private fun collectWorkflowExecution() {
     lifecycleScope.launch {
-      workflowExecutionViewModel.workflowExecutionState.collect {
-        if (it is WorkflowExecutionStatus.Finished) getTasksForPatient()
+      careWorkflowExecutionViewModel.careWorkflowExecutionState.collect {
+        if (it is CareWorkflowExecutionStatus.Finished) getTasksForPatient()
       }
     }
   }

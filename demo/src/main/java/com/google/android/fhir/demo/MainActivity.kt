@@ -31,8 +31,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
-import com.google.android.fhir.demo.care.WorkflowExecutionStatus
-import com.google.android.fhir.demo.care.WorkflowExecutionViewModel
+import com.google.android.fhir.demo.care.CareWorkflowExecutionStatus
+import com.google.android.fhir.demo.care.CareWorkflowExecutionViewModel
 import com.google.android.fhir.demo.databinding.ActivityMainBinding
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
   private lateinit var drawerToggle: ActionBarDrawerToggle
   private val viewModel: MainActivityViewModel by viewModels()
-  private val workflowExecutionViewModel: WorkflowExecutionViewModel by viewModels()
+  private val careWorkflowExecutionViewModel: CareWorkflowExecutionViewModel by viewModels()
 
   private lateinit var workflowBanner: LinearLayout
   private lateinit var workflowStatus: TextView
@@ -120,14 +120,15 @@ class MainActivity : AppCompatActivity() {
 
   private fun collectWorkflowExecutionState() {
     lifecycleScope.launch {
-      workflowExecutionViewModel.workflowExecutionState.collect {
+      careWorkflowExecutionViewModel.careWorkflowExecutionState.collect {
         fadeInTopBanner(it)
-        if (it is WorkflowExecutionStatus.Finished && it.completed == it.total) fadeOutTopBanner(it)
+        if (it is CareWorkflowExecutionStatus.Finished && it.completed == it.total)
+          fadeOutTopBanner(it)
       }
     }
   }
 
-  private fun fadeInTopBanner(state: WorkflowExecutionStatus) {
+  private fun fadeInTopBanner(state: CareWorkflowExecutionStatus) {
     if (workflowBanner.visibility != View.VISIBLE) {
       workflowStatus.text = resources.getString(R.string.executing_workflow)
       workflowProgress.progress = 0
@@ -136,7 +137,7 @@ class MainActivity : AppCompatActivity() {
       val animation = AnimationUtils.loadAnimation(workflowBanner.context, R.anim.fade_in)
       workflowBanner.startAnimation(animation)
     }
-    if (state is WorkflowExecutionStatus.Finished) {
+    if (state is CareWorkflowExecutionStatus.Finished) {
       val progress =
         state
           .let { it.completed.toDouble().div(it.total) }
@@ -148,8 +149,8 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
-  private fun fadeOutTopBanner(state: WorkflowExecutionStatus) {
-    if (state is WorkflowExecutionStatus.Finished) workflowPercent.text = ""
+  private fun fadeOutTopBanner(state: CareWorkflowExecutionStatus) {
+    if (state is CareWorkflowExecutionStatus.Finished) workflowPercent.text = ""
     workflowProgress.visibility = View.GONE
 
     if (workflowBanner.visibility == View.VISIBLE) {

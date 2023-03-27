@@ -16,4 +16,4 @@
 
 package com.google.android.fhir.demo.care
 
-data class WorkflowExecutionException(val patientId: String, val exception: Exception)
+data class CareWorkflowExecutionException(val patientId: String, val exception: Exception)

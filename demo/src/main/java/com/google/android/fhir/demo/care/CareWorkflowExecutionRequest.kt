@@ -17,10 +17,5 @@
 package com.google.android.fhir.demo.care
 
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.PlanDefinition
-import org.hl7.fhir.r4.model.Resource
 
-interface CarePlanManager {
-  fun getPlanDefinitionDependentResources(planDefinition: PlanDefinition): Collection<Resource>
-  suspend fun applyPlanDefinitionOnPatient(patient: Patient, planDefinitionId: String)
-}
+data class CareWorkflowExecutionRequest(val patient: Patient)

@@ -82,6 +82,7 @@ dependencies {
   implementation(Dependencies.Navigation.navUiKtx)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
+  implementation(Dependencies.Retrofit.gsonConverter)
   implementation(project(":datacapture")) {
     exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
   }
