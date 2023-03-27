@@ -114,14 +114,15 @@ internal fun Coding.toCodeType(): CodeType {
   return CodeType(code)
 }
 
-fun Type.valueOrCalculateValue(): Type? {
+fun Type.valueOrCalculateValue(): Type {
   return if (this.hasExtension()) {
     this.extension
       .firstOrNull { it.url == CQF_CALCULATED_EXPRESSION_URL }
-      ?.let {
-        val expression = (it.value as Expression).expression
+      ?.let { extension ->
+        val expression = (extension.value as Expression).expression
         fhirPathEngine.evaluate(this, expression).singleOrNull()?.let { it as Type }
       }
+      ?: this
   } else {
     this
   }
