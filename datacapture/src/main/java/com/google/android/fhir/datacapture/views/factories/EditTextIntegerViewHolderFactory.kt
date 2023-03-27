@@ -64,9 +64,13 @@ internal object EditTextIntegerViewHolderFactory :
           questionnaireViewItem.answers.singleOrNull()?.valueIntegerType?.value?.toString()
         val draftAnswer = questionnaireViewItem.draftAnswer?.toString()
 
-        // Update the text
         val text = answer ?: draftAnswer
-        if ((text != textInputEditText.text.toString())) {
+
+        // Update the text on the UI only if the value of the saved answer or draft answer
+        // is different from what the user is typing. We compare the two fields as integers to
+        // avoid shifting focus if the text values are different, but their integer representation
+        // is the same (e.g. "001" compared to "1")
+        if ((text?.toIntOrNull() != textInputEditText.text.toString().toIntOrNull())) {
           textInputEditText.setText(text)
         }
 
