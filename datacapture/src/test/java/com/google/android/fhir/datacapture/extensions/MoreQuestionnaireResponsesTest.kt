@@ -222,9 +222,7 @@ class MoreQuestionnaireResponsesTest {
             addItem(
               QuestionnaireItemComponent().apply {
                 linkId = "nested-question"
-                QuestionnaireItemComponent().apply {
-                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
-                }
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
               }
             )
           }
@@ -309,9 +307,7 @@ class MoreQuestionnaireResponsesTest {
             addItem(
               QuestionnaireItemComponent().apply {
                 linkId = "nested-question-1"
-                QuestionnaireItemComponent().apply {
-                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
-                }
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
               }
             )
           }
