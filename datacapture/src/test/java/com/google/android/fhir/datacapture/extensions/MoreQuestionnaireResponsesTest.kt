@@ -145,6 +145,72 @@ class MoreQuestionnaireResponsesTest {
   }
 
   @Test
+  fun `should not modify other items while packing repeated groups`() {
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "non-repeated-group-1"
+            addItem(
+              QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-question-1"
+                addAnswer(
+                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
+                )
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "non-repeated-group-2"
+            addItem(
+              QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-question-2"
+                addAnswer(
+                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(false) }
+                )
+              }
+            )
+          }
+        )
+      }
+
+    val packedQuestionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "non-repeated-group-1"
+            addItem(
+              QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-question-1"
+                addAnswer(
+                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
+                )
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "non-repeated-group-2"
+            addItem(
+              QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-question-2"
+                addAnswer(
+                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(false) }
+                )
+              }
+            )
+          }
+        )
+      }
+
+    questionnaireResponse.packRepeatedGroups()
+    assertResourceEquals(questionnaireResponse, packedQuestionnaireResponse)
+  }
+
+  @Test
   fun `should unpack repeated groups`() {
     val questionnaire =
       Questionnaire().apply {
@@ -221,6 +287,122 @@ class MoreQuestionnaireResponsesTest {
                 linkId = "nested-question"
                 addAnswer(
                   QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(false) }
+                )
+              }
+            )
+          }
+        )
+      }
+
+    questionnaireResponse.unpackRepeatedGroups(questionnaire)
+    assertResourceEquals(questionnaireResponse, unpackedQuestionnaireResponse)
+  }
+
+  @Test
+  fun `should not modify other items while unpacking repeated groups`() {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "non-repeated-group-1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "nested-question-1"
+                QuestionnaireItemComponent().apply {
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                }
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "non-repeated-group-2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "nested-question-2"
+                QuestionnaireItemComponent().apply {
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                }
+              }
+            )
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "repeated-group-1"
+            addAnswer(
+              QuestionnaireResponseItemAnswerComponent().apply {
+                addItem(
+                  QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-question-1"
+                    addAnswer(
+                      QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
+                    )
+                  }
+                )
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "repeated-group-2"
+            addAnswer(
+              QuestionnaireResponseItemAnswerComponent().apply {
+                addItem(
+                  QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-question-2"
+                    addAnswer(
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        value = BooleanType(false)
+                      }
+                    )
+                  }
+                )
+              }
+            )
+          }
+        )
+      }
+    val unpackedQuestionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "repeated-group-1"
+            addAnswer(
+              QuestionnaireResponseItemAnswerComponent().apply {
+                addItem(
+                  QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-question-1"
+                    addAnswer(
+                      QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
+                    )
+                  }
+                )
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "repeated-group-2"
+            addAnswer(
+              QuestionnaireResponseItemAnswerComponent().apply {
+                addItem(
+                  QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-question-2"
+                    addAnswer(
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        value = BooleanType(false)
+                      }
+                    )
+                  }
                 )
               }
             )
