@@ -530,7 +530,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /**
    * Creates an x-fhir-query from an [Expression]. If the questionnaire resource context is set, the
    * expression is first checked for any FHIR Path expressions to evaluate first. See:
-   * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirquery
+   * https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
    */
   private fun createXFhirQueryFromExpression(expression: Expression): String =
     questionnaireResourceContext?.let { resource ->

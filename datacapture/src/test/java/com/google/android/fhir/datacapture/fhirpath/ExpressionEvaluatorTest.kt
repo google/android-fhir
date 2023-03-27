@@ -741,7 +741,7 @@ class ExpressionEvaluatorTest {
     assertThat(expressionAndResultSequence.map { it.second }.toList()).containsExactly("")
   }
   @Test
-  fun `evaluateXFhirEnhancement() should  return one pair`() {
+  fun `evaluateXFhirEnhancement() should return one pair`() {
 
     val practitioner =
       Practitioner().apply {
@@ -766,7 +766,32 @@ class ExpressionEvaluatorTest {
   }
 
   @Test
-  fun `evaluateXFhirEnhancement() should  evaluate fhirPath with percent sign`() {
+  fun `evaluateXFhirEnhancement() should return empty string if the resource provided does not match the type in the expression`() {
+
+    val practitioner =
+      Practitioner().apply {
+        id = UUID.randomUUID().toString()
+        active = true
+        gender = Enumerations.AdministrativeGender.MALE
+        addName(HumanName().apply { this.family = "John" })
+      }
+
+    val expression =
+      Expression().apply {
+        this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+        this.expression = "Practitioner?gender={{%patient.gender}}"
+      }
+
+    val expressionAndResultSequence =
+      ExpressionEvaluator.evaluateXFhirEnhancement(expression, practitioner)
+
+    val matchingElements = expressionAndResultSequence.map { it.second }.toList()
+    assertThat(matchingElements.size).isEqualTo(1)
+    assertThat(matchingElements.first()).isEqualTo("")
+  }
+
+  @Test
+  fun `evaluateXFhirEnhancement() should evaluate fhirPath with percent sign`() {
 
     val patient =
       Patient().apply {

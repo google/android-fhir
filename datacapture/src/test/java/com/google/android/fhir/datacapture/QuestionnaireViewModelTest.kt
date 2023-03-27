@@ -76,6 +76,7 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
@@ -3473,16 +3474,26 @@ class QuestionnaireViewModelTest {
   // ==================================================================== //
 
   @Test
-  fun `resolveAnswerExpression() should return questionnaire item answer options for answer expression and choice column with x-fhir-query enhancement`() =
+  fun `resolveAnswerExpression() should return x-fhir-query referring to patient in context`() =
     runTest {
-      val practitioner =
-        Practitioner().apply {
-          id = UUID.randomUUID().toString()
-          active = true
-          addName(HumanName().apply { this.family = "John" })
-        }
+      var searchString = ""
       ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
-        .dataCaptureConfiguration = DataCaptureConfig(xFhirQueryResolver = { listOf(practitioner) })
+        .dataCaptureConfiguration =
+        DataCaptureConfig(
+          xFhirQueryResolver = { xFhirQuery ->
+            searchString = xFhirQuery
+            emptyList()
+          }
+        )
+
+      val patientId = "123"
+      val patient =
+        Patient().apply {
+          id = patientId
+          active = true
+          gender = Enumerations.AdministrativeGender.MALE
+          addName(HumanName().apply { this.family = "Johnny" })
+        }
 
       val questionnaire =
         Questionnaire().apply {
@@ -3496,18 +3507,10 @@ class QuestionnaireViewModelTest {
                   Extension(
                     "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
                     Expression().apply {
-                      this.expression = "Practitioner?active=true&{{%practitioner.name.family}}"
+                      this.expression = "Observation?subject={{%patient.id}}"
                       this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
                     }
-                  ),
-                  Extension(
-                      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
-                    )
-                    .apply {
-                      this.addExtension(Extension("path", StringType("id")))
-                      this.addExtension(Extension("label", StringType("name")))
-                      this.addExtension(Extension("forDisplay", BooleanType(true)))
-                    }
+                  )
                 )
             }
           )
@@ -3515,14 +3518,13 @@ class QuestionnaireViewModelTest {
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
       state.set(
         EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING,
-        printer.encodeResourceToString(practitioner)
+        printer.encodeResourceToString(patient)
       )
 
       val viewModel = QuestionnaireViewModel(context, state)
-      val answerOptions = viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
+      viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
 
-      assertThat(answerOptions.first().valueReference.reference)
-        .isEqualTo("Practitioner/${practitioner.logicalId}")
+      assertThat(searchString).isEqualTo("Observation?subject=Patient/$patientId")
     }
 
   @Test
