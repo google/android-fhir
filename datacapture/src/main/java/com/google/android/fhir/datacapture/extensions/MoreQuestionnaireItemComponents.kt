@@ -273,18 +273,6 @@ internal val Questionnaire.QuestionnaireItemComponent.hasHelpButton: Boolean
     return item.any { it.isHelpCode }
   }
 
-/** Whether item type is display and [displayItemControl] is [DisplayItemControlType.HELP]. */
-internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
-  get() {
-    return when (type) {
-      Questionnaire.QuestionnaireItemType.DISPLAY -> {
-        displayItemControl == DisplayItemControlType.HELP
-      }
-      else -> {
-        false
-      }
-    }
-  }
 /** Converts Text with HTML Tag to formatted text. */
 private fun String.toSpanned(): Spanned {
   return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
@@ -309,9 +297,12 @@ val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
  * code is used as the instructions of the parent question.
  */
 internal val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spanned?
+  get() = item.localizedInstructionsSpanned
+
+/** [localizedInstructionsSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
+internal val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionsSpanned: Spanned?
   get() {
-    return item
-      .firstOrNull { questionnaireItem ->
+    return this.firstOrNull { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
           questionnaireItem.isInstructionsCode
       }
@@ -323,9 +314,12 @@ internal val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpann
  * present) is used as the fly-over text of the parent question.
  */
 internal val Questionnaire.QuestionnaireItemComponent.localizedFlyoverSpanned: Spanned?
+  get() = item.localizedFlyoverSpanned
+
+/** [localizedFlyoverSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
+internal val List<Questionnaire.QuestionnaireItemComponent>.localizedFlyoverSpanned: Spanned?
   get() =
-    item
-      .firstOrNull { questionnaireItem ->
+    this.firstOrNull { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
           questionnaireItem.displayItemControl == DisplayItemControlType.FLYOVER
       }
@@ -336,9 +330,12 @@ internal val Questionnaire.QuestionnaireItemComponent.localizedFlyoverSpanned: S
  * code is used as the instructions of the parent question.
  */
 internal val Questionnaire.QuestionnaireItemComponent.localizedHelpSpanned: Spanned?
+  get() = item.localizedHelpSpanned
+
+/** [localizedHelpSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
+internal val List<Questionnaire.QuestionnaireItemComponent>.localizedHelpSpanned: Spanned?
   get() {
-    return item
-      .firstOrNull { questionnaireItem -> questionnaireItem.isHelpCode }
+    return this.firstOrNull { questionnaireItem -> questionnaireItem.isHelpCode }
       ?.localizedTextSpanned
   }
 
@@ -404,6 +401,25 @@ internal val Questionnaire.QuestionnaireItemComponent.isFlyoverCode: Boolean
       }
     }
   }
+
+/** Whether item type is display and [displayItemControl] is [DisplayItemControlType.HELP]. */
+internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.DISPLAY -> {
+        displayItemControl == DisplayItemControlType.HELP
+      }
+      else -> {
+        false
+      }
+    }
+  }
+
+/** Whether item type is display. */
+internal val Questionnaire.QuestionnaireItemComponent.isDisplayItem: Boolean
+  get() =
+    (type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+      (isInstructionsCode || isFlyoverCode || isHelpCode))
 
 /** Slider step extension value. */
 internal val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
