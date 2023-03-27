@@ -79,7 +79,7 @@ class TestingUtils constructor(private val iParser: IParser) {
   }
 
   open class TestDownloadManagerImpl(
-    val queries: List<String> = listOf("Patient?address-city=NAIROBI")
+    private val queries: List<String> = listOf("Patient?address-city=NAIROBI")
   ) : DownloadWorkManager {
     private val urls = LinkedList(queries)
 
