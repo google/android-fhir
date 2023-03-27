@@ -37,6 +37,8 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
 
   private var dataCaptureConfig: DataCaptureConfig? = null
 
+  private val dataStore by lazy { DemoDataStore(this) }
+
   override fun onCreate() {
     super.onCreate()
     if (BuildConfig.DEBUG) {
@@ -72,6 +74,8 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
 
   companion object {
     fun fhirEngine(context: Context) = (context.applicationContext as FhirApplication).fhirEngine
+
+    fun dataStore(context: Context) = (context.applicationContext as FhirApplication).dataStore
   }
 
   override fun getDataCaptureConfig(): DataCaptureConfig = dataCaptureConfig ?: DataCaptureConfig()
