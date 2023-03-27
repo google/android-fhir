@@ -116,9 +116,7 @@ class MoreQuestionnaireResponsesTest {
                   QuestionnaireResponseItemComponent().apply {
                     linkId = "nested-question"
                     addAnswer(
-                      QuestionnaireResponseItemAnswerComponent().apply {
-                        value = BooleanType(true)
-                      }
+                      QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
                     )
                   }
                 )
@@ -177,9 +175,7 @@ class MoreQuestionnaireResponsesTest {
                   QuestionnaireResponseItemComponent().apply {
                     linkId = "nested-question"
                     addAnswer(
-                      QuestionnaireResponseItemAnswerComponent().apply {
-                        value = BooleanType(true)
-                      }
+                      QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
                     )
                   }
                 )
