@@ -17,10 +17,10 @@
 package com.google.android.fhir.datacapture.mapping
 
 import com.google.android.fhir.datacapture.DataCapture
-import com.google.android.fhir.datacapture.extensions.asExpectedType
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.targetStructureMap
 import com.google.android.fhir.datacapture.extensions.toCodeType
+import com.google.android.fhir.datacapture.extensions.toCoding
 import com.google.android.fhir.datacapture.extensions.toIdType
 import com.google.android.fhir.datacapture.extensions.toUriType
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
@@ -37,6 +37,7 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.DomainResource
+import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IdType
@@ -749,6 +750,21 @@ private fun Questionnaire.createResource(): Resource? =
   this.extension.itemExtractionContextExtensionValue?.let {
     Class.forName("org.hl7.fhir.r4.model.$it").newInstance() as Resource
   }
+
+/**
+ * Returns the [Base] object as a [Type] as expected by
+ * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue]. Also,
+ * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue] only takes a certain [Type]
+ * objects and throws exception otherwise. This extension function takes care of the conversion
+ * based on the input and expected [Type].
+ */
+internal fun Base.asExpectedType(): Type {
+  return when (this) {
+    is Enumeration<*> -> toCoding()
+    is IdType -> StringType(idPart)
+    else -> this as Type
+  }
+}
 
 /**
  * Returns a newly created [Resource] from the item extraction context extension if one and only one

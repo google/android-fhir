@@ -23,14 +23,12 @@ import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localTime
 import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.Attachment
-import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
-import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.IntegerType
@@ -44,13 +42,15 @@ import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
-/** Returns the string representation of a [Type]. */
-fun Type.asStringValue(): String =
-  when (this) {
-    is PrimitiveType<*> -> this.asStringValue()
-    is Coding -> this.toCodeType().asStringValue()
-    else -> ""
-  }
+/**
+ * Returns the string representation of a [PrimitiveType].
+ *
+ * <p>If the type isn't a [PrimitiveType], an empty string is returned.
+ */
+fun Type.asStringValue(): String {
+  if (!isPrimitive) return ""
+  return (this as PrimitiveType<*>).asStringValue()
+}
 
 /**
  * Returns what to display on the UI depending on the [Type]. Used to get the display representation
@@ -112,21 +112,6 @@ internal fun StringType.toIdType(): IdType {
 /** Converts Coding to CodeType. */
 internal fun Coding.toCodeType(): CodeType {
   return CodeType(code)
-}
-
-/**
- * Returns the [Base] object as a [Type] as expected by
- * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue]. Also,
- * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue] only takes a certain [Type]
- * objects and throws exception otherwise. This extension function takes care of the conversion
- * based on the input and expected [Type].
- */
-internal fun Base.asExpectedType(): Type {
-  return when (this) {
-    is Enumeration<*> -> toCoding()
-    is IdType -> StringType(idPart)
-    else -> this as Type
-  }
 }
 
 fun Type.valueOrCalculateValue(): Type? {

@@ -30,8 +30,6 @@ import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
 import com.google.android.fhir.datacapture.extensions.answerExpression
-import com.google.android.fhir.datacapture.extensions.asExpectedType
-import com.google.android.fhir.datacapture.extensions.asStringValue
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.extractAnswerOptions
@@ -543,14 +541,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           // Systems SHOULD log it and continue with extraction as if the query had returned no
           // data.
           // See : http://build.fhir.org/ig/HL7/sdc/extraction.html#structuremap-based-extraction
-          if (it.second == null) {
+          if (it.second.isEmpty()) {
             Timber.w(
               "${it.first} evaluated to null. The expression is either invalid, or the " +
                 "expression returned no, or more than one resource. The expression will be " +
                 "replaced with a blank string."
             )
           }
-          it.first to (it.second?.asExpectedType()?.asStringValue() ?: "")
+          it.first to it.second
         }
         .fold(expression.expression) { acc: String, pair: Pair<String, String> ->
           acc.replace(pair.first, pair.second)

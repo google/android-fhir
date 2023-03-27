@@ -27,11 +27,14 @@ import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
@@ -680,17 +683,18 @@ class ExpressionEvaluatorTest {
           "Practitioner?var1={{random}}&var2={{  random   }}&var3={{ random}}&var4={{random }}"
       }
 
-    val stringBasePairsSequence =
+    val expressionsToEvaluate =
       ExpressionEvaluator.evaluateXFhirEnhancement(expression, Practitioner())
+        .map { it.first }
+        .toList()
 
-    val fhirPathsWithParentheses = stringBasePairsSequence.map { it.first }.toList()
-    assertThat(fhirPathsWithParentheses.size).isEqualTo(4)
-    assertThat(fhirPathsWithParentheses)
+    assertThat(expressionsToEvaluate.size).isEqualTo(4)
+    assertThat(expressionsToEvaluate)
       .containsExactly("{{random}}", "{{  random   }}", "{{ random}}", "{{random }}")
   }
 
   @Test
-  fun `evaluateXFhirEnhancement() should evaluate to null for incorrect fhir path`() {
+  fun `evaluateXFhirEnhancement() should evaluate to empty string for incorrect fhir path`() {
 
     val practitioner =
       Practitioner().apply {
@@ -706,15 +710,15 @@ class ExpressionEvaluatorTest {
         this.expression = "Practitioner?active={{random}}"
       }
 
-    val stringBasePairsSequence =
+    val expressionAndResultSequence =
       ExpressionEvaluator.evaluateXFhirEnhancement(expression, practitioner)
-    assertThat(stringBasePairsSequence.map { it.first }.toList()).containsExactly("{{random}}")
+    assertThat(expressionAndResultSequence.map { it.first }.toList()).containsExactly("{{random}}")
 
-    assertThat(stringBasePairsSequence.map { it.second }.toList()).containsExactly(null)
+    assertThat(expressionAndResultSequence.map { it.second }.toList()).containsExactly("")
   }
 
   @Test
-  fun `evaluateXFhirEnhancement() should evaluate to null for field that does not exist in resource`() {
+  fun `evaluateXFhirEnhancement() should evaluate to empty string for field that does not exist in resource`() {
 
     val practitioner =
       Practitioner().apply {
@@ -729,12 +733,12 @@ class ExpressionEvaluatorTest {
         this.expression = "Practitioner?gender={{Practitioner.gender}}"
       }
 
-    val stringBasePairsSequence =
+    val expressionAndResultSequence =
       ExpressionEvaluator.evaluateXFhirEnhancement(expression, practitioner)
-    assertThat(stringBasePairsSequence.map { it.first }.toList())
+    assertThat(expressionAndResultSequence.map { it.first }.toList())
       .containsExactly("{{Practitioner.gender}}")
 
-    assertThat(stringBasePairsSequence.map { it.second }.toList()).containsExactly(null)
+    assertThat(expressionAndResultSequence.map { it.second }.toList()).containsExactly("")
   }
   @Test
   fun `evaluateXFhirEnhancement() should  return one pair`() {
@@ -753,11 +757,37 @@ class ExpressionEvaluatorTest {
         this.expression = "Practitioner?gender={{Practitioner.gender}}"
       }
 
-    val stringBasePairsSequence =
+    val expressionAndResultSequence =
       ExpressionEvaluator.evaluateXFhirEnhancement(expression, practitioner)
 
-    val matchingElements = stringBasePairsSequence.map { it.second }.toList()
+    val matchingElements = expressionAndResultSequence.map { it.second }.toList()
     assertThat(matchingElements.size).isEqualTo(1)
-    assertThat(matchingElements.first()!!.primitiveValue()).isEqualTo("male")
+    assertThat(matchingElements.first()).isEqualTo("male")
+  }
+
+  @Test
+  fun `evaluateXFhirEnhancement() should  evaluate fhirPath with percent sign`() {
+
+    val patient =
+      Patient().apply {
+        id = UUID.randomUUID().toString()
+        active = true
+        gender = Enumerations.AdministrativeGender.MALE
+        addName(HumanName().apply { this.family = "John" })
+        maritalStatus = CodeableConcept().addCoding(Coding("theSystem", "theCode", "Single"))
+      }
+
+    val expression =
+      Expression().apply {
+        this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+        this.expression = "Patient?maritalStatus-display={{%patient.maritalStatus.coding.display}}"
+      }
+
+    val expressionAndResultSequence =
+      ExpressionEvaluator.evaluateXFhirEnhancement(expression, patient)
+
+    val matchingElements = expressionAndResultSequence.map { it.second }.toList()
+    assertThat(matchingElements.size).isEqualTo(1)
+    assertThat(matchingElements.first()).isEqualTo("Single")
   }
 }

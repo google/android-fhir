@@ -253,9 +253,9 @@ object ExpressionEvaluator {
   }
 
   /**
-   * Evaluates an x-fhir-query that contains fhir-paths, returning a sequence of String/Base pairs.
-   * The String is the FhirPath expression surrounded by curly brackets {{ fhir.path }}, and the
-   * Base is the matched element from evaluating the resource passed in.
+   * Evaluates an x-fhir-query that contains fhir-paths, returning a sequence of pairs. The first
+   * element in the pair is the FhirPath expression surrounded by curly brackets {{ fhir.path }},
+   * and the second element is the evaluated string result from evaluating the resource passed in.
    *
    * @param expression x-fhir-query expression containing a FHIRpath, e.g.
    * Practitioner?active=true&{{Practitioner.name.family}}
@@ -264,14 +264,22 @@ object ExpressionEvaluator {
   internal fun evaluateXFhirEnhancement(
     expression: Expression,
     resource: Resource
-  ): Sequence<Pair<String, Base?>> =
+  ): Sequence<Pair<String, String>> =
     xFhirQueryEnhancementRegex
       .findAll(expression.expression)
       .map { it.groupValues }
       .map { (fhirPathWithParentheses, fhirPath) ->
         // TODO(omarismail94): See if FHIRPathEngine.check() can be used to distinguish invalid
         // expression vs an expression that is valid, but does not return one resource only.
-        fhirPathWithParentheses to fhirPathEngine.evaluate(resource, fhirPath).singleOrNull()
+        val expressionNode = fhirPathEngine.parse(fhirPath)
+        fhirPathWithParentheses to
+          fhirPathEngine.evaluateToString(
+            mapOf(resource.resourceType.name.lowercase() to resource),
+            null,
+            null,
+            resource,
+            expressionNode
+          )
       }
   private fun findDependentVariables(expression: Expression) =
     variableRegex
