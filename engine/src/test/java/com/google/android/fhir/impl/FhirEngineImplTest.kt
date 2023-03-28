@@ -268,7 +268,7 @@ class FhirEngineImplTest {
                 )
               )
         },
-        buildPatient("4", "C", Enumerations.AdministrativeGender.MALE).apply {
+        buildPatient("4", "C", Enumerations.AdministrativeGender.FEMALE).apply {
           meta =
             Meta()
               .setTag(
@@ -303,7 +303,7 @@ class FhirEngineImplTest {
                 )
               )
         },
-        buildPatient("4", "C", Enumerations.AdministrativeGender.MALE).apply {
+        buildPatient("4", "C", Enumerations.AdministrativeGender.FEMALE).apply {
           meta =
             Meta().setProfile(mutableListOf(CanonicalType("http://d-tree.org/Diabetes-Patient")))
         }
