@@ -41,7 +41,7 @@ class DownloadWorkManagerImpl(private val carePlanManager: CarePlanManager) : Do
         "Practitioner",
         "PractitionerRole",
         "PlanDefinition",
-              "Task"
+        "Task"
       )
     )
 
