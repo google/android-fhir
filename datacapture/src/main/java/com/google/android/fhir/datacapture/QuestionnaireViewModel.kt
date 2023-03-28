@@ -307,7 +307,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    */
   fun getQuestionnaireResponse(): QuestionnaireResponse {
     return questionnaireResponse.copy().apply {
-      item = getEnabledResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
+      item =
+        getEnabledResponseItems(
+            this@QuestionnaireViewModel.questionnaire.item,
+            questionnaireResponse.item
+          )
+          .map { it.copy() }
     }
   }
 

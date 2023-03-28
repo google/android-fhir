@@ -75,16 +75,18 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
 
   init {
     /** Adds each child-parent pair in the [QuestionnaireResponse] to the parent map. */
-    fun buildParentList(item: QuestionnaireResponse.QuestionnaireResponseItemComponent) {
-      for (child in item.item) {
-        questionnaireResponseItemParentMap[child] = item
-        buildParentList(child)
+    fun buildParentList(
+      parent: QuestionnaireResponse.QuestionnaireResponseItemComponent? = null,
+      responseItemComponents: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+    ) {
+      responseItemComponents.forEach { responseItem ->
+        parent?.let { questionnaireResponseItemParentMap[responseItem] = parent }
+        responseItem.answer.forEach { buildParentList(responseItem, it.item) }
+        buildParentList(responseItem, responseItem.item)
       }
     }
 
-    for (item in questionnaireResponse.item) {
-      buildParentList(item)
-    }
+    buildParentList(null, questionnaireResponse.item)
   }
 
   /**
