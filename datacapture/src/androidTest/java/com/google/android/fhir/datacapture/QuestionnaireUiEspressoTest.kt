@@ -17,13 +17,18 @@
 package com.google.android.fhir.datacapture
 
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.fragment.app.commitNow
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -440,6 +445,89 @@ class QuestionnaireUiEspressoTest {
     onView(withId(R.id.hint)).check { view, _ ->
       val hintVisibility = (view as TextView).visibility
       assertThat(hintVisibility).isEqualTo(View.GONE)
+    }
+  }
+
+  @Test
+  fun repeatedGroupItem_nestedEnableTrue_responseItemPresentInQuestionnaireResponse() {
+    buildFragmentFromQuestionnaire("/repeated_group.json", true)
+
+    // Add repeated group item
+    onView(withId(R.id.questionnaire_edit_recycler_view))
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+          0,
+          clickChildView(R.id.add_item)
+        )
+      )
+
+    // Add repeated group item
+    onView(withId(R.id.questionnaire_edit_recycler_view))
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+          0,
+          clickChildView(R.id.add_item)
+        )
+      )
+
+    // Select Live-birth in the 1st repeated group item
+    onView(withId(R.id.questionnaire_edit_recycler_view))
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+          2,
+          clickChildView(R.id.radio_group, true)
+        )
+      )
+
+    // Select Male in the 1st repeated group item
+    onView(withId(R.id.questionnaire_edit_recycler_view))
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+          4,
+          clickChildView(R.id.radio_group, true)
+        )
+      )
+
+    // Select Still-birth in the 2nd repeated group item
+    onView(withId(R.id.questionnaire_edit_recycler_view))
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+          6,
+          clickChildView(R.id.radio_group, true, optionIndex = 2)
+        )
+      )
+
+    // select MSB in the 2nd repeated group item
+    onView(withId(R.id.questionnaire_edit_recycler_view))
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+          8,
+          clickChildView(R.id.radio_group, true, optionIndex = 2)
+        )
+      )
+
+    val code = getQuestionnaireResponse().item[1].item[0].item[1].item[0].answer[0].valueCoding.code
+    assertThat(code).isEqualTo("MSB")
+  }
+
+  private fun clickChildView(id: Int, isOption: Boolean = false, optionIndex: Int = 1): ViewAction {
+    return object : ViewAction {
+      override fun getConstraints(): org.hamcrest.Matcher<View>? {
+        return null
+      }
+      override fun getDescription(): String {
+        return "description."
+      }
+      override fun perform(uiController: UiController?, view: View) {
+        val button =
+          if (isOption) {
+            val viewGroup = view.findViewById(id) as ViewGroup
+            viewGroup.getChildAt(optionIndex)
+          } else {
+            view.findViewById(id)
+          }
+        button.performClick()
+      }
     }
   }
 
