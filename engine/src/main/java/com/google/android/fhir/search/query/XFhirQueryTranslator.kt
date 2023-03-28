@@ -187,10 +187,14 @@ object XFhirQueryTranslator {
       val paramDefinition =
         when (paramKey) {
           XFHIR_QUERY_TAG_PARAM ->
-            SearchParamDefinition("_tag", Enumerations.SearchParamType.TOKEN, "$type.meta.tag")
+            SearchParamDefinition(
+              XFHIR_QUERY_TAG_PARAM,
+              Enumerations.SearchParamType.TOKEN,
+              "$type.meta.tag"
+            )
           XFHIR_QUERT_PROFILE_PARAM ->
             SearchParamDefinition(
-              "_profile",
+              XFHIR_QUERT_PROFILE_PARAM,
               Enumerations.SearchParamType.REFERENCE,
               "$type.meta.profile"
             )
