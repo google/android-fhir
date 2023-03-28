@@ -48,12 +48,12 @@ private fun List<QuestionnaireResponse.QuestionnaireResponseItemComponent>.packR
   }
   val linkIdToPackedResponseItems =
     groupBy { it.linkId }
-      .mapValues {
-        it.value.singleOrNull()
+      .mapValues { (linkId, questionnaireResponseItems) ->
+        questionnaireResponseItems.singleOrNull()
           ?: QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = it.key
+            this.linkId = linkId
             answer =
-              it.value.map {
+              questionnaireResponseItems.map {
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                   item = it.item
                 }
