@@ -41,6 +41,8 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_ENTRY_MODE_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_HIDDEN_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_LAUNCH_CONTEXT
+import com.google.android.fhir.datacapture.extensions.EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
 import com.google.android.fhir.datacapture.extensions.asStringValue
@@ -69,6 +71,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateType
@@ -162,6 +165,123 @@ class QuestionnaireViewModelTest {
       )
   }
 
+  // ==================================================================== //
+  //                                                                      //
+  //        Initialization with Questionnaire Resource Context            //
+  //                                                                      //
+  // ==================================================================== //
+  @Test
+  fun `should throw exception if resource context is set but questionnaire does not contain launchContext extension`() =
+    runTest {
+      val patientId = "123"
+      val patient =
+        Patient().apply {
+          id = patientId
+          active = true
+          gender = Enumerations.AdministrativeGender.MALE
+          addName(HumanName().apply { this.family = "Johnny" })
+        }
+
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              text = "answer expression question text"
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              extension =
+                listOf(
+                  Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                    Expression().apply {
+                      this.expression = "Observation?subject={{%patient.id}}"
+                      this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                    }
+                  )
+                )
+            }
+          )
+        }
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      state.set(
+        EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING,
+        printer.encodeResourceToString(patient)
+      )
+
+      val errorMessage =
+        assertFailsWith<IllegalStateException> { QuestionnaireViewModel(context, state) }
+          .localizedMessage
+
+      assertThat(errorMessage)
+        .isEqualTo(
+          "Resource context set without setting $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT in the questionnaire."
+        )
+    }
+
+  @Test
+  fun `should throw exception if resource type in context different to what is in launchContext extension`() =
+    runTest {
+      val patientId = "123"
+      val patient =
+        Patient().apply {
+          id = patientId
+          active = true
+          gender = Enumerations.AdministrativeGender.MALE
+          addName(HumanName().apply { this.family = "Johnny" })
+        }
+
+      val questionnaire =
+        Questionnaire().apply {
+          extension =
+            listOf(
+              Extension(
+                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+                )
+                .apply {
+                  addExtension(
+                    "name",
+                    Coding(
+                      "http://hl7.org/fhir/uv/sdc/ValueSet/launchContext",
+                      "encounter",
+                      "Encounter"
+                    )
+                  )
+                  addExtension("type", CodeType("Encounter"))
+                }
+            )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              text = "answer expression question text"
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              extension =
+                listOf(
+                  Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                    Expression().apply {
+                      this.expression = "Observation?subject={{%patient.id}}"
+                      this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                    }
+                  )
+                )
+            }
+          )
+        }
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      state.set(
+        EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING,
+        printer.encodeResourceToString(patient)
+      )
+
+      val errorMessage =
+        assertFailsWith<IllegalStateException> { QuestionnaireViewModel(context, state) }
+          .localizedMessage
+
+      assertThat(errorMessage)
+        .isEqualTo(
+          "$EXTENSION_LAUNCH_CONTEXT name or type field does not match the resource type of the context: Patient."
+        )
+    }
   @Test
   fun `should copy questionnaire URL if no response is provided`() {
     val questionnaire =
@@ -3497,6 +3617,23 @@ class QuestionnaireViewModelTest {
 
       val questionnaire =
         Questionnaire().apply {
+          extension =
+            listOf(
+              Extension(
+                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+                )
+                .apply {
+                  addExtension(
+                    "name",
+                    Coding(
+                      "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
+                      "patient",
+                      "Patient"
+                    )
+                  )
+                  addExtension("type", CodeType("Patient"))
+                }
+            )
           addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "a"
@@ -3568,59 +3705,6 @@ class QuestionnaireViewModelTest {
           )
         }
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-
-      val viewModel = QuestionnaireViewModel(context, state)
-      val answerOptions = viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
-
-      assertThat(answerOptions.first().valueReference.reference)
-        .isEqualTo("Practitioner/${practitioner.logicalId}")
-    }
-
-  @Test
-  fun `resolveAnswerExpression() should return resource even with invalid FHIRPath in x-fhir-query enhancement`() =
-    runTest {
-      val practitioner =
-        Practitioner().apply {
-          id = UUID.randomUUID().toString()
-          active = true
-          addName(HumanName().apply { this.family = "John" })
-        }
-      ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
-        .dataCaptureConfiguration = DataCaptureConfig(xFhirQueryResolver = { listOf(practitioner) })
-
-      val questionnaire =
-        Questionnaire().apply {
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "a"
-              text = "answer expression question text"
-              type = Questionnaire.QuestionnaireItemType.REFERENCE
-              extension =
-                listOf(
-                  Extension(
-                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
-                    Expression().apply {
-                      this.expression = "Practitioner?active=true&{{Invalid.expression.here}} "
-                      this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
-                    }
-                  ),
-                  Extension(
-                      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
-                    )
-                    .apply {
-                      this.addExtension(Extension("path", StringType("id")))
-                      this.addExtension(Extension("label", StringType("name")))
-                      this.addExtension(Extension("forDisplay", BooleanType(true)))
-                    }
-                )
-            }
-          )
-        }
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-      state.set(
-        EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING,
-        printer.encodeResourceToString(practitioner)
-      )
 
       val viewModel = QuestionnaireViewModel(context, state)
       val answerOptions = viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)

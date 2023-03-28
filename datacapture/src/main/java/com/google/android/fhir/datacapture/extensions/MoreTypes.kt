@@ -117,7 +117,7 @@ internal fun Coding.toCodeType(): CodeType {
 fun Type.valueOrCalculateValue(): Type {
   return if (this.hasExtension()) {
     this.extension
-      .firstOrNull { it.url == CQF_CALCULATED_EXPRESSION_URL }
+      .firstOrNull { it.url == EXTENSION_CQF_CALCULATED_VALUE_URL }
       ?.let { extension ->
         val expression = (extension.value as Expression).expression
         fhirPathEngine.evaluate(this, expression).singleOrNull()?.let { it as Type }
@@ -127,6 +127,3 @@ fun Type.valueOrCalculateValue(): Type {
     this
   }
 }
-
-internal const val CQF_CALCULATED_EXPRESSION_URL: String =
-  "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue"

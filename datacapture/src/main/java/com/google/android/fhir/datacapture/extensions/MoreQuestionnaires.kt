@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.extensions
 
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 
@@ -46,6 +47,39 @@ internal fun Questionnaire.findVariableExpression(variableName: String): Express
   variableExpressions.find { it.name == variableName }
 
 /**
+ * Check that the resource type passed to the Questionnaire matches the resource type set in the
+ * Questionnaire launch context expression
+ */
+internal fun Questionnaire.isResourceTypeEqualToLaunchContext(resourceType: String) {
+  this.extension
+    .firstOrNull { it.url == EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT }
+    ?.let { extension ->
+      val nameExtension =
+        extension.extension
+          .firstOrNull { it.url == "name" }
+          ?.value.takeIf {
+            it is Coding &&
+              it.code == resourceType.lowercase() &&
+              it.display == resourceType &&
+              it.system == EXTENSION_LAUNCH_CONTEXT
+          }
+
+      val typeExtension =
+        extension.extension
+          .firstOrNull { it.url == "type" }
+          ?.takeIf { it.valueAsPrimitive.valueAsString == resourceType }
+
+      if (nameExtension == null || typeExtension == null) {
+        error(
+          "$EXTENSION_LAUNCH_CONTEXT name or type field does not match the resource type of the context: $resourceType."
+        )
+      }
+    }
+    ?: error(
+      "Resource context set without setting $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT in the questionnaire."
+    )
+}
+/**
  * See
  * [Extension: target structure map](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-targetStructureMap.html)
  * .
@@ -63,6 +97,11 @@ val Questionnaire.isPaginated: Boolean
  */
 internal const val EXTENSION_ENTRY_MODE_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-entryMode"
+
+internal const val EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+
+internal const val EXTENSION_LAUNCH_CONTEXT = "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext"
 
 val Questionnaire.entryMode: EntryMode?
   get() {

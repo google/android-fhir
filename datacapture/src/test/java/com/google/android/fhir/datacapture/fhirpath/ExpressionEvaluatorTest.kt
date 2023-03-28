@@ -674,7 +674,7 @@ class ExpressionEvaluatorTest {
   }
 
   @Test
-  fun `xFhirQueryEnhancementRegex should capture all FHIR paths`() {
+  fun `createXFhirQueryFromExpression() should capture all FHIR paths`() {
 
     val expression =
       Expression().apply {
@@ -684,17 +684,13 @@ class ExpressionEvaluatorTest {
       }
 
     val expressionsToEvaluate =
-      ExpressionEvaluator.evaluateXFhirEnhancement(expression, Practitioner())
-        .map { it.first }
-        .toList()
+      ExpressionEvaluator.createXFhirQueryFromExpression(expression, Practitioner())
 
-    assertThat(expressionsToEvaluate.size).isEqualTo(4)
-    assertThat(expressionsToEvaluate)
-      .containsExactly("{{random}}", "{{  random   }}", "{{ random}}", "{{random }}")
+    assertThat(expressionsToEvaluate).isEqualTo("Practitioner?var1=&var2=&var3=&var4=")
   }
 
   @Test
-  fun `evaluateXFhirEnhancement() should evaluate to empty string for incorrect fhir path`() {
+  fun `createXFhirQueryFromExpression() should evaluate to empty string for incorrect fhir path`() {
 
     val practitioner =
       Practitioner().apply {
@@ -710,15 +706,13 @@ class ExpressionEvaluatorTest {
         this.expression = "Practitioner?active={{random}}"
       }
 
-    val expressionAndResultSequence =
-      ExpressionEvaluator.evaluateXFhirEnhancement(expression, practitioner)
-    assertThat(expressionAndResultSequence.map { it.first }.toList()).containsExactly("{{random}}")
-
-    assertThat(expressionAndResultSequence.map { it.second }.toList()).containsExactly("")
+    val expressionsToEvaluate =
+      ExpressionEvaluator.createXFhirQueryFromExpression(expression, practitioner)
+    assertThat(expressionsToEvaluate).isEqualTo("Practitioner?active=")
   }
 
   @Test
-  fun `evaluateXFhirEnhancement() should evaluate to empty string for field that does not exist in resource`() {
+  fun `createXFhirQueryFromExpression() should evaluate to empty string for field that does not exist in resource`() {
 
     val practitioner =
       Practitioner().apply {
@@ -733,15 +727,12 @@ class ExpressionEvaluatorTest {
         this.expression = "Practitioner?gender={{Practitioner.gender}}"
       }
 
-    val expressionAndResultSequence =
-      ExpressionEvaluator.evaluateXFhirEnhancement(expression, practitioner)
-    assertThat(expressionAndResultSequence.map { it.first }.toList())
-      .containsExactly("{{Practitioner.gender}}")
-
-    assertThat(expressionAndResultSequence.map { it.second }.toList()).containsExactly("")
+    val expressionsToEvaluate =
+      ExpressionEvaluator.createXFhirQueryFromExpression(expression, practitioner)
+    assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
   }
   @Test
-  fun `evaluateXFhirEnhancement() should return one pair`() {
+  fun `createXFhirQueryFromExpression() should evaluate correct expression`() {
 
     val practitioner =
       Practitioner().apply {
@@ -757,16 +748,13 @@ class ExpressionEvaluatorTest {
         this.expression = "Practitioner?gender={{Practitioner.gender}}"
       }
 
-    val expressionAndResultSequence =
-      ExpressionEvaluator.evaluateXFhirEnhancement(expression, practitioner)
-
-    val matchingElements = expressionAndResultSequence.map { it.second }.toList()
-    assertThat(matchingElements.size).isEqualTo(1)
-    assertThat(matchingElements.first()).isEqualTo("male")
+    val expressionsToEvaluate =
+      ExpressionEvaluator.createXFhirQueryFromExpression(expression, practitioner)
+    assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=male")
   }
 
   @Test
-  fun `evaluateXFhirEnhancement() should return empty string if the resource provided does not match the type in the expression`() {
+  fun `createXFhirQueryFromExpression() should return empty string if the resource provided does not match the type in the expression`() {
 
     val practitioner =
       Practitioner().apply {
@@ -782,16 +770,13 @@ class ExpressionEvaluatorTest {
         this.expression = "Practitioner?gender={{%patient.gender}}"
       }
 
-    val expressionAndResultSequence =
-      ExpressionEvaluator.evaluateXFhirEnhancement(expression, practitioner)
-
-    val matchingElements = expressionAndResultSequence.map { it.second }.toList()
-    assertThat(matchingElements.size).isEqualTo(1)
-    assertThat(matchingElements.first()).isEqualTo("")
+    val expressionsToEvaluate =
+      ExpressionEvaluator.createXFhirQueryFromExpression(expression, practitioner)
+    assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
   }
 
   @Test
-  fun `evaluateXFhirEnhancement() should evaluate fhirPath with percent sign`() {
+  fun `createXFhirQueryFromExpression() should evaluate fhirPath with percent sign`() {
 
     val patient =
       Patient().apply {
@@ -808,11 +793,8 @@ class ExpressionEvaluatorTest {
         this.expression = "Patient?maritalStatus-display={{%patient.maritalStatus.coding.display}}"
       }
 
-    val expressionAndResultSequence =
-      ExpressionEvaluator.evaluateXFhirEnhancement(expression, patient)
-
-    val matchingElements = expressionAndResultSequence.map { it.second }.toList()
-    assertThat(matchingElements.size).isEqualTo(1)
-    assertThat(matchingElements.first()).isEqualTo("Single")
+    val expressionsToEvaluate =
+      ExpressionEvaluator.createXFhirQueryFromExpression(expression, patient)
+    assertThat(expressionsToEvaluate).isEqualTo("Patient?maritalStatus-display=Single")
   }
 }

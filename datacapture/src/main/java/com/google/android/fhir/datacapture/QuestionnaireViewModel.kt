@@ -39,6 +39,7 @@ import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isFhirPath
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
+import com.google.android.fhir.datacapture.extensions.isResourceTypeEqualToLaunchContext
 import com.google.android.fhir.datacapture.extensions.isXFhirQuery
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
@@ -147,14 +148,20 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
-  private val questionnaireResourceContext: Resource? by lazy {
-    if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING)) {
-      parser.parseResource(
-        state.get<String>(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING)
-      ) as Resource
-    } else {
-      null
-    }
+  /** The current resource context as questions are being answered. */
+  private val questionnaireResourceContext: Resource?
+
+  init {
+    questionnaireResourceContext =
+      if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING)) {
+        val questionnaireResourceContextJson: String =
+          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING]!!
+        val resource = parser.parseResource(questionnaireResourceContextJson) as Resource
+        questionnaire.isResourceTypeEqualToLaunchContext(resource.resourceType.name)
+        resource
+      } else {
+        null
+      }
   }
 
   /** The map from each item in the [Questionnaire] to its parent. */
@@ -514,7 +521,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
         }
 
-        val xFhirExpressionString = createXFhirQueryFromExpression(expression)
+        val xFhirExpressionString =
+          ExpressionEvaluator.createXFhirQueryFromExpression(
+            expression,
+            questionnaireResourceContext
+          )
         xFhirQueryResolver!!.resolve(xFhirExpressionString)
       } else if (expression.isFhirPath) {
         fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
@@ -526,35 +537,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
     return item.extractAnswerOptions(data)
   }
-
-  /**
-   * Creates an x-fhir-query from an [Expression]. If the questionnaire resource context is set, the
-   * expression is first checked for any FHIR Path expressions to evaluate first. See:
-   * https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
-   */
-  private fun createXFhirQueryFromExpression(expression: Expression): String =
-    questionnaireResourceContext?.let { resource ->
-      ExpressionEvaluator.evaluateXFhirEnhancement(expression, resource)
-        .map {
-          // If the result of evaluating the FHIRPath expressions is an invalid query, it returns
-          // null. As per the spec:
-          // Systems SHOULD log it and continue with extraction as if the query had returned no
-          // data.
-          // See : http://build.fhir.org/ig/HL7/sdc/extraction.html#structuremap-based-extraction
-          if (it.second.isEmpty()) {
-            Timber.w(
-              "${it.first} evaluated to null. The expression is either invalid, or the " +
-                "expression returned no, or more than one resource. The expression will be " +
-                "replaced with a blank string."
-            )
-          }
-          it.first to it.second
-        }
-        .fold(expression.expression) { acc: String, pair: Pair<String, String> ->
-          acc.replace(pair.first, pair.second)
-        }
-    }
-      ?: expression.expression
 
   /**
    * Traverses through the list of questionnaire items, the list of questionnaire response items and

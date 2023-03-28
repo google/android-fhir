@@ -253,6 +253,40 @@ object ExpressionEvaluator {
   }
 
   /**
+   * Create an x-fhir-query string for evaluation
+   *
+   * @param expression x-fhir-query expression
+   * @param resourceContext if passed, the resource context to evaluate the expression against
+   */
+  internal fun createXFhirQueryFromExpression(
+    expression: Expression,
+    resourceContext: Resource?
+  ): String {
+    if (resourceContext == null) {
+      return expression.expression
+    }
+    return evaluateXFhirEnhancement(expression, resourceContext)
+      .map {
+        // If the result of evaluating the FHIRPath expressions is an invalid query, it returns
+        // null. As per the spec:
+        // Systems SHOULD log it and continue with extraction as if the query had returned no
+        // data.
+        // See : http://build.fhir.org/ig/HL7/sdc/extraction.html#structuremap-based-extraction
+        if (it.second.isEmpty()) {
+          Timber.w(
+            "${it.first} evaluated to null. The expression is either invalid, or the " +
+              "expression returned no, or more than one resource. The expression will be " +
+              "replaced with a blank string."
+          )
+        }
+        it.first to it.second
+      }
+      .fold(expression.expression) { acc: String, pair: Pair<String, String> ->
+        acc.replace(pair.first, pair.second)
+      }
+  }
+
+  /**
    * Evaluates an x-fhir-query that contains fhir-paths, returning a sequence of pairs. The first
    * element in the pair is the FhirPath expression surrounded by curly brackets {{ fhir.path }},
    * and the second element is the evaluated string result from evaluating the resource passed in.
@@ -261,7 +295,7 @@ object ExpressionEvaluator {
    * Practitioner?active=true&{{Practitioner.name.family}}
    * @param resource the resource context to evaluate the expression against
    */
-  internal fun evaluateXFhirEnhancement(
+  private fun evaluateXFhirEnhancement(
     expression: Expression,
     resource: Resource
   ): Sequence<Pair<String, String>> =
