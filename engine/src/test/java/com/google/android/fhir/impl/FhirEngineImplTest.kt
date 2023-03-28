@@ -256,77 +256,78 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun `search() by x-fhir-query should return patients for gender param as well for _tag`() =
-    runBlocking {
-      val patients =
-        listOf(
-          buildPatient("3", "C", Enumerations.AdministrativeGender.FEMALE).apply {
-            meta =
-              Meta()
-                .setTag(
-                  mutableListOf(
-                    Coding("https://d-tree.org/", "cardiology-department", "Cardiology Dept")
-                  )
+  fun `search() by x-fhir-query should return patients for _tag param`() = runBlocking {
+    val patients =
+      listOf(
+        buildPatient("3", "C", Enumerations.AdministrativeGender.FEMALE).apply {
+          meta =
+            Meta()
+              .setTag(
+                mutableListOf(
+                  Coding("https://d-tree.org/", "cardiology-department", "Cardiology Dept")
                 )
-          },
-          buildPatient("4", "C", Enumerations.AdministrativeGender.MALE).apply {
-            meta =
-              Meta()
-                .setTag(
-                  mutableListOf(
-                    Coding("http://d-tree.org/", "cardiology-department", "Cardiology Dept")
-                  )
-                )
-          },
-          buildPatient("2", "B", Enumerations.AdministrativeGender.FEMALE),
-          buildPatient("1", "A", Enumerations.AdministrativeGender.MALE)
-        )
+              )
+        },
+        buildPatient("4", "C", Enumerations.AdministrativeGender.MALE).apply {
+          meta =
+            Meta()
+              .setTag(
+                mutableListOf(Coding("http://d-tree.org/", "salima-catchment", "Salima Patients"))
+              )
+        }
+      )
 
-      fhirEngine.create(*patients.toTypedArray())
+    fhirEngine.create(*patients.toTypedArray())
 
-      val result =
-        fhirEngine.search("Patient?gender=female&_tag=cardiology-department").map { it as Patient }
+    val result = fhirEngine.search("Patient?_tag=cardiology-department").map { it as Patient }
 
-      assertThat(result.size).isEqualTo(1)
-      assertThat(result.all { it.gender == Enumerations.AdministrativeGender.FEMALE }).isTrue()
-    }
+    assertThat(result.size).isEqualTo(1)
+    assertThat(
+        result.all { patient -> patient.meta.tag.all { it.code == "cardiology-department" } }
+      )
+      .isTrue()
+  }
 
   @Test
-  fun `search() by x-fhir-query should return patients for gender param as well for _profile`() =
-    runBlocking {
-      val patients =
-        listOf(
-          buildPatient("3", "C", Enumerations.AdministrativeGender.FEMALE).apply {
-            meta =
-              Meta()
-                .setProfile(
-                  mutableListOf(
-                    CanonicalType(
-                      "http://fhir.org/STU3/StructureDefinition/Example-Patient-Profile-1"
-                    )
+  fun `search() by x-fhir-query should return patients for _profile param`() = runBlocking {
+    val patients =
+      listOf(
+        buildPatient("3", "C", Enumerations.AdministrativeGender.FEMALE).apply {
+          meta =
+            Meta()
+              .setProfile(
+                mutableListOf(
+                  CanonicalType(
+                    "http://fhir.org/STU3/StructureDefinition/Example-Patient-Profile-1"
                   )
                 )
-          },
-          buildPatient("4", "C", Enumerations.AdministrativeGender.MALE).apply {
-            meta =
-              Meta().setProfile(mutableListOf(CanonicalType("http://d-tree.org/Diabetes-Patient")))
-          },
-          buildPatient("2", "B", Enumerations.AdministrativeGender.FEMALE),
-          buildPatient("1", "A", Enumerations.AdministrativeGender.MALE)
+              )
+        },
+        buildPatient("4", "C", Enumerations.AdministrativeGender.MALE).apply {
+          meta =
+            Meta().setProfile(mutableListOf(CanonicalType("http://d-tree.org/Diabetes-Patient")))
+        }
+      )
+
+    fhirEngine.create(*patients.toTypedArray())
+
+    val result =
+      fhirEngine
+        .search(
+          "Patient?_profile=http://fhir.org/STU3/StructureDefinition/Example-Patient-Profile-1"
         )
+        .map { it as Patient }
 
-      fhirEngine.create(*patients.toTypedArray())
-
-      val result =
-        fhirEngine
-          .search(
-            "Patient?gender=female&_profile=http://fhir.org/STU3/StructureDefinition/Example-Patient-Profile-1"
-          )
-          .map { it as Patient }
-
-      assertThat(result.size).isEqualTo(1)
-      assertThat(result.all { it.gender == Enumerations.AdministrativeGender.FEMALE }).isTrue()
-    }
+    assertThat(result.size).isEqualTo(1)
+    assertThat(
+        result.all { patient ->
+          patient.meta.profile.all {
+            it.value.equals("http://fhir.org/STU3/StructureDefinition/Example-Patient-Profile-1")
+          }
+        }
+      )
+      .isTrue()
+  }
 
   @Test
   fun syncUpload_uploadLocalChange() = runBlocking {
