@@ -47,6 +47,8 @@ import org.hl7.fhir.r4.model.ResourceType
 object XFhirQueryTranslator {
   private const val XFHIR_QUERY_SORT_PARAM = "_sort"
   private const val XFHIR_QUERY_COUNT_PARAM = "_count"
+  private const val XFHIR_QUERY_TAG_PARAM = "_tag"
+  private const val XFHIR_QUERT_PROFILE_PARAM = "_profile"
 
   /**
    * Translates the basic x-fhir-query string defined in
@@ -184,9 +186,9 @@ object XFhirQueryTranslator {
     return this.map { (paramKey, paramValue) ->
       val paramDefinition =
         when (paramKey) {
-          "_tag" ->
+          XFHIR_QUERY_TAG_PARAM ->
             SearchParamDefinition("_tag", Enumerations.SearchParamType.TOKEN, "$type.meta.tag")
-          "_profile" ->
+          XFHIR_QUERT_PROFILE_PARAM ->
             SearchParamDefinition(
               "_profile",
               Enumerations.SearchParamType.REFERENCE,
