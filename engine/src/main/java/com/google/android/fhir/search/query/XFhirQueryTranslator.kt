@@ -48,7 +48,7 @@ object XFhirQueryTranslator {
   private const val XFHIR_QUERY_SORT_PARAM = "_sort"
   private const val XFHIR_QUERY_COUNT_PARAM = "_count"
   private const val XFHIR_QUERY_TAG_PARAM = "_tag"
-  private const val XFHIR_QUERT_PROFILE_PARAM = "_profile"
+  private const val XFHIR_QUERY_PROFILE_PARAM = "_profile"
 
   /**
    * Translates the basic x-fhir-query string defined in
@@ -192,9 +192,9 @@ object XFhirQueryTranslator {
               Enumerations.SearchParamType.TOKEN,
               "$type.meta.tag"
             )
-          XFHIR_QUERT_PROFILE_PARAM ->
+          XFHIR_QUERY_PROFILE_PARAM ->
             SearchParamDefinition(
-              XFHIR_QUERT_PROFILE_PARAM,
+              XFHIR_QUERY_PROFILE_PARAM,
               Enumerations.SearchParamType.REFERENCE,
               "$type.meta.profile"
             )
