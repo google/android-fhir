@@ -85,7 +85,7 @@ internal fun QuestionnaireResponse.unpackRepeatedGroups(questionnaire: Questionn
 }
 
 private fun unpackRepeatedGroups(
-  questionnaireItems: MutableList<Questionnaire.QuestionnaireItemComponent>,
+  questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
   questionnaireResponseItems: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
 ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
   return questionnaireItems.zip(questionnaireResponseItems).flatMap {
