@@ -18,6 +18,7 @@ package com.google.android.fhir
 
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
 import java.time.OffsetDateTime
@@ -114,6 +115,9 @@ interface FhirEngine {
 
   /** Returns the total count of squashed local changes. */
   suspend fun getSquashedLocalChangeCount(): Int
+
+  /** Returns the list of squashed local changes. */
+  suspend fun getSquashedLocalChangeList(): List<SquashedLocalChange>
 }
 
 /**

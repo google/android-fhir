@@ -24,6 +24,7 @@ import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.SyncStrategyTypes
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
@@ -94,6 +95,10 @@ internal class FhirEngineImpl(
     return database.getAllLocalChanges().size
   }
 
+  override suspend fun getSquashedLocalChangeList(): List<SquashedLocalChange> {
+    return database.getAllLocalChanges()
+  }
+
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
     download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
@@ -162,25 +167,24 @@ internal class FhirEngineImpl(
     upload(squashedChanges).collect {
       val idsToDeleteFromUpdate = it.first.ids as MutableList
       // Check server for resource before delete.
-      try {
-
-        (it.second as Bundle).entry.forEachIndexed { index, bundleEntry ->
-          val response = bundleEntry.response
-          val url = response.location.toString() + "?_elements=identifier"
+      (it.second as Bundle).entry.forEachIndexed { index, bundleEntry ->
+        val response = bundleEntry.response
+        val url = response.location.toString() + "?_elements=identifier"
+        try {
           val downloadBundle = dataSource?.download(url)
           if (downloadBundle == null) {
             idsToDeleteFromUpdate.remove(it.first.ids[index])
           } else {
             Timber.i("Resource Found after upload" + downloadBundle.id.toString())
           }
+        } catch (exception: Exception) {
+          Timber.i(exception)
         }
-        database.deleteUpdates(LocalChangeToken(idsToDeleteFromUpdate))
-        when (it.second) {
-          is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
-          else -> updateVersionIdAndLastUpdated(it.second)
-        }
-      } catch (exception: Exception) {
-        Timber.i(exception)
+      }
+      database.deleteUpdates(LocalChangeToken(idsToDeleteFromUpdate))
+      when (it.second) {
+        is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
+        else -> updateVersionIdAndLastUpdated(it.second)
       }
     }
   }
