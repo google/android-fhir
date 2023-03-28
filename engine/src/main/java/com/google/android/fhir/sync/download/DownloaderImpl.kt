@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync.download
 
-import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
@@ -40,13 +39,13 @@ internal class DownloaderImpl(
 ) : Downloader {
   private val resourceTypeList = ResourceType.values().map { it.name }
 
-  override suspend fun download(context: SyncDownloadContext): Flow<DownloadState> = flow {
+  override suspend fun download(): Flow<DownloadState> = flow {
     var resourceTypeToDownload: ResourceType = ResourceType.Bundle
 
     // download count summary of all resources for progress i.e. <type, total, completed>
     val progressSummary =
       downloadWorkManager
-        .getSummaryRequestUrls(context)
+        .getSummaryRequestUrls()
         .map { summary ->
           summary.key to
             runCatching { dataSource.download(summary.value) }
@@ -63,7 +62,7 @@ internal class DownloaderImpl(
 
     emit(DownloadState.Started(resourceTypeToDownload, total))
 
-    var url = downloadWorkManager.getNextRequestUrl(context)
+    var url = downloadWorkManager.getNextRequestUrl()
     while (url != null) {
       try {
         resourceTypeToDownload =
@@ -80,7 +79,7 @@ internal class DownloaderImpl(
         emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
       }
 
-      url = downloadWorkManager.getNextRequestUrl(context)
+      url = downloadWorkManager.getNextRequestUrl()
     }
   }
 }

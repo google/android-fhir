@@ -116,6 +116,7 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
     if (enableWhenList.size == 1) {
       return evaluateEnableWhen(
         enableWhenList.single(),
+        questionnaireItem,
         questionnaireResponseItem,
       )
     }
@@ -126,9 +127,9 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
     // enabled if ANY `enableWhen` constraint is satisfied.
     return when (val value = questionnaireItem.enableBehavior) {
       Questionnaire.EnableWhenBehavior.ALL ->
-        enableWhenList.all { evaluateEnableWhen(it, questionnaireResponseItem) }
+        enableWhenList.all { evaluateEnableWhen(it, questionnaireItem, questionnaireResponseItem) }
       Questionnaire.EnableWhenBehavior.ANY ->
-        enableWhenList.any { evaluateEnableWhen(it, questionnaireResponseItem) }
+        enableWhenList.any { evaluateEnableWhen(it, questionnaireItem, questionnaireResponseItem) }
       else -> throw IllegalStateException("Unrecognized enable when behavior $value")
     }
   }
@@ -138,10 +139,15 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
    */
   private fun evaluateEnableWhen(
     enableWhen: Questionnaire.QuestionnaireItemEnableWhenComponent,
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   ): Boolean {
-    val targetQuestionnaireResponseItem =
-      findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, enableWhen.question)
+    val targetQuestionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent? =
+      if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+          questionnaireResponseItem.linkId == enableWhen.question
+      )
+        questionnaireResponseItem
+      else findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, enableWhen.question)
     return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
       // True iff the answer value of the enable when is equal to whether an answer exists in the
       // target questionnaire response item
