@@ -47,6 +47,7 @@ dependencies {
   implementation(Dependencies.Androidx.activity)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)
+  implementation(Dependencies.Androidx.datastorePref)
   implementation(Dependencies.Androidx.fragmentKtx)
   implementation(Dependencies.Androidx.recyclerView)
   implementation(Dependencies.Androidx.workRuntimeKtx)
