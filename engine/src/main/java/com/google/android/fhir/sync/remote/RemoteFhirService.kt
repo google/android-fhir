@@ -18,7 +18,6 @@ package com.google.android.fhir.sync.remote
 
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.Authenticator
-import com.google.android.fhir.sync.DataSource
 import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -32,13 +31,11 @@ import retrofit2.http.POST
 import retrofit2.http.Url
 
 /** Interface to make http requests to the FHIR server. */
-internal interface RemoteFhirService : DataSource {
+internal interface RemoteFhirService {
 
-  @GET override suspend fun download(@Url path: String): Resource
+  @GET suspend fun get(@Url path: String): Resource
 
-  @POST(".") override suspend fun download(@Body bundle: Bundle): Resource
-
-  @POST(".") override suspend fun upload(@Body bundle: Bundle): Resource
+  @POST(".") suspend fun post(@Body bundle: Bundle): Resource
 
   class Builder(
     private val baseUrl: String,

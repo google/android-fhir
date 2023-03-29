@@ -34,12 +34,14 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class RemoteFhirServiceTest {
+class RetrofitBasedRemoteDataSourceTest {
 
   private val mockWebServer = MockWebServer()
 
-  private val apiService by lazy {
-    RemoteFhirService.Builder(mockWebServer.url("/").toString(), NetworkConfiguration()).build()
+  private val retrofitBasedRemoteDataSource by lazy {
+    RetrofitBasedRemoteDataSource(
+      RemoteFhirService.Builder(mockWebServer.url("/").toString(), NetworkConfiguration()).build()
+    )
   }
 
   private val parser = FhirContext.forR4Cached().newJsonParser()
@@ -76,7 +78,7 @@ class RemoteFhirServiceTest {
       }
     mockWebServer.enqueue(mockResponse)
 
-    val result = apiService.download("Patient/patient-001")
+    val result = retrofitBasedRemoteDataSource.download("Patient/patient-001")
 
     // No exception should occur
     assertThat(result).isInstanceOf(Patient::class.java)
@@ -104,7 +106,7 @@ class RemoteFhirServiceTest {
         type = Bundle.BundleType.TRANSACTION
       }
 
-    val result = apiService.upload(request)
+    val result = retrofitBasedRemoteDataSource.upload(request)
 
     // No exception has occurred
     assertThat(result).isInstanceOf(Bundle::class.java)
@@ -132,7 +134,7 @@ class RemoteFhirServiceTest {
           type = Bundle.BundleType.TRANSACTION
         }
 
-      val result = apiService.upload(request)
+      val result = retrofitBasedRemoteDataSource.upload(request)
 
       assertThat(result).isInstanceOf(Bundle::class.java)
       assertThat((result as Bundle).type).isEqualTo(Bundle.BundleType.TRANSACTIONRESPONSE)

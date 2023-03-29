@@ -28,6 +28,7 @@ import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.Request
 import com.google.common.truth.Truth.assertThat
+import java.net.SocketTimeoutException
 import java.time.OffsetDateTime
 import java.util.Date
 import java.util.LinkedList
@@ -200,11 +201,11 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
 
     override suspend fun download(bundle: Bundle): Resource {
-      throw Exception("Posting Download Bundle failed...")
+      throw SocketTimeoutException("Posting Download Bundle failed...")
     }
 
     override suspend fun upload(bundle: Bundle): Resource {
-      throw Exception("Posting Upload Bundle failed...")
+      throw SocketTimeoutException("Posting Upload Bundle failed...")
     }
   }
 
