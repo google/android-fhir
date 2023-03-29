@@ -54,6 +54,74 @@ class DownloaderImplTest {
         Request.of(bundleOf("Observation/ob-123", "Condition/con-123"))
       )
 
+    val testDataSource: DataSource =
+      object : DataSource {
+        override suspend fun download(path: String): Resource {
+          return when (path) {
+            "Patient" ->
+              Bundle().apply {
+                type = Bundle.BundleType.SEARCHSET
+                addEntry(
+                  Bundle.BundleEntryComponent().apply {
+                    resource = Patient().apply { id = "pa-123" }
+                  }
+                )
+              }
+            "Encounter" ->
+              Bundle().apply {
+                type = Bundle.BundleType.SEARCHSET
+                addEntry(
+                  Bundle.BundleEntryComponent().apply {
+                    resource =
+                      Encounter().apply {
+                        id = "en-123"
+                        subject = Reference("Patient/pa-123")
+                      }
+                  }
+                )
+              }
+            "Medication/med-123-that-fails" ->
+              OperationOutcome().apply {
+                addIssue(
+                  OperationOutcome.OperationOutcomeIssueComponent().apply {
+                    severity = OperationOutcome.IssueSeverity.FATAL
+                    diagnostics = "Resource not found."
+                  }
+                )
+              }
+            else -> OperationOutcome()
+          }
+        }
+
+        override suspend fun download(bundle: Bundle): Resource {
+          return Bundle().apply {
+            type = Bundle.BundleType.BATCHRESPONSE
+            addEntry(
+              Bundle.BundleEntryComponent().apply {
+                resource =
+                  Observation().apply {
+                    id = "ob-123"
+                    subject = Reference("Patient/pq-123")
+                  }
+              }
+            )
+            addEntry(
+              Bundle.BundleEntryComponent().apply {
+                resource =
+                  Condition().apply {
+                    id = "con-123"
+                    subject = Reference("Patient/pq-123")
+                  }
+              }
+            )
+          }
+        }
+
+        override suspend fun upload(bundle: Bundle): Resource {
+          throw UnsupportedOperationException()
+        }
+      }
+
     val downloader = DownloaderImpl(testDataSource, TestDownloadWorkManager(requests))
 
     val result = mutableListOf<Resource>()
@@ -79,6 +147,73 @@ class DownloaderImplTest {
           Request.of(bundleOf("Observation/ob-123", "Condition/con-123"))
         )
 
+      val testDataSource: DataSource =
+        object : DataSource {
+          override suspend fun download(path: String): Resource {
+            return when (path) {
+              "Patient" ->
+                Bundle().apply {
+                  type = Bundle.BundleType.SEARCHSET
+                  addEntry(
+                    Bundle.BundleEntryComponent().apply {
+                      resource = Patient().apply { id = "pa-123" }
+                    }
+                  )
+                }
+              "Encounter" ->
+                Bundle().apply {
+                  type = Bundle.BundleType.SEARCHSET
+                  addEntry(
+                    Bundle.BundleEntryComponent().apply {
+                      resource =
+                        Encounter().apply {
+                          id = "en-123"
+                          subject = Reference("Patient/pa-123")
+                        }
+                    }
+                  )
+                }
+              "Medication/med-123-that-fails" ->
+                OperationOutcome().apply {
+                  addIssue(
+                    OperationOutcome.OperationOutcomeIssueComponent().apply {
+                      severity = OperationOutcome.IssueSeverity.FATAL
+                      diagnostics = "Resource not found."
+                    }
+                  )
+                }
+              else -> OperationOutcome()
+            }
+          }
+
+          override suspend fun download(bundle: Bundle): Resource {
+            return Bundle().apply {
+              type = Bundle.BundleType.BATCHRESPONSE
+              addEntry(
+                Bundle.BundleEntryComponent().apply {
+                  resource =
+                    Observation().apply {
+                      id = "ob-123"
+                      subject = Reference("Patient/pq-123")
+                    }
+                }
+              )
+              addEntry(
+                Bundle.BundleEntryComponent().apply {
+                  resource =
+                    Condition().apply {
+                      id = "con-123"
+                      subject = Reference("Patient/pq-123")
+                    }
+                }
+              )
+            }
+          }
+
+          override suspend fun upload(bundle: Bundle): Resource {
+            throw UnsupportedOperationException()
+          }
+        }
       val downloader = DownloaderImpl(testDataSource, TestDownloadWorkManager(requests))
 
       val result = mutableListOf<DownloadState>()
@@ -118,74 +253,6 @@ class DownloaderImplTest {
                 }
             }
           )
-        }
-      }
-
-    private val testDataSource: DataSource =
-      object : DataSource {
-        override suspend fun download(path: String): Resource {
-          return when {
-            path == "Patient" ->
-              Bundle().apply {
-                type = Bundle.BundleType.SEARCHSET
-                addEntry(
-                  Bundle.BundleEntryComponent().apply {
-                    resource = Patient().apply { id = "pa-123" }
-                  }
-                )
-              }
-            path == "Encounter" ->
-              Bundle().apply {
-                type = Bundle.BundleType.SEARCHSET
-                addEntry(
-                  Bundle.BundleEntryComponent().apply {
-                    resource =
-                      Encounter().apply {
-                        id = "en-123"
-                        subject = Reference("Patient/pa-123")
-                      }
-                  }
-                )
-              }
-            path == "Medication/med-123-that-fails" ->
-              OperationOutcome().apply {
-                addIssue(
-                  OperationOutcome.OperationOutcomeIssueComponent().apply {
-                    severity = OperationOutcome.IssueSeverity.FATAL
-                    diagnostics = "Resource not found."
-                  }
-                )
-              }
-            else -> OperationOutcome()
-          }
-        }
-
-        override suspend fun download(bundle: Bundle): Resource {
-          return Bundle().apply {
-            type = Bundle.BundleType.BATCHRESPONSE
-            addEntry(
-              Bundle.BundleEntryComponent().apply {
-                resource =
-                  Observation().apply {
-                    id = "ob-123"
-                    subject = Reference("Patient/pq-123")
-                  }
-              }
-            )
-            addEntry(
-              Bundle.BundleEntryComponent().apply {
-                resource =
-                  Condition().apply {
-                    id = "con-123"
-                    subject = Reference("Patient/pq-123")
-                  }
-              }
-            )
-          }
-        }
-
-        override suspend fun upload(bundle: Bundle): Resource {
-          throw UnsupportedOperationException()
         }
       }
   }
