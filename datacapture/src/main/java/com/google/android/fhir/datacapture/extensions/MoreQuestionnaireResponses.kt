@@ -104,10 +104,9 @@ private fun unpackRepeatedGroups(
   questionnaireResponseItem.answer.forEach {
     it.item = unpackRepeatedGroups(questionnaireItem.item, it.item)
   }
-
-  val isRepeatedGroup =
-    questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP && questionnaireItem.repeats
-  return if (isRepeatedGroup) {
+  return if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+      questionnaireItem.repeats
+  ) {
     questionnaireResponseItem.answer.map {
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
         linkId = questionnaireItem.linkId
