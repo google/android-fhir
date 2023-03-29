@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture
+package com.google.android.fhir.datacapture.extensions
 
 import android.icu.text.DateFormat
-import android.icu.text.SimpleDateFormat
 import com.google.android.fhir.datacapture.views.factories.length
 import com.google.android.fhir.datacapture.views.factories.localDate
 import java.lang.Character.isLetter
@@ -75,16 +74,17 @@ internal fun canonicalizeDatePattern(datePattern: String): String {
 
 /**
  * Parses a date string using the given date pattern, or the default date pattern for the device
- * locale.
+ * locale. If the parsing fails, an exception is thrown. These exceptions are caught in the calling
+ * widgets.
  */
 internal fun parseDate(text: String, datePattern: String): LocalDate {
-  val dateFormat =
+  val localDate =
     if (datePattern.isNotEmpty()) {
-      SimpleDateFormat(datePattern)
+      LocalDate.parse(text, DateTimeFormatter.ofPattern(datePattern))
     } else {
-      DateFormat.getDateInstance(DateFormat.SHORT)
+      DateFormat.getDateInstance(DateFormat.SHORT).apply { isLenient = false }.parse(text).localDate
     }
-  val localDate = dateFormat.apply { isLenient = false }.parse(text).localDate
+
   // Throw ParseException if year is less than 4 digits.
   if (localDate.year.length() < 4) {
     throw ParseException("Year has less than 4 digits.", text.indexOf('y'))

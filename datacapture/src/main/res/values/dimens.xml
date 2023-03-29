@@ -36,6 +36,7 @@
     <dimen name="help_header_margin_bottom">4dp</dimen>
     <dimen name="help_header_margin_horizontal">16dp</dimen>
     <dimen name="help_header_margin_top">16dp</dimen>
+    <dimen name="help_margin_bottom">16dp</dimen>
     <dimen name="help_text_margin_bottom">16dp</dimen>
     <dimen name="help_text_margin_horizontal">16dp</dimen>
     <dimen name="prefix_padding_end">5dp</dimen>
@@ -48,6 +49,7 @@
     <dimen name="attachment_action_button_icon_size">24dp</dimen>
     <dimen name="attachment_action_button_margin_end">8dp</dimen>
     <dimen name="attachment_action_button_padding_horizontal">16dp</dimen>
+    <dimen name="attachment_divider_height">1dp</dimen>
     <dimen name="attachment_divider_margin_top">16dp</dimen>
     <dimen name="attachment_error_margin_top">4dp</dimen>
     <dimen name="attachment_preview_divider_margin_top">8dp</dimen>
@@ -94,21 +96,35 @@
 
     <!--  Item Answer Media  -->
     <dimen name="item_answer_media_image_size">48dp</dimen>
-
+    <dimen name="choice_button_image">48dp</dimen>
+    
     <!--  Item Media  -->
     <dimen name="item_media_image_margin_horizontal">16dp</dimen>
     <dimen name="item_media_image_margin_vertical">8dp</dimen>
     <dimen name="item_media_image_max_height">200dp</dimen>
     <dimen name="item_media_image_max_width">200dp</dimen>
+    <dimen name="item_media_image_preview_max_width">200dp</dimen>
+    <dimen name="item_media_image_preview_max_height">200dp</dimen>
 
     <!--  Simple question  -->
     <dimen name="simple_question_view_answer_margin_top">8dp</dimen>
     <dimen name="simple_question_view_divider_margin_top">8dp</dimen>
 
+    <!--  Radio Button  -->
+    <dimen name="padding_between_text_and_icon">16dp</dimen>
+    <dimen name="padding_after_text">24dp</dimen>
 
     <!--  Non-widget related  -->
 
     <!--  Icon  -->
     <dimen name="icon_drawable_padding">16dp</dimen>
     <dimen name="icon_inset">16dp</dimen>
+
+    <!--  Bottom Container  -->
+    <dimen name="bottom_container_padding_vertical">8dp</dimen>
+    
+    <!--  Error Icon  -->
+    <dimen name="error_icon_width">20dp</dimen>
+    <dimen name="error_icon_height">20dp</dimen>
+    <dimen name="error_icon_margin_end">4dp</dimen>
 </resources>

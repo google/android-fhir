@@ -33,7 +33,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class DecimalTypeMaxDecimalValidatorTest {
+class MaxDecimalPlacesValidatorTest {
   lateinit var context: Context
 
   @Before
@@ -44,68 +44,47 @@ class DecimalTypeMaxDecimalValidatorTest {
   @Test
   fun validate_noExtension_shouldReturnValidResult() {
     val validationResult =
-      DecimalTypeMaxDecimalValidator.validate(
+      MaxDecimalPlacesValidator.validate(
         Questionnaire.QuestionnaireItemComponent(),
-        listOf(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-            .setValue(DecimalType("1.00"))
-        ),
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+          .setValue(DecimalType("1.00")),
         context
       )
 
     assertThat(validationResult.isValid).isTrue()
-    assertThat(validationResult.message.isNullOrBlank()).isTrue()
-  }
-
-  @Test
-  fun validate_noAnswer_shouldReturnValidResult() {
-    val validationResult =
-      DecimalTypeMaxDecimalValidator.validate(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          this.addExtension(Extension(MAX_DECIMAL_URL, IntegerType(1)))
-        },
-        listOf(),
-        context
-      )
-
-    assertThat(validationResult.isValid).isTrue()
-    assertThat(validationResult.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
   }
 
   @Test
   fun validate_validAnswer_shouldReturnValidResult() {
     val validationResult =
-      DecimalTypeMaxDecimalValidator.validate(
+      MaxDecimalPlacesValidator.validate(
         Questionnaire.QuestionnaireItemComponent().apply {
           this.addExtension(Extension(MAX_DECIMAL_URL, IntegerType(2)))
         },
-        listOf(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-            .setValue(DecimalType("1.00"))
-        ),
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+          .setValue(DecimalType("1.00")),
         context
       )
 
     assertThat(validationResult.isValid).isTrue()
-    assertThat(validationResult.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
   }
 
   @Test
   fun validate_tooManyDecimalPlaces_shouldReturnInvalidResult() {
     val validationResult =
-      DecimalTypeMaxDecimalValidator.validate(
+      MaxDecimalPlacesValidator.validate(
         Questionnaire.QuestionnaireItemComponent().apply {
           this.addExtension(Extension(MAX_DECIMAL_URL, IntegerType(2)))
         },
-        listOf(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-            .setValue(DecimalType("1.000"))
-        ),
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+          .setValue(DecimalType("1.000")),
         context
       )
 
     assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.message)
+    assertThat(validationResult.errorMessage)
       .isEqualTo("The maximum number of decimal places that are permitted in the answer is: 2")
   }
 

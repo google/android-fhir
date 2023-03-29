@@ -20,9 +20,15 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedFlyoverSpanned
-import com.google.android.fhir.datacapture.views.HeaderView
+import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
+import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpanned
+import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
+import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
+import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.divider.MaterialDivider
 import org.hl7.fhir.r4.model.Questionnaire
@@ -34,23 +40,41 @@ import org.hl7.fhir.r4.model.Questionnaire
 internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.layout.review_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var header: HeaderView
+      private lateinit var header: ConstraintLayout
       private lateinit var flyOverTextView: TextView
-      private lateinit var answerTextView: TextView
+      private lateinit var errorView: View
+      private lateinit var answerView: TextView
       private lateinit var divider: MaterialDivider
+      private lateinit var prefix: TextView
+      private lateinit var question: TextView
+      private lateinit var hint: TextView
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         flyOverTextView = itemView.findViewById(R.id.flyover_text_view)
-        answerTextView = itemView.findViewById(R.id.answer_text_view)
         divider = itemView.findViewById(R.id.text_divider)
+        prefix = itemView.findViewById(R.id.prefix)
+        question = itemView.findViewById(R.id.question)
+        hint = itemView.findViewById(R.id.hint)
+        errorView = itemView.findViewById(R.id.error_view)
+        answerView = itemView.findViewById(R.id.answer_text_view)
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        header.bind(questionnaireViewItem.questionnaireItem)
+        prefix.updateTextAndVisibility(
+          questionnaireViewItem.questionnaireItem.localizedPrefixSpanned
+        )
+        question.updateTextAndVisibility(
+          questionnaireViewItem.questionnaireItem.localizedTextSpanned
+        )
+        hint.updateTextAndVisibility(
+          questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
+        )
+        header.visibility = getHeaderViewVisibility(prefix, question, hint)
+
         val localizedFlyoverSpanned =
-          questionnaireViewItem.questionnaireItem.localizedFlyoverSpanned
+          questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
         flyOverTextView.apply {
           visibility =
             if (localizedFlyoverSpanned.isNullOrEmpty()) {
@@ -60,21 +84,30 @@ internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
             }
           text = localizedFlyoverSpanned
         }
-
-        answerTextView.apply {
-          visibility =
-            when (questionnaireViewItem.questionnaireItem.type) {
-              Questionnaire.QuestionnaireItemType.GROUP,
-              Questionnaire.QuestionnaireItemType.DISPLAY -> GONE
-              else -> VISIBLE
+        when (questionnaireViewItem.questionnaireItem.type) {
+          Questionnaire.QuestionnaireItemType.GROUP,
+          Questionnaire.QuestionnaireItemType.DISPLAY -> {
+            errorView.visibility = GONE
+            answerView.visibility = GONE
+          }
+          else -> {
+            answerView.text = questionnaireViewItem.answerString(answerView.context)
+            answerView.visibility = VISIBLE
+            if (questionnaireViewItem.validationResult is Invalid) {
+              errorView.findViewById<TextView>(R.id.error_text_view).text =
+                questionnaireViewItem.validationResult.getSingleStringValidationMessage()
+              errorView.visibility = VISIBLE
+            } else {
+              errorView.visibility = GONE
             }
-          text = questionnaireViewItem.answerString(context)
+          }
         }
 
         divider.visibility =
           if (header.visibility == VISIBLE ||
               flyOverTextView.visibility == VISIBLE ||
-              answerTextView.visibility == VISIBLE
+              answerView.visibility == VISIBLE ||
+              errorView.visibility == VISIBLE
           ) {
             VISIBLE
           } else {

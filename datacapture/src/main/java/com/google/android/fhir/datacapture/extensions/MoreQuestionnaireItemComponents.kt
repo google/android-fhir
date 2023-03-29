@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture
+package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -22,7 +22,8 @@ import android.graphics.BitmapFactory
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import ca.uhn.fhir.util.UrlUtil
-import com.google.android.fhir.datacapture.common.datatype.asStringValue
+import com.google.android.fhir.datacapture.DataCapture
+import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.android.fhir.datacapture.fhirpath.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
 import java.math.BigDecimal
@@ -272,19 +273,7 @@ internal val Questionnaire.QuestionnaireItemComponent.hasHelpButton: Boolean
     return item.any { it.isHelpCode }
   }
 
-/** Whether item type is display and [displayItemControl] is [DisplayItemControlType.HELP]. */
-internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
-  get() {
-    return when (type) {
-      Questionnaire.QuestionnaireItemType.DISPLAY -> {
-        displayItemControl == DisplayItemControlType.HELP
-      }
-      else -> {
-        false
-      }
-    }
-  }
-/** Converts Text with HTML Tag to formated text. */
+/** Converts Text with HTML Tag to formatted text. */
 private fun String.toSpanned(): Spanned {
   return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
 }
@@ -308,9 +297,12 @@ val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
  * code is used as the instructions of the parent question.
  */
 internal val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spanned?
+  get() = item.localizedInstructionsSpanned
+
+/** [localizedInstructionsSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
+internal val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionsSpanned: Spanned?
   get() {
-    return item
-      .firstOrNull { questionnaireItem ->
+    return this.firstOrNull { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
           questionnaireItem.isInstructionsCode
       }
@@ -322,9 +314,12 @@ internal val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpann
  * present) is used as the fly-over text of the parent question.
  */
 internal val Questionnaire.QuestionnaireItemComponent.localizedFlyoverSpanned: Spanned?
+  get() = item.localizedFlyoverSpanned
+
+/** [localizedFlyoverSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
+internal val List<Questionnaire.QuestionnaireItemComponent>.localizedFlyoverSpanned: Spanned?
   get() =
-    item
-      .firstOrNull { questionnaireItem ->
+    this.firstOrNull { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
           questionnaireItem.displayItemControl == DisplayItemControlType.FLYOVER
       }
@@ -335,9 +330,12 @@ internal val Questionnaire.QuestionnaireItemComponent.localizedFlyoverSpanned: S
  * code is used as the instructions of the parent question.
  */
 internal val Questionnaire.QuestionnaireItemComponent.localizedHelpSpanned: Spanned?
+  get() = item.localizedHelpSpanned
+
+/** [localizedHelpSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
+internal val List<Questionnaire.QuestionnaireItemComponent>.localizedHelpSpanned: Spanned?
   get() {
-    return item
-      .firstOrNull { questionnaireItem -> questionnaireItem.isHelpCode }
+    return this.firstOrNull { questionnaireItem -> questionnaireItem.isHelpCode }
       ?.localizedTextSpanned
   }
 
@@ -367,7 +365,7 @@ val Questionnaire.QuestionnaireItemComponent.entryFormat: String?
 
 internal const val INSTRUCTIONS = "instructions"
 
-/** Returns [true] if extension is display category extension and contains 'instructions' code. */
+/** Returns `true` if extension is display category extension and contains 'instructions' code. */
 internal val Questionnaire.QuestionnaireItemComponent.isInstructionsCode: Boolean
   get() {
     return when (type) {
@@ -389,7 +387,7 @@ internal val Questionnaire.QuestionnaireItemComponent.isInstructionsCode: Boolea
   }
 
 /**
- * Returns [true] if item type is display and [displayItemControl] is
+ * Returns `true` if item type is display and [displayItemControl] is
  * [DisplayItemControlType.FLYOVER].
  */
 internal val Questionnaire.QuestionnaireItemComponent.isFlyoverCode: Boolean
@@ -403,6 +401,25 @@ internal val Questionnaire.QuestionnaireItemComponent.isFlyoverCode: Boolean
       }
     }
   }
+
+/** Whether item type is display and [displayItemControl] is [DisplayItemControlType.HELP]. */
+internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.DISPLAY -> {
+        displayItemControl == DisplayItemControlType.HELP
+      }
+      else -> {
+        false
+      }
+    }
+  }
+
+/** Whether item type is display. */
+internal val Questionnaire.QuestionnaireItemComponent.isDisplayItem: Boolean
+  get() =
+    (type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+      (isInstructionsCode || isFlyoverCode || isHelpCode))
 
 /** Slider step extension value. */
 internal val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
@@ -531,13 +548,15 @@ internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expressi
  */
 internal val Questionnaire.QuestionnaireItemComponent.choiceColumn: List<ChoiceColumn>?
   get() =
-    ToolingExtensions.getExtensions(this, EXTENSION_CHOICE_COLUMN_URL)?.map {
-      it.extension.let {
+    ToolingExtensions.getExtensions(this, EXTENSION_CHOICE_COLUMN_URL)?.map { extension ->
+      extension.extension.let { nestedExtensions ->
         ChoiceColumn(
-          path = it.find { it.url == "path" }!!.value.asStringValue(),
-          label = it.find { it.url == "label" }?.value?.asStringValue(),
+          path = nestedExtensions.find { it.url == "path" }!!.value.asStringValue(),
+          label = nestedExtensions.find { it.url == "label" }?.value?.asStringValue(),
           forDisplay =
-            it.any { it.url == "forDisplay" && it.castToBoolean(it.value).booleanValue() }
+            nestedExtensions.any {
+              it.url == "forDisplay" && it.castToBoolean(it.value).booleanValue()
+            }
         )
       }
     }

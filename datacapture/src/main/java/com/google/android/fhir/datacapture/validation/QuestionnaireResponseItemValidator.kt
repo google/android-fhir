@@ -17,21 +17,27 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
-import com.google.android.fhir.datacapture.isHidden
+import com.google.android.fhir.datacapture.extensions.isHidden
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireResponseItemValidator {
 
-  private val validators =
-    mutableListOf(
-      RequiredConstraintValidator,
-      MaxValueConstraintValidator,
-      MinValueConstraintValidator,
-      PrimitiveTypeAnswerMaxLengthValidator,
-      PrimitiveTypeAnswerMinLengthValidator,
+  /** Validators for [QuestionnaireResponse.QuestionnaireResponseItemComponent]. */
+  private val questionnaireResponseItemConstraintValidators =
+    listOf(
+      RequiredValidator,
+    )
+
+  /** Validators for [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]. */
+  private val answerConstraintValidators =
+    listOf(
+      MinValueValidator,
+      MaxValueValidator,
+      MinLengthValidator,
+      MaxLengthValidator,
+      MaxDecimalPlacesValidator,
       RegexValidator,
-      DecimalTypeMaxDecimalValidator
     )
 
   /** Validates [answers] contains valid answer(s) to [questionnaireItem]. */
@@ -42,12 +48,24 @@ internal object QuestionnaireResponseItemValidator {
   ): ValidationResult {
     if (questionnaireItem.isHidden) return NotValidated
 
-    val validationResults = validators.map { it.validate(questionnaireItem, answers, context) }
+    val questionnaireResponseItemConstraintValidationResult =
+      questionnaireResponseItemConstraintValidators.map {
+        it.validate(questionnaireItem, answers, context)
+      }
+    val questionnaireResponseItemAnswerConstraintValidationResult =
+      answerConstraintValidators.flatMap { validator ->
+        answers.map { answer -> validator.validate(questionnaireItem, answer, context) }
+      }
 
-    return if (validationResults.all { it.isValid }) {
+    return if (questionnaireResponseItemConstraintValidationResult.all { it.isValid } &&
+        questionnaireResponseItemAnswerConstraintValidationResult.all { it.isValid }
+    ) {
       Valid
     } else {
-      Invalid(validationResults.mapNotNull { it.message })
+      Invalid(
+        questionnaireResponseItemConstraintValidationResult.mapNotNull { it.errorMessage } +
+          questionnaireResponseItemAnswerConstraintValidationResult.mapNotNull { it.errorMessage }
+      )
     }
   }
 }

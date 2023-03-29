@@ -16,12 +16,10 @@
 
 package com.google.android.fhir.sync.download
 
-import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
 import com.google.common.truth.Truth.assertThat
 import java.net.UnknownHostException
-import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
@@ -104,18 +102,13 @@ class DownloaderImplTest {
           mapOf(
             ResourceType.Patient to mapOf("param" to "patient-page1"),
             ResourceType.Observation to mapOf("param" to "observation-page1")
-          )
+          ),
+          NoOpResourceParamsBasedDownloadWorkManagerContext
         )
       )
 
     val result = mutableListOf<DownloadState>()
-    downloader
-      .download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
-        }
-      )
-      .collect { result.add(it) }
+    downloader.download().collect { result.add(it) }
 
     assertThat(result.filterIsInstance<DownloadState.Started>())
       .containsExactly(
@@ -166,18 +159,13 @@ class DownloaderImplTest {
             mapOf(
               ResourceType.Patient to mapOf("param" to "patient-page1"),
               ResourceType.Observation to mapOf("param" to "observation-page1")
-            )
+            ),
+            NoOpResourceParamsBasedDownloadWorkManagerContext
           )
         )
 
       val result = mutableListOf<DownloadState>()
-      downloader
-        .download(
-          object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = null
-          }
-        )
-        .collect { result.add(it) }
+      downloader.download().collect { result.add(it) }
 
       assertThat(result.filterIsInstance<DownloadState.Started>())
         .containsExactly(
@@ -232,18 +220,13 @@ class DownloaderImplTest {
             mapOf(
               ResourceType.Patient to mapOf("param" to "patient-page1"),
               ResourceType.Observation to mapOf("param" to "observation-page1")
-            )
+            ),
+            NoOpResourceParamsBasedDownloadWorkManagerContext
           )
         )
 
       val result = mutableListOf<DownloadState>()
-      downloader
-        .download(
-          object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = null
-          }
-        )
-        .collect { result.add(it) }
+      downloader.download().collect { result.add(it) }
 
       assertThat(result.filterIsInstance<DownloadState.Started>())
         .containsExactly(
@@ -280,18 +263,13 @@ class DownloaderImplTest {
           }
         },
         ResourceParamsBasedDownloadWorkManager(
-          mapOf(ResourceType.Patient to mapOf("param" to "patient-page1"))
+          mapOf(ResourceType.Patient to mapOf("param" to "patient-page1")),
+          NoOpResourceParamsBasedDownloadWorkManagerContext
         )
       )
 
     val result = mutableListOf<DownloadState>()
-    downloader
-      .download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
-        }
-      )
-      .collectIndexed { index, value -> result.add(value) }
+    downloader.download().collect { value -> result.add(value) }
 
     assertThat(result.first()).isInstanceOf(DownloadState.Started::class.java)
   }
@@ -314,18 +292,13 @@ class DownloaderImplTest {
           }
         },
         ResourceParamsBasedDownloadWorkManager(
-          mapOf(ResourceType.Patient to mapOf("param" to "patient-page1"))
+          mapOf(ResourceType.Patient to mapOf("param" to "patient-page1")),
+          NoOpResourceParamsBasedDownloadWorkManagerContext
         )
       )
 
     val result = mutableListOf<DownloadState>()
-    downloader
-      .download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
-        }
-      )
-      .collectIndexed { index, value -> result.add(value) }
+    downloader.download().collect { value -> result.add(value) }
 
     assertThat(result.first()).isInstanceOf(DownloadState.Started::class.java)
     assertThat(result.elementAt(1)).isInstanceOf(DownloadState.Success::class.java)
