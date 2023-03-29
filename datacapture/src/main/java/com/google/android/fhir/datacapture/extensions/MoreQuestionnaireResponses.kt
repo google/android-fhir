@@ -28,8 +28,9 @@ val QuestionnaireResponse.allItems: List<QuestionnaireResponse.QuestionnaireResp
  *
  * Repeated groups need some massaging before the questionnaire view model can interpret them
  * correctly. This is because they are flattened out and nested directly under the parent in the
- * FHIR data format. See discussion:
- * http://community.fhir.org/t/questionnaire-repeating-groups-what-is-the-correct-format/2276/3
+ * FHIR data format.
+ *
+ * More details: https://build.fhir.org/questionnaireresponse.html#link.
  *
  * This function should be called before the questionnaire view model accepts an
  * application-provided questionnaire response.
@@ -68,8 +69,8 @@ private fun List<QuestionnaireResponse.QuestionnaireResponseItemComponent>.packR
  *
  * Repeated groups need some massaging for their returned data-format; each instance of the group
  * should be flattened out to be its own item in the parent, rather than an answer to the main item.
- * See discussion:
- * http://community.fhir.org/t/questionnaire-repeating-groups-what-is-the-correct-format/2276/3
+ *
+ * More details: https://build.fhir.org/questionnaireresponse.html#link.
  *
  * For example, if the group contains 2 questions, and the user answered the group 3 times, this
  * function will return a list with 3 responses; each of those responses will have the linkId of the
