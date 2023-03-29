@@ -37,7 +37,7 @@ import timber.log.Timber
  * the application is active which is not true.
  */
 class CareWorkflowExecutionViewModel(application: Application) : AndroidViewModel(application) {
-  private val _careWorkflowExecutionState = MutableSharedFlow<CareWorkflowExecutionStatus>()
+  val _careWorkflowExecutionState = MutableSharedFlow<CareWorkflowExecutionStatus>()
   val careWorkflowExecutionState: Flow<CareWorkflowExecutionStatus>
     get() = _careWorkflowExecutionState
   private var totalPlanDefinitionsToApply = AtomicInteger(0)
@@ -59,12 +59,13 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
   private val patientFlowForCareWorkflowExecution =
     MutableSharedFlow<CareWorkflowExecutionRequest>(extraBufferCapacity = 5)
 
-  /**
-   * [patientFlowForCareWorkflowExecution] collects each patient in a coroutine and executes
-   * workflow blocking. This can be invoked when there is an operation on a Patient or some Task is
-   * updated. TODO(mjajoo@): Add configuration to support for WHICH EVENTS this should be invoked.
-   */
-  fun executeCareWorkflowForPatient(patient: Patient) {
+  init {
+    /**
+     * [patientFlowForCareWorkflowExecution] collects each patient in a coroutine and executes
+     * workflow blocking. This can be invoked when there is an operation on a Patient or some Task
+     * is updated. TODO(mjajoo@): Add configuration to support for WHICH EVENTS this should be
+     * invoked.
+     */
     viewModelScope.launch(Dispatchers.IO) {
       patientFlowForCareWorkflowExecution.collect { careWorkflowExecutionRequest ->
         /**
@@ -89,6 +90,8 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
         }
       }
     }
+  }
+  fun executeCareWorkflowForPatient(patient: Patient) {
     viewModelScope.launch {
       Timber.i("emitting patient ${patient.id}")
       patientFlowForCareWorkflowExecution.emit(CareWorkflowExecutionRequest(patient))
