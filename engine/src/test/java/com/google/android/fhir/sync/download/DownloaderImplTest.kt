@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync.download
 
-import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
@@ -125,7 +124,7 @@ class DownloaderImplTest {
     val downloader = DownloaderImpl(testDataSource, TestDownloadWorkManager(requests))
 
     val result = mutableListOf<Resource>()
-    downloader.download(testSyncDownloadContext).collectIndexed { _, value ->
+    downloader.download().collectIndexed { _, value ->
       if (value is DownloadState.Success) {
         result.addAll(value.resources)
       }
@@ -217,7 +216,7 @@ class DownloaderImplTest {
       val downloader = DownloaderImpl(testDataSource, TestDownloadWorkManager(requests))
 
       val result = mutableListOf<DownloadState>()
-      downloader.download(testSyncDownloadContext).collectIndexed { _, value -> result.add(value) }
+      downloader.download().collectIndexed { _, value -> result.add(value) }
 
       assertThat(result.map { it::class.java })
         .containsExactly(
@@ -235,10 +234,6 @@ class DownloaderImplTest {
     }
 
   companion object {
-    val testSyncDownloadContext =
-      object : SyncDownloadContext {
-        override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
-      }
 
     private fun bundleOf(vararg getRequest: String) =
       Bundle().apply {
@@ -261,9 +256,9 @@ class DownloaderImplTest {
 class TestDownloadWorkManager(requests: List<Request>) : DownloadWorkManager {
   private val queue: Queue<Request> = LinkedList(requests)
 
-  override suspend fun getNextRequest(context: SyncDownloadContext): Request? = queue.poll()
+  override suspend fun getNextRequest(): Request? = queue.poll()
 
-  override suspend fun getSummaryRequestUrls(context: SyncDownloadContext) =
+  override suspend fun getSummaryRequestUrls() =
     emptyMap<ResourceType, String>()
 
   override suspend fun processResponse(response: Resource): Collection<Resource> {

@@ -16,9 +16,8 @@
 
 package com.google.android.fhir.sync
 
-import com.google.android.fhir.SyncDownloadContext
-import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ResourceType
 
 /**
@@ -32,13 +31,13 @@ interface DownloadWorkManager {
    * Returns the URL for the next download request, or `null` if there is no more download request
    * to be issued.
    */
-  suspend fun getNextRequest(context: SyncDownloadContext): Request?
+  suspend fun getNextRequest(): Request?
 
   /* TODO: Generalize the DownloadWorkManager API to not sequentially download resource by type (https://github.com/google/android-fhir/issues/1884) */
   /**
-   * Returns the map of resourceType and URL for summary of total count for each download request.
+   * Returns the map of resourceType and URL for summary of total count for each download request
    */
-  suspend fun getSummaryRequestUrls(context: SyncDownloadContext): Map<ResourceType, String>
+  suspend fun getSummaryRequestUrls(): Map<ResourceType, String>
 
   /**
    * Processes the download response and returns the resources to be saved to the local database.

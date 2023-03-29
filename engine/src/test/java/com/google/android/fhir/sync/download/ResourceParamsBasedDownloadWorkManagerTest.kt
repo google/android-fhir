@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync.download
 
-import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.sync.SyncDataParams
 import com.google.android.fhir.sync.UrlRequest
@@ -43,19 +42,13 @@ class ResourceParamsBasedDownloadWorkManagerTest {
           ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"),
           ResourceType.Immunization to emptyMap(),
           ResourceType.Observation to emptyMap(),
-        )
+        ),
+        TestResourceParamsBasedDownloadWorkManagerContext("2022-03-20")
       )
 
     val urlsToDownload = mutableListOf<String>()
     do {
-      val url =
-        downloadManager
-          .getNextRequest(
-            object : SyncDownloadContext {
-              override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-03-20"
-            }
-          )
-          ?.let { (it as UrlRequest).url }
+      val url = downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
       if (url != null) {
         urlsToDownload.add(url)
       }
@@ -73,20 +66,13 @@ class ResourceParamsBasedDownloadWorkManagerTest {
   fun getNextRequestUrl_shouldReturnResourceAndPageUrlsAsNextUrls() = runBlockingTest {
     val downloadManager =
       ResourceParamsBasedDownloadWorkManager(
-        mapOf(ResourceType.Patient to emptyMap(), ResourceType.Observation to emptyMap())
+        mapOf(ResourceType.Patient to emptyMap(), ResourceType.Observation to emptyMap()),
+        TestResourceParamsBasedDownloadWorkManagerContext("2022-03-20")
       )
 
     val urlsToDownload = mutableListOf<String>()
     do {
-      val url =
-        downloadManager
-          .getNextRequest(
-            object : SyncDownloadContext {
-              override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-03-20"
-            }
-          )
-          ?.let { (it as UrlRequest).url }
-
+      val url = downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
       if (url != null) {
         urlsToDownload.add(url)
       }
@@ -122,15 +108,11 @@ class ResourceParamsBasedDownloadWorkManagerTest {
   fun getNextRequestUrl_withLastUpdatedTimeProvidedInContext_ShouldAppendGtPrefixToLastUpdatedSearchParam() =
     runBlockingTest {
       val downloadManager =
-        ResourceParamsBasedDownloadWorkManager(mapOf(ResourceType.Patient to emptyMap()))
-      val url =
-        downloadManager
-          .getNextRequest(
-            object : SyncDownloadContext {
-              override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-28"
-            }
-          )
-          ?.let { (it as UrlRequest).url }
+        ResourceParamsBasedDownloadWorkManager(
+          mapOf(ResourceType.Patient to emptyMap()),
+          TestResourceParamsBasedDownloadWorkManagerContext("2022-06-28")
+        )
+      val url = downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
       assertThat(url).isEqualTo("Patient?_sort=_lastUpdated&_lastUpdated=gt2022-06-28")
     }
 
@@ -145,16 +127,11 @@ class ResourceParamsBasedDownloadWorkManagerTest {
                 SyncDataParams.LAST_UPDATED_KEY to "2022-06-28",
                 SyncDataParams.SORT_KEY to "status"
               )
-          )
+          ),
+          TestResourceParamsBasedDownloadWorkManagerContext("2022-07-07")
         )
       val url =
-        downloadManager
-          .getNextRequest(
-            object : SyncDownloadContext {
-              override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-07-07"
-            }
-          )
-          ?.let { (it as UrlRequest).url }
+        downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
       assertThat(url).isEqualTo("Patient?_lastUpdated=2022-06-28&_sort=status")
     }
 
@@ -163,16 +140,10 @@ class ResourceParamsBasedDownloadWorkManagerTest {
     runBlockingTest {
       val downloadManager =
         ResourceParamsBasedDownloadWorkManager(
-          mapOf(ResourceType.Patient to mapOf(SyncDataParams.LAST_UPDATED_KEY to "gt2022-06-28"))
+          mapOf(ResourceType.Patient to mapOf(SyncDataParams.LAST_UPDATED_KEY to "gt2022-06-28")),
+          TestResourceParamsBasedDownloadWorkManagerContext("2022-07-07")
         )
-      val url =
-        downloadManager
-          .getNextRequest(
-            object : SyncDownloadContext {
-              override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-07-07"
-            }
-          )
-          ?.let { (it as UrlRequest).url }
+      val url = downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
       assertThat(url).isEqualTo("Patient?_lastUpdated=gt2022-06-28&_sort=_lastUpdated")
     }
 
@@ -181,16 +152,10 @@ class ResourceParamsBasedDownloadWorkManagerTest {
     runBlockingTest {
       val downloadManager =
         ResourceParamsBasedDownloadWorkManager(
-          mapOf(ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"))
+          mapOf(ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI")),
+          NoOpResourceParamsBasedDownloadWorkManagerContext
         )
-      val actual =
-        downloadManager
-          .getNextRequest(
-            object : SyncDownloadContext {
-              override suspend fun getLatestTimestampFor(type: ResourceType) = null
-            }
-          )
-          ?.let { (it as UrlRequest).url }
+      val actual = downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
       assertThat(actual).isEqualTo("Patient?address-city=NAIROBI&_sort=_lastUpdated")
     }
 
@@ -199,16 +164,11 @@ class ResourceParamsBasedDownloadWorkManagerTest {
     runBlockingTest {
       val downloadManager =
         ResourceParamsBasedDownloadWorkManager(
-          mapOf(ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"))
+          mapOf(ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI")),
+          TestResourceParamsBasedDownloadWorkManagerContext("")
         )
       val actual =
-        downloadManager
-          .getNextRequest(
-            object : SyncDownloadContext {
-              override suspend fun getLatestTimestampFor(type: ResourceType) = ""
-            }
-          )
-          ?.let { (it as UrlRequest).url }
+        downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
       assertThat(actual).isEqualTo("Patient?address-city=NAIROBI&_sort=_lastUpdated")
     }
 
@@ -220,15 +180,11 @@ class ResourceParamsBasedDownloadWorkManagerTest {
           ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"),
           ResourceType.Immunization to emptyMap(),
           ResourceType.Observation to emptyMap(),
-        )
+        ),
+        TestResourceParamsBasedDownloadWorkManagerContext("2022-03-20")
       )
 
-    val urls =
-      downloadManager.getSummaryRequestUrls(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-03-20"
-        }
-      )
+    val urls = downloadManager.getSummaryRequestUrls()
 
     assertThat(urls.map { it.key })
       .containsExactly(ResourceType.Patient, ResourceType.Immunization, ResourceType.Observation)
@@ -242,7 +198,11 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
   @Test
   fun processResponse_withBundleTypeSearchSet_shouldReturnPatient() = runBlockingTest {
-    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
+    val downloadManager =
+      ResourceParamsBasedDownloadWorkManager(
+        emptyMap(),
+        NoOpResourceParamsBasedDownloadWorkManagerContext
+      )
     val response =
       Bundle().apply {
         type = Bundle.BundleType.SEARCHSET
@@ -263,7 +223,11 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
   @Test
   fun processResponse_withTransactionResponseBundle_shouldReturnEmptyList() = runBlockingTest {
-    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
+    val downloadManager =
+      ResourceParamsBasedDownloadWorkManager(
+        emptyMap(),
+        NoOpResourceParamsBasedDownloadWorkManagerContext
+      )
     val response =
       Bundle().apply {
         type = Bundle.BundleType.TRANSACTIONRESPONSE
@@ -285,7 +249,11 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
   @Test
   fun processResponse_withOperationOutcome_shouldThrowException() {
-    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
+    val downloadManager =
+      ResourceParamsBasedDownloadWorkManager(
+        emptyMap(),
+        NoOpResourceParamsBasedDownloadWorkManagerContext
+      )
     val response =
       OperationOutcome().apply {
         addIssue(
@@ -301,4 +269,14 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       }
     assertThat(exception.localizedMessage).isEqualTo("Server couldn't fulfil the request.")
   }
+}
+
+val NoOpResourceParamsBasedDownloadWorkManagerContext =
+  TestResourceParamsBasedDownloadWorkManagerContext(null)
+
+class TestResourceParamsBasedDownloadWorkManagerContext(private val lastUpdatedTimeStamp: String?) :
+  ResourceParamsBasedDownloadWorkManager.TimestampContext {
+  override suspend fun saveLastUpdatedTimestamp(resourceType: ResourceType, timestamp: String?) {}
+  override suspend fun getLasUpdateTimestamp(resourceType: ResourceType): String? =
+    lastUpdatedTimeStamp
 }

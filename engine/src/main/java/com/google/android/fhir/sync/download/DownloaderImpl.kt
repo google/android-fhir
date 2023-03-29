@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync.download
 
-import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.BundleRequest
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
@@ -43,14 +42,13 @@ internal class DownloaderImpl(
 ) : Downloader {
   private val resourceTypeList = ResourceType.values().map { it.name }
 
-  override suspend fun download(context: SyncDownloadContext): Flow<DownloadState> = flow {
-    // TODO (We should get rid of resource type from the DownloadState)
+  override suspend fun download(): Flow<DownloadState> = flow {
     var resourceTypeToDownload: ResourceType = ResourceType.Bundle
     // download count summary of all resources for progress i.e. <type, total, completed>
-    val totalResourcesToDownloadCount = getProgressSummary(context).values.sumOf { it ?: 0 }
+    val totalResourcesToDownloadCount = getProgressSummary().values.sumOf { it ?: 0 }
     emit(DownloadState.Started(resourceTypeToDownload, totalResourcesToDownloadCount))
     var downloadedResourcesCount = 0
-    var request = downloadWorkManager.getNextRequest(context)
+    var request = downloadWorkManager.getNextRequest()
     while (request != null) {
       try {
         resourceTypeToDownload = request.toResourceType()
@@ -62,7 +60,7 @@ internal class DownloaderImpl(
         Timber.e(exception)
         emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
       }
-      request = downloadWorkManager.getNextRequest(context)
+      request = downloadWorkManager.getNextRequest()
     }
   }
 
@@ -79,9 +77,9 @@ internal class DownloaderImpl(
       is BundleRequest -> ResourceType.Bundle
     }
 
-  private suspend fun getProgressSummary(context: SyncDownloadContext) =
+  private suspend fun getProgressSummary() =
     downloadWorkManager
-      .getSummaryRequestUrls(context)
+      .getSummaryRequestUrls()
       .map { summary ->
         summary.key to
           runCatching { dataSource.download(summary.value) }
