@@ -16,8 +16,8 @@
 
 package com.google.android.fhir.demo.data
 
-import com.google.android.fhir.demo.care.CarePlanManager
 import com.google.android.fhir.demo.DemoDataStore
+import com.google.android.fhir.demo.care.CarePlanManager
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.SyncDataParams
 import java.time.ZoneId
@@ -34,8 +34,10 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
-class TimestampBasedDownloadWorkManagerImpl(private val dataStore: DemoDataStore, private val carePlanManager: CarePlanManager) :
-  DownloadWorkManager {
+class TimestampBasedDownloadWorkManagerImpl(
+  private val dataStore: DemoDataStore,
+  private val carePlanManager: CarePlanManager
+) : DownloadWorkManager {
   private val resourceTypeList = ResourceType.values().map { it.name }
   private val urls =
     LinkedList(
@@ -101,10 +103,10 @@ class TimestampBasedDownloadWorkManagerImpl(private val dataStore: DemoDataStore
     // Finally, extract the downloaded resources from the bundle.
     var bundleCollection: Collection<Resource> = mutableListOf()
     if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
-        bundleCollection =
-                response.entry
-                        .map { it.resource }
-                        .also { extractAndSaveLastUpdateTimestampToFetchFutureUpdates(it) }
+      bundleCollection =
+        response.entry
+          .map { it.resource }
+          .also { extractAndSaveLastUpdateTimestampToFetchFutureUpdates(it) }
 
       for (item in response.entry) {
         if (item.resource is PlanDefinition) {
