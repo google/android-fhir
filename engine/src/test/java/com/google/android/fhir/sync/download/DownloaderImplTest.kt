@@ -258,8 +258,7 @@ class TestDownloadWorkManager(requests: List<Request>) : DownloadWorkManager {
 
   override suspend fun getNextRequest(): Request? = queue.poll()
 
-  override suspend fun getSummaryRequestUrls() =
-    emptyMap<ResourceType, String>()
+  override suspend fun getSummaryRequestUrls() = emptyMap<ResourceType, String>()
 
   override suspend fun processResponse(response: Resource): Collection<Resource> {
     if (response is OperationOutcome) {

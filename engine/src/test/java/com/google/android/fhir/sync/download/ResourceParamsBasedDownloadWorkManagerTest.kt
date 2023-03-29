@@ -130,8 +130,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
           ),
           TestResourceParamsBasedDownloadWorkManagerContext("2022-07-07")
         )
-      val url =
-        downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
+      val url = downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
       assertThat(url).isEqualTo("Patient?_lastUpdated=2022-06-28&_sort=status")
     }
 
@@ -167,8 +166,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
           mapOf(ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI")),
           TestResourceParamsBasedDownloadWorkManagerContext("")
         )
-      val actual =
-        downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
+      val actual = downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
       assertThat(actual).isEqualTo("Patient?address-city=NAIROBI&_sort=_lastUpdated")
     }
 

@@ -16,8 +16,8 @@
 
 package com.google.android.fhir.sync
 
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /**
