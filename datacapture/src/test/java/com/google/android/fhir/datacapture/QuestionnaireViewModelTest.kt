@@ -41,7 +41,6 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_ENTRY_MODE_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_HIDDEN_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
-import com.google.android.fhir.datacapture.extensions.EXTENSION_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
@@ -219,7 +218,7 @@ class QuestionnaireViewModelTest {
     }
 
   @Test
-  fun `should throw exception if resource type in context different to what is in launchContext extension`() =
+  fun `should throw exception if resource type in context is not part of launchContext set`() =
     runTest {
       val patientId = "123"
       val patient =
@@ -241,7 +240,74 @@ class QuestionnaireViewModelTest {
                   addExtension(
                     "name",
                     Coding(
-                      "http://hl7.org/fhir/uv/sdc/ValueSet/launchContext",
+                      "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
+                      "observation",
+                      "Observation"
+                    )
+                  )
+                  addExtension("type", CodeType("Observation"))
+                }
+            )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              text = "answer expression question text"
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              extension =
+                listOf(
+                  Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                    Expression().apply {
+                      this.expression = "Observation?subject={{%patient.id}}"
+                      this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                    }
+                  )
+                )
+            }
+          )
+        }
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      state.set(
+        EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING,
+        printer.encodeResourceToString(patient)
+      )
+
+      val errorMessage =
+        assertFailsWith<IllegalStateException> { QuestionnaireViewModel(context, state) }
+          .localizedMessage
+
+      assertThat(errorMessage)
+        .isEqualTo(
+          "The value of the extension:name field in " +
+            "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext is " +
+            "not one of the ones defined in http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext."
+        )
+    }
+
+  @Test
+  fun `should throw exception if resource type in context is different to what is in launchContext extension`() =
+    runTest {
+      val patientId = "123"
+      val patient =
+        Patient().apply {
+          id = patientId
+          active = true
+          gender = Enumerations.AdministrativeGender.MALE
+          addName(HumanName().apply { this.family = "Johnny" })
+        }
+
+      val questionnaire =
+        Questionnaire().apply {
+          extension =
+            listOf(
+              Extension(
+                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+                )
+                .apply {
+                  addExtension(
+                    "name",
+                    Coding(
+                      "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
                       "encounter",
                       "Encounter"
                     )
@@ -279,7 +345,9 @@ class QuestionnaireViewModelTest {
 
       assertThat(errorMessage)
         .isEqualTo(
-          "$EXTENSION_LAUNCH_CONTEXT name or type field does not match the resource type of the context: Patient."
+          "The resource type set in the extension:type field in " +
+            "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext does " +
+            "not match the resource type of the context passed in: Patient."
         )
     }
   @Test

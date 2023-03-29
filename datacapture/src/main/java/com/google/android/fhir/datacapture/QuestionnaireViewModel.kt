@@ -39,10 +39,10 @@ import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isFhirPath
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
-import com.google.android.fhir.datacapture.extensions.isResourceTypeEqualToLaunchContext
 import com.google.android.fhir.datacapture.extensions.isXFhirQuery
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
+import com.google.android.fhir.datacapture.extensions.validateLaunchContext
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
@@ -157,7 +157,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         val questionnaireResourceContextJson: String =
           state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING]!!
         val resource = parser.parseResource(questionnaireResourceContextJson) as Resource
-        questionnaire.isResourceTypeEqualToLaunchContext(resource.resourceType.name)
+        questionnaire.validateLaunchContext(resource.resourceType.name)
         resource
       } else {
         null

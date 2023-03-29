@@ -47,21 +47,24 @@ internal fun Questionnaire.findVariableExpression(variableName: String): Express
   variableExpressions.find { it.name == variableName }
 
 /**
- * Check that the resource type passed to the Questionnaire matches the resource type set in the
- * Questionnaire launch context expression
+ * The launch context allows information to be passed into questionnaire based on the context in
+ * which he questionnaire is being evaluated. For example, what patient, what encounter, what user,
+ * etc. is "in context" at the time the questionnaire response is being completed. The supported
+ * launch contexts are defined in:
+ * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
  */
-internal fun Questionnaire.isResourceTypeEqualToLaunchContext(resourceType: String) {
+internal fun Questionnaire.validateLaunchContext(resourceType: String) {
   this.extension
     .firstOrNull { it.url == EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT }
     ?.let { extension ->
       val nameExtension =
         extension.extension
           .firstOrNull { it.url == "name" }
-          ?.value.takeIf {
-            it is Coding &&
-              it.code == resourceType.lowercase() &&
-              it.display == resourceType &&
-              it.system == EXTENSION_LAUNCH_CONTEXT
+          ?.value.takeIf { type ->
+            type is Coding &&
+              QuestionnaireLaunchContextSet.values().any {
+                it.code == type.code && it.display == type.display && it.system == type.system
+              }
           }
 
       val typeExtension =
@@ -69,9 +72,19 @@ internal fun Questionnaire.isResourceTypeEqualToLaunchContext(resourceType: Stri
           .firstOrNull { it.url == "type" }
           ?.takeIf { it.valueAsPrimitive.valueAsString == resourceType }
 
-      if (nameExtension == null || typeExtension == null) {
+      if (nameExtension == null) {
         error(
-          "$EXTENSION_LAUNCH_CONTEXT name or type field does not match the resource type of the context: $resourceType."
+          "The value of the extension:name field in " +
+            "$EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT is not one of the ones defined in " +
+            "$EXTENSION_LAUNCH_CONTEXT."
+        )
+      }
+
+      if (typeExtension == null) {
+        error(
+          "The resource type set in the extension:type field in " +
+            "$EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT does not match the resource type of the " +
+            "context passed in: $resourceType."
         )
       }
     }
@@ -79,6 +92,19 @@ internal fun Questionnaire.isResourceTypeEqualToLaunchContext(resourceType: Stri
       "Resource context set without setting $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT in the questionnaire."
     )
 }
+
+private enum class QuestionnaireLaunchContextSet(
+  val code: String,
+  val display: String,
+  val system: String,
+) {
+  PATIENT("patient", "Patient", EXTENSION_LAUNCH_CONTEXT),
+  ENCOUNTER("encounter", "Encounter", EXTENSION_LAUNCH_CONTEXT),
+  LOCATION("location", "Location", EXTENSION_LAUNCH_CONTEXT),
+  USER("user", "User", EXTENSION_LAUNCH_CONTEXT),
+  STUDY("study", "ResearchStudy", EXTENSION_LAUNCH_CONTEXT),
+}
+
 /**
  * See
  * [Extension: target structure map](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-targetStructureMap.html)
