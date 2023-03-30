@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.Order
-import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
@@ -82,7 +81,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
           }
         )
       }
-      filterCity(this)
     }
   }
 
@@ -99,7 +97,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
             }
           )
         }
-        filterCity(this)
         sort(Patient.GIVEN, Order.ASCENDING)
         count = 100
         from = 0
@@ -116,19 +113,16 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     return patients
   }
 
-  private fun filterCity(search: Search) {
-    search.filter(Patient.ADDRESS_CITY, { value = "NAIROBI" })
-  }
-
   private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {
-    return fhirEngine.search<RiskAssessment> {}.groupBy { it.subject.reference }.mapValues { entry
-      ->
-      entry
-        .value
-        .filter { it.hasOccurrence() }
-        .sortedByDescending { it.occurrenceDateTimeType.value }
-        .firstOrNull()
-    }
+    return fhirEngine
+      .search<RiskAssessment> {}
+      .groupBy { it.subject.reference }
+      .mapValues { entry ->
+        entry.value
+          .filter { it.hasOccurrence() }
+          .sortedByDescending { it.occurrenceDateTimeType.value }
+          .firstOrNull()
+      }
   }
 
   /** The Patient's details for display purposes. */

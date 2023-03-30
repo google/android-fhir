@@ -30,7 +30,6 @@ import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
-import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
@@ -103,7 +102,7 @@ internal class DatabaseImpl(
       it.resourceIndexer = resourceIndexer
     }
   }
-  private val syncedResourceDao = db.syncedResourceDao()
+
   private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 
   override suspend fun <R : Resource> insert(vararg resource: R): List<String> {
@@ -154,18 +153,8 @@ internal class DatabaseImpl(
     } as Resource
   }
 
-  override suspend fun lastUpdate(resourceType: ResourceType): String? {
-    return db.withTransaction { syncedResourceDao.getLastUpdate(resourceType) }
-  }
-
-  override suspend fun insertSyncedResources(
-    syncedResources: List<SyncedResourceEntity>,
-    resources: List<Resource>
-  ) {
-    db.withTransaction {
-      syncedResourceDao.insertAll(syncedResources)
-      insertRemote(*resources.toTypedArray())
-    }
+  override suspend fun insertSyncedResources(resources: List<Resource>) {
+    db.withTransaction { insertRemote(*resources.toTypedArray()) }
   }
 
   override suspend fun delete(type: ResourceType, id: String) {

@@ -39,7 +39,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
 
   val questionnaire: String
     get() = getQuestionnaireJson()
-  val isPatientSaved = MutableLiveData<Boolean>()
+  val savedPatient = MutableLiveData<Patient?>()
 
   private val questionnaireResource: Questionnaire
     get() =
@@ -64,10 +64,9 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
           .flatten()
           .any { it is Invalid }
       ) {
-        isPatientSaved.value = false
+        savedPatient.value = null
         return@launch
       }
-
       val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
       if (entry.resource !is Patient) {
         return@launch
@@ -75,7 +74,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
       val patient = entry.resource as Patient
       patient.id = generateUuid()
       fhirEngine.create(patient)
-      isPatientSaved.value = true
+      savedPatient.value = patient
     }
   }
 

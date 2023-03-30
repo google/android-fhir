@@ -49,15 +49,26 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.fragment.app.FragmentContainerView
+    <LinearLayout
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/nav_host_fragment"
-            android:name="androidx.navigation.fragment.NavHostFragment"
-            app:navGraph="@navigation/reference_nav_graph"
-            app:defaultNavHost="true"
-        />
+            android:orientation="vertical"
+        >
+        <include
+                android:id="@+id/workflow_execution_status_container"
+                layout="@layout/progress_status_layout"
+                android:visibility="gone"
+            />
+        <androidx.fragment.app.FragmentContainerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/nav_host_fragment"
+                android:name="androidx.navigation.fragment.NavHostFragment"
+                app:navGraph="@navigation/reference_nav_graph"
+                app:defaultNavHost="true"
+            />
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

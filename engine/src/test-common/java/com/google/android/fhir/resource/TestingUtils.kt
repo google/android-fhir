@@ -20,7 +20,6 @@ import androidx.work.Data
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
@@ -105,16 +104,13 @@ class TestingUtils constructor(private val iParser: IParser) {
   ) : DownloadWorkManager {
     private val urls = LinkedList(queries)
 
-    override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? = urls.poll()
-    override suspend fun getSummaryRequestUrls(
-      context: SyncDownloadContext
-    ): Map<ResourceType, String> {
-      return queries
+    override suspend fun getNextRequestUrl(): String? = urls.poll()
+    override suspend fun getSummaryRequestUrls() =
+      queries
         .stream()
         .map { ResourceType.fromCode(it.substringBefore("?")) to it.plus("?_summary=count") }
         .toList()
         .toMap()
-    }
 
     override suspend fun processResponse(response: Resource): Collection<Resource> {
       val patient = Patient().setMeta(Meta().setLastUpdated(Date()))
@@ -149,16 +145,9 @@ class TestingUtils constructor(private val iParser: IParser) {
 
     override suspend fun syncDownload(
       conflictResolver: ConflictResolver,
-      download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+      download: suspend () -> Flow<List<Resource>>
     ) {
-      download(
-          object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType): String {
-              return "123456788"
-            }
-          }
-        )
-        .collect {}
+      download().collect()
     }
     override suspend fun count(search: Search): Long {
       return 0

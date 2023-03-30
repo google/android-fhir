@@ -1,3 +1,6 @@
+import Dependencies.forceHapiVersion
+import Dependencies.removeIncompatibleDependencies
+
 plugins {
   id(Plugins.BuildPlugins.application)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -23,18 +26,37 @@ android {
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
   }
-  buildFeatures { viewBinding = true }
+  buildFeatures {
+    viewBinding = true
+    dataBinding = true
+  }
   compileOptions {
     // Flag to enable support for the new language APIs
     // See https://developer.android.com/studio/write/java8-support
-    isCoreLibraryDesugaringEnabled = true
+    isCoreLibraryDesugaringEnabled = false
 
     sourceCompatibility = Java.sourceCompatibility
     targetCompatibility = Java.targetCompatibility
   }
   kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
   packagingOptions {
-    resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
+    resources.excludes.addAll(
+      listOf(
+        "META-INF/ASL-2.0.txt",
+        "META-INF/LGPL-3.0.txt",
+        "META-INF/LICENSE.md",
+        "META-INF/NOTICE.md",
+        "META-INF/sun-jaxb.episode",
+        "META-INF/DEPENDENCIES"
+      )
+    )
+  }
+}
+
+configurations {
+  all {
+    removeIncompatibleDependencies()
+    forceHapiVersion()
   }
 }
 
@@ -47,6 +69,7 @@ dependencies {
   implementation(Dependencies.Androidx.activity)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)
+  implementation(Dependencies.Androidx.datastorePref)
   implementation(Dependencies.Androidx.fragmentKtx)
   implementation(Dependencies.Androidx.recyclerView)
   implementation(Dependencies.Androidx.workRuntimeKtx)
@@ -60,10 +83,12 @@ dependencies {
   implementation(Dependencies.Navigation.navUiKtx)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
+  implementation(Dependencies.Retrofit.gsonConverter)
   implementation(project(":datacapture")) {
     exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
   }
   implementation(project(":engine"))
+  implementation(project(":workflow"))
 
   testImplementation(Dependencies.junit)
 }

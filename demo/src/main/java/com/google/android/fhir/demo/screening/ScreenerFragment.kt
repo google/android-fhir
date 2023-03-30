@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.demo
+package com.google.android.fhir.demo.screening
 
 import android.os.Bundle
 import android.view.Menu
@@ -26,24 +26,29 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.demo.R
+import com.google.android.fhir.demo.care.CareWorkflowExecutionViewModel
+import org.hl7.fhir.r4.model.Task
 
 /** A fragment class to show screener questionnaire screen. */
 class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
 
   private val viewModel: ScreenerViewModel by viewModels()
+  private val careWorkflowExecutionViewModel: CareWorkflowExecutionViewModel by activityViewModels()
   private val args: ScreenerFragmentArgs by navArgs()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     setUpActionBar()
     setHasOptionsMenu(true)
-    updateArguments()
     onBackPressed()
+    setViewModelQuestionnaire()
     observeResourcesSaveAction()
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
@@ -75,15 +80,15 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
     }
   }
 
-  private fun updateArguments() {
-    requireArguments().putString(QUESTIONNAIRE_FILE_PATH_KEY, "screener-questionnaire.json")
+  private fun setViewModelQuestionnaire() {
+    viewModel.questionnaireString = args.questionnaireString
   }
 
   private fun addQuestionnaireFragment() {
     childFragmentManager.commit {
       add(
         R.id.add_patient_container,
-        QuestionnaireFragment.builder().setQuestionnaire(viewModel.questionnaire).build(),
+        QuestionnaireFragment.builder().setQuestionnaire(viewModel.questionnaireString).build(),
         QUESTIONNAIRE_FRAGMENT_TAG
       )
     }
@@ -129,12 +134,19 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
       }
       Toast.makeText(requireContext(), getString(R.string.resources_saved), Toast.LENGTH_SHORT)
         .show()
+      careWorkflowExecutionViewModel.updateTaskStatus(
+        args.taskLogicalId,
+        Task.TaskStatus.COMPLETED,
+        true
+      )
       NavHostFragment.findNavController(this).navigateUp()
     }
   }
 
   companion object {
-    const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
+    const val EXTRA_QUESTIONNAIRE_JSON_STRING = "questionnaire-json-string"
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
+    const val CURRENT_TASK_ID = "CURRENT_TASK_ID"
+    const val MODIFIED_TASK_ID = "MODIFIED_TASK_ID"
   }
 }

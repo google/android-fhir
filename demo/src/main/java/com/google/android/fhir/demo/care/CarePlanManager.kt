@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-object Sdk {
-  const val compileSdk = 31
-  const val targetSdk = 31
+package com.google.android.fhir.demo.care
 
-  // Engine and SDC must support API 24.
-  // Remove desugaring when upgrading it to 26.
-  const val minSdk = 26
+import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.PlanDefinition
+import org.hl7.fhir.r4.model.Resource
 
-  // Workflow requires minSDK 26
-  const val minSdkWorkflow = 26
+interface CarePlanManager {
+  fun getPlanDefinitionDependentResources(planDefinition: PlanDefinition): Collection<Resource>
+  suspend fun applyPlanDefinitionOnPatient(patient: Patient, planDefinitionId: String)
 }

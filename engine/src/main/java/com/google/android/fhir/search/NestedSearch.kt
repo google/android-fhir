@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,30 @@ inline fun <reified R : Resource> Search.has(
 }
 
 /**
+ * Provide limited support for reverse chaining on [Search] (See
+ * [this](https://www.hl7.org/fhir/search.html#has)).
+ *
+ * Example usage (Search for all Patients with Condition - Diabetes):
+ *
+ * ```
+ *   fhirEngine.search<Patient> {
+ *        has(resourceType = ResourceType.Condition, referenceParam = (Condition.SUBJECT) {
+ *          filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+ *        }
+ *     }
+ * ```
+ */
+fun Search.has(
+  resourceType: ResourceType,
+  referenceParam: ReferenceClientParam,
+  init: Search.() -> Unit
+) {
+  nestedSearches.add(
+    NestedSearch(referenceParam, Search(type = resourceType)).apply { search.init() }
+  )
+}
+
+/**
  * Generates the complete nested query going to several depths depending on the [Search] dsl
  * specified by the user .
  */
@@ -61,16 +85,17 @@ internal fun List<NestedSearch>.nestedQuery(
   return if (isEmpty()) {
     null
   } else {
-    map { it.nestedQuery(type) }.let {
-      SearchQuery(
-        query =
-          it.joinToString(
-            prefix = "AND a.resourceUuid IN ",
-            separator = " ${operation.logicalOperator} a.resourceUuid IN"
-          ) { "(\n${it.query}\n) " },
-        args = it.flatMap { it.args }
-      )
-    }
+    map { it.nestedQuery(type) }
+      .let { searchQueries ->
+        SearchQuery(
+          query =
+            searchQueries.joinToString(
+              prefix = "AND a.resourceUuid IN ",
+              separator = " ${operation.logicalOperator} a.resourceUuid IN"
+            ) { searchQuery -> "(\n${searchQuery.query}\n) " },
+          args = searchQueries.flatMap { it.args }
+        )
+      }
   }
 }
 

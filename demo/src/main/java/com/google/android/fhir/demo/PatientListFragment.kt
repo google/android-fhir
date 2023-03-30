@@ -103,10 +103,10 @@ class PatientListFragment : Fragment() {
     }
 
     searchView = binding.search
-    topBanner = binding.syncStatusContainer.linearLayoutSyncStatus
-    syncStatus = binding.syncStatusContainer.tvSyncingStatus
-    syncPercent = binding.syncStatusContainer.tvSyncingPercent
-    syncProgress = binding.syncStatusContainer.progressSyncing
+    topBanner = binding.syncStatusContainer.linearLayoutProgressStatus
+    syncStatus = binding.syncStatusContainer.progressStatus
+    syncPercent = binding.syncStatusContainer.progressPercent
+    syncProgress = binding.syncStatusContainer.progressBar
     searchView.setOnQueryTextListener(
       object : SearchView.OnQueryTextListener {
         override fun onQueryTextChange(newText: String): Boolean {

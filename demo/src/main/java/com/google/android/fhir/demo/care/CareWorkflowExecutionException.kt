@@ -14,20 +14,6 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.db.impl.entities
+package com.google.android.fhir.demo.care
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import org.hl7.fhir.r4.model.ResourceType
-
-/**
- * Class that models a table that holds all resource types that were synced and the highest
- * `_lastUpdate` value of each resource type.
- */
-@Entity
-internal data class SyncedResourceEntity(
-  /** Resource synced */
-  @PrimaryKey val resourceType: ResourceType,
-  /** The highest `_lastUpdate` value of the resources synced of a specific type */
-  val lastUpdate: String
-)
+data class CareWorkflowExecutionException(val patientId: String, val exception: Exception)

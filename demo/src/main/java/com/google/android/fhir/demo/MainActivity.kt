@@ -17,14 +17,25 @@
 package com.google.android.fhir.demo
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.MenuItem
+import android.view.View
+import android.view.animation.AnimationUtils
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
+import com.google.android.fhir.demo.care.CareWorkflowExecutionStatus
+import com.google.android.fhir.demo.care.CareWorkflowExecutionViewModel
 import com.google.android.fhir.demo.databinding.ActivityMainBinding
+import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 
 const val MAX_RESOURCE_COUNT = 20
 
@@ -32,6 +43,12 @@ class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
   private lateinit var drawerToggle: ActionBarDrawerToggle
   private val viewModel: MainActivityViewModel by viewModels()
+  private val careWorkflowExecutionViewModel: CareWorkflowExecutionViewModel by viewModels()
+
+  private lateinit var workflowBanner: LinearLayout
+  private lateinit var workflowStatus: TextView
+  private lateinit var workflowPercent: TextView
+  private lateinit var workflowProgress: ProgressBar
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -39,7 +56,9 @@ class MainActivity : AppCompatActivity() {
     setContentView(binding.root)
     initActionBar()
     initNavigationDrawer()
+    initWorkflowProgressBar()
     observeLastSyncTime()
+    collectWorkflowExecutionState()
     viewModel.updateLastSyncTimestamp()
   }
 
@@ -86,9 +105,63 @@ class MainActivity : AppCompatActivity() {
     return false
   }
 
+  private fun initWorkflowProgressBar() {
+    workflowBanner = binding.workflowExecutionStatusContainer.linearLayoutProgressStatus
+    workflowStatus = binding.workflowExecutionStatusContainer.progressStatus
+    workflowPercent = binding.workflowExecutionStatusContainer.progressPercent
+    workflowProgress = binding.workflowExecutionStatusContainer.progressBar
+  }
+
   private fun observeLastSyncTime() {
     viewModel.lastSyncTimestampLiveData.observe(this) {
       binding.navigationView.getHeaderView(0).findViewById<TextView>(R.id.last_sync_tv).text = it
+    }
+  }
+
+  private fun collectWorkflowExecutionState() {
+    lifecycleScope.launch {
+      careWorkflowExecutionViewModel.careWorkflowExecutionState.collect {
+        fadeInTopBanner(it)
+        if (it is CareWorkflowExecutionStatus.Finished && it.completed == it.total)
+          fadeOutTopBanner(it)
+      }
+    }
+  }
+
+  private fun fadeInTopBanner(state: CareWorkflowExecutionStatus) {
+    if (workflowBanner.visibility != View.VISIBLE) {
+      workflowStatus.text = resources.getString(R.string.executing_workflow)
+      workflowProgress.progress = 0
+      workflowProgress.visibility = View.VISIBLE
+      workflowBanner.visibility = View.VISIBLE
+      val animation = AnimationUtils.loadAnimation(workflowBanner.context, R.anim.fade_in)
+      workflowBanner.startAnimation(animation)
+    }
+    if (state is CareWorkflowExecutionStatus.Finished) {
+      val progress =
+        state
+          .let { it.completed.toDouble().div(it.total) }
+          .let { if (it.isNaN()) 0.0 else it }
+          .times(100)
+          .roundToInt()
+      "${state.completed} / ${state.total}".also { workflowPercent.text = it }
+      workflowProgress.progress = progress
+    }
+  }
+
+  private fun fadeOutTopBanner(state: CareWorkflowExecutionStatus) {
+    if (state is CareWorkflowExecutionStatus.Finished) workflowPercent.text = ""
+    workflowProgress.visibility = View.GONE
+
+    if (workflowBanner.visibility == View.VISIBLE) {
+      "${
+      resources.getString(R.string.executing_workflow).uppercase()
+      } ${state::class.java.simpleName.uppercase()}".also {
+        workflowStatus.text = it
+      }
+      val animation = AnimationUtils.loadAnimation(workflowBanner.context, R.anim.fade_out)
+      workflowBanner.startAnimation(animation)
+      Handler(Looper.getMainLooper()).postDelayed({ workflowBanner.visibility = View.GONE }, 2000)
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.demo
+package com.google.android.fhir.demo.screening
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -25,6 +25,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
+import com.google.android.fhir.demo.FhirApplication
 import java.math.BigDecimal
 import java.util.UUID
 import kotlinx.coroutines.launch
@@ -45,16 +46,13 @@ import org.hl7.fhir.r4.model.codesystems.RiskProbability
 /** ViewModel for screener questionnaire screen {@link ScreenerEncounterFragment}. */
 class ScreenerViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
-  val questionnaire: String
-    get() = getQuestionnaireJson()
-  val isResourcesSaved = MutableLiveData<Boolean>()
-
+  lateinit var questionnaireString: String
   private val questionnaireResource: Questionnaire
     get() =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire) as
-        Questionnaire
-  private var questionnaireJson: String? = null
+      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaireString)
+        as Questionnaire
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
+  val isResourcesSaved = MutableLiveData<Boolean>()
 
   /**
    * Saves screener encounter questionnaire response into the application database.
@@ -128,20 +126,6 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
     fhirEngine.create(resource)
   }
 
-  private fun getQuestionnaireJson(): String {
-    questionnaireJson?.let {
-      return it!!
-    }
-    questionnaireJson = readFileFromAssets(state[ScreenerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
-    return questionnaireJson!!
-  }
-
-  private fun readFileFromAssets(filename: String): String {
-    return getApplication<Application>().assets.open(filename).bufferedReader().use {
-      it.readText()
-    }
-  }
-
   private fun generateUuid(): String {
     return UUID.randomUUID().toString()
   }
@@ -198,8 +182,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   }
 
   private fun getSpO2(bundle: Bundle): BigDecimal? {
-    return bundle
-      .entry
+    return bundle.entry
       .asSequence()
       .filter { it.resource is Observation }
       .map { it.resource as Observation }
@@ -210,8 +193,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
 
   private fun isSymptomPresent(bundle: Bundle): Boolean {
     val count =
-      bundle
-        .entry
+      bundle.entry
         .filter { it.resource is Observation }
         .map { it.resource as Observation }
         .filter { it.hasCode() && it.code.hasCoding() }
@@ -228,8 +210,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
 
   private fun isComorbidityPresent(bundle: Bundle): Boolean {
     val count =
-      bundle
-        .entry
+      bundle.entry
         .filter { it.resource is Condition }
         .map { it.resource as Condition }
         .filter { it.hasCode() && it.code.hasCoding() }

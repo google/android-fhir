@@ -16,7 +16,7 @@
 
         <include
             android:id="@+id/sync_status_container"
-            layout="@layout/sync_status_layout"
+            layout="@layout/progress_status_layout"
         />
 
         <androidx.appcompat.widget.SearchView
