@@ -173,4 +173,5 @@ private val nonStandardLicenseUrls =
     // BSD-3
     "http://opensource.org/licenses/BSD-3-Clause",
     "http://www.opensource.org/licenses/bsd-license.php",
+    "https://asm.ow2.io/license.html",
   )

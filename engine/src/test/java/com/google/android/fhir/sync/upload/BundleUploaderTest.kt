@@ -21,8 +21,8 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
-import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.sync.UploadResult
+import com.google.android.fhir.testing.BundleDataSource
 import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
 import kotlinx.coroutines.flow.toList
@@ -43,9 +43,7 @@ class BundleUploaderTest {
   fun `upload Bundle transaction should emit Success`() = runBlocking {
     val result =
       BundleUploader(
-          TestingUtils.BundleDataSource {
-            Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
-          },
+          BundleDataSource { Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE } },
           TransactionBundleGenerator.getDefault(),
           LocalChangesPaginator.DEFAULT
         )
@@ -65,7 +63,7 @@ class BundleUploaderTest {
   fun `upload Bundle transaction should emit Started state`() = runBlocking {
     val result =
       BundleUploader(
-          TestingUtils.BundleDataSource { Bundle() },
+          BundleDataSource { Bundle() },
           TransactionBundleGenerator.getDefault(),
           LocalChangesPaginator.DEFAULT
         )
@@ -79,7 +77,7 @@ class BundleUploaderTest {
   fun `upload Bundle Transaction server error should emit Failure`() = runBlocking {
     val result =
       BundleUploader(
-          TestingUtils.BundleDataSource {
+          BundleDataSource {
             OperationOutcome().apply {
               addIssue(
                 OperationOutcome.OperationOutcomeIssueComponent().apply {
@@ -103,7 +101,7 @@ class BundleUploaderTest {
   fun `upload Bundle transaction error during upload should emit Failure`() = runBlocking {
     val result =
       BundleUploader(
-          TestingUtils.BundleDataSource { throw ConnectException("Failed to connect to server.") },
+          BundleDataSource { throw ConnectException("Failed to connect to server.") },
           TransactionBundleGenerator.getDefault(),
           LocalChangesPaginator.DEFAULT
         )
