@@ -19,6 +19,8 @@ package com.google.android.fhir.db.impl
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.android.fhir.db.impl.dao.LocalChangeDao
 import com.google.android.fhir.db.impl.dao.ResourceDao
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
@@ -48,11 +50,18 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
       LocalChangeEntity::class,
       PositionIndexEntity::class
     ],
-  version = 1,
-  exportSchema = false
+  version = 2,
+  exportSchema = true
 )
 @TypeConverters(DbTypeConverters::class)
 internal abstract class ResourceDatabase : RoomDatabase() {
   abstract fun resourceDao(): ResourceDao
   abstract fun localChangeDao(): LocalChangeDao
 }
+
+val MIGRATION_1_2 =
+  object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.execSQL("DROP table if exists SyncedResourceEntity")
+    }
+  }

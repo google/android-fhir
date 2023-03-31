@@ -155,6 +155,7 @@ object Dependencies {
     const val compiler = "androidx.room:room-compiler:${Versions.Androidx.room}"
     const val ktx = "androidx.room:room-ktx:${Versions.Androidx.room}"
     const val runtime = "androidx.room:room-runtime:${Versions.Androidx.room}"
+    const val testing = "androidx.room:room-testing:${Versions.Androidx.room}"
   }
 
   object Mlkit {
