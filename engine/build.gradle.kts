@@ -37,19 +37,13 @@ android {
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
+    consumerProguardFile("proguard-rules.pro")
   }
 
   sourceSets {
     getByName("androidTest").apply { resources.setSrcDirs(listOf("test-data")) }
 
     getByName("test").apply { resources.setSrcDirs(listOf("test-data")) }
-  }
-
-  buildTypes {
-    getByName("release") {
-      isMinifyEnabled = false
-      proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-    }
   }
 
   compileOptions {
