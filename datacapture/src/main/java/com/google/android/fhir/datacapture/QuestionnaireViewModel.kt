@@ -292,11 +292,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    */
   fun getQuestionnaireResponse(): QuestionnaireResponse {
     return questionnaireResponse.copy().apply {
-      item =
-        getEnabledResponseItems(
-          this@QuestionnaireViewModel.questionnaire.item,
-          this@QuestionnaireViewModel.questionnaireResponse.item
-        )
+      item = getEnabledResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
     }
   }
 
@@ -707,10 +703,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   ): List<QuestionnaireResponseItemComponent> {
     val enablementEvaluator = EnablementEvaluator(questionnaireResponse)
     val responseItemKeys = questionnaireResponseItemList.map { it.linkId }
+    val modifiedQuestionnaireResponseItemList =
+      questionnaireItemList.mapNotNull { questionnaireItem ->
+        if (responseItemKeys.contains(questionnaireItem.linkId)) {
+          questionnaireResponseItemList.find { it.linkId == questionnaireItem.linkId }
+        } else questionnaireItem.createQuestionnaireResponseItem()
+      }
     return questionnaireItemList
       .asSequence()
-      .filter { responseItemKeys.contains(it.linkId) }
-      .zip(questionnaireResponseItemList.asSequence())
+      .zip(modifiedQuestionnaireResponseItemList.asSequence())
       .filter { (questionnaireItem, questionnaireResponseItem) ->
         enablementEvaluator.evaluate(
           questionnaireItem,
