@@ -253,37 +253,23 @@ object ExpressionEvaluator {
   }
 
   /**
-   * Create an x-fhir-query string for evaluation
+   * Creates an x-fhir-query string for evaluation
    *
    * @param expression x-fhir-query expression
-   * @param resourceContext if passed, the resource context to evaluate the expression against
+   * @param launchContext if passed, the launch context to evaluate the expression against
    */
   internal fun createXFhirQueryFromExpression(
     expression: Expression,
-    resourceContext: Resource?
+    launchContext: Resource?
   ): String {
-    if (resourceContext == null) {
+    if (launchContext == null) {
       return expression.expression
     }
-    return evaluateXFhirEnhancement(expression, resourceContext)
-      .map {
-        // If the result of evaluating the FHIRPath expressions is an invalid query, it returns
-        // null. As per the spec:
-        // Systems SHOULD log it and continue with extraction as if the query had returned no
-        // data.
-        // See : http://build.fhir.org/ig/HL7/sdc/extraction.html#structuremap-based-extraction
-        if (it.second.isEmpty()) {
-          Timber.w(
-            "${it.first} evaluated to null. The expression is either invalid, or the " +
-              "expression returned no, or more than one resource. The expression will be " +
-              "replaced with a blank string."
-          )
-        }
-        it.first to it.second
-      }
-      .fold(expression.expression) { acc: String, pair: Pair<String, String> ->
-        acc.replace(pair.first, pair.second)
-      }
+    return evaluateXFhirEnhancement(expression, launchContext).fold(expression.expression) {
+      acc: String,
+      pair: Pair<String, String> ->
+      acc.replace(pair.first, pair.second)
+    }
   }
 
   /**
@@ -293,7 +279,7 @@ object ExpressionEvaluator {
    *
    * @param expression x-fhir-query expression containing a FHIRpath, e.g.
    * Practitioner?active=true&{{Practitioner.name.family}}
-   * @param resource the resource context to evaluate the expression against
+   * @param resource the launch context to evaluate the expression against
    */
   private fun evaluateXFhirEnhancement(
     expression: Expression,
@@ -306,7 +292,7 @@ object ExpressionEvaluator {
         // TODO(omarismail94): See if FHIRPathEngine.check() can be used to distinguish invalid
         // expression vs an expression that is valid, but does not return one resource only.
         val expressionNode = fhirPathEngine.parse(fhirPath)
-        fhirPathWithParentheses to
+        val evaluatedResult =
           fhirPathEngine.evaluateToString(
             mapOf(resource.resourceType.name.lowercase() to resource),
             null,
@@ -314,7 +300,22 @@ object ExpressionEvaluator {
             resource,
             expressionNode
           )
+
+        // If the result of evaluating the FHIRPath expressions is an invalid query, it returns
+        // null. As per the spec:
+        // Systems SHOULD log it and continue with extraction as if the query had returned no
+        // data.
+        // See : http://build.fhir.org/ig/HL7/sdc/extraction.html#structuremap-based-extraction
+        if (evaluatedResult.isEmpty()) {
+          Timber.w(
+            "$fhirPath evaluated to null. The expression is either invalid, or the " +
+              "expression returned no, or more than one resource. The expression will be " +
+              "replaced with a blank string."
+          )
+        }
+        fhirPathWithParentheses to evaluatedResult
       }
+
   private fun findDependentVariables(expression: Expression) =
     variableRegex
       .findAll(expression.expression)

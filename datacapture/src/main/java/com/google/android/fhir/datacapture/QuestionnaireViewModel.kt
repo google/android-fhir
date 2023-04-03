@@ -151,15 +151,21 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireResponse.packRepeatedGroups()
   }
 
-  /** The current resource context as questions are being answered. */
-  private val questionnaireResourceContext: Resource?
+  /**
+   * The launch context allows information to be passed into questionnaire based on the context in
+   * which he questionnaire is being evaluated. For example, what patient, what encounter, what
+   * user, etc. is "in context" at the time the questionnaire response is being completed.
+   * Currently, we support at most one launch context.The supported launch contexts are defined in:
+   * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
+   */
+  private val questionnaireLaunchContext: Resource?
 
   init {
-    questionnaireResourceContext =
-      if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING)) {
-        val questionnaireResourceContextJson: String =
-          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING]!!
-        val resource = parser.parseResource(questionnaireResourceContextJson) as Resource
+    questionnaireLaunchContext =
+      if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING)) {
+        val questionnaireLaunchContextJson: String =
+          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING]!!
+        val resource = parser.parseResource(questionnaireLaunchContextJson) as Resource
         questionnaire.validateLaunchContext(resource.resourceType.name)
         resource
       } else {
@@ -526,10 +532,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
 
         val xFhirExpressionString =
-          ExpressionEvaluator.createXFhirQueryFromExpression(
-            expression,
-            questionnaireResourceContext
-          )
+          ExpressionEvaluator.createXFhirQueryFromExpression(expression, questionnaireLaunchContext)
         xFhirQueryResolver!!.resolve(xFhirExpressionString)
       } else if (expression.isFhirPath) {
         fhirPathEngine.evaluate(questionnaireResponse, expression.expression)

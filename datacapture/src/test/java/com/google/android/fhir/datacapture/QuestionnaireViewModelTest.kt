@@ -27,7 +27,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_READ_ONLY
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
@@ -203,7 +203,7 @@ class QuestionnaireViewModelTest {
         }
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
       state.set(
-        EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING,
+        EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING,
         printer.encodeResourceToString(patient)
       )
 
@@ -268,7 +268,7 @@ class QuestionnaireViewModelTest {
         }
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
       state.set(
-        EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING,
+        EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING,
         printer.encodeResourceToString(patient)
       )
 
@@ -335,7 +335,7 @@ class QuestionnaireViewModelTest {
         }
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
       state.set(
-        EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING,
+        EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING,
         printer.encodeResourceToString(patient)
       )
 
@@ -3781,7 +3781,7 @@ class QuestionnaireViewModelTest {
         }
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
       state.set(
-        EXTRA_QUESTIONNAIRE_RESOURCE_CONTEXT_JSON_STRING,
+        EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING,
         printer.encodeResourceToString(patient)
       )
 

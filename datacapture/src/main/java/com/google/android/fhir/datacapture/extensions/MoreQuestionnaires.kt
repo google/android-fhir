@@ -47,11 +47,8 @@ internal fun Questionnaire.findVariableExpression(variableName: String): Express
   variableExpressions.find { it.name == variableName }
 
 /**
- * The launch context allows information to be passed into questionnaire based on the context in
- * which he questionnaire is being evaluated. For example, what patient, what encounter, what user,
- * etc. is "in context" at the time the questionnaire response is being completed. The supported
- * launch contexts are defined in:
- * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
+ * Validates the launch context extension, if it exists, and well formed, and validates if the
+ * resource type is applicable as a launch context.
  */
 internal fun Questionnaire.validateLaunchContext(resourceType: String) {
   this.extension
@@ -93,6 +90,9 @@ internal fun Questionnaire.validateLaunchContext(resourceType: String) {
     )
 }
 
+/**
+ * The set of supported launch contexts, as per: http://hl7.org/fhir/uv/sdc/ValueSet/launchContext
+ */
 private enum class QuestionnaireLaunchContextSet(
   val code: String,
   val display: String,
