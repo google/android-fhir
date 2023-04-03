@@ -17,7 +17,6 @@
 package com.google.android.fhir.index
 
 import android.os.Build
-import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.epochDay
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.DateTimeIndex
@@ -29,7 +28,7 @@ import com.google.android.fhir.index.entities.StringIndex
 import com.google.android.fhir.index.entities.TokenIndex
 import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.resource.TestingUtils
+import com.google.android.fhir.testing.readFromFile
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.ActivityDefinition
@@ -962,9 +961,7 @@ class ResourceIndexerTest {
   /** Integration tests for ResourceIndexer. */
   @Test
   fun index_invoice() {
-    val testInvoice =
-      TestingUtils(FhirContext.forR4().newJsonParser())
-        .readFromFile(Invoice::class.java, "/quantity_test_invoice.json")
+    val testInvoice = readFromFile(Invoice::class.java, "/quantity_test_invoice.json")
 
     val resourceIndices = resourceIndexer.index(testInvoice)
 
@@ -1041,9 +1038,7 @@ class ResourceIndexerTest {
 
   @Test
   fun index_questionnaire() {
-    val testQuestionnaire =
-      TestingUtils(FhirContext.forR4().newJsonParser())
-        .readFromFile(Questionnaire::class.java, "/uri_test_questionnaire.json")
+    val testQuestionnaire = readFromFile(Questionnaire::class.java, "/uri_test_questionnaire.json")
 
     val resourceIndices = resourceIndexer.index(testQuestionnaire)
 
@@ -1098,9 +1093,7 @@ class ResourceIndexerTest {
 
   @Test
   fun index_patient() {
-    val testPatient =
-      TestingUtils(FhirContext.forR4().newJsonParser())
-        .readFromFile(Patient::class.java, "/date_test_patient.json")
+    val testPatient = readFromFile(Patient::class.java, "/date_test_patient.json")
 
     val resourceIndices = resourceIndexer.index(testPatient)
 
@@ -1194,9 +1187,7 @@ class ResourceIndexerTest {
 
   @Test
   fun index_location() {
-    val testLocation =
-      TestingUtils(FhirContext.forR4().newJsonParser())
-        .readFromFile(Location::class.java, "/location-example-hl7hq.json")
+    val testLocation = readFromFile(Location::class.java, "/location-example-hl7hq.json")
 
     val resourceIndices = resourceIndexer.index(testLocation)
 
