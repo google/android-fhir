@@ -308,6 +308,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    */
   fun getQuestionnaireResponse(): QuestionnaireResponse {
     return questionnaireResponse.copy().apply {
+      // Use the view model's questionnaire and questionnaire response for calculating enabled items
+      // because the calculation relies on references to the questionnaire response items.
       item =
         getEnabledResponseItems(
             this@QuestionnaireViewModel.questionnaire.item,
