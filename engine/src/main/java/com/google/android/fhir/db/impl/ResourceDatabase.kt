@@ -60,7 +60,7 @@ internal abstract class ResourceDatabase : RoomDatabase() {
 }
 
 val MIGRATION_1_2 =
-  object : Migration(1, 2) {
+  object : Migration(/* startVersion = */ 1, /* endVersion = */ 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
       database.execSQL("DROP table if exists SyncedResourceEntity")
     }
