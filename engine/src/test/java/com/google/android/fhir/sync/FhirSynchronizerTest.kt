@@ -19,10 +19,10 @@ package com.google.android.fhir.sync
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirServices
-import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.sync.upload.BundleUploader
 import com.google.android.fhir.sync.upload.LocalChangesPaginator
 import com.google.android.fhir.sync.upload.TransactionBundleGenerator
+import com.google.android.fhir.testing.TestDataSourceImpl
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,7 +47,7 @@ class FhirSynchronizerTest {
   private val fhirEngine = services.fhirEngine
   private val bundleUploader =
     BundleUploader(
-      dataSource = TestingUtils.TestDataSourceImpl,
+      dataSource = TestDataSourceImpl,
       bundleGenerator = TransactionBundleGenerator.getDefault(),
       localChangesPaginator = LocalChangesPaginator.DEFAULT
     )

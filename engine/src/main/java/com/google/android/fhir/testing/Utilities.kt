@@ -26,6 +26,7 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.common.truth.Truth.assertThat
 import java.time.OffsetDateTime
@@ -33,7 +34,7 @@ import java.util.Date
 import java.util.LinkedList
 import kotlin.streams.toList
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
@@ -142,10 +143,9 @@ object TestFhirEngineImpl : FhirEngine {
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend () -> Flow<List<Resource>>
-  ) {
-    download().collect()
-  }
+    download: suspend () -> Flow<DownloadState>
+  ): Flow<DownloadState> = download().onEach {}
+
   override suspend fun count(search: Search): Long {
     return 0
   }
