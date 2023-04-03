@@ -20,7 +20,9 @@ import android.content.Context
 import androidx.work.BackoffPolicy
 import androidx.work.WorkerParameters
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.resource.TestingUtils
+import com.google.android.fhir.testing.TestDataSourceImpl
+import com.google.android.fhir.testing.TestDownloadManagerImpl
+import com.google.android.fhir.testing.TestFhirEngineImpl
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.TimeUnit
 import org.junit.Test
@@ -34,10 +36,9 @@ class SyncTest {
   class PassingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
     FhirSyncWorker(appContext, workerParams) {
 
-    override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
-    override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
-    override fun getDownloadWorkManager(): DownloadWorkManager =
-      TestingUtils.TestDownloadManagerImpl()
+    override fun getFhirEngine(): FhirEngine = TestFhirEngineImpl
+    override fun getDataSource(): DataSource = TestDataSourceImpl
+    override fun getDownloadWorkManager(): DownloadWorkManager = TestDownloadManagerImpl()
     override fun getConflictResolver() = AcceptRemoteConflictResolver
   }
 
