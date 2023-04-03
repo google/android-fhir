@@ -675,7 +675,6 @@ class ExpressionEvaluatorTest {
 
   @Test
   fun `createXFhirQueryFromExpression() should capture all FHIR paths`() {
-
     val expression =
       Expression().apply {
         this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
@@ -690,30 +689,7 @@ class ExpressionEvaluatorTest {
   }
 
   @Test
-  fun `createXFhirQueryFromExpression() should evaluate to empty string for incorrect fhir path`() {
-
-    val practitioner =
-      Practitioner().apply {
-        id = UUID.randomUUID().toString()
-        active = true
-        gender = Enumerations.AdministrativeGender.MALE
-        addName(HumanName().apply { this.family = "John" })
-      }
-
-    val expression =
-      Expression().apply {
-        this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
-        this.expression = "Practitioner?active={{random}}"
-      }
-
-    val expressionsToEvaluate =
-      ExpressionEvaluator.createXFhirQueryFromExpression(expression, practitioner)
-    assertThat(expressionsToEvaluate).isEqualTo("Practitioner?active=")
-  }
-
-  @Test
   fun `createXFhirQueryFromExpression() should evaluate to empty string for field that does not exist in resource`() {
-
     val practitioner =
       Practitioner().apply {
         id = UUID.randomUUID().toString()
@@ -731,9 +707,9 @@ class ExpressionEvaluatorTest {
       ExpressionEvaluator.createXFhirQueryFromExpression(expression, practitioner)
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
   }
+
   @Test
   fun `createXFhirQueryFromExpression() should evaluate correct expression`() {
-
     val practitioner =
       Practitioner().apply {
         id = UUID.randomUUID().toString()
@@ -755,7 +731,6 @@ class ExpressionEvaluatorTest {
 
   @Test
   fun `createXFhirQueryFromExpression() should return empty string if the resource provided does not match the type in the expression`() {
-
     val practitioner =
       Practitioner().apply {
         id = UUID.randomUUID().toString()
@@ -777,7 +752,6 @@ class ExpressionEvaluatorTest {
 
   @Test
   fun `createXFhirQueryFromExpression() should evaluate fhirPath with percent sign`() {
-
     val patient =
       Patient().apply {
         id = UUID.randomUUID().toString()

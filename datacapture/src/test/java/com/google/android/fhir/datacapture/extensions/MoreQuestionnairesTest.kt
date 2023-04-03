@@ -17,9 +17,12 @@
 package com.google.android.fhir.datacapture.extensions
 
 import com.google.common.truth.Truth.assertThat
+import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.StringType
@@ -106,5 +109,142 @@ class MoreQuestionnairesTest {
   fun `entryMode should return null if no EntryMode is defined`() {
     val questionnaire = Questionnaire()
     assertThat(questionnaire.entryMode).isNull()
+  }
+
+  @Test
+  fun `should throw exception if launch context is set but questionnaire does not contain launchContext extension`() {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a"
+            text = "answer expression question text"
+            type = Questionnaire.QuestionnaireItemType.REFERENCE
+            extension =
+              listOf(
+                Extension(
+                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                  Expression().apply {
+                    this.expression = "Observation?subject={{%patient.id}}"
+                    this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                  }
+                )
+              )
+          }
+        )
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> { questionnaire.validateLaunchContext("Patient") }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "Resource context set without setting $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT in the questionnaire."
+      )
+  }
+
+  @Test
+  fun `should throw exception if resource type in context is not part of launchContext set`() {
+    val questionnaire =
+      Questionnaire().apply {
+        extension =
+          listOf(
+            Extension(
+                "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+              )
+              .apply {
+                addExtension(
+                  "name",
+                  Coding(
+                    "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
+                    "observation",
+                    "Observation"
+                  )
+                )
+                addExtension("type", CodeType("Observation"))
+              }
+          )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a"
+            text = "answer expression question text"
+            type = Questionnaire.QuestionnaireItemType.REFERENCE
+            extension =
+              listOf(
+                Extension(
+                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                  Expression().apply {
+                    this.expression = "Observation?subject={{%patient.id}}"
+                    this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                  }
+                )
+              )
+          }
+        )
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> { questionnaire.validateLaunchContext("Patient") }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "The value of the extension:name field in " +
+          "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext is " +
+          "not one of the ones defined in http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext."
+      )
+  }
+
+  @Test
+  fun `should throw exception if resource type in context is different to what is in launchContext extension`() {
+    val questionnaire =
+      Questionnaire().apply {
+        extension =
+          listOf(
+            Extension(
+                "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+              )
+              .apply {
+                addExtension(
+                  "name",
+                  Coding(
+                    "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
+                    "encounter",
+                    "Encounter"
+                  )
+                )
+                addExtension("type", CodeType("Encounter"))
+              }
+          )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a"
+            text = "answer expression question text"
+            type = Questionnaire.QuestionnaireItemType.REFERENCE
+            extension =
+              listOf(
+                Extension(
+                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                  Expression().apply {
+                    this.expression = "Observation?subject={{%patient.id}}"
+                    this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                  }
+                )
+              )
+          }
+        )
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> { questionnaire.validateLaunchContext("Patient") }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "The resource type set in the extension:type field in " +
+          "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext does " +
+          "not match the resource type of the context passed in: Patient."
+      )
   }
 }
