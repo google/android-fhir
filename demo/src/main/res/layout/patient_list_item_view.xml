@@ -21,29 +21,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:paddingVertical="@dimen/fab_margin"
 >
-
-  <ImageView
-        android:id="@+id/status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/text_margin"
-        android:layout_marginTop="@dimen/status_margin"
-        android:gravity="center_vertical"
-        android:src="@drawable/ic_baseline_circle"
-        android:contentDescription="@string/description_status"
-    />
-
   <TextView
         android:layout_alignWithParentIfMissing="true"
         android:id="@+id/name"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
         android:layout_marginStart="@dimen/text_margin"
         android:layout_marginEnd="@dimen/small_text_margin"
         android:layout_marginBottom="@dimen/small_text_margin"
-        android:layout_toEndOf="@id/status"
         android:textAppearance="?attr/textAppearanceSubtitle1"
         android:textStyle="bold"
         tools:text="Navya Patel"
@@ -63,17 +49,16 @@
         tools:text="50 years old"
     />
 
-  <TextView
-        android:id="@+id/id"
-        android:layout_width="fill_parent"
+  <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tasksCount"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:includeFontPadding="false"
         android:layout_below="@id/field_name"
-        android:layout_alignParentEnd="true"
         android:layout_alignStart="@id/name"
         android:layout_marginTop="@dimen/small_text_margin"
         android:layout_marginEnd="@dimen/small_text_margin"
-        android:layout_toEndOf="@id/status"
         android:textAppearance="?attr/textAppearanceBody2"
-        tools:text="Id: #...456"
     />
 </RelativeLayout>

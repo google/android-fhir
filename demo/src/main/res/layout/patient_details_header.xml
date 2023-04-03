@@ -4,6 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="1dp"
 >
   <LinearLayout
@@ -35,12 +36,14 @@
                 android:layout_height="wrap_content"
                 android:text="Current status:"
             />
+
       <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/status_value"
                 style="@style/AppTheme.PatientDetails.body2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="4dp"
+                android:includeFontPadding="false"
                 android:text=""
             />
     </LinearLayout>
@@ -66,15 +69,16 @@
     </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
-            android:id="@+id/screener"
+            android:id="@+id/pending_tasks_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:paddingStart="2dp"
+            android:paddingHorizontal="20dp"
             android:drawablePadding="2dp"
             android:drawableStart="@drawable/ic_baseline_add_24"
-            android:text="@string/complete_survey"
             android:textAppearance="?attr/textAppearanceBody2"
+            app:cornerRadius="20dp"
+            android:text="@string/tasks_due"
         />
   </LinearLayout>
 </FrameLayout>

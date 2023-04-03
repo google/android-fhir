@@ -44,7 +44,6 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
             extraFilter = { filter(Task.STATUS, { value = of(taskStatus) }) }
           )
           .mapIndexed { index, fhirTask -> fhirTask.toTaskItem(index + 1) }
-      //          .addowner
     }
   }
 
@@ -62,26 +61,33 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
     val id: String,
     // for Task/123/... this should be 123
     val resourceId: String,
-    val name: String,
+    val description: String,
     val status: String,
-    val intent: String
+    val intent: String,
+    val dueDate: String,
+    val completedDate: String
   ) {
-    override fun toString() = name
+    override fun toString() = description
   }
 }
 
 internal fun Task.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
   val taskResourceId = if (hasIdElement()) idElement.idPart else ""
-  val taskName = if (hasIdentifier()) identifier[0].value else ""
+  val description = if (hasDescription()) description else "Sample Task Name"
   // status and intent are always present
   val taskStatus = status.toCode()
   val taskIntent = intent.toCode()
+  val dueDate =
+    if (hasRestriction() && restriction.hasPeriod()) restriction.period.end.toString()
+    else "Sample End Date"
 
   return ListScreeningsViewModel.TaskItem(
     id = position.toString(),
     resourceId = taskResourceId,
-    name = taskName,
+    description = description,
     status = taskStatus,
-    intent = taskIntent
+    intent = taskIntent,
+    dueDate = dueDate,
+    completedDate = dueDate,
   )
 }

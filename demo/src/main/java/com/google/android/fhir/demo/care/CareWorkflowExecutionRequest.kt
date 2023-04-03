@@ -18,4 +18,7 @@ package com.google.android.fhir.demo.care
 
 import org.hl7.fhir.r4.model.Patient
 
-data class CareWorkflowExecutionRequest(val patient: Patient)
+data class CareWorkflowExecutionRequest(
+  val patient: Patient,
+  val careWorkflowExecutionStatus: CareWorkflowExecutionStatus
+)

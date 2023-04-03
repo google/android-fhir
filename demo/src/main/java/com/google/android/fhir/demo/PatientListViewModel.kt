@@ -32,6 +32,7 @@ import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.RiskAssessment
+import org.hl7.fhir.r4.model.Task
 
 /**
  * The ViewModel helper class for PatientItemRecyclerViewAdapter, that is responsible for preparing
@@ -39,6 +40,9 @@ import org.hl7.fhir.r4.model.RiskAssessment
  */
 class PatientListViewModel(application: Application, private val fhirEngine: FhirEngine) :
   AndroidViewModel(application) {
+
+  private val taskManager =
+    FhirApplication.taskManager(getApplication<Application>().applicationContext)
 
   val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
   val patientCount = MutableLiveData<Long>()
@@ -101,7 +105,14 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
         count = 100
         from = 0
       }
-      .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
+      .mapIndexed { index, fhirPatient ->
+        fhirPatient.toPatientItem(index + 1).apply {
+          pendingTasksCount =
+            taskManager.getTasksCount(resourceId) {
+              filter(Task.STATUS, { value = of(getTaskStatus(0)) })
+            }
+        }
+      }
       .let { patients.addAll(it) }
 
     val risks = getRiskAssessments()
@@ -138,7 +149,8 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val isActive: Boolean,
     val html: String,
     var risk: String? = "",
-    var riskItem: RiskAssessmentItem? = null
+    var riskItem: RiskAssessmentItem? = null,
+    var pendingTasksCount: Int = 0
   ) {
     override fun toString(): String = name
   }
@@ -203,4 +215,16 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
     isActive = isActive,
     html = html
   )
+}
+
+/**
+ * Currently only [Task.TaskStatus.COMPLETED] & [Task.TaskStatus.READY] are shown. This logic could
+ * be extended.
+ */
+fun getTaskStatus(position: Int): String {
+  return when (position) {
+    0 -> Task.TaskStatus.READY
+    1 -> Task.TaskStatus.COMPLETED
+    else -> Task.TaskStatus.READY
+  }.toCode()
 }

@@ -21,7 +21,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -30,6 +29,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.demo.care.CareWorkflowExecutionViewModel
+import com.google.android.material.snackbar.Snackbar
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /** A fragment class to show patient registration screen. */
@@ -104,12 +104,25 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
   private fun observeSavedPatient() {
     viewModel.savedPatient.observe(viewLifecycleOwner) {
       if (it == null) {
-        Toast.makeText(requireContext(), "Inputs are missing.", Toast.LENGTH_SHORT).show()
+        Snackbar.make(
+            requireActivity().findViewById(android.R.id.content),
+            R.string.inputs_missing,
+            Snackbar.LENGTH_SHORT
+          )
+          .show()
         return@observe
       }
-      Toast.makeText(requireContext(), "Patient is saved.", Toast.LENGTH_SHORT).show()
+      Snackbar.make(
+          requireActivity().findViewById(android.R.id.content),
+          "Patient is saved. Updating tasks.",
+          Snackbar.LENGTH_SHORT
+        )
+        .show()
       // workflow execution in mainActivityViewModel is necessary
       careWorkflowExecutionViewModel.executeCareWorkflowForPatient(it)
+      NavHostFragment.findNavController(this)
+        .previousBackStackEntry
+        ?.savedStateHandle?.set(NEW_PATIENT_RESULT_KEY, it.name[0].nameAsSingleString)
       NavHostFragment.findNavController(this).navigateUp()
     }
   }
@@ -117,5 +130,6 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
   companion object {
     const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
+    const val NEW_PATIENT_RESULT_KEY = "newPatientName"
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.RoundedCornerTreatment
 import com.google.android.material.shape.ShapeAppearanceModel
 
-class PatientDetailsRecyclerViewAdapter(private val onScreenerClick: () -> Unit) :
+class PatientDetailsRecyclerViewAdapter(private val onTasksViewPageClick: () -> Unit) :
   ListAdapter<PatientDetailData, PatientDetailItemViewHolder>(PatientDetailDiffUtil()) {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientDetailItemViewHolder {
     return when (ViewTypes.from(viewType)) {
@@ -44,7 +44,7 @@ class PatientDetailsRecyclerViewAdapter(private val onScreenerClick: () -> Unit)
       ViewTypes.PATIENT ->
         PatientOverviewItemViewHolder(
           PatientDetailsHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-          onScreenerClick
+          onTasksViewPageClick
         )
       ViewTypes.PATIENT_PROPERTY ->
         PatientPropertyItemViewHolder(
@@ -151,10 +151,11 @@ abstract class PatientDetailItemViewHolder(v: View) : RecyclerView.ViewHolder(v)
 
 class PatientOverviewItemViewHolder(
   private val binding: PatientDetailsHeaderBinding,
-  val onScreenerClick: () -> Unit
+  val onTasksViewPageClick: () -> Unit
 ) : PatientDetailItemViewHolder(binding.root) {
   override fun bind(data: PatientDetailData) {
-    binding.screener.setOnClickListener { onScreenerClick() }
+    binding.pendingTasksView.setOnClickListener { onTasksViewPageClick() }
+    binding.pendingTasksView.text
     (data as PatientDetailOverview).let { binding.title.text = it.patient.name }
     data.patient.riskItem?.let {
       binding.patientContainer.setBackgroundColor(it.patientCardColor)
@@ -174,8 +175,7 @@ class PatientPropertyItemViewHolder(private val binding: PatientListItemViewBind
       binding.name.text = it.patientProperty.header
       binding.fieldName.text = it.patientProperty.value
     }
-    binding.status.visibility = View.GONE
-    binding.id.visibility = View.GONE
+    binding.tasksCount.visibility = View.GONE
   }
 }
 
@@ -193,8 +193,7 @@ class PatientDetailsObservationItemViewHolder(private val binding: PatientListIt
       binding.name.text = it.observation.code
       binding.fieldName.text = it.observation.value
     }
-    binding.status.visibility = View.GONE
-    binding.id.visibility = View.GONE
+    binding.tasksCount.visibility = View.GONE
   }
 }
 
@@ -205,8 +204,7 @@ class PatientDetailsConditionItemViewHolder(private val binding: PatientListItem
       binding.name.text = it.condition.code
       binding.fieldName.text = it.condition.value
     }
-    binding.status.visibility = View.GONE
-    binding.id.visibility = View.GONE
+    binding.tasksCount.visibility = View.GONE
   }
 }
 

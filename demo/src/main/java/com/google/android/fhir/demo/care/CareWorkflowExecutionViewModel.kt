@@ -22,14 +22,12 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.demo.FhirApplication
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.Task
-import timber.log.Timber
 
 /**
  * TODO(mjajoo@): Move this implementation to background in CarePlanManager(?) using
@@ -37,27 +35,25 @@ import timber.log.Timber
  * the application is active which is not true.
  */
 class CareWorkflowExecutionViewModel(application: Application) : AndroidViewModel(application) {
-  val _careWorkflowExecutionState = MutableSharedFlow<CareWorkflowExecutionStatus>()
-  val careWorkflowExecutionState: Flow<CareWorkflowExecutionStatus>
-    get() = _careWorkflowExecutionState
-  private var totalPlanDefinitionsToApply = AtomicInteger(0)
-  private var totalPlanDefinitionsApplied = AtomicInteger(0)
-
   private val fhirEngine =
     FhirApplication.fhirEngine(getApplication<Application>().applicationContext)
   private val carePlanManager =
     FhirApplication.carePlanManager(getApplication<Application>().applicationContext)
   private val taskManager =
     FhirApplication.taskManager(getApplication<Application>().applicationContext)
-  private val careConfiguration = ConfigurationManager.getCareConfiguration()
+  lateinit var currentPlanDefinitionId: String
 
   /**
    * Shared flow of [CareWorkflowExecutionRequest]. For each collected patient the execution shall
    * run in blocking mode as asynchronous execution is resource exhaustive. extraBufferCapacity > 0
    * so that pending executions are collected properly.
    */
-  private val patientFlowForCareWorkflowExecution =
-    MutableSharedFlow<CareWorkflowExecutionRequest>(extraBufferCapacity = 5)
+  // Having a map of patients is better ? Check TVPF.updateWorkflowExecutionBar
+  // replay to 5 is not good since for multiple patients will be in queue. map makes lot more sense
+  val patientFlowForCareWorkflowExecution =
+    MutableSharedFlow<CareWorkflowExecutionRequest>(replay = 5)
+  private var totalPlanDefinitionsToApply = AtomicInteger(0)
+  private var totalPlanDefinitionsApplied = AtomicInteger(0)
 
   init {
     /**
@@ -68,33 +64,40 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
      */
     viewModelScope.launch(Dispatchers.IO) {
       patientFlowForCareWorkflowExecution.collect { careWorkflowExecutionRequest ->
+        if (careWorkflowExecutionRequest.careWorkflowExecutionStatus
+            is CareWorkflowExecutionStatus.Finished
+        )
+          return@collect
         /**
          * runBlocking because we want to run care workflows sequentially to avoid resource
          * exhaustion.
          */
         runBlocking {
-          careConfiguration.supportedImplementationGuides
-            .map { it.implementationGuideConfig.entryPoint.substring("PlanDefinition/".length) }
-            .forEach {
-              _careWorkflowExecutionState.emit(
-                CareWorkflowExecutionStatus.Started(totalPlanDefinitionsToApply.incrementAndGet())
-              )
-              carePlanManager.applyPlanDefinitionOnPatient(careWorkflowExecutionRequest.patient, it)
-              _careWorkflowExecutionState.emit(
-                CareWorkflowExecutionStatus.Finished(
-                  totalPlanDefinitionsApplied.incrementAndGet(),
-                  totalPlanDefinitionsToApply.get()
-                )
-              )
-            }
+          carePlanManager.applyPlanDefinitionOnPatient(
+            careWorkflowExecutionRequest.patient,
+            currentPlanDefinitionId
+          )
         }
+        patientFlowForCareWorkflowExecution.emit(
+          CareWorkflowExecutionRequest(
+            careWorkflowExecutionRequest.patient,
+            CareWorkflowExecutionStatus.Finished(
+              totalPlanDefinitionsApplied.incrementAndGet(),
+              totalPlanDefinitionsToApply.get()
+            )
+          )
+        )
       }
     }
   }
   fun executeCareWorkflowForPatient(patient: Patient) {
     viewModelScope.launch {
-      Timber.i("emitting patient ${patient.id}")
-      patientFlowForCareWorkflowExecution.emit(CareWorkflowExecutionRequest(patient))
+      patientFlowForCareWorkflowExecution.emit(
+        CareWorkflowExecutionRequest(
+          patient,
+          CareWorkflowExecutionStatus.Started(totalPlanDefinitionsToApply.incrementAndGet())
+        )
+      )
     }
   }
 
@@ -110,11 +113,11 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
   ) {
     viewModelScope.launch {
       val task = fhirEngine.get(ResourceType.Task, taskLogicalId) as Task
-      taskManager.updateTaskStatus(task, taskStatus, updateCarePlan)
-      executeCareWorkflowForPatient(
+      val taskPatient =
         fhirEngine.get(ResourceType.Patient, task.`for`.reference.substring("Patient/".length))
           as Patient
-      )
+      taskManager.updateTaskStatus(task, taskStatus, updateCarePlan)
+      executeCareWorkflowForPatient(taskPatient)
     }
   }
 }

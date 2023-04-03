@@ -31,10 +31,14 @@ interface TaskManager {
    * questionnaireId only ?
    */
   suspend fun fetchQuestionnaireFromTaskLogicalId(taskResourceId: String): Questionnaire?
-  suspend fun getTasksForPatient(patientId: String, extraFilter: Search.() -> Unit): List<Task>
+  suspend fun getTasksForPatient(
+    patientId: String,
+    extraFilter: (Search.() -> Unit)? = null
+  ): List<Task>
   suspend fun updateTaskStatus(
     task: Task,
     status: Task.TaskStatus,
     updateCarePlanStatus: Boolean = true
   )
+  suspend fun getTasksCount(patientId: String, extraFilter: (Search.() -> Unit)? = null): Int
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,21 +18,19 @@ package com.google.android.fhir.demo
 
 import android.content.res.ColorStateList
 import android.content.res.Resources
-import android.widget.ImageView
+import android.graphics.Color
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.demo.databinding.PatientListItemViewBinding
+import com.google.android.material.textview.MaterialTextView
 import java.time.LocalDate
 import java.time.Period
-import org.hl7.fhir.r4.model.codesystems.RiskProbability
 
 class PatientItemViewHolder(binding: PatientListItemViewBinding) :
   RecyclerView.ViewHolder(binding.root) {
-  private val statusView: ImageView = binding.status
   private val nameView: TextView = binding.name
   private val ageView: TextView = binding.fieldName
-  private val idView: TextView = binding.id
+  private val tasksCount: MaterialTextView = binding.tasksCount
 
   fun bindTo(
     patientItem: PatientListViewModel.PatientItem,
@@ -40,20 +38,13 @@ class PatientItemViewHolder(binding: PatientListItemViewBinding) :
   ) {
     this.nameView.text = patientItem.name
     this.ageView.text = getFormattedAge(patientItem, ageView.context.resources)
-    this.idView.text = "Id: #---${getTruncatedId(patientItem)}"
+    this.tasksCount.text = "${patientItem.pendingTasksCount} Tasks"
+    this.tasksCount.setTextColor(Color.BLACK)
+    this.tasksCount.background =
+      PatientDetailsRecyclerViewAdapter.allCornersRounded().apply {
+        fillColor = ColorStateList.valueOf(Color.parseColor("#D2E3FC"))
+      }
     this.itemView.setOnClickListener { onItemClicked(patientItem) }
-    statusView.imageTintList =
-      ColorStateList.valueOf(
-        ContextCompat.getColor(
-          statusView.context,
-          when (patientItem.risk) {
-            RiskProbability.HIGH.toCode() -> R.color.high_risk
-            RiskProbability.MODERATE.toCode() -> R.color.moderate_risk
-            RiskProbability.LOW.toCode() -> R.color.low_risk
-            else -> R.color.unknown_risk
-          }
-        )
-      )
   }
 
   private fun getFormattedAge(
@@ -68,10 +59,5 @@ class PatientItemViewHolder(binding: PatientListItemViewBinding) :
         else -> resources.getQuantityString(R.plurals.ageDay, it.days, it.days)
       }
     }
-  }
-
-  /** The new ui just shows shortened id with just last 3 characters. */
-  private fun getTruncatedId(patientItem: PatientListViewModel.PatientItem): String {
-    return patientItem.resourceId.takeLast(3)
   }
 }

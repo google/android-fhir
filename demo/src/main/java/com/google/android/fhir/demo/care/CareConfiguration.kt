@@ -27,7 +27,7 @@ val careConfig =
                 "carePlanPolicy": "ACCEPT_ALL", 
                 "implementationGuideConfig": {
                     "implementationGuideId": "ImplementationGuide/NCDIG",
-                    "entryPoint": "PlanDefinition/Configurable-Screenings-Milestone-1-Master-Plan-Definition",
+                    "entryPoint": "PlanDefinition/Configurable-Screenings-NCD-Master-Plan-Definition",
                     "requestResourceConfigurations": [
                         {
                             "resourceType": "Task",

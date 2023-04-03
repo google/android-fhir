@@ -23,14 +23,22 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.demo.care.CareWorkflowExecutionStatus
+import com.google.android.fhir.demo.care.CareWorkflowExecutionViewModel
 import com.google.android.fhir.demo.databinding.PatientDetailBinding
+import kotlinx.coroutines.launch
 
 /**
  * A fragment representing a single Patient detail screen. This fragment is contained in a
@@ -39,11 +47,17 @@ import com.google.android.fhir.demo.databinding.PatientDetailBinding
 class PatientDetailsFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
   private lateinit var patientDetailsViewModel: PatientDetailsViewModel
+  private val careWorkflowExecutionViewModel by activityViewModels<CareWorkflowExecutionViewModel>()
+
   private val args: PatientDetailsFragmentArgs by navArgs()
   private var _binding: PatientDetailBinding? = null
   private val binding
     get() = _binding!!
   var editMenuItem: MenuItem? = null
+  private lateinit var careWorkflowExecutionStatusLayout: LinearLayout
+  private lateinit var careWorkflowExecutionStatus: TextView
+  private lateinit var careWorkflowExecutionImage: ImageView
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setHasOptionsMenu(true)
@@ -67,7 +81,13 @@ class PatientDetailsFragment : Fragment() {
           PatientDetailsViewModelFactory(requireActivity().application, fhirEngine, args.patientId)
         )
         .get(PatientDetailsViewModel::class.java)
-    val adapter = PatientDetailsRecyclerViewAdapter(::onAddScreenerClick)
+    careWorkflowExecutionStatusLayout =
+      binding.workflowExecutionStatusContainer.careWorkflowExecutionStatusLayout
+    careWorkflowExecutionStatus =
+      binding.workflowExecutionStatusContainer.careWorkflowExecutionStatus
+    careWorkflowExecutionImage =
+      binding.workflowExecutionStatusContainer.careWorkflowExecutionStatusImage
+    val adapter = PatientDetailsRecyclerViewAdapter(::onTaskViewPageClick)
     binding.recycler.adapter = adapter
     (requireActivity() as AppCompatActivity).supportActionBar?.apply {
       title = "Patient Card"
@@ -81,9 +101,42 @@ class PatientDetailsFragment : Fragment() {
     }
     patientDetailsViewModel.getPatientDetailData()
     (activity as MainActivity).setDrawerEnabled(false)
+    collectWorkflowExecution()
   }
 
-  private fun onAddScreenerClick() {
+  private fun collectWorkflowExecution() {
+    lifecycleScope.launch {
+      careWorkflowExecutionViewModel.patientFlowForCareWorkflowExecution.collect {
+        val status = it.careWorkflowExecutionStatus
+        if (it.patient.id == args.patientId) {
+          updateWorkflowExecutionBar(status)
+        }
+      }
+    }
+  }
+
+  private fun updateWorkflowExecutionBar(status: CareWorkflowExecutionStatus) {
+    when (status) {
+      is CareWorkflowExecutionStatus.Started -> {
+        careWorkflowExecutionStatusLayout.setBackgroundColor(
+          resources.getColor(R.color.workflow_running)
+        )
+        careWorkflowExecutionStatus.text = resources.getString(R.string.updating_tasks)
+        careWorkflowExecutionImage.setImageResource(R.drawable.ic_baseline_sync_24)
+      }
+      is CareWorkflowExecutionStatus.InProgress -> {}
+      is CareWorkflowExecutionStatus.Finished -> {
+        careWorkflowExecutionStatusLayout.setBackgroundColor(
+          resources.getColor(R.color.workflow_finished)
+        )
+        careWorkflowExecutionStatus.text = resources.getString(R.string.tasks_updated)
+        careWorkflowExecutionImage.setImageResource(R.drawable.ic_check)
+      }
+      is CareWorkflowExecutionStatus.Failed -> {}
+    }
+  }
+
+  private fun onTaskViewPageClick() {
     findNavController()
       .navigate(
         PatientDetailsFragmentDirections.actionPatientDetailsToTasksViewPagerFragment(

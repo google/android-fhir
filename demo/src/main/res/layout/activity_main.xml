@@ -37,38 +37,31 @@
             android:id="@+id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay"
+            android:theme="@style/AppTheme.PopupOverlay"
         >
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:popupTheme="@style/AppTheme.PopupOverlay"
-            />
+                android:background="@android:color/white"
+                app:titleCentered="true"
+            >
+
+        </com.google.android.material.appbar.MaterialToolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <LinearLayout
+    <androidx.fragment.app.FragmentContainerView
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-        >
-        <include
-                android:id="@+id/workflow_execution_status_container"
-                layout="@layout/progress_status_layout"
-                android:visibility="gone"
-            />
-        <androidx.fragment.app.FragmentContainerView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/nav_host_fragment"
-                android:name="androidx.navigation.fragment.NavHostFragment"
-                app:navGraph="@navigation/reference_nav_graph"
-                app:defaultNavHost="true"
-            />
-    </LinearLayout>
+            android:id="@+id/nav_host_fragment"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            app:navGraph="@navigation/reference_nav_graph"
+            app:defaultNavHost="true"
+        />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

@@ -20,14 +20,12 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -38,25 +36,34 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
+import com.google.android.fhir.demo.care.CareWorkflowExecutionStatus
+import com.google.android.fhir.demo.care.CareWorkflowExecutionViewModel
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
 import com.google.android.fhir.sync.SyncJobStatus
-import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
   private lateinit var patientListViewModel: PatientListViewModel
+  private val careWorkflowExecutionViewModel by activityViewModels<CareWorkflowExecutionViewModel>()
+
+  private lateinit var recyclerView: RecyclerView
+  private lateinit var adapter: PatientItemRecyclerViewAdapter
   private lateinit var searchView: SearchView
   private lateinit var topBanner: LinearLayout
   private lateinit var syncStatus: TextView
   private lateinit var syncPercent: TextView
   private lateinit var syncProgress: ProgressBar
+  private lateinit var careWorkflowExecutionStatusLayout: LinearLayout
+  private lateinit var careWorkflowExecutionStatus: TextView
+  private lateinit var careWorkflowExecutionImage: ImageView
   private var _binding: FragmentPatientListBinding? = null
   private val binding
     get() = _binding!!
@@ -84,29 +91,39 @@ class PatientListFragment : Fragment() {
           PatientListViewModelFactory(requireActivity().application, fhirEngine)
         )
         .get(PatientListViewModel::class.java)
-    val recyclerView: RecyclerView = binding.patientListContainer.patientList
-    val adapter = PatientItemRecyclerViewAdapter(this::onPatientItemClicked)
+
+    setupRecyclerView()
+    setupSearchView()
+    observeTasksUpdate()
+    setupSyncProgress()
+    observePatients()
+
+    binding.apply {
+      addPatient.setOnClickListener { onAddPatientClick() }
+      addPatient.setColorFilter(Color.WHITE)
+    }
+    setHasOptionsMenu(false)
+    (activity as MainActivity).setDrawerEnabled(false)
+  }
+
+  private fun setupRecyclerView() {
+    recyclerView = binding.patientListContainer.patientList
+    adapter = PatientItemRecyclerViewAdapter(this::onPatientItemClicked)
     recyclerView.adapter = adapter
     recyclerView.addItemDecoration(
       DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
         setDrawable(ColorDrawable(Color.LTGRAY))
       }
     )
+  }
 
-    patientListViewModel.liveSearchedPatients.observe(viewLifecycleOwner) {
-      Timber.d("Submitting ${it.count()} patient records")
-      adapter.submitList(it)
-    }
+  private fun onPatientItemClicked(patientItem: PatientListViewModel.PatientItem) {
+    findNavController()
+      .navigate(PatientListFragmentDirections.navigateToProductDetail(patientItem.resourceId))
+  }
 
-    patientListViewModel.patientCount.observe(viewLifecycleOwner) {
-      binding.patientListContainer.patientCount.text = "$it Patient(s)"
-    }
-
+  private fun setupSearchView() {
     searchView = binding.search
-    topBanner = binding.syncStatusContainer.linearLayoutProgressStatus
-    syncStatus = binding.syncStatusContainer.progressStatus
-    syncPercent = binding.syncStatusContainer.progressPercent
-    syncProgress = binding.syncStatusContainer.progressBar
     searchView.setOnQueryTextListener(
       object : SearchView.OnQueryTextListener {
         override fun onQueryTextChange(newText: String): Boolean {
@@ -141,14 +158,13 @@ class PatientListFragment : Fragment() {
           }
         }
       )
+  }
 
-    binding.apply {
-      addPatient.setOnClickListener { onAddPatientClick() }
-      addPatient.setColorFilter(Color.WHITE)
-    }
-    setHasOptionsMenu(true)
-    (activity as MainActivity).setDrawerEnabled(true)
-
+  private fun setupSyncProgress() {
+    topBanner = binding.syncStatusContainer.linearLayoutProgressStatus
+    syncStatus = binding.syncStatusContainer.progressStatus
+    syncPercent = binding.syncStatusContainer.progressPercent
+    syncProgress = binding.syncStatusContainer.progressBar
     lifecycleScope.launch {
       mainActivityViewModel.pollState.collect {
         Timber.d("onViewCreated: pollState Got status $it")
@@ -184,6 +200,80 @@ class PatientListFragment : Fragment() {
     }
   }
 
+  private fun fadeInTopBanner(state: SyncJobStatus) {
+    // workaround
+    careWorkflowExecutionStatusLayout.setBackgroundColor(
+      resources.getColor(R.color.workflow_running)
+    )
+    careWorkflowExecutionStatus.text = resources.getString(R.string.syncing)
+    careWorkflowExecutionImage.setImageResource(R.drawable.ic_baseline_sync_24)
+  }
+
+  private fun fadeOutTopBanner(state: SyncJobStatus) {
+    // workaround
+
+    careWorkflowExecutionStatusLayout.setBackgroundColor(
+      resources.getColor(R.color.workflow_finished)
+    )
+    careWorkflowExecutionStatus.text =
+      "${resources.getString(R.string.sync)} ${state::class.java.simpleName}"
+    careWorkflowExecutionImage.setImageResource(R.drawable.ic_check)
+  }
+
+  private fun observePatients() {
+    patientListViewModel.liveSearchedPatients.observe(viewLifecycleOwner) {
+      Timber.d("Submitting ${it.count()} patient records")
+      adapter.submitList(it)
+    }
+
+    patientListViewModel.patientCount.observe(viewLifecycleOwner) {
+      binding.patientListContainer.patientCount.text = "$it Patients"
+    }
+  }
+
+  private fun observeTasksUpdate() {
+    careWorkflowExecutionStatusLayout =
+      binding.workflowExecutionStatusContainer.careWorkflowExecutionStatusLayout
+    careWorkflowExecutionStatus =
+      binding.workflowExecutionStatusContainer.careWorkflowExecutionStatus
+    careWorkflowExecutionImage =
+      binding.workflowExecutionStatusContainer.careWorkflowExecutionStatusImage
+    lifecycleScope.launch {
+      careWorkflowExecutionViewModel.patientFlowForCareWorkflowExecution.collect {
+        val status = it.careWorkflowExecutionStatus
+        if (status is CareWorkflowExecutionStatus.Finished) {
+          if (status.total == status.completed) {
+            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+          }
+        }
+        updateWorkflowExecutionBar(status)
+      }
+    }
+  }
+
+  private fun updateWorkflowExecutionBar(status: CareWorkflowExecutionStatus) {
+    when (status) {
+      is CareWorkflowExecutionStatus.Started -> {
+        careWorkflowExecutionStatusLayout.setBackgroundColor(
+          resources.getColor(R.color.workflow_running)
+        )
+        careWorkflowExecutionStatus.text = resources.getString(R.string.updating_tasks)
+        careWorkflowExecutionImage.setImageResource(R.drawable.ic_baseline_sync_24)
+      }
+      is CareWorkflowExecutionStatus.InProgress -> {}
+      is CareWorkflowExecutionStatus.Finished -> {
+        if (status.completed == status.total) {
+          careWorkflowExecutionStatusLayout.setBackgroundColor(
+            resources.getColor(R.color.workflow_finished)
+          )
+          careWorkflowExecutionStatus.text = resources.getString(R.string.tasks_updated)
+          careWorkflowExecutionImage.setImageResource(R.drawable.ic_check)
+        }
+      }
+      is CareWorkflowExecutionStatus.Failed -> {}
+    }
+  }
+
   override fun onDestroyView() {
     super.onDestroyView()
     _binding = null
@@ -194,56 +284,15 @@ class PatientListFragment : Fragment() {
       android.R.id.home -> {
         // hide the soft keyboard when the navigation drawer is shown on the screen.
         searchView.clearFocus()
-        (requireActivity() as MainActivity).openNavigationDrawer()
+        NavHostFragment.findNavController(this).navigateUp()
         true
       }
       else -> false
     }
   }
 
-  private fun onPatientItemClicked(patientItem: PatientListViewModel.PatientItem) {
-    findNavController()
-      .navigate(PatientListFragmentDirections.navigateToProductDetail(patientItem.resourceId))
-  }
-
   private fun onAddPatientClick() {
     findNavController()
       .navigate(PatientListFragmentDirections.actionPatientListToAddPatientFragment())
-  }
-
-  private fun fadeInTopBanner(state: SyncJobStatus) {
-    if (topBanner.visibility != View.VISIBLE) {
-      syncStatus.text = resources.getString(R.string.syncing).uppercase()
-      syncPercent.text = ""
-      syncProgress.progress = 0
-      syncProgress.visibility = View.VISIBLE
-      topBanner.visibility = View.VISIBLE
-      val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_in)
-      topBanner.startAnimation(animation)
-    } else if (state is SyncJobStatus.InProgress) {
-      val progress =
-        state
-          .let { it.completed.toDouble().div(it.total) }
-          .let { if (it.isNaN()) 0.0 else it }
-          .times(100)
-          .roundToInt()
-      "$progress% ${state.syncOperation.name.lowercase()}ed".also { syncPercent.text = it }
-      syncProgress.progress = progress
-    }
-  }
-
-  private fun fadeOutTopBanner(state: SyncJobStatus) {
-    if (state is SyncJobStatus.Finished) syncPercent.text = ""
-    syncProgress.visibility = View.GONE
-
-    if (topBanner.visibility == View.VISIBLE) {
-      "${resources.getString(R.string.sync).uppercase()} ${state::class.java.simpleName.uppercase()}".also {
-        syncStatus.text = it
-      }
-
-      val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_out)
-      topBanner.startAnimation(animation)
-      Handler(Looper.getMainLooper()).postDelayed({ topBanner.visibility = View.GONE }, 2000)
-    }
   }
 }

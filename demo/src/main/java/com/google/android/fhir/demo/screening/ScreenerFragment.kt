@@ -21,7 +21,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -34,6 +33,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.demo.R
 import com.google.android.fhir.demo.care.CareWorkflowExecutionViewModel
+import com.google.android.material.snackbar.Snackbar
 import org.hl7.fhir.r4.model.Task
 
 /** A fragment class to show screener questionnaire screen. */
@@ -128,11 +128,19 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
   private fun observeResourcesSaveAction() {
     viewModel.isResourcesSaved.observe(viewLifecycleOwner) {
       if (!it) {
-        Toast.makeText(requireContext(), getString(R.string.inputs_missing), Toast.LENGTH_SHORT)
+        Snackbar.make(
+            requireActivity().findViewById(android.R.id.content),
+            R.string.inputs_missing,
+            Snackbar.LENGTH_SHORT
+          )
           .show()
         return@observe
       }
-      Toast.makeText(requireContext(), getString(R.string.resources_saved), Toast.LENGTH_SHORT)
+      Snackbar.make(
+          requireActivity().findViewById(android.R.id.content),
+          R.string.resources_saved,
+          Snackbar.LENGTH_SHORT
+        )
         .show()
       careWorkflowExecutionViewModel.updateTaskStatus(
         args.taskLogicalId,
