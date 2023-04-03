@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,10 @@ class PatientItemRecyclerViewAdapter(
     override fun areContentsTheSame(
       oldItem: PatientListViewModel.PatientItem,
       newItem: PatientListViewModel.PatientItem
-    ): Boolean = oldItem.id == newItem.id && oldItem.risk == newItem.risk
+    ): Boolean =
+      oldItem.id == newItem.id &&
+        oldItem.risk == newItem.risk &&
+        oldItem.pendingTasksCount == newItem.pendingTasksCount
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientItemViewHolder {

@@ -16,35 +16,27 @@
 
 package com.google.android.fhir.demo.screening
 
-import android.graphics.Color
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.demo.R
 import com.google.android.fhir.demo.databinding.ItemTaskViewBinding
-import org.hl7.fhir.r4.model.Task
 
 class TaskItemViewHolder(binding: ItemTaskViewBinding) : RecyclerView.ViewHolder(binding.root) {
-  private val title: TextView = binding.taskTitle
-  private val status: TextView = binding.taskStatus
-  private val taskId: TextView = binding.taskId
+  private val description: TextView = binding.taskDescription
+  private val dueDate: TextView = binding.taskDueDate
+  private val taskIcon: ImageView = binding.taskIcon
 
   fun bindTo(
     taskItem: ListScreeningsViewModel.TaskItem,
     onItemClicked: (ListScreeningsViewModel.TaskItem) -> Unit
   ) {
-    this.title.text = taskItem.name
-    this.status.text = taskItem.status
-    this.status.setTextColor(getStatusColor(taskItem.status))
-    this.taskId.text = "Id: #---${getTruncatedId(taskItem)}"
+    this.description.text = taskItem.description
+    this.dueDate.text =
+      if (taskItem.status == "ready") "Due ${taskItem.dueDate}" else "Completed ${taskItem.dueDate}"
+    this.taskIcon.setImageResource(
+      if (taskItem.status == "ready") R.drawable.ic_task else R.drawable.ic_task_check
+    )
     this.itemView.setOnClickListener { onItemClicked(taskItem) }
-  }
-
-  /** The new ui just shows shortened id with just last 3 characters. */
-  private fun getTruncatedId(taskItem: ListScreeningsViewModel.TaskItem): String {
-    return taskItem.resourceId.takeLast(3)
-  }
-
-  private fun getStatusColor(status: String): Int {
-    if (status == Task.TaskStatus.COMPLETED.toCode()) return Color.RED
-    return Color.GREEN
   }
 }

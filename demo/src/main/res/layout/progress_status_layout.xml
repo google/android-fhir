@@ -23,6 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_baseline_sync_24"
+            android:layout_gravity="center"
         />
     <TextView
             android:id="@+id/progress_status"
@@ -30,9 +31,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:text="@string/syncing"
-            android:textColor="?attr/colorControlNormal"
-            android:textSize="16sp"
-            android:textAlignment="center"
+            android:textColor="@color/primary_dark_material_dark"
+            android:textSize="12sp"
+            android:layout_gravity="center"
+            android:paddingVertical="1dp"
         />
     </LinearLayout>
     <TextView

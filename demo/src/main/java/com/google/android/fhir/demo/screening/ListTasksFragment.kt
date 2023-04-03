@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.demo.screening
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,10 +24,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.android.fhir.demo.care.CareWorkflowExecutionStatus
 import com.google.android.fhir.demo.care.CareWorkflowExecutionViewModel
 import com.google.android.fhir.demo.databinding.FragmentListTasksBinding
+import com.google.android.fhir.logicalId
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -62,12 +60,6 @@ class ListTasksFragment(private val navigateToQuestionnaireCallback: (String, St
     val recyclerView = binding.rvTask
     val adapter = TaskItemRecyclerViewAdapter(::onTaskItemClicked)
     recyclerView.adapter = adapter
-    recyclerView.addItemDecoration(
-      DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
-        setDrawable(ColorDrawable(Color.LTGRAY))
-      }
-    )
-
     getTasksForPatient()
     collectWorkflowExecution()
 
@@ -83,8 +75,13 @@ class ListTasksFragment(private val navigateToQuestionnaireCallback: (String, St
 
   private fun collectWorkflowExecution() {
     lifecycleScope.launch {
-      careWorkflowExecutionViewModel.careWorkflowExecutionState.collect {
-        if (it is CareWorkflowExecutionStatus.Finished) getTasksForPatient()
+      careWorkflowExecutionViewModel.patientFlowForCareWorkflowExecution.collect {
+        val status = it.careWorkflowExecutionStatus
+        if (status is CareWorkflowExecutionStatus.Finished) {
+          if (it.patient.logicalId == args.getString(PATIENT_ID_KEY)!!) {
+            getTasksForPatient()
+          }
+        }
       }
     }
   }

@@ -14,18 +14,26 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
 >
+
+    <include
+        android:id="@+id/workflow_execution_status_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/status_layout"
+    />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_margin="@dimen/fab_margin"
         android:scrollbars="vertical"
     />
-</FrameLayout>
+</LinearLayout>

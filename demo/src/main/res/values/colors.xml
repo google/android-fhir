@@ -25,9 +25,13 @@
     <color name="moderate_risk_background">#fff8e1</color>
     <color name="high_risk">#c62828</color>
     <color name="high_risk_background">#ffebee</color>
-    <color name="unknown_risk_background">#10156125</color>
-    <color name="unknown_risk">#ffffff</color>
+    <color name="unknown_risk_background">#DADCE0</color>
+    <color name="unknown_risk">#A8C7FA</color>
     <color name="syncing_background">#E8F0FE</color>
+    <color name="workflow_running">#E8F0FE</color>
+    <color name="workflow_finished">#E6F4EA</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="grey">#DADCE0</color>
     <color name="disable_state">#9AFFFFFF</color>
 </resources>

@@ -20,21 +20,38 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.fhir.demo.R
+import com.google.android.fhir.demo.care.CareWorkflowExecutionStatus
+import com.google.android.fhir.demo.care.CareWorkflowExecutionViewModel
 import com.google.android.fhir.demo.databinding.FragmentTasksViewPagerBinding
+import com.google.android.fhir.logicalId
 import com.google.android.material.tabs.TabLayoutMediator
-import org.hl7.fhir.r4.model.Task
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class TasksViewPagerFragment : Fragment() {
+  private val taskViewPagerViewModel: TaskViewPagerViewModel by viewModels()
+  private val careWorkflowExecutionViewModel by activityViewModels<CareWorkflowExecutionViewModel>()
+
   private val args: TasksViewPagerFragmentArgs by navArgs()
   private var _binding: FragmentTasksViewPagerBinding? = null
   private val binding
     get() = _binding!!
+  private lateinit var careWorkflowExecutionStatusLayout: LinearLayout
+  private lateinit var careWorkflowExecutionStatus: TextView
+  private lateinit var careWorkflowExecutionImage: ImageView
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -54,31 +71,77 @@ class TasksViewPagerFragment : Fragment() {
           arguments =
             bundleOf(
               ListTasksFragment.PATIENT_ID_KEY to args.patientId,
-              ListTasksFragment.TASK_STATUS to getTaskStatus(it)
+              ListTasksFragment.TASK_STATUS to taskViewPagerViewModel.getTaskStatus(it)
             )
         }
       }
+    careWorkflowExecutionStatusLayout =
+      binding.workflowExecutionStatusContainer.careWorkflowExecutionStatusLayout
+    careWorkflowExecutionStatus =
+      binding.workflowExecutionStatusContainer.careWorkflowExecutionStatus
+    careWorkflowExecutionImage =
+      binding.workflowExecutionStatusContainer.careWorkflowExecutionStatusImage
     binding.viewPager.adapter =
       object : FragmentStateAdapter(this) {
         override fun getItemCount() = fragmentList.size
         override fun createFragment(position: Int) = fragmentList[position]
       }
     binding.viewPager.offscreenPageLimit
+    taskViewPagerViewModel.patientName.observe(viewLifecycleOwner) {
+      (requireActivity() as AppCompatActivity).supportActionBar?.apply {
+        title = it
+        setDisplayHomeAsUpEnabled(true)
+      }
+    }
+    val tasksTabHeadings = listOf("Tasks", "Completed Tasks")
     TabLayoutMediator(binding.tasksTabLayout, binding.viewPager) { tab, position ->
-        tab.text = getTaskStatus(position).uppercase()
+        tab.text = tasksTabHeadings[position]
       }
       .attach()
+    taskViewPagerViewModel.livePendingTasksCount.observe(viewLifecycleOwner) {
+      binding.tasksTabLayout.getTabAt(0)?.text = "Tasks ($it)"
+    }
+    taskViewPagerViewModel.liveCompletedTasksCount.observe(viewLifecycleOwner) {
+      binding.tasksTabLayout.getTabAt(1)?.text = "Completed Tasks ($it)"
+    }
+    taskViewPagerViewModel.getTasksCount(args.patientId)
+    taskViewPagerViewModel.getPatientName(args.patientId)
+
+    collectWorkflowExecution()
   }
 
-  /**
-   * Currently only [Task.TaskStatus.COMPLETED] & [Task.TaskStatus.READY] are shown. This logic
-   * could be extended.
-   */
-  private fun getTaskStatus(position: Int): String {
-    return when (position) {
-      1 -> Task.TaskStatus.COMPLETED
-      else -> Task.TaskStatus.READY
-    }.toCode()
+  private fun collectWorkflowExecution() {
+    lifecycleScope.launch {
+      careWorkflowExecutionViewModel.patientFlowForCareWorkflowExecution.collect {
+        val status = it.careWorkflowExecutionStatus
+        if (it.patient.logicalId == args.patientId) {
+          updateWorkflowExecutionBar(status)
+          taskViewPagerViewModel.getTasksCount(args.patientId)
+          taskViewPagerViewModel.getPatientName(args.patientId)
+        }
+      }
+    }
+  }
+
+  private fun updateWorkflowExecutionBar(status: CareWorkflowExecutionStatus) {
+    when (status) {
+      is CareWorkflowExecutionStatus.Started -> {
+        careWorkflowExecutionStatusLayout.setBackgroundColor(
+          resources.getColor(R.color.workflow_running)
+        )
+        careWorkflowExecutionStatus.text = resources.getString(R.string.updating_tasks)
+        careWorkflowExecutionImage.setImageResource(R.drawable.ic_baseline_sync_24)
+      }
+      is CareWorkflowExecutionStatus.InProgress -> {}
+      is CareWorkflowExecutionStatus.Finished -> {
+        careWorkflowExecutionStatusLayout.setBackgroundColor(
+          resources.getColor(R.color.workflow_finished)
+        )
+        careWorkflowExecutionStatus.text = resources.getString(R.string.tasks_updated)
+        careWorkflowExecutionImage.setImageResource(R.drawable.ic_check)
+      }
+      is CareWorkflowExecutionStatus.Failed -> {}
+    }
   }
 
   private fun navigateToQuestionnaireCallback(taskLogicalId: String, questionnaireString: String) {

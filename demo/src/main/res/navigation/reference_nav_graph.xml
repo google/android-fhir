@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/reference_nav_graph"
-    app:startDestination="@id/patient_list"
+    app:startDestination="@id/home_fragment"
 >
 
   <fragment
@@ -60,6 +60,7 @@
         android:id="@+id/tasksViewPagerFragment"
         android:name="com.google.android.fhir.demo.screening.TasksViewPagerFragment"
         android:label="ScreeningsViewPagerFragment"
+        tools:layout="@layout/fragment_tasks_view_pager"
     >
     <argument android:name="patient_id" app:argType="string" />
     <action
@@ -76,6 +77,21 @@
     <argument android:name="patient_id" app:argType="string" />
     <argument android:name="task_logical_id" app:argType="string" />
     <argument android:name="questionnaire_string" app:argType="string" />
+  </fragment>
+  <fragment
+        android:id="@+id/home_fragment"
+        android:name="com.google.android.fhir.demo.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home"
+    >
+    <action
+            android:id="@+id/action_home_fragment_to_addPatientFragment"
+            app:destination="@id/addPatientFragment"
+        />
+    <action
+            android:id="@+id/action_home_fragment_to_patient_list"
+            app:destination="@id/patient_list"
+        />
   </fragment>
 
 </navigation>

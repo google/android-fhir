@@ -14,9 +14,9 @@
  limitations under the License.
 -->
 <resources>
-    <string name="app_name">FHIR Engine Sample App</string>
+    <string name="app_name">User App</string>
 
-    <string name="title_patient_list">Registered Patients</string>
+    <string name="title_patient_list">Patient List</string>
     <string name="title_patient_detail">SamplePatient Detail</string>
 
     <string name="menu_about">About Fhir Engine</string>
@@ -60,6 +60,7 @@
     <string name="header_conditions">Conditions</string>
     <string name="message_no_datetime">No effective DateTime</string>
     <string name="complete_survey">Complete Survey</string>
+    <string name="tasks_due">Go To Tasks</string>
     <string name="risk_status">Current status: </string>
     <string name="unknown">UNKNOWN</string>
     <string name="none">none</string>
@@ -69,7 +70,8 @@
     <string name="sync_menu">Sync</string>
     <string name="last_sync">Last sync</string>
     <string name="syncing">Syncing</string>
-    <string name="executing_workflow">Executing Workflow(s)</string>
+    <string name="tasks_updated">Tasks Updated</string>
+    <string name="updating_tasks">Updating Tasks</string>
     <string name="sync">Sync</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
