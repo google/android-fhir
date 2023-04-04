@@ -16,14 +16,23 @@
 
 package com.google.android.fhir.sync.remote
 
-import com.google.android.fhir.sync.DataSource
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.OperationOutcome
+import org.hl7.fhir.r4.model.Resource
 
-internal class RetrofitBasedRemoteDataSource(private val remoteFhirService: RemoteFhirService) :
-  DataSource {
-  override suspend fun download(path: String) = remoteFhirService.get(path)
+/** Interface to make HTTP requests to the FHIR server. */
+internal interface FhirHttpService {
 
-  override suspend fun download(bundle: Bundle) = remoteFhirService.post(bundle)
+  /**
+   * Makes a HTTP-GET method request to the server.
+   * @return The server may return a particular [Resource], [Bundle] or [OperationOutcome] based on
+   * the request processing.
+   */
+  suspend fun get(path: String): Resource
 
-  override suspend fun upload(bundle: Bundle) = remoteFhirService.post(bundle)
+  /**
+   * Makes a HTTP-POST method request to the server with the [Bundle] as request-body.
+   * @return The server may return [Bundle] or [OperationOutcome] based on the request processing.
+   */
+  suspend fun post(bundle: Bundle): Resource
 }
