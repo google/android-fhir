@@ -173,7 +173,8 @@ object Dependencies {
   const val androidFhirEngine =
     "$androidFhirGroup:$androidFhirEngineModule:${Versions.androidFhirEngine}"
 
-  const val apacheCommonsCompress = "org.apache.commons:commons-compress:${Versions.apacheCommonsCompress}"
+  const val apacheCommonsCompress =
+    "org.apache.commons:commons-compress:${Versions.apacheCommonsCompress}"
 
   const val lifecycleExtensions =
     "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
