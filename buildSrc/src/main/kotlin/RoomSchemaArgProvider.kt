@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.extensions
+import java.io.File
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.process.CommandLineArgumentProvider
 
-import org.hl7.fhir.r4.model.QuestionnaireResponse
+// https://developer.android.com/training/data-storage/room/migrating-db-versions#test
+class RoomSchemaArgProvider(
+  @get:InputDirectory @get:PathSensitive(PathSensitivity.RELATIVE) val schemaDir: File
+) : CommandLineArgumentProvider {
 
-/** Pre-order list of all questionnaire response items in the questionnaire. */
-val QuestionnaireResponse.allItems: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-  get() = item.flatMap { it.descendant }
+  override fun asArguments() = listOf("-Aroom.schemaLocation=${schemaDir.path}")
+}
