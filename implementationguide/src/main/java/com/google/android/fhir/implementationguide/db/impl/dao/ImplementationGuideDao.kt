@@ -33,7 +33,7 @@ abstract class ImplementationGuideDao {
 
   @Transaction
   internal open suspend fun insertResource(
-    implementationGuideId: Long,
+    implementationGuideId: Long?,
     resource: ResourceMetadataEntity,
   ) {
 
@@ -47,7 +47,7 @@ abstract class ImplementationGuideDao {
     // exception if they
     // are different.
     val resourceMetadataId = resourceMetadata?.resourceMetadataId ?: insert(resource)
-    insert(ImplementationGuideResourceMetadataEntity(implementationGuideId, resourceMetadataId))
+    insert(ImplementationGuideResourceMetadataEntity(0, implementationGuideId, resourceMetadataId))
   }
 
   @Transaction

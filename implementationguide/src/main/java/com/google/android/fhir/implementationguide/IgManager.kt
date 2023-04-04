@@ -70,13 +70,7 @@ class IgManager internal constructor(private val igDatabase: ImplementationGuide
 
   /** Imports the IG from the provided [file] to the default dependency. */
   suspend fun install(file: File) {
-    val defaultIgId =
-      igDao
-        .getImplementationGuide(DEFAULT_DEPENDENCY.packageId, DEFAULT_DEPENDENCY.version)
-        ?.implementationGuideId
-        ?: igDao.insert(DEFAULT_DEPENDENCY.toEntity(File("NotARealDirectory")))
-
-    importFile(defaultIgId, file)
+    importFile(null, file)
   }
 
   /** Loads resources from IGs listed in dependencies. */
@@ -111,7 +105,7 @@ class IgManager internal constructor(private val igDatabase: ImplementationGuide
     }
   }
 
-  private suspend fun importFile(igId: Long, file: File) {
+  private suspend fun importFile(igId: Long?, file: File) {
     val resource =
       withContext(Dispatchers.IO) {
         try {
@@ -125,7 +119,7 @@ class IgManager internal constructor(private val igDatabase: ImplementationGuide
     }
   }
 
-  private suspend fun importResource(igId: Long, resource: Resource, file: File) {
+  private suspend fun importResource(igId: Long?, resource: Resource, file: File) {
     val metadataResource = resource as? MetadataResource
     val res =
       ResourceMetadataEntity(
@@ -149,12 +143,6 @@ class IgManager internal constructor(private val igDatabase: ImplementationGuide
 
   companion object {
     private const val DB_NAME = "implementationguide.db"
-    val DEFAULT_DEPENDENCY =
-      ImplementationGuide(
-        "com.google.android.fhir",
-        "1.0.0",
-        "http://github.com/google/android-fhir"
-      )
 
     /** Creates an [IgManager] backed by the Room DB. */
     fun create(context: Context) =
