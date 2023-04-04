@@ -37,8 +37,8 @@ internal data class ResourceMetadataEntity(
   @PrimaryKey(autoGenerate = true) val resourceMetadataId: Long,
   val resourceType: ResourceType,
   val url: String?,
-  val version: String?,
   val name: String?,
+  val version: String?,
   /** Location of the JSON file with a full Resource. */
   val resourceFile: File,
 )
