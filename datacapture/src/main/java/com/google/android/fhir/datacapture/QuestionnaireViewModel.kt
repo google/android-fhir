@@ -35,15 +35,15 @@ import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.extractAnswerOptions
 import com.google.android.fhir.datacapture.extensions.flattened
 import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
+import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isFhirPath
-import com.google.android.fhir.datacapture.extensions.isFlyoverCode
-import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.isHidden
-import com.google.android.fhir.datacapture.extensions.isInstructionsCode
 import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.extensions.isXFhirQuery
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
+import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
+import com.google.android.fhir.datacapture.extensions.unpackRepeatedGroups
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
@@ -145,6 +145,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
     }
+    questionnaireResponse.packRepeatedGroups()
   }
 
   /** The map from each item in the [Questionnaire] to its parent. */
@@ -308,6 +309,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   fun getQuestionnaireResponse(): QuestionnaireResponse {
     return questionnaireResponse.copy().apply {
       item = getEnabledResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
+      unpackRepeatedGroups(this@QuestionnaireViewModel.questionnaire)
     }
   }
 
@@ -643,7 +645,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             answersChangedCallback = answersChangedCallback,
             resolveAnswerValueSet = { resolveAnswerValueSet(it) },
             resolveAnswerExpression = { resolveAnswerExpression(it) },
-            draftAnswer = draftAnswerMap[questionnaireResponseItem]
+            draftAnswer = draftAnswerMap[questionnaireResponseItem],
+            enabledDisplayItems =
+              questionnaireItem.item.filter {
+                it.isDisplayItem &&
+                  EnablementEvaluator(questionnaireResponse).evaluate(it, questionnaireResponseItem)
+              }
           )
         )
       )
@@ -672,11 +679,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             getQuestionnaireAdapterItems(
               // If nested display item is identified as instructions or flyover, then do not create
               // questionnaire state for it.
-              questionnaireItemList =
-                questionnaireItem.item.filterNot {
-                  it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-                    (it.isInstructionsCode || it.isFlyoverCode || it.isHelpCode)
-                },
+              questionnaireItemList = questionnaireItem.item.filterNot { it.isDisplayItem },
               questionnaireResponseItemList = nestedResponseItemList,
             )
           )
@@ -729,58 +732,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireResponseItem,
         )
       }
-      .flatMap { (questionnaireItem, questionnaireResponseItem) ->
-        val isRepeatedGroup =
-          questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
-            questionnaireItem.repeats
-        if (isRepeatedGroup) {
-          createRepeatedGroupResponse(questionnaireItem, questionnaireResponseItem)
-        } else {
-          listOf(
-            questionnaireResponseItem.apply {
-              text = questionnaireItem.localizedTextSpanned?.toString()
-              // Nested group items
-              item = getEnabledResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
-              // Nested question items
-              answer.forEach { it.item = getEnabledResponseItems(questionnaireItem.item, it.item) }
-            }
-          )
+      .map { (questionnaireItem, questionnaireResponseItem) ->
+        questionnaireResponseItem.apply {
+          text = questionnaireItem.localizedTextSpanned?.toString()
+          // Nested group items
+          item = getEnabledResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
+          // Nested question items
+          answer.forEach { it.item = getEnabledResponseItems(questionnaireItem.item, it.item) }
         }
       }
       .toList()
-  }
-
-  /**
-   * Repeated groups need some massaging for their returned data-format; each instance of the group
-   * should be flattened out to be its own item in the parent, rather than an answer to the main
-   * item. See discussion:
-   * http://community.fhir.org/t/questionnaire-repeating-groups-what-is-the-correct-format/2276/3
-   *
-   * For example, if the group contains 2 questions, and the user answered the group 3 times, this
-   * function will return a list with 3 responses; each of those responses will have the linkId of
-   * the provided group, and each will contain an item array with 2 items (the answers to the
-   * individual questions within this particular group instance).
-   */
-  private fun createRepeatedGroupResponse(
-    questionnaireItem: QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponseItemComponent,
-  ): List<QuestionnaireResponseItemComponent> {
-    val individualQuestions = questionnaireItem.item
-    return questionnaireResponseItem.answer.map { repeatedGroupInstance ->
-      val responsesToIndividualQuestions = repeatedGroupInstance.item
-      check(responsesToIndividualQuestions.size == individualQuestions.size) {
-        "Repeated groups responses must have the same # of responses as the group has questions"
-      }
-      QuestionnaireResponseItemComponent().apply {
-        linkId = questionnaireItem.linkId
-        text = questionnaireItem.localizedTextSpanned?.toString()
-        item =
-          getEnabledResponseItems(
-            questionnaireItemList = individualQuestions,
-            questionnaireResponseItemList = responsesToIndividualQuestions,
-          )
-      }
-    }
   }
 
   /**

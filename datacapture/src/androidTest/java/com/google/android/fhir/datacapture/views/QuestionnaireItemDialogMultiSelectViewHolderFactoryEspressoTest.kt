@@ -201,31 +201,32 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
   @Test
   fun bindView_setHintText() {
+    val hintItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1.1"
+        text = "Select code"
+        type = Questionnaire.QuestionnaireItemType.DISPLAY
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(DisplayItemControlType.FLYOVER.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
+            )
+        )
+      }
     val questionnaireViewItem =
       QuestionnaireViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5")
-          .addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "1.1"
-              text = "Select code"
-              type = Questionnaire.QuestionnaireItemType.DISPLAY
-              addExtension(
-                Extension()
-                  .setUrl(EXTENSION_ITEM_CONTROL_URL)
-                  .setValue(
-                    CodeableConcept()
-                      .addCoding(
-                        Coding()
-                          .setCode(DisplayItemControlType.FLYOVER.extensionCode)
-                          .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                      )
-                  )
-              )
-            }
-          ),
+          .addItem(hintItem),
         responseOptions(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        enabledDisplayItems = listOf(hintItem)
       )
     runOnUI { viewHolder.bind(questionnaireViewItem) }
 

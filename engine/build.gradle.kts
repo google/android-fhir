@@ -40,15 +40,9 @@ android {
   }
 
   sourceSets {
-    getByName("androidTest").apply {
-      java.srcDirs("src/test-common/java")
-      resources.setSrcDirs(listOf("sampledata"))
-    }
+    getByName("androidTest").apply { resources.setSrcDirs(listOf("test-data")) }
 
-    getByName("test").apply {
-      java.srcDirs("src/test-common/java")
-      resources.setSrcDirs(listOf("sampledata"))
-    }
+    getByName("test").apply { resources.setSrcDirs(listOf("test-data")) }
   }
 
   buildTypes {
@@ -119,6 +113,7 @@ dependencies {
   implementation(Dependencies.jsonToolsPatch)
   implementation(Dependencies.sqlcipher)
   implementation(Dependencies.timber)
+  implementation(Dependencies.truth)
 
   kapt(Dependencies.Room.compiler)
 
