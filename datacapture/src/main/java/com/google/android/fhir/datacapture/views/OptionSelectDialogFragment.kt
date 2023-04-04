@@ -89,11 +89,7 @@ internal class OptionSelectDialogFragment(
 
     val adapter = OptionSelectAdapter(multiSelectEnabled = config.multiSelect)
     recyclerView.adapter = adapter
-    lifecycleScope.launch {
-      viewModel.getSelectedOptionsFlow(questionLinkId).collect { selectedOptions ->
-        adapter.submitList(selectedOptions.toOptionRows())
-      }
-    }
+    adapter.submitList(viewModel.getSelectedOptions().toOptionRows())
 
     val dialog =
       MaterialAlertDialogBuilder(requireContext()).setView(view).create().apply {

@@ -76,14 +76,11 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
         holder.header.bind(questionnaireViewItem)
 
         val questionnaireItem = questionnaireViewItem.questionnaireItem
+        viewModel.updateSelectedOptions(
+          questionnaireViewItem.extractInitialOptions(holder.header.context)
+        )
         selectedOptionsJob =
           activity.lifecycleScope.launch {
-            // Set the initial selected options state from the FHIR data model
-            viewModel.updateSelectedOptions(
-              questionnaireItem.linkId,
-              questionnaireViewItem.extractInitialOptions(holder.header.context)
-            )
-
             // Listen for changes to selected options to update summary + FHIR data model
             viewModel.getSelectedOptionsFlow(questionnaireItem.linkId).collect { selectedOptions ->
               holder.summary.text = selectedOptions.selectedSummary
@@ -168,6 +165,13 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 internal class QuestionnaireItemDialogSelectViewModel : ViewModel() {
   private val linkIdsToSelectedOptionsFlow =
     mutableMapOf<String, MutableSharedFlow<SelectedOptions>>()
+  private lateinit var selectedOptions: SelectedOptions
+
+  fun updateSelectedOptions(selectedOptions: SelectedOptions) {
+    this.selectedOptions = selectedOptions
+  }
+
+  fun getSelectedOptions() = selectedOptions
 
   fun getSelectedOptionsFlow(linkId: String): Flow<SelectedOptions> = selectedOptionsFlow(linkId)
 
