@@ -20,7 +20,13 @@ import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import ca.uhn.fhir.context.FhirContext
+import com.google.common.truth.Truth.assertThat
 import java.io.IOException
+import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,9 +40,28 @@ class ResourceDatabaseMigrationTest {
 
   @Test
   @Throws(IOException::class)
-  fun migrate1To2_should_not_throw_exception() {
-    helper.createDatabase(DB_NAME, 1).apply { close() }
+  fun migrate1To2_should_not_throw_exception(): Unit = runBlocking {
+    val insertedPatientJson: String =
+      Patient()
+        .apply {
+          id = "migrate1-2-test"
+          addName(
+            HumanName().apply {
+              addGiven("Jane")
+              family = "Doe"
+            }
+          )
+        }
+        .let { FhirContext.forR4Cached().newJsonParser().encodeResourceToString(it) }
 
+    helper.createDatabase(DB_NAME, 1).apply {
+      execSQL(
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('migrate1-2-test', 'Patient', 'migrate1-2-test', '$insertedPatientJson' );"
+      )
+      close()
+    }
+
+    val readPatientJson: String?
     // Open latest version of the database. Room will validate the schema
     // once all migrations execute.
     Room.databaseBuilder(
@@ -46,7 +71,12 @@ class ResourceDatabaseMigrationTest {
       )
       .addMigrations(MIGRATION_1_2)
       .build()
-      .apply { openHelper.writableDatabase.close() }
+      .apply {
+        readPatientJson = this.resourceDao().getResource("migrate1-2-test", ResourceType.Patient)
+        openHelper.writableDatabase.close()
+      }
+
+    assertThat(readPatientJson).isEqualTo(insertedPatientJson)
   }
 
   companion object {
