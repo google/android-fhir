@@ -26,6 +26,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.extensions.EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
@@ -165,9 +166,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING)) {
         val questionnaireLaunchContextJson: String =
           state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING]!!
-        val resource = parser.parseResource(questionnaireLaunchContextJson) as Resource
-        questionnaire.validateLaunchContext(resource.resourceType.name)
-        resource
+        questionnaire.extension
+          .firstOrNull { it.url == EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT }
+          ?.let {
+            val resource = parser.parseResource(questionnaireLaunchContextJson) as Resource
+            validateLaunchContext(it, resource.resourceType.name)
+            resource
+          }
       } else {
         null
       }

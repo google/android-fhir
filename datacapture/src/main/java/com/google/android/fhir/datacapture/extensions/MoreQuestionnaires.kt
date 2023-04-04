@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.extensions
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 
 /**
@@ -47,47 +48,40 @@ internal fun Questionnaire.findVariableExpression(variableName: String): Express
   variableExpressions.find { it.name == variableName }
 
 /**
- * Validates the launch context extension, if it exists, and well formed, and validates if the
- * resource type is applicable as a launch context.
+ * Validates the questionnaire launch context extension, if it exists, and well formed, and
+ * validates if the resource type is applicable as a launch context.
  */
-internal fun Questionnaire.validateLaunchContext(resourceType: String) {
-  this.extension
-    .firstOrNull { it.url == EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT }
-    ?.let { extension ->
-      val nameExtension =
-        extension.extension
-          .firstOrNull { it.url == "name" }
-          ?.value.takeIf { type ->
-            type is Coding &&
-              QuestionnaireLaunchContextSet.values().any {
-                it.code == type.code && it.display == type.display && it.system == type.system
-              }
+internal fun validateLaunchContext(extension: Extension, resourceType: String) {
+  val nameExtension =
+    extension.extension
+      .firstOrNull { it.url == "name" }
+      ?.value.takeIf { type ->
+        type is Coding &&
+          QuestionnaireLaunchContextSet.values().any {
+            it.code == type.code && it.display == type.display && it.system == type.system
           }
-
-      val typeExtension =
-        extension.extension
-          .firstOrNull { it.url == "type" }
-          ?.takeIf { it.valueAsPrimitive.valueAsString == resourceType }
-
-      if (nameExtension == null) {
-        error(
-          "The value of the extension:name field in " +
-            "$EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT is not one of the ones defined in " +
-            "$EXTENSION_LAUNCH_CONTEXT."
-        )
       }
 
-      if (typeExtension == null) {
-        error(
-          "The resource type set in the extension:type field in " +
-            "$EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT does not match the resource type of the " +
-            "context passed in: $resourceType."
-        )
-      }
-    }
-    ?: error(
-      "Resource context set without setting $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT in the questionnaire."
+  val typeExtension =
+    extension.extension
+      .firstOrNull { it.url == "type" }
+      ?.takeIf { it.valueAsPrimitive.valueAsString == resourceType }
+
+  if (nameExtension == null) {
+    error(
+      "The value of the extension:name field in " +
+        "$EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT is not one of the ones defined in " +
+        "$EXTENSION_LAUNCH_CONTEXT."
     )
+  }
+
+  if (typeExtension == null) {
+    error(
+      "The resource type set in the extension:type field in " +
+        "$EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT does not match the resource type of the " +
+        "context passed in: $resourceType."
+    )
+  }
 }
 
 /**
