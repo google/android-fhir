@@ -28,9 +28,13 @@ import java.io.FileInputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.instance.model.api.IBaseResource
+import org.hl7.fhir.r4.model.ImplementationGuide as ImplementationGuideR4
+import org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDependsOnComponent
 import org.hl7.fhir.r4.model.MetadataResource
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.utilities.Utilities
+import org.hl7.fhir.utilities.npm.NpmPackage
 import timber.log.Timber
 
 /** Responsible for importing, accessing and deleting Implementation Guides. */
@@ -38,6 +42,7 @@ class KnowledgeManager
 internal constructor(
   private val knowledgeDatabase: KnowledgeDatabase,
   private val jsonParser: IParser = FhirContext.forR4().newJsonParser(),
+  private val cacheFolder: String,
 ) {
 
   private val knowledgeDao = knowledgeDatabase.knowledgeDao()
@@ -48,7 +53,45 @@ internal constructor(
    * FHIR Resources)
    */
   suspend fun install(vararg implementationGuides: ImplementationGuide) {
-    TODO("[1937]Not implemented yet ")
+    val implementationGuide =
+      ImplementationGuideR4().apply {
+        implementationGuides.forEach {
+          addDependsOn(
+            ImplementationGuideDependsOnComponent().apply {
+              uri = it.uri
+              version = it.version
+            }
+          )
+        }
+      }
+    val npmPackageManager =
+      NpmPackageManager.fromResource(
+        cacheFolder,
+        implementationGuide,
+        "4.0.1",
+        "https://packages.fhir.org",
+        "https://packages.simplifier.net"
+      )
+    npmPackageManager.npmList.forEach { npmPackage ->
+      for (folder in npmPackage.folders.keys) {
+        val p =
+          if (folder.contains("$")) npmPackage.path else Utilities.path(npmPackage.path, folder)
+        for (file in File(p).listFiles()) {
+          if (!file.isDirectory && !NpmPackage.isInternalExemptFile(file)) {
+            try {
+              val resource = jsonParser.parseResource(FileInputStream(file))
+              if (resource is Resource) {
+                importResource(null, resource, file)
+              } else {
+                Timber.d("Unable to import file: %file")
+              }
+            } catch (exception: Exception) {
+              Timber.d(exception, "Unable to import file: %file")
+            }
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -154,11 +197,12 @@ internal constructor(
     /** Creates an [KnowledgeManager] backed by the Room DB. */
     fun create(context: Context) =
       KnowledgeManager(
-        Room.databaseBuilder(context, KnowledgeDatabase::class.java, DB_NAME).build()
+        Room.databaseBuilder(context, KnowledgeDatabase::class.java, DB_NAME).build(),
+        context.cacheDir.absolutePath
       )
 
     /** Creates an [KnowledgeManager] backed by the in-memory DB. */
     fun createInMemory(context: Context) =
-      KnowledgeManager(Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build())
+      KnowledgeManager(Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build(), context.cacheDir.absolutePath)
   }
 }

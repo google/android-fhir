@@ -175,7 +175,8 @@ object Dependencies {
     "$androidFhirGroup:$androidFhirEngineModule:${Versions.androidFhirEngine}"
   const val androidFhirKnowledge = "$androidFhirGroup:knowledge:${Versions.androidFhirKnowledge}"
 
-  const val apacheCommonsCompress = "org.apache.commons:commons-compress:${Versions.apacheCommonsCompress}"
+  const val apacheCommonsCompress =
+    "org.apache.commons:commons-compress:${Versions.apacheCommonsCompress}"
 
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"

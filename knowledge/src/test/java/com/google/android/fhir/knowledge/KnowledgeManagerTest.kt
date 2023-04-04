@@ -38,8 +38,8 @@ internal class KnowledgeManagerTest {
   private val context: Context = ApplicationProvider.getApplicationContext()
   private val knowledgeDb =
     Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build()
-  private val knowledgeManager = KnowledgeManager(knowledgeDb)
-  private val implementationGuide = ImplementationGuide("anc-cds", "0.3.0", "http://url.com")
+  private val knowledgeManager = KnowledgeManager(knowledgeDb, context.cacheDir.absolutePath)
+  private val implementationGuide = Dependency("anc-cds", "0.3.0", "http://url.com")
   private val dataFolder = File(javaClass.getResource("/anc-cds")!!.file)
 
   @After
@@ -124,5 +124,29 @@ internal class KnowledgeManagerTest {
     return File(context.filesDir, library.name).apply {
       writeText(jsonParser.encodeResourceToString(library))
     }
+  }
+
+  @Test
+  fun `installing from internet`() = runTest {
+    knowledgeManager.install(
+      Dependency(
+        "fhir.cdc.opioid-mme-r4",
+        "3.0.0",
+        "http://fhir.org/guides/cdc/opioid-mme-r4"
+      )
+    )
+
+    assertThat(knowledgeManager.loadResources(resourceType = "Library", name = "WHOCommon")).isNotNull()
+    assertThat(knowledgeManager.loadResources(resourceType = "Library", url = "FHIRCommon")).isNotNull()
+    // assertThat(igManager.loadResources(resourceType = "Measure")).hasSize(1)
+    // assertThat(
+    //   igManager.loadResources(
+    //     resourceType = "Measure",
+    //     url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01"
+    //   )
+    // )
+    //   .isNotEmpty()
+    // assertThat(igManager.loadResources(resourceType = "Measure", url = "Measure/ANCIND01"))
+    //   .isNotNull()
   }
 }
