@@ -47,16 +47,16 @@ internal class IgManagerTest {
   @Test
   fun `importing IG creates entries in DB`() = runTest {
     igManager.install(implementationGuide, dataFolder)
+    val implementationGuideId =
+      igDb
+        .implementationGuideDao()
+        .getImplementationGuide("anc-cds", "0.3.0")!!
+        .implementationGuideId
 
     assertThat(
         igDb
           .implementationGuideDao()
-          .getImplementationGuidesWithResources(
-            igDb
-              .implementationGuideDao()
-              .getImplementationGuide("anc-cds", "0.3.0")
-              .implementationGuideId
-          )
+          .getImplementationGuidesWithResources(implementationGuideId)
           ?.resources
       )
       .hasSize(6)

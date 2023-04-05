@@ -27,7 +27,9 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadWorkManager
+import com.google.android.fhir.sync.Request
 import com.google.common.truth.Truth.assertThat
+import java.net.SocketTimeoutException
 import java.time.OffsetDateTime
 import java.util.Date
 import java.util.LinkedList
@@ -95,6 +97,10 @@ object TestDataSourceImpl : DataSource {
     return Bundle().apply { type = Bundle.BundleType.SEARCHSET }
   }
 
+  override suspend fun download(bundle: Bundle): Resource {
+    return Bundle().apply { type = Bundle.BundleType.BATCHRESPONSE }
+  }
+
   override suspend fun upload(bundle: Bundle): Resource {
     return Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
   }
@@ -105,7 +111,7 @@ open class TestDownloadManagerImpl(
 ) : DownloadWorkManager {
   private val urls = LinkedList(queries)
 
-  override suspend fun getNextRequestUrl(): String? = urls.poll()
+  override suspend fun getNextRequest(): Request? = urls.poll()?.let { Request.of(it) }
   override suspend fun getSummaryRequestUrls() =
     queries
       .stream()
@@ -179,14 +185,22 @@ object TestFailingDatasource : DataSource {
     throw Exception(hugeStackTraceMessage)
   }
 
+  override suspend fun download(bundle: Bundle): Resource {
+    throw SocketTimeoutException("Posting Download Bundle failed...")
+  }
+
   override suspend fun upload(bundle: Bundle): Resource {
-    throw Exception("Posting Bundle failed...")
+    throw SocketTimeoutException("Posting Upload Bundle failed...")
   }
 }
 
 class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSource {
 
   override suspend fun download(path: String): Resource {
+    TODO("Not yet implemented")
+  }
+
+  override suspend fun download(bundle: Bundle): Resource {
     TODO("Not yet implemented")
   }
 

@@ -18,6 +18,7 @@ package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.sync.SyncDataParams
+import com.google.android.fhir.sync.UrlRequest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.exceptions.FHIRException
@@ -47,7 +48,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
     val urlsToDownload = mutableListOf<String>()
     do {
-      val url = downloadManager.getNextRequestUrl()
+      val url = downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
       if (url != null) {
         urlsToDownload.add(url)
       }
@@ -71,7 +72,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
     val urlsToDownload = mutableListOf<String>()
     do {
-      val url = downloadManager.getNextRequestUrl()
+      val url = downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
       if (url != null) {
         urlsToDownload.add(url)
       }
@@ -111,7 +112,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
           mapOf(ResourceType.Patient to emptyMap()),
           TestResourceParamsBasedDownloadWorkManagerContext("2022-06-28")
         )
-      val url = downloadManager.getNextRequestUrl()
+      val url = downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
       assertThat(url).isEqualTo("Patient?_sort=_lastUpdated&_lastUpdated=gt2022-06-28")
     }
 
@@ -129,7 +130,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
           ),
           TestResourceParamsBasedDownloadWorkManagerContext("2022-07-07")
         )
-      val url = downloadManager.getNextRequestUrl()
+      val url = downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
       assertThat(url).isEqualTo("Patient?_lastUpdated=2022-06-28&_sort=status")
     }
 
@@ -141,7 +142,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
           mapOf(ResourceType.Patient to mapOf(SyncDataParams.LAST_UPDATED_KEY to "gt2022-06-28")),
           TestResourceParamsBasedDownloadWorkManagerContext("2022-07-07")
         )
-      val url = downloadManager.getNextRequestUrl()
+      val url = downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
       assertThat(url).isEqualTo("Patient?_lastUpdated=gt2022-06-28&_sort=_lastUpdated")
     }
 
@@ -153,7 +154,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
           mapOf(ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI")),
           NoOpResourceParamsBasedDownloadWorkManagerContext
         )
-      val actual = downloadManager.getNextRequestUrl()
+      val actual = downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
       assertThat(actual).isEqualTo("Patient?address-city=NAIROBI&_sort=_lastUpdated")
     }
 
@@ -165,7 +166,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
           mapOf(ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI")),
           TestResourceParamsBasedDownloadWorkManagerContext("")
         )
-      val actual = downloadManager.getNextRequestUrl()
+      val actual = downloadManager.getNextRequest()?.let { (it as UrlRequest).url }
       assertThat(actual).isEqualTo("Patient?address-city=NAIROBI&_sort=_lastUpdated")
     }
 
