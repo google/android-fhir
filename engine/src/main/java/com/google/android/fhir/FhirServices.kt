@@ -28,7 +28,8 @@ import com.google.android.fhir.impl.FhirEngineImpl
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.SearchParamDefinitionsProviderImpl
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.remote.RemoteFhirService
+import com.google.android.fhir.sync.remote.FhirHttpDataSource
+import com.google.android.fhir.sync.remote.RetrofitHttpService
 import org.hl7.fhir.r4.model.SearchParameter
 import timber.log.Timber
 
@@ -81,10 +82,13 @@ internal data class FhirServices(
       val engine = FhirEngineImpl(database = db, context = context)
       val remoteDataSource =
         serverConfiguration?.let {
-          RemoteFhirService.builder(it.baseUrl, it.networkConfiguration)
-            .setAuthenticator(it.authenticator)
-            .setHttpLogger(it.httpLogger)
-            .build()
+          FhirHttpDataSource(
+            fhirHttpService =
+              RetrofitHttpService.builder(it.baseUrl, it.networkConfiguration)
+                .setAuthenticator(it.authenticator)
+                .setHttpLogger(it.httpLogger)
+                .build()
+          )
         }
       return FhirServices(
         fhirEngine = engine,
