@@ -38,78 +38,75 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class EnablementEvaluatorTest {
-    val iParser: IParser = FhirContext.forR4Cached().newJsonParser()
+  val iParser: IParser = FhirContext.forR4Cached().newJsonParser()
 
-    @Test
-    fun evaluate_noEnableWhen_shouldReturnTrue() {
-        assertEnableWhen().isTrue()
-    }
+  @Test
+  fun evaluate_noEnableWhen_shouldReturnTrue() {
+    assertEnableWhen().isTrue()
+  }
 
-    @Test
-    fun evaluate_missingResponseItem_shouldReturnFalse() {
-        val questionnaireItem =
-            Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "q1"
-                type = Questionnaire.QuestionnaireItemType.BOOLEAN
-                addEnableWhen(
-                    Questionnaire.QuestionnaireItemEnableWhenComponent().setQuestion("q2")
-                )
-            }
-        val questionnaireResponseItem =
-            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "q1" }
-        val questionnaireResponse =
-            QuestionnaireResponse().apply { addItem(questionnaireResponseItem) }
-        assertThat(
-            EnablementEvaluator(questionnaireResponse)
-                .evaluate(questionnaireItem, questionnaireResponseItem)
+  @Test
+  fun evaluate_missingResponseItem_shouldReturnFalse() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "q1"
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+        addEnableWhen(Questionnaire.QuestionnaireItemEnableWhenComponent().setQuestion("q2"))
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "q1" }
+    val questionnaireResponse = QuestionnaireResponse().apply { addItem(questionnaireResponseItem) }
+    assertThat(
+        EnablementEvaluator(questionnaireResponse)
+          .evaluate(questionnaireItem, questionnaireResponseItem)
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_expectAnswerExists_answerExists_shouldReturnTrue() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
+          expected = BooleanType(true),
+          actual = listOf(IntegerType(123))
         )
-            .isFalse()
-    }
+      )
+      .isTrue()
+  }
 
-    @Test
-    fun evaluate_expectAnswerExists_answerExists_shouldReturnTrue() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
-                expected = BooleanType(true),
-                actual = listOf(IntegerType(123))
-            )
+  @Test
+  fun evaluate_expectAnswerExists_answerDoesNotExist_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
+          expected = BooleanType(true),
+          actual = listOf()
         )
-            .isTrue()
-    }
+      )
+      .isFalse()
+  }
 
-    @Test
-    fun evaluate_expectAnswerExists_answerDoesNotExist_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
-                expected = BooleanType(true),
-                actual = listOf()
-            )
+  @Test
+  fun evaluate_expectAnswerDoesNotExist_answerExists_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
+          expected = BooleanType(false),
+          actual = listOf(IntegerType(123))
         )
-            .isFalse()
-    }
+      )
+      .isFalse()
+  }
 
-    @Test
-    fun evaluate_expectAnswerDoesNotExist_answerExists_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
-                expected = BooleanType(false),
-                actual = listOf(IntegerType(123))
-            )
-        )
-            .isFalse()
-    }
-
-    @Test
-    fun `evaluate() should evaluate enableWhenExpression`() = runBlocking {
-        @Language("JSON")
-        val questionnaireJson =
-            """
+  @Test
+  fun `evaluate() should evaluate enableWhenExpression`() = runBlocking {
+    @Language("JSON")
+    val questionnaireJson =
+      """
         {
   "resourceType": "Questionnaire",
       "item": [
@@ -139,9 +136,9 @@ class EnablementEvaluatorTest {
 
       """.trimIndent()
 
-        @Language("JSON")
-        val questionnaireResponseJson =
-            """
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
         {
     "resourceType": "QuestionnaireResponse",
     "item": [
@@ -164,32 +161,32 @@ class EnablementEvaluatorTest {
       } 
       """.trimIndent()
 
-        val questionnaire =
-            iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+    val questionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
-        var questionnaireItem: Questionnaire.QuestionnaireItemComponent =
-            Questionnaire.QuestionnaireItemComponent()
-        questionnaire.item.forEach { item -> if (item.linkId == "2") questionnaireItem = item }
+    var questionnaireItem: Questionnaire.QuestionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent()
+    questionnaire.item.forEach { item -> if (item.linkId == "2") questionnaireItem = item }
 
-        val questionnaireResponse =
-            iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
-                    as QuestionnaireResponse
+    val questionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+        as QuestionnaireResponse
 
-        assertThat(
-            EnablementEvaluator(questionnaireResponse)
-                .evaluate(
-                    questionnaireItem,
-                    questionnaireResponse.item[1],
-                )
-        )
-            .isTrue()
-    }
+    assertThat(
+        EnablementEvaluator(questionnaireResponse)
+          .evaluate(
+            questionnaireItem,
+            questionnaireResponse.item[1],
+          )
+      )
+      .isTrue()
+  }
 
-    @Test
-    fun `evaluate() should evaluate false enableWhenExpression`() = runBlocking {
-        @Language("JSON")
-        val questionnaireJson =
-            """
+  @Test
+  fun `evaluate() should evaluate false enableWhenExpression`() = runBlocking {
+    @Language("JSON")
+    val questionnaireJson =
+      """
         {
   "resourceType": "Questionnaire",
       "item": [
@@ -219,9 +216,9 @@ class EnablementEvaluatorTest {
 
       """.trimIndent()
 
-        @Language("JSON")
-        val questionnaireResponseJson =
-            """
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
         {
     "resourceType": "QuestionnaireResponse",
     "item": [
@@ -244,34 +241,32 @@ class EnablementEvaluatorTest {
       } 
       """.trimIndent()
 
-        val questionnaire =
-            iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+    val questionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
-        var questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent =
-            Questionnaire.QuestionnaireItemComponent()
-        questionnaire.item.forEach { item ->
-            if (item.linkId == "2") questionnaireItemComponent = item
-        }
-        val questionnaireResponse =
-            iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
-                    as QuestionnaireResponse
+    var questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent()
+    questionnaire.item.forEach { item -> if (item.linkId == "2") questionnaireItemComponent = item }
+    val questionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+        as QuestionnaireResponse
 
-        assertThat(
-            EnablementEvaluator(questionnaireResponse)
-                .evaluate(
-                    questionnaireItemComponent,
-                    questionnaireResponse.item[1],
-                )
-        )
-            .isFalse()
-    }
+    assertThat(
+        EnablementEvaluator(questionnaireResponse)
+          .evaluate(
+            questionnaireItemComponent,
+            questionnaireResponse.item[1],
+          )
+      )
+      .isFalse()
+  }
 
-    @Test
-    fun `evaluate() should evaluate enableWhenExpression with context fhirpath supplement literal`() =
-        runBlocking {
-            @Language("JSON")
-            val questionnaireJson =
-                """
+  @Test
+  fun `evaluate() should evaluate enableWhenExpression with context fhirpath supplement literal`() =
+    runBlocking {
+      @Language("JSON")
+      val questionnaireJson =
+        """
     {
       "resourceType": "Questionnaire",
           "item": [
@@ -298,11 +293,11 @@ class EnablementEvaluatorTest {
             }
           ]
     }
-      """.trimIndent()
+        """.trimIndent()
 
-            @Language("JSON")
-            val questionnaireResponseJson =
-                """
+      @Language("JSON")
+      val questionnaireResponseJson =
+        """
     {
       "resourceType": "QuestionnaireResponse",
       "item": [
@@ -323,480 +318,478 @@ class EnablementEvaluatorTest {
         }
       ]
     } 
-      """.trimIndent()
+        """.trimIndent()
 
-        val questionnaire =
-            iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+      val questionnaire =
+        iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
-        val questionnaireItem: Questionnaire.QuestionnaireItemComponent = questionnaire.item.find { it.linkId == "female" }!!
+      val questionnaireItem: Questionnaire.QuestionnaireItemComponent =
+        questionnaire.item.find { it.linkId == "female" }!!
 
-        val questionnaireResponse =
-            iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
-                    as QuestionnaireResponse
+      val questionnaireResponse =
+        iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+          as QuestionnaireResponse
 
-        assertThat(
-            EnablementEvaluator(questionnaireResponse)
-                .evaluate(
-                    questionnaireItem,
-                    questionnaireResponse.item[1],
-                )
+      assertThat(
+          EnablementEvaluator(questionnaireResponse)
+            .evaluate(
+              questionnaireItem,
+              questionnaireResponse.item[1],
+            )
         )
-            .isTrue()
+        .isTrue()
+    }
+
+  @Test
+  fun evaluate_expectAnswerDoesNotExist_answerDoesNotExist_shouldReturnTrue() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
+          expected = BooleanType(false),
+          actual = listOf()
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_expectAnswerEqualToValue_noAnswer_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
+          expected = IntegerType(123),
+          actual = listOf()
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_expectAnswerEqualToValue_someAnswerEqualToValue_shouldReturnTrue() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
+          expected = IntegerType(123),
+          actual = listOf(IntegerType(123), IntegerType(456))
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_expectAnswerEqualToValue_noAnswerEqualToValue_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
+          expected = IntegerType(123),
+          actual = listOf(IntegerType(456), IntegerType(789))
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_expectAnswerNotEqualToValue_noAnswer_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
+          expected = IntegerType(123),
+          actual = listOf()
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_expectAnswerNotEqualToValue_someAnswerNotEqualToValue_shouldReturnTrue() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
+          expected = IntegerType(123),
+          actual = listOf(IntegerType(123), IntegerType(456))
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_expectAnswerNotEqualToValue_noAnswerNotEqualToValue_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
+          expected = IntegerType(123),
+          actual = listOf(IntegerType(123), IntegerType(123))
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_expectAnswerGreaterThanValue_someAnswerGreaterThanValue_shouldReturnTrue() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.GREATER_THAN,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(20))
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_expectAnswerGreaterThanValue_noAnswerGreaterThanValue_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.GREATER_THAN,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(5))
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_expectAnswerGreaterThanOrEqualToValue_someAnswerGreaterThanOrEqualToValue_shouldReturnTrue() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(10))
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_expectAnswerGreaterThanOrEqualToValue_noAnswerGreaterThanOrEqualToValue_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(5))
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_expectAnswerLessThanValue_someAnswerLessThanValue_shouldReturnTrue() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.LESS_THAN,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(5))
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_expectAnswerLessThanValue_noAnswerLessThanValue_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.LESS_THAN,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(20))
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_expectAnswerLessThanOrEqualToValue_someAnswerLessThanOrEqualToValue_shouldReturnTrue() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(10))
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_expectAnswerLessThanOrEqualToValue_noAnswerLessThanOrEqualToValue_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(20))
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_multipleEnableWhens_behaviorAny_noneSatisfied_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = Questionnaire.EnableWhenBehavior.ANY,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
+          expected = BooleanType(true),
+          actual = listOf()
+        ),
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
+          expected = BooleanType(true),
+          actual = listOf()
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_multipleEnableWhens_behaviorAny_someSatisfied_shouldReturnTrue() {
+    assertEnableWhen(
+        behavior = Questionnaire.EnableWhenBehavior.ANY,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
+          expected = BooleanType(false),
+          actual = listOf()
+        ),
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
+          expected = BooleanType(true),
+          actual = listOf()
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_multipleEnableWhens_behaviorAll_someSatisfied_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = Questionnaire.EnableWhenBehavior.ALL,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
+          expected = BooleanType(false),
+          actual = listOf()
+        ),
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
+          expected = BooleanType(true),
+          actual = listOf()
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_multipleEnableWhens_behaviorAll_allSatisfied_shouldReturnTrue() {
+    assertEnableWhen(
+        behavior = Questionnaire.EnableWhenBehavior.ALL,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
+          expected = BooleanType(false),
+          actual = listOf()
+        ),
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
+          expected = BooleanType(false),
+          actual = listOf()
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_primitiveType_equal_shouldReturnTrue() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
+          expected = IntegerType(123),
+          actual = listOf(IntegerType(123))
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_primitiveType_equal_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
+          expected = IntegerType(123),
+          actual = listOf(IntegerType(456))
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_primitiveType_notEqual_shouldReturnTrue() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
+          expected = IntegerType(123),
+          actual = listOf(IntegerType(456))
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_primitiveType_notEqual_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
+          expected = IntegerType(123),
+          actual = listOf(IntegerType(123))
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_codingType_equal_differentSystem_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
+          expected = Coding("system", "code", "display"),
+          actual = listOf(Coding("otherSystem", "code", "display"))
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_codingType_equal_differentCode_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
+          expected = Coding("system", "code", "display"),
+          actual = listOf(Coding("system", "otherCode", "display"))
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_codingType_equal_differentDisplay_shouldReturnTrue() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
+          expected = Coding("system", "code", "display"),
+          actual = listOf(Coding("system", "code", "otherDisplay"))
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_codingType_notEqual_differentSystem_shouldReturnTrue() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
+          expected = Coding("system", "code", "display"),
+          actual = listOf(Coding("otherSystem", "code", "display"))
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_codingType_notEqual_differentCode_shouldReturnTrue() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
+          expected = Coding("system", "code", "display"),
+          actual = listOf(Coding("system", "otherCode", "display"))
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_codingType_notEqual_differentDisplay_shouldReturnFalse() {
+    assertEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
+          expected = Coding("system", "code", "display"),
+          actual = listOf(Coding("system", "code", "otherDisplay"))
+        )
+      )
+      .isFalse()
+  }
+
+  /**
+   * Evaluates multiple `enableWhen` constraints according to the `behavior` (any or all).
+   *
+   * See https://www.hl7.org/fhir/valueset-questionnaire-enable-behavior.html.
+   */
+  private fun assertEnableWhen(
+    behavior: Questionnaire.EnableWhenBehavior? = null,
+    vararg enableWhen: EnableWhen
+  ): BooleanSubject {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        enableWhen.forEachIndexed { index, enableWhen ->
+          addEnableWhen(
+            Questionnaire.QuestionnaireItemEnableWhenComponent()
+              .setQuestion("$index") // use the index as linkId
+              .setOperator(enableWhen.operator)
+              .setAnswer(enableWhen.expected)
+          )
         }
-
-    @Test
-    fun evaluate_expectAnswerDoesNotExist_answerDoesNotExist_shouldReturnTrue() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
-                expected = BooleanType(false),
-                actual = listOf()
-            )
-        )
-            .isTrue()
-    }
-
-    @Test
-    fun evaluate_expectAnswerEqualToValue_noAnswer_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
-                expected = IntegerType(123),
-                actual = listOf()
-            )
-        )
-            .isFalse()
-    }
-
-    @Test
-    fun evaluate_expectAnswerEqualToValue_someAnswerEqualToValue_shouldReturnTrue() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
-                expected = IntegerType(123),
-                actual = listOf(IntegerType(123), IntegerType(456))
-            )
-        )
-            .isTrue()
-    }
-
-    @Test
-    fun evaluate_expectAnswerEqualToValue_noAnswerEqualToValue_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
-                expected = IntegerType(123),
-                actual = listOf(IntegerType(456), IntegerType(789))
-            )
-        )
-            .isFalse()
-    }
-
-    @Test
-    fun evaluate_expectAnswerNotEqualToValue_noAnswer_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
-                expected = IntegerType(123),
-                actual = listOf()
-            )
-        )
-            .isFalse()
-    }
-
-    @Test
-    fun evaluate_expectAnswerNotEqualToValue_someAnswerNotEqualToValue_shouldReturnTrue() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
-                expected = IntegerType(123),
-                actual = listOf(IntegerType(123), IntegerType(456))
-            )
-        )
-            .isTrue()
-    }
-
-    @Test
-    fun evaluate_expectAnswerNotEqualToValue_noAnswerNotEqualToValue_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
-                expected = IntegerType(123),
-                actual = listOf(IntegerType(123), IntegerType(123))
-            )
-        )
-            .isFalse()
-    }
-
-    @Test
-    fun evaluate_expectAnswerGreaterThanValue_someAnswerGreaterThanValue_shouldReturnTrue() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.GREATER_THAN,
-                expected = IntegerType(10),
-                actual = listOf(IntegerType(20))
-            )
-        )
-            .isTrue()
-    }
-
-    @Test
-    fun evaluate_expectAnswerGreaterThanValue_noAnswerGreaterThanValue_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.GREATER_THAN,
-                expected = IntegerType(10),
-                actual = listOf(IntegerType(5))
-            )
-        )
-            .isFalse()
-    }
-
-    @Test
-    fun evaluate_expectAnswerGreaterThanOrEqualToValue_someAnswerGreaterThanOrEqualToValue_shouldReturnTrue() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL,
-                expected = IntegerType(10),
-                actual = listOf(IntegerType(10))
-            )
-        )
-            .isTrue()
-    }
-
-    @Test
-    fun evaluate_expectAnswerGreaterThanOrEqualToValue_noAnswerGreaterThanOrEqualToValue_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL,
-                expected = IntegerType(10),
-                actual = listOf(IntegerType(5))
-            )
-        )
-            .isFalse()
-    }
-
-    @Test
-    fun evaluate_expectAnswerLessThanValue_someAnswerLessThanValue_shouldReturnTrue() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.LESS_THAN,
-                expected = IntegerType(10),
-                actual = listOf(IntegerType(5))
-            )
-        )
-            .isTrue()
-    }
-
-    @Test
-    fun evaluate_expectAnswerLessThanValue_noAnswerLessThanValue_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.LESS_THAN,
-                expected = IntegerType(10),
-                actual = listOf(IntegerType(20))
-            )
-        )
-            .isFalse()
-    }
-
-    @Test
-    fun evaluate_expectAnswerLessThanOrEqualToValue_someAnswerLessThanOrEqualToValue_shouldReturnTrue() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL,
-                expected = IntegerType(10),
-                actual = listOf(IntegerType(10))
-            )
-        )
-            .isTrue()
-    }
-
-    @Test
-    fun evaluate_expectAnswerLessThanOrEqualToValue_noAnswerLessThanOrEqualToValue_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL,
-                expected = IntegerType(10),
-                actual = listOf(IntegerType(20))
-            )
-        )
-            .isFalse()
-    }
-
-    @Test
-    fun evaluate_multipleEnableWhens_behaviorAny_noneSatisfied_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = Questionnaire.EnableWhenBehavior.ANY,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
-                expected = BooleanType(true),
-                actual = listOf()
-            ),
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
-                expected = BooleanType(true),
-                actual = listOf()
-            )
-        )
-            .isFalse()
-    }
-
-    @Test
-    fun evaluate_multipleEnableWhens_behaviorAny_someSatisfied_shouldReturnTrue() {
-        assertEnableWhen(
-            behavior = Questionnaire.EnableWhenBehavior.ANY,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
-                expected = BooleanType(false),
-                actual = listOf()
-            ),
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
-                expected = BooleanType(true),
-                actual = listOf()
-            )
-        )
-            .isTrue()
-    }
-
-    @Test
-    fun evaluate_multipleEnableWhens_behaviorAll_someSatisfied_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = Questionnaire.EnableWhenBehavior.ALL,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
-                expected = BooleanType(false),
-                actual = listOf()
-            ),
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
-                expected = BooleanType(true),
-                actual = listOf()
-            )
-        )
-            .isFalse()
-    }
-
-    @Test
-    fun evaluate_multipleEnableWhens_behaviorAll_allSatisfied_shouldReturnTrue() {
-        assertEnableWhen(
-            behavior = Questionnaire.EnableWhenBehavior.ALL,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
-                expected = BooleanType(false),
-                actual = listOf()
-            ),
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
-                expected = BooleanType(false),
-                actual = listOf()
-            )
-        )
-            .isTrue()
-    }
-
-    @Test
-    fun evaluate_primitiveType_equal_shouldReturnTrue() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
-                expected = IntegerType(123),
-                actual = listOf(IntegerType(123))
-            )
-        )
-            .isTrue()
-    }
-
-    @Test
-    fun evaluate_primitiveType_equal_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
-                expected = IntegerType(123),
-                actual = listOf(IntegerType(456))
-            )
-        )
-            .isFalse()
-    }
-
-    @Test
-    fun evaluate_primitiveType_notEqual_shouldReturnTrue() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
-                expected = IntegerType(123),
-                actual = listOf(IntegerType(456))
-            )
-        )
-            .isTrue()
-    }
-
-    @Test
-    fun evaluate_primitiveType_notEqual_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
-                expected = IntegerType(123),
-                actual = listOf(IntegerType(123))
-            )
-        )
-            .isFalse()
-    }
-
-    @Test
-    fun evaluate_codingType_equal_differentSystem_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
-                expected = Coding("system", "code", "display"),
-                actual = listOf(Coding("otherSystem", "code", "display"))
-            )
-        )
-            .isFalse()
-    }
-
-    @Test
-    fun evaluate_codingType_equal_differentCode_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
-                expected = Coding("system", "code", "display"),
-                actual = listOf(Coding("system", "otherCode", "display"))
-            )
-        )
-            .isFalse()
-    }
-
-    @Test
-    fun evaluate_codingType_equal_differentDisplay_shouldReturnTrue() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
-                expected = Coding("system", "code", "display"),
-                actual = listOf(Coding("system", "code", "otherDisplay"))
-            )
-        )
-            .isTrue()
-    }
-
-    @Test
-    fun evaluate_codingType_notEqual_differentSystem_shouldReturnTrue() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
-                expected = Coding("system", "code", "display"),
-                actual = listOf(Coding("otherSystem", "code", "display"))
-            )
-        )
-            .isTrue()
-    }
-
-    @Test
-    fun evaluate_codingType_notEqual_differentCode_shouldReturnTrue() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
-                expected = Coding("system", "code", "display"),
-                actual = listOf(Coding("system", "otherCode", "display"))
-            )
-        )
-            .isTrue()
-    }
-
-    @Test
-    fun evaluate_codingType_notEqual_differentDisplay_shouldReturnFalse() {
-        assertEnableWhen(
-            behavior = null,
-            EnableWhen(
-                operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
-                expected = Coding("system", "code", "display"),
-                actual = listOf(Coding("system", "code", "otherDisplay"))
-            )
-        )
-            .isFalse()
-    }
-
-    /**
-     * Evaluates multiple `enableWhen` constraints according to the `behavior` (any or all).
-     *
-     * See https://www.hl7.org/fhir/valueset-questionnaire-enable-behavior.html.
-     */
-    private fun assertEnableWhen(
-        behavior: Questionnaire.EnableWhenBehavior? = null,
-        vararg enableWhen: EnableWhen
-    ): BooleanSubject {
-        val questionnaireItem =
-            Questionnaire.QuestionnaireItemComponent().apply {
-                enableWhen.forEachIndexed { index, enableWhen ->
-                    addEnableWhen(
-                        Questionnaire.QuestionnaireItemEnableWhenComponent()
-                            .setQuestion("$index") // use the index as linkId
-                            .setOperator(enableWhen.operator)
-                            .setAnswer(enableWhen.expected)
-                    )
-                }
-                behavior?.let { enableBehavior = it }
-                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+        behavior?.let { enableBehavior = it }
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        enableWhen.forEachIndexed { index, enableWhen ->
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "$index"
+              enableWhen.actual.forEach {
+                addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = it })
+              }
             }
-        val questionnaireResponse =
-            QuestionnaireResponse().apply {
-                enableWhen.forEachIndexed { index, enableWhen ->
-                    addItem(
-                        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                            linkId = "$index"
-                            enableWhen.actual.forEach {
-                                addAnswer(QuestionnaireResponseItemAnswerComponent().apply {
-                                    value = it
-                                })
-                            }
-                        }
-                    )
-                }
-                addItem(
-                    QuestionnaireResponse.QuestionnaireResponseItemComponent()
-                        .apply { linkId = "target" }
-                )
-            }
-        return assertThat(
-            EnablementEvaluator(questionnaireResponse)
-                .evaluate(questionnaireItem, questionnaireResponse.item.last())
+          )
+        }
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "target" }
         )
-    }
-
-    /**
-     * Encapsulates the `enableWhen` constraint (`operator` and `expected` answer) and the `actual`
-     * answers used for evaluation. In the test cases, the actual answers will be provided when the
-     * evaluator retrieves answers to the question that matches the `linkId` of the `enableWhen`
-     * constraint.
-     */
-    private data class EnableWhen(
-        val operator: Questionnaire.QuestionnaireItemOperator,
-        val expected: Type,
-        val actual: List<Type>
+      }
+    return assertThat(
+      EnablementEvaluator(questionnaireResponse)
+        .evaluate(questionnaireItem, questionnaireResponse.item.last())
     )
+  }
+
+  /**
+   * Encapsulates the `enableWhen` constraint (`operator` and `expected` answer) and the `actual`
+   * answers used for evaluation. In the test cases, the actual answers will be provided when the
+   * evaluator retrieves answers to the question that matches the `linkId` of the `enableWhen`
+   * constraint.
+   */
+  private data class EnableWhen(
+    val operator: Questionnaire.QuestionnaireItemOperator,
+    val expected: Type,
+    val actual: List<Type>
+  )
 }
