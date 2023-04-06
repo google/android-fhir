@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localTime
 import com.google.android.fhir.getLocalizedText
@@ -28,6 +29,7 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.PrimitiveType
@@ -110,4 +112,18 @@ internal fun StringType.toIdType(): IdType {
 /** Converts Coding to CodeType. */
 internal fun Coding.toCodeType(): CodeType {
   return CodeType(code)
+}
+
+fun Type.valueOrCalculateValue(): Type {
+  return if (this.hasExtension()) {
+    this.extension
+      .firstOrNull { it.url == EXTENSION_CQF_CALCULATED_VALUE_URL }
+      ?.let { extension ->
+        val expression = (extension.value as Expression).expression
+        fhirPathEngine.evaluate(this, expression).singleOrNull()?.let { it as Type }
+      }
+      ?: this
+  } else {
+    this
+  }
 }
