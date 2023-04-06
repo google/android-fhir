@@ -38,6 +38,11 @@ class BehaviorListViewModel(application: Application) : AndroidViewModel(applica
       R.string.behavior_name_calculated_expression,
       "behavior_calculated_expression.json"
     ),
+    ENABLE_WHEN_EXPRESSION(
+      R.drawable.ic_skiplogic_behavior,
+      R.string.behavior_name_enable_when_expression,
+      "behavior_enable_when_expression.json"
+    ),
     SKIP_LOGIC(
       R.drawable.ic_skiplogic_behavior,
       R.string.behavior_name_skip_logic,
