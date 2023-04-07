@@ -61,6 +61,7 @@ dependencies {
   implementation(Dependencies.Navigation.navUiKtx)
 
   implementation(project(path = ":datacapture"))
+  implementation(project(path = ":engine"))
   implementation(project(path = ":contrib:barcode"))
 
   testImplementation(Dependencies.junit)

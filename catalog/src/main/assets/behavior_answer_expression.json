@@ -1,0 +1,34 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "text": "Choose a Task?",
+      "type": "reference",
+      "linkId": "1",
+      "required": true,
+      "repeats": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+          "valueExpression": {
+            "expression": "Task?subject=Patient/3e3d698a-4edb-48f9-9330-2f1adc0635d1&code=33879002&status=ready&_sort=period",
+            "language": "application/x-fhir-query"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn",
+          "extension": [
+            {
+              "url": "path",
+              "valueString": "reasonCode.text + ' - ' + reasonCode.coding.where(system='http://snomed.info/sct').display"
+            },
+            {
+              "url": "forDisplay",
+              "valueBoolean": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
