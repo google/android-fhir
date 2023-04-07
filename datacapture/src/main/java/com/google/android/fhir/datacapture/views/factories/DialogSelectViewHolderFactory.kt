@@ -77,14 +77,13 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
         val questionnaireItem = questionnaireViewItem.questionnaireItem
         val selectedOptions = questionnaireViewItem.extractInitialOptions(holder.header.context)
         viewModel.updateSelectedOptions(selectedOptions)
-        if (selectedOptions.options.any { it.selected }) {
-          onSelectedOptions(selectedOptions)
-        }
+        holder.summary.text = selectedOptions.selectedSummary
         selectedOptionsJob =
           activity.lifecycleScope.launch {
             // Listen for changes to selected options to update summary + FHIR data model
             viewModel.getSelectedOptionsFlow(questionnaireItem.linkId).collect { selectedOptions ->
-              onSelectedOptions(selectedOptions)
+              holder.summary.text = selectedOptions.selectedSummary
+              updateAnswers(selectedOptions)
             }
           }
 
@@ -147,11 +146,6 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
             }
         }
         questionnaireViewItem.setAnswer(*answers)
-      }
-
-      private fun onSelectedOptions(selectedOptions: SelectedOptions) {
-        holder.summary.text = selectedOptions.selectedSummary
-        updateAnswers(selectedOptions)
       }
     }
 
