@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import com.google.android.fhir.compareTo
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.valueOrCalculateValue
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse

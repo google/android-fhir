@@ -27,6 +27,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_READ_ONLY
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
@@ -68,6 +69,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateType
@@ -75,6 +77,7 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
@@ -3529,6 +3532,77 @@ class QuestionnaireViewModelTest {
   //                          Answer Expression                           //
   //                                                                      //
   // ==================================================================== //
+
+  @Test
+  fun `resolveAnswerExpression() should return x-fhir-query referring to patient in context`() =
+    runTest {
+      var searchString = ""
+      ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+        .dataCaptureConfiguration =
+        DataCaptureConfig(
+          xFhirQueryResolver = { xFhirQuery ->
+            searchString = xFhirQuery
+            emptyList()
+          }
+        )
+
+      val patientId = "123"
+      val patient =
+        Patient().apply {
+          id = patientId
+          active = true
+          gender = Enumerations.AdministrativeGender.MALE
+          addName(HumanName().apply { this.family = "Johnny" })
+        }
+
+      val questionnaire =
+        Questionnaire().apply {
+          extension =
+            listOf(
+              Extension(
+                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+                )
+                .apply {
+                  addExtension(
+                    "name",
+                    Coding(
+                      "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
+                      "patient",
+                      "Patient"
+                    )
+                  )
+                  addExtension("type", CodeType("Patient"))
+                }
+            )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              text = "answer expression question text"
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              extension =
+                listOf(
+                  Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                    Expression().apply {
+                      this.expression = "Observation?subject={{%patient.id}}"
+                      this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                    }
+                  )
+                )
+            }
+          )
+        }
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      state.set(
+        EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING,
+        printer.encodeResourceToString(patient)
+      )
+
+      val viewModel = QuestionnaireViewModel(context, state)
+      viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
+
+      assertThat(searchString).isEqualTo("Observation?subject=Patient/$patientId")
+    }
 
   @Test
   fun `resolveAnswerExpression() should return questionnaire item answer options for answer expression and choice column`() =

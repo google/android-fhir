@@ -26,10 +26,12 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.extensions.EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
 import com.google.android.fhir.datacapture.extensions.answerExpression
+import com.google.android.fhir.datacapture.extensions.cqfExpression
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.extractAnswerOptions
@@ -44,8 +46,11 @@ import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
 import com.google.android.fhir.datacapture.extensions.unpackRepeatedGroups
+import com.google.android.fhir.datacapture.extensions.validateLaunchContext
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
+import com.google.android.fhir.datacapture.fhirpath.evaluateToBase
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -61,13 +66,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Element
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ValueSet
 import timber.log.Timber
@@ -146,6 +154,32 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
     }
     questionnaireResponse.packRepeatedGroups()
+  }
+
+  /**
+   * The launch context allows information to be passed into questionnaire based on the context in
+   * which he questionnaire is being evaluated. For example, what patient, what encounter, what
+   * user, etc. is "in context" at the time the questionnaire response is being completed.
+   * Currently, we support at most one launch context.The supported launch contexts are defined in:
+   * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
+   */
+  private val questionnaireLaunchContext: Resource?
+
+  init {
+    questionnaireLaunchContext =
+      if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING)) {
+        val questionnaireLaunchContextJson: String =
+          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING]!!
+        questionnaire.extension
+          .firstOrNull { it.url == EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT }
+          ?.let {
+            val resource = parser.parseResource(questionnaireLaunchContextJson) as Resource
+            validateLaunchContext(it, resource.resourceType.name)
+            resource
+          }
+      } else {
+        null
+      }
   }
 
   /** The map from each item in the [Questionnaire] to its parent. */
@@ -496,6 +530,20 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return options
   }
 
+  internal fun resolveCqfExpression(
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
+    element: Element,
+  ): List<Base> {
+    val cqfExpression = element.cqfExpression ?: return emptyList()
+    if (cqfExpression.isFhirPath) {
+      return evaluateToBase(
+        questionnaireResponse,
+        questionnaireResponseItem,
+        cqfExpression.expression
+      )
+    } else throw UnsupportedOperationException("${cqfExpression.language} not supported yet")
+  }
+
   private suspend fun loadAnswerExpressionOptions(
     item: QuestionnaireItemComponent,
     expression: Expression,
@@ -505,7 +553,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         checkNotNull(xFhirQueryResolver) {
           "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
         }
-        xFhirQueryResolver!!.resolve(expression.expression)
+
+        val xFhirExpressionString =
+          ExpressionEvaluator.createXFhirQueryFromExpression(expression, questionnaireLaunchContext)
+        xFhirQueryResolver!!.resolve(xFhirExpressionString)
       } else if (expression.isFhirPath) {
         fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
       } else {
@@ -645,6 +696,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             answersChangedCallback = answersChangedCallback,
             resolveAnswerValueSet = { resolveAnswerValueSet(it) },
             resolveAnswerExpression = { resolveAnswerExpression(it) },
+            resolveCqfExpression = { resolveCqfExpression(questionnaireResponseItem, it) },
             draftAnswer = draftAnswerMap[questionnaireResponseItem],
             enabledDisplayItems =
               questionnaireItem.item.filter {
