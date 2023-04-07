@@ -23,15 +23,9 @@ import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.DataCaptureConfig
 import com.google.android.fhir.search.search
-import com.google.android.fhir.sync.SyncJobStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.hl7.fhir.r4.model.Bundle
 
 class CatalogApplication : Application(), DataCaptureConfig.Provider {
@@ -47,15 +41,16 @@ class CatalogApplication : Application(), DataCaptureConfig.Provider {
 
     dataCaptureConfig = DataCaptureConfig(xFhirQueryResolver = { fhirEngine.search(it) })
 
-    this.assets.open("resource_data_bundle.json").bufferedReader().use { it.readText() }.let {
-      FhirContext.forR4Cached().newJsonParser().parseResource(it) as Bundle
-    }.entry.map {
-      it.resource
-    }.also { resources ->
-      CoroutineScope(Dispatchers.IO).launch {
-        fhirEngine.create(*resources.toTypedArray())
+    this.assets
+      .open("resource_data_bundle.json")
+      .bufferedReader()
+      .use { it.readText() }
+      .let { FhirContext.forR4Cached().newJsonParser().parseResource(it) as Bundle }
+      .entry
+      .map { it.resource }
+      .also { resources ->
+        CoroutineScope(Dispatchers.IO).launch { fhirEngine.create(*resources.toTypedArray()) }
       }
-    }
   }
 
   override fun getDataCaptureConfig(): DataCaptureConfig = dataCaptureConfig
