@@ -3079,6 +3079,375 @@ class QuestionnaireViewModelTest {
       }
     }
 
+  @Test
+  fun `getQuestionnaireResponse() should return enabled repeated groups`() {
+    val questionnaireString =
+      """
+        {
+  "resourceType": "Questionnaire",
+  "id": "ANCDELIVERY",
+  "item": [
+    {
+      "linkId": "12.0",
+      "type": "group",
+      "text": "Pregnancy Outcome - Baby",
+      "repeats": true,
+      "item": [
+        {
+          "linkId": "12.6",
+          "type": "group",
+          "text": "Live Birth/Stillbirth",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "radio-button",
+                        "display": "Radio Button"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "linkId": "12.6.1",
+              "type": "choice",
+              "text": "Is it Live Birth/Stillbirth?",
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "live-birth",
+                    "display": "Live Birth"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "code": "still-birth",
+                    "display": "Stillbirth"
+                  }
+                }
+              ]
+            },
+            {
+              "enableWhen": [
+                {
+                  "question": "12.6.1",
+                  "operator": "=",
+                  "answerCoding": {
+                    "code": "live-birth",
+                    "display": "Live Birth"
+                  }
+                }
+              ],
+              "linkId": "12.6.3",
+              "type": "group",
+              "text": "Baby Gender",
+              "item": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "radio-button",
+                            "display": "Radio Button"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "linkId": "12.6.3.1",
+                  "type": "choice",
+                  "text": "Sex of Baby",
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "male",
+                        "display": "Male"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "female",
+                        "display": "Female"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "enableWhen": [
+                {
+                  "question": "12.6.1",
+                  "operator": "=",
+                  "answerCoding": {
+                    "code": "still-birth",
+                    "display": "Stillbirth"
+                  }
+                }
+              ],
+              "linkId": "12.6.4",
+              "type": "group",
+              "text": "Stillbirth Type",
+              "item": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "radio-button",
+                            "display": "Radio Button"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "linkId": "12.6.4.1",
+                  "type": "choice",
+                  "text": "Stillbirth Type",
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "FSB",
+                        "display": "FSB"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "MSB",
+                        "display": "MSB"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+      """.trimIndent()
+
+    val questionnaireResponseString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "12.0",
+              "answer": [
+                {
+                  "item": [
+                    {
+                      "linkId": "12.6",
+                      "item": [
+                        {
+                          "linkId": "12.6.1",
+                          "answer": [
+                            {
+                              "valueCoding": {
+                                "code": "live-birth",
+                                "display": "Live Birth"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "linkId": "12.6.3",
+                          "item": [
+                            {
+                              "linkId": "12.6.3.1",
+                              "answer": [
+                                {
+                                  "valueCoding": {
+                                    "code": "male",
+                                    "display": "Male"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "linkId": "12.6.4",
+                          "item": [
+                            {
+                              "linkId": "12.6.4.1"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "item": [
+                    {
+                      "linkId": "12.6",
+                      "item": [
+                        {
+                          "linkId": "12.6.1",
+                          "answer": [
+                            {
+                              "valueCoding": {
+                                "code": "still-birth",
+                                "display": "Stillbirth"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "linkId": "12.6.3",
+                          "item": [
+                            {
+                              "linkId": "12.6.3.1"
+                            }
+                          ]
+                        },
+                        {
+                          "linkId": "12.6.4",
+                          "item": [
+                            {
+                              "linkId": "12.6.4.1",
+                              "answer": [
+                                {
+                                  "valueCoding": {
+                                    "code": "FSB",
+                                    "display": "FSB"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+
+      """.trimIndent()
+
+    val expectedResponseString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "12.0",
+              "text": "Pregnancy Outcome - Baby",
+              "item": [
+                {
+                  "linkId": "12.6",
+                  "text": "Live Birth/Stillbirth",
+                  "item": [
+                    {
+                      "linkId": "12.6.1",
+                      "text": "Is it Live Birth/Stillbirth?",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "code": "live-birth",
+                            "display": "Live Birth"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "12.6.3",
+                      "text": "Baby Gender",
+                      "item": [
+                        {
+                          "linkId": "12.6.3.1",
+                          "text": "Sex of Baby",
+                          "answer": [
+                            {
+                              "valueCoding": {
+                                "code": "male",
+                                "display": "Male"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "linkId": "12.0",
+              "text": "Pregnancy Outcome - Baby",
+              "item": [
+                {
+                  "linkId": "12.6",
+                  "text": "Live Birth/Stillbirth",
+                  "item": [
+                    {
+                      "linkId": "12.6.1",
+                      "text": "Is it Live Birth/Stillbirth?",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "code": "still-birth",
+                            "display": "Stillbirth"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "12.6.4",
+                      "text": "Stillbirth Type",
+                      "item": [
+                        {
+                          "linkId": "12.6.4.1",
+                          "text": "Stillbirth Type",
+                          "answer": [
+                            {
+                              "valueCoding": {
+                                "code": "FSB",
+                                "display": "FSB"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+
+      """.trimIndent()
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
+    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    val viewModel = QuestionnaireViewModel(context, state)
+    val value = viewModel.getQuestionnaireResponse()
+    val expectedResponse =
+      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+        as QuestionnaireResponse
+
+    assertResourceEquals(value, expectedResponse)
+  }
+
   // ==================================================================== //
   //                                                                      //
   //               Questionnaire Response with Nested Items               //
@@ -4293,375 +4662,6 @@ class QuestionnaireViewModelTest {
     assertThat(enabledDisplayItems[0].type).isEqualTo(Questionnaire.QuestionnaireItemType.DISPLAY)
     assertThat(enabledDisplayItems[0].linkId).isEqualTo("1.2")
     assertThat(enabledDisplayItems[0].text).isEqualTo("Text when yes is selected")
-  }
-
-  @Test
-  fun `repeatedGroupItem response contains enabled items`() {
-    val questionnaireString =
-      """
-        {
-  "resourceType": "Questionnaire",
-  "id": "ANCDELIVERY",
-  "item": [
-    {
-      "linkId": "12.0",
-      "type": "group",
-      "text": "Pregnancy Outcome - Baby",
-      "repeats": true,
-      "item": [
-        {
-          "linkId": "12.6",
-          "type": "group",
-          "text": "Live Birth/Stillbirth",
-          "item": [
-            {
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-                  "valueCodeableConcept": {
-                    "coding": [
-                      {
-                        "system": "http://hl7.org/fhir/questionnaire-item-control",
-                        "code": "radio-button",
-                        "display": "Radio Button"
-                      }
-                    ]
-                  }
-                }
-              ],
-              "linkId": "12.6.1",
-              "type": "choice",
-              "text": "Is it Live Birth/Stillbirth?",
-              "answerOption": [
-                {
-                  "valueCoding": {
-                    "code": "live-birth",
-                    "display": "Live Birth"
-                  }
-                },
-                {
-                  "valueCoding": {
-                    "code": "still-birth",
-                    "display": "Stillbirth"
-                  }
-                }
-              ]
-            },
-            {
-              "enableWhen": [
-                {
-                  "question": "12.6.1",
-                  "operator": "=",
-                  "answerCoding": {
-                    "code": "live-birth",
-                    "display": "Live Birth"
-                  }
-                }
-              ],
-              "linkId": "12.6.3",
-              "type": "group",
-              "text": "Baby Gender",
-              "item": [
-                {
-                  "extension": [
-                    {
-                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-                      "valueCodeableConcept": {
-                        "coding": [
-                          {
-                            "system": "http://hl7.org/fhir/questionnaire-item-control",
-                            "code": "radio-button",
-                            "display": "Radio Button"
-                          }
-                        ]
-                      }
-                    }
-                  ],
-                  "linkId": "12.6.3.1",
-                  "type": "choice",
-                  "text": "Sex of Baby",
-                  "answerOption": [
-                    {
-                      "valueCoding": {
-                        "code": "male",
-                        "display": "Male"
-                      }
-                    },
-                    {
-                      "valueCoding": {
-                        "code": "female",
-                        "display": "Female"
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "enableWhen": [
-                {
-                  "question": "12.6.1",
-                  "operator": "=",
-                  "answerCoding": {
-                    "code": "still-birth",
-                    "display": "Stillbirth"
-                  }
-                }
-              ],
-              "linkId": "12.6.4",
-              "type": "group",
-              "text": "Stillbirth Type",
-              "item": [
-                {
-                  "extension": [
-                    {
-                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-                      "valueCodeableConcept": {
-                        "coding": [
-                          {
-                            "system": "http://hl7.org/fhir/questionnaire-item-control",
-                            "code": "radio-button",
-                            "display": "Radio Button"
-                          }
-                        ]
-                      }
-                    }
-                  ],
-                  "linkId": "12.6.4.1",
-                  "type": "choice",
-                  "text": "Stillbirth Type",
-                  "answerOption": [
-                    {
-                      "valueCoding": {
-                        "code": "FSB",
-                        "display": "FSB"
-                      }
-                    },
-                    {
-                      "valueCoding": {
-                        "code": "MSB",
-                        "display": "MSB"
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-
-      """.trimIndent()
-
-    val questionnaireResponseString =
-      """
-        {
-          "resourceType": "QuestionnaireResponse",
-          "item": [
-            {
-              "linkId": "12.0",
-              "answer": [
-                {
-                  "item": [
-                    {
-                      "linkId": "12.6",
-                      "item": [
-                        {
-                          "linkId": "12.6.1",
-                          "answer": [
-                            {
-                              "valueCoding": {
-                                "code": "live-birth",
-                                "display": "Live Birth"
-                              }
-                            }
-                          ]
-                        },
-                        {
-                          "linkId": "12.6.3",
-                          "item": [
-                            {
-                              "linkId": "12.6.3.1",
-                              "answer": [
-                                {
-                                  "valueCoding": {
-                                    "code": "male",
-                                    "display": "Male"
-                                  }
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "linkId": "12.6.4",
-                          "item": [
-                            {
-                              "linkId": "12.6.4.1"
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "item": [
-                    {
-                      "linkId": "12.6",
-                      "item": [
-                        {
-                          "linkId": "12.6.1",
-                          "answer": [
-                            {
-                              "valueCoding": {
-                                "code": "still-birth",
-                                "display": "Stillbirth"
-                              }
-                            }
-                          ]
-                        },
-                        {
-                          "linkId": "12.6.3",
-                          "item": [
-                            {
-                              "linkId": "12.6.3.1"
-                            }
-                          ]
-                        },
-                        {
-                          "linkId": "12.6.4",
-                          "item": [
-                            {
-                              "linkId": "12.6.4.1",
-                              "answer": [
-                                {
-                                  "valueCoding": {
-                                    "code": "FSB",
-                                    "display": "FSB"
-                                  }
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-
-      """.trimIndent()
-
-    val expectedResponseString =
-      """
-        {
-          "resourceType": "QuestionnaireResponse",
-          "item": [
-            {
-              "linkId": "12.0",
-              "text": "Pregnancy Outcome - Baby",
-              "item": [
-                {
-                  "linkId": "12.6",
-                  "text": "Live Birth/Stillbirth",
-                  "item": [
-                    {
-                      "linkId": "12.6.1",
-                      "text": "Is it Live Birth/Stillbirth?",
-                      "answer": [
-                        {
-                          "valueCoding": {
-                            "code": "live-birth",
-                            "display": "Live Birth"
-                          }
-                        }
-                      ]
-                    },
-                    {
-                      "linkId": "12.6.3",
-                      "text": "Baby Gender",
-                      "item": [
-                        {
-                          "linkId": "12.6.3.1",
-                          "text": "Sex of Baby",
-                          "answer": [
-                            {
-                              "valueCoding": {
-                                "code": "male",
-                                "display": "Male"
-                              }
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "linkId": "12.0",
-              "text": "Pregnancy Outcome - Baby",
-              "item": [
-                {
-                  "linkId": "12.6",
-                  "text": "Live Birth/Stillbirth",
-                  "item": [
-                    {
-                      "linkId": "12.6.1",
-                      "text": "Is it Live Birth/Stillbirth?",
-                      "answer": [
-                        {
-                          "valueCoding": {
-                            "code": "still-birth",
-                            "display": "Stillbirth"
-                          }
-                        }
-                      ]
-                    },
-                    {
-                      "linkId": "12.6.4",
-                      "text": "Stillbirth Type",
-                      "item": [
-                        {
-                          "linkId": "12.6.4.1",
-                          "text": "Stillbirth Type",
-                          "answer": [
-                            {
-                              "valueCoding": {
-                                "code": "FSB",
-                                "display": "FSB"
-                              }
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-
-      """.trimIndent()
-
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
-    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
-    val viewModel = QuestionnaireViewModel(context, state)
-    val value = viewModel.getQuestionnaireResponse()
-    val expectedResponse =
-      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
-        as QuestionnaireResponse
-
-    assertResourceEquals(value, expectedResponse)
   }
 
   private fun createQuestionnaireViewModel(
