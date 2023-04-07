@@ -338,7 +338,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    */
   fun getQuestionnaireResponse(): QuestionnaireResponse {
     return questionnaireResponse.copy().apply {
-      item = getEnabledResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
+      // Use the view model's questionnaire and questionnaire response for calculating enabled items
+      // because the calculation relies on references to the questionnaire response items.
+      item =
+        getEnabledResponseItems(
+            this@QuestionnaireViewModel.questionnaire.item,
+            questionnaireResponse.item
+          )
+          .map { it.copy() }
       unpackRepeatedGroups(this@QuestionnaireViewModel.questionnaire)
     }
   }

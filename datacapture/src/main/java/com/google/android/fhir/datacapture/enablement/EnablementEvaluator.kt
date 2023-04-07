@@ -80,6 +80,11 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
         questionnaireResponseItemParentMap[child] = item
         buildParentList(child)
       }
+      for (answer in item.answer) {
+        for (nestedItem in answer.item) {
+          buildParentList(nestedItem)
+        }
+      }
     }
 
     for (item in questionnaireResponse.item) {
