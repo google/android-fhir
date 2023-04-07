@@ -211,12 +211,12 @@ data class QuestionnaireViewItem(
    * cqf-expression on textElement if exists, otherwise it is derived from translatable textElement
    * property
    */
-  internal val questionTitle: Spanned?
-    get() =
-      questionnaireItem.textElement
-        .takeIf { it.cqfExpression != null }
-        ?.let { resolveCqfExpression(it).firstOrNull()?.primitiveValue()?.toSpanned() }
-        ?: questionnaireItem.localizedTextSpanned
+  internal val questionTitle: Spanned? by lazy {
+    questionnaireItem.textElement
+      .takeIf { it.cqfExpression != null }
+      ?.let { resolveCqfExpression(it).firstOrNull()?.primitiveValue()?.toSpanned() }
+      ?: questionnaireItem.localizedTextSpanned
+  }
 
   /**
    * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem] have the
@@ -230,7 +230,7 @@ data class QuestionnaireViewItem(
   internal fun hasTheSameItem(other: QuestionnaireViewItem) =
     questionnaireItem === other.questionnaireItem &&
       questionnaireResponseItem === other.questionnaireResponseItem &&
-      questionTitle === other.questionTitle
+      questionTitle == other.questionTitle
 
   /**
    * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem] have the
