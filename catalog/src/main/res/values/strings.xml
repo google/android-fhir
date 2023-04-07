@@ -44,9 +44,6 @@
         name="behavior_name_skip_logic_info"
     >If Yes is selected, a follow-up question is displayed. If No is selected, no follow-up questions are displayed.</string>
     <string
-        name="behavior_name_enable_when_expression"
-    >Enable When Expression</string>
-    <string
         name="behavior_name_calculated_expression_info"
     >Input age to automatically calculate birthdate until birthdate is updated manually.</string>
     <string
