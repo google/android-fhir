@@ -110,7 +110,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
           pendingTasksCount =
             taskManager.getTasksCount(resourceId) {
               filter(Task.STATUS, { value = of(getTaskStatus(0)) })
-            }
+            }!!
         }
       }
       .let { patients.addAll(it) }

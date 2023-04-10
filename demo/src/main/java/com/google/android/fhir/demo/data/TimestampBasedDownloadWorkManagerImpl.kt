@@ -17,9 +17,10 @@
 package com.google.android.fhir.demo.data
 
 import com.google.android.fhir.demo.DemoDataStore
-import com.google.android.fhir.demo.care.CarePlanManager
+import com.google.android.fhir.demo.care.ConfigurationManager.getCareConfigurationResources
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.SyncDataParams
+import com.google.android.fhir.workflow.CarePlanManager
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
@@ -44,11 +45,12 @@ class TimestampBasedDownloadWorkManagerImpl(
       listOf(
         "Patient",
         "Organization",
-        "Location",
-        "Practitioner",
         "PractitionerRole",
+        "Location",
         "PlanDefinition",
-        "Task"
+        "Questionnaire",
+        "Task",
+        "CarePlan"
       )
     )
 
@@ -112,6 +114,7 @@ class TimestampBasedDownloadWorkManagerImpl(
         if (item.resource is PlanDefinition) {
           bundleCollection +=
             carePlanManager.getPlanDefinitionDependentResources(item.resource as PlanDefinition)
+          bundleCollection += getCareConfigurationResources()
         }
       }
     }
