@@ -232,17 +232,14 @@ class CarePlanManager(
         "DiagnosticReport" -> TODO("Not supported yet")
         "Communication" -> TODO("Not supported yet")
         "CommunicationRequest" -> TODO("Not supported yet")
-        "RequestGroup" -> { }
+        "RequestGroup" -> {}
         else -> TODO("Not a valid request resource")
       }
     }
     return createdRequestResources
   }
 
-  private suspend fun acceptCarePlan(
-    proposedCarePlan: CarePlan,
-    carePlanOfRecord: CarePlan
-  ) {
+  private suspend fun acceptCarePlan(proposedCarePlan: CarePlan, carePlanOfRecord: CarePlan) {
     val resourceList = createProposedRequestResources(proposedCarePlan.contained)
     updateCarePlanWithProtocol(carePlanOfRecord, proposedCarePlan.instantiatesCanonical)
     addRequestResourcesToCarePlanOfRecord(carePlanOfRecord, resourceList)
@@ -299,7 +296,7 @@ class CarePlanManager(
       "DiagnosticReport" -> TODO("Not supported yet")
       "Communication" -> TODO("Not supported yet")
       "CommunicationRequest" -> TODO("Not supported yet")
-      "RequestGroup" -> { }
+      "RequestGroup" -> {}
       else -> TODO("Not a valid request resource")
     }
   }
