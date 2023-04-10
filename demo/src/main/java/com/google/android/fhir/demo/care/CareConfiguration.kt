@@ -215,7 +215,6 @@ object ConfigurationManager {
       for (resourceJson in resourceJsonList) {
         val resource = jsonParser.parseResource(resourceJson.toString()) as Resource
         bundleCollection += resource
-        // fhirEngine.create(resource)
       }
     }
     return bundleCollection
