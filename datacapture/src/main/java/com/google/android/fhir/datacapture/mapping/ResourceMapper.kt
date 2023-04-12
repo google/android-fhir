@@ -26,6 +26,7 @@ import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.targetStructureMap
 import com.google.android.fhir.datacapture.toCoding
 import java.lang.reflect.Field
+import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.util.Locale
@@ -44,6 +45,7 @@ import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -672,9 +674,24 @@ private fun addAnswerToListField(base: Base, field: Field, answerValue: List<Bas
 }
 
 private fun updateListFieldWithAnswer(base: Base, field: Field, answerValue: List<Base>) {
-  base.javaClass
-    .getMethod("set${field.name.capitalize()}", field.type)
-    .invoke(base, if (field.isParameterized && field.isList) answerValue else answerValue.first())
+  try {
+    base.javaClass
+      .getMethod("set${field.name.capitalize()}", field.type)
+      .invoke(base, if (field.isParameterized && field.isList) answerValue else answerValue.first())
+  } catch (e: InvocationTargetException) {
+    when (base) {
+      is Observation -> {
+        if (!field.isParameterized && !field.isList && answerValue.first().fhirType() == "Coding") {
+          base.javaClass.getMethod("set${field.name.capitalize()}", field.type)
+            .invoke(base, CodeableConcept().apply {
+              addCoding(answerValue.first() as Coding)
+              text = (answerValue.first() as Coding).display
+            })
+        } else throw e
+      }
+      else -> throw e
+    }
+  }
 }
 
 private fun String.capitalize() = replaceFirstChar {
