@@ -16,11 +16,19 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import android.content.Context
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.util.TypedValue
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Button
 import android.widget.TextView
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
+import com.google.android.fhir.datacapture.R
 import com.google.android.material.card.MaterialCardView
 import org.hl7.fhir.r4.model.Questionnaire
 
@@ -67,4 +75,32 @@ internal fun initHelpViews(
       }
   }
   helpTextView.updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
+}
+
+/**
+ * Appends the optional text [R.string.optional_text] to the [localizedText], and assign the
+ * resulting text to the [textView].
+ */
+internal fun appendOptionalText(textView: TextView, localizedText: Spanned? = null) {
+  val builder = SpannableStringBuilder()
+  localizedText?.let { builder.append(it) }
+  builder.appendWithSpan(
+    textView.context.applicationContext.getString(R.string.optional_text),
+    textView.context.getColorFromAttr(R.attr.colorOutline)
+  )
+  textView.updateTextAndVisibility(builder)
+}
+
+private fun SpannableStringBuilder.appendWithSpan(value: String, @ColorInt color: Int) {
+  val start = length
+  append(value)
+  val end = length
+  setSpan(ForegroundColorSpan(color), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+}
+
+@ColorInt
+private fun Context.getColorFromAttr(@AttrRes attrColor: Int): Int {
+  val typedValue = TypedValue()
+  theme.resolveAttribute(attrColor, typedValue, true)
+  return typedValue.data
 }

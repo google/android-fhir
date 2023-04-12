@@ -472,6 +472,47 @@ class DatePickerViewHolderFactoryTest {
     assertThat(viewHolder.dateInputView.text.toString()).isEmpty()
   }
 
+  @Test
+  fun `showRequiredText shows required text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          required = true
+          text = "Question?"
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<TextInputLayout>(R.id.text_input_layout)
+          .helperText.toString()
+      )
+      .isEqualTo("Required")
+  }
+
+  @Test
+  fun `optionalText appends optional text to the end of the question text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          text = "Question"
+          required = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        markOptionalQuestionText = true
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+      .isEqualTo("Question (optional)")
+  }
+
   private fun setLocale(locale: Locale) {
     Locale.setDefault(locale)
     context.resources.configuration.setLocale(locale)

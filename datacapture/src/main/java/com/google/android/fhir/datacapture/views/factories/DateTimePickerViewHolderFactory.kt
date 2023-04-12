@@ -125,7 +125,14 @@ internal object DateTimePickerViewHolderFactory :
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         clearPreviousState()
         header.bind(questionnaireViewItem)
-        dateInputLayout.hint = canonicalizedDatePattern
+        dateInputLayout.apply {
+          hint = canonicalizedDatePattern
+          if (!questionnaireViewItem.markOptionalQuestionText &&
+              questionnaireViewItem.questionnaireItem.required
+          ) {
+            helperText = dateInputLayout.context.getString(R.string.required)
+          }
+        }
         dateInputEditText.removeTextChangedListener(textWatcher)
 
         val questionnaireItemViewItemDateTimeAnswer =

@@ -326,6 +326,14 @@ class QuestionnaireFragment : Fragment() {
     }
 
     /**
+     * A [Boolean] extra to control if the optional text is being added to the end of the question
+     * text.
+     */
+    fun markOptionalQuestionText(value: Boolean) = apply {
+      args.add(EXTRA_MARK_OPTIONAL_QUESTION to value)
+    }
+
+    /**
      * A matcher to provide [QuestionnaireItemViewHolderFactoryMatcher]s for custom
      * [Questionnaire.QuestionnaireItemType]. The application needs to provide a
      * [QuestionnaireItemViewHolderFactoryMatchersProviderFactory] in the [DataCaptureConfig] so
@@ -419,6 +427,8 @@ class QuestionnaireFragment : Fragment() {
      * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
      */
     internal const val EXTRA_SHOW_SUBMIT_BUTTON = "show-submit-button"
+
+    internal const val EXTRA_MARK_OPTIONAL_QUESTION = "mark-optional-question"
 
     fun builder() = Builder()
   }

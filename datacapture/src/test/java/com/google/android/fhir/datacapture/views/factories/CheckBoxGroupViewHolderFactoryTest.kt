@@ -25,8 +25,11 @@ import androidx.core.view.children
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.extensions.EXTENSION_CHOICE_ORIENTATION_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
+import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_ANSWER_MEDIA
 import com.google.android.fhir.datacapture.extensions.EXTENSION_OPTION_EXCLUSIVE_URL
+import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -34,6 +37,7 @@ import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
@@ -470,4 +474,82 @@ class CheckBoxGroupViewHolderFactoryTest {
       )
       .isFalse()
   }
+
+  @Test
+  fun `showRequiredText shows required text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          required = true
+          text = "Question?"
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.hint).text.toString())
+      .isEqualTo("Required")
+  }
+
+  @Test
+  fun `showRequiredText appends required text to the beginning of the instructions`() {
+    val itemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "nested-display-question"
+          text = "subtitle text"
+          extension = listOf(displayCategoryExtensionWithInstructionsCode)
+          type = Questionnaire.QuestionnaireItemType.DISPLAY
+        }
+      )
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        enabledDisplayItems = itemList
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.hint).text.toString())
+      .isEqualTo("Required. subtitle text")
+  }
+
+  @Test
+  fun `optionalText appends optional text to the end of the question text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          text = "Question"
+          required = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        markOptionalQuestionText = true
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+      .isEqualTo("Question (optional)")
+  }
+
+  private val displayCategoryExtensionWithInstructionsCode =
+    Extension().apply {
+      url = EXTENSION_DISPLAY_CATEGORY_URL
+      setValue(
+        CodeableConcept().apply {
+          coding =
+            listOf(
+              Coding().apply {
+                code = INSTRUCTIONS
+                system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+              }
+            )
+        }
+      )
+    }
 }

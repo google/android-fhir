@@ -56,6 +56,7 @@ internal object BooleanChoiceViewHolderFactory :
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         this.questionnaireViewItem = questionnaireViewItem
         header.bind(questionnaireViewItem)
+        header.appendRequiredTextToBeginningOfInstructions(questionnaireViewItem)
         val choiceOrientation =
           questionnaireViewItem.questionnaireItem.choiceOrientation
             ?: ChoiceOrientationTypes.VERTICAL

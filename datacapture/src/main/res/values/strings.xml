@@ -116,4 +116,7 @@
     >Number must be between <xliff:g id="min_value">%1$s</xliff:g> and <xliff:g
             id="max_value"
         >%2$s</xliff:g></string>
+    <string name="optional_text">\u0020(optional)</string>
+    <string name="required_in_instructions">Required.\u0020</string>
+    <string name="required">Required</string>
 </resources>

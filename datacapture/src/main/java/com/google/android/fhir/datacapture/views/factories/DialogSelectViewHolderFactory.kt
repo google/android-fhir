@@ -63,8 +63,14 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         cleanupOldState()
-        holder.summaryHolder.hint =
-          questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
+        holder.summaryHolder.apply {
+          hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
+          if (!questionnaireViewItem.markOptionalQuestionText &&
+              questionnaireViewItem.questionnaireItem.required
+          ) {
+            helperText = context.getString(R.string.required)
+          }
+        }
         val activity =
           requireNotNull(holder.header.context.tryUnwrapContext()) {
             "Can only use dialog select in an AppCompatActivity context"

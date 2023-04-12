@@ -188,6 +188,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** Flag to show/hide submit button. Default is true. */
   private var shouldShowSubmitButton = state[QuestionnaireFragment.EXTRA_SHOW_SUBMIT_BUTTON] ?: true
 
+  /** Flag to control if the optional text is being added to the end of the question text. */
+  private var markOptionalQuestionText =
+    state[QuestionnaireFragment.EXTRA_MARK_OPTIONAL_QUESTION] ?: false
+
   /** The pages of the questionnaire, or null if the questionnaire is not paginated. */
   @VisibleForTesting var pages: List<QuestionnairePage>? = null
 
@@ -650,7 +654,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               questionnaireItem.item.filter {
                 it.isDisplayItem &&
                   EnablementEvaluator(questionnaireResponse).evaluate(it, questionnaireResponseItem)
-              }
+              },
+            markOptionalQuestionText = markOptionalQuestionText
           )
         )
       )

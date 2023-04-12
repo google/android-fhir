@@ -60,6 +60,14 @@ internal object DropDownViewHolderFactory :
         cleanupOldState()
         header.bind(questionnaireViewItem)
         textInputLayout.hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
+        textInputLayout.apply {
+          hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
+          if (!questionnaireViewItem.markOptionalQuestionText &&
+              questionnaireViewItem.questionnaireItem.required
+          ) {
+            helperText = context.getString(R.string.required)
+          }
+        }
         val answerOptionList =
           this.questionnaireViewItem.answerOption
             .map {
