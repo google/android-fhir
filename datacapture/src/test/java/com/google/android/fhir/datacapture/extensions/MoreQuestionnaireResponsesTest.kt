@@ -25,6 +25,7 @@ import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.junit.Test
 
@@ -285,6 +286,112 @@ class MoreQuestionnaireResponsesTest {
                 linkId = "nested-question"
                 addAnswer(
                   QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(false) }
+                )
+              }
+            )
+          }
+        )
+      }
+
+    questionnaireResponse.unpackRepeatedGroups(questionnaire)
+    assertResourceEquals(questionnaireResponse, unpackedQuestionnaireResponse)
+  }
+
+  @Test
+  fun `should unpack repeated groups correctly with missing questionnaire response items`() {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "simple-question-1"
+            type = Questionnaire.QuestionnaireItemType.STRING
+          }
+        )
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "repeated-group"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            repeats = true
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "nested-question-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "nested-question-2"
+                type = Questionnaire.QuestionnaireItemType.REFERENCE
+              }
+            )
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        // linkId = "simple-question-1" not present due to enablement
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "repeated-group"
+            addAnswer(
+              QuestionnaireResponseItemAnswerComponent().apply {
+                // linkId = "nested-question-1" not present due to enablement
+                addItem(
+                  QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-question-2"
+                    addAnswer(
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        value = Reference().apply { reference = "Patient/123" }
+                      }
+                    )
+                  }
+                )
+              }
+            )
+            addAnswer(
+              QuestionnaireResponseItemAnswerComponent().apply {
+                addItem(
+                  QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-question-2"
+                    addAnswer(
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        value = Reference().apply { reference = "Patient/456" }
+                      }
+                    )
+                  }
+                )
+              }
+            )
+          }
+        )
+      }
+    val unpackedQuestionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "repeated-group"
+            addItem(
+              QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-question-2"
+                addAnswer(
+                  QuestionnaireResponseItemAnswerComponent().apply {
+                    value = Reference().apply { reference = "Patient/123" }
+                  }
+                )
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "repeated-group"
+            addItem(
+              QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-question-2"
+                addAnswer(
+                  QuestionnaireResponseItemAnswerComponent().apply {
+                    value = Reference().apply { reference = "Patient/456" }
+                  }
                 )
               }
             )
