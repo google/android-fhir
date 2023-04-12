@@ -94,7 +94,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /** The current questionnaire response as questions are being answered. */
-  private val questionnaireResponse: QuestionnaireResponse
+  private var questionnaireResponse: QuestionnaireResponse
 
   init {
     when {
@@ -110,6 +110,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           parser.parseResource(application.contentResolver.openInputStream(uri))
             as QuestionnaireResponse
         checkQuestionnaireResponse(questionnaire, questionnaireResponse)
+        questionnaireResponse =
+          questionnaireResponse.copy().apply {
+            item = getAllResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
+          }
       }
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING) -> {
         val questionnaireResponseJson: String =
@@ -117,6 +121,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaireResponse =
           parser.parseResource(questionnaireResponseJson) as QuestionnaireResponse
         checkQuestionnaireResponse(questionnaire, questionnaireResponse)
+        questionnaireResponse =
+          questionnaireResponse.copy().apply {
+            item = getAllResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
+          }
       }
       else -> {
         questionnaireResponse =
@@ -694,6 +702,29 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     if (responseItemToAnswersMapForDisabledQuestionnaireItem.contains(questionnaireResponseItem)) {
       questionnaireResponseItem.answer =
         responseItemToAnswersMapForDisabledQuestionnaireItem.remove(questionnaireResponseItem)
+    }
+  }
+
+  private fun getAllResponseItems(
+    questionnaireItemList: List<QuestionnaireItemComponent>,
+    questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>,
+  ): List<QuestionnaireResponseItemComponent> {
+    val linkIdToQuestionnaireResponseItemMap =
+      questionnaireResponseItemList.associateBy { it.linkId }
+    return questionnaireItemList.mapNotNull {
+      val questionnaireResponseItemComponent = linkIdToQuestionnaireResponseItemMap[it.linkId]
+      if (questionnaireResponseItemComponent == null) {
+        it.createQuestionnaireResponseItem()
+      } else if (it.type == Questionnaire.QuestionnaireItemType.GROUP &&
+          !it.repeats &&
+          questionnaireResponseItemComponent.item.isEmpty()
+      ) {
+        it.createQuestionnaireResponseItem()
+      } else {
+        questionnaireResponseItemComponent.copy().apply {
+          item = getAllResponseItems(it.item, this.item)
+        }
+      }
     }
   }
 
