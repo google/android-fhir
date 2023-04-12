@@ -24,7 +24,9 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
 
 internal val fhirPathEngine: FHIRPathEngine =
   with(FhirContext.forCached(FhirVersionEnum.R4)) {
-    FHIRPathEngine(HapiWorkerContext(this, this.validationSupport))
+    FHIRPathEngine(HapiWorkerContext(this, this.validationSupport)).apply {
+      hostServices = FHIRPathEngineHostServices
+    }
   }
 
 /**
