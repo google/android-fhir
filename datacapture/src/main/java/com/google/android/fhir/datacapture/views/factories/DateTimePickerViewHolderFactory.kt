@@ -125,12 +125,27 @@ internal object DateTimePickerViewHolderFactory :
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         clearPreviousState()
         header.bind(questionnaireViewItem)
-        dateInputLayout.apply {
+        with(dateInputLayout) {
           hint = canonicalizedDatePattern
-          if (!questionnaireViewItem.markOptionalQuestionText &&
-              questionnaireViewItem.questionnaireItem.required
-          ) {
-            helperText = dateInputLayout.context.getString(R.string.required)
+          when {
+            questionnaireViewItem.markOptionalQuestionText ->
+              // Show the R.string.optional_helper_text as the helper text only if the question text
+              // is missing.
+              // if question text is present, then optional_helper_text is appended to the end of
+              // the question text in the header view.
+              if (questionnaireViewItem.questionnaireItem.text.isNullOrEmpty()) {
+                helperText =
+                  context.getString(
+                    com.google.android.fhir.datacapture.R.string.optional_helper_text
+                  )
+              }
+            else ->
+              // show the R.string.required text as the helper text, if the question must be
+              // answered.
+              if (questionnaireViewItem.questionnaireItem.required) {
+                helperText =
+                  context.getString(com.google.android.fhir.datacapture.R.string.required)
+              }
           }
         }
         dateInputEditText.removeTextChangedListener(textWatcher)

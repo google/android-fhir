@@ -371,6 +371,74 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     onView(withId(R.id.error_text_at_header)).check(matches(not(isDisplayed())))
   }
 
+  @Test
+  fun shows_requiredText_asHelperText() {
+    runOnUI {
+      viewHolder.bind(
+        QuestionnaireViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "1"
+            required = true
+            text = "Question?"
+          },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _, _ -> },
+        )
+      )
+
+      assertThat(
+          viewHolder.itemView
+            .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
+            .helperText.toString()
+        )
+        .isEqualTo("Required")
+    }
+  }
+
+  @Test
+  fun shows_optionalText_afterQuestionText() {
+    runOnUI {
+      viewHolder.bind(
+        QuestionnaireViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "1"
+            text = "Question"
+            required = true
+          },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _, _ -> },
+          markOptionalQuestionText = true
+        )
+      )
+
+      assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+        .isEqualTo("Question (optional)")
+    }
+  }
+
+  @Test
+  fun shows_optionalText_asHelperText() {
+    runOnUI {
+      viewHolder.bind(
+        QuestionnaireViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _, _ -> },
+          markOptionalQuestionText = true
+        )
+      )
+      assertThat(
+          viewHolder.itemView
+            .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
+            .helperText.toString()
+        )
+        .isEqualTo("Optional")
+    }
+  }
+
   /** Method to run code snippet on UI/main thread */
   private fun runOnUI(action: () -> Unit) {
     activityScenarioRule.scenario.onActivity { activity -> action() }

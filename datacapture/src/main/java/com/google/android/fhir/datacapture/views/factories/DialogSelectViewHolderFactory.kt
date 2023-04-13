@@ -63,12 +63,27 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         cleanupOldState()
-        holder.summaryHolder.apply {
+        with(holder.summaryHolder) {
           hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
-          if (!questionnaireViewItem.markOptionalQuestionText &&
-              questionnaireViewItem.questionnaireItem.required
-          ) {
-            helperText = context.getString(R.string.required)
+          when {
+            questionnaireViewItem.markOptionalQuestionText ->
+              // Show the R.string.optional_helper_text as the helper text only if the question text
+              // is missing.
+              // if question text is present, then optional_helper_text is appended to the end of
+              // the question text in the header view.
+              if (questionnaireViewItem.questionnaireItem.text.isNullOrEmpty()) {
+                helperText =
+                  context.getString(
+                    com.google.android.fhir.datacapture.R.string.optional_helper_text
+                  )
+              }
+            else ->
+              // show the R.string.required text as the helper text, if the question must be
+              // answered.
+              if (questionnaireViewItem.questionnaireItem.required) {
+                helperText =
+                  context.getString(com.google.android.fhir.datacapture.R.string.required)
+              }
           }
         }
         val activity =

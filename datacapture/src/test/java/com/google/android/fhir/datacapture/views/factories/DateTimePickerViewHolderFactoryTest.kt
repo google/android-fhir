@@ -536,6 +536,26 @@ class DateTimePickerViewHolderFactoryTest {
       .isEqualTo("Question (optional)")
   }
 
+  @Test
+  fun `optionalText shown as helper text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {},
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        markOptionalQuestionText = true
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<TextInputLayout>(R.id.date_input_layout)
+          .helperText.toString()
+      )
+      .isEqualTo("Optional")
+  }
+
   private val QuestionnaireItemViewHolder.dateInputView: TextView
     get() {
       return itemView.findViewById(R.id.date_input_edit_text)

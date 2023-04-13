@@ -282,4 +282,24 @@ class EditTextQuantityViewHolderFactoryTest {
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question (optional)")
   }
+
+  @Test
+  fun `optionalText shown as helper text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {},
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        markOptionalQuestionText = true
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<TextInputLayout>(R.id.text_input_layout)
+          .helperText.toString()
+      )
+      .isEqualTo("Optional")
+  }
 }
