@@ -76,7 +76,7 @@
     {
       "text": "Confirm that vaccine date is known",
       "type": "boolean",
-      "linkId": "2.0.1",
+      "linkId": "2",
       "enableWhen": [
         {
           "question": "1.0",
@@ -90,8 +90,22 @@
     },
     {
       "text": "Confirm that vaccine date is unknown",
-      "type": "boolean",
-      "linkId": "2.0.2",
+      "type": "choice",
+      "linkId": "3",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "Y",
+            "display": "Yes"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "N",
+            "display": "No"
+          }
+        }
+      ],
       "enableWhen": [
         {
           "question": "1.0",
@@ -104,10 +118,24 @@
       ]
     },
     {
+      "text": "Confirm that vaccine date is not known",
+      "type": "boolean",
+      "linkId": "4",
+      "enableWhen": [
+        {
+          "question": "1.0",
+          "operator": "=",
+          "answerCoding": {
+            "system": "custom",
+            "code": "N"
+          }
+        }
+      ]
+    },
+    {
       "text": "Provide vaccine dates for 2 doses",
       "type": "group",
-      "linkId": "3.0",
-      "repeats": true,
+      "linkId": "5",
       "enableWhen": [
         {
           "question": "1.0",
@@ -129,7 +157,7 @@
     {
       "text": "Additional details",
       "type": "string",
-      "linkId": "4.0"
+      "linkId": "6"
     }
   ]
 }
