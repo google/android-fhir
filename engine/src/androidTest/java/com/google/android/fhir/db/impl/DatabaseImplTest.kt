@@ -54,6 +54,7 @@ import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
@@ -65,6 +66,7 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.SearchParameter
@@ -3073,6 +3075,147 @@ class DatabaseImplTest {
       )
 
     assertThat(result.map { it.nameFirstRep.nameAsSingleString }).contains("Darcy Smith")
+  }
+
+  @Test
+  fun search_revInclude(): Unit = runBlocking {
+    val resources =
+      listOf(
+        Patient().apply { id = "pa-01" },
+        Patient().apply { id = "pa-02" },
+        Patient().apply { id = "pa-04" },
+        Encounter().apply {
+          id = "en-01"
+          subject = Reference("Patient/pa-01")
+        },
+        Encounter().apply {
+          id = "en-02"
+          subject = Reference("Patient/pa-02")
+        },
+        Encounter().apply {
+          id = "en-03"
+          subject = Reference("Patient/pa-03")
+        }
+      )
+    database.insertRemote(*resources.toTypedArray())
+
+    val result =
+      database.search<Resource>(
+        Search(ResourceType.Patient)
+          .apply { revInclude(ResourceType.Encounter, Encounter.SUBJECT) }
+          .getQuery()
+      )
+    assertThat(result.map { it.logicalId })
+      .containsExactly("pa-01", "pa-02", "pa-04", "en-01", "en-02", "test_patient_1")
+  }
+
+  @Test
+  fun search_patient_revInclude(): Unit = runBlocking {
+    val resources =
+      listOf(
+        Patient().apply {
+          id = "pa-01"
+          addName(
+            HumanName().apply {
+              addGiven("James")
+              family = "Gorden"
+            }
+          )
+        },
+        Patient().apply { id = "pa-02" },
+        Patient().apply { id = "pa-04" },
+        Encounter().apply {
+          id = "en-01"
+          subject = Reference("Patient/pa-01")
+        },
+        Encounter().apply {
+          id = "en-02"
+          subject = Reference("Patient/pa-02")
+        },
+        Encounter().apply {
+          id = "en-03"
+          subject = Reference("Patient/pa-01")
+        }
+      )
+    database.insertRemote(*resources.toTypedArray())
+
+    val result =
+      database.search<Resource>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.GIVEN, { value = "James" })
+            revInclude(ResourceType.Encounter, Encounter.SUBJECT)
+          }
+          .getQuery()
+      )
+    assertThat(result.map { it.logicalId }).containsExactly("pa-01", "en-01", "en-03")
+  }
+
+  @Test
+  fun search_patient_has_revInclude(): Unit = runBlocking {
+    val diabetesCodeableConcept =
+      CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+    val hyperTensionCodeableConcept =
+      CodeableConcept(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1"))
+    val resources =
+      listOf(
+        Patient().apply {
+          id = "pa-01"
+          addName(
+            HumanName().apply {
+              addGiven("James")
+              family = "Gorden"
+            }
+          )
+        },
+        Patient().apply {
+          id = "pa-02"
+          addName(
+            HumanName().apply {
+              addGiven("James")
+              family = "Bond"
+            }
+          )
+        },
+        Patient().apply { id = "pa-04" },
+        Encounter().apply {
+          id = "en-01"
+          subject = Reference("Patient/pa-01")
+        },
+        Encounter().apply {
+          id = "en-02"
+          subject = Reference("Patient/pa-02")
+        },
+        Encounter().apply {
+          id = "en-03"
+          subject = Reference("Patient/pa-01")
+        },
+        Condition().apply {
+          id = "con-01"
+          code = diabetesCodeableConcept
+          subject = Reference("Patient/pa-01")
+        },
+        Condition().apply {
+          id = "con-02"
+          code = hyperTensionCodeableConcept
+          subject = Reference("Patient/pa-02")
+        }
+      )
+    database.insertRemote(*resources.toTypedArray())
+
+    val result =
+      database.search<Resource>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.GIVEN, { value = "James" })
+            has<Condition>(Condition.SUBJECT) {
+              filter(Condition.CODE, { value = of(diabetesCodeableConcept) })
+            }
+            revInclude(ResourceType.Encounter, Encounter.SUBJECT)
+          }
+          .getQuery()
+      )
+    assertThat(result.map { it.logicalId }).containsExactly("pa-01", "en-01", "en-03")
   }
 
   private companion object {

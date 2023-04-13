@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   internal val uriFilterCriteria = mutableListOf<UriFilterCriteria>()
   internal var sort: IParam? = null
   internal var order: Order? = null
+  internal val revIncludeMap = mutableMapOf<ResourceType, MutableList<ReferenceClientParam>>()
   @PublishedApi internal var nestedSearches = mutableListOf<NestedSearch>()
   var operation = Operation.AND
 
@@ -141,6 +142,10 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   fun sort(parameter: DateClientParam, order: Order) {
     sort = parameter
     this.order = order
+  }
+
+  fun revInclude(resourceType: ResourceType, vararg clientParam: ReferenceClientParam) {
+    revIncludeMap.computeIfAbsent(resourceType) { mutableListOf() }.addAll(clientParam)
   }
 }
 
