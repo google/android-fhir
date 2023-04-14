@@ -41,8 +41,10 @@ import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValid
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localDateTime
+import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Calendar
@@ -110,6 +112,49 @@ class QuestionnaireUiEspressoTest {
       val actualError = (view as TextInputLayout).error
       assertThat(actualError).isEqualTo("Number must be between -2,147,483,648 and 2,147,483,647")
     }
+  }
+
+  @Test
+  fun integerTextEdit_typingZeroBeforeAnyIntegerShouldKeepZeroDisplayed() {
+    // Do not skip cursor when typing on the numeric field if the initial value is set to 0
+    // as from an integer comparison, leading zeros do not change how the answer is saved.
+    // e.g whether 000001 or 1 is input, the answer saved will be 1.
+    buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
+
+    onView(withId(R.id.text_input_edit_text)).perform(typeText("0"))
+    assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
+      .isEqualTo(0)
+
+    onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
+    assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
+      .isEqualTo(1)
+
+    onView(withId(R.id.text_input_edit_text)).check { view, _ ->
+      assertThat((view as TextInputEditText).text.toString()).isEqualTo("001")
+    }
+
+    assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
+      .isEqualTo(1)
+  }
+
+  @Test
+  fun decimalTextEdit_typingZeroBeforeAnyIntegerShouldKeepZeroDisplayed() {
+    buildFragmentFromQuestionnaire("/text_questionnaire_decimal.json")
+
+    onView(withId(R.id.text_input_edit_text)).perform(typeText("0."))
+    assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
+      .isEqualTo(BigDecimal.valueOf(0.0))
+
+    onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
+    assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
+      .isEqualTo(BigDecimal.valueOf(0.01))
+
+    onView(withId(R.id.text_input_edit_text)).check { view, _ ->
+      assertThat((view as TextInputEditText).text.toString()).isEqualTo("0.01")
+    }
+
+    assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
+      .isEqualTo(BigDecimal.valueOf(0.01))
   }
 
   @Test

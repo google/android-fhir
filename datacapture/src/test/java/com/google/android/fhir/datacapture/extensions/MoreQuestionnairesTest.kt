@@ -17,7 +17,9 @@
 package com.google.android.fhir.datacapture.extensions
 
 import com.google.common.truth.Truth.assertThat
+import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
@@ -106,5 +108,61 @@ class MoreQuestionnairesTest {
   fun `entryMode should return null if no EntryMode is defined`() {
     val questionnaire = Questionnaire()
     assertThat(questionnaire.entryMode).isNull()
+  }
+
+  @Test
+  fun `should throw exception if resource type in context is not part of launchContext set`() {
+    val launchContextExtension =
+      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
+        .apply {
+          addExtension(
+            "name",
+            Coding(
+              "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
+              "observation",
+              "Observation"
+            )
+          )
+          addExtension("type", CodeType("Observation"))
+        }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          validateLaunchContext(launchContextExtension, "Patient")
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "The value of the extension:name field in " +
+          "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext is " +
+          "not one of the ones defined in http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext."
+      )
+  }
+
+  @Test
+  fun `should throw exception if resource type in context is different to what is in launchContext extension`() {
+    val launchContextExtension =
+      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
+        .apply {
+          addExtension(
+            "name",
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "encounter", "Encounter")
+          )
+          addExtension("type", CodeType("Encounter"))
+        }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          validateLaunchContext(launchContextExtension, "Patient")
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "The resource type set in the extension:type field in " +
+          "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext does " +
+          "not match the resource type of the context passed in: Patient."
+      )
   }
 }

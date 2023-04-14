@@ -24,6 +24,8 @@ import com.google.android.fhir.implementationguide.db.impl.entities.ResourceMeta
 import com.google.android.fhir.implementationguide.db.impl.entities.toEntity
 import java.io.File
 import java.io.FileInputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.MetadataResource
 import org.hl7.fhir.r4.model.Resource
@@ -31,18 +33,18 @@ import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
 /** Responsible for importing, accessing and deleting Implementation Guides. */
-class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
+class IgManager internal constructor(private val igDatabase: ImplementationGuideDatabase) {
 
   private val igDao = igDatabase.implementationGuideDao()
   private val jsonParser = FhirContext.forR4().newJsonParser()
 
   /**
-   * * Checks if the [igDependencies] are present in DB. If necessary, downloads the dependencies
-   * from NPM and imports data from the package manager (populates the metadata of the FHIR
-   * Resorces)
+   * * Checks if the [implementationGuides] are present in DB. If necessary, downloads the
+   * dependencies from NPM and imports data from the package manager (populates the metadata of the
+   * FHIR Resources)
    */
-  suspend fun install(vararg igDependencies: ImplementationGuide) {
-    TODO("not implemented yet")
+  suspend fun install(vararg implementationGuides: ImplementationGuide) {
+    TODO("[1937]Not implemented yet ")
   }
 
   /**
@@ -68,13 +70,14 @@ class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
 
   /** Imports the IG from the provided [file] to the default dependency. */
   suspend fun install(file: File) {
-    TODO("not implemented yet")
+    importFile(null, file)
   }
 
   /** Loads resources from IGs listed in dependencies. */
   suspend fun loadResources(
     resourceType: String,
     url: String? = null,
+    id: String? = null,
     name: String? = null,
     version: String? = null,
   ): Iterable<IBaseResource> {
@@ -82,6 +85,7 @@ class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
     val resourceEntities =
       when {
         url != null -> listOfNotNull(igDao.getResourceWithUrl(url))
+        id != null -> listOfNotNull(igDao.getResourceWithUrlLike("%$id"))
         name != null && version != null ->
           listOfNotNull(igDao.getResourcesWithNameAndVersion(resType, name, version))
         name != null -> igDao.getResourcesWithName(resType, name)
@@ -94,12 +98,28 @@ class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
   suspend fun delete(vararg igDependencies: ImplementationGuide) {
     igDependencies.forEach { igDependency ->
       val igEntity = igDao.getImplementationGuide(igDependency.packageId, igDependency.version)
-      igDao.deleteImplementationGuide(igEntity)
-      igEntity.rootDirectory.deleteRecursively()
+      if (igEntity != null) {
+        igDao.deleteImplementationGuide(igEntity)
+        igEntity.rootDirectory.deleteRecursively()
+      }
     }
   }
 
-  private suspend fun importResource(igId: Long, resource: Resource, file: File) {
+  private suspend fun importFile(igId: Long?, file: File) {
+    val resource =
+      withContext(Dispatchers.IO) {
+        try {
+          FileInputStream(file).use(jsonParser::parseResource)
+        } catch (exception: Exception) {
+          Timber.d(exception, "Unable to import file: $file. Parsing to FhirResource failed.")
+        }
+      }
+    when (resource) {
+      is Resource -> importResource(igId, resource, file)
+    }
+  }
+
+  private suspend fun importResource(igId: Long?, resource: Resource, file: File) {
     val metadataResource = resource as? MetadataResource
     val res =
       ResourceMetadataEntity(
@@ -115,6 +135,10 @@ class IgManager internal constructor(igDatabase: ImplementationGuideDatabase) {
 
   private fun loadResource(resourceEntity: ResourceMetadataEntity): IBaseResource {
     return jsonParser.parseResource(FileInputStream(resourceEntity.resourceFile))
+  }
+
+  fun close() {
+    igDatabase.close()
   }
 
   companion object {

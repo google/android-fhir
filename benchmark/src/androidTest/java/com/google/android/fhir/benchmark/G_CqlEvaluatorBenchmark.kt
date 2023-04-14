@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.benchmark
 
+import android.content.Context
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.test.core.app.ApplicationProvider
@@ -23,11 +24,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.workflow.FhirOperator
+import com.google.android.fhir.implementationguide.IgManager
+import com.google.android.fhir.workflow.FhirOperatorBuilder
 import com.google.common.truth.Truth.assertThat
+import java.io.File
 import java.io.InputStream
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Parameters
 import org.junit.Rule
 import org.junit.Test
@@ -48,20 +52,30 @@ class G_CqlEvaluatorBenchmark {
       val fhirOperator = runWithTimingDisabled {
         val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
         val jsonParser = fhirContext.newJsonParser()
+        val context: Context = ApplicationProvider.getApplicationContext()
 
         val patientImmunizationHistory =
           jsonParser.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
         val fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+        val igManager = IgManager.createInMemory(context)
+        val lib = jsonParser.parseResource(open("/immunity-check/ImmunityCheck.json")) as Library
 
         runBlocking {
           for (entry in patientImmunizationHistory.entry) {
             fhirEngine.create(entry.resource)
           }
+          igManager.install(
+            File(context.filesDir, lib.name).apply {
+              writeText(jsonParser.encodeResourceToString(lib))
+            }
+          )
         }
 
-        val lib = jsonParser.parseResource(open("/immunity-check/ImmunityCheck.json")) as Bundle
-
-        FhirOperator(fhirContext, fhirEngine).also { it.loadLibs(lib) }
+        FhirOperatorBuilder(context)
+          .withFhirContext(fhirContext)
+          .withFhirEngine(fhirEngine)
+          .withIgManager(igManager)
+          .build()
       }
 
       val results =
