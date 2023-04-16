@@ -130,9 +130,9 @@ internal class KnowledgeManagerTest {
   fun `installing from internet`() = runTest {
     knowledgeManager.install(
       Dependency(
-        "fhir.cdc.opioid-mme-r4",
-        "3.0.0",
-        "http://fhir.org/guides/cdc/opioid-mme-r4"
+        "hl7.fhir.r4b.examples",
+        "4.3.0",
+        "http://hl7.org/fhir"
       )
     )
 

@@ -42,7 +42,6 @@ import org.hl7.fhir.utilities.npm.CommonPackages;
 import org.hl7.fhir.utilities.npm.IPackageCacheManager;
 import org.hl7.fhir.utilities.npm.NpmPackage;
 import org.hl7.fhir.utilities.npm.NpmPackage.NpmPackageFolder;
-import org.hl7.fhir.utilities.npm.PackageClient;
 import org.hl7.fhir.utilities.npm.PackageInfo;
 import org.hl7.fhir.utilities.npm.PackageList;
 import org.hl7.fhir.utilities.npm.PackageList.PackageListEntry;
@@ -280,7 +279,7 @@ public class FilesystemPackageCacheManager extends BasePackageCacheManager imple
     for (PackageServer nextPackageServer : getPackageServers()) {
       // special case:
       if (!(Utilities.existsInList(id, CommonPackages.ID_PUBPACK, "hl7.terminology.r5") && PackageServer.PRIMARY_SERVER.equals(nextPackageServer.getUrl()))) {
-        PackageClient pc = new PackageClient(nextPackageServer);
+        CachingPackageClient pc = new CachingPackageClient(cacheFolder, nextPackageServer);
         try {
           return pc.getLatestVersion(id);
         } catch (IOException e) {
@@ -983,7 +982,7 @@ public class FilesystemPackageCacheManager extends BasePackageCacheManager imple
       return true;
     }
     for (PackageServer s : getPackageServers()) {
-      if (new PackageClient(s).exists(id, ver)) {
+      if (new CachingPackageClient(cacheFolder, s).exists(id, ver)) {
         return true;
       }
     }

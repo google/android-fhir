@@ -46,7 +46,7 @@ class NpmPackageManager(
   vararg packageServers: String,
 ) : IWorkerContext.ILoggingService {
   private val pcm: FilesystemPackageCacheManager
-  val npmList: MutableList<NpmPackage> = ArrayList()
+  val npmList: MutableList<NpmPackage> = mutableListOf()
 
   init {
     pcm =
