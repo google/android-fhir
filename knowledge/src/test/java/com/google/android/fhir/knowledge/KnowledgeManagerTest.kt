@@ -94,15 +94,15 @@ internal class KnowledgeManagerTest {
 
   @Test
   fun `installing from internet`() = runTest {
-    igManager.install(
-      ImplementationGuide(
-        "hl7.fhir.r4b.examples",
-        "4.3.0",
-        "http://hl7.org/fhir"
-      )
-    )
+    igManager.install(ImplementationGuide("hl7.fhir.r4b.examples", "4.3.0", "http://hl7.org/fhir"))
 
-    assertThat(igManager.loadResources(resourceType = "Library", url = "http://ohie.org/Library/hiv-indicators")).isNotEmpty()
+    assertThat(
+        igManager.loadResources(
+          resourceType = "Library",
+          url = "http://ohie.org/Library/hiv-indicators"
+        )
+      )
+      .isNotEmpty()
     // assertThat(igManager.loadResources(resourceType = "Measure")).hasSize(1)
     // assertThat(
     //   igManager.loadResources(

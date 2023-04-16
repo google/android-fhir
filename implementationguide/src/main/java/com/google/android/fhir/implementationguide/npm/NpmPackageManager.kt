@@ -21,15 +21,17 @@ import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.function.Function
 import org.hl7.fhir.convertors.advisors.impl.BaseAdvisor_40_50
 import org.hl7.fhir.convertors.conv40_50.VersionConvertor_40_50
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r5.context.IWorkerContext
-import org.hl7.fhir.r5.model.Constants
 import org.hl7.fhir.r5.model.ImplementationGuide
 import org.hl7.fhir.utilities.Utilities
-import org.hl7.fhir.utilities.VersionUtilities
+import org.hl7.fhir.utilities.npm.BasePackageCacheManager
 import org.hl7.fhir.utilities.npm.NpmPackage
+import org.hl7.fhir.utilities.npm.PackageClient
+import org.hl7.fhir.utilities.npm.PackageServer
 import org.json.JSONObject
 import timber.log.Timber
 
@@ -42,45 +44,27 @@ import timber.log.Timber
 class NpmPackageManager(
   cacheFolder: String,
   sourceIg: ImplementationGuide,
-  private val version: String,
+  clientFactory:Function<PackageServer, PackageClient> =  Function { address: PackageServer ->
+    CachingPackageClient(
+      cacheFolder,
+      address
+    )
+  },
   vararg packageServers: String,
 ) : IWorkerContext.ILoggingService {
-  private val pcm: FilesystemPackageCacheManager
-  val npmList: MutableList<NpmPackage> = mutableListOf()
+  private val pcm: BasePackageCacheManager
+  val npmList = mutableListOf<NpmPackage>()
 
   init {
     pcm =
       try {
-        // userMode indicates whether the packageCache is within the working directory or in the
-        // user home
-        FilesystemPackageCacheManager(cacheFolder, *packageServers)
+        SimplePackageCacheManager(cacheFolder, clientFactory, *packageServers)
       } catch (e: IOException) {
-        val message = "error creating the FilesystemPackageCacheManager"
+        val message = "error creating the SimplePackageCacheManager"
         logMessage(message)
         throw NpmPackageManagerException(message, e)
       }
-    loadCorePackage()
     sourceIg.dependsOn.forEach(::loadIg)
-  }
-
-  private fun loadCorePackage() {
-    val v = if (version == Constants.VERSION) "current" else version
-    logMessage("Core Package ${VersionUtilities.packageForVersion(v)} #$v")
-
-    val pi: NpmPackage =
-      try {
-        pcm.loadPackage(VersionUtilities.packageForVersion(v), v)
-      } catch (e: Exception) {
-        try {
-          // Appears to be race condition in FHIR core where they are
-          // loading a custom cert provider.
-          pcm.loadPackage(VersionUtilities.packageForVersion(v), v)
-        } catch (ex: Exception) {
-          throw NpmPackageManagerException("Error loading core package", e)
-        }
-      }
-    require(v != "current") { "Current core package not supported" }
-    npmList.add(pi)
   }
 
   @Throws(IOException::class)
@@ -258,15 +242,13 @@ class NpmPackageManager(
     fun fromResource(
       cacheFolder: String,
       resource: Resource,
-      version: String,
       vararg packageServers: String,
     ): NpmPackageManager {
       val versionConvertor40to50 = VersionConvertor_40_50(BaseAdvisor_40_50())
       return NpmPackageManager(
-        cacheFolder,
-        versionConvertor40to50.convertResource(resource) as ImplementationGuide,
-        version,
-        *packageServers
+        cacheFolder = cacheFolder,
+        sourceIg = versionConvertor40to50.convertResource(resource) as ImplementationGuide,
+        packageServers = packageServers
       )
     }
   }

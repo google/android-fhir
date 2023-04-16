@@ -69,7 +69,6 @@ internal constructor(
       NpmPackageManager.fromResource(
         cacheFolder,
         implementationGuide,
-        "4.0.1",
         "https://packages.fhir.org",
         "https://packages.simplifier.net"
       )
