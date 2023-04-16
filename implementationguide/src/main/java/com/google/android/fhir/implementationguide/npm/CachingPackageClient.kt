@@ -16,10 +16,14 @@
 
 package com.google.android.fhir.implementationguide.npm
 
+import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import java.io.OutputStream
+import org.apache.commons.io.IOUtils
 import org.hl7.fhir.utilities.TextFile
 import org.hl7.fhir.utilities.Utilities
 import org.hl7.fhir.utilities.npm.PackageClient
@@ -52,7 +56,15 @@ internal class CachingPackageClient(cacheFolderRoot: String, server: PackageServ
       return FileInputStream(cacheFile)
     }
     val fetchedPackage = super.fetchCached(url)
-    TextFile.bytesToFile(TextFile.streamToBytes(fetchedPackage), cacheFile)
+    fetchedPackage.toFile(cacheFile)
     return FileInputStream(cacheFile)
+  }
+}
+
+internal fun InputStream.toFile(file: File) {
+  use { input ->
+    file.outputStream().use { output ->
+      input.copyTo(output)
+    }
   }
 }

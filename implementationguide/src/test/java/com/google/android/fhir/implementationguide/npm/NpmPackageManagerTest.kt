@@ -32,7 +32,6 @@ class NpmPackageManagerTest {
     NpmPackageManager.fromResource(
       cacheFolderPath,
       ImplementationGuide(),
-      "4.0.1",
       "https://packages.fhir.org",
       "https://packages.simplifier.net"
     )
