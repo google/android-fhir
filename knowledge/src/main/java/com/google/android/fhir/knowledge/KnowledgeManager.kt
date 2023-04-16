@@ -58,6 +58,7 @@ internal constructor(
         implementationGuides.forEach {
           addDependsOn(
             ImplementationGuideDependsOnComponent().apply {
+              packageId = it.packageId
               uri = it.uri
               version = it.version
             }

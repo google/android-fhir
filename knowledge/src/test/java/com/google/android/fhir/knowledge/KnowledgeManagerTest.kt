@@ -96,14 +96,13 @@ internal class KnowledgeManagerTest {
   fun `installing from internet`() = runTest {
     igManager.install(
       ImplementationGuide(
-        "fhir.cdc.opioid-mme-r4",
-        "3.0.0",
-        "http://fhir.org/guides/cdc/opioid-mme-r4"
+        "hl7.fhir.r4b.examples",
+        "4.3.0",
+        "http://hl7.org/fhir"
       )
     )
 
-    assertThat(igManager.loadResources(resourceType = "Library", name = "WHOCommon")).isNotNull()
-    assertThat(igManager.loadResources(resourceType = "Library", url = "FHIRCommon")).isNotNull()
+    assertThat(igManager.loadResources(resourceType = "Library", url = "http://ohie.org/Library/hiv-indicators")).isNotEmpty()
     // assertThat(igManager.loadResources(resourceType = "Measure")).hasSize(1)
     // assertThat(
     //   igManager.loadResources(
