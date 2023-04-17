@@ -37,10 +37,19 @@ android {
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
+
+    javaCompileOptions {
+      annotationProcessorOptions {
+        compilerArgumentProviders(RoomSchemaArgProvider(File(projectDir, "schemas")))
+      }
+    }
   }
 
   sourceSets {
-    getByName("androidTest").apply { resources.setSrcDirs(listOf("test-data")) }
+    getByName("androidTest").apply {
+      resources.setSrcDirs(listOf("test-data"))
+      assets.srcDirs("$projectDir/schemas")
+    }
 
     getByName("test").apply { resources.setSrcDirs(listOf("test-data")) }
   }
@@ -88,6 +97,7 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  androidTestImplementation(Dependencies.Room.testing)
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
 

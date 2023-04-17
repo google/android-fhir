@@ -33,7 +33,7 @@ abstract class ImplementationGuideDao {
 
   @Transaction
   internal open suspend fun insertResource(
-    implementationGuideId: Long,
+    implementationGuideId: Long?,
     resource: ResourceMetadataEntity,
   ) {
 
@@ -47,14 +47,16 @@ abstract class ImplementationGuideDao {
     // exception if they
     // are different.
     val resourceMetadataId = resourceMetadata?.resourceMetadataId ?: insert(resource)
-    insert(ImplementationGuideResourceMetadataEntity(implementationGuideId, resourceMetadataId))
+    insert(ImplementationGuideResourceMetadataEntity(0, implementationGuideId, resourceMetadataId))
   }
 
   @Transaction
   internal open suspend fun deleteImplementationGuide(name: String, version: String) {
     val igEntity = getImplementationGuide(name, version)
-    deleteImplementationGuide(igEntity)
-    deleteOrphanedResources()
+    if (igEntity != null) {
+      deleteImplementationGuide(igEntity)
+      deleteOrphanedResources()
+    }
   }
 
   @Query(
@@ -71,7 +73,7 @@ abstract class ImplementationGuideDao {
   internal abstract suspend fun getImplementationGuide(
     packageId: String,
     version: String?,
-  ): ImplementationGuideEntity
+  ): ImplementationGuideEntity?
 
   @Query("SELECT * from ResourceMetadataEntity")
   internal abstract suspend fun getResources(): List<ResourceMetadataEntity>
@@ -84,6 +86,11 @@ abstract class ImplementationGuideDao {
   @Query("SELECT * from ResourceMetadataEntity WHERE url = :url")
   internal abstract suspend fun getResourceWithUrl(
     url: String,
+  ): ResourceMetadataEntity?
+  // Remove after https://github.com/google/android-fhir/issues/1920
+  @Query("SELECT * from ResourceMetadataEntity WHERE url LIKE :urlPart")
+  internal abstract suspend fun getResourceWithUrlLike(
+    urlPart: String,
   ): ResourceMetadataEntity?
 
   @Query(

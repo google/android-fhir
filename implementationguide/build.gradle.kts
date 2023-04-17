@@ -25,9 +25,9 @@ android {
   }
 
   sourceSets {
-    getByName("androidTest").apply { resources.setSrcDirs(listOf("sampledata")) }
+    getByName("androidTest").apply { resources.setSrcDirs(listOf("testdata")) }
 
-    getByName("test").apply { resources.setSrcDirs(listOf("sampledata")) }
+    getByName("test").apply { resources.setSrcDirs(listOf("testdata")) }
   }
 
   buildTypes {

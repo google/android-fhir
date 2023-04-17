@@ -1,0 +1,76 @@
+{
+  "resourceType": "ValueSet",
+  "id": "antenatal-care-case",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"
+    ]
+  },
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This value set contains 1 concepts</p><p>All codes in this table are from the system <a href=\"CodeSystem-anc-care-codes.html\"><code>http://fhir.org/guides/who/anc-cds/CodeSystem/anc-care-codes</code></a></p><table class=\"codes\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td></tr><tr><td style=\"white-space:nowrap\"><a name=\"http---fhir.org-guides-who-anc-cds-CodeSystem-anc-care-codes-ANC.Case\"> </a>  <a href=\"CodeSystem-anc-care-codes.html#anc-care-codes-ANC.46Case\">ANC.Case</a></td><td>Antenatal care case</td><td>An episode of antenatal care related to a single pregnancy</td></tr></table></div>"
+  },
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueString": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueString": "executable"
+    }
+  ],
+  "url": "http://fhir.org/guides/who/anc-cds/ValueSet/antenatal-care-case",
+  "version": "0.3.0",
+  "name": "AntenatalCareCase",
+  "title": "Antenatal care case",
+  "status": "draft",
+  "experimental": false,
+  "date": "2022-08-22T21:51:39+00:00",
+  "publisher": "World Health Organization (WHO)",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "https://www.who.int"
+        }
+      ]
+    }
+  ],
+  "description": "An episode of antenatal care related to a single pregnancy",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+          "code": "001"
+        }
+      ]
+    }
+  ],
+  "immutable": true,
+  "compose": {
+    "include": [
+      {
+        "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-care-codes",
+        "concept": [
+          {
+            "code": "ANC.Case",
+            "display": "Antenatal care case"
+          }
+        ]
+      }
+    ]
+  },
+  "expansion": {
+    "timestamp": "2021-11-30T07:13:39-07:00",
+    "contains": [
+      {
+        "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-care-codes",
+        "code": "ANC.Case",
+        "display": "Antenatal care case"
+      }
+    ]
+  }
+}
