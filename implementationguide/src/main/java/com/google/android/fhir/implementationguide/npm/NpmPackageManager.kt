@@ -16,6 +16,9 @@
 
 package com.google.android.fhir.implementationguide.npm
 
+import java.io.File
+import java.io.FileInputStream
+import java.io.FilenameFilter
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -52,8 +55,8 @@ class NpmPackageManager(
   },
   vararg packageServers: String,
 ) : IWorkerContext.ILoggingService {
-  private val pcm: BasePackageCacheManager
-  val npmList = mutableListOf<NpmPackage>()
+  private val pcm: SimplePackageCacheManager
+  val npmList = mutableListOf<File>()
 
   init {
     pcm =
@@ -92,7 +95,7 @@ class NpmPackageManager(
     require(!igver.isNullOrEmpty()) {
       "You must specify a version for the IG $packageId ($canonical)"
     }
-    var pi = if (packageId == null) null else pcm.loadPackageFromCacheOnly(packageId, igver)
+    var pi = if (packageId == null) null else pcm.loadPackageFromCacheOnly1(packageId, igver)
     if (pi != null) {
       npmList.add(pi)
     }
@@ -110,12 +113,7 @@ class NpmPackageManager(
       IWorkerContext.ILoggingService.LogCategory.INIT,
       "Load $name ($canonical) from $packageId#$igver"
     )
-    if (dep.hasUri() && !dep.uri.contains("/ImplementationGuide/")) {
-      val cu = getIgUri(pi)
-      if (cu != null) {
-        logMessage("The correct canonical URL for this dependency is $cu")
-      }
-    }
+
   }
 
   private fun determineCanonical(url: String?): String? {
@@ -149,24 +147,13 @@ class NpmPackageManager(
   }
 
   @Throws(IOException::class)
-  private fun getIgUri(pi: NpmPackage): String? {
-    for (rs in pi.listResources("ImplementationGuide")) {
-      val json = parseJson(pi.loadResource(rs))
-      if (json.optString("packageId") == pi.name()) {
-        return json.optString("url")
-      }
-    }
-    return null
-  }
-
-  @Throws(IOException::class)
   private fun resolveDependency(
     canonical: String?,
     packageId: String?,
     igver: String,
-  ): NpmPackage? {
+  ): File? {
     if (packageId != null) {
-      return pcm.loadPackage(packageId, igver)
+      return pcm.loadPackage1(packageId, igver)
     }
     logDebugMessage(
       IWorkerContext.ILoggingService.LogCategory.INIT,
@@ -191,7 +178,7 @@ class NpmPackageManager(
             "${pl.getString("package-id")}-$igver",
             Utilities.pathURL(o.getString("path"), "package.tgz")
           )
-        return pcm.addPackageToCache(
+        return pcm.addPackageToCacheFile(
           pl.getString("package-id"),
           igver,
           src,
