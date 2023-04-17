@@ -17,6 +17,7 @@
 package com.google.android.fhir.knowledge
 
 import android.content.Context
+import android.util.Log
 import androidx.room.Room
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
@@ -73,12 +74,10 @@ internal constructor(
         "https://packages.simplifier.net"
       )
     npmPackageManager.npmList.forEach { npmPackage ->
-      for (folder in npmPackage.folders.keys) {
-        val p =
-          if (folder.contains("$")) npmPackage.path else Utilities.path(npmPackage.path, folder)
-        for (file in File(p).listFiles()) {
-          if (!file.isDirectory && !NpmPackage.isInternalExemptFile(file)) {
+      for (file in npmPackage.listFiles()) {
+          if (!file.isDirectory && !NpmPackage.isInternalExemptFile(file) && !file.name.startsWith("Bundle") && !file.name.contains("ModelInfo")) {
             try {
+              Log.d("TEST", file.name)
               val resource = jsonParser.parseResource(FileInputStream(file))
               if (resource is Resource) {
                 importResource(null, resource, file)
@@ -90,7 +89,6 @@ internal constructor(
             }
           }
         }
-      }
     }
   }
 
@@ -198,11 +196,11 @@ internal constructor(
     fun create(context: Context) =
       KnowledgeManager(
         Room.databaseBuilder(context, KnowledgeDatabase::class.java, DB_NAME).build(),
-        context.cacheDir.absolutePath
+        context.dataDir.absolutePath
       )
 
     /** Creates an [KnowledgeManager] backed by the in-memory DB. */
     fun createInMemory(context: Context) =
-      KnowledgeManager(Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build(), context.cacheDir.absolutePath)
+      KnowledgeManager(Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build(), context.dataDir.absolutePath)
   }
 }

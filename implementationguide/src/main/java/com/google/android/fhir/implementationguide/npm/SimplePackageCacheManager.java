@@ -1,5 +1,6 @@
 package com.google.android.fhir.implementationguide.npm;
 
+import androidx.annotation.Nullable;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,7 +17,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.utilities.TextFile;
 import org.hl7.fhir.utilities.Utilities;
@@ -115,6 +115,12 @@ public class SimplePackageCacheManager extends BasePackageCacheManager implement
     return super.loadFromPackageServer(id, VersionUtilities.getMajMin(version) + ".x");
   }
 
+  @Override
+  public NpmPackage loadPackageFromCacheOnly(String id, @Nullable String version)
+      throws IOException {
+    return null;
+  }
+
   private NpmPackage loadPackageFromFile(String id, String folder) throws IOException {
     File f = new File(Utilities.path(folder, id));
     if (!f.exists()) {
@@ -161,8 +167,7 @@ public class SimplePackageCacheManager extends BasePackageCacheManager implement
    * This is for special purpose only (testing, control over speed of loading). Generally, use the
    * loadPackage method
    */
-  @Override
-  public NpmPackage loadPackageFromCacheOnly(String id, String version) throws IOException {
+  public File loadPackageFromCacheOnly1(String id, String version) throws IOException {
     String foundPackage = null;
     String foundVersion = null;
     for (String f : new File(cacheFolder).list()) {
@@ -170,7 +175,7 @@ public class SimplePackageCacheManager extends BasePackageCacheManager implement
       if (cf.isDirectory()) {
         if (f.equals(id + "#" + version) || (Utilities.noString(version) && f.startsWith(
             id + "#"))) {
-          return loadPackageInfo(Utilities.path(cacheFolder, f));
+          return new File(Utilities.path(cacheFolder, f));
         }
         if (version != null && !version.equals("current") && (version.endsWith(".x")
             || Utilities.charCount(version, '.') < 2) && f.contains("#")) {
@@ -184,7 +189,7 @@ public class SimplePackageCacheManager extends BasePackageCacheManager implement
       }
     }
     if (foundPackage != null) {
-      return loadPackageInfo(Utilities.path(cacheFolder, foundPackage));
+      return new File(Utilities.path(cacheFolder, foundPackage));
     }
     return null;
   }
@@ -192,17 +197,16 @@ public class SimplePackageCacheManager extends BasePackageCacheManager implement
   /**
    * Add an already fetched package to the cache
    */
-  @Override
-  public NpmPackage addPackageToCache(String id, String version, InputStream packageTgzInputStream,
+  public File addPackageToCacheFile(String id, String version, InputStream packageTgzInputStream,
       String sourceDesc) throws IOException {
     checkValidVersionString(version, id);
 
     return new CacheLock(id + "#" + version).doWithLock(() -> {
       String packRoot = Utilities.path(cacheFolder, id + "#" + version);
+      File packageFolder = new File(packRoot, "package");
       try {
         // ok, now we have a lock on it... check if something created it while we were waiting
         if (!new File(packRoot).exists()) {
-          File packageFolder = new File(packRoot, "package");
           packageFolder.mkdirs();
           TarArchiveInputStream tarInput = new TarArchiveInputStream(new GzipCompressorInputStream(packageTgzInputStream));
           TarArchiveEntry currentEntry;
@@ -221,7 +225,7 @@ public class SimplePackageCacheManager extends BasePackageCacheManager implement
                 dest.write(data, 0, count);
               }
             }
-            IOUtils.closeQuietly(outStream);
+            outStream.close();
           }
         }
       } catch (Exception e) {
@@ -235,7 +239,7 @@ public class SimplePackageCacheManager extends BasePackageCacheManager implement
         }
         throw e;
       }
-      return NpmPackage.fromFolder(packRoot);
+      return packageFolder;
     });
   }
 
@@ -250,10 +254,14 @@ public class SimplePackageCacheManager extends BasePackageCacheManager implement
     return super.getPackageUrl(packageId);
   }
 
-
   @Override
   public NpmPackage loadPackage(String id, String version) throws FHIRException, IOException {
-    NpmPackage p = loadPackageFromCacheOnly(id, version);
+    return null;
+  }
+
+
+  public File loadPackage1(String id, String version) throws FHIRException, IOException {
+    File p = loadPackageFromCacheOnly1(id, version);
     if (p != null) {
       return p;
     }
@@ -262,7 +270,7 @@ public class SimplePackageCacheManager extends BasePackageCacheManager implement
     if (source == null) {
       throw new FHIRException("Unable to find package " + id + "#" + version);
     }
-    return addPackageToCache(id, source.version, source.stream, source.url);
+    return addPackageToCacheFile(id, source.version, source.stream, source.url);
   }
 
 
@@ -276,6 +284,12 @@ public class SimplePackageCacheManager extends BasePackageCacheManager implement
     }
 
     return retVal;
+  }
+
+  @Override
+  public NpmPackage addPackageToCache(String id, String version, InputStream packageTgzInputStream,
+      String sourceDesc) throws IOException {
+    return null;
   }
 
 
