@@ -20,7 +20,7 @@ import androidx.annotation.WorkerThread
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.implementationguide.IgManager
+import com.google.android.fhir.knowledge.KnowledgeManager
 import java.util.function.Supplier
 import org.hl7.fhir.instance.model.api.IBaseParameters
 import org.hl7.fhir.instance.model.api.IBaseResource
@@ -61,12 +61,17 @@ import org.opencds.cqf.cql.evaluator.plandefinition.r4.PlanDefinitionProcessor
 object CachedR4FhirModelResolver : R4FhirModelResolver(FhirContext.forR4Cached())
 
 class FhirOperator
-internal constructor(fhirContext: FhirContext, fhirEngine: FhirEngine, igManager: IgManager) {
+internal constructor(
+  fhirContext: FhirContext,
+  fhirEngine: FhirEngine,
+  knowledgeManager: KnowledgeManager
+) {
   // Initialize the measure processor
   private val fhirEngineTerminologyProvider =
-    FhirEngineTerminologyProvider(fhirContext, fhirEngine, igManager)
+    FhirEngineTerminologyProvider(fhirContext, fhirEngine, knowledgeManager)
   private val adapterFactory = AdapterFactory()
-  private val libraryContentProvider = FhirEngineLibraryContentProvider(adapterFactory, igManager)
+  private val libraryContentProvider =
+    FhirEngineLibraryContentProvider(adapterFactory, knowledgeManager)
   private val fhirTypeConverter = FhirTypeConverterFactory().create(FhirVersionEnum.R4)
   private val fhirEngineRetrieveProvider =
     FhirEngineRetrieveProvider(fhirEngine).apply {
@@ -79,7 +84,7 @@ internal constructor(fhirContext: FhirContext, fhirEngine: FhirEngine, igManager
       CachingModelResolverDecorator(CachedR4FhirModelResolver),
       fhirEngineRetrieveProvider
     )
-  private val fhirEngineDal = FhirEngineDal(fhirEngine, igManager)
+  private val fhirEngineDal = FhirEngineDal(fhirEngine, knowledgeManager)
 
   private val measureProcessor =
     R4MeasureProcessor(
