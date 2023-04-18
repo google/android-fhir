@@ -112,7 +112,7 @@ internal object DatePickerViewHolderFactory :
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         clearPreviousState()
         header.bind(questionnaireViewItem)
-        textInputLayout.hint = canonicalizedDatePattern
+        textInputLayout.hint = canonicalizedDatePattern.lowercase()
         textInputEditText.removeTextChangedListener(textWatcher)
 
         val questionnaireItemViewItemDateAnswer =
@@ -325,6 +325,6 @@ internal fun Int.length() =
 internal fun invalidDateErrorText(context: Context, formatPattern: String) =
   context.getString(
     R.string.date_format_validation_error_msg,
-    formatPattern,
+    formatPattern.lowercase(),
     formatPattern.replace("dd", "31").replace("MM", "01").replace("yyyy", "2023")
   )
