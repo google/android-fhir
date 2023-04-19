@@ -92,6 +92,10 @@
             name="questionnaireTextInputEditTextStyle"
         >@style/TextAppearance.Material3.BodyLarge
         </item>
+      <item
+            name="questionnaireMultiLineTextInputEditTextStyle"
+        >@style/Questionnaire.MultiLineTextInputEditTextStyle
+      </item>
         <item
             name="questionnaireChipStyle"
         >@style/Widget.Material3.Chip.Input</item>
@@ -249,6 +253,13 @@
         <!--        Override default theme box stroke color to improve contrast of disabled widget. -->
         <item name="boxStrokeColor">@color/box_stroke_color</item>
     </style>
+
+  <style
+        name="Questionnaire.MultiLineTextInputEditTextStyle"
+        parent="TextAppearance.Material3.BodyLarge"
+    >
+    <item name="android:minLines">3</item>
+  </style>
 
     <style
         name="Questionnaire.TextInputEditTextStyle"

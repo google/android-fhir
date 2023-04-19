@@ -4,7 +4,7 @@
     {
       "linkId": "1.1",
       "text": "Register new patient",
-      "type": "string",
+      "type": "text",
       "item": [
         {
           "linkId": "1-first-name",
