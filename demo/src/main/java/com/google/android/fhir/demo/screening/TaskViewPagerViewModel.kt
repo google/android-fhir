@@ -44,11 +44,11 @@ class TaskViewPagerViewModel(application: Application, private val state: SavedS
       livePendingTasksCount.value =
         taskManager.getTasksCount(patientId) {
           filter(Task.STATUS, { value = of(getTaskStatus(0)) })
-        }
+        }!!
       liveCompletedTasksCount.value =
         taskManager.getTasksCount(patientId) {
           filter(Task.STATUS, { value = of(getTaskStatus(1)) })
-        }
+        }!!
     }
   }
 

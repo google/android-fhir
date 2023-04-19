@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.workflow
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.search
 import org.hl7.fhir.r4.model.Bundle
@@ -38,7 +36,6 @@ class CarePlanManager(
   private var fhirOperator: FhirOperator,
   private val taskManager: TaskManager
 ) {
-  private val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
   private var planDefinitionIdList = ArrayList<String>()
   private var cqlLibraryIdList = ArrayList<String>()
 

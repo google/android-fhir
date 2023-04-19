@@ -16,9 +16,6 @@
 
 package com.google.android.fhir.workflow
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
-import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.Search
@@ -39,7 +36,6 @@ class TaskManager(
   private var fhirEngine: FhirEngine,
   private val taskConfigMap: MutableMap<String, String>
 ) : RequestResourceManager<Task> {
-  private var jsonParser: IParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
   override suspend fun createRequestResource(resource: Task): Task {
     resource.id = null // purge any temporary id that might exist
@@ -148,8 +144,8 @@ class TaskManager(
     resource.apply { owner = ownerReference }
   }
 
-  suspend fun getTasksCount(patientId: String, extraFilter: (Search.() -> Unit)?): Int? {
-    return extraFilter?.let { getTasksForPatient(patientId, it, null).count() }
+  suspend fun getTasksCount(patientId: String, extraFilter: (Search.() -> Unit)?): Int {
+    return extraFilter?.let { getTasksForPatient(patientId, it, null).count() } ?: 0
   }
 
   companion object {
