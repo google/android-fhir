@@ -4,11 +4,11 @@
     {
       "linkId": "1.1",
       "text": "Register new patient",
-      "type": "text",
+      "type": "string",
       "item": [
         {
           "linkId": "1-first-name",
-          "text": "Address",
+          "text": "First Name",
           "type": "display",
           "extension": [
             {
