@@ -30,6 +30,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.fhir.demo.care.CareWorkflowExecutionViewModel
 import com.google.android.fhir.demo.care.ConfigurationManager
+import com.google.android.fhir.demo.care.ConfigurationManager.setServiceRequestConfigMap
+import com.google.android.fhir.demo.care.ConfigurationManager.setTaskConfigMap
 import com.google.android.fhir.demo.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -75,6 +77,8 @@ class HomeFragment : Fragment() {
         override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
           if (p0 != null) {
             workflowExecutionViewModel.currentPlanDefinitionId = p0.getItemAtPosition(p2) as String
+            setTaskConfigMap(workflowExecutionViewModel.currentPlanDefinitionId)
+            setServiceRequestConfigMap(workflowExecutionViewModel.currentPlanDefinitionId)
           }
         }
         override fun onNothingSelected(p0: AdapterView<*>?) {}

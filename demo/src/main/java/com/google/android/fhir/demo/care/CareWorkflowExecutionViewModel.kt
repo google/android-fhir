@@ -39,8 +39,6 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
     FhirApplication.fhirEngine(getApplication<Application>().applicationContext)
   private val carePlanManager =
     FhirApplication.carePlanManager(getApplication<Application>().applicationContext)
-  private val taskManager =
-    FhirApplication.taskManager(getApplication<Application>().applicationContext)
   lateinit var currentPlanDefinitionId: String
 
   /**
@@ -74,8 +72,8 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
          */
         runBlocking {
           carePlanManager.applyPlanDefinitionOnPatient(
-            careWorkflowExecutionRequest.patient,
-            currentPlanDefinitionId
+            currentPlanDefinitionId,
+            careWorkflowExecutionRequest.patient
           )
         }
         patientFlowForCareWorkflowExecution.emit(
@@ -100,7 +98,6 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
       )
     }
   }
-
   /**
    * Updating task statuses should be done in scope of [CareWorkflowExecutionViewModel] under
    * activity context. Also re-triggering of [PlanDefinition].apply is done here by fetching the
@@ -116,7 +113,7 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
       val taskPatient =
         fhirEngine.get(ResourceType.Patient, task.`for`.reference.substring("Patient/".length))
           as Patient
-      taskManager.updateTaskStatus(task, taskStatus, updateCarePlan)
+      carePlanManager.updateCarePlanActivity(task, taskStatus.toString(), updateCarePlan)
       executeCareWorkflowForPatient(taskPatient)
     }
   }

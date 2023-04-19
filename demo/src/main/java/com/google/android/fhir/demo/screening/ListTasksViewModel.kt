@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.demo.FhirApplication
+import com.google.android.fhir.search.Order
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Task
@@ -41,7 +42,8 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
         taskManager
           .getTasksForPatient(
             patientId = patientId,
-            extraFilter = { filter(Task.STATUS, { value = of(taskStatus) }) }
+            extraFilter = { filter(Task.STATUS, { value = of(taskStatus) }) },
+            sort = { sort(Task.MODIFIED, Order.ASCENDING) }
           )
           .mapIndexed { index, fhirTask -> fhirTask.toTaskItem(index + 1) }
     }
@@ -65,7 +67,8 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
     val status: String,
     val intent: String,
     val dueDate: String,
-    val completedDate: String
+    val completedDate: String,
+    val owner: String
   ) {
     override fun toString() = description
   }
@@ -80,6 +83,8 @@ internal fun Task.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
   val dueDate =
     if (hasRestriction() && restriction.hasPeriod()) restriction.period.end.toString()
     else "Sample End Date"
+  val completedDate = if (hasLastModified()) lastModified.toString() else dueDate
+  val owner = if (owner.hasDisplay()) owner.display else owner.reference
 
   return ListScreeningsViewModel.TaskItem(
     id = position.toString(),
@@ -88,6 +93,7 @@ internal fun Task.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
     status = taskStatus,
     intent = taskIntent,
     dueDate = dueDate,
-    completedDate = dueDate,
+    completedDate = completedDate,
+    owner = owner
   )
 }

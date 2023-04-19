@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.demo.care
+package com.google.android.fhir.workflow
 
-import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.PlanDefinition
-import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.CarePlan
 
-interface CarePlanManager {
-  fun getPlanDefinitionDependentResources(planDefinition: PlanDefinition): Collection<Resource>
-  suspend fun applyPlanDefinitionOnPatient(patient: Patient, planDefinitionId: String)
+interface RequestResourceManager<T> {
+
+  suspend fun createRequestResource(resource: T): T
+
+  suspend fun updateRequestResourceStatus(resource: T, status: String)
+
+  fun mapRequestResourceStatusToCarePlanStatus(resource: T): CarePlan.CarePlanActivityStatus
+
+  suspend fun linkCarePlanToRequestResource(resource: T, carePlan: CarePlan)
+
+  suspend fun assignOwner(resource: T, ownerId: String)
 }

@@ -41,6 +41,7 @@ import org.apache.commons.lang3.StringUtils
 import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.codesystems.RiskProbability
 
@@ -97,20 +98,7 @@ class PatientDetailsViewModel(
       data.add(PatientDetailOverview(patientItem, firstInGroup = true))
       data.add(
         PatientDetailProperty(
-          PatientProperty(getString(R.string.patient_property_mobile), patientItem.phone)
-        )
-      )
-      data.add(
-        PatientDetailProperty(
           PatientProperty(getString(R.string.patient_property_id), patientItem.resourceId)
-        )
-      )
-      data.add(
-        PatientDetailProperty(
-          PatientProperty(
-            getString(R.string.patient_property_address),
-            "${patientItem.city}, ${patientItem.country} "
-          )
         )
       )
       data.add(
@@ -184,10 +172,12 @@ class PatientDetailsViewModel(
         .filter { it.hasOccurrence() }
         .sortedByDescending { it.occurrenceDateTimeType.value }
         .firstOrNull()
+    val patient = fhirEngine.get(ResourceType.Patient, patientId)
     return RiskAssessmentItem(
       getRiskAssessmentStatusColor(riskAssessment),
       getRiskAssessmentStatus(riskAssessment),
-      getLastContactedDate(riskAssessment),
+      if (patient.hasMeta() && patient.meta.hasLastUpdated()) patient.meta.lastUpdated.toString()
+      else "",
       getPatientDetailsCardColor(riskAssessment)
     )
   }
@@ -224,7 +214,7 @@ class PatientDetailsViewModel(
     riskAssessment?.let {
       return StringUtils.upperCase(it.prediction.first().qualitativeRisk.coding.first().display)
     }
-    return getString(R.string.unknown)
+    return "ACTIVE" // getString(R.string.patient_is_active)
   }
 
   private fun getLastContactedDate(riskAssessment: RiskAssessment?): String {
