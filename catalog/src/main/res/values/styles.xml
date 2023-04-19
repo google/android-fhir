@@ -80,10 +80,6 @@
             name="questionnaireSubmitButtonStyle"
         >@style/App.Layout.SubmitButtonStyle
         </item>
-        <item
-            name="questionnaireMultiLineTextInputEditTextStyle"
-        >@style/Catalog.MultiLineTextInputEditTextStyle
-        </item>
     </style>
 
     <style name="Theme.MyQuestionnaire.PaginatedLayout">
@@ -93,10 +89,6 @@
         <item
             name="questionnaireSubmitButtonStyle"
         >@style/App.Layout.SubmitButtonStyle
-        </item>
-        <item
-            name="questionnaireMultiLineTextInputEditTextStyle"
-        >@style/Catalog.MultiLineTextInputEditTextStyle
         </item>
     </style>
 
@@ -132,7 +124,7 @@
         name="Catalog.MultiLineTextInputEditTextStyle"
         parent="Questionnaire.MultiLineTextInputEditTextStyle"
     >
-        <item name="android:minLines">6</item>
+        <item name="android:minLines">2</item>
     </style>
 
 </resources>
