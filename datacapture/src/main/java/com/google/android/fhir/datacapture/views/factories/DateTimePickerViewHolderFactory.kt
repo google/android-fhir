@@ -125,6 +125,8 @@ internal object DateTimePickerViewHolderFactory :
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         clearPreviousState()
         header.bind(questionnaireViewItem)
+        // Use 'mm' for month instead of 'MM' to avoid confusion.
+        // See https://developer.android.com/reference/kotlin/java/text/SimpleDateFormat.
         dateInputLayout.hint = canonicalizedDatePattern.lowercase()
         dateInputEditText.removeTextChangedListener(textWatcher)
 
