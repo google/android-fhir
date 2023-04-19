@@ -84,12 +84,6 @@ object ExpressionEvaluator {
   }
 
   /**
-   * Evaluates the expressions over list of resources [QuestionnaireResponse] and
-   * [QuestionnaireResponseItemComponent] and returns the resulting elements FhirPath supplements
-   * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements %resource =
-   * [QuestionnaireResponse] %context = [QuestionnaireResponseItemComponent]
-   */
-  /**
    * Returns a list of [Base] as the evaluated value for cqf expression extension. Expression runs
    * over questionnaireResponse with fhirpath supplements values
    * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements. %resource =
