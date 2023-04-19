@@ -50,7 +50,7 @@ import com.google.android.fhir.datacapture.extensions.validateLaunchContext
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
-import com.google.android.fhir.datacapture.fhirpath.evaluateToBase
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCqfExpression
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -538,15 +538,19 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   internal fun resolveCqfExpression(
+    questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent,
     element: Element,
   ): List<Base> {
     val cqfExpression = element.cqfExpression ?: return emptyList()
     if (cqfExpression.isFhirPath) {
-      return evaluateToBase(
+      return evaluateCqfExpression(
+        questionnaire,
         questionnaireResponse,
+        questionnaireItem,
         questionnaireResponseItem,
-        cqfExpression.expression
+        cqfExpression,
+        questionnaireItemParentMap
       )
     } else throw UnsupportedOperationException("${cqfExpression.language} not supported yet")
   }
@@ -703,7 +707,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             answersChangedCallback = answersChangedCallback,
             resolveAnswerValueSet = { resolveAnswerValueSet(it) },
             resolveAnswerExpression = { resolveAnswerExpression(it) },
-            resolveCqfExpression = { resolveCqfExpression(questionnaireResponseItem, it) },
+            resolveCqfExpression = {
+              resolveCqfExpression(questionnaireItem, questionnaireResponseItem, it)
+            },
             draftAnswer = draftAnswerMap[questionnaireResponseItem],
             enabledDisplayItems =
               questionnaireItem.item.filter {

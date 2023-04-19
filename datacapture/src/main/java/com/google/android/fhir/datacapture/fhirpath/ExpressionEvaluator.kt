@@ -25,7 +25,9 @@ import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.Type
 import timber.log.Timber
@@ -79,6 +81,46 @@ object ExpressionEvaluator {
           }
         }
       }
+  }
+
+  /**
+   * Evaluates the expressions over list of resources [QuestionnaireResponse] and
+   * [QuestionnaireResponseItemComponent] and returns the resulting elements FhirPath supplements
+   * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements %resource =
+   * [QuestionnaireResponse] %context = [QuestionnaireResponseItemComponent]
+   */
+  /**
+   * Returns a list of [Base] as the evaluated value for cqf expression extension. Expression runs
+   * over questionnaireResponse with fhirpath supplements values
+   * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements. %resource =
+   * [QuestionnaireResponse] %context = [QuestionnaireResponseItemComponent]
+   */
+  fun evaluateCqfExpression(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse,
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
+    expression: Expression,
+    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>
+  ): List<Base> {
+    val appContext =
+      mutableMapOf<String, Base?>().apply {
+        extractDependentVariables(
+          expression,
+          questionnaire,
+          questionnaireResponse,
+          questionnaireItemParentMap,
+          questionnaireItem,
+          this
+        )
+      }
+    return fhirPathEngine.evaluate(
+      appContext,
+      questionnaireResponse,
+      null,
+      questionnaireResponseItem,
+      expression.expression
+    )
   }
 
   /**

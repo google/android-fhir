@@ -19,8 +19,6 @@ package com.google.android.fhir.datacapture.fhirpath
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
-import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 
@@ -36,22 +34,3 @@ internal val fhirPathEngine: FHIRPathEngine =
  */
 internal fun evaluateToDisplay(expressions: List<String>, data: Resource) =
   expressions.joinToString(" ") { fhirPathEngine.evaluateToString(data, it) }
-
-/**
- * Evaluates the expressions over list of resources [QuestionnaireResponse] and
- * [QuestionnaireResponseItemComponent] and returns the resulting elements FhirPath supplements
- * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements %resource =
- * [QuestionnaireResponse] %context = [QuestionnaireResponseItemComponent]
- */
-internal fun evaluateToBase(
-  questionnaireResponse: QuestionnaireResponse,
-  questionnaireResponseItemComponent: QuestionnaireResponseItemComponent,
-  expression: String
-) =
-  fhirPathEngine.evaluate(
-    null,
-    questionnaireResponse,
-    null,
-    questionnaireResponseItemComponent,
-    expression
-  )
