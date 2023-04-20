@@ -90,7 +90,7 @@
         </item>
         <item
             name="questionnaireTextInputEditTextStyle"
-        >@style/TextAppearance.Material3.BodyLarge
+        >@style/Questionnaire.TextInputEditTextStyle
         </item>
       <item
             name="questionnaireMultiLineTextInputEditTextStyle"
@@ -256,7 +256,7 @@
 
   <style
         name="Questionnaire.MultiLineTextInputEditTextStyle"
-        parent="TextAppearance.Material3.BodyLarge"
+        parent="Questionnaire.TextInputEditTextStyle"
     >
     <item name="android:minLines">3</item>
   </style>
