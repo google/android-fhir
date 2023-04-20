@@ -76,7 +76,6 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
         val questionnaireItem = questionnaireViewItem.questionnaireItem
         val selectedOptions = questionnaireViewItem.extractInitialOptions(holder.header.context)
-        viewModel.updateSelectedOptions(selectedOptions)
         holder.summary.text = selectedOptions.selectedSummary
         selectedOptionsJob =
           activity.lifecycleScope.launch {
@@ -94,6 +93,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
               OptionSelectDialogFragment(
                 title = questionnaireItem.localizedTextSpanned ?: "",
                 config = questionnaireItem.buildConfig(),
+                selectedOptions = selectedOptions
               )
             fragment.arguments =
               bundleOf(
@@ -159,13 +159,6 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 internal class QuestionnaireItemDialogSelectViewModel : ViewModel() {
   private val linkIdsToSelectedOptionsFlow =
     mutableMapOf<String, MutableSharedFlow<SelectedOptions>>()
-  private lateinit var selectedOptions: SelectedOptions
-
-  fun updateSelectedOptions(selectedOptions: SelectedOptions) {
-    this.selectedOptions = selectedOptions
-  }
-
-  fun getSelectedOptions() = selectedOptions
 
   fun getSelectedOptionsFlow(linkId: String): Flow<SelectedOptions> = selectedOptionsFlow(linkId)
 
