@@ -100,10 +100,6 @@ fun Project.configureLicensee() {
     allowDependency("org.antlr", "antlr4-runtime", "4.10.1") {
       because("BSD 3-clause. http://www.antlr.org/license.html")
     }
-    // ANTLR 4
-    allowDependency("org.antlr", "antlr4", "4.10.1") {
-      because("BSD 3-clause. http://www.antlr.org/license.html")
-    }
 
     // Utilities
     // https://developers.google.com/android/reference/com/google/android/gms/common/package-summary
@@ -149,6 +145,26 @@ fun Project.configureLicensee() {
     // Vision Common
     // https://developers.google.com/android/reference/com/google/mlkit/vision/common/package-summary
     allowDependency("com.google.mlkit", "vision-internal-vkp", "18.0.0") { because("") }
+
+    // Glide
+    allowDependency("com.github.bumptech.glide", "glide", "4.14.2") {
+      because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
+    }
+
+    // Glide Annotations
+    allowDependency("com.github.bumptech.glide", "annotations", "4.14.2") {
+      because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
+    }
+
+    // Glide Disk LRU Cache
+    allowDependency("com.github.bumptech.glide", "disklrucache", "4.14.2") {
+      because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
+    }
+
+    // Glide GIF Decoder
+    allowDependency("com.github.bumptech.glide", "gifdecoder", "4.14.2") {
+      because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
+    }
   }
 }
 
@@ -157,4 +173,5 @@ private val nonStandardLicenseUrls =
     // BSD-3
     "http://opensource.org/licenses/BSD-3-Clause",
     "http://www.opensource.org/licenses/bsd-license.php",
+    "https://asm.ow2.io/license.html",
   )

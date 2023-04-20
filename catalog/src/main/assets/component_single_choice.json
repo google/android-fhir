@@ -17,42 +17,43 @@
         }
       ],
       "linkId": "1",
-      "text": "What is the highest level of education achieved?",
+      "text": "Choose one from the options below",
       "type": "choice",
       "answerOption": [
         {
           "valueCoding": {
-            "system": "http://terminology.hl7.org/CodeSystem/v2-0532",
-            "code": "Y",
-            "display": "Does not know level of education"
+            "code": "option-1",
+            "display": "Option 1"
           }
         },
         {
           "valueCoding": {
-            "system": "http://terminology.hl7.org/CodeSystem/v2-0532",
-            "code": "no",
-            "display": "No education"
+            "code": "option-2",
+            "display": "Option 2"
           }
         },
         {
           "valueCoding": {
-            "system": "http://terminology.hl7.org/CodeSystem/v2-0532",
-            "code": "primary",
-            "display": "Primary school"
+            "code": "option-3",
+            "display": "Option 3"
           }
         },
         {
           "valueCoding": {
-            "system": "http://terminology.hl7.org/CodeSystem/v2-0532",
-            "code": "secondary",
-            "display": "Secondary school"
+            "code": "mother",
+            "display": "Option 4"
           }
         },
         {
           "valueCoding": {
-            "system": "http://terminology.hl7.org/CodeSystem/v2-0532",
-            "code": "higher",
-            "display": "Higher education"
+            "code": "sibling",
+            "display": "Option 5"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "other",
+            "display": "Option 6"
           }
         }
       ],

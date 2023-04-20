@@ -32,7 +32,7 @@ import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
-import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
+import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
@@ -47,7 +47,8 @@ import org.hl7.fhir.r4.model.ResourceType
 internal class DatabaseImpl(
   private val context: Context,
   private val iParser: IParser,
-  databaseConfig: DatabaseConfig
+  databaseConfig: DatabaseConfig,
+  private val resourceIndexer: ResourceIndexer
 ) : com.google.android.fhir.db.Database {
 
   val db: ResourceDatabase
@@ -101,6 +102,8 @@ internal class DatabaseImpl(
               ) { DatabaseEncryptionKeyProvider.getOrCreatePassphrase(DATABASE_PASSPHRASE_NAME) }
             }
           }
+
+          addMigrations(MIGRATION_1_2)
         }
         .build()
 
@@ -112,8 +115,13 @@ internal class DatabaseImpl(
     }*/
   }
 
-  private val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
-  private val syncedResourceDao = db.syncedResourceDao()
+  private val resourceDao by lazy {
+    db.resourceDao().also {
+      it.iParser = iParser
+      it.resourceIndexer = resourceIndexer
+    }
+  }
+
   private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 
   override suspend fun <R : Resource> insert(vararg resource: R): List<String> {
@@ -164,18 +172,8 @@ internal class DatabaseImpl(
     } as Resource
   }
 
-  override suspend fun lastUpdate(resourceType: ResourceType): String? {
-    return db.withTransaction { syncedResourceDao.getLastUpdate(resourceType) }
-  }
-
-  override suspend fun insertSyncedResources(
-    syncedResources: List<SyncedResourceEntity>,
-    resources: List<Resource>
-  ) {
-    db.withTransaction {
-      syncedResourceDao.insertAll(syncedResources)
-      insertRemote(*resources.toTypedArray())
-    }
+  override suspend fun insertSyncedResources(resources: List<Resource>) {
+    db.withTransaction { insertRemote(*resources.toTypedArray()) }
   }
 
   override suspend fun delete(type: ResourceType, id: String) {

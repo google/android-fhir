@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,16 @@ package com.google.android.fhir.catalog
 
 import android.view.View
 import android.widget.NumberPicker
-import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderDelegate
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 
 object CustomNumberPickerFactory :
   QuestionnaireItemViewHolderFactory(R.layout.custom_number_picker_layout) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var numberPicker: NumberPicker
-      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override lateinit var questionnaireViewItem: QuestionnaireViewItem
 
       override fun init(itemView: View) {
         /**
@@ -38,13 +37,9 @@ object CustomNumberPickerFactory :
         numberPicker = itemView.findViewById(R.id.number_picker)
       }
 
-      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+      override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         numberPicker.minValue = 1
         numberPicker.maxValue = 100
-      }
-
-      override fun displayValidationResult(validationResult: ValidationResult) {
-        // Custom validation message
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

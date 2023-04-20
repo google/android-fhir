@@ -24,30 +24,23 @@ import androidx.room.PrimaryKey
 import java.io.File
 import org.hl7.fhir.r4.model.ResourceType
 
-/** A DB entity holding the FHIR Resource metadata for `implementationguide` module. */
+/**
+ * A DB entity containing the description and metadata for
+ * [FHIR Resource](https://build.fhir.org/canonicalresource.html).
+ */
 @Entity(
   indices =
     [
-      Index(value = ["implementationGuideId"], unique = false),
-      Index(value = ["resourceType", "resourceId", "implementationGuideId"], unique = true)
+      Index(value = ["resourceMetadataId"]),
+      Index(value = ["url", "version", "resourceFile"], unique = true)
     ],
-  foreignKeys =
-    [
-      ForeignKey(
-        entity = ImplementationGuideEntity::class,
-        parentColumns = ["id"],
-        childColumns = ["implementationGuideId"],
-        onDelete = CASCADE
-      )
-    ]
 )
 internal data class ResourceMetadataEntity(
-  @PrimaryKey(autoGenerate = true) val id: Long,
+  @PrimaryKey(autoGenerate = true) val resourceMetadataId: Long,
   val resourceType: ResourceType,
-  val resourceId: String,
   val url: String?,
   val name: String?,
   val version: String?,
-  val fileUri: File,
-  val implementationGuideId: Long,
+  /** Location of the JSON file with a full Resource. */
+  val resourceFile: File,
 )

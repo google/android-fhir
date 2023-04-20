@@ -16,9 +16,11 @@
 
 package com.google.android.fhir.workflow
 
+import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.implementationguide.IgManager
 import com.google.android.fhir.search.search
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
@@ -44,13 +46,14 @@ class FhirEngineDalTest {
 
   @Before
   fun setupTest() {
-    fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
-    fhirEngineDal = FhirEngineDal(fhirEngine)
+    val context: Context = ApplicationProvider.getApplicationContext()
+    fhirEngine = FhirEngineProvider.getInstance(context)
+    fhirEngineDal = FhirEngineDal(fhirEngine, IgManager.createInMemory(context))
     runBlocking { fhirEngine.create(testPatient) }
   }
 
   @Test
-  fun testDalRead() = runBlocking {
+  fun testDalRead() = runBlockingOnWorkerThread {
     val result = fhirEngineDal.read(IdType("Patient/${testPatient.id}"))
 
     assertThat(result).isInstanceOf(Patient::class.java)
@@ -58,8 +61,14 @@ class FhirEngineDalTest {
       .isEqualTo(testPatient.nameFirstRep.givenAsSingleString)
   }
 
+  @Test(expected = BlockingMainThreadException::class)
+  fun `testDalRead when called from main thread should throw BlockingMainThreadException`(): Unit =
+    runBlocking {
+      fhirEngineDal.read(IdType("Patient/${testPatient.id}"))
+    }
+
   @Test
-  fun testDalCreate() = runBlocking {
+  fun testDalCreate() = runBlockingOnWorkerThread {
     val patient =
       Patient().apply {
         id = "Patient/2"
@@ -73,8 +82,12 @@ class FhirEngineDalTest {
       .isEqualTo(patient.nameFirstRep.givenAsSingleString)
   }
 
+  @Test(expected = BlockingMainThreadException::class)
+  fun `testDalCreate when called from main thread should throw BlockingMainThreadException`():
+    Unit = runBlocking { fhirEngineDal.create(testPatient) }
+
   @Test
-  fun testDalUpdate() = runBlocking {
+  fun testDalUpdate() = runBlockingOnWorkerThread {
     testPatient.name = listOf(HumanName().addGiven("Eve"))
 
     fhirEngineDal.update(testPatient)
@@ -83,14 +96,24 @@ class FhirEngineDalTest {
     assertThat(result.nameFirstRep.givenAsSingleString).isEqualTo("Eve")
   }
 
+  @Test(expected = BlockingMainThreadException::class)
+  fun `testDalUpdate when called from main thread should throw BlockingMainThreadException`():
+    Unit = runBlocking { fhirEngineDal.update(testPatient) }
+
   @Test
-  fun testDalDelete() = runBlocking {
+  fun testDalDelete() = runBlockingOnWorkerThread {
     fhirEngineDal.delete(testPatient.idElement)
 
     val result = fhirEngine.search<Patient> {}
 
     assertThat(result).isEmpty()
   }
+
+  @Test(expected = BlockingMainThreadException::class)
+  fun `testDalDelete when called from main thread should throw BlockingMainThreadException`() =
+    runBlocking {
+      fhirEngineDal.delete(testPatient.idElement)
+    }
 
   @After fun fhirEngine() = runBlocking { fhirEngine.delete(ResourceType.Patient, "Patient/1") }
 

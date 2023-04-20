@@ -54,6 +54,8 @@ android {
   testOptions { animationsDisabled = true }
 }
 
+afterEvaluate { configureFirebaseTestLab() }
+
 configurations { all { exclude(module = "xpp3") } }
 
 dependencies {
@@ -78,6 +80,7 @@ dependencies {
   implementation(Dependencies.Androidx.constraintLayout)
   implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.fragmentKtx)
+  implementation(Dependencies.Glide.glide)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
@@ -92,6 +95,7 @@ dependencies {
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)
+  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   testImplementation(Dependencies.Kotlin.kotlinTestJunit)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.mockitoInline)

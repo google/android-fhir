@@ -16,17 +16,17 @@
 
 package com.google.android.fhir.workflow
 
+import androidx.annotation.WorkerThread
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.implementationguide.IgManager
 import java.util.function.Supplier
 import org.hl7.fhir.instance.model.api.IBaseParameters
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.CarePlan
+import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Endpoint
 import org.hl7.fhir.r4.model.IdType
-import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.MeasureReport
 import org.hl7.fhir.r4.model.Parameters
 import org.opencds.cqf.cql.engine.data.CompositeDataProvider
@@ -52,26 +52,34 @@ import org.opencds.cqf.cql.evaluator.fhir.adapter.r4.AdapterFactory
 import org.opencds.cqf.cql.evaluator.library.CqlFhirParametersConverter
 import org.opencds.cqf.cql.evaluator.library.LibraryProcessor
 import org.opencds.cqf.cql.evaluator.measure.r4.R4MeasureProcessor
-import org.opencds.cqf.cql.evaluator.plandefinition.r4.OperationParametersParser
+import org.opencds.cqf.cql.evaluator.plandefinition.OperationParametersParser
 import org.opencds.cqf.cql.evaluator.plandefinition.r4.PlanDefinitionProcessor
 
-class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
+// Uses the already cached FhirContext instead of creating a new one
+// on the default protected R4FhirModelResolver() constructor.
+// This is a heavy object to load. Avoid having to create a new one.
+object CachedR4FhirModelResolver : R4FhirModelResolver(FhirContext.forR4Cached())
+
+class FhirOperator
+internal constructor(fhirContext: FhirContext, fhirEngine: FhirEngine, igManager: IgManager) {
   // Initialize the measure processor
-  private val fhirEngineTerminologyProvider = FhirEngineTerminologyProvider(fhirContext, fhirEngine)
+  private val fhirEngineTerminologyProvider =
+    FhirEngineTerminologyProvider(fhirContext, fhirEngine, igManager)
   private val adapterFactory = AdapterFactory()
-  private val libraryContentProvider = FhirEngineLibraryContentProvider(adapterFactory)
+  private val libraryContentProvider = FhirEngineLibraryContentProvider(adapterFactory, igManager)
   private val fhirTypeConverter = FhirTypeConverterFactory().create(FhirVersionEnum.R4)
   private val fhirEngineRetrieveProvider =
     FhirEngineRetrieveProvider(fhirEngine).apply {
       terminologyProvider = fhirEngineTerminologyProvider
       isExpandValueSets = true
     }
+
   private val dataProvider =
     CompositeDataProvider(
-      CachingModelResolverDecorator(R4FhirModelResolver()),
+      CachingModelResolverDecorator(CachedR4FhirModelResolver),
       fhirEngineRetrieveProvider
     )
-  private val fhirEngineDal = FhirEngineDal(fhirEngine)
+  private val fhirEngineDal = FhirEngineDal(fhirEngine, igManager)
 
   private val measureProcessor =
     R4MeasureProcessor(
@@ -158,7 +166,6 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     ActivityDefinitionProcessor(fhirContext, fhirEngineDal, libraryProcessor)
   private val operationParametersParser =
     OperationParametersParser(adapterFactory, fhirTypeConverter)
-
   private val planDefinitionProcessor =
     PlanDefinitionProcessor(
       fhirContext,
@@ -169,31 +176,74 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       operationParametersParser
     )
 
-  fun loadLib(lib: Library) {
-    if (lib.url != null) {
-      fhirEngineDal.libs[lib.url] = lib
-    }
-    if (lib.name != null) {
-      libraryContentProvider.libs[lib.name] = lib
-    }
-  }
-
-  fun loadLibs(libBundle: Bundle) {
-    for (entry in libBundle.entry) {
-      loadLib(entry.resource as Library)
-    }
+  /**
+   * The function evaluates a FHIR library against the database.
+   *
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
+   * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   * @param libraryUrl the url of the Library to evaluate
+   * @param expressions names of expressions in the Library to evaluate.
+   * @return a Parameters resource that contains an evaluation result for each expression requested.
+   */
+  @WorkerThread
+  fun evaluateLibrary(libraryUrl: String, expressions: Set<String>): IBaseParameters {
+    return evaluateLibrary(libraryUrl, null, null, expressions)
   }
 
   /**
    * The function evaluates a FHIR library against a patient's records.
+   *
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
+   * from a worker thread or it may throw [BlockingMainThreadException] exception.
    * @param libraryUrl the url of the Library to evaluate
    * @param patientId the Id of the patient to be evaluated
    * @param expressions names of expressions in the Library to evaluate.
    * @return a Parameters resource that contains an evaluation result for each expression requested
    */
+  @WorkerThread
   fun evaluateLibrary(
     libraryUrl: String,
     patientId: String,
+    expressions: Set<String>
+  ): IBaseParameters {
+    return evaluateLibrary(libraryUrl, patientId, null, expressions)
+  }
+
+  /**
+   * The function evaluates a FHIR library against the database.
+   *
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
+   * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   * @param libraryUrl the url of the Library to evaluate
+   * @param parameters list of parameters to be passed to the CQL library
+   * @param expressions names of expressions in the Library to evaluate.
+   * @return a Parameters resource that contains an evaluation result for each expression requested
+   */
+  @WorkerThread
+  fun evaluateLibrary(
+    libraryUrl: String,
+    parameters: Parameters,
+    expressions: Set<String>
+  ): IBaseParameters {
+    return evaluateLibrary(libraryUrl, null, parameters, expressions)
+  }
+
+  /**
+   * The function evaluates a FHIR library against the database.
+   *
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
+   * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   * @param libraryUrl the url of the Library to evaluate
+   * @param patientId the Id of the patient to be evaluated, if applicable
+   * @param parameters list of parameters to be passed to the CQL library, if applicable
+   * @param expressions names of expressions in the Library to evaluate.
+   * @return a Parameters resource that contains an evaluation result for each expression requested
+   */
+  @WorkerThread
+  fun evaluateLibrary(
+    libraryUrl: String,
+    patientId: String?,
+    parameters: Parameters?,
     expressions: Set<String>
   ): IBaseParameters {
     val dataEndpoint =
@@ -204,7 +254,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     return libraryProcessor.evaluate(
       libraryUrl,
       patientId,
-      null,
+      parameters,
       null,
       null,
       dataEndpoint,
@@ -213,14 +263,20 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     )
   }
 
+  /**
+   * Generates a [MeasureReport] based on the provided inputs.
+   *
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
+   * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   */
+  @WorkerThread
   fun evaluateMeasure(
     measureUrl: String,
     start: String,
     end: String,
     reportType: String,
     subject: String?,
-    practitioner: String?,
-    lastReceivedOn: String?
+    practitioner: String?
   ): MeasureReport {
     return measureProcessor.evaluateMeasure(
       measureUrl,
@@ -229,7 +285,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       reportType,
       subject,
       practitioner,
-      lastReceivedOn,
+      /* lastReceivedOn= */ null,
       /* contentEndpoint= */ null,
       /* terminologyEndpoint= */ null,
       /* dataEndpoint= */ null,
@@ -237,15 +293,29 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     )
   }
 
-  fun generateCarePlan(planDefinitionId: String, patientId: String): CarePlan {
+  /**
+   * Generates a [CarePlan] based on the provided inputs.
+   *
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
+   * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   */
+  @WorkerThread
+  fun generateCarePlan(planDefinitionId: String, patientId: String): IBaseResource {
     return generateCarePlan(planDefinitionId, patientId, encounterId = null)
   }
 
+  /**
+   * Generates a [CarePlan] based on the provided inputs.
+   *
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
+   * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   */
+  @WorkerThread
   fun generateCarePlan(
     planDefinitionId: String,
     patientId: String,
     encounterId: String?
-  ): CarePlan {
+  ): IBaseResource {
     return planDefinitionProcessor.apply(
       IdType("PlanDefinition", planDefinitionId),
       patientId,
@@ -265,6 +335,6 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       /* dataEndpoint= */ null,
       /* contentEndpoint*/ null,
       /* terminologyEndpoint= */ null
-    )
+    ) as IBaseResource
   }
 }

@@ -37,18 +37,21 @@ android {
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
+
+    javaCompileOptions {
+      annotationProcessorOptions {
+        compilerArgumentProviders(RoomSchemaArgProvider(File(projectDir, "schemas")))
+      }
+    }
   }
 
   sourceSets {
     getByName("androidTest").apply {
-      java.srcDirs("src/test-common/java")
-      resources.setSrcDirs(listOf("sampledata"))
+      resources.setSrcDirs(listOf("test-data"))
+      assets.srcDirs("$projectDir/schemas")
     }
 
-    getByName("test").apply {
-      java.srcDirs("src/test-common/java")
-      resources.setSrcDirs(listOf("sampledata"))
-    }
+    getByName("test").apply { resources.setSrcDirs(listOf("test-data")) }
   }
 
   buildTypes {
@@ -84,6 +87,8 @@ android {
   configureJacocoTestOptions()
 }
 
+afterEvaluate { configureFirebaseTestLab() }
+
 configurations {
   all {
     exclude(module = "json")
@@ -101,6 +106,7 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  androidTestImplementation(Dependencies.Room.testing)
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
 
@@ -118,7 +124,6 @@ dependencies {
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Retrofit.coreRetrofit)
-  implementation(Dependencies.Retrofit.gsonConverter)
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.androidFhirCommon)
@@ -129,6 +134,8 @@ dependencies {
   implementation(Dependencies.timber)
   //implementation("net.zetetic:sqlcipher-android:4.5.3@aar")
   implementation(project(":libspellfix"))
+  implementation(Dependencies.truth)
+
 
   kapt(Dependencies.Room.compiler)
 
@@ -139,6 +146,7 @@ dependencies {
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
+  testImplementation(Dependencies.mockWebServer)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
 }

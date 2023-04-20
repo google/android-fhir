@@ -24,11 +24,14 @@ import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
+import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.fhir.datacapture.extensions.flattened
+import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -51,10 +54,11 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
     return MaterialAlertDialogBuilder(requireContext())
       .setView(onCreateCustomView())
       .setPositiveButton(R.string.questionnaire_validation_error_fix_button_text) { dialog, _ ->
+        setFragmentResult(RESULT_CALLBACK, bundleOf(RESULT_KEY to RESULT_VALUE_FIX))
         dialog?.dismiss()
       }
       .setNegativeButton(R.string.questionnaire_validation_error_submit_button_text) { dialog, _ ->
-        setFragmentResult(RESULT_CALLBACK, Bundle.EMPTY)
+        setFragmentResult(RESULT_CALLBACK, bundleOf(RESULT_KEY to RESULT_VALUE_SUBMIT))
         dialog?.dismiss()
       }
       .create()
@@ -90,6 +94,9 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
   companion object {
     const val TAG = "QuestionnaireValidationErrorMessageDialogFragment"
     const val RESULT_CALLBACK = "QuestionnaireValidationResultCallback"
+    const val RESULT_KEY = "result"
+    const val RESULT_VALUE_FIX = "result_fix"
+    const val RESULT_VALUE_SUBMIT = "result_submit"
   }
 }
 
