@@ -16,7 +16,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-    android:layout_marginTop="@dimen/padding_default"
+    android:layout_marginVertical="@dimen/item_margin_vertical"
     android:orientation="vertical"
 >
 
@@ -24,7 +24,7 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/padding_default"
+        android:layout_marginBottom="@dimen/header_margin_bottom"
     />
 
     <com.google.android.fhir.datacapture.views.MediaView
@@ -43,7 +43,7 @@
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
             style="?attr/questionnaireDropDownSelectedTextStyle"
             android:id="@+id/auto_complete"
-            android:drawablePadding="@dimen/item_margin_horizontal"
+            android:drawablePadding="@dimen/icon_drawable_padding"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
         />

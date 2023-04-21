@@ -84,7 +84,10 @@ internal class OptionSelectDialogFragment(
     val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
     recyclerView.layoutManager = LinearLayoutManager(requireContext())
     recyclerView.addItemDecoration(
-      MarginItemDecoration(resources.getDimensionPixelOffset(R.dimen.item_margin_vertical))
+      MarginItemDecoration(
+        marginVertical = resources.getDimensionPixelOffset(R.dimen.option_item_margin_vertical),
+        marginHorizontal = resources.getDimensionPixelOffset(R.dimen.option_item_margin_horizontal)
+      )
     )
 
     val adapter = OptionSelectAdapter(multiSelectEnabled = config.multiSelect)
