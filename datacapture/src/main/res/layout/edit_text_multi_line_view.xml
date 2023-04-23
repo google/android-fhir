@@ -45,11 +45,10 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/text_input_edit_text"
-            style="?attr/questionnaireTextInputEditTextStyle"
+            style="?attr/questionnaireMultiLineTextInputEditTextStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="top"
-            android:minLines="3"
         />
 
     </com.google.android.material.textfield.TextInputLayout>
