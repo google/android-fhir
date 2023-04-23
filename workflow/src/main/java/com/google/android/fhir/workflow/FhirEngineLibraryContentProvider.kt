@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.workflow
 
-import com.google.android.fhir.implementationguide.IgManager
+import com.google.android.fhir.knowledge.KnowledgeManager
 import org.hl7.elm.r1.VersionedIdentifier
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.opencds.cqf.cql.evaluator.cql2elm.content.fhir.BaseFhirLibrarySourceProvider
@@ -24,12 +24,12 @@ import org.opencds.cqf.cql.evaluator.fhir.adapter.r4.AdapterFactory
 
 internal class FhirEngineLibraryContentProvider(
   adapterFactory: AdapterFactory,
-  private val igManager: IgManager,
+  private val knowledgeManager: KnowledgeManager,
 ) : BaseFhirLibrarySourceProvider(adapterFactory) {
 
   override fun getLibrary(libraryIdentifier: VersionedIdentifier): IBaseResource? {
     return runBlockingOrThrowMainThreadException {
-      igManager
+      knowledgeManager
         .loadResources(
           resourceType = "Library",
           name = libraryIdentifier.id,

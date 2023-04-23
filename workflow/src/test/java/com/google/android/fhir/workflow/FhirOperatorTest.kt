@@ -21,8 +21,8 @@ import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.implementationguide.IgManager
-import com.google.android.fhir.implementationguide.ImplementationGuide
+import com.google.android.fhir.knowledge.ImplementationGuide
+import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.android.fhir.workflow.testing.CqlBuilder
 import com.google.common.truth.Truth.assertThat
@@ -50,7 +50,7 @@ class FhirOperatorTest {
   @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
 
   private val context: Context = ApplicationProvider.getApplicationContext()
-  private val igManager = IgManager.createInMemory(context)
+  private val knowledgeManager = KnowledgeManager.createInMemory(context)
   private val fhirContext = FhirContext.forR4()
   private val jsonParser = fhirContext.newJsonParser()
   private val xmlParser = fhirContext.newXmlParser()
@@ -62,11 +62,11 @@ class FhirOperatorTest {
   fun setUp() = runBlockingOnWorkerThread {
     TimeZone.setDefault(TimeZone.getTimeZone("GMT"))
     fhirEngine = FhirEngineProvider.getInstance(context)
-    fhirOperator = FhirOperator(fhirContext, fhirEngine, igManager)
+    fhirOperator = FhirOperator(fhirContext, fhirEngine, knowledgeManager)
 
     // Installing ANC CDS to the IGManager
     val rootDirectory = File(javaClass.getResource("/anc-cds")!!.file)
-    igManager.install(
+    knowledgeManager.install(
       ImplementationGuide(
         "com.google.android.fhir",
         "1.0.0",
@@ -78,7 +78,7 @@ class FhirOperatorTest {
 
   @After
   fun tearDown() {
-    igManager.close()
+    knowledgeManager.close()
   }
 
   @Test
@@ -286,6 +286,6 @@ class FhirOperatorTest {
   }
 
   private suspend fun installToIgManager(resource: Resource) {
-    igManager.install(writeToFile(resource))
+    knowledgeManager.install(writeToFile(resource))
   }
 }

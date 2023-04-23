@@ -23,7 +23,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.implementationguide.IgManager
+import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.io.File
@@ -48,7 +48,7 @@ class FhirOperatorLibraryEvaluateTest {
 
   private val context: Context = ApplicationProvider.getApplicationContext()
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
-  private val igManager = IgManager.createInMemory(context)
+  private val knowledgeManager = KnowledgeManager.createInMemory(context)
   private val jsonParser = fhirContext.newJsonParser()
 
   private fun open(asset: String): InputStream? {
@@ -73,7 +73,7 @@ class FhirOperatorLibraryEvaluateTest {
       FhirOperatorBuilder(context)
         .withFhirContext(fhirContext)
         .withFhirEngine(fhirEngine)
-        .withIgManager(igManager)
+        .withIgManager(knowledgeManager)
         .build()
   }
 
@@ -120,7 +120,7 @@ class FhirOperatorLibraryEvaluateTest {
     }
 
     // Load Library that checks if Patient has taken a vaccine
-    igManager.install(copy("/immunity-check/ImmunityCheck.json"))
+    knowledgeManager.install(copy("/immunity-check/ImmunityCheck.json"))
 
     // Evaluates a specific Patient
     val results =

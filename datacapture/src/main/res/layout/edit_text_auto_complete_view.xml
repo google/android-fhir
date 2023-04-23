@@ -19,7 +19,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-    android:layout_marginTop="@dimen/padding_default"
+    android:layout_marginVertical="@dimen/item_margin_vertical"
     android:orientation="vertical"
 >
 
@@ -27,7 +27,7 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/padding_default"
+        android:layout_marginBottom="@dimen/header_margin_bottom"
     />
 
     <com.google.android.fhir.datacapture.views.MediaView
@@ -67,10 +67,10 @@
             android:id="@+id/chipContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/auto_complete_chip_group_margin"
-            android:layout_marginTop="@dimen/auto_complete_chip_group_margin"
-            android:layout_marginEnd="@dimen/auto_complete_chip_group_margin"
-            android:layout_marginBottom="@dimen/auto_complete_chip_group_bottom_margin"
+            android:layout_marginStart="@dimen/auto_complete_chip_margin"
+            android:layout_marginTop="@dimen/auto_complete_chip_margin"
+            android:layout_marginEnd="@dimen/auto_complete_chip_margin"
+            android:layout_marginBottom="@dimen/auto_complete_chip_margin_bottom"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
