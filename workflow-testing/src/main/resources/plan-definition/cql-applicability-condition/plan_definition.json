@@ -6,11 +6,11 @@
       "resource": {
         "resourceType": "ActivityDefinition",
         "id": "Activity-Example",
-        "url": "http://localhost/ActivityDefinition/Activity-Example",
+        "url": "http://example.com/ActivityDefinition/Activity-Example",
         "status": "active",
         "kind": "Task",
         "library": [
-          "http://localhost/Library/example|1.0.0"
+          "http://example.com/Library/example|1.0.0"
         ],
         "dynamicValue": [
           {
@@ -27,16 +27,16 @@
       "resource": {
         "resourceType": "PlanDefinition",
         "id": "Plan-Definition-Example",
-        "url" : "http://localhost/PlanDefinition/Plan-Definition-Example",
+        "url" : "http://example.com/PlanDefinition/Plan-Definition-Example",
         "status": "active",
         "type": "workflow-definition",
         "library": [
-          "http://localhost/Library/example|1.0.0"
+          "http://example.com/Library/example|1.0.0"
         ],
         "action": [
           {
             "title": "Test for Female Patient",
-            "definitionCanonical": "http://localhost/ActivityDefinition/Activity-Example",
+            "definitionCanonical": "http://example.com/ActivityDefinition/Activity-Example",
             "condition": [
               {
                 "kind": "applicability",

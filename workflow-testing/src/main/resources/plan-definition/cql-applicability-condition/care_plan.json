@@ -5,7 +5,7 @@
       "resourceType": "RequestGroup",
       "id": "Plan-Definition-Example",
       "instantiatesCanonical": [
-        "http://localhost/PlanDefinition/Plan-Definition-Example"
+        "http://example.com/PlanDefinition/Plan-Definition-Example"
       ],
       "status": "draft",
       "intent": "proposal",
@@ -43,7 +43,7 @@
     }
   ],
   "instantiatesCanonical": [
-    "http://localhost/PlanDefinition/Plan-Definition-Example"
+    "http://example.com/PlanDefinition/Plan-Definition-Example"
   ],
   "status": "draft",
   "intent": "proposal",
