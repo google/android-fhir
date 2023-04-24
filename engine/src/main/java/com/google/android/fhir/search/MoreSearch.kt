@@ -170,17 +170,18 @@ internal fun Search.getQuery(
         }
         revIncludeMap.isNotEmpty() -> {
           """
-               select serializedResource from ResourceEntity where resourceUuid in (
-               with UUIDS as ( select '${type.name}/' || a.resourceId from ResourceEntity a 
-                $sortJoinStatement
-                WHERE a.resourceType = ?
-                $filterStatement
-                $sortOrderStatement
-                $limitStatement
-             )
-                 Select resourceUuid from ResourceEntity where '${type.name}/' || resourceId in UUIDS
-              ${revIncludeMap.toSQLQuery()}
-              )
+        select serializedResource from ResourceEntity where resourceUuid in (
+        with UUIDS as ( select '${type.name}/' || a.resourceId from ResourceEntity a 
+        $sortJoinStatement
+        WHERE a.resourceType = ?
+        $filterStatement
+        $sortOrderStatement
+        $limitStatement
+        )
+        Select resourceUuid
+        FROM ResourceEntity
+        WHERE '${type.name}/' || resourceId in UUIDS ${revIncludeMap.toSQLQuery()}
+        )
         """.trimIndent()
         }
         else ->

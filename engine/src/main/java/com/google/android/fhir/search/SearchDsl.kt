@@ -144,6 +144,23 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     this.order = order
   }
 
+  /**
+   * Allows user to include additional resources to be included in the search results that reference
+   * the resource on which [revInclude] is being called. The developers may call [revInclude]
+   * multiple times with different [ResourceType] to allow search api to return multiple referenced
+   * resource types.
+   *
+   * e.g. The below example would return all the Patients with given-name as James and their
+   * associated Encounters and Conditions.
+   *
+   * ```
+   * fhirEngine.search<Resource>(Search(ResourceType.Patient).apply {
+   *  filter(Patient.GIVEN, { value = "James" })
+   *  revInclude(ResourceType.Encounter, Encounter.PATIENT)
+   *  revInclude(ResourceType.Condition, Condition.PATIENT)
+   * })
+   * ```
+   */
   fun revInclude(resourceType: ResourceType, vararg clientParam: ReferenceClientParam) {
     revIncludeMap.computeIfAbsent(resourceType) { mutableListOf() }.addAll(clientParam)
   }
