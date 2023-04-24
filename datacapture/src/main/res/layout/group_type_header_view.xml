@@ -13,51 +13,58 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingEnd="@dimen/prefix_padding_end"
-        app:layout_constraintEnd_toStartOf="@+id/question"
+        app:layout_constraintEnd_toStartOf="@+id/questionContainer"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-    />
-
-  <TextView
-        android:id="@+id/question"
-        style="?attr/questionnaireGroupTypeQuestionTextStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/prefix"
         app:layout_constraintTop_toTopOf="parent"
     />
 
   <LinearLayout
-        android:id="@+id/helpContainer"
+        android:id="@+id/questionContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/help_container_margin_top"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/question"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/prefix"
+        app:layout_constraintTop_toTopOf="parent"
     >
 
     <TextView
-            android:id="@+id/hint"
-            style="?attr/questionnaireSubtitleTextStyle"
+            android:id="@+id/question"
+            style="?attr/questionnaireGroupTypeQuestionTextStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight=".7"
-            android:layout_gravity="center_vertical"
-            tools:text="Sample helper text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/prefix"
+            app:layout_constraintTop_toTopOf="parent"
         />
+
     <Button
             style="?attr/questionnaireHelpButtonStyle"
             android:id="@+id/helpButton"
             android:layout_width="@dimen/help_button_width"
             android:layout_height="@dimen/help_button_height"
             android:layout_gravity="center_vertical"
-            android:layout_weight=".3"
             android:layout_marginStart="@dimen/help_button_margin_start"
             app:icon="@drawable/ic_help_48px"
+            app:layout_constraintStart_toEndOf="@id/question"
+            app:layout_constraintTop_toTopOf="parent"
         />
   </LinearLayout>
+
+
+
+  <TextView
+        android:id="@+id/hint"
+        style="?attr/questionnaireSubtitleTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight=".7"
+        android:layout_gravity="center_vertical"
+        tools:text="Sample helper text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/questionContainer"
+    />
+
 
   <com.google.android.material.card.MaterialCardView
         android:id="@+id/helpCardView"
@@ -66,7 +73,7 @@
         android:layout_marginTop="@dimen/help_card_margin_top"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/helpContainer"
+        app:layout_constraintTop_toBottomOf="@id/hint"
         app:layout_constraintStart_toStartOf="parent"
     >
     <LinearLayout
