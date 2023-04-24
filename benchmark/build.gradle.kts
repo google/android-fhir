@@ -87,7 +87,7 @@ dependencies {
   androidTestImplementation(Dependencies.truth)
 
   androidTestImplementation(project(":engine"))
-  androidTestImplementation(project(":implementationguide"))
+  androidTestImplementation(project(":knowledge"))
   androidTestImplementation(project(":workflow"))
   androidTestImplementation(project(":workflow-testing"))
 }

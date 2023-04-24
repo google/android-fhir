@@ -83,6 +83,12 @@
     <!--   Style for textInputEditText view. -->
     <attr name="questionnaireTextInputEditTextStyle" format="reference" />
 
+    <!--   Style for multiline textInputEditText view. -->
+    <attr
+        name="questionnaireMultiLineTextInputEditTextStyle"
+        format="reference"
+    />
+
     <!--   Style for chip view. -->
     <attr name="questionnaireChipStyle" format="reference" />
 
