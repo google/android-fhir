@@ -23,6 +23,9 @@
     <!--   Style for question text. -->
     <attr name="questionnaireQuestionTextStyle" format="reference" />
 
+    <!--   Style for question header layout. -->
+    <attr name="questionnaireQuestionHeaderStyle" format="reference" />
+
     <!--   Style for subtitle text. -->
     <attr name="questionnaireSubtitleTextStyle" format="reference" />
 

@@ -43,7 +43,9 @@
         <item
             name="questionnaireQuestionTextStyle"
         >@style/TextAppearance.Material3.TitleMedium</item>
-
+        <item
+            name="questionnaireQuestionHeaderStyle"
+        >@style/Questionnaire.QuestionHeaderStyle</item>
       <item
             name="questionnaireReviewModeQuestionTextStyle"
         >@style/TextAppearance.Material3.TitleMedium</item>
@@ -184,6 +186,10 @@
         parent="TextAppearance.Material3.BodyMedium"
     >
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="Questionnaire.QuestionHeaderStyle" parent="">
+        <item name="android:paddingBottom">@dimen/header_padding_bottom</item>
     </style>
 
     <style name="Questionnaire.BottomNavContainerStyle" parent="">
