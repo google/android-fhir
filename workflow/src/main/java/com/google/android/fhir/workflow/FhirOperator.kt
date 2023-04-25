@@ -337,7 +337,9 @@ internal constructor(
       /* useServerData= */ null,
       /* bundle= */ null,
       /* prefetchData= */ null,
-      /* dataEndpoint= */ null,
+      /* dataEndpoint= */ Endpoint()
+        .setAddress("localhost")
+        .setConnectionType(Coding().setCode(Constants.HL7_FHIR_FILES)),
       /* contentEndpoint*/ null,
       /* terminologyEndpoint= */ null
     ) as IBaseResource

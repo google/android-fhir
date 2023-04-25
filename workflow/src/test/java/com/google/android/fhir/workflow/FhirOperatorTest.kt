@@ -132,6 +132,28 @@ class FhirOperatorTest {
   }
 
   @Test
+  fun generateCarePlanWithCqlApplicabilityCondition() = runBlockingOnWorkerThread {
+    loadFile("/plan-definition/cql-applicability-condition/patient.json", ::importToFhirEngine)
+    loadFile(
+      "/plan-definition/cql-applicability-condition/plan_definition.json",
+      ::installToIgManager
+    )
+    loadFile("/plan-definition/cql-applicability-condition/example-1.0.0.cql", ::installToIgManager)
+
+    val carePlan =
+      fhirOperator.generateCarePlan(
+        planDefinitionId = "Plan-Definition-Example",
+        patientId = "Patient/Female-Patient-Example"
+      )
+
+    assertEquals(
+      readResourceAsString("/plan-definition/cql-applicability-condition/care_plan.json"),
+      jsonParser.encodeResourceToString(carePlan),
+      true
+    )
+  }
+
+  @Test
   fun evaluatePopulationMeasure() = runBlockingOnWorkerThread {
     loadFile("/first-contact/01-registration/patient-charity-otala-1.json", ::importToFhirEngine)
     loadFile(
