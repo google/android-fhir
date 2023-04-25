@@ -16,10 +16,12 @@
 
 package com.google.android.fhir.workflow
 
+import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.android.fhir.workflow.testing.Loadable
 import com.google.common.truth.Truth.assertThat
@@ -52,10 +54,16 @@ class FhirEngineRetrieveProviderTest : Loadable() {
 
   @Before
   fun setupTest() {
-    fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+    val context: Context = ApplicationProvider.getApplicationContext()
+    fhirEngine = FhirEngineProvider.getInstance(context)
     retrieveProvider =
       FhirEngineRetrieveProvider(fhirEngine).apply {
-        terminologyProvider = FhirEngineTerminologyProvider(FhirContext.forR4Cached(), fhirEngine)
+        terminologyProvider =
+          FhirEngineTerminologyProvider(
+            FhirContext.forR4Cached(),
+            fhirEngine,
+            KnowledgeManager.createInMemory(context)
+          )
         isExpandValueSets = true
       }
   }
