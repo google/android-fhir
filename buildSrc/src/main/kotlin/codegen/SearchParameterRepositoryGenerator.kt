@@ -63,6 +63,7 @@ internal object SearchParameterRepositoryGenerator {
 
   private val searchParamMap: HashMap<String, MutableList<SearchParamDefinition>> = HashMap()
   private val searchParamDefinitionClass = ClassName(indexPackage, "SearchParamDefinition")
+  private val baseResourceSearchParameters = mutableListOf<SearchParamDefinition>()
 
   fun generate(bundle: Bundle, outputPath: File, testOutputPath: File) {
     for (entry in bundle.entry) {
@@ -74,6 +75,15 @@ internal object SearchParameterRepositoryGenerator {
         searchParamMap
           .getOrPut(hashMapKey) { mutableListOf() }
           .add(
+            SearchParamDefinition(
+              className = searchParamDefinitionClass,
+              name = searchParameter.name,
+              paramTypeCode = searchParameter.type.toCode().toUpperCase(Locale.US),
+              path = path.value
+            )
+          )
+        if (hashMapKey == "Resource")
+          baseResourceSearchParameters.add(
             SearchParamDefinition(
               className = searchParamDefinitionClass,
               name = searchParameter.name,
@@ -100,6 +110,19 @@ internal object SearchParameterRepositoryGenerator {
     val testHelperFunctionCodeBlock =
       CodeBlock.builder().addStatement("val resourceList = listOf<%T>(", Resource::class.java)
     searchParamMap.entries.forEach { (resource, definitions) ->
+      // add search parameters defined in base -> Resource to this resource
+      if (resource != "Resource") {
+        definitions.addAll(
+          baseResourceSearchParameters.map { baseSearchParam ->
+            SearchParamDefinition(
+              className = baseSearchParam.className,
+              name = baseSearchParam.name,
+              paramTypeCode = baseSearchParam.paramTypeCode,
+              path = baseSearchParam.path.replace("Resource", resource)
+            )
+          }
+        )
+      }
       val resourceClass = ClassName(hapiPackage, resource.toHapiName())
       val klass =
         try {
@@ -175,8 +198,7 @@ internal object SearchParameterRepositoryGenerator {
     return if (searchParam.base.size == 1) {
       mapOf(searchParam.base.single().valueAsString to searchParam.expression)
     } else {
-      searchParam
-        .expression
+      searchParam.expression
         .split("|")
         .groupBy { splitString -> splitString.split(".").first().trim().removePrefix("(") }
         .mapValues { it.value.joinToString(" | ") { join -> join.trim() } }
