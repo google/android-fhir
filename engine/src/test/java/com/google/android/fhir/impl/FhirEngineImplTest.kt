@@ -259,33 +259,20 @@ class FhirEngineImplTest {
   fun `search() by x-fhir-query should return patients for _tag param`() = runBlocking {
     val patients =
       listOf(
-        buildPatient("3", "C", Enumerations.AdministrativeGender.FEMALE).apply {
-          meta =
-            Meta()
-              .setTag(
-                mutableListOf(
-                  Coding("https://d-tree.org/", "cardiology-department", "Cardiology Dept")
-                )
-              )
+        buildPatient("1", "Patient1", Enumerations.AdministrativeGender.FEMALE).apply {
+          meta = Meta().setTag(mutableListOf(Coding("https://d-tree.org/", "Tag1", "Tag 1")))
         },
-        buildPatient("4", "C", Enumerations.AdministrativeGender.FEMALE).apply {
-          meta =
-            Meta()
-              .setTag(
-                mutableListOf(Coding("http://d-tree.org/", "salima-catchment", "Salima Patients"))
-              )
+        buildPatient("2", "Patient2", Enumerations.AdministrativeGender.FEMALE).apply {
+          meta = Meta().setTag(mutableListOf(Coding("http://d-tree.org/", "Tag2", "Tag 2")))
         }
       )
 
     fhirEngine.create(*patients.toTypedArray())
 
-    val result = fhirEngine.search("Patient?_tag=cardiology-department").map { it as Patient }
+    val result = fhirEngine.search("Patient?_tag=Tag1").map { it as Patient }
 
     assertThat(result.size).isEqualTo(1)
-    assertThat(
-        result.all { patient -> patient.meta.tag.all { it.code == "cardiology-department" } }
-      )
-      .isTrue()
+    assertThat(result.all { patient -> patient.meta.tag.all { it.code == "Tag1" } }).isTrue()
   }
 
   @Test
