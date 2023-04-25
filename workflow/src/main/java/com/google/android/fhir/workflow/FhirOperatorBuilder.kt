@@ -21,22 +21,22 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.implementationguide.IgManager
-import com.google.android.fhir.implementationguide.ImplementationGuide
+import com.google.android.fhir.knowledge.ImplementationGuide
+import com.google.android.fhir.knowledge.KnowledgeManager
 
 class FhirOperatorBuilder(private val applicationContext: Context) {
   private var fhirContext: FhirContext? = null
   private var fhirEngine: FhirEngine? = null
   private var implementationGuides: List<ImplementationGuide> = emptyList()
-  private var igManager: IgManager? = null
+  private var knowledgeManager: KnowledgeManager? = null
 
   fun withFhirEngine(fhirEngine: FhirEngine): FhirOperatorBuilder {
     this.fhirEngine = fhirEngine
     return this
   }
 
-  fun withIgManager(igManager: IgManager): FhirOperatorBuilder {
-    this.igManager = igManager
+  fun withIgManager(knowledgeManager: KnowledgeManager): FhirOperatorBuilder {
+    this.knowledgeManager = knowledgeManager
     return this
   }
 
@@ -56,7 +56,7 @@ class FhirOperatorBuilder(private val applicationContext: Context) {
     return FhirOperator(
       fhirContext ?: FhirContext(FhirVersionEnum.R4),
       fhirEngine ?: FhirEngineProvider.getInstance(applicationContext),
-      igManager ?: IgManager.create(applicationContext)
+      knowledgeManager ?: KnowledgeManager.create(applicationContext)
     )
   }
 }

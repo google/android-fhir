@@ -15,49 +15,116 @@
  limitations under the License.
 -->
 <resources>
+    <!--  Widget related  -->
+
+    <!--  Root layout  -->
     <dimen name="item_margin_horizontal">16dp</dimen>
     <dimen name="item_margin_vertical">8dp</dimen>
-    <dimen name="prefix_padding_end">5dp</dimen>
-    <dimen name="answer_option_checkbox_margin_vertical">2dp</dimen>
-    <dimen name="padding_drop_down">16dp</dimen>
-    <dimen name="padding_auto_complete">10dp</dimen>
-    <dimen name="auto_complete_item_gap">5dp</dimen>
-    <dimen name="recyclerview_bottom_padding">64dp</dimen>
-    <dimen name="padding_modal_card">24dp</dimen>
-    <dimen name="padding_default">16dp</dimen>
-    <dimen name="padding_half_size">8dp</dimen>
-    <dimen name="padding_quarter_size">4dp</dimen>
-    <dimen name="radio_button_item_gap">16dp</dimen>
-    <dimen name="dialog_button_text_size_default">14sp</dimen>
-    <dimen name="auto_complete_chip_group_margin">10dp</dimen>
-    <dimen name="auto_complete_chip_group_bottom_margin">50dp</dimen>
-    <dimen name="instructions_top_margin">4dp</dimen>
+
+    <!--  Action button  -->
+    <dimen name="action_button_margin_horizontal">16dp</dimen>
+    <dimen name="action_button_margin_vertical">8dp</dimen>
+
+    <!--  Header  -->
+    <dimen name="error_text_at_header_margin_top">4dp</dimen>
+    <dimen name="header_margin_bottom">16dp</dimen>
     <dimen name="help_button_margin_start">4dp</dimen>
-    <dimen name="help_button_width">24dp</dimen>
     <dimen name="help_button_height">24dp</dimen>
-    <dimen name="help_card_view_margin_top">16dp</dimen>
-    <dimen name="help_header_horizontal_margin">16dp</dimen>
+    <dimen name="help_button_width">24dp</dimen>
+    <dimen name="help_card_margin_top">16dp</dimen>
+    <dimen name="help_container_margin_top">4dp</dimen>
     <dimen name="help_header_margin_bottom">4dp</dimen>
+    <dimen name="help_header_margin_horizontal">16dp</dimen>
+    <dimen name="help_header_margin_top">16dp</dimen>
     <dimen name="help_margin_bottom">16dp</dimen>
-    <dimen name="icon_inset">16dp</dimen>
-    <dimen name="error_icon_margin_end">4dp</dimen>
-    <dimen name="choice_button_image">48dp</dimen>
-    <dimen name="attachment_error_margin_top">4dp</dimen>
-    <dimen name="attachment_preview_base_margin">8dp</dimen>
-    <dimen name="attachment_photo_preview_max_width">72dp</dimen>
-    <dimen name="attachment_photo_preview_max_height">72dp</dimen>
-    <dimen name="attachment_icon_file_preview_width">40dp</dimen>
-    <dimen name="attachment_icon_file_preview_height">40dp</dimen>
-    <dimen name="attachment_icon_button_size">24dp</dimen>
-    <dimen name="attachment_uploaded_label_margin_bottom">4dp</dimen>
+    <dimen name="help_text_margin_bottom">16dp</dimen>
+    <dimen name="help_text_margin_horizontal">16dp</dimen>
+    <dimen name="prefix_padding_end">5dp</dimen>
+
+    <!--  Error text  -->
+    <dimen name="error_text_margin_horizontal">16dp</dimen>
+    <dimen name="error_text_margin_vertical">16dp</dimen>
+
+    <!--  Attachment  -->
+    <dimen name="attachment_action_button_icon_size">24dp</dimen>
+    <dimen name="attachment_action_button_margin_end">8dp</dimen>
+    <dimen name="attachment_action_button_padding_horizontal">16dp</dimen>
     <dimen name="attachment_divider_height">1dp</dimen>
+    <dimen name="attachment_divider_margin_top">16dp</dimen>
+    <dimen name="attachment_error_margin_top">4dp</dimen>
+    <dimen name="attachment_preview_divider_margin_top">8dp</dimen>
+    <dimen name="attachment_preview_file_icon_margin">16dp</dimen>
+    <dimen name="attachment_preview_margin_top">8dp</dimen>
+    <dimen
+        name="attachment_preview_photo_and_preview_file_icon_background_height"
+    >72dp</dimen>
+    <dimen
+        name="attachment_preview_photo_and_preview_file_icon_background_width"
+    >72dp</dimen>
+    <dimen name="attachment_preview_title_margin_horizontal">8dp</dimen>
+    <dimen name="attachment_uploaded_label_margin_bottom">4dp</dimen>
+    <dimen name="attachment_uploaded_label_margin_top">16dp</dimen>
+
+    <!--  Auto Complete  -->
+    <dimen name="auto_complete_chip_margin">10dp</dimen>
+    <dimen name="auto_complete_chip_margin_bottom">50dp</dimen>
+
+    <!--  Barcode  -->
+    <dimen name="barcode_question_margin_end">8dp</dimen>
+    <dimen name="barcode_question_margin_start">8dp</dimen>
+
+    <!--  Option item  -->
+    <dimen name="option_item_after_text_padding">24dp</dimen>
+    <dimen name="option_item_between_text_and_icon_padding">16dp</dimen>
+    <dimen name="option_item_margin_horizontal">16dp</dimen>
+    <dimen name="option_item_margin_vertical">16dp</dimen>
+    <dimen name="option_item_padding">16dp</dimen>
+
+    <!--  Date picker and Date time picker  -->
+    <dimen name="date_picker_and_time_picker_gap">16dp</dimen>
+
+    <!--  Dialog  -->
+    <dimen name="dialog_confirmation_button_padding">8dp</dimen>
+    <dimen name="dialog_content_scroll_margin_vertical">8dp</dimen>
+    <dimen name="dialog_option_scroll_margin_top">16dp</dimen>
+    <dimen name="dialog_padding">24dp</dimen>
+    <dimen name="dialog_subtitle_margin_top">16dp</dimen>
+    <dimen name="dialog_title_margin_bottom">4dp</dimen>
+
+    <!--  Dropdown  -->
+    <dimen name="drop_down_padding">16dp</dimen>
+
+    <!--  Item Answer Media  -->
+    <dimen name="item_answer_media_image_size">48dp</dimen>
+    <dimen name="choice_button_image">48dp</dimen>
+    
+    <!--  Item Media  -->
+    <dimen name="item_media_image_margin_horizontal">16dp</dimen>
+    <dimen name="item_media_image_margin_vertical">8dp</dimen>
+    <dimen name="item_media_image_max_height">200dp</dimen>
+    <dimen name="item_media_image_max_width">200dp</dimen>
     <dimen name="item_media_image_preview_max_width">200dp</dimen>
     <dimen name="item_media_image_preview_max_height">200dp</dimen>
-    <dimen name="bottom_container_padding_vertical">8dp</dimen>
-    <!--  dimens for padding between text and icon in the radio button  -->
+
+    <!--  Simple question  -->
+    <dimen name="simple_question_view_answer_margin_top">8dp</dimen>
+    <dimen name="simple_question_view_divider_margin_top">8dp</dimen>
+
+    <!--  Radio Button  -->
     <dimen name="padding_between_text_and_icon">16dp</dimen>
     <dimen name="padding_after_text">24dp</dimen>
-    <!--  dimens for error icon width and height on review summary page.  -->
+
+    <!--  Non-widget related  -->
+
+    <!--  Icon  -->
+    <dimen name="icon_drawable_padding">16dp</dimen>
+    <dimen name="icon_inset">16dp</dimen>
+
+    <!--  Bottom Container  -->
+    <dimen name="bottom_container_padding_vertical">8dp</dimen>
+    
+    <!--  Error Icon  -->
     <dimen name="error_icon_width">20dp</dimen>
     <dimen name="error_icon_height">20dp</dimen>
+    <dimen name="error_icon_margin_end">4dp</dimen>
 </resources>
