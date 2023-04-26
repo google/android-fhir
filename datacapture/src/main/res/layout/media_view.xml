@@ -11,11 +11,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-        android:layout_marginVertical="@dimen/item_margin_vertical"
+        android:layout_marginHorizontal="@dimen/item_media_image_margin_horizontal"
+        android:layout_marginVertical="@dimen/item_media_image_margin_vertical"
         android:adjustViewBounds="true"
-        android:maxWidth="@dimen/item_media_image_preview_max_width"
-        android:maxHeight="@dimen/attachment_photo_preview_max_height"
+        android:maxWidth="@dimen/item_media_image_max_width"
+        android:maxHeight="@dimen/item_media_image_max_height"
         android:visibility="gone"
     />
 
