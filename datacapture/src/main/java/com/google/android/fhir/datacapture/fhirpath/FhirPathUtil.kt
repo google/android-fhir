@@ -38,9 +38,9 @@ internal fun evaluateToDisplay(expressions: List<String>, data: Resource) =
   expressions.joinToString(" ") { fhirPathEngine.evaluateToString(data, it) }
 
 /**
- * Evaluates the expression and returns the boolean result. The resources [QuestionnaireResponse] and
- * [QuestionnaireResponseItemComponent] are passed as fhirPath supplements as defined in fhir specs
- * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements
+ * Evaluates the expression and returns the boolean result. The resources [QuestionnaireResponse]
+ * and [QuestionnaireResponseItemComponent] are passed as fhirPath supplements as defined in fhir
+ * specs https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements
  *
  * %resource = [QuestionnaireResponse], %context = [QuestionnaireResponseItemComponent]
  */
