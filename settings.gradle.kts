@@ -41,7 +41,7 @@ include(":demo")
 
 include(":engine")
 
-include(":implementationguide")
+include(":knowledge")
 
 include(":workflow")
 
