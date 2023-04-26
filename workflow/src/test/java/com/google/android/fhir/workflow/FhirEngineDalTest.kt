@@ -20,7 +20,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.implementationguide.IgManager
+import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.search.search
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
@@ -48,7 +48,7 @@ class FhirEngineDalTest {
   fun setupTest() {
     val context: Context = ApplicationProvider.getApplicationContext()
     fhirEngine = FhirEngineProvider.getInstance(context)
-    fhirEngineDal = FhirEngineDal(fhirEngine, IgManager.createInMemory(context))
+    fhirEngineDal = FhirEngineDal(fhirEngine, KnowledgeManager.createInMemory(context))
     runBlocking { fhirEngine.create(testPatient) }
   }
 
