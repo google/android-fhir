@@ -20,7 +20,7 @@ import ca.uhn.fhir.rest.gclient.UriClientParam
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.getResourceType
-import com.google.android.fhir.implementationguide.IgManager
+import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.search.Search
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.instance.model.api.IIdType
@@ -31,13 +31,13 @@ import timber.log.Timber
 
 internal class FhirEngineDal(
   private val fhirEngine: FhirEngine,
-  private val igManager: IgManager,
+  private val knowledgeManager: KnowledgeManager,
 ) : FhirDal {
 
   override fun read(id: IIdType): IBaseResource = runBlockingOrThrowMainThreadException {
     val clazz = id.getResourceClass()
     if (id.isAbsolute) {
-      igManager
+      knowledgeManager
         .loadResources(
           resourceType = id.resourceType,
           url = "${id.baseUrl}/${id.resourceType}/${id.idPart}"
@@ -51,7 +51,7 @@ internal class FhirEngineDal(
         // https://github.com/google/android-fhir/issues/1920
         // remove when the issue is resolved.
         val searchByNameWorkaround =
-          igManager.loadResources(resourceType = id.resourceType, id = id.toString())
+          knowledgeManager.loadResources(resourceType = id.resourceType, id = id.toString())
         if (searchByNameWorkaround.count() > 1) {
           Timber.w("Found more than one value in the IgManager for the id $id")
         }
@@ -76,7 +76,7 @@ internal class FhirEngineDal(
   override fun search(resourceType: String): Iterable<IBaseResource> =
     runBlockingOrThrowMainThreadException {
       val search = Search(type = ResourceType.fromCode(resourceType))
-      igManager.loadResources(resourceType = resourceType) + fhirEngine.search(search)
+      knowledgeManager.loadResources(resourceType = resourceType) + fhirEngine.search(search)
     }
 
   override fun searchByUrl(resourceType: String, url: String): Iterable<IBaseResource> =
@@ -84,7 +84,7 @@ internal class FhirEngineDal(
       val search = Search(type = ResourceType.fromCode(resourceType))
       search.filter(UriClientParam("url"), { value = url })
       // Searching for knowledge artifact, no need to lookup for fhirEngine
-      igManager.loadResources(resourceType = resourceType, url = url)
+      knowledgeManager.loadResources(resourceType = resourceType, url = url)
     }
 
   @Suppress("UNCHECKED_CAST")

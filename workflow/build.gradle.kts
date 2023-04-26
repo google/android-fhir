@@ -148,7 +148,7 @@ dependencies {
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.xerces)
   implementation(project(":engine"))
-  implementation(project(":implementationguide"))
+  implementation(project(":knowledge"))
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.jsonAssert)
