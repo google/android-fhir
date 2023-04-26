@@ -22,7 +22,6 @@ import androidx.core.text.toSpanned
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.answerExpression
-import com.google.android.fhir.datacapture.extensions.cqfExpression
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -30,8 +29,6 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.Base
-import org.hl7.fhir.r4.model.Element
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -86,7 +83,6 @@ data class QuestionnaireViewItem(
     {
       emptyList()
     },
-  private val resolveCqfExpression: (Element) -> List<Base> = { emptyList() },
   internal val draftAnswer: Any? = null,
   internal val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList()
 ) {
@@ -207,15 +203,12 @@ data class QuestionnaireViewItem(
       }
 
   /**
-   * Fetches the question title that should be displayed to user. The title is evaluated from
-   * cqf-expression on textElement if exists, otherwise it is derived from translatable textElement
-   * property
+   * Fetches the question title that should be displayed to user. The title is fetched from
+   * [Questionnaire.QuestionnaireResponseItemComponent] if exists, otherwise it is derived from
+   * translatable textElement property of [QuestionnaireResponse.QuestionnaireItemComponent]
    */
   internal val questionTitle: Spanned? by lazy {
-    questionnaireItem.textElement
-      .takeIf { it.cqfExpression != null }
-      ?.let { resolveCqfExpression(it).firstOrNull()?.primitiveValue()?.toSpanned() }
-      ?: questionnaireItem.localizedTextSpanned
+    questionnaireResponseItem.text?.toSpanned() ?: questionnaireItem.localizedTextSpanned
   }
 
   /**

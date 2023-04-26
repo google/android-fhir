@@ -2,7 +2,7 @@
   "resourceType": "Questionnaire",
   "item": [
     {
-      "text": "Choose vaccination administered",
+      "text": "Choose an option below",
       "type": "choice",
       "extension": [
         {
@@ -23,26 +23,26 @@
       "answerOption": [
         {
           "valueCoding": {
-            "code": "bcg",
-            "display": "BCG - Bacillus Calmette Guerin Vaccine"
+            "code": "option1",
+            "display": "First Option"
           }
         },
         {
           "valueCoding": {
-            "code": "opv 0",
-            "display": "OPV 0 - Oral Poliovirus Vaccine"
+            "code": "option2",
+            "display": "Second Option"
           }
         },
         {
           "valueCoding": {
-            "code": "penta 1",
-            "display": "Penta 1 - Pentavalent (DPT + Hep B + Hib) Vaccine"
+            "code": "option3",
+            "display": "Third Option"
           }
         },
         {
           "valueCoding": {
-            "code": "pcv 1",
-            "display": "PCV 1 - Pneumococcal Conjugate Vaccine"
+            "code": "option4",
+            "display": "Fourth Option"
           }
         }
       ]
@@ -50,14 +50,14 @@
     {
       "linkId": "2",
       "required": true,
-      "text": "Vaccine Date",
+      "text": "Option Date",
       "_text": {
         "extension": [
           {
             "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
             "valueExpression": {
               "language": "text/fhirpath",
-              "expression": "'Select '+ %resource.descendants().where(linkId = '1').answer.value.display + ' Date'"
+              "expression": "'Provide \"'+ %resource.descendants().where(linkId = '1').answer.value.display + '\" Date'"
             }
           }
         ]

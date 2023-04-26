@@ -537,7 +537,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return options
   }
 
-  internal fun resolveCqfExpression(
+  private fun resolveCqfExpression(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent,
     element: Element,
@@ -696,6 +696,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       } else {
         NotValidated
       }
+
+    // set title dynamically from cqf expression on textElement
+    questionnaireResponseItem.apply {
+      resolveCqfExpression(questionnaireItem, this, questionnaireItem.textElement)
+        .firstOrNull()
+        ?.let { text = it.primitiveValue() }
+    }
+
     val items = buildList {
       // Add an item for the question itself
       add(
@@ -707,9 +715,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             answersChangedCallback = answersChangedCallback,
             resolveAnswerValueSet = { resolveAnswerValueSet(it) },
             resolveAnswerExpression = { resolveAnswerExpression(it) },
-            resolveCqfExpression = {
-              resolveCqfExpression(questionnaireItem, questionnaireResponseItem, it)
-            },
             draftAnswer = draftAnswerMap[questionnaireResponseItem],
             enabledDisplayItems =
               questionnaireItem.item.filter {
@@ -799,7 +804,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
       .map { (questionnaireItem, questionnaireResponseItem) ->
         questionnaireResponseItem.apply {
-          text = questionnaireItem.localizedTextSpanned?.toString()
+          if (text.isNullOrBlank()) text = questionnaireItem.localizedTextSpanned?.toString()
+
           // Nested group items
           item = getEnabledResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
           // Nested question items
