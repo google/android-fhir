@@ -136,11 +136,11 @@ internal object BooleanChoiceViewHolderFactory :
         layoutParams =
           LinearLayout.LayoutParams(
             when (choiceOrientation) {
-              ChoiceOrientationTypes.HORIZONTAL -> 0
+              ChoiceOrientationTypes.HORIZONTAL -> /* width= */ 0
               ChoiceOrientationTypes.VERTICAL -> ViewGroup.LayoutParams.MATCH_PARENT
             },
             ViewGroup.LayoutParams.WRAP_CONTENT,
-            1.0f
+            /* weight= */ 1.0f
           )
       }
 
