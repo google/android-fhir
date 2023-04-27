@@ -97,24 +97,24 @@ object ExpressionEvaluator {
     expression: Expression,
     questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>
   ): List<Base> {
-    val appContext =
-      mutableMapOf<String, Base?>().apply {
-        extractDependentVariables(
-          expression,
-          questionnaire,
-          questionnaireResponse,
-          questionnaireItemParentMap,
-          questionnaireItem,
-          this
-        )
-      }
-    return fhirPathEngine.evaluate(
-      appContext,
-      questionnaireResponse,
-      null,
-      questionnaireResponseItem,
-      expression.expression
-    )
+    val appContext = mutableMapOf<String, Base?>()
+    return with(appContext) {
+      extractDependentVariables(
+        expression,
+        questionnaire,
+        questionnaireResponse,
+        questionnaireItemParentMap,
+        questionnaireItem,
+        appContext
+      )
+      fhirPathEngine.evaluate(
+        appContext,
+        questionnaireResponse,
+        null,
+        questionnaireResponseItem,
+        expression.expression
+      )
+    }
   }
 
   /**
