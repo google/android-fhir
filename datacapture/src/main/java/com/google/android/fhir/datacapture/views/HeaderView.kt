@@ -48,7 +48,8 @@ internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout
       questionnaireItem = questionnaireViewItem.questionnaireItem
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
-    question.updateTextAndVisibility(questionnaireViewItem.questionTitle)
+    // use questionText to ensure cqf-expression derived text is prioritized over localized text
+    question.updateTextAndVisibility(questionnaireViewItem.questionText)
     hint.updateTextAndVisibility(
       questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
     )

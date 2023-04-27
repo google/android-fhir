@@ -4792,7 +4792,7 @@ class QuestionnaireViewModelTest {
         }
       job.join()
 
-      assertThat(descriptionResponseItem!!.questionTitle).isNull()
+      assertThat(descriptionResponseItem!!.questionText).isNull()
       val ageItemUpdated =
         viewModel.questionnaireStateFlow.value.items
           .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-age" }
@@ -4820,7 +4820,7 @@ class QuestionnaireViewModelTest {
           .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-description" }
           .asQuestion()
 
-      assertThat(descriptionItemUpdated.questionTitle.toString())
+      assertThat(descriptionItemUpdated.questionText.toString())
         .isEqualTo("Notes for child of age 2 years")
     }
 
@@ -4875,7 +4875,7 @@ class QuestionnaireViewModelTest {
           .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-description" }
           .asQuestion()
 
-      assertThat(descriptionItem.questionTitle.toString()).isEqualTo("Sum of variables is 3")
+      assertThat(descriptionItem.questionText.toString()).isEqualTo("Sum of variables is 3")
     }
 
   private fun createQuestionnaireViewModel(

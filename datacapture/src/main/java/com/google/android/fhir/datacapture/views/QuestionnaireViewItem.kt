@@ -203,9 +203,9 @@ data class QuestionnaireViewItem(
       }
 
   /**
-   * Fetches the question title that should be displayed to user. The title is fetched from
-   * [Questionnaire.QuestionnaireResponseItemComponent] if exists, otherwise it is derived from
-   * translatable textElement property of [QuestionnaireResponse.QuestionnaireItemComponent]
+   * Fetches the question title that should be displayed to user. The title is first fetched from
+   * [Questionnaire.QuestionnaireResponseItemComponent] (derived from cqf-expression), otherwise it
+   * is derived from [localizedTextSpanned] of [QuestionnaireResponse.QuestionnaireItemComponent]
    */
   internal val questionText: Spanned? by lazy {
     questionnaireResponseItem.text?.toSpanned() ?: questionnaireItem.localizedTextSpanned
@@ -222,17 +222,16 @@ data class QuestionnaireViewItem(
    */
   internal fun hasTheSameItem(other: QuestionnaireViewItem) =
     questionnaireItem === other.questionnaireItem &&
-      questionnaireResponseItem === other.questionnaireResponseItem &&
-      questionTitle == other.questionTitle
+      questionnaireResponseItem === other.questionnaireResponseItem
 
   /**
    * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem] have the
-   * same answers.
+   * same response.
    *
-   * This is useful for determining if the [QuestionnaireViewItem] has outdated answer(s) and
-   * therefore needs to be updated in the [RecyclerView] UI.
+   * This is useful for determining if the [QuestionnaireViewItem] has outdated answer(s) or
+   * question text and therefore needs to be updated in the [RecyclerView] UI.
    */
-  internal fun hasTheSameAnswer(other: QuestionnaireViewItem) =
+  internal fun hasTheSameResponse(other: QuestionnaireViewItem) =
     answers.size == other.answers.size &&
       answers
         .zip(other.answers) { answer, otherAnswer ->
@@ -241,7 +240,8 @@ data class QuestionnaireViewItem(
             answer.value.equalsShallow(otherAnswer.value)
         }
         .all { it } &&
-      draftAnswer == other.draftAnswer
+      draftAnswer == other.draftAnswer &&
+      questionText == other.questionText
 
   /**
    * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem] have the

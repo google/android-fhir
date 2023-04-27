@@ -43,10 +43,10 @@ class BehaviorListViewModel(application: Application) : AndroidViewModel(applica
       R.string.behavior_name_skip_logic,
       "behavior_skip_logic.json"
     ),
-    DYNAMIC_QUESTION_TITLE(
-      R.drawable.ic_dynamic_title_behavior,
-      R.string.behavior_name_dynamic_question_title,
-      "behavior_dynamic_question_title.json"
+    DYNAMIC_QUESTION_TEXT(
+      R.drawable.ic_dynamic_text_behavior,
+      R.string.behavior_name_dynamic_question_text,
+      "behavior_dynamic_question_text.json"
     )
   }
 }
