@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
@@ -199,7 +200,10 @@ object QuestionnaireResponseValidator {
     ) {
       "Mismatching Questionnaire ${questionnaire.url} and QuestionnaireResponse (for Questionnaire ${questionnaireResponse.questionnaire})"
     }
-    checkQuestionnaireResponseItems(questionnaire.item, questionnaireResponse.item)
+    checkQuestionnaireResponseItems(
+      questionnaire.item,
+      questionnaireResponse.copy().apply { packRepeatedGroups() }.item
+    )
   }
 
   private fun checkQuestionnaireResponseItems(

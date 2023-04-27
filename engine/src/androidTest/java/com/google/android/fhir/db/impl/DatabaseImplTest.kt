@@ -29,13 +29,16 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
+import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
+import com.google.android.fhir.testing.assertResourceEquals
+import com.google.android.fhir.testing.readFromFile
+import com.google.android.fhir.testing.readJsonArrayFromFile
 import com.google.android.fhir.versionId
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -91,7 +94,6 @@ class DatabaseImplTest {
 
   private val context: Context = ApplicationProvider.getApplicationContext()
   private lateinit var services: FhirServices
-  private lateinit var testingUtils: TestingUtils
   private lateinit var database: Database
 
   @Before
@@ -110,7 +112,6 @@ class DatabaseImplTest {
         }
         .build()
     database = services.database
-    testingUtils = TestingUtils(services.parser)
   }
 
   @After
@@ -121,10 +122,7 @@ class DatabaseImplTest {
   @Test
   fun insert_shouldInsertResource() = runBlocking {
     database.insert(TEST_PATIENT_2)
-    testingUtils.assertResourceEquals(
-      TEST_PATIENT_2,
-      database.select(ResourceType.Patient, TEST_PATIENT_2_ID)
-    )
+    assertResourceEquals(TEST_PATIENT_2, database.select(ResourceType.Patient, TEST_PATIENT_2_ID))
   }
 
   @Test
@@ -133,14 +131,8 @@ class DatabaseImplTest {
     patients.add(TEST_PATIENT_1)
     patients.add(TEST_PATIENT_2)
     database.insert(*patients.toTypedArray())
-    testingUtils.assertResourceEquals(
-      TEST_PATIENT_1,
-      database.select(ResourceType.Patient, TEST_PATIENT_1_ID)
-    )
-    testingUtils.assertResourceEquals(
-      TEST_PATIENT_2,
-      database.select(ResourceType.Patient, TEST_PATIENT_2_ID)
-    )
+    assertResourceEquals(TEST_PATIENT_1, database.select(ResourceType.Patient, TEST_PATIENT_1_ID))
+    assertResourceEquals(TEST_PATIENT_2, database.select(ResourceType.Patient, TEST_PATIENT_2_ID))
   }
 
   @Test
@@ -149,15 +141,12 @@ class DatabaseImplTest {
     patient.id = TEST_PATIENT_1_ID
     patient.gender = Enumerations.AdministrativeGender.FEMALE
     database.update(patient)
-    testingUtils.assertResourceEquals(
-      patient,
-      database.select(ResourceType.Patient, TEST_PATIENT_1_ID)
-    )
+    assertResourceEquals(patient, database.select(ResourceType.Patient, TEST_PATIENT_1_ID))
   }
 
   @Test
   fun update_existentResourceWithNoChange_shouldNotUpdateResource() = runBlocking {
-    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
     patient.gender = Enumerations.AdministrativeGender.FEMALE
     database.update(patient)
@@ -187,8 +176,8 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun getLocalChanges_withSingleLoaleChange_shouldReturnSingleLocalChanges() = runBlocking {
-    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+  fun getLocalChanges_withSingleLocaleChange_shouldReturnSingleLocalChanges() = runBlocking {
+    val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
     val patientString = services.parser.encodeResourceToString(patient)
     val squashedLocalChange = database.getLocalChange(patient.resourceType, patient.logicalId)
@@ -201,8 +190,8 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun getLocalChanges_withMultipleLoaleChanges_shouldReturnSquashedLocalChanges() = runBlocking {
-    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+  fun getLocalChanges_withMultipleLocaleChanges_shouldReturnSquashedLocalChanges() = runBlocking {
+    val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
 
     patient.gender = Enumerations.AdministrativeGender.FEMALE
@@ -222,21 +211,21 @@ class DatabaseImplTest {
 
   @Test
   fun getLocalChanges_withWrongResourceId_shouldReturnNull() = runBlocking {
-    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
     assertThat(database.getLocalChange(patient.resourceType, "nonexistent_patient")).isNull()
   }
 
   @Test
   fun getLocalChanges_withWrongResourceType_shouldReturnNull() = runBlocking {
-    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
     assertThat(database.getLocalChange(ResourceType.Encounter, patient.logicalId)).isNull()
   }
 
   @Test
   fun clearDatabase_shouldClearAllTablesData() = runBlocking {
-    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
     val patientString = services.parser.encodeResourceToString(patient)
     val squashedLocalChange = database.getLocalChange(patient.resourceType, patient.logicalId)
@@ -246,10 +235,7 @@ class DatabaseImplTest {
       assertThat(LocalChange.Type.from(type.value)).isEqualTo(LocalChange.Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
-    testingUtils.assertResourceEquals(
-      patient,
-      database.select(ResourceType.Patient, patient.logicalId)
-    )
+    assertResourceEquals(patient, database.select(ResourceType.Patient, patient.logicalId))
     database.clearDatabase()
 
     assertThat(database.getLocalChange(patient.resourceType, patient.logicalId)).isNull()
@@ -294,10 +280,7 @@ class DatabaseImplTest {
     database.insertRemote(TEST_PATIENT_2)
 
     assertThat(database.getLocalChange(ResourceType.Patient, TEST_PATIENT_2_ID)).isNull()
-    testingUtils.assertResourceEquals(
-      TEST_PATIENT_2,
-      database.select(ResourceType.Patient, TEST_PATIENT_2_ID)
-    )
+    assertResourceEquals(TEST_PATIENT_2, database.select(ResourceType.Patient, TEST_PATIENT_2_ID))
 
     database.purge(TEST_PATIENT_2.resourceType, TEST_PATIENT_2_ID)
 
@@ -314,10 +297,7 @@ class DatabaseImplTest {
     database.insertRemote(TEST_PATIENT_2)
     assertThat(database.getLocalChange(ResourceType.Patient, TEST_PATIENT_2_ID)).isNull()
 
-    testingUtils.assertResourceEquals(
-      TEST_PATIENT_2,
-      database.select(ResourceType.Patient, TEST_PATIENT_2_ID)
-    )
+    assertResourceEquals(TEST_PATIENT_2, database.select(ResourceType.Patient, TEST_PATIENT_2_ID))
 
     database.purge(TEST_PATIENT_2.resourceType, TEST_PATIENT_2_ID, true)
 
@@ -367,10 +347,7 @@ class DatabaseImplTest {
 
   @Test
   fun select_shouldReturnResource() = runBlocking {
-    testingUtils.assertResourceEquals(
-      TEST_PATIENT_1,
-      database.select(ResourceType.Patient, TEST_PATIENT_1_ID)
-    )
+    assertResourceEquals(TEST_PATIENT_1, database.select(ResourceType.Patient, TEST_PATIENT_1_ID))
   }
 
   @Test
@@ -390,9 +367,9 @@ class DatabaseImplTest {
 
   @Test
   fun update_insertAndUpdate_shouldAddUpdateLocalChange() = runBlocking {
-    var patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    var patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
-    patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_1.json")
+    patient = readFromFile(Patient::class.java, "/update_test_patient_1.json")
     database.update(patient)
     val patientString = services.parser.encodeResourceToString(patient)
     val (_, resourceType, resourceId, _, type, payload, _) =
@@ -483,9 +460,9 @@ class DatabaseImplTest {
 
   @Test
   fun deleteUpdates_shouldDeleteLocalChanges() = runBlocking {
-    var patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    var patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
-    patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_1.json")
+    patient = readFromFile(Patient::class.java, "/update_test_patient_1.json")
     database.update(patient)
     services.parser.encodeResourceToString(patient)
     val localChange =
@@ -499,7 +476,7 @@ class DatabaseImplTest {
 
   @Test
   fun insert_remoteResource_shouldNotInsertLocalChange() = runBlocking {
-    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insertRemote(patient)
     assertThat(
         database
@@ -574,7 +551,7 @@ class DatabaseImplTest {
 
   @Test
   fun insertAll_remoteResources_shouldNotInsertAnyLocalChange() = runBlocking {
-    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insertRemote(patient, TEST_PATIENT_2)
     assertThat(
         database
@@ -665,11 +642,10 @@ class DatabaseImplTest {
 
   @Test
   fun update_remoteResource_readSquashedChanges_shouldReturnPatch() = runBlocking {
-    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insertRemote(patient)
-    val updatedPatient =
-      testingUtils.readFromFile(Patient::class.java, "/update_test_patient_1.json")
-    val updatePatch = testingUtils.readJsonArrayFromFile("/update_patch_1.json")
+    val updatedPatient = readFromFile(Patient::class.java, "/update_test_patient_1.json")
+    val updatePatch = readJsonArrayFromFile("/update_patch_1.json")
     database.update(updatedPatient)
     val (_, resourceType, resourceId, _, type, payload, _) =
       database
@@ -679,7 +655,7 @@ class DatabaseImplTest {
     assertThat(type).isEqualTo(LocalChangeEntity.Type.UPDATE)
     assertThat(resourceId).isEqualTo(patient.logicalId)
     assertThat(resourceType).isEqualTo(patient.resourceType.name)
-    testingUtils.assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
+    assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
   }
 
   @Test
@@ -689,14 +665,14 @@ class DatabaseImplTest {
         versionId = "patient-version-1"
         lastUpdated = Date()
       }
-    var patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    var patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     patient.meta = remoteMeta
     database.insertRemote(patient)
-    patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_1.json")
+    patient = readFromFile(Patient::class.java, "/update_test_patient_1.json")
     database.update(patient)
-    patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_2.json")
+    patient = readFromFile(Patient::class.java, "/update_test_patient_2.json")
     database.update(patient)
-    val updatePatch = testingUtils.readJsonArrayFromFile("/update_patch_2.json")
+    val updatePatch = readJsonArrayFromFile("/update_patch_2.json")
     val (_, resourceType, resourceId, _, type, payload, versionId) =
       database
         .getAllLocalChanges()
@@ -707,7 +683,7 @@ class DatabaseImplTest {
     assertThat(resourceType).isEqualTo(patient.resourceType.name)
     assertThat(resourceType).isEqualTo(patient.resourceType.name)
     assertThat(versionId).isEqualTo(remoteMeta.versionId)
-    testingUtils.assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
+    assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
   }
 
   @Test
@@ -2462,8 +2438,7 @@ class DatabaseImplTest {
 
   @Test
   fun search_nameGivenDuplicate_deduplicatePatient() = runBlocking {
-    var patient: Patient =
-      testingUtils.readFromFile(Patient::class.java, "/patient_name_given_duplicate.json")
+    var patient: Patient = readFromFile(Patient::class.java, "/patient_name_given_duplicate.json")
     database.insertRemote(patient)
     val result =
       database.search<Patient>(

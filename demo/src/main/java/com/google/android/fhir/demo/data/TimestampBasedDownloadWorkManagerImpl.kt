@@ -18,6 +18,7 @@ package com.google.android.fhir.demo.data
 
 import com.google.android.fhir.demo.DemoDataStore
 import com.google.android.fhir.sync.DownloadWorkManager
+import com.google.android.fhir.sync.Request
 import com.google.android.fhir.sync.SyncDataParams
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -43,7 +44,7 @@ class TimestampBasedDownloadWorkManagerImpl(private val dataStore: DemoDataStore
       )
     )
 
-  override suspend fun getNextRequestUrl(): String? {
+  override suspend fun getNextRequest(): Request? {
     var url = urls.poll() ?: return null
 
     val resourceTypeToDownload =
@@ -51,7 +52,7 @@ class TimestampBasedDownloadWorkManagerImpl(private val dataStore: DemoDataStore
     dataStore.getLasUpdateTimestamp(resourceTypeToDownload)?.let {
       url = affixLastUpdatedTimestamp(url, it)
     }
-    return url
+    return Request.of(url)
   }
 
   override suspend fun getSummaryRequestUrls(): Map<ResourceType, String> {

@@ -25,10 +25,17 @@ import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluate
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
 import java.util.Date
+import java.util.UUID
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -664,5 +671,104 @@ class ExpressionEvaluatorTest {
       }
     assertThat(exception.message)
       .isEqualTo("a-birthdate and a-age-years have cyclic dependency in expression based extension")
+  }
+
+  @Test
+  fun `createXFhirQueryFromExpression() should capture all FHIR paths`() {
+    val expression =
+      Expression().apply {
+        this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+        this.expression =
+          "Practitioner?var1={{random}}&var2={{  random   }}&var3={{ random}}&var4={{random }}"
+      }
+
+    val expressionsToEvaluate =
+      ExpressionEvaluator.createXFhirQueryFromExpression(expression, Practitioner())
+
+    assertThat(expressionsToEvaluate).isEqualTo("Practitioner?var1=&var2=&var3=&var4=")
+  }
+
+  @Test
+  fun `createXFhirQueryFromExpression() should evaluate to empty string for field that does not exist in resource`() {
+    val practitioner =
+      Practitioner().apply {
+        id = UUID.randomUUID().toString()
+        active = true
+        addName(HumanName().apply { this.family = "John" })
+      }
+
+    val expression =
+      Expression().apply {
+        this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+        this.expression = "Practitioner?gender={{Practitioner.gender}}"
+      }
+
+    val expressionsToEvaluate =
+      ExpressionEvaluator.createXFhirQueryFromExpression(expression, practitioner)
+    assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
+  }
+
+  @Test
+  fun `createXFhirQueryFromExpression() should evaluate correct expression`() {
+    val practitioner =
+      Practitioner().apply {
+        id = UUID.randomUUID().toString()
+        active = true
+        gender = Enumerations.AdministrativeGender.MALE
+        addName(HumanName().apply { this.family = "John" })
+      }
+
+    val expression =
+      Expression().apply {
+        this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+        this.expression = "Practitioner?gender={{Practitioner.gender}}"
+      }
+
+    val expressionsToEvaluate =
+      ExpressionEvaluator.createXFhirQueryFromExpression(expression, practitioner)
+    assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=male")
+  }
+
+  @Test
+  fun `createXFhirQueryFromExpression() should return empty string if the resource provided does not match the type in the expression`() {
+    val practitioner =
+      Practitioner().apply {
+        id = UUID.randomUUID().toString()
+        active = true
+        gender = Enumerations.AdministrativeGender.MALE
+        addName(HumanName().apply { this.family = "John" })
+      }
+
+    val expression =
+      Expression().apply {
+        this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+        this.expression = "Practitioner?gender={{%patient.gender}}"
+      }
+
+    val expressionsToEvaluate =
+      ExpressionEvaluator.createXFhirQueryFromExpression(expression, practitioner)
+    assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
+  }
+
+  @Test
+  fun `createXFhirQueryFromExpression() should evaluate fhirPath with percent sign`() {
+    val patient =
+      Patient().apply {
+        id = UUID.randomUUID().toString()
+        active = true
+        gender = Enumerations.AdministrativeGender.MALE
+        addName(HumanName().apply { this.family = "John" })
+        maritalStatus = CodeableConcept().addCoding(Coding("theSystem", "theCode", "Single"))
+      }
+
+    val expression =
+      Expression().apply {
+        this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+        this.expression = "Patient?maritalStatus-display={{%patient.maritalStatus.coding.display}}"
+      }
+
+    val expressionsToEvaluate =
+      ExpressionEvaluator.createXFhirQueryFromExpression(expression, patient)
+    assertThat(expressionsToEvaluate).isEqualTo("Patient?maritalStatus-display=Single")
   }
 }
