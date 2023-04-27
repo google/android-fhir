@@ -207,7 +207,7 @@ data class QuestionnaireViewItem(
    * [Questionnaire.QuestionnaireResponseItemComponent] if exists, otherwise it is derived from
    * translatable textElement property of [QuestionnaireResponse.QuestionnaireItemComponent]
    */
-  internal val questionTitle: Spanned? by lazy {
+  internal val questionText: Spanned? by lazy {
     questionnaireResponseItem.text?.toSpanned() ?: questionnaireItem.localizedTextSpanned
   }
 
