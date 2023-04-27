@@ -520,7 +520,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     item: QuestionnaireItemComponent,
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     // Check cache first for database queries
-    val answerExpression = item.answerExpression ?: item.candidateExpression ?: return emptyList()
+    val answerExpression = item.answerExpression ?: return emptyList()
     if (answerExpression.isXFhirQuery && answerExpressionMap.contains(answerExpression.expression)
     ) {
       return answerExpressionMap[answerExpression.expression]!!
