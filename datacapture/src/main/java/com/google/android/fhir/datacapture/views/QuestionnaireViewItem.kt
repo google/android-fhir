@@ -20,7 +20,6 @@ import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.answerExpression
-import com.google.android.fhir.datacapture.extensions.candidateExpression
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -195,9 +194,7 @@ data class QuestionnaireViewItem(
           questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
           !questionnaireItem.answerValueSet.isNullOrEmpty() ->
             resolveAnswerValueSet(questionnaireItem.answerValueSet)
-          (questionnaireItem.answerExpression != null ||
-            questionnaireItem.candidateExpression != null) ->
-            resolveAnswerExpression(questionnaireItem)
+          questionnaireItem.answerExpression != null -> resolveAnswerExpression(questionnaireItem)
           else -> emptyList()
         }
       }

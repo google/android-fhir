@@ -1867,7 +1867,7 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `candidateExpression should return expression`() {
-    val questionItem =
+    val questionnaire =
       Questionnaire()
         .addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
@@ -1886,13 +1886,13 @@ class MoreQuestionnaireItemComponentsTest {
           }
         )
 
-    assertThat(questionItem.itemFirstRep.candidateExpression!!.expression)
+    assertThat(questionnaire.itemFirstRep.candidateExpression!!.expression)
       .isEqualTo("%resource.item.where(linkId='diseases').value")
   }
 
   @Test
   fun `candidateExpression should return null for missing extension`() {
-    val questionItem =
+    val questionnaire =
       Questionnaire()
         .addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
@@ -1911,7 +1911,7 @@ class MoreQuestionnaireItemComponentsTest {
           }
         )
 
-    assertThat(questionItem.itemFirstRep.candidateExpression).isNull()
+    assertThat(questionnaire.itemFirstRep.candidateExpression).isNull()
   }
 
   @Test
