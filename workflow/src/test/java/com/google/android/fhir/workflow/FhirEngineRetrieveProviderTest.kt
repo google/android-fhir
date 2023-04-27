@@ -21,7 +21,7 @@ import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.implementationguide.IgManager
+import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.android.fhir.workflow.testing.Loadable
 import com.google.common.truth.Truth.assertThat
@@ -62,7 +62,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
           FhirEngineTerminologyProvider(
             FhirContext.forR4Cached(),
             fhirEngine,
-            IgManager.createInMemory(context)
+            KnowledgeManager.createInMemory(context)
           )
         isExpandValueSets = true
       }
