@@ -41,16 +41,20 @@ class CatalogApplication : Application(), DataCaptureConfig.Provider {
 
     dataCaptureConfig = DataCaptureConfig(xFhirQueryResolver = { fhirEngine.search(it) })
 
-    this.assets
-      .open("resource_data_bundle.json")
-      .bufferedReader()
-      .use { it.readText() }
-      .let { FhirContext.forR4Cached().newJsonParser().parseResource(it) as Bundle }
-      .entry
-      .map { it.resource }
-      .also { resources ->
-        CoroutineScope(Dispatchers.IO).launch { fhirEngine.create(*resources.toTypedArray()) }
-      }
+    CoroutineScope(Dispatchers.IO).launch {
+      assets
+        .open("resource_data_bundle.json")
+        .bufferedReader()
+        .use { bufferedReader -> bufferedReader.readText() }
+        .let { stringValue ->
+          FhirContext.forR4Cached().newJsonParser().parseResource(stringValue) as Bundle
+        }
+        .entry
+        .map { bundleEntryComponent -> bundleEntryComponent.resource }
+        .let { resources ->
+          fhirEngine.create(*resources.toTypedArray())
+        }
+    }
   }
 
   override fun getDataCaptureConfig(): DataCaptureConfig = dataCaptureConfig
