@@ -319,7 +319,11 @@ internal class ResourceIndexer(
       "code",
       "Coding" -> {
         val coding = value as ICoding
-        listOf(TokenIndex(searchParam.name, searchParam.path, coding.system ?: "", coding.code))
+        if (coding.code != null) {
+          listOf(TokenIndex(searchParam.name, searchParam.path, coding.system ?: "", coding.code))
+        } else {
+          listOf()
+        }
       }
       else -> listOf()
     }
