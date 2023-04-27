@@ -1761,7 +1761,7 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient)
         .apply {
-          has<Condition>(Condition.SUBJECT) {
+          has(resourceType = ResourceType.Condition, referenceParam = Condition.SUBJECT) {
             filter(
               Condition.CODE,
               { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) }

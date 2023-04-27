@@ -21,6 +21,7 @@
 
   <application
         android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar"
+        android:name=".DataCaptureTestApplication"
     >
     <activity android:name=".TestActivity" />
   </application>

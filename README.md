@@ -46,9 +46,6 @@ If you want to provide any feedback or discuss use cases you can:
 * start a new topic in [android](https://chat.fhir.org/#narrow/stream/276344-android), [questionnaire](https://chat.fhir.org/#narrow/stream/179255-questionnaire), [implementers](https://chat.fhir.org/#narrow/stream/179166-implementers), or [WHO SMART guidelines](https://chat.fhir.org/#narrow/stream/310477-who-smart-guidelines) stream in the [FHIR Zulip chat](https://chat.fhir.org/)
 
 ## Disclaimer
-
-This is not an officially supported Google product.
-
 This product is not intended to be a medical device.
 
 HL7®, and FHIR® are the registered trademarks of Health Level Seven International and their use of

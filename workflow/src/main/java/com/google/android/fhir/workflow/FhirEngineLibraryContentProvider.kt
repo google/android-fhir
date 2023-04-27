@@ -16,17 +16,26 @@
 
 package com.google.android.fhir.workflow
 
+import com.google.android.fhir.knowledge.KnowledgeManager
 import org.hl7.elm.r1.VersionedIdentifier
 import org.hl7.fhir.instance.model.api.IBaseResource
-import org.hl7.fhir.r4.model.Library
 import org.opencds.cqf.cql.evaluator.cql2elm.content.fhir.BaseFhirLibrarySourceProvider
 import org.opencds.cqf.cql.evaluator.fhir.adapter.r4.AdapterFactory
 
-internal class FhirEngineLibraryContentProvider(adapterFactory: AdapterFactory) :
-  BaseFhirLibrarySourceProvider(adapterFactory) {
-  val libs = mutableMapOf<String, Library>()
+internal class FhirEngineLibraryContentProvider(
+  adapterFactory: AdapterFactory,
+  private val knowledgeManager: KnowledgeManager,
+) : BaseFhirLibrarySourceProvider(adapterFactory) {
 
   override fun getLibrary(libraryIdentifier: VersionedIdentifier): IBaseResource? {
-    return libs[libraryIdentifier.id]
+    return runBlockingOrThrowMainThreadException {
+      knowledgeManager
+        .loadResources(
+          resourceType = "Library",
+          name = libraryIdentifier.id,
+          version = libraryIdentifier.version
+        )
+        .firstOrNull()
+    }
   }
 }

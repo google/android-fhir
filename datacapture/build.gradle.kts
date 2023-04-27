@@ -54,6 +54,8 @@ android {
   testOptions { animationsDisabled = true }
 }
 
+afterEvaluate { configureFirebaseTestLab() }
+
 configurations { all { exclude(module = "xpp3") } }
 
 dependencies {
@@ -93,6 +95,7 @@ dependencies {
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)
+  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   testImplementation(Dependencies.Kotlin.kotlinTestJunit)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.mockitoInline)
