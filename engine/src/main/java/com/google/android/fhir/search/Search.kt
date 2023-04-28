@@ -42,3 +42,11 @@ suspend fun FhirEngine.search(resourceType: ResourceType, init: Search.() -> Uni
   search.init()
   return this.search(search)
 }
+
+suspend inline fun <reified R : Resource> FhirEngine.searchWithRevInclude(
+  init: Search.() -> Unit
+): Map<R, Map<ResourceType, List<Resource>>> {
+  val search = Search(type = R::class.java.newInstance().resourceType)
+  search.init()
+  return this.searchWithRevInclude(search)
+}

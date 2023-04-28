@@ -55,6 +55,28 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
   return getQuery(isCount, null)
 }
 
+internal fun Search.getIncludeQuery(includeIds: List<String>): SearchQuery {
+  val match =
+    revIncludeMap
+      .map {
+        " ( a.resourceType = '${it.key}' and a.index_name IN (${it.value.joinToString { "\'${it.paramName}\'" }}) ) "
+      }
+      .joinToString(separator = "OR")
+
+  return SearchQuery(
+    query =
+      """
+    SELECT  a.index_value, b.serializedResource
+    FROM ReferenceIndexEntity a 
+    JOIN  ResourceEntity b
+    ON  a.resourceUuid = b.resourceUuid
+    AND  a.index_value IN( ${includeIds.joinToString()} ) 
+    AND ($match)
+    """.trimIndent(),
+    args = listOf()
+  )
+}
+
 internal fun Search.getQuery(
   isCount: Boolean = false,
   nestedContext: NestedContext? = null
@@ -168,22 +190,22 @@ internal fun Search.getQuery(
         $limitStatement)
         """
         }
-        revIncludeMap.isNotEmpty() -> {
-          """
-        select serializedResource from ResourceEntity where resourceUuid in (
-        with UUIDS as ( select '${type.name}/' || a.resourceId from ResourceEntity a 
-        $sortJoinStatement
-        WHERE a.resourceType = ?
-        $filterStatement
-        $sortOrderStatement
-        $limitStatement
-        )
-        Select resourceUuid
-        FROM ResourceEntity
-        WHERE '${type.name}/' || resourceId in UUIDS ${revIncludeMap.toSQLQuery()}
-        )
-        """.trimIndent()
-        }
+        //        revIncludeMap.isNotEmpty() -> {
+        //          """
+        //        select serializedResource from ResourceEntity where resourceUuid in (
+        //        with UUIDS as ( select '${type.name}/' || a.resourceId from ResourceEntity a
+        //        $sortJoinStatement
+        //        WHERE a.resourceType = ?
+        //        $filterStatement
+        //        $sortOrderStatement
+        //        $limitStatement
+        //        )
+        //        Select resourceUuid
+        //        FROM ResourceEntity
+        //        WHERE '${type.name}/' || resourceId in UUIDS ${revIncludeMap.toSQLQuery()}
+        //        )
+        //        """.trimIndent()
+        //        }
         else ->
           """ 
         SELECT a.serializedResource

@@ -27,6 +27,8 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
+import com.google.android.fhir.search.getIncludeQuery
+import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
 import java.time.OffsetDateTime
@@ -58,6 +60,29 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun <R : Resource> search(search: Search): List<R> {
     return search.execute(database)
+  }
+
+  override suspend fun <R : Resource> searchWithRevInclude(
+    search: Search
+  ): Map<R, Map<ResourceType, List<Resource>>> {
+    val baseResources = database.search<R>(search.getQuery()) // .subList(0,2)
+    val includedResources =
+      database.searchRev<R>(
+        search.getIncludeQuery(
+          includeIds = baseResources.map { "\'${it.resourceType}/${it.logicalId}\'" }
+        )
+      )
+    val resultMap = mutableMapOf<R, Map<ResourceType, List<Resource>>>()
+    baseResources.forEach { patient ->
+      resultMap[patient] =
+        includedResources
+          .filter {
+            it.idOfBaseResourceOnWhichThisMatched == "${patient.fhirType()}/${patient.logicalId}"
+          }
+          .map { it.resource }
+          .groupBy { it.resourceType }
+    }
+    return resultMap
   }
 
   override suspend fun count(search: Search): Long {

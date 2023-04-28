@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.db
 
+import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -93,6 +94,8 @@ internal interface Database {
   suspend fun delete(type: ResourceType, id: String)
 
   suspend fun <R : Resource> search(query: SearchQuery): List<R>
+
+  suspend fun <R : Resource> searchRev(query: SearchQuery): List<IndexedIdAndResource>
 
   suspend fun count(query: SearchQuery): Long
 

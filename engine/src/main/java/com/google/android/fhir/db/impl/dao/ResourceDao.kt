@@ -17,6 +17,7 @@
 package com.google.android.fhir.db.impl.dao
 
 import androidx.annotation.VisibleForTesting
+import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -150,6 +151,11 @@ internal abstract class ResourceDao {
 
   @RawQuery abstract suspend fun getResources(query: SupportSQLiteQuery): List<String>
 
+  @RawQuery
+  abstract suspend fun getResourcesRev(
+    query: SupportSQLiteQuery
+  ): List<IndexedIdAndSerializedResource>
+
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
   private suspend fun insertResource(resource: Resource): String {
@@ -279,3 +285,13 @@ internal abstract class ResourceDao {
     }
   }
 }
+
+internal data class IndexedIdAndSerializedResource(
+  @ColumnInfo(name = "index_value") val idOfBaseResourceOnWhichThisMatched: String,
+  val serializedResource: String
+)
+
+internal data class IndexedIdAndResource(
+  val idOfBaseResourceOnWhichThisMatched: String,
+  val resource: Resource
+)
