@@ -1,0 +1,24 @@
+{
+  "resourceType": "Bundle",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "Female-Patient-Example",
+        "active": true,
+        "name": [
+          {
+            "use": "official",
+            "family": "Kensington",
+            "given": [
+              "Amelia"
+            ]
+          }
+        ],
+        "gender": "female",
+        "birthDate": "1986-03-18",
+        "deceasedBoolean": false
+      }
+    }
+  ]
+}

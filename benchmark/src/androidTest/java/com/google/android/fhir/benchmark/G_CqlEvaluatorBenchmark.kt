@@ -24,7 +24,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.implementationguide.IgManager
+import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.workflow.FhirOperatorBuilder
 import com.google.common.truth.Truth.assertThat
 import java.io.File
@@ -57,14 +57,14 @@ class G_CqlEvaluatorBenchmark {
         val patientImmunizationHistory =
           jsonParser.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
         val fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
-        val igManager = IgManager.createInMemory(context)
+        val knowledgeManager = KnowledgeManager.createInMemory(context)
         val lib = jsonParser.parseResource(open("/immunity-check/ImmunityCheck.json")) as Library
 
         runBlocking {
           for (entry in patientImmunizationHistory.entry) {
             fhirEngine.create(entry.resource)
           }
-          igManager.install(
+          knowledgeManager.install(
             File(context.filesDir, lib.name).apply {
               writeText(jsonParser.encodeResourceToString(lib))
             }
@@ -74,7 +74,7 @@ class G_CqlEvaluatorBenchmark {
         FhirOperatorBuilder(context)
           .withFhirContext(fhirContext)
           .withFhirEngine(fhirEngine)
-          .withIgManager(igManager)
+          .withIgManager(knowledgeManager)
           .build()
       }
 

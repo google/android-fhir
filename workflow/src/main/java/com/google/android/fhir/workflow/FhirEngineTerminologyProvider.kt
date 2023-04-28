@@ -19,7 +19,7 @@ package com.google.android.fhir.workflow
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.db.ResourceNotFoundException
-import com.google.android.fhir.implementationguide.IgManager
+import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.search.search
 import org.hl7.fhir.r4.model.CodeSystem
 import org.hl7.fhir.r4.model.Resource
@@ -35,7 +35,7 @@ import org.opencds.cqf.cql.evaluator.engine.util.ValueSetUtil
 internal class FhirEngineTerminologyProvider(
   private val fhirContext: FhirContext,
   private val fhirEngine: FhirEngine,
-  private val igManager: IgManager,
+  private val knowledgeManager: KnowledgeManager,
 ) : TerminologyProvider {
 
   companion object {
@@ -99,9 +99,9 @@ internal class FhirEngineTerminologyProvider(
 
   private suspend fun searchByUrl(url: String?): List<ValueSet> {
     if (url == null) return emptyList()
-    return igManager.loadResources(resourceType = ResourceType.ValueSet.name, url = url).map {
-      it as ValueSet
-    } + fhirEngine.search { filter(ValueSet.URL, { value = url }) }
+    return knowledgeManager
+      .loadResources(resourceType = ResourceType.ValueSet.name, url = url)
+      .map { it as ValueSet } + fhirEngine.search { filter(ValueSet.URL, { value = url }) }
   }
 
   private suspend fun searchByIdentifier(identifier: String?): List<ValueSet> {
