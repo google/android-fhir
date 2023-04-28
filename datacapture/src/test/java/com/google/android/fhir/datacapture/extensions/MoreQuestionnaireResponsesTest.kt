@@ -421,8 +421,9 @@ class MoreQuestionnaireResponsesTest {
         )
         addItem(
           QuestionnaireItemComponent().apply {
-            linkId = "non-repeated-group-2"
+            linkId = "repeated-group-2"
             type = Questionnaire.QuestionnaireItemType.GROUP
+            repeats = true
             addItem(
               QuestionnaireItemComponent().apply {
                 linkId = "nested-question-2"
@@ -438,7 +439,7 @@ class MoreQuestionnaireResponsesTest {
       QuestionnaireResponse().apply {
         addItem(
           QuestionnaireResponseItemComponent().apply {
-            linkId = "repeated-group-1"
+            linkId = "non-repeated-group-1"
             addAnswer(
               QuestionnaireResponseItemAnswerComponent().apply {
                 addItem(
@@ -465,6 +466,18 @@ class MoreQuestionnaireResponsesTest {
                       QuestionnaireResponseItemAnswerComponent().apply {
                         value = BooleanType(false)
                       }
+                    )
+                  }
+                )
+              }
+            )
+            addAnswer(
+              QuestionnaireResponseItemAnswerComponent().apply {
+                addItem(
+                  QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-question-2"
+                    addAnswer(
+                      QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
                     )
                   }
                 )
@@ -477,7 +490,7 @@ class MoreQuestionnaireResponsesTest {
       QuestionnaireResponse().apply {
         addItem(
           QuestionnaireResponseItemComponent().apply {
-            linkId = "repeated-group-1"
+            linkId = "non-repeated-group-1"
             addAnswer(
               QuestionnaireResponseItemAnswerComponent().apply {
                 addItem(
@@ -495,17 +508,24 @@ class MoreQuestionnaireResponsesTest {
         addItem(
           QuestionnaireResponseItemComponent().apply {
             linkId = "repeated-group-2"
-            addAnswer(
-              QuestionnaireResponseItemAnswerComponent().apply {
-                addItem(
-                  QuestionnaireResponseItemComponent().apply {
-                    linkId = "nested-question-2"
-                    addAnswer(
-                      QuestionnaireResponseItemAnswerComponent().apply {
-                        value = BooleanType(false)
-                      }
-                    )
-                  }
+            addItem(
+              QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-question-2"
+                addAnswer(
+                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(false) }
+                )
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "repeated-group-2"
+            addItem(
+              QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-question-2"
+                addAnswer(
+                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
                 )
               }
             )

@@ -434,6 +434,33 @@ internal val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
   }
 
 /**
+ * Returns a list of values built from the elements of `this` and the
+ * `questionnaireResponseItemList` with the same linkId using the provided `transform` function
+ * applied to each pair of questionnaire item and questionnaire response item.
+ *
+ * It is assumed that the linkIds are unique in `this` and in `questionnaireResponseItemList`.
+ *
+ * Although linkIds may appear more than once in questionnaire response, they would not appear more
+ * than once within a list of questionnaire response items sharing the same parent.
+ */
+inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLinkId(
+  questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+  transform:
+    (
+      Questionnaire.QuestionnaireItemComponent,
+      QuestionnaireResponse.QuestionnaireResponseItemComponent
+    ) -> T
+): List<T> {
+  val linkIdToQuestionnaireResponseItemMap = questionnaireResponseItemList.associateBy { it.linkId }
+  return mapNotNull { questionnaireItem ->
+    linkIdToQuestionnaireResponseItemMap[questionnaireItem.linkId]?.let { questionnaireResponseItem
+      ->
+      transform(questionnaireItem, questionnaireResponseItem)
+    }
+  }
+}
+
+/**
  * Whether the corresponding [QuestionnaireResponse.QuestionnaireResponseItemComponent] should have
  * [QuestionnaireResponse.QuestionnaireResponseItemComponent]s nested under
  * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]s.
