@@ -26,7 +26,7 @@ import androidx.annotation.WorkerThread
 interface Authenticator {
   /** @return Access token for the engine to make requests on user's behalf. */
   @WorkerThread fun getAccessToken(): String
-  @WorkerThread fun getSignatureHeader(): String
+  @WorkerThread fun getSignatureHeader(accessToken:String): String
   @WorkerThread fun getTimeStampHeader(): String
   @WorkerThread fun getKeyIdHeader(): String
 }

@@ -66,7 +66,7 @@ internal interface RemoteFhirService : DataSource {
               addInterceptor(
                 Interceptor { chain: Interceptor.Chain ->
                   val accessToken = it.getAccessToken()
-                  val signatureHeader = it.getSignatureHeader()
+                  val signatureHeader = it.getSignatureHeader(accessToken)
                   val timestampHeader = it.getTimeStampHeader()
                   val keyIdHeader = it.getKeyIdHeader()
                   val request =
