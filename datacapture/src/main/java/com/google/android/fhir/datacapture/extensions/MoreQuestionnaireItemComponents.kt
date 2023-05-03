@@ -94,6 +94,9 @@ internal const val EXTENSION_ENABLE_WHEN_EXPRESSION_URL: String =
 internal const val EXTENSION_ANSWER_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression"
 
+internal const val EXTENSION_CANDIDATE_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression"
+
 internal const val EXTENSION_CHOICE_COLUMN_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
 
@@ -531,6 +534,12 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
 internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expression?
   get() =
     ToolingExtensions.getExtension(this, EXTENSION_ANSWER_EXPRESSION_URL)?.value?.let {
+      it.castToExpression(it)
+    }
+
+internal val Questionnaire.QuestionnaireItemComponent.candidateExpression: Expression?
+  get() =
+    ToolingExtensions.getExtension(this, EXTENSION_CANDIDATE_EXPRESSION_URL)?.value?.let {
       it.castToExpression(it)
     }
 
