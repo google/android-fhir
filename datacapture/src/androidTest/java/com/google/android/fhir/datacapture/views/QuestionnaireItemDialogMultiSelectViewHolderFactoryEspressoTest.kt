@@ -41,6 +41,7 @@ import com.google.android.fhir.datacapture.utilities.assertQuestionnaireResponse
 import com.google.android.fhir.datacapture.utilities.clickOnText
 import com.google.android.fhir.datacapture.utilities.clickOnTextInDialog
 import com.google.android.fhir.datacapture.utilities.endIconClickInTextInputLayout
+import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDialogSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
@@ -369,6 +370,53 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     runOnUI { viewHolder.bind(questionnaireViewItem) }
 
     onView(withId(R.id.error_text_at_header)).check(matches(not(isDisplayed())))
+  }
+
+  @Test
+  fun multipleChoice_doNotShowErrorInitially() {
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5").apply {
+          required = true
+        },
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, answers, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireViewItem) }
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error
+      )
+      .isNull()
+  }
+
+  @Test
+  fun multipleChoice_unselectSelectedAnswer_showErrorWhenNoAnswerIsSelected() {
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        answerOptions(false, "Coding 1", "Coding 2").apply { required = true },
+        responseOptions(),
+        validationResult = Invalid(listOf("Missing answer for required field.")),
+        answersChangedCallback = { _, _, answers, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireViewItem) }
+
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
+    clickOnTextInDialog("Coding 2")
+    clickOnText("Save")
+    assertDisplayedText().isEqualTo("Coding 2")
+
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
+    clickOnTextInDialog("Coding 2")
+    clickOnText("Save")
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error
+      )
+      .isEqualTo("Missing answer for required field.")
   }
 
   /** Method to run code snippet on UI/main thread */

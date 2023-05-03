@@ -89,10 +89,11 @@ private fun unpackRepeatedGroups(
   questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
   questionnaireResponseItems: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
 ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
-  return questionnaireItems.zip(questionnaireResponseItems).flatMap {
-    (questionnaireItem, questionnaireResponseItem) ->
-    unpackRepeatedGroups(questionnaireItem, questionnaireResponseItem)
-  }
+  return questionnaireItems
+    .zipByLinkId(questionnaireResponseItems) { questionnaireItem, questionnaireResponseItem ->
+      unpackRepeatedGroups(questionnaireItem, questionnaireResponseItem)
+    }
+    .flatten()
 }
 
 private fun unpackRepeatedGroups(

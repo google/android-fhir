@@ -49,8 +49,9 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.launch
 
 internal class OptionSelectDialogFragment(
-  val title: CharSequence,
-  val config: Config,
+  private val title: CharSequence,
+  private val config: Config,
+  private val selectedOptions: SelectedOptions
 ) : DialogFragment() {
 
   /** Configures this [OptionSelectDialogFragment]. */
@@ -92,11 +93,7 @@ internal class OptionSelectDialogFragment(
 
     val adapter = OptionSelectAdapter(multiSelectEnabled = config.multiSelect)
     recyclerView.adapter = adapter
-    lifecycleScope.launch {
-      viewModel.getSelectedOptionsFlow(questionLinkId).collect { selectedOptions ->
-        adapter.submitList(selectedOptions.toOptionRows())
-      }
-    }
+    adapter.submitList(selectedOptions.toOptionRows())
 
     val dialog =
       MaterialAlertDialogBuilder(requireContext()).setView(view).create().apply {

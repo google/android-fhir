@@ -94,6 +94,9 @@ internal const val EXTENSION_ENABLE_WHEN_EXPRESSION_URL: String =
 internal const val EXTENSION_ANSWER_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression"
 
+internal const val EXTENSION_CANDIDATE_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression"
+
 internal const val EXTENSION_CHOICE_COLUMN_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
 
@@ -434,6 +437,33 @@ internal val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
   }
 
 /**
+ * Returns a list of values built from the elements of `this` and the
+ * `questionnaireResponseItemList` with the same linkId using the provided `transform` function
+ * applied to each pair of questionnaire item and questionnaire response item.
+ *
+ * It is assumed that the linkIds are unique in `this` and in `questionnaireResponseItemList`.
+ *
+ * Although linkIds may appear more than once in questionnaire response, they would not appear more
+ * than once within a list of questionnaire response items sharing the same parent.
+ */
+internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLinkId(
+  questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+  transform:
+    (
+      Questionnaire.QuestionnaireItemComponent,
+      QuestionnaireResponse.QuestionnaireResponseItemComponent
+    ) -> T
+): List<T> {
+  val linkIdToQuestionnaireResponseItemMap = questionnaireResponseItemList.associateBy { it.linkId }
+  return mapNotNull { questionnaireItem ->
+    linkIdToQuestionnaireResponseItemMap[questionnaireItem.linkId]?.let { questionnaireResponseItem
+      ->
+      transform(questionnaireItem, questionnaireResponseItem)
+    }
+  }
+}
+
+/**
  * Whether the corresponding [QuestionnaireResponse.QuestionnaireResponseItemComponent] should have
  * [QuestionnaireResponse.QuestionnaireResponseItemComponent]s nested under
  * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]s.
@@ -531,6 +561,12 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
 internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expression?
   get() =
     ToolingExtensions.getExtension(this, EXTENSION_ANSWER_EXPRESSION_URL)?.value?.let {
+      it.castToExpression(it)
+    }
+
+internal val Questionnaire.QuestionnaireItemComponent.candidateExpression: Expression?
+  get() =
+    ToolingExtensions.getExtension(this, EXTENSION_CANDIDATE_EXPRESSION_URL)?.value?.let {
       it.castToExpression(it)
     }
 
