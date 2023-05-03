@@ -443,7 +443,7 @@ internal val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
  * Although linkIds may appear more than once in questionnaire response, they would not appear more
  * than once within a list of questionnaire response items sharing the same parent.
  */
-inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLinkId(
+internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLinkId(
   questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
   transform:
     (
