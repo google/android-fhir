@@ -22,7 +22,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.implementationguide.IgManager
+import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.android.fhir.workflow.testing.CqlBuilder
 import com.google.common.truth.Truth.assertThat
@@ -51,7 +51,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
   private lateinit var fhirOperator: FhirOperator
 
   private val context: Context = ApplicationProvider.getApplicationContext()
-  private val igManager = IgManager.createInMemory(context)
+  private val knowledgeManager = KnowledgeManager.createInMemory(context)
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
   private val jsonParser = fhirContext.newJsonParser()
 
@@ -64,7 +64,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
   @Before
   fun setUp() = runBlocking {
     fhirEngine = FhirEngineProvider.getInstance(context)
-    fhirOperator = FhirOperator(fhirContext, fhirEngine, igManager)
+    fhirOperator = FhirOperator(fhirContext, fhirEngine, knowledgeManager)
   }
 
   /**
@@ -110,8 +110,8 @@ class FhirOperatorLibraryEvaluateJavaTest {
     }
 
     // Load Library that checks if Patient has taken a vaccine
-    igManager.install(writeToFile(load("/immunity-check/ImmunityCheck.json") as Library))
-    igManager.install(writeToFile(load("/immunity-check/FhirHelpers.json") as Library))
+    knowledgeManager.install(writeToFile(load("/immunity-check/ImmunityCheck.json") as Library))
+    knowledgeManager.install(writeToFile(load("/immunity-check/FhirHelpers.json") as Library))
 
     // Evaluates a specific Patient
     val results =
@@ -136,7 +136,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
 
     val library = CqlBuilder.assembleFhirLib(cql, null, null, "TestGetName", "1.0.0")
 
-    igManager.install(writeToFile(library))
+    knowledgeManager.install(writeToFile(library))
 
     // Evaluates expression without any extra data
     val results = fhirOperator.evaluateLibrary(library.url, setOf("GetName")) as Parameters
@@ -158,7 +158,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
 
     val library = CqlBuilder.assembleFhirLib(cql, null, null, "TestSumWithParams", "1.0.0")
 
-    igManager.install(writeToFile(library))
+    knowledgeManager.install(writeToFile(library))
 
     val params =
       Parameters().apply {

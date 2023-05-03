@@ -126,7 +126,9 @@ internal object DateTimePickerViewHolderFactory :
         clearPreviousState()
         header.bind(questionnaireViewItem)
         with(dateInputLayout) {
-          hint = canonicalizedDatePattern
+          // Use 'mm' for month instead of 'MM' to avoid confusion.
+          // See https://developer.android.com/reference/kotlin/java/text/SimpleDateFormat.
+          hint = canonicalizedDatePattern.lowercase()
           when {
             questionnaireViewItem.markOptionalQuestionText ->
               // Show the R.string.optional_helper_text as the helper text only if the question text

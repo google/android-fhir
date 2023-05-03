@@ -113,7 +113,9 @@ internal object DatePickerViewHolderFactory :
         clearPreviousState()
         header.bind(questionnaireViewItem)
         with(textInputLayout) {
-          hint = canonicalizedDatePattern
+          // Use 'mm' for month instead of 'MM' to avoid confusion.
+          // See https://developer.android.com/reference/kotlin/java/text/SimpleDateFormat.
+          hint = canonicalizedDatePattern.lowercase()
           when {
             questionnaireViewItem.markOptionalQuestionText ->
               // Show the R.string.optional_helper_text as the helper text only if the question text
@@ -343,6 +345,8 @@ internal fun Int.length() =
 internal fun invalidDateErrorText(context: Context, formatPattern: String) =
   context.getString(
     R.string.date_format_validation_error_msg,
-    formatPattern,
+    // Use 'mm' for month instead of 'MM' to avoid confusion.
+    // See https://developer.android.com/reference/kotlin/java/text/SimpleDateFormat.
+    formatPattern.lowercase(),
     formatPattern.replace("dd", "31").replace("MM", "01").replace("yyyy", "2023")
   )

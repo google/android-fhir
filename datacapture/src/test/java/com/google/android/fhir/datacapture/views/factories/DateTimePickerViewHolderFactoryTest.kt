@@ -81,6 +81,19 @@ class DateTimePickerViewHolderFactoryTest {
   }
 
   @Test
+  fun `show dateFormat label in lowerCase`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+    assertThat(viewHolder.dateInputView.hint.toString()).isEqualTo("mm/dd/yyyy")
+  }
+
+  @Test
   fun shouldSetDateTimeInput() {
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -414,7 +427,24 @@ class DateTimePickerViewHolderFactoryTest {
     viewHolder.bind(itemViewItem)
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
-      .isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/31/2023)")
+      .isEqualTo("Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)")
+  }
+
+  @Test
+  fun `show dateFormat in lowerCase in the error message`() {
+    val itemViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        draftAnswer = "11/19/202"
+      )
+
+    viewHolder.bind(itemViewItem)
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
+      .isEqualTo("Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)")
   }
 
   @Test

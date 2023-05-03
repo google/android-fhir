@@ -303,8 +303,8 @@ class QuestionnaireFragment : Fragment() {
       args.add(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI to questionnaireResponseUri)
     }
 
-    fun setQuestionnaireResourceContext(questionnaireResourceContext: String) = apply {
-      args.add(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING to questionnaireResourceContext)
+    fun setQuestionnaireLaunchContext(questionnaireLaunchContext: String) = apply {
+      args.add(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING to questionnaireLaunchContext)
     }
 
     /**
