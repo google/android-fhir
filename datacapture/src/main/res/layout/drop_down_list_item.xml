@@ -20,6 +20,7 @@
         android:id="@+id/answer_option_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:drawablePadding="@dimen/icon_drawable_padding"
         android:padding="@dimen/drop_down_padding"
         android:textAppearance="?attr/questionnaireDropDownTextStyle"
     />
