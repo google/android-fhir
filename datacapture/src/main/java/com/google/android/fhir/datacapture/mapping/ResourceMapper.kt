@@ -303,6 +303,11 @@ object ResourceMapper {
     profileLoader: ProfileLoader
   ) {
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
+    // Questionnaire item with type = group and repeats = true can have multiple questionnaire
+    // response item components for the same
+    // questionnaire item linkId. Therefore, it must traverse the structure based on the linkId
+    // present in the response item component to avoid missing any remaining response items with the
+    // same linkId.
     while (questionnaireResponseItemListIterator.hasNext()) {
       val currentQuestionnaireResponseItem = questionnaireResponseItemListIterator.next()
       val currentQuestionnaireItem =

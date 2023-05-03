@@ -1245,7 +1245,7 @@ class ResourceMapperTest {
 
     val bundle = ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse)
 
-    val observation1 = bundle.entry[0].resource as Observation
+    val observation1 = bundle.entry.first().resource as Observation
     assertThat(observation1.valueCodeableConcept.coding[0].code).isEqualTo("test-coding-code-1")
     assertThat(observation1.valueCodeableConcept.coding[0].display)
       .isEqualTo("Test Coding Display 1")
