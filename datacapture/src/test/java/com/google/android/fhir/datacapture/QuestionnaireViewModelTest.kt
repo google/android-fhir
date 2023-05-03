@@ -27,6 +27,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_READ_ONLY
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
@@ -35,6 +36,7 @@ import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
 import com.google.android.fhir.datacapture.extensions.EXTENSION_CALCULATED_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ENABLE_WHEN_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ENTRY_MODE_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_HIDDEN_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
@@ -67,12 +69,15 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
@@ -768,7 +773,7 @@ class QuestionnaireViewModelTest {
       }
     val questionnaireResponse =
       QuestionnaireResponse().apply {
-        id = "a-questionnaire"
+        id = "a-questionnaire-response"
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
@@ -785,6 +790,65 @@ class QuestionnaireViewModelTest {
                         value = StringType("a-name")
                       }
                     )
+                  }
+                )
+              }
+            )
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+  }
+
+  @Test
+  fun `should not throw exception for repeated group`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "repeated-group"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            repeats = true
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "repeated-group"
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-question"
+                addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = BooleanType(true)
+                  }
+                )
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "repeated-group"
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-question"
+                addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = BooleanType(false)
                   }
                 )
               }
@@ -3018,6 +3082,375 @@ class QuestionnaireViewModelTest {
       }
     }
 
+  @Test
+  fun `getQuestionnaireResponse() should return enabled repeated groups`() {
+    val questionnaireString =
+      """
+        {
+  "resourceType": "Questionnaire",
+  "id": "ANCDELIVERY",
+  "item": [
+    {
+      "linkId": "12.0",
+      "type": "group",
+      "text": "Pregnancy Outcome - Baby",
+      "repeats": true,
+      "item": [
+        {
+          "linkId": "12.6",
+          "type": "group",
+          "text": "Live Birth/Stillbirth",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "radio-button",
+                        "display": "Radio Button"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "linkId": "12.6.1",
+              "type": "choice",
+              "text": "Is it Live Birth/Stillbirth?",
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "live-birth",
+                    "display": "Live Birth"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "code": "still-birth",
+                    "display": "Stillbirth"
+                  }
+                }
+              ]
+            },
+            {
+              "enableWhen": [
+                {
+                  "question": "12.6.1",
+                  "operator": "=",
+                  "answerCoding": {
+                    "code": "live-birth",
+                    "display": "Live Birth"
+                  }
+                }
+              ],
+              "linkId": "12.6.3",
+              "type": "group",
+              "text": "Baby Gender",
+              "item": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "radio-button",
+                            "display": "Radio Button"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "linkId": "12.6.3.1",
+                  "type": "choice",
+                  "text": "Sex of Baby",
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "male",
+                        "display": "Male"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "female",
+                        "display": "Female"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "enableWhen": [
+                {
+                  "question": "12.6.1",
+                  "operator": "=",
+                  "answerCoding": {
+                    "code": "still-birth",
+                    "display": "Stillbirth"
+                  }
+                }
+              ],
+              "linkId": "12.6.4",
+              "type": "group",
+              "text": "Stillbirth Type",
+              "item": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "radio-button",
+                            "display": "Radio Button"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "linkId": "12.6.4.1",
+                  "type": "choice",
+                  "text": "Stillbirth Type",
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "FSB",
+                        "display": "FSB"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "MSB",
+                        "display": "MSB"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+      """.trimIndent()
+
+    val questionnaireResponseString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "12.0",
+              "answer": [
+                {
+                  "item": [
+                    {
+                      "linkId": "12.6",
+                      "item": [
+                        {
+                          "linkId": "12.6.1",
+                          "answer": [
+                            {
+                              "valueCoding": {
+                                "code": "live-birth",
+                                "display": "Live Birth"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "linkId": "12.6.3",
+                          "item": [
+                            {
+                              "linkId": "12.6.3.1",
+                              "answer": [
+                                {
+                                  "valueCoding": {
+                                    "code": "male",
+                                    "display": "Male"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "linkId": "12.6.4",
+                          "item": [
+                            {
+                              "linkId": "12.6.4.1"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "item": [
+                    {
+                      "linkId": "12.6",
+                      "item": [
+                        {
+                          "linkId": "12.6.1",
+                          "answer": [
+                            {
+                              "valueCoding": {
+                                "code": "still-birth",
+                                "display": "Stillbirth"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "linkId": "12.6.3",
+                          "item": [
+                            {
+                              "linkId": "12.6.3.1"
+                            }
+                          ]
+                        },
+                        {
+                          "linkId": "12.6.4",
+                          "item": [
+                            {
+                              "linkId": "12.6.4.1",
+                              "answer": [
+                                {
+                                  "valueCoding": {
+                                    "code": "FSB",
+                                    "display": "FSB"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+
+      """.trimIndent()
+
+    val expectedResponseString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "12.0",
+              "text": "Pregnancy Outcome - Baby",
+              "item": [
+                {
+                  "linkId": "12.6",
+                  "text": "Live Birth/Stillbirth",
+                  "item": [
+                    {
+                      "linkId": "12.6.1",
+                      "text": "Is it Live Birth/Stillbirth?",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "code": "live-birth",
+                            "display": "Live Birth"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "12.6.3",
+                      "text": "Baby Gender",
+                      "item": [
+                        {
+                          "linkId": "12.6.3.1",
+                          "text": "Sex of Baby",
+                          "answer": [
+                            {
+                              "valueCoding": {
+                                "code": "male",
+                                "display": "Male"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "linkId": "12.0",
+              "text": "Pregnancy Outcome - Baby",
+              "item": [
+                {
+                  "linkId": "12.6",
+                  "text": "Live Birth/Stillbirth",
+                  "item": [
+                    {
+                      "linkId": "12.6.1",
+                      "text": "Is it Live Birth/Stillbirth?",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "code": "still-birth",
+                            "display": "Stillbirth"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "12.6.4",
+                      "text": "Stillbirth Type",
+                      "item": [
+                        {
+                          "linkId": "12.6.4.1",
+                          "text": "Stillbirth Type",
+                          "answer": [
+                            {
+                              "valueCoding": {
+                                "code": "FSB",
+                                "display": "FSB"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+
+      """.trimIndent()
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
+    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    val viewModel = QuestionnaireViewModel(context, state)
+    val value = viewModel.getQuestionnaireResponse()
+    val expectedResponse =
+      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+        as QuestionnaireResponse
+
+    assertResourceEquals(value, expectedResponse)
+  }
+
   // ==================================================================== //
   //                                                                      //
   //               Questionnaire Response with Nested Items               //
@@ -3468,6 +3901,77 @@ class QuestionnaireViewModelTest {
   //                          Answer Expression                           //
   //                                                                      //
   // ==================================================================== //
+
+  @Test
+  fun `resolveAnswerExpression() should return x-fhir-query referring to patient in context`() =
+    runTest {
+      var searchString = ""
+      ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+        .dataCaptureConfiguration =
+        DataCaptureConfig(
+          xFhirQueryResolver = { xFhirQuery ->
+            searchString = xFhirQuery
+            emptyList()
+          }
+        )
+
+      val patientId = "123"
+      val patient =
+        Patient().apply {
+          id = patientId
+          active = true
+          gender = Enumerations.AdministrativeGender.MALE
+          addName(HumanName().apply { this.family = "Johnny" })
+        }
+
+      val questionnaire =
+        Questionnaire().apply {
+          extension =
+            listOf(
+              Extension(
+                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+                )
+                .apply {
+                  addExtension(
+                    "name",
+                    Coding(
+                      "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
+                      "patient",
+                      "Patient"
+                    )
+                  )
+                  addExtension("type", CodeType("Patient"))
+                }
+            )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              text = "answer expression question text"
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              extension =
+                listOf(
+                  Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                    Expression().apply {
+                      this.expression = "Observation?subject={{%patient.id}}"
+                      this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                    }
+                  )
+                )
+            }
+          )
+        }
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      state.set(
+        EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING,
+        printer.encodeResourceToString(patient)
+      )
+
+      val viewModel = QuestionnaireViewModel(context, state)
+      viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
+
+      assertThat(searchString).isEqualTo("Observation?subject=Patient/$patientId")
+    }
 
   @Test
   fun `resolveAnswerExpression() should return questionnaire item answer options for answer expression and choice column`() =
@@ -4113,6 +4617,125 @@ class QuestionnaireViewModelTest {
         (viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination
       }
     }
+  }
+
+  @Test
+  fun `display item should be enabled when initial value is set`() = runTest {
+    val enableWhenExpressionExtension: (Boolean) -> Extension = {
+      Extension().apply {
+        url = EXTENSION_ENABLE_WHEN_EXPRESSION_URL
+        setValue(
+          Expression().apply {
+            language = Expression.ExpressionLanguage.TEXT_FHIRPATH.toCode()
+            expression =
+              "%resource.repeat(item).where(linkId='1' and answer.empty().not()).select(answer.value) = ${if (it) "true" else "false"}"
+          }
+        )
+      }
+    }
+    val displayCategoryExtension =
+      Extension().apply {
+        url = EXTENSION_DISPLAY_CATEGORY_URL
+        setValue(
+          CodeableConcept().apply {
+            coding =
+              listOf(
+                Coding().apply {
+                  code = INSTRUCTIONS
+                  system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
+                }
+              )
+          }
+        )
+      }
+    val questionnaire: (List<Questionnaire.QuestionnaireItemInitialComponent>) -> Questionnaire = {
+      Questionnaire().apply {
+        id = "questionnaire.enabled.display"
+        name = "Questionnaire Enabled Display"
+        title = "Questionnaire Enabled Display"
+        status = Enumerations.PublicationStatus.ACTIVE
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "1"
+            text = "Questionnaire Text"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            initial = it
+            addItem(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  extension = listOf(displayCategoryExtension, enableWhenExpressionExtension(false))
+                  linkId = "1.1"
+                  text = "Text when no is selected"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                }
+              )
+              .addItem(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  extension = listOf(displayCategoryExtension, enableWhenExpressionExtension(true))
+                  linkId = "1.2"
+                  text = "Text when yes is selected"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                }
+              )
+          }
+        )
+      }
+    }
+
+    state.set(
+      EXTRA_QUESTIONNAIRE_JSON_STRING,
+      printer.encodeResourceToString(questionnaire(emptyList()))
+    )
+
+    // empty initial value
+    var viewModel = QuestionnaireViewModel(context, state)
+    assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
+    // enabledDisplayItems is 0 when no choice is present
+    assertThat(
+        viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems.size
+      )
+      .isEqualTo(0)
+
+    // initial value is set to false
+    state.set(
+      EXTRA_QUESTIONNAIRE_JSON_STRING,
+      printer.encodeResourceToString(
+        questionnaire(
+          listOf(
+            Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(false) }
+          )
+        )
+      )
+    )
+
+    viewModel = QuestionnaireViewModel(context, state)
+    assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
+    var enabledDisplayItems =
+      viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems
+    assertThat(enabledDisplayItems.size).isEqualTo(1)
+    assertThat(enabledDisplayItems[0].type).isEqualTo(Questionnaire.QuestionnaireItemType.DISPLAY)
+    assertThat(enabledDisplayItems[0].linkId).isEqualTo("1.1")
+    assertThat(enabledDisplayItems[0].text).isEqualTo("Text when no is selected")
+
+    // initial value is set to true
+    state.set(
+      EXTRA_QUESTIONNAIRE_JSON_STRING,
+      printer.encodeResourceToString(
+        questionnaire(
+          listOf(
+            Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(true) }
+          )
+        )
+      )
+    )
+
+    viewModel = QuestionnaireViewModel(context, state)
+    assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
+    enabledDisplayItems =
+      viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems
+    assertThat(enabledDisplayItems.size).isEqualTo(1)
+    assertThat(enabledDisplayItems[0].type).isEqualTo(Questionnaire.QuestionnaireItemType.DISPLAY)
+    assertThat(enabledDisplayItems[0].linkId).isEqualTo("1.2")
+    assertThat(enabledDisplayItems[0].text).isEqualTo("Text when yes is selected")
   }
 
   private fun createQuestionnaireViewModel(

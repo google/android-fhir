@@ -155,6 +155,7 @@ object Dependencies {
     const val compiler = "androidx.room:room-compiler:${Versions.Androidx.room}"
     const val ktx = "androidx.room:room-ktx:${Versions.Androidx.room}"
     const val runtime = "androidx.room:room-runtime:${Versions.Androidx.room}"
+    const val testing = "androidx.room:room-testing:${Versions.Androidx.room}"
   }
 
   object Mlkit {
@@ -280,7 +281,7 @@ object Dependencies {
     const val slf4j = "1.7.36"
     const val sqlcipher = "4.5.0"
     const val timber = "5.0.1"
-    const val truth = "1.0.1"
+    const val truth = "1.1.3"
     const val woodstox = "6.2.7"
     const val xerces = "2.12.2"
     const val xmlUnit = "2.9.0"
@@ -291,9 +292,9 @@ object Dependencies {
       const val benchmarkJUnit = "1.1.0"
       const val core = "1.4.0"
       const val archCore = "2.1.0"
-      const val extJunit = "1.1.3"
+      const val extJunit = "1.1.5"
       const val rules = "1.4.0"
-      const val runner = "1.4.0"
+      const val runner = "1.5.2"
       const val fragmentVersion = "1.3.6"
     }
 

@@ -124,8 +124,10 @@ internal object DateTimePickerViewHolderFactory :
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         clearPreviousState()
-        header.bind(questionnaireViewItem.questionnaireItem)
-        dateInputLayout.hint = canonicalizedDatePattern
+        header.bind(questionnaireViewItem)
+        // Use 'mm' for month instead of 'MM' to avoid confusion.
+        // See https://developer.android.com/reference/kotlin/java/text/SimpleDateFormat.
+        dateInputLayout.hint = canonicalizedDatePattern.lowercase()
         dateInputEditText.removeTextChangedListener(textWatcher)
 
         val questionnaireItemViewItemDateTimeAnswer =

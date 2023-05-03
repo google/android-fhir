@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@ package com.google.android.fhir.db.impl
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.android.fhir.db.impl.dao.LocalChangeDao
 import com.google.android.fhir.db.impl.dao.ResourceDao
-import com.google.android.fhir.db.impl.dao.SyncedResourceDao
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -31,7 +32,6 @@ import com.google.android.fhir.db.impl.entities.QuantityIndexEntity
 import com.google.android.fhir.db.impl.entities.ReferenceIndexEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.StringIndexEntity
-import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
 
@@ -47,15 +47,21 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
       DateIndexEntity::class,
       DateTimeIndexEntity::class,
       NumberIndexEntity::class,
-      SyncedResourceEntity::class,
       LocalChangeEntity::class,
-      PositionIndexEntity::class],
-  version = 1,
-  exportSchema = false
+      PositionIndexEntity::class
+    ],
+  version = 2,
+  exportSchema = true
 )
 @TypeConverters(DbTypeConverters::class)
 internal abstract class ResourceDatabase : RoomDatabase() {
   abstract fun resourceDao(): ResourceDao
-  abstract fun syncedResourceDao(): SyncedResourceDao
   abstract fun localChangeDao(): LocalChangeDao
 }
+
+val MIGRATION_1_2 =
+  object : Migration(/* startVersion = */ 1, /* endVersion = */ 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.execSQL("DROP table if exists SyncedResourceEntity")
+    }
+  }

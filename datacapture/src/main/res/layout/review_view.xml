@@ -19,7 +19,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-    android:layout_marginTop="@dimen/item_margin_vertical"
+    android:layout_marginVertical="@dimen/item_margin_vertical"
     android:orientation="vertical"
 >
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -54,7 +54,7 @@
             style="?attr/questionnaireSubtitleTextStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/instructions_top_margin"
+            android:layout_marginTop="@dimen/help_container_margin_top"
             android:layout_gravity="center_vertical"
             tools:text="Sample helper text"
             app:layout_constraintTop_toBottomOf="@id/question"
@@ -110,7 +110,7 @@
         android:id="@+id/text_divider"
         style="?attr/questionnaireReviewModeItemDividerStyle"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/item_margin_vertical"
+        android:layout_marginTop="@dimen/simple_question_view_divider_margin_top"
         android:layout_width="match_parent"
     />
 </LinearLayout>

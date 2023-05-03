@@ -29,8 +29,8 @@
         app:icon="@drawable/ic_outline_edit_24"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-        android:layout_marginVertical="@dimen/item_margin_vertical"
+        android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+        android:layout_marginVertical="@dimen/action_button_margin_vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
     />
@@ -51,7 +51,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_buttons"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_container_divider"
         app:layout_constraintTop_toBottomOf="@+id/questionnaire_progress_indicator"
     />
 
@@ -60,12 +60,21 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_buttons"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_container_divider"
         app:layout_constraintTop_toBottomOf="@+id/review_mode_edit_button"
     />
 
+    <com.google.android.material.divider.MaterialDivider
+        style="?attr/questionnaireBottomNavContainerDividerStyle"
+        android:id="@+id/bottom_nav_container_divider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav_container"
+    />
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/bottom_buttons"
+        style="?attr/questionnaireBottomNavContainerStyle"
+        android:id="@+id/bottom_nav_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -78,8 +87,8 @@
             style="?attr/questionnaireButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-            android:layout_marginVertical="@dimen/item_margin_vertical"
+            android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+            android:layout_marginVertical="@dimen/action_button_margin_vertical"
             android:text="@string/button_pagination_previous"
             android:textAllCaps="false"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -92,8 +101,8 @@
             style="?attr/questionnaireButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-            android:layout_marginVertical="@dimen/item_margin_vertical"
+            android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+            android:layout_marginVertical="@dimen/action_button_margin_vertical"
             android:text="@string/button_pagination_next"
             android:textAllCaps="false"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -106,8 +115,8 @@
             style="?attr/questionnaireButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-            android:layout_marginVertical="@dimen/item_margin_vertical"
+            android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+            android:layout_marginVertical="@dimen/action_button_margin_vertical"
             android:text="@string/button_review"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -120,8 +129,8 @@
             android:id="@+id/submit_questionnaire"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-            android:layout_marginVertical="@dimen/item_margin_vertical"
+            android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+            android:layout_marginVertical="@dimen/action_button_margin_vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
         />
