@@ -46,6 +46,7 @@ import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
 import com.google.android.fhir.datacapture.extensions.unpackRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.validateLaunchContext
+import com.google.android.fhir.datacapture.extensions.zipByLinkId
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
@@ -872,26 +873,3 @@ internal val QuestionnairePagination.hasPreviousPage: Boolean
 
 internal val QuestionnairePagination.hasNextPage: Boolean
   get() = pages.any { it.index > currentPageIndex && it.enabled }
-
-/**
- * Returns a list of values built from the elements of `this` and the
- * `questionnaireResponseItemList` with the same linkId using the provided `transform` function
- * applied to each pair of questionnaire item and questionnaire response item.
- *
- * It is assumed that the linkIds are unique in `this` and in `questionnaireResponseItemList`.
- *
- * Although linkIds may appear more than once in questionnaire response, they would not appear more
- * than once within a list of questionnaire response items sharing the same parent.
- */
-private inline fun <T> List<QuestionnaireItemComponent>.zipByLinkId(
-  questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>,
-  transform: (QuestionnaireItemComponent, QuestionnaireResponseItemComponent) -> T
-): List<T> {
-  val linkIdToQuestionnaireResponseItemMap = questionnaireResponseItemList.associateBy { it.linkId }
-  return mapNotNull { questionnaireItem ->
-    linkIdToQuestionnaireResponseItemMap[questionnaireItem.linkId]?.let { questionnaireResponseItem
-      ->
-      transform(questionnaireItem, questionnaireResponseItem)
-    }
-  }
-}
