@@ -45,7 +45,7 @@ import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
 import com.google.android.fhir.datacapture.extensions.unpackRepeatedGroups
-import com.google.android.fhir.datacapture.extensions.validateLaunchContext
+import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
@@ -154,24 +154,29 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /**
    * The launch context allows information to be passed into questionnaire based on the context in
-   * which he questionnaire is being evaluated. For example, what patient, what encounter, what
-   * user, etc. is "in context" at the time the questionnaire response is being completed.
-   * Currently, we support at most one launch context.The supported launch contexts are defined in:
+   * which the questionnaire is being evaluated. For example, what patient, what encounter, what
+   * user, etc. is "in context" at the time the questionnaire response is being completed:
    * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
    */
-  private val questionnaireLaunchContext: Resource?
+  private val questionnaireLaunchContextMap: Map<String, Resource>?
 
   init {
-    questionnaireLaunchContext =
-      if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING)) {
-        val questionnaireLaunchContextJson: String =
-          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING]!!
+    questionnaireLaunchContextMap =
+      if (state.contains(
+          QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LIST_OF_LAUNCH_CONTEXTS_JSON_STRING
+        )
+      ) {
+
+        val launchContextsAsStrings: List<String> =
+          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LIST_OF_LAUNCH_CONTEXTS_JSON_STRING]!!
+
+        val launchContexts = launchContextsAsStrings.map { parser.parseResource(it) as Resource }
         questionnaire.extension
-          .firstOrNull { it.url == EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT }
-          ?.let {
-            val resource = parser.parseResource(questionnaireLaunchContextJson) as Resource
-            validateLaunchContext(it, resource.resourceType.name)
-            resource
+          .filter { it.url == EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT }
+          .takeIf { it.isNotEmpty() }
+          ?.let { extensions ->
+            validateLaunchContextExtensions(extensions, launchContexts.map { it.resourceType.name })
+            launchContexts.associateBy { it.resourceType.name.lowercase() }
           }
       } else {
         null
@@ -544,7 +549,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
 
         val xFhirExpressionString =
-          ExpressionEvaluator.createXFhirQueryFromExpression(expression, questionnaireLaunchContext)
+          ExpressionEvaluator.createXFhirQueryFromExpression(
+            expression,
+            questionnaireLaunchContextMap
+          )
         xFhirQueryResolver!!.resolve(xFhirExpressionString)
       } else if (expression.isFhirPath) {
         fhirPathEngine.evaluate(questionnaireResponse, expression.expression)

@@ -128,7 +128,7 @@ class MoreQuestionnairesTest {
 
     val errorMessage =
       assertFailsWith<IllegalStateException> {
-          validateLaunchContext(launchContextExtension, "Patient")
+          validateLaunchContextExtensions(listOf(launchContextExtension), listOf("Patient"))
         }
         .localizedMessage
 
@@ -154,7 +154,7 @@ class MoreQuestionnairesTest {
 
     val errorMessage =
       assertFailsWith<IllegalStateException> {
-          validateLaunchContext(launchContextExtension, "Patient")
+          validateLaunchContextExtensions(listOf(launchContextExtension), listOf("Patient"))
         }
         .localizedMessage
 
@@ -162,7 +162,7 @@ class MoreQuestionnairesTest {
       .isEqualTo(
         "The resource type set in the extension:type field in " +
           "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext does " +
-          "not match the resource type of the context passed in: Patient."
+          "not match any of the resource types of the context passed in: [Patient]."
       )
   }
 }

@@ -256,16 +256,16 @@ object ExpressionEvaluator {
    * Creates an x-fhir-query string for evaluation
    *
    * @param expression x-fhir-query expression
-   * @param launchContext if passed, the launch context to evaluate the expression against
+   * @param launchContextMap if passed, the launch context to evaluate the expression against
    */
   internal fun createXFhirQueryFromExpression(
     expression: Expression,
-    launchContext: Resource?
+    launchContextMap: Map<String, Resource>?
   ): String {
-    if (launchContext == null) {
+    if (launchContextMap == null) {
       return expression.expression
     }
-    return evaluateXFhirEnhancement(expression, launchContext).fold(expression.expression) {
+    return evaluateXFhirEnhancement(expression, launchContextMap).fold(expression.expression) {
       acc: String,
       pair: Pair<String, String> ->
       acc.replace(pair.first, pair.second)
@@ -279,11 +279,11 @@ object ExpressionEvaluator {
    *
    * @param expression x-fhir-query expression containing a FHIRpath, e.g.
    * Practitioner?active=true&{{Practitioner.name.family}}
-   * @param resource the launch context to evaluate the expression against
+   * @param launchContextMap the launch context to evaluate the expression against
    */
   private fun evaluateXFhirEnhancement(
     expression: Expression,
-    resource: Resource
+    launchContextMap: Map<String, Resource>
   ): Sequence<Pair<String, String>> =
     xFhirQueryEnhancementRegex
       .findAll(expression.expression)
@@ -292,12 +292,15 @@ object ExpressionEvaluator {
         // TODO(omarismail94): See if FHIRPathEngine.check() can be used to distinguish invalid
         // expression vs an expression that is valid, but does not return one resource only.
         val expressionNode = fhirPathEngine.parse(fhirPath)
+        val resourceType =
+          expressionNode.constant?.primitiveValue()?.substring(1)
+            ?: expressionNode.name?.lowercase()
         val evaluatedResult =
           fhirPathEngine.evaluateToString(
-            mapOf(resource.resourceType.name.lowercase() to resource),
+            launchContextMap,
             null,
             null,
-            resource,
+            launchContextMap[resourceType],
             expressionNode
           )
 

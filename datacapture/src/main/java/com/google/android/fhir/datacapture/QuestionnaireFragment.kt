@@ -303,8 +303,8 @@ class QuestionnaireFragment : Fragment() {
       args.add(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI to questionnaireResponseUri)
     }
 
-    fun setQuestionnaireLaunchContext(questionnaireLaunchContext: String) = apply {
-      args.add(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING to questionnaireLaunchContext)
+    fun setQuestionnaireLaunchContext(launchContexts: List<String>) = apply {
+      args.add(EXTRA_QUESTIONNAIRE_LIST_OF_LAUNCH_CONTEXTS_JSON_STRING to launchContexts)
     }
 
     /**
@@ -389,9 +389,9 @@ class QuestionnaireFragment : Fragment() {
      */
     internal const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
 
-    /** A JSON encoded string extra for questionnaire context. */
-    internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING =
-      "questionnaire-launch-context"
+    /** A list of JSON encoded strings extra for each questionnaire context. */
+    internal const val EXTRA_QUESTIONNAIRE_LIST_OF_LAUNCH_CONTEXTS_JSON_STRING =
+      "list-of-questionnaire-launch-contexts"
     /**
      * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.
      *

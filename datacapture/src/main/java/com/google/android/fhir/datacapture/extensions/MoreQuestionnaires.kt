@@ -51,7 +51,16 @@ internal fun Questionnaire.findVariableExpression(variableName: String): Express
  * Validates the questionnaire launch context extension, if it exists, and well formed, and
  * validates if the resource type is applicable as a launch context.
  */
-internal fun validateLaunchContext(extension: Extension, resourceType: String) {
+internal fun validateLaunchContextExtensions(
+  launchContextExtensions: List<Extension>,
+  launchContextResourceTypes: List<String>
+) =
+  launchContextExtensions.forEach { validateLaunchContextExtension(it, launchContextResourceTypes) }
+
+private fun validateLaunchContextExtension(
+  extension: Extension,
+  launchContextResourceTypes: List<String>
+) {
   val nameExtension =
     extension.extension
       .firstOrNull { it.url == "name" }
@@ -65,7 +74,7 @@ internal fun validateLaunchContext(extension: Extension, resourceType: String) {
   val typeExtension =
     extension.extension
       .firstOrNull { it.url == "type" }
-      ?.takeIf { it.valueAsPrimitive.valueAsString == resourceType }
+      ?.takeIf { launchContextResourceTypes.contains(it.valueAsPrimitive.valueAsString) }
 
   if (nameExtension == null) {
     error(
@@ -78,8 +87,8 @@ internal fun validateLaunchContext(extension: Extension, resourceType: String) {
   if (typeExtension == null) {
     error(
       "The resource type set in the extension:type field in " +
-        "$EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT does not match the resource type of the " +
-        "context passed in: $resourceType."
+        "$EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT does not match any of the resource types of the " +
+        "context passed in: $launchContextResourceTypes."
     )
   }
 }

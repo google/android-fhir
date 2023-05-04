@@ -683,7 +683,10 @@ class ExpressionEvaluatorTest {
       }
 
     val expressionsToEvaluate =
-      ExpressionEvaluator.createXFhirQueryFromExpression(expression, Practitioner())
+      ExpressionEvaluator.createXFhirQueryFromExpression(
+        expression,
+        mapOf("Practitioner" to Practitioner())
+      )
 
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?var1=&var2=&var3=&var4=")
   }
@@ -704,7 +707,10 @@ class ExpressionEvaluatorTest {
       }
 
     val expressionsToEvaluate =
-      ExpressionEvaluator.createXFhirQueryFromExpression(expression, practitioner)
+      ExpressionEvaluator.createXFhirQueryFromExpression(
+        expression,
+        mapOf(practitioner.resourceType.name to practitioner)
+      )
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
   }
 
@@ -725,7 +731,10 @@ class ExpressionEvaluatorTest {
       }
 
     val expressionsToEvaluate =
-      ExpressionEvaluator.createXFhirQueryFromExpression(expression, practitioner)
+      ExpressionEvaluator.createXFhirQueryFromExpression(
+        expression,
+        mapOf(practitioner.resourceType.name.lowercase() to practitioner)
+      )
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=male")
   }
 
@@ -746,7 +755,10 @@ class ExpressionEvaluatorTest {
       }
 
     val expressionsToEvaluate =
-      ExpressionEvaluator.createXFhirQueryFromExpression(expression, practitioner)
+      ExpressionEvaluator.createXFhirQueryFromExpression(
+        expression,
+        mapOf(practitioner.resourceType.name to practitioner)
+      )
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
   }
 
@@ -768,7 +780,10 @@ class ExpressionEvaluatorTest {
       }
 
     val expressionsToEvaluate =
-      ExpressionEvaluator.createXFhirQueryFromExpression(expression, patient)
+      ExpressionEvaluator.createXFhirQueryFromExpression(
+        expression,
+        mapOf(patient.resourceType.name.lowercase() to patient)
+      )
     assertThat(expressionsToEvaluate).isEqualTo("Patient?maritalStatus-display=Single")
   }
 }
