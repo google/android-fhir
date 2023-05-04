@@ -22,12 +22,11 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.extensions.appendOptionalText
+import com.google.android.fhir.datacapture.extensions.appendAsteriskToQuestionText
 import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
 import com.google.android.fhir.datacapture.extensions.initHelpViews
 import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 
 /** View for the prefix, question, and hint of a questionnaire item. */
@@ -41,6 +40,7 @@ internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout
   private val question = findViewById<TextView>(R.id.question)
   private val hint = findViewById<TextView>(R.id.hint)
   private val errorTextView = findViewById<TextView>(R.id.error_text_at_header)
+  private val requiredOptionalTextView = findViewById<TextView>(R.id.required_optional_text)
 
   fun bind(questionnaireViewItem: QuestionnaireViewItem) {
     initHelpViews(
@@ -50,13 +50,7 @@ internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout
       questionnaireItem = questionnaireViewItem.questionnaireItem
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
-    if (questionnaireViewItem.markOptionalQuestionText &&
-        !questionnaireViewItem.questionnaireItem.localizedTextSpanned.isNullOrEmpty()
-    ) {
-      appendOptionalText(question, questionnaireViewItem.questionnaireItem.localizedTextSpanned)
-    } else {
-      question.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedTextSpanned)
-    }
+    appendAsteriskToQuestionText(question, questionnaireViewItem)
     hint.updateTextAndVisibility(
       questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
     )
@@ -82,26 +76,25 @@ internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout
     errorTextView.text = errorText
   }
 
-  /**
-   * Append the required text [R.string.required] to the beginning of the instructions text, and
-   * assign the resulting text to the [hint].
-   */
-  fun appendRequiredTextToBeginningOfInstructions(questionnaireViewItem: QuestionnaireViewItem) {
-    if (questionnaireViewItem.markOptionalQuestionText) {
-      return
-    }
-    if (!questionnaireViewItem.questionnaireItem.required) {
-      return
-    }
-    hint.apply {
-      val instructions = questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
-      if (instructions.isNullOrEmpty()) {
-        text = context.getText(R.string.required)
-      } else {
-        text = context.getText(R.string.required_in_instructions)
-        append(instructions)
+  /** Shows an required text in the header. */
+  fun showRequiredOrOptionalTextInHeaderView(questionnaireViewItem: QuestionnaireViewItem) {
+    val requireOptionalText =
+      when {
+        (questionnaireViewItem.questionnaireItem.required &&
+          questionnaireViewItem.showRequiredText) -> context.getString(R.string.required)
+        (!questionnaireViewItem.questionnaireItem.required &&
+          questionnaireViewItem.showOptionalText) ->
+          context.getString(R.string.optional_helper_text)
+        else -> null
       }
-      visibility = VISIBLE
+    with(requiredOptionalTextView) {
+      visibility =
+        if (requireOptionalText == null) {
+          GONE
+        } else {
+          VISIBLE
+        }
+      text = requireOptionalText
     }
   }
 }

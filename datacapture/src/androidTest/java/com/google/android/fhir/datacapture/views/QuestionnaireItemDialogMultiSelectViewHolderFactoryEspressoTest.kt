@@ -385,6 +385,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
+          showRequiredText = true
         )
       )
 
@@ -398,24 +399,23 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shows_optionalText_afterQuestionText() {
+  fun shows_requiredText() {
     runOnUI {
       viewHolder.bind(
         QuestionnaireViewItem(
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "1"
-            text = "Question"
             required = true
           },
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
-          markOptionalQuestionText = true
+          showOptionalText = true
         )
       )
 
-      assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
-        .isEqualTo("Question (optional)")
+      assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString())
+        .isEqualTo("Required")
     }
   }
 
@@ -428,7 +428,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
-          markOptionalQuestionText = true
+          showOptionalText = true
         )
       )
       assertThat(

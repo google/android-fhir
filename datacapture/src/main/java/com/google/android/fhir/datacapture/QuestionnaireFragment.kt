@@ -329,13 +329,14 @@ class QuestionnaireFragment : Fragment() {
       args.add(EXTRA_SHOW_REVIEW_PAGE_FIRST to value)
     }
 
-    /**
-     * A [Boolean] extra to control if the optional text is being added to the end of the question
-     * text.
-     */
-    fun markOptionalQuestionText(value: Boolean) = apply {
-      args.add(EXTRA_MARK_OPTIONAL_QUESTION to value)
-    }
+    /** A [Boolean] extra to control whether the asterisk text is shown. */
+    fun showAsterisk(value: Boolean) = apply { args.add(EXTRA_SHOW_ASTERISK_TEXT to value) }
+
+    /** A [Boolean] extra to control whether the required text is shown. */
+    fun showRequiredText(value: Boolean) = apply { args.add(EXTRA_SHOW_REQUIRED_TEXT to value) }
+
+    /** A [Boolean] extra to control whether the optional text is shown. */
+    fun showOptionalText(value: Boolean) = apply { args.add(EXTRA_SHOW_OPTIONAL_TEXT to value) }
 
     /**
      * A matcher to provide [QuestionnaireItemViewHolderFactoryMatcher]s for custom
@@ -435,7 +436,11 @@ class QuestionnaireFragment : Fragment() {
      */
     internal const val EXTRA_SHOW_SUBMIT_BUTTON = "show-submit-button"
 
-    internal const val EXTRA_MARK_OPTIONAL_QUESTION = "mark-optional-question"
+    internal const val EXTRA_SHOW_OPTIONAL_TEXT = "show-optional-text"
+
+    internal const val EXTRA_SHOW_ASTERISK_TEXT = "show-asterisk-text"
+
+    internal const val EXTRA_SHOW_REQUIRED_TEXT = "show-required-text"
 
     fun builder() = Builder()
   }

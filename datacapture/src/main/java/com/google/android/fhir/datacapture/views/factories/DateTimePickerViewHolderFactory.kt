@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.extensions.format
 import com.google.android.fhir.datacapture.extensions.getDateSeparator
+import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.parseDate
 import com.google.android.fhir.datacapture.extensions.toLocalizedString
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
@@ -129,26 +130,7 @@ internal object DateTimePickerViewHolderFactory :
           // Use 'mm' for month instead of 'MM' to avoid confusion.
           // See https://developer.android.com/reference/kotlin/java/text/SimpleDateFormat.
           hint = canonicalizedDatePattern.lowercase()
-          when {
-            questionnaireViewItem.markOptionalQuestionText ->
-              // Show the R.string.optional_helper_text as the helper text only if the question text
-              // is missing.
-              // if question text is present, then optional_helper_text is appended to the end of
-              // the question text in the header view.
-              if (questionnaireViewItem.questionnaireItem.text.isNullOrEmpty()) {
-                helperText =
-                  context.getString(
-                    com.google.android.fhir.datacapture.R.string.optional_helper_text
-                  )
-              }
-            else ->
-              // show the R.string.required text as the helper text, if the question must be
-              // answered.
-              if (questionnaireViewItem.questionnaireItem.required) {
-                helperText =
-                  context.getString(com.google.android.fhir.datacapture.R.string.required)
-              }
-          }
+          helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
         }
         dateInputEditText.removeTextChangedListener(textWatcher)
 
@@ -181,7 +163,17 @@ internal object DateTimePickerViewHolderFactory :
           when (validationResult) {
             is NotValidated,
             Valid -> null
-            is Invalid -> validationResult.getSingleStringValidationMessage()
+            is Invalid -> {
+              val validationMessage = validationResult.getSingleStringValidationMessage()
+              if (questionnaireViewItem.questionnaireItem.required &&
+                  questionnaireViewItem.showRequiredText
+              ) {
+                dateInputLayout.context.getString(R.string.required_text_and_new_line) +
+                  validationMessage
+              } else {
+                validationMessage
+              }
+            }
           }
       }
 

@@ -77,13 +77,7 @@ internal object AutoCompleteViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         header.bind(questionnaireViewItem)
-        textInputLayout.apply {
-          if (!questionnaireViewItem.markOptionalQuestionText &&
-              questionnaireViewItem.questionnaireItem.required
-          ) {
-            helperText = context.getString(R.string.required)
-          }
-        }
+        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
         val answerOptionString =
           questionnaireViewItem.answerOption.map { it.value.displayString(header.context) }
         val adapter = ArrayAdapter(header.context, R.layout.drop_down_list_item, answerOptionString)

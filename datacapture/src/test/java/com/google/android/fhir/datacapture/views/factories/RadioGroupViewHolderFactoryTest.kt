@@ -484,50 +484,25 @@ class RadioGroupViewHolderFactoryTest {
   }
 
   @Test
-  fun `showRequiredText shows required text`() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          required = true
-          text = "Question?"
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      )
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.hint).text.toString())
-      .isEqualTo("Required")
-  }
-
-  @Test
-  fun `showRequiredText appends required text to the beginning of the instructions`() {
-    val itemList =
-      listOf(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          linkId = "nested-display-question"
-          text = "subtitle text"
-          extension = listOf(displayCategoryExtensionWithInstructionsCode)
-          type = Questionnaire.QuestionnaireItemType.DISPLAY
-        }
-      )
+  fun `shows required text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        enabledDisplayItems = itemList
+        showRequiredText = true
       )
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.hint).text.toString())
-      .isEqualTo("Required. subtitle text")
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+      )
+      .isEqualTo("Required")
   }
 
   @Test
-  fun `optionalText appends optional text to the end of the question text`() {
+  fun `shows asterisk`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -537,12 +512,30 @@ class RadioGroupViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        markOptionalQuestionText = true
+        showAsterisk = true
       )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
-      .isEqualTo("Question (optional)")
+      .isEqualTo("Question*")
+  }
+
+  @Test
+  fun `shows optional text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        showOptionalText = true
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+      )
+      .isEqualTo("Optional")
   }
 
   private val displayCategoryExtensionWithInstructionsCode =

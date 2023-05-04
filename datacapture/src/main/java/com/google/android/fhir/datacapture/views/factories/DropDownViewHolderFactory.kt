@@ -26,6 +26,7 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -62,22 +63,7 @@ internal object DropDownViewHolderFactory :
         textInputLayout.hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
         with(textInputLayout) {
           hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
-          when {
-            questionnaireViewItem.markOptionalQuestionText ->
-              // Show the R.string.optional_helper_text as the helper text only if the question text
-              // is missing.
-              // if question text is present, then optional_helper_text is appended to the end of
-              // the question text in the header view.
-              if (questionnaireViewItem.questionnaireItem.text.isNullOrEmpty()) {
-                helperText = context.getString(R.string.optional_helper_text)
-              }
-            else ->
-              // show the R.string.required text as the helper text, if the question must be
-              // answered.
-              if (questionnaireViewItem.questionnaireItem.required) {
-                helperText = context.getString(R.string.required)
-              }
-          }
+          helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
         }
         val answerOptionList =
           this.questionnaireViewItem.answerOption
@@ -140,7 +126,17 @@ internal object DropDownViewHolderFactory :
           when (validationResult) {
             is NotValidated,
             Valid -> null
-            is Invalid -> validationResult.getSingleStringValidationMessage()
+            is Invalid -> {
+              val validationMessage = validationResult.getSingleStringValidationMessage()
+              if (questionnaireViewItem.questionnaireItem.required &&
+                  questionnaireViewItem.showRequiredText
+              ) {
+                textInputLayout.context.getString(R.string.required_text_and_new_line) +
+                  validationMessage
+              } else {
+                validationMessage
+              }
+            }
           }
       }
 

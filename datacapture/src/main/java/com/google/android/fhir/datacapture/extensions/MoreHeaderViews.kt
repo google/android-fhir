@@ -29,6 +29,7 @@ import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.card.MaterialCardView
 import org.hl7.fhir.r4.model.Questionnaire
 
@@ -89,6 +90,49 @@ internal fun appendOptionalText(textView: TextView, localizedText: Spanned? = nu
     textView.context.getColorFromAttr(R.attr.colorOutline)
   )
   textView.updateTextAndVisibility(builder)
+}
+
+/**
+ * Updates textview [R.id.question] with
+ * [Questionnaire.QuestionnaireItemComponent.localizedTextSpanned] text and `*` if
+ * [Questionnaire.QuestionnaireItemComponent.required] is true. And applies [R.attr.colorError] to
+ * `*`.
+ */
+internal fun updateQuestionText(
+  questionTextView: TextView,
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+) {
+  val builder = SpannableStringBuilder()
+  questionnaireItem.localizedTextSpanned?.let { builder.append(it) }
+  if (questionnaireItem.required) {
+    builder.appendWithSpan(
+      questionTextView.context.applicationContext.getString(R.string.space_asterisk),
+      questionTextView.context.getColorFromAttr(R.attr.colorError)
+    )
+  }
+  questionTextView.updateTextAndVisibility(builder)
+}
+
+/**
+ * Updates textview [R.id.question] with
+ * [Questionnaire.QuestionnaireItemComponent.localizedTextSpanned] text and `*` if
+ * [Questionnaire.QuestionnaireItemComponent.required] is true.
+ */
+internal fun appendAsteriskToQuestionText(
+  questionTextView: TextView,
+  questionnaireViewItem: QuestionnaireViewItem
+) {
+  val builder = SpannableStringBuilder()
+  questionnaireViewItem.questionnaireItem.localizedTextSpanned?.let {
+    builder.append(questionnaireViewItem.questionnaireItem.localizedTextSpanned)
+  }
+  if (questionnaireViewItem.showAsterisk &&
+      questionnaireViewItem.questionnaireItem.required &&
+      !questionnaireViewItem.questionnaireItem.localizedTextSpanned.isNullOrEmpty()
+  ) {
+    builder.append(questionTextView.context.applicationContext.getString(R.string.space_asterisk))
+  }
+  questionTextView.updateTextAndVisibility(builder)
 }
 
 private fun SpannableStringBuilder.appendWithSpan(value: String, @ColorInt color: Int) {

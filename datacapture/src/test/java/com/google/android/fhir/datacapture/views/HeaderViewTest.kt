@@ -28,7 +28,6 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
 import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
-import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.material.card.MaterialCardView
 import com.google.common.truth.Truth.assertThat
@@ -314,50 +313,6 @@ class HeaderViewTest {
     view.showErrorText(isErrorTextVisible = false)
     assertThat(view.findViewById<TextView>(R.id.error_text_at_header).visibility)
       .isEqualTo(View.GONE)
-  }
-
-  @Test
-  fun `showRequiredText shows required text`() {
-    view.appendRequiredTextToBeginningOfInstructions(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          required = true
-          text = "Question?"
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      )
-    )
-
-    assertThat(view.findViewById<TextView>(R.id.hint).text.toString()).isEqualTo("Required")
-    assertThat(view.findViewById<TextView>(R.id.hint).visibility).isEqualTo(View.VISIBLE)
-  }
-
-  @Test
-  fun `showRequiredText appends required text to the beginning of the instructions`() {
-    val itemList =
-      listOf(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          linkId = "nested-display-question"
-          text = "subtitle text"
-          extension = listOf(displayCategoryExtensionWithInstructionsCode)
-          type = Questionnaire.QuestionnaireItemType.DISPLAY
-        }
-      )
-    view.appendRequiredTextToBeginningOfInstructions(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-        enabledDisplayItems = itemList
-      )
-    )
-
-    assertThat(view.findViewById<TextView>(R.id.hint).text.toString())
-      .isEqualTo("Required. subtitle text")
-    assertThat(view.findViewById<TextView>(R.id.hint).visibility).isEqualTo(View.VISIBLE)
   }
 
   private val displayCategoryExtensionWithInstructionsCode =

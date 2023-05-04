@@ -526,16 +526,14 @@ class DateTimePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `showRequiredText shows required text`() {
+  fun `shows required text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          required = true
-          text = "Question?"
-        },
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        showRequiredText = true
       )
     )
 
@@ -548,33 +546,14 @@ class DateTimePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `optionalText appends optional text to the end of the question text`() {
+  fun `shows optional text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          text = "Question"
-          required = true
-        },
+        Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        markOptionalQuestionText = true
-      )
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
-      .isEqualTo("Question (optional)")
-  }
-
-  @Test
-  fun `optionalText shown as helper text`() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {},
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-        markOptionalQuestionText = true
+        showOptionalText = true
       )
     )
 
@@ -584,6 +563,25 @@ class DateTimePickerViewHolderFactoryTest {
           .helperText.toString()
       )
       .isEqualTo("Optional")
+  }
+
+  @Test
+  fun `shows asterisk`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          text = "Question?"
+          required = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        showAsterisk = true
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+      .isEqualTo("Question?*")
   }
 
   private val QuestionnaireItemViewHolder.dateInputView: TextView
