@@ -68,6 +68,8 @@ android {
   }
 }
 
+afterEvaluate { configureFirebaseTestLab() }
+
 configurations {
   all {
     removeIncompatibleDependencies()
