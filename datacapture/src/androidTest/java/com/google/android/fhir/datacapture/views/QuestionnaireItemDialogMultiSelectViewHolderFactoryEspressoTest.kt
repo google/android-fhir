@@ -414,7 +414,9 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         )
       )
 
-      assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString())
+      assertThat(
+          viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+        )
         .isEqualTo("Required")
     }
   }
