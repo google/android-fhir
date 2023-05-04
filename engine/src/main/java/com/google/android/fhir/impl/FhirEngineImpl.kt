@@ -63,13 +63,18 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun <R : Resource> searchWithRevInclude(
+    isRevInclude: Boolean,
     search: Search
   ): Map<R, Map<ResourceType, List<Resource>>> {
     val baseResources = database.search<R>(search.getQuery()) // .subList(0,2)
     val includedResources =
       database.searchRev<R>(
         search.getIncludeQuery(
-          includeIds = baseResources.map { "\'${it.resourceType}/${it.logicalId}\'" }
+          isRevInclude,
+          includeIds =
+            baseResources.map {
+              if (isRevInclude) "\'${it.resourceType}/${it.logicalId}\'" else "\'${it.logicalId}\'"
+            }
         )
       )
     val resultMap = mutableMapOf<R, Map<ResourceType, List<Resource>>>()
@@ -77,7 +82,9 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       resultMap[patient] =
         includedResources
           .filter {
-            it.idOfBaseResourceOnWhichThisMatched == "${patient.fhirType()}/${patient.logicalId}"
+            if (isRevInclude)
+              it.idOfBaseResourceOnWhichThisMatched == "${patient.fhirType()}/${patient.logicalId}"
+            else it.idOfBaseResourceOnWhichThisMatched == patient.logicalId
           }
           .map { it.resource }
           .groupBy { it.resourceType }

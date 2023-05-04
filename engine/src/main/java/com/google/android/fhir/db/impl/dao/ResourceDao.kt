@@ -287,7 +287,8 @@ internal abstract class ResourceDao {
 }
 
 internal data class IndexedIdAndSerializedResource(
-  @ColumnInfo(name = "index_value") val idOfBaseResourceOnWhichThisMatched: String,
+  @ColumnInfo(name = "index_value") val idOfBaseResourceOnWhichThisMatchedRev: String?,
+  @ColumnInfo(name = "resourceId") val idOfBaseResourceOnWhichThisMatchedInc: String?,
   val serializedResource: String
 )
 

@@ -191,7 +191,7 @@ internal class DatabaseImpl(
     return db.withTransaction {
       resourceDao.getResourcesRev(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).map {
         IndexedIdAndResource(
-          it.idOfBaseResourceOnWhichThisMatched,
+          it.idOfBaseResourceOnWhichThisMatchedInc ?: it.idOfBaseResourceOnWhichThisMatchedRev!!,
           iParser.parseResource(it.serializedResource) as Resource
         )
       }

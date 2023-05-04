@@ -55,7 +55,12 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
   return getQuery(isCount, null)
 }
 
-internal fun Search.getIncludeQuery(includeIds: List<String>): SearchQuery {
+internal fun Search.getIncludeQuery(isRevInclude: Boolean, includeIds: List<String>) =
+  if (isRevInclude) {
+    getRevIncludeQuery(includeIds)
+  } else getIncludeQuery(includeIds)
+
+private fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
   val match =
     revIncludeMap
       .map {
@@ -71,6 +76,31 @@ internal fun Search.getIncludeQuery(includeIds: List<String>): SearchQuery {
     JOIN  ResourceEntity b
     ON  a.resourceUuid = b.resourceUuid
     AND  a.index_value IN( ${includeIds.joinToString()} ) 
+    AND ($match)
+    """.trimIndent(),
+    args = listOf()
+  )
+}
+
+private fun Search.getIncludeQuery(includeIds: List<String>): SearchQuery {
+  val match =
+    includeMap
+      .map {
+        " ( c.resourceType = '${it.key}' and b.index_name IN (${it.value.joinToString { "\'${it.paramName}\'" }}) ) "
+      }
+      .joinToString(separator = "OR")
+  //  SELECT a.resourceType||"/"||a.resourceId, c.serializedResource from ResourceEntity a
+
+  return SearchQuery(
+    query =
+      """
+    SELECT a.resourceId, c.serializedResource from ResourceEntity a 
+    JOIN ReferenceIndexEntity b 
+    On a.resourceUuid = b.resourceUuid
+    AND a.resourceType = 'Observation'
+    AND a.resourceId in ( ${includeIds.joinToString()} ) 
+    JOIN ResourceEntity c
+    ON c.resourceType||"/"||c.resourceId = b.index_value
     AND ($match)
     """.trimIndent(),
     args = listOf()

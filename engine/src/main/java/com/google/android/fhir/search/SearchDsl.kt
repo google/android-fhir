@@ -54,6 +54,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   internal var sort: IParam? = null
   internal var order: Order? = null
   internal val revIncludeMap = mutableMapOf<ResourceType, MutableList<ReferenceClientParam>>()
+  internal val includeMap = mutableMapOf<ResourceType, MutableList<ReferenceClientParam>>()
   @PublishedApi internal var nestedSearches = mutableListOf<NestedSearch>()
   var operation = Operation.AND
 
@@ -161,8 +162,12 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
    * })
    * ```
    */
-  fun revInclude(resourceType: ResourceType, vararg clientParam: ReferenceClientParam) {
-    revIncludeMap.computeIfAbsent(resourceType) { mutableListOf() }.addAll(clientParam)
+  fun revInclude(resourceType: ResourceType, clientParam: ReferenceClientParam) {
+    revIncludeMap.computeIfAbsent(resourceType) { mutableListOf() }.add(clientParam)
+  }
+
+  fun include(clientParam: ReferenceClientParam, resourceType: ResourceType) {
+    includeMap.computeIfAbsent(resourceType) { mutableListOf() }.add(clientParam)
   }
 }
 
