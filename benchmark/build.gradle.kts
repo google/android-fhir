@@ -33,7 +33,7 @@ android {
       "DEBUGGABLE,LOW-BATTERY,EMULATOR,CODE-COVERAGE,UNLOCKED"
   }
 
-  testBuildType = "release"
+  testBuildType = "debug"
   buildTypes {
     debug {
       // Since isDebuggable can't be modified by gradle for library modules,
