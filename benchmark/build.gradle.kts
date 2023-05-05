@@ -30,7 +30,7 @@ android {
     testInstrumentationRunnerArguments["androidx.benchmark.startupMode.enable"] = "true"
   }
 
-  testBuildType = "release"
+  testBuildType = "debug"
   buildTypes {
     debug {
       // Since isDebuggable can't be modified by gradle for library modules,
