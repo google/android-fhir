@@ -97,7 +97,7 @@ private fun Search.getIncludeQuery(includeIds: List<String>): SearchQuery {
     SELECT a.resourceId, c.serializedResource from ResourceEntity a 
     JOIN ReferenceIndexEntity b 
     On a.resourceUuid = b.resourceUuid
-    AND a.resourceType = 'Observation'
+    AND a.resourceType = '${type.name}'
     AND a.resourceId in ( ${includeIds.joinToString()} ) 
     JOIN ResourceEntity c
     ON c.resourceType||"/"||c.resourceId = b.index_value
