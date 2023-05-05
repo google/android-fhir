@@ -24,7 +24,6 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
 import java.io.StringReader
-import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Library
 import org.junit.Rule
 import org.junit.Test

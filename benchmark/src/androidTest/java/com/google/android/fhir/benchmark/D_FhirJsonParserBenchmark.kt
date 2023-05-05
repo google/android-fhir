@@ -70,7 +70,6 @@ class D_FhirJsonParserBenchmark {
 
       assertThat(immunityCheckLibrary.id).isEqualTo("Library/ImmunityCheck-1.0.0")
       assertThat(immunityCheckLibrary.content[0].data.size).isEqualTo(575)
-
     }
   }
 }
