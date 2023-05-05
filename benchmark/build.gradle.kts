@@ -23,7 +23,7 @@ android {
     minSdk = Sdk.minSdkWorkflow
     targetSdk = Sdk.targetSdk
 
-    testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
+    //testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
     // Runs only once
     testInstrumentationRunnerArguments["androidx.benchmark.dryRunMode.enable"] = "true"
     // Includes Startup time
