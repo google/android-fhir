@@ -25,9 +25,9 @@ android {
 
     testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
     // Runs only once
-    testInstrumentationRunnerArguments["androidx.benchmark.dryRunMode.enable"] = "true"
+    //testInstrumentationRunnerArguments["androidx.benchmark.dryRunMode.enable"] = "true"
     // Includes Startup time
-    testInstrumentationRunnerArguments["androidx.benchmark.startupMode.enable"] = "true"
+    //testInstrumentationRunnerArguments["androidx.benchmark.startupMode.enable"] = "true"
     // Suppress errors
     testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] =
       "DEBUGGABLE,LOW-BATTERY,EMULATOR,CODE-COVERAGE,UNLOCKED"
