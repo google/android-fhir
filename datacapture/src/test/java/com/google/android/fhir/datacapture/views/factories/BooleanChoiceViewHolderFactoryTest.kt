@@ -363,24 +363,6 @@ class BooleanChoiceViewHolderFactoryTest {
   }
 
   @Test
-  fun `showRequiredText shows required text`() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          required = true
-          text = "Question?"
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      )
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.hint).text.toString())
-      .isEqualTo("Required")
-  }
-
-  @Test
   fun `shows required text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
