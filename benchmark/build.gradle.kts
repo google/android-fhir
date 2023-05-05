@@ -28,8 +28,9 @@ android {
     testInstrumentationRunnerArguments["androidx.benchmark.dryRunMode.enable"] = "true"
     // Includes Startup time
     testInstrumentationRunnerArguments["androidx.benchmark.startupMode.enable"] = "true"
-    //Suppress errors
-    testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "DEBUGGABLE,LOW-BATTERY,EMULATOR,CODE-COVERAGE,UNLOCKED"
+    // Suppress errors
+    testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] =
+      "DEBUGGABLE,LOW-BATTERY,EMULATOR,CODE-COVERAGE,UNLOCKED"
   }
 
   testBuildType = "release"
