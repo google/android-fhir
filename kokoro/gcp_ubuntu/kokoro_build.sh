@@ -89,6 +89,7 @@ function build_only() {
 # Runs instrumentation tests using Firebase Test Lab, and retrieves the code
 # coverage reports.
 function device_tests() {
+  ./gradlew packageDebugAndroidTest --scan --stacktrace
   ./gradlew packageReleaseAndroidTest --scan --stacktrace
     local lib_names=("benchmark")
     firebase_pids=()
