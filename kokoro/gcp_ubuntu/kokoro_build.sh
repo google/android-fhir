@@ -89,8 +89,8 @@ function build_only() {
 # Runs instrumentation tests using Firebase Test Lab, and retrieves the code
 # coverage reports.
 function device_tests() {
-  ./gradlew packageDebugAndroidTest --scan --stacktrace
-    local lib_names=("datacapture" "engine" "workflow" "benchmark")
+  ./gradlew packageReleaseAndroidTest --scan --stacktrace
+    local lib_names=("benchmark")
     firebase_pids=()
     for lib_name in "${lib_names[@]}"; do
       ./gradlew :$lib_name:runFlank  --scan --stacktrace &

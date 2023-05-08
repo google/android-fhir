@@ -47,7 +47,7 @@ fun Project.configureFirebaseTestLab() {
         ),
       )
     )
-    instrumentationApk.set(project.provider { "$buildDir/outputs/apk/androidTest/debug/*.apk" })
+    instrumentationApk.set(project.provider { "$buildDir/outputs/apk/androidTest/release/*.apk" })
     useOrchestrator.set(false)
     flakyTestAttempts.set(3)
     environmentVariables.set(
