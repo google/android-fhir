@@ -51,7 +51,11 @@ fun Project.configureFirebaseTestLab() {
     useOrchestrator.set(false)
     flakyTestAttempts.set(3)
     environmentVariables.set(
-      mapOf("coverage" to "true", "coverageFile" to "/sdcard/Download/coverage.ec", "additionalTestOutputDir" to "/sdcard/Download")
+      mapOf(
+        "coverage" to "true",
+        "coverageFile" to "/sdcard/Download/coverage.ec",
+        "additionalTestOutputDir" to "/sdcard/Download"
+      )
     )
     directoriesToPull.set(listOf("/sdcard/Download"))
     filesToDownload.set(listOf(".*/sdcard/Download/.*.ec"))
