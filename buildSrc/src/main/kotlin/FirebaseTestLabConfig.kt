@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import com.android.build.api.dsl.LibraryExtension
 import java.util.UUID
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -32,19 +31,15 @@ fun Project.configureFirebaseTestLab() {
     )
     devices.set(
       listOf(
-        mapOf(
-          "model" to "Nexus6P",
-          "version" to
-            "${this@configureFirebaseTestLab.extensions.getByType(LibraryExtension::class.java).defaultConfig.minSdk}",
-          "locale" to "en_US"
-        ),
-        mapOf("model" to "Nexus6P", "version" to "27", "locale" to "en_US"),
-        mapOf(
-          "model" to "oriole",
-          "version" to
-            "${this@configureFirebaseTestLab.extensions.getByType(LibraryExtension::class.java).defaultConfig.targetSdk}",
-          "locale" to "en_US"
-        ),
+        //        mapOf(
+        //          "model" to "Nexus6P",
+        //          "version" to
+        //
+        // "${this@configureFirebaseTestLab.extensions.getByType(LibraryExtension::class.java).defaultConfig.minSdk}",
+        //          "locale" to "en_US"
+        //        ),
+        //        mapOf("model" to "Nexus6P", "version" to "27", "locale" to "en_US"),
+        mapOf("model" to "oriole", "version" to "32", "locale" to "en_US"),
       )
     )
     instrumentationApk.set(project.provider { "$buildDir/outputs/apk/androidTest/release/*.apk" })
