@@ -165,23 +165,7 @@ internal class FhirEngineImpl(
     upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
     upload(squashedChanges).collect {
-      val idsToDeleteFromUpdate = it.first.ids as MutableList
-      // Check server for resource before delete.
-      (it.second as Bundle).entry.forEachIndexed { index, bundleEntry ->
-        val response = bundleEntry.response
-        val url = response.location.toString() + "?_elements=identifier"
-        try {
-          val downloadBundle = dataSource?.download(url)
-          if (downloadBundle == null) {
-            idsToDeleteFromUpdate.remove(it.first.ids[index])
-          } else {
-            Timber.i("Resource Found after upload" + downloadBundle.id.toString())
-          }
-        } catch (exception: Exception) {
-          Timber.i(exception)
-        }
-      }
-      database.deleteUpdates(LocalChangeToken(idsToDeleteFromUpdate))
+      database.deleteUpdates(LocalChangeToken(it.first.ids))
       when (it.second) {
         is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
         else -> updateVersionIdAndLastUpdated(it.second)
