@@ -447,6 +447,19 @@ object ResourceMapper {
         // choice of data type field, e.g., by calling `Observation#getValueQuantity`
         base.getChoiceFieldValue(fieldName)
       }
+    if (fieldName == "valueCodeableConcept" && questionnaireResponseItem.hasItem() && questionnaireResponseItem.item.first()
+        .hasAnswer() && questionnaireResponseItem.item.first().answer.isNotEmpty() && questionnaireResponseItem.item.first().answer.first()
+        .hasValueStringType()
+    ) {
+      extractByDefinition(
+        questionnaireItem.item,
+        questionnaireResponseItem.item,
+        base,
+        extractionResult,
+        profileLoader
+      )
+      return
+    }
     extractByDefinition(
       questionnaireItem.item,
       questionnaireResponseItem.item,
@@ -674,24 +687,9 @@ private fun addAnswerToListField(base: Base, field: Field, answerValue: List<Bas
 }
 
 private fun updateListFieldWithAnswer(base: Base, field: Field, answerValue: List<Base>) {
-  try {
-    base.javaClass
-      .getMethod("set${field.name.capitalize()}", field.type)
-      .invoke(base, if (field.isParameterized && field.isList) answerValue else answerValue.first())
-  } catch (e: InvocationTargetException) {
-    when (base) {
-      is Observation -> {
-        if (!field.isParameterized && !field.isList && answerValue.first().fhirType() == "Coding") {
-          base.javaClass.getMethod("set${field.name.capitalize()}", field.type)
-            .invoke(base, CodeableConcept().apply {
-              addCoding(answerValue.first() as Coding)
-              text = (answerValue.first() as Coding).display
-            })
-        } else throw e
-      }
-      else -> throw e
-    }
-  }
+  base.javaClass
+    .getMethod("set${field.name.capitalize()}", field.type)
+    .invoke(base, if (field.isParameterized && field.isList) answerValue else answerValue.first())
 }
 
 private fun String.capitalize() = replaceFirstChar {
