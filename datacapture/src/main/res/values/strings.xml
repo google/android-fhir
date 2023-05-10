@@ -121,5 +121,5 @@
     <string name="required_in_instructions">Required.\u0020</string>
     <string name="required">Required</string>
     <string name="required_text_and_new_line">Required \n</string>
-    <string name="space_asterisk">\u002a</string>
+    <string name="space_asterisk">\u0020\u002a</string>
 </resources>
