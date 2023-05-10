@@ -74,6 +74,9 @@ internal interface RetrofitHttpService : FhirHttpService {
                 }
               )
             }
+            if (networkConfiguration.uploadWithGzip) {
+              addInterceptor(GzipUploadInterceptor())
+            }
           }
           .build()
       return Retrofit.Builder()
