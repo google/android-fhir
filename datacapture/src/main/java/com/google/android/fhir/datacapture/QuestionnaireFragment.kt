@@ -303,6 +303,10 @@ class QuestionnaireFragment : Fragment() {
       args.add(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI to questionnaireResponseUri)
     }
 
+    fun setQuestionnaireLaunchContext(questionnaireLaunchContext: String) = apply {
+      args.add(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING to questionnaireLaunchContext)
+    }
+
     /**
      * An [Boolean] extra to control if the questionnaire is read-only. If review page and read-only
      * are both enabled, read-only will take precedence.
@@ -385,6 +389,9 @@ class QuestionnaireFragment : Fragment() {
      */
     internal const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
 
+    /** A JSON encoded string extra for questionnaire context. */
+    internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING =
+      "questionnaire-launch-context"
     /**
      * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.
      *

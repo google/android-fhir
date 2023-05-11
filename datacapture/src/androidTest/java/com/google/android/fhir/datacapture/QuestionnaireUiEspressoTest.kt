@@ -179,7 +179,7 @@ class QuestionnaireUiEspressoTest {
 
     onView(withId(R.id.date_input_layout)).check { view, _ ->
       val actualError = (view as TextInputLayout).error
-      assertThat(actualError).isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/31/2023)")
+      assertThat(actualError).isEqualTo("Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)")
     }
     onView(withId(R.id.time_input_layout)).check { view, _ -> assertThat(view.isEnabled).isFalse() }
   }
@@ -233,7 +233,7 @@ class QuestionnaireUiEspressoTest {
 
     onView(withId(R.id.text_input_layout)).check { view, _ ->
       val actualError = (view as TextInputLayout).error
-      assertThat(actualError).isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/31/2023)")
+      assertThat(actualError).isEqualTo("Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)")
     }
   }
 

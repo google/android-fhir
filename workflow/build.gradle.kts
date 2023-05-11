@@ -25,6 +25,12 @@ android {
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.workflow"
   }
 
+  sourceSets {
+    getByName("androidTest").apply { resources.setSrcDirs(listOf("sampledata")) }
+
+    getByName("test").apply { resources.setSrcDirs(listOf("sampledata")) }
+  }
+
   // Added this for fixing out of memory issue in running test cases
   tasks.withType<Test>().configureEach {
     maxParallelForks = (Runtime.getRuntime().availableProcessors() - 1).takeIf { it > 0 } ?: 1
@@ -110,6 +116,7 @@ dependencies {
   implementation(Dependencies.Cql.translatorElmJackson) // Necessary to import XML/JSON CQL Libs
   implementation(Dependencies.Cql.translatorModel) // Overrides HAPI's old versions
   implementation(Dependencies.Cql.translatorModelJackson) // Necessary to import XML/JSON ModelInfos
+  implementation(Dependencies.timber)
 
   // Forces the most recent version of jackson, ignoring what dependencies use.
   // Remove these lines when HAPI 6.4 becomes available.
@@ -131,6 +138,7 @@ dependencies {
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.xerces)
   implementation(project(":engine"))
+  implementation(project(":knowledge"))
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.jsonAssert)

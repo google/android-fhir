@@ -1,0 +1,76 @@
+{
+  "resourceType": "ValueSet",
+  "id": "anc-b6-de17",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"
+    ]
+  },
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This value set contains 1 concepts</p><p>All codes in this table are from the system <a href=\"CodeSystem-anc-custom-codes.html\"><code>http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes</code></a></p><table class=\"codes\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td></tr><tr><td style=\"white-space:nowrap\"><a name=\"http---fhir.org-guides-who-anc-cds-CodeSystem-anc-custom-codes-ANC.B6.DE17\"> </a>  <a href=\"CodeSystem-anc-custom-codes.html#anc-custom-codes-ANC.46B6.46DE17\">ANC.B6.DE17</a></td><td>Gestational age</td><td>Gestational age</td></tr></table></div>"
+  },
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueString": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueString": "executable"
+    }
+  ],
+  "url": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de17",
+  "version": "0.3.0",
+  "name": "Gestationalage",
+  "title": "Gestational age",
+  "status": "draft",
+  "experimental": false,
+  "date": "2022-08-22T21:51:39+00:00",
+  "publisher": "World Health Organization (WHO)",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "https://www.who.int"
+        }
+      ]
+    }
+  ],
+  "description": "Codes representing possible values for the Gestational age element",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+          "code": "001"
+        }
+      ]
+    }
+  ],
+  "immutable": true,
+  "compose": {
+    "include": [
+      {
+        "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+        "concept": [
+          {
+            "code": "ANC.B6.DE17",
+            "display": "Gestational age"
+          }
+        ]
+      }
+    ]
+  },
+  "expansion": {
+    "timestamp": "2021-11-30T07:11:22-07:00",
+    "contains": [
+      {
+        "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+        "code": "ANC.B6.DE17",
+        "display": "Gestational age"
+      }
+    ]
+  }
+}
