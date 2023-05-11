@@ -28,31 +28,27 @@ fun Project.configureFirebaseTestLab() {
     commonConfigurationForFirebaseTestLab(this@configureFirebaseTestLab)
     instrumentationApk.set(project.provider { "$buildDir/outputs/apk/androidTest/debug/*.apk" })
     environmentVariables.set(
-      mapOf(
-        "coverage" to "true",
-        "coverageFile" to "/sdcard/Download/coverage.ec"
-      )
+      mapOf("coverage" to "true", "coverageFile" to "/sdcard/Download/coverage.ec")
     )
     devices.set(
       listOf(
         mapOf(
           "model" to "Nexus6P",
           "version" to
-                  "${project.extensions.getByType(LibraryExtension::class.java).defaultConfig.minSdk}",
+            "${project.extensions.getByType(LibraryExtension::class.java).defaultConfig.minSdk}",
           "locale" to "en_US"
         ),
         mapOf("model" to "Nexus6P", "version" to "27", "locale" to "en_US"),
         mapOf(
           "model" to "oriole",
           "version" to
-                  "${project.extensions.getByType(LibraryExtension::class.java).defaultConfig.targetSdk}",
+            "${project.extensions.getByType(LibraryExtension::class.java).defaultConfig.targetSdk}",
           "locale" to "en_US"
         ),
       )
     )
   }
 }
-
 
 fun Project.configureFirebaseTestLabForMicroBenchmark() {
   apply(plugin = Plugins.BuildPlugins.fladle)
@@ -61,11 +57,7 @@ fun Project.configureFirebaseTestLabForMicroBenchmark() {
     instrumentationApk.set(project.provider { "$buildDir/outputs/apk/androidTest/release/*.apk" })
     devices.set(
       listOf(
-        mapOf(
-          "model" to "oriole",
-          "version" to "32",
-          "locale" to "en_US"
-        ),
+        mapOf("model" to "oriole", "version" to "32", "locale" to "en_US"),
       )
     )
   }
@@ -91,4 +83,3 @@ private fun FlankGradleExtension.commonConfigurationForFirebaseTestLab(project: 
     }
   )
 }
-
