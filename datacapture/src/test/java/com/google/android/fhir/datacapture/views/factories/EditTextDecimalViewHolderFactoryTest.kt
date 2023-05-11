@@ -168,6 +168,7 @@ class EditTextDecimalViewHolderFactoryTest {
     viewHolder.itemView.clearFocus()
     assertThat(draftAnswer as String).isEqualTo("1.1.1.1")
   }
+
   @Test
   fun `displayValidationResult should show no error message`() {
     viewHolder.bind(
