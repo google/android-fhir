@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture.enablement
 import com.google.android.fhir.compareTo
 import com.google.android.fhir.datacapture.extensions.allItems
 import com.google.android.fhir.datacapture.extensions.enableWhenExpression
-import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
+import com.google.android.fhir.datacapture.fhirpath.evaluateToBoolean
 import com.google.android.fhir.equals
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -110,8 +110,10 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
 
     // Evaluate `enableWhenExpression`.
     if (enableWhenExpression != null && enableWhenExpression.hasExpression()) {
-      return fhirPathEngine.convertToBoolean(
-        fhirPathEngine.evaluate(questionnaireResponse, enableWhenExpression.expression)
+      return evaluateToBoolean(
+        questionnaireResponse,
+        questionnaireResponseItem,
+        enableWhenExpression.expression
       )
     }
 
