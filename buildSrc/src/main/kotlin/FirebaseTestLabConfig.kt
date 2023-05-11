@@ -55,6 +55,9 @@ fun Project.configureFirebaseTestLabForMicroBenchmark() {
   configure<FlankGradleExtension> {
     commonConfigurationForFirebaseTestLab(this@configureFirebaseTestLabForMicroBenchmark)
     instrumentationApk.set(project.provider { "$buildDir/outputs/apk/androidTest/release/*.apk" })
+    environmentVariables.set(
+      mapOf("additionalTestOutputDir" to "/sdcard/Download", "no-isolated-storage" to "true")
+    )
     devices.set(
       listOf(
         mapOf("model" to "oriole", "version" to "32", "locale" to "en_US"),
