@@ -76,7 +76,7 @@ private fun FlankGradleExtension.commonConfigurationForFirebaseTestLab(project: 
   useOrchestrator.set(false)
   flakyTestAttempts.set(3)
   directoriesToPull.set(listOf("/sdcard/Download"))
-  filesToDownload.set(listOf(".*/sdcard/Download/.*.ec"))
+  filesToDownload.set(listOf(".*/sdcard/Download/.*.ec", ".*/sdcard/Download/.*.json"))
   resultsBucket.set("android-fhir-build-artifacts")
   resultsDir.set(
     if (project.providers.environmentVariable("KOKORO_BUILD_ARTIFACTS_SUBDIR").isPresent) {
