@@ -44,7 +44,7 @@ class EditTextDecimalViewHolderFactoryTest {
   private val viewHolder = EditTextDecimalViewHolderFactory.create(parent)
 
   @Test
-  fun shouldSetQuestionHeader() {
+  fun `should set questionnaire header`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -59,7 +59,7 @@ class EditTextDecimalViewHolderFactoryTest {
   }
 
   @Test
-  fun shouldSetInputText() {
+  fun `should set input text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -84,7 +84,7 @@ class EditTextDecimalViewHolderFactoryTest {
   }
 
   @Test
-  fun shouldSetInputTextToEmpty() {
+  fun `should set input text to empty`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -117,7 +117,7 @@ class EditTextDecimalViewHolderFactoryTest {
   }
 
   @Test
-  fun shouldSetQuestionnaireResponseItemAnswerIfValidText() {
+  fun `should set QuestionnaireResponseItemAnswer if text is valid`() {
     var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireViewItem =
       QuestionnaireViewItem(
@@ -136,7 +136,7 @@ class EditTextDecimalViewHolderFactoryTest {
   }
 
   @Test
-  fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
+  fun `should set QuestionnaireResponseItemAnswer to empty`() {
     var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireViewItem =
       QuestionnaireViewItem(
@@ -151,7 +151,26 @@ class EditTextDecimalViewHolderFactoryTest {
   }
 
   @Test
-  fun displayValidationResult_shouldShowNoErrorMessage() {
+  fun `should set draftAnswer if text is invalid`() {
+    var draftAnswer: Any? = null
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, result -> draftAnswer = result },
+      )
+    viewHolder.bind(questionnaireViewItem)
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).apply {
+      setText("1.1.1.1")
+      clearFocus()
+    }
+    viewHolder.itemView.clearFocus()
+    assertThat(draftAnswer as String).isEqualTo("1.1.1.1")
+  }
+
+  @Test
+  fun `displayValidationResult should show no error message`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -181,7 +200,7 @@ class EditTextDecimalViewHolderFactoryTest {
   }
 
   @Test
-  fun displayValidationResult_error_shouldShowErrorMessage() {
+  fun `displayValidationResult should show error message`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -226,7 +245,7 @@ class EditTextDecimalViewHolderFactoryTest {
   }
 
   @Test
-  fun bind_readOnly_shouldDisableView() {
+  fun `bind readOnly should disable view`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
