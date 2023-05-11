@@ -33,7 +33,7 @@ import org.robolectric.RobolectricTestRunner
 class GzipUploadInterceptorTest {
 
   @JvmField @Rule val server = MockWebServer()
-  private val client = OkHttpClient.Builder().addInterceptor(GzipUploadInterceptor()).build()
+  private val client = OkHttpClient.Builder().addInterceptor(GzipUploadInterceptor).build()
 
   @Test
   fun `uncompressed request body received by server should match request body sent`() {
@@ -52,6 +52,21 @@ class GzipUploadInterceptorTest {
       String(GZIPInputStream(recordedRequest.body.inputStream()).use { it.readBytes() })
     assertThat(uncompressedBodyReceived).isEqualTo("abc")
     assertThat(recordedRequest.getHeader(CONTENT_ENCODING_HEADER_NAME)).isEqualTo("gzip")
+  }
+
+  @Test
+  fun `content length header gets set`() {
+    server.enqueue(MockResponse())
+    val request =
+      Request.Builder()
+        .url(server.url("/"))
+        .method("POST", "abc".toRequestBody(MediaTypes.MEDIA_TYPE_FHIR_JSON))
+        .build()
+
+    client.newCall(request).execute()
+
+    val recordedRequest = server.takeRequest()
+    assertThat(recordedRequest.getHeader("Content-Length")?.toLong()).isGreaterThan(-1)
   }
 
   @Test

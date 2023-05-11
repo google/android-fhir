@@ -163,5 +163,5 @@ data class NetworkConfiguration(
   /** Write timeout (in seconds) for network connection. The default is 10 seconds. */
   val writeTimeOut: Long = 10,
   /** Compresses requests when uploading to a server that supports gzip. */
-  val uploadWithGzip: Boolean = false
+  val uploadWithGzip: Boolean = false,
 )

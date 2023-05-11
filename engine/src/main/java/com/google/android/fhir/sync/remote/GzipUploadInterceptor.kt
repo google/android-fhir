@@ -20,14 +20,15 @@ import okhttp3.Interceptor
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import okhttp3.Response
+import okio.Buffer
 import okio.BufferedSink
 import okio.GzipSink
 import okio.buffer
 
 const val CONTENT_ENCODING_HEADER_NAME = "Content-Encoding"
 
-/** Compresses uploads with gzip */
-class GzipUploadInterceptor : Interceptor {
+/** Compresses upload requests with gzip */
+object GzipUploadInterceptor : Interceptor {
   override fun intercept(chain: Interceptor.Chain): Response {
     val uncompressedRequest = chain.request()
     if (uncompressedRequest.body == null ||
@@ -40,7 +41,7 @@ class GzipUploadInterceptor : Interceptor {
       uncompressedRequest
         .newBuilder()
         .header(CONTENT_ENCODING_HEADER_NAME, "gzip")
-        .method(uncompressedRequest.method, gzip(uncompressedRequest.body!!))
+        .method(uncompressedRequest.method, addContentLength(gzip(uncompressedRequest.body!!)))
         .build()
 
     return chain.proceed(compressedRequest)
@@ -56,4 +57,18 @@ class GzipUploadInterceptor : Interceptor {
         gzipBufferedSink.close()
       }
     }
+
+  private fun addContentLength(requestBody: RequestBody): RequestBody {
+    val buffer = Buffer()
+    requestBody.writeTo(buffer)
+    return object : RequestBody() {
+      override fun contentType(): MediaType? = requestBody.contentType()
+
+      override fun contentLength(): Long = buffer.size
+
+      override fun writeTo(sink: BufferedSink) {
+        sink.write(buffer.snapshot())
+      }
+    }
+  }
 }
