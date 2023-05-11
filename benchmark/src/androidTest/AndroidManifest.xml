@@ -15,6 +15,7 @@
         android:debuggable="false"
         tools:ignore="HardcodedDebugMode"
         tools:replace="android:debuggable"
+        android:requestLegacyExternalStorage="true"
     >
         <profileable android:shell="true" />
     </application>

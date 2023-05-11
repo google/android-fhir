@@ -29,6 +29,7 @@ android {
     // Includes Startup time
     testInstrumentationRunnerArguments["androidx.benchmark.startupMode.enable"] = "true"
     testInstrumentationRunnerArguments["additionalTestOutputDir"] = "/sdcard/Download"
+    testInstrumentationRunnerArguments["no-isolated-storage"] = "true"
   }
 
   testBuildType = "release"
