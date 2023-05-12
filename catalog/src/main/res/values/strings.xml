@@ -46,7 +46,7 @@
     <string name="behavior_name_context_variables">Context variable</string>
     <string
         name="behavior_name_dynamic_question_text"
-    >Dynamic Question Text</string>
+    >Dynamic question text</string>
     <string
         name="behavior_name_calculated_expression_info"
     >Input age to automatically calculate birthdate until birthdate is updated manually.</string>
