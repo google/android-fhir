@@ -47,7 +47,7 @@ internal class GroupHeaderView(context: Context, attrs: AttributeSet?) :
       questionnaireItem = questionnaireViewItem.questionnaireItem
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
-    // use questionText to ensure cqf-expression derived text is prioritized over localized text
+    // CQF expression takes precedence over static question text
     question.updateTextAndVisibility(questionnaireViewItem.questionText)
     hint.updateTextAndVisibility(
       questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
