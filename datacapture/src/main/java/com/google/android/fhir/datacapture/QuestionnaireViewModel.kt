@@ -51,7 +51,7 @@ import com.google.android.fhir.datacapture.extensions.zipByLinkId
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
-import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCqfExpression
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateExpression
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -321,7 +321,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
 
-      updateDependentQuestionnaireResponseItems(questionnaireItem)
+      updateDependentQuestionnaireResponseItems(questionnaireItem, questionnaireResponseItem)
 
       modificationCount.update { it + 1 }
     }
@@ -443,17 +443,22 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           getQuestionnaireState()
             .also { detectExpressionCyclicDependency(questionnaire.item) }
             .also {
-              questionnaire.item.flattened().forEach {
-                updateDependentQuestionnaireResponseItems(it)
+              questionnaire.item.flattened().forEach { qItem ->
+                updateDependentQuestionnaireResponseItems(
+                  qItem,
+                  questionnaireResponse.allItems.find { it.linkId == qItem.linkId }
+                )
               }
             }
       )
 
   private fun updateDependentQuestionnaireResponseItems(
     updatedQuestionnaireItem: QuestionnaireItemComponent,
+    updatedQuestionnaireResponseItem: QuestionnaireResponseItemComponent?,
   ) {
     evaluateCalculatedExpressions(
         updatedQuestionnaireItem,
+        updatedQuestionnaireResponseItem,
         questionnaire,
         questionnaireResponse,
         questionnaireItemParentMap
@@ -544,16 +549,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     element: Element,
   ): List<Base> {
     val cqfExpression = element.cqfExpression ?: return emptyList()
-    if (cqfExpression.isFhirPath) {
-      return evaluateCqfExpression(
-        questionnaire,
-        questionnaireResponse,
-        questionnaireItem,
-        questionnaireResponseItem,
-        cqfExpression,
-        questionnaireItemParentMap
-      )
-    } else throw UnsupportedOperationException("${cqfExpression.language} not supported yet")
+
+    if (!cqfExpression.isFhirPath) {
+      throw UnsupportedOperationException("${cqfExpression.language} not supported yet")
+    }
+    return evaluateExpression(
+      questionnaire,
+      questionnaireResponse,
+      questionnaireItem,
+      questionnaireResponseItem,
+      cqfExpression,
+      questionnaireItemParentMap
+    )
   }
 
   private suspend fun loadAnswerExpressionOptions(

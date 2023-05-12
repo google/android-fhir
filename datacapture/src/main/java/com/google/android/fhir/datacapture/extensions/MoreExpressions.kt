@@ -16,9 +16,7 @@
 
 package com.google.android.fhir.datacapture.extensions
 
-import org.hl7.fhir.r4.model.Element
 import org.hl7.fhir.r4.model.Expression
-import org.hl7.fhir.r4.utils.ToolingExtensions
 
 internal val Expression.isXFhirQuery: Boolean
   get() = this.language == Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
