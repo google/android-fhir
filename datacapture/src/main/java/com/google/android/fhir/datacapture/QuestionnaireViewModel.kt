@@ -698,7 +698,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         NotValidated
       }
 
-    // set title dynamically from cqf expression on textElement
+    // Set question text dynamically from CQL expression
     questionnaireResponseItem.apply {
       resolveCqfExpression(questionnaireItem, this, questionnaireItem.textElement)
         .firstOrNull()
