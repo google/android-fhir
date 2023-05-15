@@ -64,7 +64,6 @@ class D_FhirJsonParserBenchmark {
         fhirContext.newJsonParser()
       }
 
-
       val immunityCheckJson = runWithTimingDisabled { open("/immunity-check/ImmunityCheck.json") }
       val immunityCheckLibrary = jsonParser.parseResource(immunityCheckJson) as Library
       val fhirHelpersJson = runWithTimingDisabled { open("/immunity-check/FhirHelpers.json") }
