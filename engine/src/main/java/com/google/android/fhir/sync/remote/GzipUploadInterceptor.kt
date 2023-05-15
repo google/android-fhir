@@ -27,7 +27,7 @@ import okio.buffer
 
 const val CONTENT_ENCODING_HEADER_NAME = "Content-Encoding"
 
-/** Compresses upload requests with gzip */
+/** Compresses upload requests with gzip. */
 object GzipUploadInterceptor : Interceptor {
   override fun intercept(chain: Interceptor.Chain): Response {
     val uncompressedRequest = chain.request()
