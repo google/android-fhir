@@ -43,7 +43,7 @@ class D_FhirJsonParserBenchmark {
   fun parseLightFhirBundle() {
     benchmarkRule.measureRepeated {
       val jsonParser = runWithTimingDisabled {
-        var fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
+        val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
         fhirContext.newJsonParser()
       }
 
@@ -60,16 +60,20 @@ class D_FhirJsonParserBenchmark {
   fun parseLightFhirLibrary() {
     benchmarkRule.measureRepeated {
       val jsonParser = runWithTimingDisabled {
-        var fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
+        val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
         fhirContext.newJsonParser()
       }
 
-      val library = runWithTimingDisabled { open("/immunity-check/ImmunityCheck.json") }
 
-      val immunityCheckLibrary = jsonParser.parseResource(library) as Library
+      val immunityCheckJson = runWithTimingDisabled { open("/immunity-check/ImmunityCheck.json") }
+      val immunityCheckLibrary = jsonParser.parseResource(immunityCheckJson) as Library
+      val fhirHelpersJson = runWithTimingDisabled { open("/immunity-check/FhirHelpers.json") }
+      val fhirHelpersLibrary = jsonParser.parseResource(fhirHelpersJson) as Library
 
       assertThat(immunityCheckLibrary.id).isEqualTo("Library/ImmunityCheck-1.0.0")
       assertThat(immunityCheckLibrary.content[0].data.size).isEqualTo(575)
+      assertThat(fhirHelpersLibrary.id).isEqualTo("Library/FHIRHelpers-4.0.1")
+      assertThat(fhirHelpersLibrary.content[0].data.size).isEqualTo(17845)
     }
   }
 }
