@@ -88,6 +88,7 @@ dependencies {
   androidTestImplementation(Dependencies.Androidx.workRuntimeKtx)
   androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
   androidTestImplementation(Dependencies.mockWebServer)
+  androidTestImplementation(Dependencies.Retrofit.coreRetrofit)
 
   androidTestImplementation(project(":engine"))
   androidTestImplementation(project(":knowledge"))
