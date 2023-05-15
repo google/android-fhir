@@ -43,7 +43,7 @@ class E_ElmJsonLibraryLoaderBenchmark {
   fun parseImmunityCheckCqlFromFhirLibrary() {
     benchmarkRule.measureRepeated {
       val immunityCheckLibrary = runWithTimingDisabled {
-        var fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
+        val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
         val jsonParser = fhirContext.newJsonParser()
         jsonParser.parseResource(open("/immunity-check/ImmunityCheck.json")) as Library
       }

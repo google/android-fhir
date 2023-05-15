@@ -74,25 +74,9 @@ class H_FhirSyncWorkerBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()
 
-  private lateinit var fhirJsonParser: IParser
+  private val fhirJsonParser: IParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
   private lateinit var mockWebServer: MockWebServer
-
-  companion object {
-
-    private const val mockServerPort = 8080
-
-    @JvmStatic
-    @BeforeClass
-    fun oneTimeSetup() {
-      FhirEngineProvider.init(
-        FhirEngineConfiguration(
-          serverConfiguration = ServerConfiguration("http://127.0.0.1:$mockServerPort/fhir/"),
-          testMode = true
-        )
-      )
-    }
-  }
 
   class BenchmarkTestOneTimeSyncWorker(
     private val appContext: Context,
@@ -110,10 +94,7 @@ class H_FhirSyncWorkerBenchmark {
     DownloadWorkManager {
     private val urls = LinkedList(queries)
 
-    override suspend fun getNextRequest(): Request? {
-      val url = urls.poll()?.let { Request.of(it) }
-      return url
-    }
+    override suspend fun getNextRequest() = urls.poll()?.let { Request.of(it) }
     override suspend fun getSummaryRequestUrls(): Map<ResourceType, String> {
       return emptyMap()
     }
@@ -144,7 +125,6 @@ class H_FhirSyncWorkerBenchmark {
 
   @Before
   fun setup() {
-    fhirJsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
     mockWebServer = MockWebServer()
     mockWebServer.start(mockServerPort)
   }
@@ -237,6 +217,65 @@ class H_FhirSyncWorkerBenchmark {
   private fun createResourceResponse(resource: IBaseResource): MockResponse {
     val response = MockResponse().addHeader("Content-Type", "application/json; charset=utf-8")
     return response.setBody(fhirJsonParser.encodeResourceToString(resource)).setResponseCode(200)
+  }
+
+  private fun createMockPatient(patientId: String): Patient {
+    return Patient().apply {
+      id = patientId
+      gender =
+        if (patientId.last().isDigit()) Enumerations.AdministrativeGender.FEMALE
+        else Enumerations.AdministrativeGender.MALE
+      name =
+        listOf(
+          HumanName().apply {
+            given = listOf(StringType("Test patient Name $patientId"))
+            family = "Patient Family"
+          }
+        )
+      address =
+        listOf(
+          Address().apply {
+            text = "534 Erewhon St PeasantVille, Rainbow, Vic  3999"
+            city = "PleasantVille"
+            district = "Rainbow"
+            state = "Vic"
+            postalCode = "postalCode"
+            line = listOf(StringType("534 Erewhon St"))
+          }
+        )
+      contact =
+        listOf(
+          Patient.ContactComponent().apply {
+            relationship =
+              listOf(
+                CodeableConcept().apply {
+                  coding = listOf(Coding("http://terminology.hl7.org/CodeSystem/v2-0131", "N", ""))
+                  name =
+                    HumanName().apply {
+                      given = listOf(StringType("Test patient rep Name $patientId"))
+                      family = "Patient Family"
+                    }
+                  gender =
+                    if (patientId.last().isDigit()) Enumerations.AdministrativeGender.MALE
+                    else Enumerations.AdministrativeGender.FEMALE
+                }
+              )
+          }
+        )
+      telecom =
+        listOf(
+          ContactPoint().apply {
+            system = ContactPoint.ContactPointSystem.PHONE
+            value = "(03) 5555 6473"
+            use = ContactPoint.ContactPointUse.HOME
+          },
+          ContactPoint().apply {
+            system = ContactPoint.ContactPointSystem.PHONE
+            value = "(03) 3410 5613"
+            use = ContactPoint.ContactPointUse.WORK
+          }
+        )
+    }
   }
 
   private fun createMockObservation(patientId: String): Observation {
@@ -361,62 +400,19 @@ class H_FhirSyncWorkerBenchmark {
     }
   }
 
-  private fun createMockPatient(patientId: String): Patient {
-    return Patient().apply {
-      id = patientId
-      gender =
-        if (patientId.last().isDigit()) Enumerations.AdministrativeGender.FEMALE
-        else Enumerations.AdministrativeGender.MALE
-      name =
-        listOf(
-          HumanName().apply {
-            given = listOf(StringType("Test patient Name $patientId"))
-            family = "Patient Family"
-          }
+  companion object {
+
+    private const val mockServerPort = 8080
+
+    @JvmStatic
+    @BeforeClass
+    fun oneTimeSetup() {
+      FhirEngineProvider.init(
+        FhirEngineConfiguration(
+          serverConfiguration = ServerConfiguration("http://127.0.0.1:$mockServerPort/fhir/"),
+          testMode = true
         )
-      address =
-        listOf(
-          Address().apply {
-            text = "534 Erewhon St PeasantVille, Rainbow, Vic  3999"
-            city = "PleasantVille"
-            district = "Rainbow"
-            state = "Vic"
-            postalCode = "postalCode"
-            line = listOf(StringType("534 Erewhon St"))
-          }
-        )
-      contact =
-        listOf(
-          Patient.ContactComponent().apply {
-            relationship =
-              listOf(
-                CodeableConcept().apply {
-                  coding = listOf(Coding("http://terminology.hl7.org/CodeSystem/v2-0131", "N", ""))
-                  name =
-                    HumanName().apply {
-                      given = listOf(StringType("Test patient rep Name $patientId"))
-                      family = "Patient Family"
-                    }
-                  gender =
-                    if (patientId.last().isDigit()) Enumerations.AdministrativeGender.MALE
-                    else Enumerations.AdministrativeGender.FEMALE
-                }
-              )
-          }
-        )
-      telecom =
-        listOf(
-          ContactPoint().apply {
-            system = ContactPoint.ContactPointSystem.PHONE
-            value = "(03) 5555 6473"
-            use = ContactPoint.ContactPointUse.HOME
-          },
-          ContactPoint().apply {
-            system = ContactPoint.ContactPointSystem.PHONE
-            value = "(03) 3410 5613"
-            use = ContactPoint.ContactPointUse.WORK
-          }
-        )
+      )
     }
   }
 }
