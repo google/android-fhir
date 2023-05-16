@@ -939,7 +939,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `add nested QuestionnaireResponseItemComponent in the group if items are not answered`() {
+  fun `add empty nested QuestionnaireResponseItemComponent to the group if questions are not answered`() {
     val questionnaireString =
       """
         {

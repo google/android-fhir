@@ -161,6 +161,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireResponse.packRepeatedGroups()
   }
 
+  /**
+   * If the corresponding [QuestionnaireItemComponent] lacks a response item component, the
+   * [QuestionnaireResponseItemComponent] is added to the QuestionnaireResponse. Note : However, the
+   * aforementioned does not apply if the [QuestionnaireItemComponent] is a question (type other tha
+   * group type) with a nested questionnaire,or repeated group.
+   */
   private fun addQuestionnaireResponseItemComponentToQuestionnaireResponse(
     questionnaireItemComponents: List<QuestionnaireItemComponent>,
     responseItemComponents: MutableList<QuestionnaireResponseItemComponent>
