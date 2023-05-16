@@ -129,6 +129,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           parser.parseResource(application.contentResolver.openInputStream(uri))
             as QuestionnaireResponse
         checkQuestionnaireResponse(questionnaire, questionnaireResponse)
+        addQuestionnaireResponseItemComponentToQuestionnaireResponse(
+          questionnaire.item,
+          questionnaireResponse.item
+        )
       }
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING) -> {
         val questionnaireResponseJson: String =
@@ -136,6 +140,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaireResponse =
           parser.parseResource(questionnaireResponseJson) as QuestionnaireResponse
         checkQuestionnaireResponse(questionnaire, questionnaireResponse)
+        addQuestionnaireResponseItemComponentToQuestionnaireResponse(
+          questionnaire.item,
+          questionnaireResponse.item
+        )
       }
       else -> {
         questionnaireResponse =
@@ -150,6 +158,31 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
     }
     questionnaireResponse.packRepeatedGroups()
+  }
+
+  private fun addQuestionnaireResponseItemComponentToQuestionnaireResponse(
+    questionnaireItemComponents: List<QuestionnaireItemComponent>,
+    responseItemComponents: MutableList<QuestionnaireResponseItemComponent>
+  ) {
+    questionnaireItemComponents.forEachIndexed { index, questionnaireItemComponent ->
+      when {
+        index >= responseItemComponents.size -> {
+          responseItemComponents.add(questionnaireItemComponent.createQuestionnaireResponseItem())
+        }
+        questionnaireItemComponent.linkId != responseItemComponents[index].linkId -> {
+          responseItemComponents.add(
+            index,
+            questionnaireItemComponent.createQuestionnaireResponseItem()
+          )
+        }
+      }
+      if (!questionnaireItemComponent.shouldHaveNestedItemsUnderAnswers) {
+        addQuestionnaireResponseItemComponentToQuestionnaireResponse(
+          questionnaireItemComponent.item,
+          responseItemComponents[index].item
+        )
+      }
+    }
   }
 
   /**

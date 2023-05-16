@@ -938,6 +938,101 @@ class QuestionnaireViewModelTest {
     createQuestionnaireViewModel(questionnaire, questionnaireResponse)
   }
 
+  @Test
+  fun `add nested QuestionnaireResponseItemComponent in the group if items are not answered`() {
+    val questionnaireString =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "id": "client-registration-sample",
+          "language": "en",
+          "status": "active",
+          "date": "2020-11-18T07:24:47.111Z",
+          "subjectType": [
+            "Patient"
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Patient",
+                "name": "patient"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "1",
+              "text": "Group Item",
+              "type": "group",
+              "required": true,
+              "item": [
+                {
+                  "linkId": "1.1",
+                  "text": "First Nested Item",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
+                  "linkId": "1.2",
+                  "text": "Second Nested Item",
+                  "type": "boolean",
+                  "required": true
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    val questionnaireResponseString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "1",
+              "text":"Group Item"
+            }
+          ]
+        }
+      """.trimIndent()
+
+    val expectedResponseString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "1",
+              "text": "Group Item",
+              "item": [
+                {
+                  "linkId": "1.1",
+                  "text": "First Nested Item"
+                },
+                {
+                  "linkId": "1.2",
+                  "text": "Second Nested Item"
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
+    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    val viewModel = QuestionnaireViewModel(context, state)
+    val value = viewModel.getQuestionnaireResponse()
+    val expectedResponse =
+      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+        as QuestionnaireResponse
+
+    assertResourceEquals(value, expectedResponse)
+  }
+
   // ==================================================================== //
   //                                                                      //
   //                       Questionnaire State Flow                       //

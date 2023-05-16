@@ -448,7 +448,10 @@ internal val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
  * For background, see https://build.fhir.org/questionnaireresponse.html#link.
  */
 internal val Questionnaire.QuestionnaireItemComponent.shouldHaveNestedItemsUnderAnswers: Boolean
-  get() = item.isNotEmpty() && (type != Questionnaire.QuestionnaireItemType.GROUP || !repeats)
+  get() =
+    item.isNotEmpty() &&
+      ((type != Questionnaire.QuestionnaireItemType.GROUP && !repeats) ||
+        (type == Questionnaire.QuestionnaireItemType.GROUP && repeats))
 
 /**
  * Creates a list of [QuestionnaireResponse.QuestionnaireResponseItemComponent]s from the nested
