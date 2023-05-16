@@ -62,8 +62,7 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.StringType
-import org.junit.After
-import org.junit.Before
+import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
@@ -75,8 +74,6 @@ class H_FhirSyncWorkerBenchmark {
   @get:Rule val benchmarkRule = BenchmarkRule()
 
   private val fhirJsonParser: IParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-
-  private lateinit var mockWebServer: MockWebServer
 
   class BenchmarkTestOneTimeSyncWorker(
     private val appContext: Context,
@@ -123,22 +120,11 @@ class H_FhirSyncWorkerBenchmark {
     }
   }
 
-  @Before
-  fun setup() {
-    mockWebServer = MockWebServer()
-    mockWebServer.start(mockServerPort)
-  }
+  @Test fun oneTimeSync_1patient() = oneTimeSync(1, 5, 5)
 
-  @After
-  fun teardown() {
-    mockWebServer.shutdown()
-  }
+  @Test fun oneTimeSync_10patients() = oneTimeSync(10, 5, 5)
 
-  @Test fun oneTimeSync_10patients() = oneTimeSync(10, 10, 10)
-
-  @Test fun oneTimeSync_100patients() = oneTimeSync(100, 10, 10)
-
-  @Test fun oneTimeSync_1000patients() = oneTimeSync(1000, 10, 10)
+  @Test fun oneTimeSync_100patients() = oneTimeSync(100, 5, 5)
 
   private fun oneTimeSync(numberPatients: Int, numberObservations: Int, numberEncounters: Int) =
     runBlocking {
@@ -403,6 +389,7 @@ class H_FhirSyncWorkerBenchmark {
   companion object {
 
     private const val mockServerPort = 8080
+    private val mockWebServer: MockWebServer = MockWebServer()
 
     @JvmStatic
     @BeforeClass
@@ -413,6 +400,14 @@ class H_FhirSyncWorkerBenchmark {
           testMode = true
         )
       )
+      mockWebServer.start(mockServerPort)
+    }
+
+    @JvmStatic
+    @AfterClass
+    fun oneTimeTearDown() {
+      FhirEngineProvider.cleanup()
+      mockWebServer.shutdown()
     }
   }
 }

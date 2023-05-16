@@ -30,6 +30,7 @@ fun Project.configureFirebaseTestLab() {
     environmentVariables.set(
       mapOf("coverage" to "true", "coverageFile" to "/sdcard/Download/coverage.ec")
     )
+    flakyTestAttempts.set(3)
     devices.set(
       listOf(
         mapOf(
@@ -58,6 +59,9 @@ fun Project.configureFirebaseTestLabForMicroBenchmark() {
     environmentVariables.set(
       mapOf("additionalTestOutputDir" to "/sdcard/Download", "no-isolated-storage" to "true")
     )
+    maxTestShards.set(4)
+    // some of the benchmark tests get timed-out in the default 15m
+    testTimeout.set("30m")
     devices.set(
       listOf(
         mapOf("model" to "oriole", "version" to "32", "locale" to "en_US"),
@@ -74,7 +78,6 @@ private fun FlankGradleExtension.commonConfigurationForFirebaseTestLab(project: 
     }
   )
   useOrchestrator.set(false)
-  flakyTestAttempts.set(3)
   directoriesToPull.set(listOf("/sdcard/Download"))
   filesToDownload.set(listOf(".*/sdcard/Download/.*.ec", ".*/sdcard/Download/.*.json"))
   resultsBucket.set("android-fhir-build-artifacts")
