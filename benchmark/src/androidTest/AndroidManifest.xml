@@ -13,9 +13,11 @@
     -->
     <application
         android:debuggable="false"
+        android:usesCleartextTraffic="true"
         tools:ignore="HardcodedDebugMode"
         tools:replace="android:debuggable"
     >
         <profileable android:shell="true" />
     </application>
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

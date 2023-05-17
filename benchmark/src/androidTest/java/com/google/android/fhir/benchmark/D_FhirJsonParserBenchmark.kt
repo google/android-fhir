@@ -64,12 +64,10 @@ class D_FhirJsonParserBenchmark {
         fhirContext.newJsonParser()
       }
 
-      val library = runWithTimingDisabled { open("/immunity-check/ImmunityCheck.json") }
-
-      val libraryBundle = jsonParser.parseResource(library) as Bundle
-
-      val immunityCheckLibrary = libraryBundle.entry[0].resource as Library
-      val fhirHelpersLibrary = libraryBundle.entry[1].resource as Library
+      val immunityCheckJson = runWithTimingDisabled { open("/immunity-check/ImmunityCheck.json") }
+      val immunityCheckLibrary = jsonParser.parseResource(immunityCheckJson) as Library
+      val fhirHelpersJson = runWithTimingDisabled { open("/immunity-check/FhirHelpers.json") }
+      val fhirHelpersLibrary = jsonParser.parseResource(fhirHelpersJson) as Library
 
       assertThat(immunityCheckLibrary.id).isEqualTo("Library/ImmunityCheck-1.0.0")
       assertThat(immunityCheckLibrary.content[0].data.size).isEqualTo(575)
