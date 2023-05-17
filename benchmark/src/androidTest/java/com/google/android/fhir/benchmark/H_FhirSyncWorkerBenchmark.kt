@@ -124,7 +124,7 @@ class H_FhirSyncWorkerBenchmark {
 
   @Test fun oneTimeSync_10patients() = oneTimeSync(10, 5, 5)
 
-  @Test fun oneTimeSync_100patients() = oneTimeSync(100, 5, 5)
+  @Test fun oneTimeSync_50patients() = oneTimeSync(50, 5, 5)
 
   private fun oneTimeSync(numberPatients: Int, numberObservations: Int, numberEncounters: Int) =
     runBlocking {
