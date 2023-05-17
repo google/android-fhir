@@ -31,6 +31,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -91,10 +92,15 @@ class I_GzipUploadInterceptorBenchmark {
   @Test fun upload_1000patientsWithoutGzip() = uploader(1000, httpServiceWithoutGzip)
 
   private fun uploader(numberObservations: Int, httpService: TestHttpService) = runBlocking {
-    val response = MockResponse().addHeader("Content-Type", "application/json; charset=utf-8")
-    mockWebServer.enqueue(
-      response.setBody(fhirJsonParser.encodeResourceToString(Bundle())).setResponseCode(200)
-    )
+    mockWebServer.dispatcher =
+      object : okhttp3.mockwebserver.Dispatcher() {
+        override fun dispatch(request: RecordedRequest): MockResponse {
+          val response = MockResponse().addHeader("Content-Type", "application/json; charset=utf-8")
+          return response
+            .setBody(fhirJsonParser.encodeResourceToString(Bundle()))
+            .setResponseCode(200)
+        }
+      }
 
     benchmarkRule.measureRepeated {
       runBlocking {
