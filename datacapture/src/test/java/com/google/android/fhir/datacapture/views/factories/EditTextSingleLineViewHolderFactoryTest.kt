@@ -22,6 +22,7 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -240,14 +241,14 @@ class EditTextSingleLineViewHolderFactoryTest {
   }
 
   @Test
-  fun `shows required text`() {
+  fun `show required text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        showRequiredText = true
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
       )
     )
 
@@ -260,14 +261,14 @@ class EditTextSingleLineViewHolderFactoryTest {
   }
 
   @Test
-  fun `shows optional text`() {
+  fun `show optional text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        showOptionalText = true
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
       )
     )
 
@@ -280,7 +281,7 @@ class EditTextSingleLineViewHolderFactoryTest {
   }
 
   @Test
-  fun `shows asterisk`() {
+  fun `show asterisk`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -290,7 +291,7 @@ class EditTextSingleLineViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        showAsterisk = true
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
       )
     )
 

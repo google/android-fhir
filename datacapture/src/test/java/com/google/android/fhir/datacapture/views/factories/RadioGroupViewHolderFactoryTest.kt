@@ -31,6 +31,7 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_ANSWER_MEDI
 import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Attachment
@@ -484,14 +485,14 @@ class RadioGroupViewHolderFactoryTest {
   }
 
   @Test
-  fun `shows required text`() {
+  fun `show required text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        showRequiredText = true
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
       )
     )
 
@@ -502,7 +503,7 @@ class RadioGroupViewHolderFactoryTest {
   }
 
   @Test
-  fun `shows asterisk`() {
+  fun `show asterisk`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -512,7 +513,7 @@ class RadioGroupViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        showAsterisk = true
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
       )
     )
 
@@ -521,14 +522,14 @@ class RadioGroupViewHolderFactoryTest {
   }
 
   @Test
-  fun `shows optional text`() {
+  fun `show optional text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        showOptionalText = true
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
       )
     )
 

@@ -27,13 +27,12 @@ import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.extensions.format
 import com.google.android.fhir.datacapture.extensions.getDateSeparator
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
+import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.parseDate
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.MaxValueValidator.getMaxValue
 import com.google.android.fhir.datacapture.validation.MinValueValidator.getMinValue
-import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -210,21 +209,11 @@ internal object DatePickerViewHolderFactory :
 
       private fun displayValidationResult(validationResult: ValidationResult) {
         textInputLayout.error =
-          when (validationResult) {
-            is NotValidated,
-            Valid -> null
-            is Invalid -> {
-              val validationMessage = validationResult.getSingleStringValidationMessage()
-              if (questionnaireViewItem.questionnaireItem.required &&
-                  questionnaireViewItem.showRequiredText
-              ) {
-                textInputLayout.context.getString(R.string.required_text_and_new_line) +
-                  validationMessage
-              } else {
-                validationMessage
-              }
-            }
-          }
+          getValidationErrorMessage(
+            textInputLayout.context,
+            questionnaireViewItem,
+            validationResult
+          )
       }
 
       /** Automatically appends date separator (e.g. "/") during date input. */

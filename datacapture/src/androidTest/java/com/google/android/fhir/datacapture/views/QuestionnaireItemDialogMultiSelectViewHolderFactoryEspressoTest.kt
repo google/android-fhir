@@ -373,7 +373,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shows_requiredText_asHelperText() {
+  fun show_requiredText() {
     runOnUI {
       viewHolder.bind(
         QuestionnaireViewItem(
@@ -385,7 +385,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
-          showRequiredText = true
+          questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
         )
       )
 
@@ -399,7 +399,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shows_asterisk() {
+  fun show_asterisk() {
     runOnUI {
       viewHolder.bind(
         QuestionnaireViewItem(
@@ -411,7 +411,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
-          showAsterisk = true
+          questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
         )
       )
 
@@ -421,7 +421,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shows_optionalText_asHelperText() {
+  fun shows_optionalText() {
     runOnUI {
       viewHolder.bind(
         QuestionnaireViewItem(
@@ -429,7 +429,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
-          showOptionalText = true
+          questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
         )
       )
       assertThat(

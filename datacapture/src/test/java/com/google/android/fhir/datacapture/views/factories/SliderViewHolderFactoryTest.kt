@@ -26,6 +26,7 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_SLIDER_STEP_VALU
 import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.slider.Slider
 import com.google.common.truth.Truth.assertThat
@@ -388,14 +389,14 @@ class SliderViewHolderFactoryTest {
   }
 
   @Test
-  fun `shows required text`() {
+  fun `show required text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        showRequiredText = true
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
       )
     )
 
@@ -406,7 +407,7 @@ class SliderViewHolderFactoryTest {
   }
 
   @Test
-  fun `shows asterisk`() {
+  fun `show asterisk`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -416,7 +417,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        showAsterisk = true
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
       )
     )
 
@@ -425,14 +426,14 @@ class SliderViewHolderFactoryTest {
   }
 
   @Test
-  fun `shows optional text`() {
+  fun `show optional text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        showOptionalText = true
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
       )
     )
 

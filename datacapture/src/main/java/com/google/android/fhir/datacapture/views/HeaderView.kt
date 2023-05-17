@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.extensions.initHelpViews
 import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
+import org.hl7.fhir.r4.model.Questionnaire
 
 /** View for the prefix, question, and hint of a questionnaire item. */
 internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
@@ -50,7 +51,7 @@ internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout
       questionnaireItem = questionnaireViewItem.questionnaireItem
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
-    appendAsteriskToQuestionText(question, questionnaireViewItem)
+    question.updateTextAndVisibility(appendAsteriskToQuestionText(question, questionnaireViewItem))
     hint.updateTextAndVisibility(
       questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
     )
@@ -76,14 +77,18 @@ internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout
     errorTextView.text = errorText
   }
 
-  /** Shows an required text in the header. */
+  /**
+   * Shows [R.string.required] if [Questionnaire.QuestionnaireItemComponent.required] is true, or
+   * else it shows [R.string.optional_helper_text]
+   */
   fun showRequiredOrOptionalTextInHeaderView(questionnaireViewItem: QuestionnaireViewItem) {
     val requireOptionalText =
       when {
         (questionnaireViewItem.questionnaireItem.required &&
-          questionnaireViewItem.showRequiredText) -> context.getString(R.string.required)
+          questionnaireViewItem.questionViewTextConfiguration.showRequiredText) ->
+          context.getString(R.string.required)
         (!questionnaireViewItem.questionnaireItem.required &&
-          questionnaireViewItem.showOptionalText) ->
+          questionnaireViewItem.questionViewTextConfiguration.showOptionalText) ->
           context.getString(R.string.optional_helper_text)
         else -> null
       }

@@ -29,13 +29,11 @@ import com.google.android.fhir.datacapture.extensions.ItemControlTypes
 import com.google.android.fhir.datacapture.extensions.asStringValue
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
+import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
-import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.OptionSelectDialogFragment
@@ -116,21 +114,11 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
       private fun displayValidationResult(validationResult: ValidationResult) {
         holder.summaryHolder.error =
-          when (validationResult) {
-            is NotValidated,
-            Valid -> null
-            is Invalid -> {
-              val validationMessage = validationResult.getSingleStringValidationMessage()
-              if (questionnaireViewItem.questionnaireItem.required &&
-                  questionnaireViewItem.showRequiredText
-              ) {
-                holder.summaryHolder.context.getString(R.string.required_text_and_new_line) +
-                  validationMessage
-              } else {
-                validationMessage
-              }
-            }
-          }
+          getValidationErrorMessage(
+            holder.summaryHolder.context,
+            questionnaireViewItem,
+            validationResult
+          )
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

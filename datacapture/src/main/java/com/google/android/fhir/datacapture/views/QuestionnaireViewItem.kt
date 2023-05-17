@@ -83,9 +83,8 @@ data class QuestionnaireViewItem(
     },
   internal val draftAnswer: Any? = null,
   internal val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
-  internal val showAsterisk: Boolean = false,
-  internal val showRequiredText: Boolean = false,
-  internal val showOptionalText: Boolean = false,
+  internal val questionViewTextConfiguration: QuestionTextConfiguration =
+    QuestionTextConfiguration()
 ) {
 
   /**

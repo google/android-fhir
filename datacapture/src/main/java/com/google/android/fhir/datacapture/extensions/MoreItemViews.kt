@@ -18,6 +18,10 @@ package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import org.hl7.fhir.r4.model.Questionnaire
 
@@ -32,14 +36,40 @@ internal fun getRequiredOrOptionalText(
 ) =
   when {
     (questionnaireViewItem.questionnaireItem.required &&
-      questionnaireViewItem.showRequiredText) -> {
+      questionnaireViewItem.questionViewTextConfiguration.showRequiredText) -> {
       context.getString(R.string.required)
     }
     (!questionnaireViewItem.questionnaireItem.required &&
-      questionnaireViewItem.showOptionalText) -> {
+      questionnaireViewItem.questionViewTextConfiguration.showOptionalText) -> {
       context.getString(R.string.optional_helper_text)
     }
     else -> {
       null
     }
   }
+
+/**
+ * Returns the validation error message. If [Questionnaire.QuestionnaireItemComponent.required] is
+ * true, the error message starts with `Required` text and the rest of the error message is placed
+ * on the next line.
+ */
+internal fun getValidationErrorMessage(
+  context: Context,
+  questionnaireViewItem: QuestionnaireViewItem,
+  validationResult: ValidationResult
+): String? {
+  return when (validationResult) {
+    is NotValidated,
+    Valid -> null
+    is Invalid -> {
+      val validationMessage = validationResult.getSingleStringValidationMessage()
+      if (questionnaireViewItem.questionnaireItem.required &&
+          questionnaireViewItem.questionViewTextConfiguration.showRequiredText
+      ) {
+        context.getString(R.string.required_text_and_new_line) + validationMessage
+      } else {
+        validationMessage
+      }
+    }
+  }
+}
