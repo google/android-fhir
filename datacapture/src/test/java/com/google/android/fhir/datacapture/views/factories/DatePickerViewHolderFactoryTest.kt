@@ -559,7 +559,7 @@ class DatePickerViewHolderFactoryTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
-      .isEqualTo("Question?*")
+      .isEqualTo("Question? *")
   }
 
   private fun setLocale(locale: Locale) {

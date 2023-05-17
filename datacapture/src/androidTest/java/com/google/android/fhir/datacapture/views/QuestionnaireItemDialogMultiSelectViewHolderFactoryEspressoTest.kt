@@ -399,25 +399,24 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shows_requiredText() {
+  fun shows_asterisk() {
     runOnUI {
       viewHolder.bind(
         QuestionnaireViewItem(
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "1"
+            text = "Question?"
             required = true
           },
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
-          showOptionalText = true
+          showAsterisk = true
         )
       )
 
-      assertThat(
-          viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
-        )
-        .isEqualTo("Required")
+      assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+        .isEqualTo("Question? *")
     }
   }
 

@@ -295,6 +295,6 @@ class EditTextSingleLineViewHolderFactoryTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
-      .isEqualTo("Question?*")
+      .isEqualTo("Question? *")
   }
 }
