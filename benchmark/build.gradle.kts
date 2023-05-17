@@ -85,6 +85,9 @@ dependencies {
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
   androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(Dependencies.Androidx.workRuntimeKtx)
+  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  androidTestImplementation(Dependencies.mockWebServer)
 
   androidTestImplementation(project(":engine"))
   androidTestImplementation(project(":knowledge"))
