@@ -26,7 +26,6 @@ import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
 import com.google.android.fhir.datacapture.extensions.initHelpViews
 import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 
 /** View for the prefix, question, and hint of a questionnaire item. */
@@ -49,7 +48,8 @@ internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout
       questionnaireItem = questionnaireViewItem.questionnaireItem
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
-    question.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedTextSpanned)
+    // CQF expression takes precedence over static question text
+    question.updateTextAndVisibility(questionnaireViewItem.questionText)
     hint.updateTextAndVisibility(
       questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
     )
