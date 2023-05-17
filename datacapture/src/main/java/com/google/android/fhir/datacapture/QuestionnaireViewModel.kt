@@ -31,6 +31,7 @@ import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
 import com.google.android.fhir.datacapture.extensions.answerExpression
+import com.google.android.fhir.datacapture.extensions.cqfExpression
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.extractAnswerOptions
@@ -50,6 +51,7 @@ import com.google.android.fhir.datacapture.extensions.zipByLinkId
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateExpression
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -65,7 +67,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Element
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
@@ -317,7 +321,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
 
-      updateDependentQuestionnaireResponseItems(questionnaireItem)
+      updateDependentQuestionnaireResponseItems(questionnaireItem, questionnaireResponseItem)
 
       modificationCount.update { it + 1 }
     }
@@ -439,17 +443,22 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           getQuestionnaireState()
             .also { detectExpressionCyclicDependency(questionnaire.item) }
             .also {
-              questionnaire.item.flattened().forEach {
-                updateDependentQuestionnaireResponseItems(it)
+              questionnaire.item.flattened().forEach { qItem ->
+                updateDependentQuestionnaireResponseItems(
+                  qItem,
+                  questionnaireResponse.allItems.find { it.linkId == qItem.linkId }
+                )
               }
             }
       )
 
   private fun updateDependentQuestionnaireResponseItems(
     updatedQuestionnaireItem: QuestionnaireItemComponent,
+    updatedQuestionnaireResponseItem: QuestionnaireResponseItemComponent?,
   ) {
     evaluateCalculatedExpressions(
         updatedQuestionnaireItem,
+        updatedQuestionnaireResponseItem,
         questionnaire,
         questionnaireResponse,
         questionnaireItemParentMap
@@ -532,6 +541,26 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     if (answerExpression.isXFhirQuery) answerExpressionMap[answerExpression.expression] = options
 
     return options
+  }
+
+  private fun resolveCqfExpression(
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
+    element: Element,
+  ): List<Base> {
+    val cqfExpression = element.cqfExpression ?: return emptyList()
+
+    if (!cqfExpression.isFhirPath) {
+      throw UnsupportedOperationException("${cqfExpression.language} not supported yet")
+    }
+    return evaluateExpression(
+      questionnaire,
+      questionnaireResponse,
+      questionnaireItem,
+      questionnaireResponseItem,
+      cqfExpression,
+      questionnaireItemParentMap
+    )
   }
 
   private suspend fun loadAnswerExpressionOptions(
@@ -675,6 +704,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       } else {
         NotValidated
       }
+
+    // Set question text dynamically from CQL expression
+    questionnaireResponseItem.apply {
+      resolveCqfExpression(questionnaireItem, this, questionnaireItem.textElement)
+        .firstOrNull()
+        ?.let { text = it.primitiveValue() }
+    }
+
     val items = buildList {
       // Add an item for the question itself
       add(
@@ -775,7 +812,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
       .map { (questionnaireItem, questionnaireResponseItem) ->
         questionnaireResponseItem.apply {
-          text = questionnaireItem.localizedTextSpanned?.toString()
+          if (text.isNullOrBlank()) {
+            text = questionnaireItem.localizedTextSpanned?.toString()
+          }
           // Nested group items
           item = getEnabledResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
           // Nested question items
