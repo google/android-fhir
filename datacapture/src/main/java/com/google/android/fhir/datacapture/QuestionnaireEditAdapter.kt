@@ -292,7 +292,7 @@ internal object DiffCallbacks {
         newItem: QuestionnaireAdapterItem.Question,
       ): Boolean {
         return oldItem.item.hasTheSameItem(newItem.item) &&
-          oldItem.item.hasTheSameAnswer(newItem.item) &&
+          oldItem.item.hasTheSameResponse(newItem.item) &&
           oldItem.item.hasTheSameValidationResult(newItem.item)
       }
     }
