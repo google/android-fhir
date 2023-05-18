@@ -27,6 +27,7 @@ import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -451,6 +452,29 @@ class QuestionnaireUiEspressoTest {
     onView(withId(R.id.hint)).check { view, _ ->
       val hintVisibility = (view as TextView).visibility
       assertThat(hintVisibility).isEqualTo(View.GONE)
+    }
+  }
+
+  @Test
+  fun cqfExpression_shouldSetText_withEvaluatedAnswer() {
+    buildFragmentFromQuestionnaire("/questionnaire_with_dynamic_question_text.json")
+
+    onView(CoreMatchers.allOf(withText("Option Date"))).check { view, _ ->
+      assertThat(view.id).isEqualTo(R.id.question)
+    }
+
+    onView(CoreMatchers.allOf(withText("Provide \"First Option\" Date"))).check { view, _ ->
+      assertThat(view).isNull()
+    }
+
+    onView(CoreMatchers.allOf(withText("First Option"))).perform(ViewActions.click())
+
+    onView(CoreMatchers.allOf(withText("Option Date"))).check { view, _ ->
+      assertThat(view).isNull()
+    }
+
+    onView(CoreMatchers.allOf(withText("Provide \"First Option\" Date"))).check { view, _ ->
+      assertThat(view.id).isEqualTo(R.id.question)
     }
   }
 
