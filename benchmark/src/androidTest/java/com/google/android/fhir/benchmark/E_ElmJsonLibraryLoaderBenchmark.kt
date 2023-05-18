@@ -24,7 +24,6 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
 import java.io.StringReader
-import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Library
 import org.junit.Rule
 import org.junit.Test
@@ -43,13 +42,12 @@ class E_ElmJsonLibraryLoaderBenchmark {
   @Test
   fun parseImmunityCheckCqlFromFhirLibrary() {
     benchmarkRule.measureRepeated {
-      val libraryBundle = runWithTimingDisabled {
-        var fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
+      val immunityCheckLibrary = runWithTimingDisabled {
+        val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
         val jsonParser = fhirContext.newJsonParser()
-        jsonParser.parseResource(open("/immunity-check/ImmunityCheck.json")) as Bundle
+        jsonParser.parseResource(open("/immunity-check/ImmunityCheck.json")) as Library
       }
 
-      val immunityCheckLibrary = libraryBundle.entry[0].resource as Library
       val jsonLib = immunityCheckLibrary.content.first { it.contentType == "application/elm+json" }
 
       val immunityCheckCqlLibrary = JsonCqlLibraryReader().read(StringReader(String(jsonLib.data)))
@@ -61,13 +59,12 @@ class E_ElmJsonLibraryLoaderBenchmark {
   @Test
   fun parseFhirHelpersCqlFromFhirLibrary() {
     benchmarkRule.measureRepeated {
-      val libraryBundle = runWithTimingDisabled {
-        var fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
+      val fhirHelpersLibrary = runWithTimingDisabled {
+        val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
         val jsonParser = fhirContext.newJsonParser()
-        jsonParser.parseResource(open("/immunity-check/ImmunityCheck.json")) as Bundle
+        jsonParser.parseResource(open("/immunity-check/FhirHelpers.json")) as Library
       }
 
-      val fhirHelpersLibrary = libraryBundle.entry[1].resource as Library
       val jsonLib = fhirHelpersLibrary.content.first { it.contentType == "application/elm+json" }
 
       val fhirHelpersCqlLibrary = JsonCqlLibraryReader().read(StringReader(String(jsonLib.data)))
