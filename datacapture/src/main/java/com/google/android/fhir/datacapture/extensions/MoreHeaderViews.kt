@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import android.content.Context
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.view.View.GONE
@@ -77,18 +78,18 @@ internal fun initHelpViews(
  * [Questionnaire.QuestionnaireItemComponent.required] is true.
  */
 internal fun appendAsteriskToQuestionText(
-  questionTextView: TextView,
+  context: Context,
   questionnaireViewItem: QuestionnaireViewItem
 ): Spanned {
   return SpannableStringBuilder().apply {
-    questionnaireViewItem.questionnaireItem.localizedTextSpanned?.let {
+    questionnaireViewItem.questionText?.let {
       append(questionnaireViewItem.questionnaireItem.localizedTextSpanned)
     }
     if (questionnaireViewItem.questionViewTextConfiguration.showAsterisk &&
         questionnaireViewItem.questionnaireItem.required &&
         !questionnaireViewItem.questionnaireItem.localizedTextSpanned.isNullOrEmpty()
     ) {
-      append(questionTextView.context.applicationContext.getString(R.string.space_asterisk))
+      append(context.applicationContext.getString(R.string.space_asterisk))
     }
   }
 }

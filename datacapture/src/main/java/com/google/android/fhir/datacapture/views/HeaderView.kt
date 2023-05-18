@@ -51,7 +51,10 @@ internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout
       questionnaireItem = questionnaireViewItem.questionnaireItem
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
-    question.updateTextAndVisibility(appendAsteriskToQuestionText(question, questionnaireViewItem))
+    // CQF expression takes precedence over static question text
+    question.updateTextAndVisibility(
+      appendAsteriskToQuestionText(question.context, questionnaireViewItem)
+    )
     hint.updateTextAndVisibility(
       questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
     )
