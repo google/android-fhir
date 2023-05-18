@@ -297,7 +297,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `hasTheSameAnswer() should return false for different answer list sizes`() {
+  fun `hasTheSameResponse() should return false for different answer list sizes`() {
     assertThat(
         QuestionnaireViewItem(
             Questionnaire.QuestionnaireItemComponent(),
@@ -311,7 +311,7 @@ class QuestionnaireViewItemTest {
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> }
           )
-          .hasTheSameAnswer(
+          .hasTheSameResponse(
             QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
@@ -324,7 +324,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `hasTheSameAnswer() should return true for two empty answer lists`() {
+  fun `hasTheSameResponse() should return true for two empty answer lists`() {
     assertThat(
         QuestionnaireViewItem(
             Questionnaire.QuestionnaireItemComponent(),
@@ -332,7 +332,7 @@ class QuestionnaireViewItemTest {
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> }
           )
-          .hasTheSameAnswer(
+          .hasTheSameResponse(
             QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
@@ -345,7 +345,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `hasTheSameAnswer() should return false for different answers`() {
+  fun `hasTheSameResponse() should return false for different answers`() {
     assertThat(
         QuestionnaireViewItem(
             Questionnaire.QuestionnaireItemComponent(),
@@ -359,7 +359,7 @@ class QuestionnaireViewItemTest {
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> }
           )
-          .hasTheSameAnswer(
+          .hasTheSameResponse(
             QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
@@ -378,7 +378,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `hasTheSameAnswer() should return false for null and non-null answers`() {
+  fun `hasTheSameResponse() should return false for null and non-null answers`() {
     assertThat(
         QuestionnaireViewItem(
             Questionnaire.QuestionnaireItemComponent(),
@@ -387,7 +387,7 @@ class QuestionnaireViewItemTest {
             answersChangedCallback = { _, _, _, _ -> }
           )
           .apply { setAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()) }
-          .hasTheSameAnswer(
+          .hasTheSameResponse(
             QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
@@ -406,7 +406,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `hasTheSameAnswer() should return false for non-null and null answers`() {
+  fun `hasTheSameResponse() should return false for non-null and null answers`() {
     assertThat(
         QuestionnaireViewItem(
             Questionnaire.QuestionnaireItemComponent(),
@@ -420,7 +420,7 @@ class QuestionnaireViewItemTest {
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> }
           )
-          .hasTheSameAnswer(
+          .hasTheSameResponse(
             QuestionnaireViewItem(
                 Questionnaire.QuestionnaireItemComponent(),
                 QuestionnaireResponse.QuestionnaireResponseItemComponent(),
@@ -434,7 +434,49 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `hasTheSameAnswer() should return true for the same answers`() {
+  fun `hasTheSameResponse() should return true for the same question text`() {
+    assertThat(
+        QuestionnaireViewItem(
+            Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _, _ -> }
+          )
+          .hasTheSameResponse(
+            QuestionnaireViewItem(
+              Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _, _ -> }
+            )
+          )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun `hasTheSameResponse() should return false for the different question text`() {
+    assertThat(
+        QuestionnaireViewItem(
+            Questionnaire.QuestionnaireItemComponent().apply { text = "Question 1?" },
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _, _ -> }
+          )
+          .hasTheSameResponse(
+            QuestionnaireViewItem(
+              Questionnaire.QuestionnaireItemComponent().apply { text = "Question 2?" },
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+              validationResult = NotValidated,
+              answersChangedCallback = { _, _, _, _ -> }
+            )
+          )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun `hasTheSameResponse() should return true for the same answers`() {
     assertThat(
         QuestionnaireViewItem(
             Questionnaire.QuestionnaireItemComponent(),
@@ -449,7 +491,7 @@ class QuestionnaireViewItemTest {
               }
             )
           }
-          .hasTheSameAnswer(
+          .hasTheSameResponse(
             QuestionnaireViewItem(
                 Questionnaire.QuestionnaireItemComponent(),
                 QuestionnaireResponse.QuestionnaireResponseItemComponent(),

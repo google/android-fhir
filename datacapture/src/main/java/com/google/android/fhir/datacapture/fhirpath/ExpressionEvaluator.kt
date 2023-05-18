@@ -25,7 +25,9 @@ import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.Type
 import timber.log.Timber
@@ -82,15 +84,51 @@ object ExpressionEvaluator {
   }
 
   /**
+   * Returns the evaluation result of the expression.
+   *
+   * FHIRPath supplements are handled according to
+   * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements.
+   *
+   * %resource = [QuestionnaireResponse] %context = [QuestionnaireResponseItemComponent]
+   */
+  fun evaluateExpression(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse,
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent?,
+    expression: Expression,
+    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>
+  ): List<Base> {
+    val appContext =
+      mutableMapOf<String, Base?>().apply {
+        extractDependentVariables(
+          expression,
+          questionnaire,
+          questionnaireResponse,
+          questionnaireItemParentMap,
+          questionnaireItem,
+          this
+        )
+      }
+    return fhirPathEngine.evaluate(
+      appContext,
+      questionnaireResponse,
+      null,
+      questionnaireResponseItem,
+      expression.expression
+    )
+  }
+
+  /**
    * Returns a list of pair of item and the calculated and evaluated value for all items with
    * calculated expression extension, which is dependent on value of updated response
    */
   fun evaluateCalculatedExpressions(
-    updatedQuestionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    updatedQuestionnaireItem: QuestionnaireItemComponent,
+    updatedQuestionnaireResponseItemComponent: QuestionnaireResponseItemComponent?,
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    questionnaireItemParentMap:
-      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>
+    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>
   ): List<ItemToAnswersPair> {
     return questionnaire.item
       .flattened()
@@ -102,26 +140,14 @@ object ExpressionEvaluator {
             findDependentVariables(item.calculatedExpression!!).isNotEmpty())
       }
       .map { questionnaireItem ->
-        val appContext =
-          mutableMapOf<String, Base?>().apply {
-            extractDependentVariables(
-              questionnaireItem.calculatedExpression!!,
+        val updatedAnswer =
+          evaluateExpression(
               questionnaire,
               questionnaireResponse,
-              questionnaireItemParentMap,
               questionnaireItem,
-              this
-            )
-          }
-
-        val updatedAnswer =
-          fhirPathEngine
-            .evaluate(
-              appContext,
-              questionnaireResponse,
-              null,
-              null,
-              questionnaireItem.calculatedExpression!!.expression
+              updatedQuestionnaireResponseItemComponent,
+              questionnaireItem.calculatedExpression!!,
+              questionnaireItemParentMap
             )
             .map { it.castToType(it) }
         questionnaireItem to updatedAnswer
