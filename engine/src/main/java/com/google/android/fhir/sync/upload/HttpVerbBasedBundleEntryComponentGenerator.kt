@@ -56,7 +56,15 @@ internal abstract class HttpVerbBasedBundleEntryComponentGenerator(
 
   private fun getEntryRequest(localChange: LocalChange) =
     Bundle.BundleEntryRequestComponent(
-      Enumeration(Bundle.HTTPVerbEnumFactory()).apply { value = httpVerb },
-      UriType("${localChange.resourceType}/${localChange.resourceId}")
-    )
+        Enumeration(Bundle.HTTPVerbEnumFactory()).apply { value = httpVerb },
+        UriType("${localChange.resourceType}/${localChange.resourceId}")
+      )
+      .apply {
+        // FHIR supports weak Etag, See ETag section https://hl7.org/fhir/http.html#Http-Headers
+        when (localChange.type) {
+          LocalChange.Type.UPDATE,
+          LocalChange.Type.DELETE -> ifMatch = "W/\"${localChange.versionId}\""
+          LocalChange.Type.INSERT -> {}
+        }
+      }
 }

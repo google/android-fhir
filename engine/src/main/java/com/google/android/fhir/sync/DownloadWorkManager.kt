@@ -45,13 +45,14 @@ interface DownloadWorkManager {
   suspend fun processResponse(response: Resource): Collection<Resource>
 }
 
-sealed class Request {
+sealed class Request(open val headers: Map<String, String>) {
   companion object {
     /** @return [UrlRequest] for a FHIR search [url]. */
-    fun of(url: String) = UrlRequest(url)
+    fun of(url: String, headers: Map<String, String> = emptyMap()) = UrlRequest(url, headers)
 
     /** @return [BundleRequest] for a FHIR search [bundle]. */
-    fun of(bundle: Bundle) = BundleRequest(bundle)
+    fun of(bundle: Bundle, headers: Map<String, String> = emptyMap()) =
+      BundleRequest(bundle, headers)
   }
 }
 
@@ -59,11 +60,15 @@ sealed class Request {
  * A [url] based FHIR request to download resources from the server. e.g.
  * `Patient?given=valueGiven&family=valueFamily`
  */
-data class UrlRequest(val url: String) : Request()
+data class UrlRequest(val url: String, override val headers: Map<String, String> = emptyMap()) :
+  Request(headers)
 
 /**
  * A [bundle] based FHIR request to download resources from the server. For an example, see
  * [bundle-request-medsallergies.json](https://www.hl7.org/fhir/bundle-request-medsallergies.json.html)
  * .
  */
-data class BundleRequest(val bundle: Bundle) : Request()
+data class BundleRequest(
+  val bundle: Bundle,
+  override val headers: Map<String, String> = emptyMap()
+) : Request(headers)

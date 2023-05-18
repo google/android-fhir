@@ -161,7 +161,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
         database.updateVersionIdAndLastUpdated(
           id,
           type,
-          response.etag,
+          getVersionFromETag(response.etag),
           response.lastModified.toInstant()
         )
       }
@@ -178,6 +178,17 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       )
     }
   }
+
+  /**
+   * FHIR uses weak ETag that look something like W/"MTY4NDMyODE2OTg3NDUyNTAwMA", so we need to
+   * extract version from it. See https://hl7.org/fhir/http.html#Http-Headers.
+   */
+  private fun getVersionFromETag(eTag: String) =
+    if (eTag.startsWith("W/")) {
+      eTag.split("\"")[1]
+    } else {
+      eTag
+    }
 
   /**
    * May return a Pair of versionId and resource type extracted from the

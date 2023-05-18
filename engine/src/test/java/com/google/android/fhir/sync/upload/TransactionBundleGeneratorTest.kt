@@ -184,7 +184,8 @@ class TransactionBundleGeneratorTest {
                     )
                   }
                 )
-                .toString()
+                .toString(),
+            versionId = "v-p002-01"
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(2)) },
@@ -204,7 +205,8 @@ class TransactionBundleGeneratorTest {
                     }
                   )
                 }
-              )
+              ),
+            versionId = "v-p003-01"
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(3)) }
@@ -220,6 +222,10 @@ class TransactionBundleGeneratorTest {
     assertThat(result.all { it.first.entry.size == 1 }).isTrue()
     assertThat(result.map { it.first.entry.first().request.method })
       .containsExactly(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, Bundle.HTTPVerb.DELETE)
+      .inOrder()
+    // Insert has no etag related header, update and delete have etag in the request.
+    assertThat(result.map { it.first.entry.first().request.ifMatch })
+      .containsExactly(null, "W/\"v-p002-01\"", "W/\"v-p003-01\"")
       .inOrder()
   }
 }
