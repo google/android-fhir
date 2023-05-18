@@ -373,6 +373,50 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
+  fun show_asterisk() {
+    runOnUI {
+      viewHolder.bind(
+        QuestionnaireViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "1"
+            text = "Question?"
+            required = true
+          },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _, _ -> },
+          questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
+        )
+      )
+
+      assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+        .isEqualTo("Question? *")
+    }
+  }
+
+  @Test
+  fun hide_asterisk() {
+    runOnUI {
+      viewHolder.bind(
+        QuestionnaireViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "1"
+            text = "Question?"
+            required = true
+          },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _, _ -> },
+          questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
+        )
+      )
+
+      assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+        .isEqualTo("Question?")
+    }
+  }
+
+  @Test
   fun show_requiredText() {
     runOnUI {
       viewHolder.bind(
@@ -399,24 +443,28 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun show_asterisk() {
+  fun hide_requiredText() {
     runOnUI {
       viewHolder.bind(
         QuestionnaireViewItem(
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "1"
-            text = "Question?"
             required = true
+            text = "Question?"
           },
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
-          questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
+          questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
         )
       )
 
-      assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
-        .isEqualTo("Question? *")
+      assertThat(
+          viewHolder.itemView
+            .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
+            .helperText
+        )
+        .isNull()
     }
   }
 
@@ -438,6 +486,27 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
             .helperText.toString()
         )
         .isEqualTo("Optional")
+    }
+  }
+
+  @Test
+  fun hide_optionalText() {
+    runOnUI {
+      viewHolder.bind(
+        QuestionnaireViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _, _ -> },
+          questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
+        )
+      )
+      assertThat(
+          viewHolder.itemView
+            .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
+            .helperText
+        )
+        .isNull()
     }
   }
 

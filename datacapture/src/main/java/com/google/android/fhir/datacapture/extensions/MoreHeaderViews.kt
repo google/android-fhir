@@ -83,7 +83,7 @@ internal fun appendAsteriskToQuestionText(
 ): Spanned {
   return SpannableStringBuilder().apply {
     questionnaireViewItem.questionText?.let {
-      append(questionnaireViewItem.questionnaireItem.localizedTextSpanned)
+      append(it)
     }
     if (questionnaireViewItem.questionViewTextConfiguration.showAsterisk &&
         questionnaireViewItem.questionnaireItem.required &&

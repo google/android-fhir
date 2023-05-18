@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.RadioButton
 import android.widget.TextView
@@ -364,24 +365,6 @@ class BooleanChoiceViewHolderFactoryTest {
   }
 
   @Test
-  fun `shows required text`() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
-      )
-    )
-
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
-      )
-      .isEqualTo("Required")
-  }
-
-  @Test
   fun `show asterisk`() {
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -401,6 +384,63 @@ class BooleanChoiceViewHolderFactoryTest {
   }
 
   @Test
+  fun `hide asterisk`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          text = "Question"
+          required = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+      .isEqualTo("Question")
+  }
+
+  @Test
+  fun `shows required text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+      )
+      .isEqualTo("Required")
+  }
+
+  @Test
+  fun `hide required text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+      )
+      .isEmpty()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).visibility)
+      .isEqualTo(View.GONE)
+  }
+
+  @Test
   fun `show optional text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -416,6 +456,26 @@ class BooleanChoiceViewHolderFactoryTest {
         viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
       )
       .isEqualTo("Optional")
+  }
+
+  @Test
+  fun `hide optional text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+      )
+      .isEmpty()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).visibility)
+      .isEqualTo(View.GONE)
   }
 
   private val displayCategoryExtensionWithInstructionsCode =
