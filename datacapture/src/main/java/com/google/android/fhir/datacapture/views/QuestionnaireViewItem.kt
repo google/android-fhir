@@ -60,6 +60,9 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * extension exists options
  * @param draftAnswer the draft input that cannot be stored in the [QuestionnaireResponse].
  * @param enabledDisplayItems the enabled display items in the given [questionnaireItem]
+ * @param showOptionalText the optional text is being added to the end of the question text
+ * @param questionViewTextConfiguration configuration to show asterisk, required and optional text
+ * in the header view.
  */
 data class QuestionnaireViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -84,7 +87,9 @@ data class QuestionnaireViewItem(
       emptyList()
     },
   internal val draftAnswer: Any? = null,
-  internal val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList()
+  internal val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
+  internal val questionViewTextConfiguration: QuestionTextConfiguration =
+    QuestionTextConfiguration(),
 ) {
 
   /**

@@ -60,6 +60,7 @@ import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -222,6 +223,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** Flag to show/hide submit button. Default is true. */
   private var shouldShowSubmitButton = state[QuestionnaireFragment.EXTRA_SHOW_SUBMIT_BUTTON] ?: true
+
+  /** Flag to control whether asterisk text is shown for required questions. */
+  private val showAsterisk = state[QuestionnaireFragment.EXTRA_SHOW_ASTERISK_TEXT] ?: false
+
+  /** Flag to control whether asterisk text is shown for required questions. */
+  private val showRequiredText = state[QuestionnaireFragment.EXTRA_SHOW_REQUIRED_TEXT] ?: true
+
+  /** Flag to control whether optional text is shown. */
+  private val showOptionalText = state[QuestionnaireFragment.EXTRA_SHOW_OPTIONAL_TEXT] ?: false
 
   /** The pages of the questionnaire, or null if the questionnaire is not paginated. */
   @VisibleForTesting var pages: List<QuestionnairePage>? = null
@@ -728,7 +738,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               questionnaireItem.item.filter {
                 it.isDisplayItem &&
                   EnablementEvaluator(questionnaireResponse).evaluate(it, questionnaireResponseItem)
-              }
+              },
+            questionViewTextConfiguration =
+              QuestionTextConfiguration(
+                showAsterisk = showAsterisk,
+                showRequiredText = showRequiredText,
+                showOptionalText = showOptionalText
+              )
           )
         )
       )
