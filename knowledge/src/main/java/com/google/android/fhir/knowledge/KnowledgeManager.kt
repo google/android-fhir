@@ -24,17 +24,15 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.knowledge.db.impl.KnowledgeDatabase
 import com.google.android.fhir.knowledge.db.impl.entities.ResourceMetadataEntity
 import com.google.android.fhir.knowledge.db.impl.entities.toEntity
+import com.google.android.fhir.knowledge.npm.NpmPackageManager
 import java.io.File
 import java.io.FileInputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.instance.model.api.IBaseResource
-import org.hl7.fhir.r4.model.ImplementationGuide as ImplementationGuideR4
-import org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDependsOnComponent
 import org.hl7.fhir.r4.model.MetadataResource
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import org.hl7.fhir.utilities.Utilities
 import org.hl7.fhir.utilities.npm.NpmPackage
 import timber.log.Timber
 
@@ -42,8 +40,9 @@ import timber.log.Timber
 class KnowledgeManager
 internal constructor(
   private val knowledgeDatabase: KnowledgeDatabase,
+  private val dataFolder: File,
   private val jsonParser: IParser = FhirContext.forR4().newJsonParser(),
-  private val cacheFolder: String,
+  private val npmPackageManager: NpmPackageManager = NpmPackageManager(dataFolder)
 ) {
 
   private val knowledgeDao = knowledgeDatabase.knowledgeDao()
@@ -54,42 +53,23 @@ internal constructor(
    * FHIR Resources)
    */
   suspend fun install(vararg implementationGuides: ImplementationGuide) {
-    val implementationGuide =
-      ImplementationGuideR4().apply {
-        implementationGuides.forEach {
-          addDependsOn(
-            ImplementationGuideDependsOnComponent().apply {
-              packageId = it.packageId
-              uri = it.uri
-              version = it.version
-            }
-          )
-        }
-      }
-    val npmPackageManager =
-      NpmPackageManager.fromResource(
-        cacheFolder,
-        implementationGuide,
-        "https://packages.fhir.org",
-        "https://packages.simplifier.net"
-      )
-    npmPackageManager.npmList.forEach { npmPackage ->
-      for (file in npmPackage.listFiles()) {
-          if (!file.isDirectory && !NpmPackage.isInternalExemptFile(file) && !file.name.startsWith("Bundle") && !file.name.contains("ModelInfo")) {
-            try {
-              Log.d("TEST", file.name)
-              val resource = jsonParser.parseResource(FileInputStream(file))
-              if (resource is Resource) {
-                importResource(null, resource, file)
-              } else {
-                Timber.d("Unable to import file: %file")
-              }
-            } catch (exception: Exception) {
-              Timber.d(exception, "Unable to import file: %file")
-            }
-          }
-        }
-    }
+   for (npmRootDirectory in npmPackageManager.install(*implementationGuides)){
+     for (file in npmRootDirectory.listFiles().orEmpty()) {
+       if (!file.isDirectory && !NpmPackage.isInternalExemptFile(file) && !file.name.startsWith("Bundle") && !file.name.contains("ModelInfo")) {
+         try {
+           Log.d("TEST", file.name)
+           val resource = jsonParser.parseResource(FileInputStream(file))
+           if (resource is Resource) {
+             importResource(null, resource, file)
+           } else {
+             Timber.d("Unable to import file: %file")
+           }
+         } catch (exception: Exception) {
+           Timber.d(exception, "Unable to import file: %file")
+         }
+       }
+     }
+   }
   }
 
   /**
@@ -196,11 +176,11 @@ internal constructor(
     fun create(context: Context) =
       KnowledgeManager(
         Room.databaseBuilder(context, KnowledgeDatabase::class.java, DB_NAME).build(),
-        context.dataDir.absolutePath
+        context.dataDir
       )
 
     /** Creates an [KnowledgeManager] backed by the in-memory DB. */
     fun createInMemory(context: Context) =
-      KnowledgeManager(Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build(), context.dataDir.absolutePath)
+      KnowledgeManager(Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build(), context.dataDir)
   }
 }

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.implementationguide.npm
+package com.google.android.fhir.knowledge.npm
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import org.hl7.fhir.r4.model.ImplementationGuide
+import com.google.android.fhir.knowledge.ImplementationGuide
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -29,9 +29,9 @@ class NpmPackageManagerTest {
   @Test
   fun smoketest() {
     val cacheFolderPath = ApplicationProvider.getApplicationContext<Context>().cacheDir.absolutePath
-    NpmPackageManager.fromResource(
+    NpmPackageManager1.fromResource(
       cacheFolderPath,
-      ImplementationGuide(),
+      ImplementationGuide("hl7.fhir.r4b.examples", "4.3.0", "http://hl7.org/fhir"),
       "https://packages.fhir.org",
       "https://packages.simplifier.net"
     )

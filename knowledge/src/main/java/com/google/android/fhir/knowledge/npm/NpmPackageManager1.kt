@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.implementationguide.npm
+package com.google.android.fhir.knowledge.npm
 
+import com.google.android.fhir.implementationguide.npm.CachingPackageClient
+import com.google.android.fhir.implementationguide.npm.NpmPackageManagerException
 import java.io.File
-import java.io.FileInputStream
-import java.io.FilenameFilter
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -31,8 +31,6 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r5.context.IWorkerContext
 import org.hl7.fhir.r5.model.ImplementationGuide
 import org.hl7.fhir.utilities.Utilities
-import org.hl7.fhir.utilities.npm.BasePackageCacheManager
-import org.hl7.fhir.utilities.npm.NpmPackage
 import org.hl7.fhir.utilities.npm.PackageClient
 import org.hl7.fhir.utilities.npm.PackageServer
 import org.json.JSONObject
@@ -44,7 +42,7 @@ import timber.log.Timber
  * NpmPackageManager](https://github.com/cqframework/clinical_quality_language/blob/master/Src/java/cqf-fhir-npm/src/main/java/org/cqframework/fhir/npm/NpmPackageManager.java)
  * Fixes the nested dependency issue, uses android-friendly loggers and CacheManagers.
  */
-class NpmPackageManager(
+class NpmPackageManager1(
   cacheFolder: String,
   sourceIg: ImplementationGuide,
   clientFactory:Function<PackageServer, PackageClient> =  Function { address: PackageServer ->
@@ -230,9 +228,9 @@ class NpmPackageManager(
       cacheFolder: String,
       resource: Resource,
       vararg packageServers: String,
-    ): NpmPackageManager {
+    ): NpmPackageManager1 {
       val versionConvertor40to50 = VersionConvertor_40_50(BaseAdvisor_40_50())
-      return NpmPackageManager(
+      return NpmPackageManager1(
         cacheFolder = cacheFolder,
         sourceIg = versionConvertor40to50.convertResource(resource) as ImplementationGuide,
         packageServers = packageServers

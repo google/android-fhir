@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.implementationguide.npm
+package com.google.android.fhir.knowledge
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -27,9 +27,9 @@ import kotlinx.coroutines.test.runTest
 import com.google.common.truth.Truth.assertThat
 
 @RunWith(AndroidJUnit4::class)
-class IgManagerTest {
+class KnowledgeManagerTest {
   private val context: Context = ApplicationProvider.getApplicationContext()
-  private val igManager = IgManager.create(context)
+  private val knowledgeManager = KnowledgeManage.create(context)
 
   @Test
   fun smoketest() = runTest {

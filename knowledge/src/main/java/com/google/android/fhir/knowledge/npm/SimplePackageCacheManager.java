@@ -1,4 +1,4 @@
-package com.google.android.fhir.implementationguide.npm;
+package com.google.android.fhir.knowledge.npm;
 
 import androidx.annotation.Nullable;
 import java.io.BufferedOutputStream;
