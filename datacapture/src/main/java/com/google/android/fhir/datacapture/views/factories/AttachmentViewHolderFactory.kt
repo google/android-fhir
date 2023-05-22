@@ -104,6 +104,7 @@ internal object AttachmentViewHolderFactory :
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         this.questionnaireViewItem = questionnaireViewItem
         header.bind(questionnaireViewItem)
+        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
         val questionnaireItem = questionnaireViewItem.questionnaireItem
         displayOrClearInitialPreview()
         displayTakePhotoButton(questionnaireItem)
