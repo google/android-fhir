@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
@@ -129,22 +130,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaireResponse =
           parser.parseResource(application.contentResolver.openInputStream(uri))
             as QuestionnaireResponse
+        addMissingResponseItems(questionnaire.item, questionnaireResponse.item)
         checkQuestionnaireResponse(questionnaire, questionnaireResponse)
-        addQuestionnaireResponseItemComponentToQuestionnaireResponse(
-          questionnaire.item,
-          questionnaireResponse.item
-        )
       }
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING) -> {
         val questionnaireResponseJson: String =
           state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]!!
         questionnaireResponse =
           parser.parseResource(questionnaireResponseJson) as QuestionnaireResponse
-        checkQuestionnaireResponse(questionnaire, questionnaireResponse)
-        addQuestionnaireResponseItemComponentToQuestionnaireResponse(
-          questionnaire.item,
-          questionnaireResponse.item
-        )
+        addMissingResponseItems(questionnaire.item, questionnaireResponse.item)
+        checkQuestionnaireResponse(questionnaire, questionnaireResponse!!)
       }
       else -> {
         questionnaireResponse =
@@ -164,30 +159,29 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /**
    * If the corresponding [QuestionnaireItemComponent] lacks a response item component, the
    * [QuestionnaireResponseItemComponent] is added to the QuestionnaireResponse. Note : However, the
-   * aforementioned does not apply if the [QuestionnaireItemComponent] is a question (type other tha
-   * group type) with a nested questionnaire,or repeated group.
+   * aforementioned does not apply if the [QuestionnaireItemComponent] is a question (type other
+   * than group type) with a nested question items,or repeated group.
    */
-  private fun addQuestionnaireResponseItemComponentToQuestionnaireResponse(
-    questionnaireItemComponents: List<QuestionnaireItemComponent>,
-    responseItemComponents: MutableList<QuestionnaireResponseItemComponent>
+  private fun addMissingResponseItems(
+    questionnaireItems: List<QuestionnaireItemComponent>,
+    responseItems: MutableList<QuestionnaireResponseItemComponent>
   ) {
-    questionnaireItemComponents.forEachIndexed { index, questionnaireItemComponent ->
-      when {
-        index >= responseItemComponents.size -> {
-          responseItemComponents.add(questionnaireItemComponent.createQuestionnaireResponseItem())
-        }
-        questionnaireItemComponent.linkId != responseItemComponents[index].linkId -> {
-          responseItemComponents.add(
-            index,
-            questionnaireItemComponent.createQuestionnaireResponseItem()
-          )
-        }
+    val questionnaireIterator = questionnaireItems.iterator()
+    while (questionnaireIterator.hasNext()) {
+      val questionnaireItem = questionnaireIterator.next()
+      var responseItem = responseItems.firstOrNull { it.linkId == questionnaireItem.linkId }
+
+      // add missing item
+      if (responseItem == null) {
+        responseItem = questionnaireItem.createQuestionnaireResponseItem()
+        responseItems.add(questionnaireItems.indexOf(questionnaireItem), responseItem)
       }
-      if (!questionnaireItemComponent.shouldHaveNestedItemsUnderAnswers) {
-        addQuestionnaireResponseItemComponentToQuestionnaireResponse(
-          questionnaireItemComponent.item,
-          responseItemComponents[index].item
-        )
+
+      // recursion
+      if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+          !questionnaireItem.repeats
+      ) {
+        addMissingResponseItems(questionnaireItem.item, responseItem.item)
       }
     }
   }
@@ -609,6 +603,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val questionnaireItemList = questionnaire.item
     val questionnaireResponseItemList = questionnaireResponse.item
 
+    questionnaireItemList.forEach { Log.d("GROUP", "q adpter item ${it.linkId}") }
+    questionnaireResponseItemList.forEach { Log.d("GROUP", "r adpter item ${it.linkId}") }
+
     // Only display items on the current page while editing a paginated questionnaire, otherwise,
     // display all items.
     val questionnaireItemViewItems =
@@ -624,6 +621,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       } else {
         getQuestionnaireAdapterItems(questionnaireItemList, questionnaireResponseItemList)
       }
+    //    questionnaireItemViewItems.forEach { item ->
+    //      item.
+    // //      Log.d("GROUP", "view item : ${it}")
+    //    }
 
     // Reviewing the questionnaire or the questionnaire is read-only
     if (isReadOnly || isInReviewModeFlow.value) {
@@ -672,8 +673,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireItemList: List<QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>,
   ): List<QuestionnaireAdapterItem> {
+    //    questionnaireItemList.forEach {
+    //      Log.d("GROUP", "q adpter item ${it.linkId}")
+    //    }
+    //    questionnaireResponseItemList.forEach {
+    //      Log.d("GROUP", "r adpter item ${it.linkId}")
+    //    }
     return questionnaireItemList
       .zipByLinkId(questionnaireResponseItemList) { questionnaireItem, questionnaireResponseItem ->
+        //        Log.d("GROUP", "adpter item ${questionnaireItem.linkId} :
+        // ${questionnaireResponseItem.linkId}")
         getQuestionnaireAdapterItems(questionnaireItem, questionnaireResponseItem)
       }
       .flatten()
