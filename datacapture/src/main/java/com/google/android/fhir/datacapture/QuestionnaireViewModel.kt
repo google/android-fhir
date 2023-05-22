@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import android.net.Uri
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
@@ -139,7 +138,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaireResponse =
           parser.parseResource(questionnaireResponseJson) as QuestionnaireResponse
         addMissingResponseItems(questionnaire.item, questionnaireResponse.item)
-        checkQuestionnaireResponse(questionnaire, questionnaireResponse!!)
+        checkQuestionnaireResponse(questionnaire, questionnaireResponse)
       }
       else -> {
         questionnaireResponse =
@@ -603,9 +602,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val questionnaireItemList = questionnaire.item
     val questionnaireResponseItemList = questionnaireResponse.item
 
-    questionnaireItemList.forEach { Log.d("GROUP", "q adpter item ${it.linkId}") }
-    questionnaireResponseItemList.forEach { Log.d("GROUP", "r adpter item ${it.linkId}") }
-
     // Only display items on the current page while editing a paginated questionnaire, otherwise,
     // display all items.
     val questionnaireItemViewItems =
@@ -621,10 +617,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       } else {
         getQuestionnaireAdapterItems(questionnaireItemList, questionnaireResponseItemList)
       }
-    //    questionnaireItemViewItems.forEach { item ->
-    //      item.
-    // //      Log.d("GROUP", "view item : ${it}")
-    //    }
 
     // Reviewing the questionnaire or the questionnaire is read-only
     if (isReadOnly || isInReviewModeFlow.value) {
@@ -673,16 +665,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireItemList: List<QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>,
   ): List<QuestionnaireAdapterItem> {
-    //    questionnaireItemList.forEach {
-    //      Log.d("GROUP", "q adpter item ${it.linkId}")
-    //    }
-    //    questionnaireResponseItemList.forEach {
-    //      Log.d("GROUP", "r adpter item ${it.linkId}")
-    //    }
     return questionnaireItemList
       .zipByLinkId(questionnaireResponseItemList) { questionnaireItem, questionnaireResponseItem ->
-        //        Log.d("GROUP", "adpter item ${questionnaireItem.linkId} :
-        // ${questionnaireResponseItem.linkId}")
         getQuestionnaireAdapterItems(questionnaireItem, questionnaireResponseItem)
       }
       .flatten()
