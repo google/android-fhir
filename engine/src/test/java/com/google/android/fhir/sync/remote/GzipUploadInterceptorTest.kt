@@ -70,13 +70,28 @@ class GzipUploadInterceptorTest {
   }
 
   @Test
-  fun `no compression happens if content header is not gzip`() {
+  fun `gzip gets appended to content header if another value already exists`() {
     server.enqueue(MockResponse())
     val request =
       Request.Builder()
         .url(server.url("/"))
-        .addHeader(CONTENT_ENCODING_HEADER_NAME, "random")
+        .addHeader(CONTENT_ENCODING_HEADER_NAME, "deflate")
         .method("POST", "abc".toRequestBody(MediaTypes.MEDIA_TYPE_FHIR_JSON))
+        .build()
+
+    client.newCall(request).execute()
+
+    val recordedRequest = server.takeRequest()
+    assertThat(recordedRequest.getHeader(CONTENT_ENCODING_HEADER_NAME)).isEqualTo("deflate, gzip")
+  }
+  @Test
+  fun `no compression happens if the request body is empty`() {
+    server.enqueue(MockResponse())
+    val request =
+      Request.Builder()
+        .url(server.url("/"))
+        .addHeader(CONTENT_ENCODING_HEADER_NAME, "deflate")
+        .method("GET", null)
         .build()
 
     client.newCall(request).execute()

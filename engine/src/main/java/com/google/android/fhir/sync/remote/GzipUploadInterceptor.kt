@@ -31,16 +31,21 @@ const val CONTENT_ENCODING_HEADER_NAME = "Content-Encoding"
 object GzipUploadInterceptor : Interceptor {
   override fun intercept(chain: Interceptor.Chain): Response {
     val uncompressedRequest = chain.request()
-    if (uncompressedRequest.body == null ||
-        uncompressedRequest.header(CONTENT_ENCODING_HEADER_NAME) != null
-    ) {
+    if (uncompressedRequest.body == null) {
       return chain.proceed(uncompressedRequest)
     }
+
+    val encodingHeader =
+      if (uncompressedRequest.header(CONTENT_ENCODING_HEADER_NAME) != null) {
+        "${uncompressedRequest.header(CONTENT_ENCODING_HEADER_NAME)}, gzip"
+      } else {
+        "gzip"
+      }
 
     val compressedRequest =
       uncompressedRequest
         .newBuilder()
-        .header(CONTENT_ENCODING_HEADER_NAME, "gzip")
+        .header(CONTENT_ENCODING_HEADER_NAME, encodingHeader)
         .method(uncompressedRequest.method, addContentLength(gzip(uncompressedRequest.body!!)))
         .build()
 
