@@ -23,6 +23,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.workflow.FhirOperatorBuilder
@@ -33,6 +34,8 @@ import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Parameters
+import org.junit.AfterClass
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -86,6 +89,20 @@ class G_CqlEvaluatorBenchmark {
         ) as Parameters
 
       assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
+    }
+  }
+
+  companion object {
+
+    @JvmStatic
+    @BeforeClass
+    fun oneTimeSetup() {
+      FhirEngineProvider.init(FhirEngineConfiguration(testMode = true))
+    }
+    @JvmStatic
+    @AfterClass
+    fun oneTimeTearDown() {
+      FhirEngineProvider.cleanup()
     }
   }
 }
