@@ -117,4 +117,8 @@
             id="max_value"
         >%2$s</xliff:g></string>
     <string name="decimal_format_validation_error_msg">Invalid number</string>
-    </resources>
+    <string name="optional_helper_text">Optional</string>
+    <string name="required">Required</string>
+    <string name="required_text_and_new_line">Required\n</string>
+    <string name="space_asterisk">\u0020\u002a</string>
+</resources>
