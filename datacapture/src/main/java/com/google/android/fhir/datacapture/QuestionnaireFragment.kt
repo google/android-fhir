@@ -329,6 +329,15 @@ class QuestionnaireFragment : Fragment() {
       args.add(EXTRA_SHOW_REVIEW_PAGE_FIRST to value)
     }
 
+    /** A [Boolean] extra to control whether the asterisk text is shown. */
+    fun showAsterisk(value: Boolean) = apply { args.add(EXTRA_SHOW_ASTERISK_TEXT to value) }
+
+    /** A [Boolean] extra to control whether the required text is shown. */
+    fun showRequiredText(value: Boolean) = apply { args.add(EXTRA_SHOW_REQUIRED_TEXT to value) }
+
+    /** A [Boolean] extra to control whether the optional text is shown. */
+    fun showOptionalText(value: Boolean) = apply { args.add(EXTRA_SHOW_OPTIONAL_TEXT to value) }
+
     /**
      * A matcher to provide [QuestionnaireItemViewHolderFactoryMatcher]s for custom
      * [Questionnaire.QuestionnaireItemType]. The application needs to provide a
@@ -426,6 +435,12 @@ class QuestionnaireFragment : Fragment() {
      * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
      */
     internal const val EXTRA_SHOW_SUBMIT_BUTTON = "show-submit-button"
+
+    internal const val EXTRA_SHOW_OPTIONAL_TEXT = "show-optional-text"
+
+    internal const val EXTRA_SHOW_ASTERISK_TEXT = "show-asterisk-text"
+
+    internal const val EXTRA_SHOW_REQUIRED_TEXT = "show-required-text"
 
     fun builder() = Builder()
   }
