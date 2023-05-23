@@ -304,7 +304,7 @@ class QuestionnaireFragment : Fragment() {
     }
 
     fun setQuestionnaireLaunchContexts(launchContexts: List<String>) = apply {
-      args.add(EXTRA_QUESTIONNAIRE_LIST_OF_LAUNCH_CONTEXTS_JSON_STRING to launchContexts)
+      args.add(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS to launchContexts)
     }
 
     /**
@@ -399,8 +399,8 @@ class QuestionnaireFragment : Fragment() {
     internal const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
 
     /** A list of JSON encoded strings extra for each questionnaire context. */
-    internal const val EXTRA_QUESTIONNAIRE_LIST_OF_LAUNCH_CONTEXTS_JSON_STRING =
-      "list-of-questionnaire-launch-contexts"
+    internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS =
+      "questionnaire-launch-contexts"
     /**
      * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.
      *

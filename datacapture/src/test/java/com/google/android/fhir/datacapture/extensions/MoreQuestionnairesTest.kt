@@ -134,7 +134,7 @@ class MoreQuestionnairesTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "The value of the extension:name field in " +
+        "The value of the extension:name extension in " +
           "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext is " +
           "not one of the ones defined in http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext."
       )
@@ -160,7 +160,7 @@ class MoreQuestionnairesTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "The resource type set in the extension:type field in " +
+        "The launch contexts' resource types are not set in the extension:type extension in " +
           "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext does " +
           "not match any of the resource types of the context passed in: [Patient]."
       )

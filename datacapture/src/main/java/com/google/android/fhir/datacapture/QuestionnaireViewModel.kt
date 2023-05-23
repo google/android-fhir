@@ -26,7 +26,6 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
-import com.google.android.fhir.datacapture.extensions.EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
@@ -44,6 +43,7 @@ import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.extensions.isXFhirQuery
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
+import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
 import com.google.android.fhir.datacapture.extensions.unpackRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
@@ -168,22 +168,19 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   init {
     questionnaireLaunchContextMap =
-      if (state.contains(
-          QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LIST_OF_LAUNCH_CONTEXTS_JSON_STRING
-        )
-      ) {
+      if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS)) {
 
-        val launchContextsAsStrings: List<String> =
-          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LIST_OF_LAUNCH_CONTEXTS_JSON_STRING]!!
+        val launchContextJsonStrings: List<String> =
+          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS]!!
 
-        val launchContexts = launchContextsAsStrings.map { parser.parseResource(it) as Resource }
-        questionnaire.extension
-          .filter { it.url == EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT }
-          .takeIf { it.isNotEmpty() }
-          ?.let { extensions ->
-            validateLaunchContextExtensions(extensions, launchContexts.map { it.resourceType.name })
-            launchContexts.associateBy { it.resourceType.name.lowercase() }
-          }
+        val launchContexts = launchContextJsonStrings.map { parser.parseResource(it) as Resource }
+        questionnaire.questionnaireLaunchContexts?.let { launchContextExtensions ->
+          validateLaunchContextExtensions(
+            launchContextExtensions,
+            launchContexts.map { it.resourceType.name }
+          )
+          launchContexts.associateBy { it.resourceType.name.lowercase() }
+        }
       } else {
         null
       }

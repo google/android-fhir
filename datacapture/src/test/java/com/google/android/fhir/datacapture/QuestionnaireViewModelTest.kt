@@ -27,7 +27,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_LIST_OF_LAUNCH_CONTEXTS_JSON_STRING
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_READ_ONLY
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
@@ -86,7 +86,6 @@ import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.ValueSet
 import org.hl7.fhir.r4.utils.ToolingExtensions
@@ -3962,7 +3961,7 @@ class QuestionnaireViewModelTest {
         }
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
       state.set(
-        EXTRA_QUESTIONNAIRE_LIST_OF_LAUNCH_CONTEXTS_JSON_STRING,
+        EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS,
         listOf(printer.encodeResourceToString(patient))
       )
 
