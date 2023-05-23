@@ -59,19 +59,15 @@ internal fun Questionnaire.findVariableExpression(variableName: String): Express
 
 /**
  * Validates each questionnaire launch context extension to match:
- * https://build.fhir.org/ig/HL7/sdc/ValueSet-launchContext.html
+ * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
  */
-internal fun validateLaunchContextExtensions(
-  launchContextExtensions: List<Extension>,
-  launchContextResourceTypes: List<String>
-) =
+internal fun validateLaunchContextExtensions(launchContextExtensions: List<Extension>) =
   launchContextExtensions.forEach { launchContextExtension ->
-    validateLaunchContextNameExtension(
-      launchContextExtension.extension.firstOrNull { it.url == "name" }
-    )
-    validateResourceTypeInTypeExtension(
+    val nameExtension = launchContextExtension.extension.firstOrNull { it.url == "name" }
+    validateLaunchContextNameExtension(nameExtension)
+    validateLaunchContextTypeExtension(
       launchContextExtension.extension.firstOrNull { it.url == "type" },
-      launchContextResourceTypes
+      (nameExtension!!.value as Coding).display
     )
   }
 
@@ -81,9 +77,7 @@ internal fun validateLaunchContextExtensions(
  */
 private fun validateLaunchContextNameExtension(nameExtension: Extension?) {
   if (nameExtension == null) {
-    error(
-      "The extension:name extension is not defined in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
-    )
+    error("The extension:name extension is missing in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT")
   }
   val isValidCode =
     QuestionnaireLaunchContextSet.values().any {
@@ -110,23 +104,28 @@ private fun validateLaunchContextNameExtension(nameExtension: Extension?) {
 }
 
 /**
- * Checks that the type of resources provided is defined in the type extension field:
+ * Checks that the type of resources provided is defined in the type extension field and is the same
+ * as the resource type in the name extension:
  * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
  */
-private fun validateResourceTypeInTypeExtension(
+private fun validateLaunchContextTypeExtension(
   typeExtension: Extension?,
-  launchContextResourceTypes: List<String>
+  resourceTypeInNameExtension: String
 ) {
   if (typeExtension == null) {
-    error(
-      "The extension:type extension is not defined in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
-    )
+    error("The extension:type extension is missing in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT")
   }
 
-  if (typeExtension.valueAsPrimitive.valueAsString !in launchContextResourceTypes) {
+  val resourceTypeInTypeExtension = typeExtension.valueAsPrimitive.valueAsString
+  if ((resourceTypeInNameExtension == "User") and
+      (resourceTypeInTypeExtension !in USER_CODE_RESOURCE_TYPE_SET)
+  ) {
     error(
-      "The launch contexts' resource types are not set in the extension:type extension in " +
-        EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+      "Types must be from the specified value set of resource types based on User: $USER_CODE_RESOURCE_TYPE_SET"
+    )
+  } else if (!resourceTypeInTypeExtension.equals(resourceTypeInNameExtension)) {
+    error(
+      "The resource type, $resourceTypeInTypeExtension, in the extension:type extension is not the same as the value set defined in the extension:name extension"
     )
   }
 }
@@ -154,6 +153,12 @@ private enum class QuestionnaireLaunchContextSet(
 private const val TARGET_STRUCTURE_MAP: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap"
 
+/**
+ * Set of resource types that the User code encompasses. See the User row in:
+ * https://build.fhir.org/ig/HL7/sdc/ValueSet-launchContext.html#expansion
+ */
+private val USER_CODE_RESOURCE_TYPE_SET =
+  listOf("Device", "Organization", "Patient", "Practitioner", "PractitionerRole", "RelatedPerson")
 val Questionnaire.isPaginated: Boolean
   get() = item.any { item -> item.displayItemControl == DisplayItemControlType.PAGE }
 

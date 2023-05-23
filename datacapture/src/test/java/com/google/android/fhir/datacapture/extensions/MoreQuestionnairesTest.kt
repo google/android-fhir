@@ -111,7 +111,7 @@ class MoreQuestionnairesTest {
   }
 
   @Test
-  fun `should throw exception if resource type in context is not part of launchContext set`() {
+  fun `should throw exception if resource type in context is not part of launchContext value set`() {
     val launchContextExtension =
       Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
         .apply {
@@ -128,7 +128,7 @@ class MoreQuestionnairesTest {
 
     val errorMessage =
       assertFailsWith<IllegalStateException> {
-          validateLaunchContextExtensions(listOf(launchContextExtension), listOf("Patient"))
+          validateLaunchContextExtensions(listOf(launchContextExtension))
         }
         .localizedMessage
 
@@ -136,12 +136,12 @@ class MoreQuestionnairesTest {
       .isEqualTo(
         "The value of the extension:name extension in " +
           "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext is " +
-          "not one of the ones defined in http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext."
+          "not a valid code in http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext."
       )
   }
 
   @Test
-  fun `should throw exception if resource type in context is different to what is in launchContext extension`() {
+  fun `should throw exception if resource type in type extension is different to what is in name extension`() {
     val launchContextExtension =
       Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
         .apply {
@@ -149,20 +149,44 @@ class MoreQuestionnairesTest {
             "name",
             Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "encounter", "Encounter")
           )
-          addExtension("type", CodeType("Encounter"))
+          addExtension("type", CodeType("Patient"))
         }
 
     val errorMessage =
       assertFailsWith<IllegalStateException> {
-          validateLaunchContextExtensions(listOf(launchContextExtension), listOf("Patient"))
+          validateLaunchContextExtensions(listOf(launchContextExtension))
         }
         .localizedMessage
 
     assertThat(errorMessage)
       .isEqualTo(
-        "The launch contexts' resource types are not set in the extension:type extension in " +
-          "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext does " +
-          "not match any of the resource types of the context passed in: [Patient]."
+        "The resource type, Patient, in the extension:type extension is not the same as " +
+          "the value set defined in the extension:name extension"
+      )
+  }
+
+  @Test
+  fun `should throw exception if type extension is not a subset of User value set in name extension`() {
+    val launchContextExtension =
+      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
+        .apply {
+          addExtension(
+            "name",
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User")
+          )
+          addExtension("type", CodeType("Observation"))
+        }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          validateLaunchContextExtensions(listOf(launchContextExtension))
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "Types must be from the specified value set of resource types based on User: " +
+          "[Patient, Practitioner, PractitionerRole, RelatedPerson]"
       )
   }
 }

@@ -175,10 +175,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
         val launchContexts = launchContextJsonStrings.map { parser.parseResource(it) as Resource }
         questionnaire.questionnaireLaunchContexts?.let { launchContextExtensions ->
-          validateLaunchContextExtensions(
-            launchContextExtensions,
-            launchContexts.map { it.resourceType.name }
-          )
+          validateLaunchContextExtensions(launchContextExtensions)
           launchContexts.associateBy { it.resourceType.name.lowercase() }
         }
       } else {
