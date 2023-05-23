@@ -26,7 +26,8 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
  */
 internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
   override fun resolveConstant(appContext: Any?, name: String?, beforeContext: Boolean): Base? {
-    return if (appContext is Map<*, *> && appContext.containsKey(name)) appContext[name] as Base
+    return if (appContext is Map<*, *> && appContext.containsKey(name) && appContext[name] != null)
+      appContext[name] as Base
     else null
   }
 
