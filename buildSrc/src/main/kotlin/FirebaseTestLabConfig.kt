@@ -15,6 +15,7 @@
  */
 
 import com.android.build.api.dsl.LibraryExtension
+import com.osacky.flank.gradle.FlankGradleExtension
 import java.util.UUID
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -23,45 +24,68 @@ import org.gradle.kotlin.dsl.configure
 @Suppress("SdCardPath")
 fun Project.configureFirebaseTestLab() {
   apply(plugin = Plugins.BuildPlugins.fladle)
-  configure<com.osacky.flank.gradle.FlankGradleExtension> {
-    projectId.set("android-fhir-instrumeted-tests")
-    debugApk.set(
-      project.provider {
-        "$rootDir/demo/build/outputs/apk/androidTest/debug/demo-debug-androidTest.apk"
-      }
+  configure<FlankGradleExtension> {
+    commonConfigurationForFirebaseTestLab(this@configureFirebaseTestLab)
+    instrumentationApk.set(project.provider { "$buildDir/outputs/apk/androidTest/debug/*.apk" })
+    environmentVariables.set(
+      mapOf("coverage" to "true", "coverageFile" to "/sdcard/Download/coverage.ec")
     )
+    flakyTestAttempts.set(3)
     devices.set(
       listOf(
         mapOf(
           "model" to "Nexus6P",
           "version" to
-            "${this@configureFirebaseTestLab.extensions.getByType(LibraryExtension::class.java).defaultConfig.minSdk}",
+            "${project.extensions.getByType(LibraryExtension::class.java).defaultConfig.minSdk}",
           "locale" to "en_US"
         ),
         mapOf("model" to "Nexus6P", "version" to "27", "locale" to "en_US"),
         mapOf(
           "model" to "oriole",
           "version" to
-            "${this@configureFirebaseTestLab.extensions.getByType(LibraryExtension::class.java).defaultConfig.targetSdk}",
+            "${project.extensions.getByType(LibraryExtension::class.java).defaultConfig.targetSdk}",
           "locale" to "en_US"
         ),
       )
     )
-    instrumentationApk.set(project.provider { "$buildDir/outputs/apk/androidTest/debug/*.apk" })
-    useOrchestrator.set(false)
-    flakyTestAttempts.set(3)
+  }
+}
+
+fun Project.configureFirebaseTestLabForMicroBenchmark() {
+  apply(plugin = Plugins.BuildPlugins.fladle)
+  configure<FlankGradleExtension> {
+    commonConfigurationForFirebaseTestLab(this@configureFirebaseTestLabForMicroBenchmark)
+    instrumentationApk.set(project.provider { "$buildDir/outputs/apk/androidTest/release/*.apk" })
     environmentVariables.set(
-      mapOf("coverage" to "true", "coverageFile" to "/sdcard/Download/coverage.ec")
+      mapOf("additionalTestOutputDir" to "/sdcard/Download", "no-isolated-storage" to "true")
     )
-    directoriesToPull.set(listOf("/sdcard/Download"))
-    filesToDownload.set(listOf(".*/sdcard/Download/.*.ec"))
-    resultsBucket.set("android-fhir-build-artifacts")
-    resultsDir.set(
-      if (project.providers.environmentVariable("KOKORO_BUILD_ARTIFACTS_SUBDIR").isPresent) {
-        "${System.getenv("KOKORO_BUILD_ARTIFACTS_SUBDIR")}/firebase/${project.name}"
-      } else {
-        "${project.name}-${UUID.randomUUID()}"
-      }
+    maxTestShards.set(4)
+    // some of the benchmark tests get timed-out in the default 15m
+    testTimeout.set("30m")
+    devices.set(
+      listOf(
+        mapOf("model" to "oriole", "version" to "32", "locale" to "en_US"),
+      )
     )
   }
+}
+
+private fun FlankGradleExtension.commonConfigurationForFirebaseTestLab(project: Project) {
+  projectId.set("android-fhir-instrumeted-tests")
+  debugApk.set(
+    project.provider {
+      "${project.rootDir}/demo/build/outputs/apk/androidTest/debug/demo-debug-androidTest.apk"
+    }
+  )
+  useOrchestrator.set(false)
+  directoriesToPull.set(listOf("/sdcard/Download"))
+  filesToDownload.set(listOf(".*/sdcard/Download/.*.ec", ".*/sdcard/Download/.*.json"))
+  resultsBucket.set("android-fhir-build-artifacts")
+  resultsDir.set(
+    if (project.providers.environmentVariable("KOKORO_BUILD_ARTIFACTS_SUBDIR").isPresent) {
+      "${System.getenv("KOKORO_BUILD_ARTIFACTS_SUBDIR")}/firebase/${project.name}"
+    } else {
+      "${project.name}-${UUID.randomUUID()}"
+    }
+  )
 }
