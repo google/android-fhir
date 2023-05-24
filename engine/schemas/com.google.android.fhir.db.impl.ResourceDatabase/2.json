@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "6dd24dd7340c3808456a812933bc6838",
+    "identityHash": "ff9a029a72466b4877b2f7654d8c0095",
     "entities": [
       {
         "tableName": "ResourceEntity",
@@ -660,15 +660,6 @@
         },
         "indices": [
           {
-            "name": "index_DateTimeIndexEntity_index_from",
-            "unique": false,
-            "columnNames": [
-              "index_from"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_index_from` ON `${TABLE_NAME}` (`index_from`)"
-          },
-          {
             "name": "index_DateTimeIndexEntity_resourceType_index_name_index_from_index_to",
             "unique": false,
             "columnNames": [
@@ -935,7 +926,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6dd24dd7340c3808456a812933bc6838')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ff9a029a72466b4877b2f7654d8c0095')"
     ]
   }
 }
