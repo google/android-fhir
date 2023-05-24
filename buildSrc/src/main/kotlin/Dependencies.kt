@@ -289,7 +289,7 @@ object Dependencies {
     // Test dependencies
 
     object AndroidxTest {
-      const val benchmarkJUnit = "1.1.0"
+      const val benchmarkJUnit = "1.1.1"
       const val core = "1.4.0"
       const val archCore = "2.1.0"
       const val extJunit = "1.1.5"
