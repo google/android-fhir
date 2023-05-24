@@ -70,6 +70,7 @@ class ResourceDatabaseMigrationTest {
         DB_NAME
       )
       .addMigrations(MIGRATION_1_2)
+      .addMigrations(MIGRATION_2_3)
       .build()
       .apply {
         readPatientJson = this.resourceDao().getResource("migrate1-2-test", ResourceType.Patient)
