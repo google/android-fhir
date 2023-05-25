@@ -32,6 +32,29 @@ class SearchParameterRepositoryGeneratedTest(private val resource: Resource) {
   }
 
   private fun getSearchParamListReflection(resource: Resource): MutableList<SearchParamDefinition> {
+    val searchParams = getBaseSearchParameters()
+    searchParams.addAll(
+      resource.javaClass.fields
+        .asSequence()
+        .mapNotNull {
+          it.getAnnotation(ca.uhn.fhir.model.api.annotation.SearchParamDefinition::class.java)
+        }
+        .filter { it.path.isNotEmpty() }
+        .map {
+          SearchParamDefinition(
+            it.name,
+            Enumerations.SearchParamType.valueOf(it.type.toUpperCase()),
+            it.path
+          )
+        }
+        .toMutableList()
+    )
+
+    return searchParams
+  }
+
+  // We are adding these manually because they don't exists in HAPI FHIR java classes
+  private fun getBaseSearchParameters(): MutableList<SearchParamDefinition> {
     val searchParams = mutableListOf<SearchParamDefinition>()
     searchParams.add(
       SearchParamDefinition(
@@ -50,7 +73,7 @@ class SearchParameterRepositoryGeneratedTest(private val resource: Resource) {
     searchParams.add(
       SearchParamDefinition(
         "_profile",
-        Enumerations.SearchParamType.URI,
+        Enumerations.SearchParamType.REFERENCE,
         "${resource.resourceType.name}.meta.profile"
       )
     )
@@ -74,23 +97,6 @@ class SearchParameterRepositoryGeneratedTest(private val resource: Resource) {
         Enumerations.SearchParamType.TOKEN,
         "${resource.resourceType.name}.meta.tag"
       )
-    )
-
-    searchParams.addAll(
-      resource.javaClass.fields
-        .asSequence()
-        .mapNotNull {
-          it.getAnnotation(ca.uhn.fhir.model.api.annotation.SearchParamDefinition::class.java)
-        }
-        .filter { it.path.isNotEmpty() }
-        .map {
-          SearchParamDefinition(
-            it.name,
-            Enumerations.SearchParamType.valueOf(it.type.toUpperCase()),
-            it.path
-          )
-        }
-        .toMutableList()
     )
 
     return searchParams
