@@ -16,10 +16,11 @@
 -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-    android:layout_marginVertical="@dimen/item_margin_vertical"
+    android:layout_marginTop="@dimen/padding_default"
     android:orientation="vertical"
 >
 
@@ -27,6 +28,7 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding_default"
     />
 
     <com.google.android.fhir.datacapture.views.MediaView
@@ -38,6 +40,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_default"
         android:orientation="horizontal"
     >
 
@@ -59,14 +62,24 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-            android:id="@+id/unit_text_view"
-            style="?attr/questionnaireHelpTextStyle"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/unit_text_input_layout"
+            style="?attr/questionnaireDropdownLayoutStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-            android:visibility="gone"
-        />
+            android:layout_marginStart="@dimen/item_margin_horizontal"
+        >
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/unit_auto_complete"
+                style="?attr/questionnaireDropDownSelectedTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawablePadding="@dimen/item_margin_horizontal"
+                android:inputType="none"
+            />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 </LinearLayout>

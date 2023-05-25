@@ -44,7 +44,7 @@ class EditTextQuantityViewHolderFactoryTest {
     FrameLayout(
       RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
-  private val viewHolder = EditTextQuantityViewHolderFactory.create(parent)
+  private val viewHolder = QuantityViewHolderFactory.create(parent)
 
   @Test
   fun shouldSetQuestionHeader() {

@@ -78,8 +78,7 @@ internal object DropDownViewHolderFactory :
         val selectedAnswer =
           questionnaireViewItem.answers.singleOrNull()?.value?.displayString(header.context)
         answerOptionList
-          .filter { it.answerOptionString == selectedAnswer }
-          .singleOrNull()
+          .singleOrNull { it.answerOptionString == selectedAnswer }
           ?.let {
             autoCompleteTextView.setText(it.answerOptionString)
             autoCompleteTextView.setSelection(it.answerOptionString.length)
@@ -168,7 +167,7 @@ internal class AnswerOptionDropDownArrayAdapter(
 
 internal data class DropDownAnswerOption(
   val answerOptionString: String,
-  val answerOptionImage: Drawable?
+  val answerOptionImage: Drawable? = null
 ) {
   override fun toString(): String {
     return this.answerOptionString

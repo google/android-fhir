@@ -34,6 +34,7 @@ import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IntegerType
@@ -111,6 +112,24 @@ internal const val EXTENSION_CQF_CALCULATED_VALUE_URL: String =
 
 internal const val EXTENSION_SLIDER_STEP_VALUE_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue"
+
+/**
+ * Extension for questionnaire items of integer and decimal types including a single unit to be
+ * displayed.
+ */
+internal const val EXTENSION_QUESTIONNAIRE_UNIT_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
+
+/** Extension for questionnaire items of quantity type including unit options to choose from. */
+internal const val EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption"
+
+/**
+ * Extension for questionnaire items of quantity type including a value set of unit options to
+ * choose from.
+ */
+internal const val EXTENSION_QUESTIONNAIRE_UNIT_VALUE_SET_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet"
 
 internal val Questionnaire.QuestionnaireItemComponent.variableExpressions: List<Expression>
   get() =
@@ -450,6 +469,24 @@ val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
     return null
   }
 
+internal val Questionnaire.QuestionnaireItemComponent.unit: Coding?
+  get() {
+    val extension =
+      this.extension.singleOrNull { it.url == EXTENSION_QUESTIONNAIRE_UNIT_URL } ?: return null
+    val value = extension.value
+    if (value is Coding) {
+      return value
+    }
+    return null
+  }
+
+internal val Questionnaire.QuestionnaireItemComponent.unitOption: List<Coding>
+  get() {
+    return this.extension
+      .filter { it.url == EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL }
+      .map { it.value as Coding }
+  }
+
 /**
  * Returns a list of values built from the elements of `this` and the
  * `questionnaireResponseItemList` with the same linkId using the provided `transform` function
@@ -541,8 +578,9 @@ val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
  * value.
  */
 private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
-  MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? {
-  // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
+  MutableList<
+    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+  >? { // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
   // quantity given as initial without value is for unit reference purpose only. Answer conversion
   // not needed
   if (initial.isEmpty() ||

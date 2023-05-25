@@ -28,7 +28,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.views.factories.EditTextQuantityViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuantityViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -51,7 +51,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
   @Before
   fun setup() {
     activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }
-    viewHolder = EditTextQuantityViewHolderFactory.create(parent)
+    viewHolder = QuantityViewHolderFactory.create(parent)
     setTestLayout(viewHolder.itemView)
   }
 
