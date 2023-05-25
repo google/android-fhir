@@ -134,9 +134,8 @@ class MoreQuestionnairesTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "The value of the extension:name extension in " +
-          "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext is " +
-          "not a valid code in http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext."
+        "The extension:name extension and/or extension:type extension do not follow " +
+          "the format specified in http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
       )
   }
 
@@ -160,8 +159,8 @@ class MoreQuestionnairesTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "The resource type, Patient, in the extension:type extension is not the same as " +
-          "the value set defined in the extension:name extension"
+        "The extension:name extension and/or extension:type extension do not follow " +
+          "the format specified in http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
       )
   }
 
@@ -185,8 +184,32 @@ class MoreQuestionnairesTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "Types must be from the specified value set of resource types based on User: " +
-          "[Patient, Practitioner, PractitionerRole, RelatedPerson]"
+        "The extension:name extension and/or extension:type extension do not follow " +
+          "the format specified in http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+      )
+  }
+
+  @Test
+  fun `should throw exception if both name and type extension are not present`() {
+    val launchContextExtension =
+      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
+        .apply {
+          addExtension(
+            "name",
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User")
+          )
+        }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          validateLaunchContextExtensions(listOf(launchContextExtension))
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "The extension:name or extension:type extension is missing in " +
+          EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
       )
   }
 }
