@@ -62,6 +62,9 @@ internal interface RetrofitHttpService : FhirHttpService {
           .readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
           .writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
           .apply {
+            if (networkConfiguration.uploadWithGzip) {
+              addInterceptor(GzipUploadInterceptor)
+            }
             httpLoggingInterceptor?.let { addInterceptor(it) }
             authenticator?.let {
               addInterceptor(
