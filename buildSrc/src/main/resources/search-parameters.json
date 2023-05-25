@@ -189,7 +189,7 @@
       "description" : "Profiles this resource claims to conform to",
       "code" : "_profile",
       "base" : ["Resource"],
-      "type" : "uri",
+      "type" : "reference",
       "expression" : "Resource.meta.profile",
       "xpath" : "f:Resource/f:meta/f:profile",
       "xpathUsage" : "normal"
