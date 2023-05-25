@@ -22,6 +22,7 @@ import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.datacapture.DataCaptureConfig
 import com.google.android.fhir.datacapture.XFhirQueryResolver
@@ -55,7 +56,8 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
               HttpLogger.Configuration(
                 if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC
               )
-            ) { Timber.tag("App-HttpLog").d(it) }
+            ) { Timber.tag("App-HttpLog").d(it) },
+          networkConfiguration = NetworkConfiguration(uploadWithGzip = false)
         )
       )
     )

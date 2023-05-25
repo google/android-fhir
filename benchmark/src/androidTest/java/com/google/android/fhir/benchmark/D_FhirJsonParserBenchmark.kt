@@ -43,7 +43,7 @@ class D_FhirJsonParserBenchmark {
   fun parseLightFhirBundle() {
     benchmarkRule.measureRepeated {
       val jsonParser = runWithTimingDisabled {
-        var fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
+        val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
         fhirContext.newJsonParser()
       }
 
@@ -60,7 +60,7 @@ class D_FhirJsonParserBenchmark {
   fun parseLightFhirLibrary() {
     benchmarkRule.measureRepeated {
       val jsonParser = runWithTimingDisabled {
-        var fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
+        val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
         fhirContext.newJsonParser()
       }
 
