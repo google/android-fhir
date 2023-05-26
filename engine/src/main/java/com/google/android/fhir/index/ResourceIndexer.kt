@@ -263,7 +263,7 @@ internal class ResourceIndexer(
       "id" -> {
         val id = value as IdType
         if (id.value != null) {
-          listOf(TokenIndex(searchParam.name, searchParam.path, null, id.idPart))
+          listOf(TokenIndex(searchParam.name, searchParam.path, null, id.idPart ?: id.value))
         } else {
           listOf()
         }
