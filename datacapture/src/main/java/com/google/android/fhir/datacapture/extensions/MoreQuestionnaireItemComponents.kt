@@ -290,7 +290,7 @@ internal fun Questionnaire.QuestionnaireItemComponent.isGivenSizeOverLimit(
 internal enum class DisplayItemControlType(val extensionCode: String) {
   FLYOVER("flyover"),
   PAGE("page"),
-  HELP("help")
+  HELP("help"),
 }
 
 /** Item control to show instruction text */

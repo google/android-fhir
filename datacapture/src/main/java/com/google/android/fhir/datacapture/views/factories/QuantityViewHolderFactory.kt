@@ -64,8 +64,7 @@ internal object QuantityViewHolderFactory :
           itemView.findViewById<TextInputEditText?>(R.id.text_input_edit_text).apply {
             setRawInputType(QUANTITY_INPUT_TYPE)
             // Override `setOnEditorActionListener` to avoid crash with `IllegalStateException` if
-            // it's
-            // not possible to move focus forward.
+            // it's not possible to move focus forward.
             // See
             // https://stackoverflow.com/questions/13614101/fatal-crash-focus-search-returned-a-view-that-wasnt-able-to-take-focus/47991577
             setOnEditorActionListener { view, actionId, _ ->

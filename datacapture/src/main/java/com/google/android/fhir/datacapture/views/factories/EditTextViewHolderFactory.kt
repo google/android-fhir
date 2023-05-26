@@ -55,7 +55,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   private lateinit var header: HeaderView
   protected lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
-  private lateinit var unitTextView: TextView
+  private var unitTextView: TextView? = null
   private var textWatcher: TextWatcher? = null
 
   override fun init(itemView: View) {
@@ -99,7 +99,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     textInputEditText.removeTextChangedListener(textWatcher)
     updateUI(questionnaireViewItem, textInputEditText, textInputLayout)
 
-    unitTextView.apply {
+    unitTextView?.apply {
       text = questionnaireViewItem.questionnaireItem.unit?.code
       visibility = if (text.isNullOrEmpty()) GONE else VISIBLE
     }

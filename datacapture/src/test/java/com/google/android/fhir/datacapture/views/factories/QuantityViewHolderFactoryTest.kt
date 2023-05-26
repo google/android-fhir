@@ -39,7 +39,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
-class EditTextQuantityViewHolderFactoryTest {
+class QuantityViewHolderFactoryTest {
   private val parent =
     FrameLayout(
       RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
