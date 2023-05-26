@@ -190,7 +190,31 @@ class MoreQuestionnairesTest {
   }
 
   @Test
-  fun `should throw exception if both name and type extension are not present`() {
+  fun `should throw exception if the type extension is not present`() {
+    val launchContextExtension =
+      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
+        .apply {
+          addExtension(
+            "name",
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User")
+          )
+        }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          validateLaunchContextExtensions(listOf(launchContextExtension))
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "The extension:name or extension:type extension is missing in " +
+          EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+      )
+  }
+
+  @Test
+  fun `should throw exception if the name extension is not present`() {
     val launchContextExtension =
       Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
         .apply {

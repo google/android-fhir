@@ -77,11 +77,10 @@ internal fun validateLaunchContextExtensions(launchContextExtensions: List<Exten
  * [QuestionnaireLaunchContextSet]
  */
 private fun validateLaunchContextExtension(launchExtension: Extension) {
-  if (launchExtension.extension.size != 2) {
-    error(
-      "The extension:name or extension:type extension is missing in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
-    )
+  check(launchExtension.extension.size == 2) {
+    "The extension:name or extension:type extension is missing in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
   }
+
   val isValidExtension =
     QuestionnaireLaunchContextSet.values().any {
       launchExtension.equalsDeep(

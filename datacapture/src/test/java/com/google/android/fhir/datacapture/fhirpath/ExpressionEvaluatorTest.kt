@@ -27,13 +27,13 @@ import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.CodeableConcept
-import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Location
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
@@ -687,7 +687,7 @@ class ExpressionEvaluatorTest {
     val expressionsToEvaluate =
       ExpressionEvaluator.createXFhirQueryFromExpression(
         expression,
-        mapOf("Practitioner" to Practitioner())
+        mapOf(Practitioner().resourceType.name.lowercase() to Practitioner())
       )
 
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?var1=&var2=&var3=&var4=")
@@ -772,13 +772,12 @@ class ExpressionEvaluatorTest {
         active = true
         gender = Enumerations.AdministrativeGender.MALE
         addName(HumanName().apply { this.family = "John" })
-        maritalStatus = CodeableConcept().addCoding(Coding("theSystem", "theCode", "Single"))
       }
 
     val expression =
       Expression().apply {
         this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
-        this.expression = "Patient?maritalStatus-display={{%patient.maritalStatus.coding.display}}"
+        this.expression = "Patient?family={{%patient.name.family}}"
       }
 
     val expressionsToEvaluate =
@@ -786,6 +785,47 @@ class ExpressionEvaluatorTest {
         expression,
         mapOf(patient.resourceType.name.lowercase() to patient)
       )
-    assertThat(expressionsToEvaluate).isEqualTo("Patient?maritalStatus-display=Single")
+    assertThat(expressionsToEvaluate).isEqualTo("Patient?family=John")
+  }
+
+  @Test
+  fun `createXFhirQueryFromExpression() should evaluate when multiple fhir paths are given`() {
+    val patient =
+      Patient().apply {
+        id = UUID.randomUUID().toString()
+        active = true
+        gender = Enumerations.AdministrativeGender.MALE
+        addName(HumanName().apply { this.family = "John" })
+      }
+
+    val location =
+      Location().apply {
+        id = UUID.randomUUID().toString()
+        status = Location.LocationStatus.ACTIVE
+        mode = Location.LocationMode.INSTANCE
+        address =
+          Address().apply {
+            use = Address.AddressUse.HOME
+            type = Address.AddressType.PHYSICAL
+            city = "NAIROBI"
+          }
+      }
+
+    val expression =
+      Expression().apply {
+        this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+        this.expression =
+          "Patient?family={{%patient.name.family}}&address-city={{%location.address.city}}"
+      }
+
+    val expressionsToEvaluate =
+      ExpressionEvaluator.createXFhirQueryFromExpression(
+        expression,
+        mapOf(
+          patient.resourceType.name.lowercase() to patient,
+          location.resourceType.name.lowercase() to location
+        )
+      )
+    assertThat(expressionsToEvaluate).isEqualTo("Patient?family=John&address-city=NAIROBI")
   }
 }
