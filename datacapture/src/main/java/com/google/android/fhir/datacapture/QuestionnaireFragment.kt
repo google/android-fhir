@@ -303,8 +303,16 @@ class QuestionnaireFragment : Fragment() {
       args.add(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI to questionnaireResponseUri)
     }
 
-    fun setQuestionnaireLaunchContext(questionnaireLaunchContext: String) = apply {
-      args.add(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING to questionnaireLaunchContext)
+    /**
+     * The launch context allows information to be passed into questionnaire based on the context in
+     * which the questionnaire is being evaluated. For example, what patient, what encounter, what
+     * user, etc. is "in context" at the time the questionnaire response is being completed:
+     * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
+     *
+     * @param launchContexts list of serialized resources
+     */
+    fun setQuestionnaireLaunchContexts(launchContexts: List<String>) = apply {
+      args.add(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS to launchContexts)
     }
 
     /**
@@ -398,9 +406,9 @@ class QuestionnaireFragment : Fragment() {
      */
     internal const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
 
-    /** A JSON encoded string extra for questionnaire context. */
-    internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING =
-      "questionnaire-launch-context"
+    /** A list of JSON encoded strings extra for each questionnaire context. */
+    internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS =
+      "questionnaire-launch-contexts"
     /**
      * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.
      *
