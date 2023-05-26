@@ -355,7 +355,7 @@ class XFhirQueryTranslatorTest {
     val search =
       translate("Patient?_profile=http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient")
 
-    search.uriFilterCriteria.first().run {
+    search.referenceFilterCriteria.first().run {
       assertThat(this.parameter.paramName).isEqualTo("_profile")
       assertThat(this.filters.first().value)
         .isEqualTo("http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient")
