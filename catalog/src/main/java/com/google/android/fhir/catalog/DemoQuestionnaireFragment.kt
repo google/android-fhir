@@ -34,12 +34,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.BUNDLE_ERROR_KEY
 import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.REQUEST_ERROR_KEY
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.SUBMIT_REQUEST_KEY
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
+import org.hl7.fhir.r4.model.Patient
 
 class DemoQuestionnaireFragment : Fragment() {
   private val viewModel: DemoQuestionnaireViewModel by viewModels()
@@ -147,7 +149,8 @@ class DemoQuestionnaireFragment : Fragment() {
             R.id.container,
             QuestionnaireFragment.builder()
               .setQuestionnaire(viewModel.getQuestionnaireJson())
-              .build(),
+              .setQuestionnaireResourceContext(FhirContext.forR4Cached().newJsonParser().encodeResourceToString(Patient().apply { id="P1" }))
+            .build(),
             QUESTIONNAIRE_FRAGMENT_TAG
           )
         }
@@ -176,7 +179,9 @@ class DemoQuestionnaireFragment : Fragment() {
         setReorderingAllowed(true)
         replace(
           R.id.container,
-          QuestionnaireFragment.builder().setQuestionnaire(questionnaireJsonString).build(),
+          QuestionnaireFragment.builder().setQuestionnaire(questionnaireJsonString)
+            .setQuestionnaireResourceContext(FhirContext.forR4Cached().newJsonParser().encodeResourceToString(Patient().apply { id="P1" }))
+          .build(),
           QUESTIONNAIRE_FRAGMENT_TAG
         )
       }

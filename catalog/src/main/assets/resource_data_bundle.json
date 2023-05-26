@@ -3,6 +3,58 @@
   "entry": [
     {
       "resource": {
+        "resourceType" : "Patient",
+        "id" : "P1"
+      }
+    },
+    {
+      "resource": {
+      "resourceType" : "Immunization",
+      "id" : "I1",
+      "status" : "completed",
+      "vaccineCode" : {
+        "coding" : [{
+      "system":"https://icd.who.int/", "code":"XM4YL8","display":"AstraZeneca"
+        }],
+        "text" : "AstraZeneca"
+      },
+      "patient" : {
+        "reference" : "Patient/P1"
+      },
+      "occurrenceDateTime" : "2013-01-11",
+      "reasonCode" : [{
+          "coding" : [{
+            "system" : "http://snomed.info/sct",
+            "code" : "840534001"
+          }]
+      }]
+    }
+    },
+    {
+      "resource": {
+        "resourceType" : "Immunization",
+        "id" : "I2",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [{
+            "system":"https://icd.who.int/", "code":"XM6QV1","display":"Johnson & Johnson"
+          }],
+          "text" : "Johnson & Johnson"
+        },
+        "patient" : {
+          "reference" : "Patient/P1"
+        },
+        "occurrenceDateTime" : "2013-01-10",
+        "reasonCode" : [{
+            "coding" : [{
+              "system" : "http://snomed.info/sct",
+              "code" : "840534001"
+            }]
+        }]
+      }
+    },
+    {
+      "resource": {
         "resourceType": "Task",
         "id": "b8e13d21-1a62-4172-a9ef-57670e6ac238",
         "status": "ready",

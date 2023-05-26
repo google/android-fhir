@@ -1,17 +1,48 @@
 {
   "resourceType": "Questionnaire",
+  "extension" : [
+    {
+      "extension" : [
+        {
+          "url" : "name",
+          "valueCoding" : {
+            "system" : "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
+            "code" : "patient",
+            "display" : "Patient"
+          }
+        },
+        {
+          "url" : "type",
+          "valueCode" : "Patient"
+        }
+      ],
+      "url" : "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "name": "PREV-VACCINES",
+      "valueExpression": {
+        "expression": "%resource.item.where(linkId='previous_vaccine').answer.value"
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "name": "LAST-VACCINE",
+      "valueExpression": {
+        "expression": "%resource.item.where(linkId='previous_vaccine').answer.value.last()"
+      }
+    }
+  ],
   "item": [
     {
-      "text": "Choose a Task?",
+      "text": "Previous vaccine name",
       "type": "reference",
-      "linkId": "1",
-      "required": true,
-      "repeats": true,
+      "linkId": "previous_vaccine",
       "extension": [
         {
           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
           "valueExpression": {
-            "expression": "Task?subject=Patient/3e3d698a-4edb-48f9-9330-2f1adc0635d1&code=33879002&status=ready&_sort=period",
+            "expression": "Immunization?patient={{%patient.id}}&reason-code=840534001&_sort=date",
             "language": "application/x-fhir-query"
           }
         },
@@ -20,7 +51,7 @@
           "extension": [
             {
               "url": "path",
-              "valueString": "reasonCode.text + ' - ' + reasonCode.coding.where(system='http://snomed.info/sct').display"
+              "valueString": "vaccineCode.coding.display"
             },
             {
               "url": "forDisplay",
@@ -29,6 +60,150 @@
           ]
         }
       ]
+    },
+    {
+      "text": "Vaccine name",
+      "type": "choice",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
+          "valueExpression": {
+            "expression": "%resource.descendants().where(linkId='previous_vaccine').answer.empty()",
+            "language": "text/fhirpath"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "radio-button",
+                "display": "Radio Button"
+              }
+            ]
+          }
+        }
+      ],
+      "linkId": "vaccine_selector",
+      "required": true,
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "AstraZeneca",
+            "display": "AstraZeneca"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "Sinopharm",
+            "display": "Sinopharm"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "Pfizer",
+            "display": "Pfizer"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "Moderna",
+            "display": "Moderna"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "Johnson & Johnson",
+            "display": "Johnson & Johnson"
+          }
+        }
+      ]
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression",
+          "valueExpression": {
+            "expression": "iif(%LAST-VACCINE.value.empty().not(), %context.answerOption.value.where(display=%LAST-VACCINE.display),%resource.item.where(linkId='vaccine_selector').answer.value)"
+          }
+        }
+      ],
+      "linkId": "current_vaccine",
+      "required": true,
+      "text": "Current Vaccine",
+      "type": "choice",
+      "readOnly": true,
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "AstraZeneca",
+            "display": "AstraZeneca"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "Sinopharm",
+            "display": "Sinopharm"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "Pfizer",
+            "display": "Pfizer"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "Moderna",
+            "display": "Moderna"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "Johnson & Johnson",
+            "display": "Johnson & Johnson"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "dose_number",
+      "required": true,
+      "text": "Dose Number",
+      "type": "choice",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "1",
+            "display": "1"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "2",
+            "display": "2"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "booster",
+            "display": "Booster"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "vaccine_date",
+      "required": true,
+      "text": "Date Vaccine is Given",
+      "type": "date"
+    },
+    {
+      "linkId": "batch_number",
+      "required": true,
+      "text": "Batch Number",
+      "type": "string"
     }
   ]
 }
