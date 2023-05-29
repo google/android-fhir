@@ -41,12 +41,21 @@ class BehaviorListViewModel(application: Application) : AndroidViewModel(applica
     ANSWER_EXPRESSION(
       R.drawable.ic_answers_behavior,
       R.string.behavior_name_answer_expression,
-      "behavior_answer_expression.json"
+      "behavior_answer_expression.json"),
+    CONTEXT_VARIABLES(
+      R.drawable.ic_context,
+      R.string.behavior_name_context_variables,
+      "behavior_context_variables.json"
     ),
     SKIP_LOGIC(
       R.drawable.ic_skiplogic_behavior,
       R.string.behavior_name_skip_logic,
       "behavior_skip_logic.json"
+    ),
+    DYNAMIC_QUESTION_TEXT(
+      R.drawable.ic_dynamic_text_behavior,
+      R.string.behavior_name_dynamic_question_text,
+      "behavior_dynamic_question_text.json"
     )
   }
 }

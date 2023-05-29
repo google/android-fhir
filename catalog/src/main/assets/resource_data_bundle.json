@@ -16,16 +16,16 @@
         "coding" : [{
       "system":"https://icd.who.int/", "code":"XM4YL8","display":"AstraZeneca"
         }],
-        "text" : "AstraZeneca"
+        "text" : "AstraZeneca - 1"
       },
       "patient" : {
         "reference" : "Patient/P1"
-      },
-      "occurrenceDateTime" : "2013-01-11",
+      },      "occurrenceDateTime" : "2013-01-11",
       "reasonCode" : [{
           "coding" : [{
             "system" : "http://snomed.info/sct",
-            "code" : "840534001"
+            "code" : "840534001",
+            "display": "SARS-CoV-2 vaccination"
           }]
       }]
     }
@@ -39,16 +39,17 @@
           "coding" : [{
             "system":"https://icd.who.int/", "code":"XM6QV1","display":"Johnson & Johnson"
           }],
-          "text" : "Johnson & Johnson"
+          "text" : "Johnson & Johnson - 1"
         },
         "patient" : {
           "reference" : "Patient/P1"
         },
-        "occurrenceDateTime" : "2013-01-10",
+        "occurrenceDateTime" : "2013-01-12",
         "reasonCode" : [{
             "coding" : [{
               "system" : "http://snomed.info/sct",
-              "code" : "840534001"
+              "code" : "840534001",
+              "display": "SARS-CoV-2 vaccination"
             }]
         }]
       }

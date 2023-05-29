@@ -149,7 +149,7 @@ class DemoQuestionnaireFragment : Fragment() {
             R.id.container,
             QuestionnaireFragment.builder()
               .setQuestionnaire(viewModel.getQuestionnaireJson())
-              .setQuestionnaireResourceContext(FhirContext.forR4Cached().newJsonParser().encodeResourceToString(Patient().apply { id="P1" }))
+              .setQuestionnaireLaunchContext(FhirContext.forR4Cached().newJsonParser().encodeResourceToString(Patient().apply { id="P1" }))
             .build(),
             QUESTIONNAIRE_FRAGMENT_TAG
           )
@@ -180,7 +180,7 @@ class DemoQuestionnaireFragment : Fragment() {
         replace(
           R.id.container,
           QuestionnaireFragment.builder().setQuestionnaire(questionnaireJsonString)
-            .setQuestionnaireResourceContext(FhirContext.forR4Cached().newJsonParser().encodeResourceToString(Patient().apply { id="P1" }))
+            .setQuestionnaireLaunchContext(FhirContext.forR4Cached().newJsonParser().encodeResourceToString(Patient().apply { id="P1" }))
           .build(),
           QUESTIONNAIRE_FRAGMENT_TAG
         )

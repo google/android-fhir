@@ -27,6 +27,7 @@ import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -158,6 +159,17 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
+  fun decimalTextEdit_typingInvalidTextShouldShowError() {
+    buildFragmentFromQuestionnaire("/text_questionnaire_decimal.json")
+
+    onView(withId(R.id.text_input_edit_text)).perform(typeText("1.1.1.1"))
+
+    onView(withId(R.id.text_input_layout)).check { view, _ ->
+      assertThat((view as TextInputLayout).error).isEqualTo("Invalid number")
+    }
+  }
+
+  @Test
   fun dateTimePicker_shouldShowErrorForWrongDate() {
     buildFragmentFromQuestionnaire("/component_date_time_picker.json")
 
@@ -168,7 +180,7 @@ class QuestionnaireUiEspressoTest {
 
     onView(withId(R.id.date_input_layout)).check { view, _ ->
       val actualError = (view as TextInputLayout).error
-      assertThat(actualError).isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/31/2023)")
+      assertThat(actualError).isEqualTo("Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)")
     }
     onView(withId(R.id.time_input_layout)).check { view, _ -> assertThat(view.isEnabled).isFalse() }
   }
@@ -222,7 +234,7 @@ class QuestionnaireUiEspressoTest {
 
     onView(withId(R.id.text_input_layout)).check { view, _ ->
       val actualError = (view as TextInputLayout).error
-      assertThat(actualError).isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/31/2023)")
+      assertThat(actualError).isEqualTo("Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)")
     }
   }
 
@@ -440,6 +452,29 @@ class QuestionnaireUiEspressoTest {
     onView(withId(R.id.hint)).check { view, _ ->
       val hintVisibility = (view as TextView).visibility
       assertThat(hintVisibility).isEqualTo(View.GONE)
+    }
+  }
+
+  @Test
+  fun cqfExpression_shouldSetText_withEvaluatedAnswer() {
+    buildFragmentFromQuestionnaire("/questionnaire_with_dynamic_question_text.json")
+
+    onView(CoreMatchers.allOf(withText("Option Date"))).check { view, _ ->
+      assertThat(view.id).isEqualTo(R.id.question)
+    }
+
+    onView(CoreMatchers.allOf(withText("Provide \"First Option\" Date"))).check { view, _ ->
+      assertThat(view).isNull()
+    }
+
+    onView(CoreMatchers.allOf(withText("First Option"))).perform(ViewActions.click())
+
+    onView(CoreMatchers.allOf(withText("Option Date"))).check { view, _ ->
+      assertThat(view).isNull()
+    }
+
+    onView(CoreMatchers.allOf(withText("Provide \"First Option\" Date"))).check { view, _ ->
+      assertThat(view.id).isEqualTo(R.id.question)
     }
   }
 

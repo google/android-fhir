@@ -539,6 +539,7 @@ class ExpressionEvaluatorTest {
     val result =
       evaluateCalculatedExpressions(
         questionnaire.item.elementAt(1),
+        questionnaireResponse.item.elementAt(1),
         questionnaire,
         questionnaireResponse,
         emptyMap()
@@ -611,6 +612,7 @@ class ExpressionEvaluatorTest {
       val result =
         evaluateCalculatedExpressions(
           questionnaire.item.elementAt(1),
+          questionnaireResponse.item.elementAt(1),
           questionnaire,
           questionnaireResponse,
           emptyMap()

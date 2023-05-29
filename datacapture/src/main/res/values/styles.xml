@@ -90,8 +90,12 @@
         </item>
         <item
             name="questionnaireTextInputEditTextStyle"
-        >@style/TextAppearance.Material3.BodyLarge
+        >@style/Questionnaire.TextInputEditTextStyle
         </item>
+      <item
+            name="questionnaireMultiLineTextInputEditTextStyle"
+        >@style/Questionnaire.MultiLineTextInputEditTextStyle
+      </item>
         <item
             name="questionnaireChipStyle"
         >@style/Widget.Material3.Chip.Input</item>
@@ -250,6 +254,13 @@
         <item name="boxStrokeColor">@color/box_stroke_color</item>
     </style>
 
+  <style
+        name="Questionnaire.MultiLineTextInputEditTextStyle"
+        parent="Questionnaire.TextInputEditTextStyle"
+    >
+    <item name="android:minLines">3</item>
+  </style>
+
     <style
         name="Questionnaire.TextInputEditTextStyle"
         parent="ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
@@ -304,7 +315,7 @@
         <item
             name="android:background"
         >@drawable/questionnaire_item_checkbox_background</item>
-        <item name="android:padding">@dimen/padding_default</item>
+        <item name="android:padding">@dimen/option_item_padding</item>
     </style>
 
     <style
@@ -317,11 +328,13 @@
         <item
             name="android:background"
         >@drawable/questionnaire_item_checkbox_background</item>
-        <item name="android:padding">@dimen/padding_default</item>
+        <item name="android:padding">@dimen/option_item_padding</item>
         <item
             name="android:paddingStart"
-        >@dimen/padding_between_text_and_icon</item>
-        <item name="android:paddingEnd">@dimen/padding_after_text</item>
+        >@dimen/option_item_between_text_and_icon_padding</item>
+        <item
+            name="android:paddingEnd"
+        >@dimen/option_item_after_text_padding</item>
     </style>
 
     <style
@@ -347,7 +360,7 @@
     >
         <item name="icon">@drawable/ic_camera</item>
         <item name="iconTint">?attr/colorPrimary</item>
-        <item name="iconSize">@dimen/attachment_icon_button_size</item>
+        <item name="iconSize">@dimen/attachment_action_button_icon_size</item>
         <item name="android:text">@string/take_photo</item>
     </style>
 
@@ -363,7 +376,7 @@
         parent="Widget.Material3.Button.OutlinedButton"
     >
         <item name="iconTint">?attr/colorPrimary</item>
-        <item name="iconSize">@dimen/attachment_icon_button_size</item>
+        <item name="iconSize">@dimen/attachment_action_button_icon_size</item>
     </style>
 
     <style
@@ -402,8 +415,12 @@
         <item name="android:textColor">?attr/colorError</item>
         <item name="android:text">@string/delete</item>
         <item name="android:visibility">visible</item>
-        <item name="android:paddingRight">@dimen/padding_default</item>
-        <item name="android:paddingLeft">@dimen/padding_default</item>
+        <item
+            name="android:paddingRight"
+        >@dimen/attachment_action_button_padding_horizontal</item>
+        <item
+            name="android:paddingLeft"
+        >@dimen/attachment_action_button_padding_horizontal</item>
     </style>
 
 </resources>
