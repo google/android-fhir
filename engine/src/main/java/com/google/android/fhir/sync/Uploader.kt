@@ -20,6 +20,7 @@ import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
 /** Module for uploading local changes to a [DataSource]. */
 internal interface Uploader {
@@ -31,6 +32,55 @@ internal interface Uploader {
    */
   suspend fun upload(localChanges: List<LocalChange>): Flow<UploadResult>
 }
+
+/** A request that needs to be uploaded to a server */
+sealed class UploadRequest(open val localChangeToken: LocalChangeToken)
+
+/** A simple HTTP based FHIR request to upload modifications to a server */
+sealed class SimpleUploadRequest(
+  open val path: String,
+  open val body: String,
+  val httpVerb: HttpVerb,
+  override val localChangeToken: LocalChangeToken
+) : UploadRequest(localChangeToken)
+
+/**
+ * A simple HTTP PUT FHIR request to update/create a resource/resources on the server
+ * https://hl7.org/fhir/R4/http.html#update
+ */
+data class PutUploadRequest(
+  override val path: String,
+  override val body: String,
+  override val localChangeToken: LocalChangeToken
+) : SimpleUploadRequest(path, body, HttpVerb.PUT, localChangeToken)
+
+/**
+ * A simple HTTP PATCH FHIR request to update a resource/resources on the server
+ * https://hl7.org/fhir/R4/http.html#patch
+ */
+data class PatchUploadRequest(
+  override val path: String,
+  override val body: String,
+  override val localChangeToken: LocalChangeToken
+) : SimpleUploadRequest(path, body, HttpVerb.PATCH, localChangeToken)
+
+/**
+ * A simple HTTP DELETE FHIR request to delete resources on the server
+ * https://hl7.org/fhir/R4/http.html#delete
+ */
+data class DeleteUploadRequest(
+  override val path: String,
+  override val localChangeToken: LocalChangeToken
+) : SimpleUploadRequest(path, "", HttpVerb.DELETE, localChangeToken)
+
+/**
+ * A [bundle] based FHIR request to upload multiple modification to the server in a batch. e.g.
+ * https://hl7.org/fhir/R4/bundle-transaction.json.html
+ */
+data class BundleUploadRequest(
+  val bundle: Bundle,
+  override val localChangeToken: LocalChangeToken
+) : UploadRequest(localChangeToken)
 
 internal sealed class UploadResult {
   data class Started(val total: Int) : UploadResult()

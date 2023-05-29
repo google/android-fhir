@@ -20,7 +20,7 @@ import com.google.android.fhir.LocalChange
 import com.google.android.fhir.sync.UploadConfiguration
 
 /** Splits the [List]<[LocalChange]> into smaller chunks. */
-internal fun interface LocalChangesPaginator {
+fun interface LocalChangesPaginator {
   fun page(list: List<LocalChange>): List<List<LocalChange>>
 
   companion object Factory {

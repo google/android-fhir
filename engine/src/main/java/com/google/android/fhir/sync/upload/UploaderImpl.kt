@@ -18,9 +18,12 @@ package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.sync.BundleUploadRequest
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
+import com.google.android.fhir.sync.UploadRequest
 import com.google.android.fhir.sync.UploadResult
+import com.google.android.fhir.sync.UploadWorkManager
 import com.google.android.fhir.sync.Uploader
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -32,46 +35,46 @@ import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
 /** [Uploader] implementation to work with Fhir [Bundle]. */
-internal class BundleUploader(
+internal class UploaderImpl(
   private val dataSource: DataSource,
-  private val bundleGenerator: TransactionBundleGenerator,
-  private val localChangesPaginator: LocalChangesPaginator
+  private val uploadWorkManager: UploadWorkManager
 ) : Uploader {
 
   override suspend fun upload(localChanges: List<LocalChange>): Flow<UploadResult> = flow {
-    val total = localChanges.size
+    val transformedChanges = uploadWorkManager.preprocessLocalChanges(localChanges)
+    val uploadRequests = uploadWorkManager.createUploadRequestsFromChanges(transformedChanges)
+    val total = uploadRequests.size
     var completed = 0
-
     emit(UploadResult.Started(total))
-
-    bundleGenerator.generate(localChangesPaginator.page(localChanges)).forEach {
-      (bundle, localChangeTokens) ->
+    uploadRequests.forEach { uploadRequest ->
       try {
-        val response = dataSource.upload(bundle)
-
-        completed += bundle.entry.size
-        emit(getUploadResult(response, localChangeTokens, total, completed))
+        val response = executeUploadRequest(uploadRequest)
+        completed += 1
+        emit(getUploadResult(response, uploadRequest.localChangeToken, total, completed))
       } catch (e: Exception) {
         Timber.e(e)
+        // TODO(anchitag: throw correct resource type)
         emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
       }
     }
   }
 
+  private suspend fun executeUploadRequest(uploadRequest: UploadRequest): Resource {
+    return when (uploadRequest) {
+      is BundleUploadRequest -> dataSource.upload(uploadRequest.bundle)
+      else -> throw IllegalArgumentException("This type of upload request is not supported")
+    }
+  }
+
   private fun getUploadResult(
     response: Resource,
-    localChangeTokens: List<LocalChangeToken>,
+    localChangeToken: LocalChangeToken,
     total: Int,
     completed: Int
   ) =
     when {
       response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
-        UploadResult.Success(
-          LocalChangeToken(localChangeTokens.flatMap { it.ids }),
-          response,
-          total,
-          completed
-        )
+        UploadResult.Success(localChangeToken, response, total, completed)
       }
       response is OperationOutcome && response.issue.isNotEmpty() -> {
         UploadResult.Failure(

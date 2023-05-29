@@ -25,9 +25,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.download.DownloaderImpl
-import com.google.android.fhir.sync.upload.BundleUploader
-import com.google.android.fhir.sync.upload.LocalChangesPaginator
-import com.google.android.fhir.sync.upload.TransactionBundleGenerator
+import com.google.android.fhir.sync.upload.UploaderImpl
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
@@ -46,12 +44,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDownloadWorkManager(): DownloadWorkManager
   abstract fun getConflictResolver(): ConflictResolver
-
-  /**
-   * Configuration defining the max upload Bundle size (in terms to number of resources in a Bundle)
-   * and optionally defining the order of Resources.
-   */
-  open fun getUploadConfiguration(): UploadConfiguration = UploadConfiguration()
+  abstract fun getUploadWorkManager(): UploadWorkManager
 
   private val gson =
     GsonBuilder()
@@ -92,11 +85,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       FhirSynchronizer(
           applicationContext,
           getFhirEngine(),
-          BundleUploader(
-            dataSource,
-            TransactionBundleGenerator.getDefault(),
-            LocalChangesPaginator.create(getUploadConfiguration())
-          ),
+          UploaderImpl(dataSource, getUploadWorkManager()),
           DownloaderImpl(dataSource, getDownloadWorkManager()),
           getConflictResolver()
         )

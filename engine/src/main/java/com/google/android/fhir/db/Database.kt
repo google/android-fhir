@@ -16,8 +16,8 @@
 
 package com.google.android.fhir.db
 
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.search.SearchQuery
@@ -98,10 +98,9 @@ internal interface Database {
 
   /**
    * Retrieves all [LocalChangeEntity] s for all [Resource] s, which can be used to update the
-   * remote FHIR server. Each resource will have at most one
-   * [LocalChangeEntity](multiple changes are squashed).
+   * remote FHIR server.
    */
-  suspend fun getAllLocalChanges(): List<SquashedLocalChange>
+  suspend fun getAllLocalChanges(): List<LocalChange>
 
   /** Remove the [LocalChangeEntity] s with given ids. Call this after a successful sync. */
   suspend fun deleteUpdates(token: LocalChangeToken)
@@ -129,10 +128,10 @@ internal interface Database {
    * [resourceType] and [Resource.id], return `null`.
    * @param type The [ResourceType]
    * @param id The resource id [Resource.id]
-   * @return [LocalChangeEntity] A squashed local changes for given [resourceType] and [Resource.id]
-   * . If there is no local change for given [resourceType] and [Resource.id], return `null`.
+   * @return [LocalChange] A squashed local changes for given [resourceType] and [Resource.id] . If
+   * there is no local change for given [resourceType] and [Resource.id], return `null`.
    */
-  suspend fun getLocalChange(type: ResourceType, id: String): SquashedLocalChange?
+  suspend fun getLocalChange(type: ResourceType, id: String): LocalChange?
 
   /**
    * Purge resource from database based on resource type and id without any deletion of data from
