@@ -1654,6 +1654,78 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun `createQuestionnaireResponseItem should set answer for non repeating question initial value`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent(
+          StringType("phone"),
+          Enumeration(
+            Questionnaire.QuestionnaireItemTypeEnumFactory(),
+            Questionnaire.QuestionnaireItemType.STRING
+          )
+        )
+        .apply {
+          initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("000011111")))
+        }
+
+    val responseItem = question.createQuestionnaireResponseItem()
+
+    assertThat(responseItem.answer.map { it.value.primitiveValue() }).containsExactly("000011111")
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should set answer for repeating question initial values`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent(
+          StringType("phones"),
+          Enumeration(
+            Questionnaire.QuestionnaireItemTypeEnumFactory(),
+            Questionnaire.QuestionnaireItemType.STRING
+          )
+        )
+        .apply {
+          repeats = true
+          initial =
+            listOf(
+              Questionnaire.QuestionnaireItemInitialComponent(StringType("000011111")),
+              Questionnaire.QuestionnaireItemInitialComponent(StringType("000022222"))
+            )
+        }
+
+    val responseItem = question.createQuestionnaireResponseItem()
+
+    assertThat(responseItem.answer.map { it.value.primitiveValue() })
+      .containsExactly("000011111", "000022222")
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should throw exception for non repeating question with multiple initial values `() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent(
+          StringType("phones"),
+          Enumeration(
+            Questionnaire.QuestionnaireItemTypeEnumFactory(),
+            Questionnaire.QuestionnaireItemType.STRING
+          )
+        )
+        .apply {
+          initial =
+            listOf(
+              Questionnaire.QuestionnaireItemInitialComponent(StringType("000011111")),
+              Questionnaire.QuestionnaireItemInitialComponent(StringType("000022222"))
+            )
+        }
+    assertThrows(IllegalArgumentException::class.java) {
+        question.createQuestionnaireResponseItem()
+      }
+      .run {
+        assertThat(this.message)
+          .isEqualTo(
+            "Questionnaire item ${question.linkId} can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+          )
+      }
+  }
+
+  @Test
   fun `fetchBitmapFromUrl() should return Bitmap from url`() {
     val attachment =
       Attachment().apply {
