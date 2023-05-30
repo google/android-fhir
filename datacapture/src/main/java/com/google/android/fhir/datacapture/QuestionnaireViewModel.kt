@@ -156,10 +156,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * If the corresponding [QuestionnaireItemComponent] lacks a response item component, the
-   * [QuestionnaireResponseItemComponent] is added to the QuestionnaireResponse. Note : However, the
-   * aforementioned does not apply if the [QuestionnaireItemComponent] is a question (type other
-   * than group type) with a nested question items,or repeated group.
+   * Adds empty [QuestionnaireResponseItemComponent]s to `responseItems` so that each
+   * [QuestionnaireItemComponent] in `questionnaireItems` has at least one corresponding
+   * [QuestionnaireResponseItemComponent]. This is because user-provided [QuestionnaireResponse]
+   * might not contain answers to unanswered or disabled questions. Note : this only applies to
+   * [QuestionnaireItemComponent]s nested under a group.
    */
   private fun addMissingResponseItems(
     questionnaireItems: List<QuestionnaireItemComponent>,
