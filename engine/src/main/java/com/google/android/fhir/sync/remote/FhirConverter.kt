@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,7 @@ import org.hl7.fhir.r4.model.Resource
 import retrofit2.Converter
 import retrofit2.Retrofit
 
-internal class FhirConverterFactory private constructor(val fhirContext: FhirContext) :
-  Converter.Factory() {
+class FhirConverterFactory private constructor(val fhirContext: FhirContext) : Converter.Factory() {
   override fun responseBodyConverter(
     type: Type,
     annotations: Array<Annotation>,
