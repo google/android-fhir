@@ -1675,14 +1675,10 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun `createQuestionnaireResponseItem should set answer for repeating question initial values`() {
     val question =
-      Questionnaire.QuestionnaireItemComponent(
-          StringType("phones"),
-          Enumeration(
-            Questionnaire.QuestionnaireItemTypeEnumFactory(),
-            Questionnaire.QuestionnaireItemType.STRING
-          )
-        )
+      Questionnaire.QuestionnaireItemComponent()
         .apply {
+          linkId = "phones"
+          type = Questionnaire.QuestionnaireItemType.STRING
           repeats = true
           initial =
             listOf(
