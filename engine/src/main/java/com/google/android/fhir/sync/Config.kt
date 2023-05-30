@@ -112,12 +112,19 @@ data class BackoffCriteria(
 
 /**
  * Configuration for max number of resources to be uploaded in a Bundle.The default size is
- * [DEFAULT_BUNDLE_SIZE].
+ * [DEFAULT_BUNDLE_SIZE]. The application developer may also configure if the eTag should be used
+ * for edit and delete requests during the upload. Default is to use the eTag.
  */
 data class UploadConfiguration(
   /**
    * Number of [Resource]s to be added in a singe [Bundle] for upload and default is
    * [DEFAULT_BUNDLE_SIZE]
    */
-  val uploadBundleSize: Int = DEFAULT_BUNDLE_SIZE
+  val uploadBundleSize: Int = DEFAULT_BUNDLE_SIZE,
+
+  /**
+   * Use if-match http header with e-tag for upload requests. See ETag
+   * [section](https://hl7.org/fhir/http.html#Http-Headers) for more details.
+   */
+  val useETagForUpload: Boolean = true,
 )

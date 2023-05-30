@@ -184,6 +184,9 @@ internal class FhirEngineImpl(private val database: Database, private val contex
    * extract version from it. See https://hl7.org/fhir/http.html#Http-Headers.
    */
   private fun getVersionFromETag(eTag: String) =
+    // The server should always return a weak etag that starts with W, but if it server returns a
+    // strong tag, we store it as-is. The http-headers for conditional upload like if-match will
+    // always add value as a weak tag.
     if (eTag.startsWith("W/")) {
       eTag.split("\"")[1]
     } else {

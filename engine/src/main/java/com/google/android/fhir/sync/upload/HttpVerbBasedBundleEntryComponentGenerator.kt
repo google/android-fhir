@@ -32,7 +32,8 @@ import org.hl7.fhir.r4.model.UriType
  * more info regarding the supported [Bundle.HTTPVerb].
  */
 internal abstract class HttpVerbBasedBundleEntryComponentGenerator(
-  private val httpVerb: Bundle.HTTPVerb
+  private val httpVerb: Bundle.HTTPVerb,
+  private val useETagForUpload: Boolean,
 ) {
 
   /**
@@ -60,11 +61,13 @@ internal abstract class HttpVerbBasedBundleEntryComponentGenerator(
         UriType("${localChange.resourceType}/${localChange.resourceId}")
       )
       .apply {
-        // FHIR supports weak Etag, See ETag section https://hl7.org/fhir/http.html#Http-Headers
-        when (localChange.type) {
-          LocalChange.Type.UPDATE,
-          LocalChange.Type.DELETE -> ifMatch = "W/\"${localChange.versionId}\""
-          LocalChange.Type.INSERT -> {}
+        if (useETagForUpload) {
+          // FHIR supports weak Etag, See ETag section https://hl7.org/fhir/http.html#Http-Headers
+          when (localChange.type) {
+            LocalChange.Type.UPDATE,
+            LocalChange.Type.DELETE -> ifMatch = "W/\"${localChange.versionId}\""
+            LocalChange.Type.INSERT -> {}
+          }
         }
       }
 }

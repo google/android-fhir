@@ -228,4 +228,52 @@ class TransactionBundleGeneratorTest {
       .containsExactly(null, "W/\"v-p002-01\"", "W/\"v-p003-01\"")
       .inOrder()
   }
+
+  @Test
+  fun `generate() should return Bundle Entry without if-match when useETagForUpload is false`() =
+    runBlocking {
+      val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+      val changes =
+        listOf(
+          LocalChangeEntity(
+              id = 1,
+              resourceType = ResourceType.Patient.name,
+              resourceId = "Patient-002",
+              type = Type.UPDATE,
+              payload =
+                LocalChangeUtils.diff(
+                    jsonParser,
+                    Patient().apply {
+                      id = "Patient-002"
+                      addName(
+                        HumanName().apply {
+                          addGiven("Jane")
+                          family = "Doe"
+                        }
+                      )
+                    },
+                    Patient().apply {
+                      id = "Patient-002"
+                      addName(
+                        HumanName().apply {
+                          addGiven("Janet")
+                          family = "Doe"
+                        }
+                      )
+                    }
+                  )
+                  .toString(),
+              versionId = "v-p002-01"
+            )
+            .toLocalChange()
+            .apply { LocalChangeToken(listOf(2)) }
+        )
+      val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = false)
+      val result = generator.generate(changes.chunked(1))
+
+      assertThat(result).hasSize(1)
+      assertThat(result.first().first.type).isEqualTo(Bundle.BundleType.TRANSACTION)
+      assertThat(result.first().first.entry.first().request.method).isEqualTo(Bundle.HTTPVerb.PATCH)
+      assertThat(result.first().first.entry.first().request.ifMatch).isNull()
+    }
 }
