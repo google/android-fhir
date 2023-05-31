@@ -23,6 +23,7 @@ import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.sync.UploadResult
 import com.google.android.fhir.testing.BundleDataSource
+import com.google.android.fhir.testing.TestUploadManagerImpl
 import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
 import kotlinx.coroutines.flow.toList
@@ -37,15 +38,14 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class BundleUploaderTest {
+class UploaderImplTest {
 
   @Test
   fun `upload Bundle transaction should emit Success`() = runBlocking {
     val result =
-      BundleUploader(
+      UploaderImpl(
           BundleDataSource { Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE } },
-          TransactionBundleGenerator.getDefault(),
-          LocalChangesPaginator.DEFAULT
+          TestUploadManagerImpl()
         )
         .upload(localChanges)
         .toList()
@@ -62,11 +62,7 @@ class BundleUploaderTest {
   @Test
   fun `upload Bundle transaction should emit Started state`() = runBlocking {
     val result =
-      BundleUploader(
-          BundleDataSource { Bundle() },
-          TransactionBundleGenerator.getDefault(),
-          LocalChangesPaginator.DEFAULT
-        )
+      UploaderImpl(BundleDataSource { Bundle() }, TestUploadManagerImpl())
         .upload(localChanges)
         .toList()
 
@@ -76,7 +72,7 @@ class BundleUploaderTest {
   @Test
   fun `upload Bundle Transaction server error should emit Failure`() = runBlocking {
     val result =
-      BundleUploader(
+      UploaderImpl(
           BundleDataSource {
             OperationOutcome().apply {
               addIssue(
@@ -87,8 +83,7 @@ class BundleUploaderTest {
               )
             }
           },
-          TransactionBundleGenerator.getDefault(),
-          LocalChangesPaginator.DEFAULT
+          TestUploadManagerImpl()
         )
         .upload(localChanges)
         .toList()
@@ -100,10 +95,9 @@ class BundleUploaderTest {
   @Test
   fun `upload Bundle transaction error during upload should emit Failure`() = runBlocking {
     val result =
-      BundleUploader(
+      UploaderImpl(
           BundleDataSource { throw ConnectException("Failed to connect to server.") },
-          TransactionBundleGenerator.getDefault(),
-          LocalChangesPaginator.DEFAULT
+          TestUploadManagerImpl()
         )
         .upload(localChanges)
         .toList()

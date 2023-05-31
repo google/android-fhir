@@ -28,6 +28,8 @@ import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.Request
+import com.google.android.fhir.sync.UploadWorkManager
+import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import com.google.common.truth.Truth.assertThat
 import java.net.SocketTimeoutException
 import java.time.OffsetDateTime
@@ -124,6 +126,8 @@ open class TestDownloadManagerImpl(
     return listOf(patient)
   }
 }
+
+open class TestUploadManagerImpl() : UploadWorkManager(TransactionBundleGenerator.getDefault())
 
 object TestFhirEngineImpl : FhirEngine {
   override suspend fun create(vararg resource: Resource) = emptyList<String>()

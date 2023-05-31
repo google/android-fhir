@@ -429,9 +429,7 @@ class FhirEngineImplTest {
     fhirEngine.syncDownload(AcceptRemoteConflictResolver) { flowOf((listOf(remoteChange))) }
 
     assertThat(
-        services.database.getAllLocalChanges().filter {
-          it.localChange.resourceId == "Patient/original-001"
-        }
+        services.database.getAllLocalChanges().filter { it.resourceId == "Patient/original-001" }
       )
       .isEmpty()
     assertResourceEquals(fhirEngine.get<Patient>("original-001"), remoteChange)
@@ -486,10 +484,7 @@ class FhirEngineImplTest {
       val localChangeDiff =
         """[{"op":"remove","path":"\/address\/0\/country"},{"op":"add","path":"\/address\/0\/city","value":"Malibu"},{"op":"add","path":"\/address\/-","value":{"city":"Malibu","state":"California"}}]"""
       assertThat(
-          services.database
-            .getAllLocalChanges()
-            .first { it.localChange.resourceId == "original-002" }
-            .localChange.payload
+          services.database.getAllLocalChanges().first { it.resourceId == "original-002" }.payload
         )
         .isEqualTo(localChangeDiff)
       assertResourceEquals(fhirEngine.get<Patient>("original-002"), localChange)

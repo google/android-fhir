@@ -18,10 +18,8 @@ package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.sync.BundleUploadRequest
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
-import com.google.android.fhir.sync.UploadRequest
 import com.google.android.fhir.sync.UploadResult
 import com.google.android.fhir.sync.UploadWorkManager
 import com.google.android.fhir.sync.Uploader
@@ -34,7 +32,12 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
-/** [Uploader] implementation to work with Fhir [Bundle]. */
+/**
+ * Implementation of the [Uploader]. It orchestrates the pre processing of [LocalChange] and
+ * constructing appropriate upload requests via [UploadWorkManager] and uploading of requests via
+ * [DataSource]. [Uploader] clients should call upload and listen to the various states emitted by
+ * [UploadWorkManager] as [UploadResult].
+ */
 internal class UploaderImpl(
   private val dataSource: DataSource,
   private val uploadWorkManager: UploadWorkManager
@@ -48,21 +51,13 @@ internal class UploaderImpl(
     emit(UploadResult.Started(total))
     uploadRequests.forEach { uploadRequest ->
       try {
-        val response = executeUploadRequest(uploadRequest)
+        val response = dataSource.upload(uploadRequest.bundle)
         completed += 1
         emit(getUploadResult(response, uploadRequest.localChangeToken, total, completed))
       } catch (e: Exception) {
         Timber.e(e)
-        // TODO(anchitag: throw correct resource type)
         emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
       }
-    }
-  }
-
-  private suspend fun executeUploadRequest(uploadRequest: UploadRequest): Resource {
-    return when (uploadRequest) {
-      is BundleUploadRequest -> dataSource.upload(uploadRequest.bundle)
-      else -> throw IllegalArgumentException("This type of upload request is not supported")
     }
   }
 

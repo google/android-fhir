@@ -45,8 +45,8 @@ abstract class UploadWorkManager(private val uploadRequestGenerator: UploadReque
       .map { it.toLocalChange() }
   }
 
-  /** Generates a list of [UploadRequest] from the [LocalChange] to be sent to the server */
-  fun createUploadRequestsFromChanges(localChanges: List<LocalChange>): List<UploadRequest> {
+  /** Generates a list of [BundleUploadRequest] from the [LocalChange] to be sent to the server */
+  fun createUploadRequestsFromChanges(localChanges: List<LocalChange>): List<BundleUploadRequest> {
     return uploadRequestGenerator.generateUploadRequests(localChanges)
   }
 }
