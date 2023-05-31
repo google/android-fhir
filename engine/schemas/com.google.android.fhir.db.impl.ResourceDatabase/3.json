@@ -1,0 +1,941 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "6dd24dd7340c3808456a812933bc6838",
+    "entities": [
+      {
+        "tableName": "ResourceEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceUuid` BLOB NOT NULL, `resourceType` TEXT NOT NULL, `resourceId` TEXT NOT NULL, `serializedResource` TEXT NOT NULL, `versionId` TEXT, `lastUpdatedRemote` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceUuid",
+            "columnName": "resourceUuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceType",
+            "columnName": "resourceType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceId",
+            "columnName": "resourceId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serializedResource",
+            "columnName": "serializedResource",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "versionId",
+            "columnName": "versionId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastUpdatedRemote",
+            "columnName": "lastUpdatedRemote",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_ResourceEntity_resourceUuid",
+            "unique": true,
+            "columnNames": [
+              "resourceUuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ResourceEntity_resourceUuid` ON `${TABLE_NAME}` (`resourceUuid`)"
+          },
+          {
+            "name": "index_ResourceEntity_resourceType_resourceId",
+            "unique": true,
+            "columnNames": [
+              "resourceType",
+              "resourceId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ResourceEntity_resourceType_resourceId` ON `${TABLE_NAME}` (`resourceType`, `resourceId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "StringIndexEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceUuid` BLOB NOT NULL, `resourceType` TEXT NOT NULL, `index_name` TEXT NOT NULL, `index_path` TEXT NOT NULL, `index_value` TEXT NOT NULL, FOREIGN KEY(`resourceUuid`) REFERENCES `ResourceEntity`(`resourceUuid`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceUuid",
+            "columnName": "resourceUuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceType",
+            "columnName": "resourceType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.name",
+            "columnName": "index_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.path",
+            "columnName": "index_path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.value",
+            "columnName": "index_value",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_StringIndexEntity_resourceType_index_name_index_value",
+            "unique": false,
+            "columnNames": [
+              "resourceType",
+              "index_name",
+              "index_value"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_StringIndexEntity_resourceType_index_name_index_value` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `index_value`)"
+          },
+          {
+            "name": "index_StringIndexEntity_resourceUuid",
+            "unique": false,
+            "columnNames": [
+              "resourceUuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_StringIndexEntity_resourceUuid` ON `${TABLE_NAME}` (`resourceUuid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "ResourceEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "resourceUuid"
+            ],
+            "referencedColumns": [
+              "resourceUuid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "ReferenceIndexEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceUuid` BLOB NOT NULL, `resourceType` TEXT NOT NULL, `index_name` TEXT NOT NULL, `index_path` TEXT NOT NULL, `index_value` TEXT NOT NULL, FOREIGN KEY(`resourceUuid`) REFERENCES `ResourceEntity`(`resourceUuid`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceUuid",
+            "columnName": "resourceUuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceType",
+            "columnName": "resourceType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.name",
+            "columnName": "index_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.path",
+            "columnName": "index_path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.value",
+            "columnName": "index_value",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_ReferenceIndexEntity_resourceType_index_name_index_value",
+            "unique": false,
+            "columnNames": [
+              "resourceType",
+              "index_name",
+              "index_value"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ReferenceIndexEntity_resourceType_index_name_index_value` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `index_value`)"
+          },
+          {
+            "name": "index_ReferenceIndexEntity_resourceUuid",
+            "unique": false,
+            "columnNames": [
+              "resourceUuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ReferenceIndexEntity_resourceUuid` ON `${TABLE_NAME}` (`resourceUuid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "ResourceEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "resourceUuid"
+            ],
+            "referencedColumns": [
+              "resourceUuid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "TokenIndexEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceUuid` BLOB NOT NULL, `resourceType` TEXT NOT NULL, `index_name` TEXT NOT NULL, `index_path` TEXT NOT NULL, `index_system` TEXT, `index_value` TEXT NOT NULL, FOREIGN KEY(`resourceUuid`) REFERENCES `ResourceEntity`(`resourceUuid`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceUuid",
+            "columnName": "resourceUuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceType",
+            "columnName": "resourceType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.name",
+            "columnName": "index_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.path",
+            "columnName": "index_path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.system",
+            "columnName": "index_system",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "index.value",
+            "columnName": "index_value",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_TokenIndexEntity_resourceType_index_name_index_system_index_value",
+            "unique": false,
+            "columnNames": [
+              "resourceType",
+              "index_name",
+              "index_system",
+              "index_value"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `index_system`, `index_value`)"
+          },
+          {
+            "name": "index_TokenIndexEntity_resourceUuid",
+            "unique": false,
+            "columnNames": [
+              "resourceUuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_TokenIndexEntity_resourceUuid` ON `${TABLE_NAME}` (`resourceUuid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "ResourceEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "resourceUuid"
+            ],
+            "referencedColumns": [
+              "resourceUuid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "QuantityIndexEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceUuid` BLOB NOT NULL, `resourceType` TEXT NOT NULL, `index_name` TEXT NOT NULL, `index_path` TEXT NOT NULL, `index_system` TEXT NOT NULL, `index_code` TEXT NOT NULL, `index_value` REAL NOT NULL, FOREIGN KEY(`resourceUuid`) REFERENCES `ResourceEntity`(`resourceUuid`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceUuid",
+            "columnName": "resourceUuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceType",
+            "columnName": "resourceType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.name",
+            "columnName": "index_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.path",
+            "columnName": "index_path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.system",
+            "columnName": "index_system",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.code",
+            "columnName": "index_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.value",
+            "columnName": "index_value",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_QuantityIndexEntity_resourceType_index_name_index_value_index_code",
+            "unique": false,
+            "columnNames": [
+              "resourceType",
+              "index_name",
+              "index_value",
+              "index_code"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_QuantityIndexEntity_resourceType_index_name_index_value_index_code` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `index_value`, `index_code`)"
+          },
+          {
+            "name": "index_QuantityIndexEntity_resourceUuid",
+            "unique": false,
+            "columnNames": [
+              "resourceUuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_QuantityIndexEntity_resourceUuid` ON `${TABLE_NAME}` (`resourceUuid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "ResourceEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "resourceUuid"
+            ],
+            "referencedColumns": [
+              "resourceUuid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "UriIndexEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceUuid` BLOB NOT NULL, `resourceType` TEXT NOT NULL, `index_name` TEXT NOT NULL, `index_path` TEXT NOT NULL, `index_value` TEXT NOT NULL, FOREIGN KEY(`resourceUuid`) REFERENCES `ResourceEntity`(`resourceUuid`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceUuid",
+            "columnName": "resourceUuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceType",
+            "columnName": "resourceType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.name",
+            "columnName": "index_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.path",
+            "columnName": "index_path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.value",
+            "columnName": "index_value",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_UriIndexEntity_resourceType_index_name_index_value",
+            "unique": false,
+            "columnNames": [
+              "resourceType",
+              "index_name",
+              "index_value"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_UriIndexEntity_resourceType_index_name_index_value` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `index_value`)"
+          },
+          {
+            "name": "index_UriIndexEntity_resourceUuid",
+            "unique": false,
+            "columnNames": [
+              "resourceUuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_UriIndexEntity_resourceUuid` ON `${TABLE_NAME}` (`resourceUuid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "ResourceEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "resourceUuid"
+            ],
+            "referencedColumns": [
+              "resourceUuid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "DateIndexEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceUuid` BLOB NOT NULL, `resourceType` TEXT NOT NULL, `index_name` TEXT NOT NULL, `index_path` TEXT NOT NULL, `index_from` INTEGER NOT NULL, `index_to` INTEGER NOT NULL, FOREIGN KEY(`resourceUuid`) REFERENCES `ResourceEntity`(`resourceUuid`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceUuid",
+            "columnName": "resourceUuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceType",
+            "columnName": "resourceType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.name",
+            "columnName": "index_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.path",
+            "columnName": "index_path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.from",
+            "columnName": "index_from",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.to",
+            "columnName": "index_to",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_DateIndexEntity_resourceType_index_name_index_from_index_to",
+            "unique": false,
+            "columnNames": [
+              "resourceType",
+              "index_name",
+              "index_from",
+              "index_to"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceType_index_name_index_from_index_to` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `index_from`, `index_to`)"
+          },
+          {
+            "name": "index_DateIndexEntity_resourceUuid",
+            "unique": false,
+            "columnNames": [
+              "resourceUuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceUuid` ON `${TABLE_NAME}` (`resourceUuid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "ResourceEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "resourceUuid"
+            ],
+            "referencedColumns": [
+              "resourceUuid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "DateTimeIndexEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceUuid` BLOB NOT NULL, `resourceType` TEXT NOT NULL, `index_name` TEXT NOT NULL, `index_path` TEXT NOT NULL, `index_from` INTEGER NOT NULL, `index_to` INTEGER NOT NULL, FOREIGN KEY(`resourceUuid`) REFERENCES `ResourceEntity`(`resourceUuid`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceUuid",
+            "columnName": "resourceUuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceType",
+            "columnName": "resourceType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.name",
+            "columnName": "index_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.path",
+            "columnName": "index_path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.from",
+            "columnName": "index_from",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.to",
+            "columnName": "index_to",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_DateTimeIndexEntity_index_from",
+            "unique": false,
+            "columnNames": [
+              "index_from"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_index_from` ON `${TABLE_NAME}` (`index_from`)"
+          },
+          {
+            "name": "index_DateTimeIndexEntity_resourceType_index_name_index_from_index_to",
+            "unique": false,
+            "columnNames": [
+              "resourceType",
+              "index_name",
+              "index_from",
+              "index_to"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceType_index_name_index_from_index_to` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `index_from`, `index_to`)"
+          },
+          {
+            "name": "index_DateTimeIndexEntity_resourceUuid",
+            "unique": false,
+            "columnNames": [
+              "resourceUuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceUuid` ON `${TABLE_NAME}` (`resourceUuid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "ResourceEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "resourceUuid"
+            ],
+            "referencedColumns": [
+              "resourceUuid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "NumberIndexEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceUuid` BLOB NOT NULL, `resourceType` TEXT NOT NULL, `index_name` TEXT NOT NULL, `index_path` TEXT NOT NULL, `index_value` REAL NOT NULL, FOREIGN KEY(`resourceUuid`) REFERENCES `ResourceEntity`(`resourceUuid`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceUuid",
+            "columnName": "resourceUuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceType",
+            "columnName": "resourceType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.name",
+            "columnName": "index_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.path",
+            "columnName": "index_path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.value",
+            "columnName": "index_value",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_NumberIndexEntity_resourceType_index_name_index_value",
+            "unique": false,
+            "columnNames": [
+              "resourceType",
+              "index_name",
+              "index_value"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_NumberIndexEntity_resourceType_index_name_index_value` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `index_value`)"
+          },
+          {
+            "name": "index_NumberIndexEntity_resourceUuid",
+            "unique": false,
+            "columnNames": [
+              "resourceUuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_NumberIndexEntity_resourceUuid` ON `${TABLE_NAME}` (`resourceUuid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "ResourceEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "resourceUuid"
+            ],
+            "referencedColumns": [
+              "resourceUuid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "LocalChangeEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceType` TEXT NOT NULL, `resourceId` TEXT NOT NULL, `timestamp` TEXT NOT NULL, `type` INTEGER NOT NULL, `payload` TEXT NOT NULL, `versionId` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceType",
+            "columnName": "resourceType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceId",
+            "columnName": "resourceId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "payload",
+            "columnName": "payload",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "versionId",
+            "columnName": "versionId",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_LocalChangeEntity_resourceType_resourceId",
+            "unique": false,
+            "columnNames": [
+              "resourceType",
+              "resourceId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_LocalChangeEntity_resourceType_resourceId` ON `${TABLE_NAME}` (`resourceType`, `resourceId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "PositionIndexEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceUuid` BLOB NOT NULL, `resourceType` TEXT NOT NULL, `index_latitude` REAL NOT NULL, `index_longitude` REAL NOT NULL, FOREIGN KEY(`resourceUuid`) REFERENCES `ResourceEntity`(`resourceUuid`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceUuid",
+            "columnName": "resourceUuid",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceType",
+            "columnName": "resourceType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.latitude",
+            "columnName": "index_latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index.longitude",
+            "columnName": "index_longitude",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_PositionIndexEntity_resourceType_index_latitude_index_longitude",
+            "unique": false,
+            "columnNames": [
+              "resourceType",
+              "index_latitude",
+              "index_longitude"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_PositionIndexEntity_resourceType_index_latitude_index_longitude` ON `${TABLE_NAME}` (`resourceType`, `index_latitude`, `index_longitude`)"
+          },
+          {
+            "name": "index_PositionIndexEntity_resourceUuid",
+            "unique": false,
+            "columnNames": [
+              "resourceUuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_PositionIndexEntity_resourceUuid` ON `${TABLE_NAME}` (`resourceUuid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "ResourceEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "resourceUuid"
+            ],
+            "referencedColumns": [
+              "resourceUuid"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6dd24dd7340c3808456a812933bc6838')"
+    ]
+  }
+}

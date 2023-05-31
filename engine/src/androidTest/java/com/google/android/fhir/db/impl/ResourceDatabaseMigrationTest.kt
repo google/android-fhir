@@ -23,10 +23,12 @@ import androidx.test.platform.app.InstrumentationRegistry
 import ca.uhn.fhir.context.FhirContext
 import com.google.common.truth.Truth.assertThat
 import java.io.IOException
+import java.util.Date
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.Task
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,6 +39,7 @@ class ResourceDatabaseMigrationTest {
   @get:Rule
   val helper: MigrationTestHelper =
     MigrationTestHelper(InstrumentationRegistry.getInstrumentation(), ResourceDatabase::class.java)
+  private val iParser = FhirContext.forR4Cached().newJsonParser()
 
   @Test
   @Throws(IOException::class)
@@ -52,7 +55,7 @@ class ResourceDatabaseMigrationTest {
             }
           )
         }
-        .let { FhirContext.forR4Cached().newJsonParser().encodeResourceToString(it) }
+        .let { iParser.encodeResourceToString(it) }
 
     helper.createDatabase(DB_NAME, 1).apply {
       execSQL(
@@ -61,23 +64,59 @@ class ResourceDatabaseMigrationTest {
       close()
     }
 
-    val readPatientJson: String?
     // Open latest version of the database. Room will validate the schema
     // once all migrations execute.
+    helper.runMigrationsAndValidate(DB_NAME, 2, true, MIGRATION_1_2)
+
+    val readPatientJson: String?
+    getMigratedRoomDatabase().apply {
+      readPatientJson = this.resourceDao().getResource("migrate1-2-test", ResourceType.Patient)
+      openHelper.writableDatabase.close()
+    }
+
+    assertThat(readPatientJson).isEqualTo(insertedPatientJson)
+  }
+
+  @Test
+  @Throws(IOException::class)
+  fun migrate2To3_should_execute_with_no_exception(): Unit = runBlocking {
+    val taskId = "bed-net-001"
+    val bedNetTask: String =
+      Task()
+        .apply {
+          id = taskId
+          description = "Issue bed net"
+          meta.lastUpdated = Date()
+        }
+        .let { iParser.encodeResourceToString(it) }
+
+    helper.createDatabase(DB_NAME, 2).apply {
+      execSQL(
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask');"
+      )
+      close()
+    }
+
+    // Re-open the database with version 3 and provide MIGRATION_2_3 as the migration process.
+    helper.runMigrationsAndValidate(DB_NAME, 3, true, MIGRATION_2_3)
+
+    val retrievedTask: String?
+    getMigratedRoomDatabase().apply {
+      retrievedTask = this.resourceDao().getResource(taskId, ResourceType.Task)
+      openHelper.writableDatabase.close()
+    }
+
+    assertThat(retrievedTask).isEqualTo(bedNetTask)
+  }
+
+  private fun getMigratedRoomDatabase(): ResourceDatabase =
     Room.databaseBuilder(
         InstrumentationRegistry.getInstrumentation().targetContext,
         ResourceDatabase::class.java,
         DB_NAME
       )
-      .addMigrations(MIGRATION_1_2)
+      .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
       .build()
-      .apply {
-        readPatientJson = this.resourceDao().getResource("migrate1-2-test", ResourceType.Patient)
-        openHelper.writableDatabase.close()
-      }
-
-    assertThat(readPatientJson).isEqualTo(insertedPatientJson)
-  }
 
   companion object {
     const val DB_NAME = "migration_tests.db"
