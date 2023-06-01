@@ -21,6 +21,7 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import java.io.File
 import java.util.Locale
@@ -104,25 +105,37 @@ internal object SearchParameterRepositoryGenerator {
         )
         .addModifiers(KModifier.INTERNAL)
         .addKdoc(generatedComment)
-        .beginControlFlow("return when (resource.fhirType())")
+        .beginControlFlow("val resourceSearchParams = when (resource.fhirType())")
 
+    // Function for base resource search parameters
+    val baseParamResourceSpecName = ParameterSpec.builder("resourceName", String::class).build()
+    val getBaseResourceSearchParamListFunction =
+      FunSpec.builder("getBaseResourceSearchParamsList")
+        .addParameter(baseParamResourceSpecName)
+        .apply {
+          addModifiers(KModifier.PRIVATE)
+          returns(
+            ClassName("kotlin.collections", "List").parameterizedBy(searchParamDefinitionClass)
+          )
+          beginControlFlow("return buildList(capacity = %L)", baseResourceSearchParameters.size)
+          baseResourceSearchParameters.forEach { definition ->
+            addStatement(
+              "add(%T(%S, %T.%L, %P))",
+              definition.className,
+              definition.name,
+              Enumerations.SearchParamType::class,
+              definition.paramTypeCode,
+              "$" + "${baseParamResourceSpecName.name}." + definition.path.substringAfter(".")
+            )
+          }
+          endControlFlow() // end buildList
+        }
+        .build()
+    fileSpec.addFunction(getBaseResourceSearchParamListFunction)
     // Helper function used in SearchParameterRepositoryGeneratedTest
     val testHelperFunctionCodeBlock =
       CodeBlock.builder().addStatement("val resourceList = listOf<%T>(", Resource::class.java)
     searchParamMap.entries.forEach { (resource, definitions) ->
-      // add search parameters defined in base -> Resource to this resource
-      if (resource != "Resource") {
-        definitions.addAll(
-          baseResourceSearchParameters.map { baseSearchParam ->
-            SearchParamDefinition(
-              className = baseSearchParam.className,
-              name = baseSearchParam.name,
-              paramTypeCode = baseSearchParam.paramTypeCode,
-              path = baseSearchParam.path.replace("Resource", resource)
-            )
-          }
-        )
-      }
       val resourceClass = ClassName(hapiPackage, resource.toHapiName())
       val klass =
         try {
@@ -163,6 +176,11 @@ internal object SearchParameterRepositoryGenerator {
     }
 
     getSearchParamListFunction.addStatement("else -> emptyList()").endControlFlow()
+    // This will now return the list of search parameter for the resource + search parameters
+    // defined in base resource i.e. _profile, _tag, _id, _security, _lastUpdated, _source
+    getSearchParamListFunction.addStatement(
+      "return resourceSearchParams + getBaseResourceSearchParamsList(resource.fhirType())"
+    )
     fileSpec.addFunction(getSearchParamListFunction.build()).build().writeTo(outputPath)
 
     testHelperFunctionCodeBlock.add(")\n")
