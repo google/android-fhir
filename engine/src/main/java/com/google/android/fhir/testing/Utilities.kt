@@ -147,7 +147,7 @@ object TestFhirEngineImpl : FhirEngine {
   override suspend fun syncUpload(
     upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
-    upload(listOf(getLocalChange(ResourceType.Patient, "123")))
+    upload(getLocalChanges(ResourceType.Patient, "123"))
   }
 
   override suspend fun syncDownload(
@@ -166,13 +166,15 @@ object TestFhirEngineImpl : FhirEngine {
 
   override suspend fun clearDatabase() {}
 
-  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange {
-    return LocalChange(
-      resourceType = type.name,
-      resourceId = id,
-      payload = "{}",
-      token = LocalChangeToken(listOf()),
-      type = LocalChange.Type.INSERT
+  override suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange> {
+    return listOf(
+      LocalChange(
+        resourceType = type.name,
+        resourceId = id,
+        payload = "{}",
+        token = LocalChangeToken(listOf()),
+        type = LocalChange.Type.INSERT
+      )
     )
   }
 

@@ -70,7 +70,7 @@ internal object LocalChangeUtils {
       type = type,
       payload = payload,
       versionId = second.versionId,
-      token = LocalChangeToken(emptyList())
+      token = LocalChangeToken(first.token.ids + second.token.ids)
     )
   }
 
@@ -159,18 +159,3 @@ internal fun LocalChangeEntity.toLocalChange(): LocalChange {
 }
 
 data class LocalChangeToken(val ids: List<Long>)
-
-internal data class SquashedLocalChange(val token: LocalChangeToken, val localChange: LocalChange)
-
-/** Method to convert internal SquashedLocalChange to LocalChange instance. */
-internal fun SquashedLocalChange.toLocalChange(): LocalChange {
-  return LocalChange(
-    localChange.resourceType,
-    localChange.resourceId,
-    localChange.versionId,
-    localChange.timestamp,
-    LocalChange.Type.from(localChange.type.value),
-    localChange.payload,
-    token
-  )
-}

@@ -282,21 +282,22 @@ class FhirEngineImplTest {
     }
 
   @Test
-  fun `getLocalChange() should return single local change`() = runBlocking {
+  fun `getLocalChanges() should return single local change`() = runBlocking {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     fhirEngine.create(patient)
     val patientString = services.parser.encodeResourceToString(patient)
-    val squashedLocalChange = fhirEngine.getLocalChange(patient.resourceType, patient.logicalId)
-    with(squashedLocalChange) {
-      assertThat(this!!.resourceId).isEqualTo(patient.logicalId)
-      assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(type).isEqualTo(Type.INSERT)
-      assertThat(payload).isEqualTo(patientString)
+    val resourceLocalChanges = fhirEngine.getLocalChanges(patient.resourceType, patient.logicalId)
+    with(resourceLocalChanges) {
+      assertThat(size).isEqualTo(1)
+      assertThat(get(0).resourceId).isEqualTo(patient.logicalId)
+      assertThat(get(0).resourceType).isEqualTo(patient.resourceType.name)
+      assertThat(get(0).type).isEqualTo(Type.INSERT)
+      assertThat(get(0).payload).isEqualTo(patientString)
     }
   }
 
   @Test
-  fun `getLocalChange() should return squashed local change`() = runBlocking {
+  fun `getLocalChanges() should return all local changes`() = runBlocking {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     fhirEngine.create(patient)
 
@@ -305,13 +306,14 @@ class FhirEngineImplTest {
     patient.name[0].family = "TestPatient"
     fhirEngine.update(patient)
 
-    val patientString = services.parser.encodeResourceToString(patient)
-    val squashedLocalChange = fhirEngine.getLocalChange(patient.resourceType, patient.logicalId)
-    with(squashedLocalChange) {
-      assertThat(this!!.resourceId).isEqualTo(patient.logicalId)
-      assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(type).isEqualTo(Type.INSERT)
-      assertThat(payload).isEqualTo(patientString)
+    val resourceLocalChanges = fhirEngine.getLocalChanges(patient.resourceType, patient.logicalId)
+    with(resourceLocalChanges) {
+      assertThat(size).isEqualTo(3)
+      assertThat(all { it.resourceType == patient.resourceType.name }).isTrue()
+      assertThat(all { it.resourceId == patient.logicalId }).isTrue()
+      assertThat(get(0).type).isEqualTo(Type.INSERT)
+      assertThat(get(1).type).isEqualTo(Type.UPDATE)
+      assertThat(get(2).type).isEqualTo(Type.UPDATE)
     }
   }
 
@@ -319,7 +321,7 @@ class FhirEngineImplTest {
   fun `getLocalChange() with wrong resource id should return null`() = runBlocking {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     fhirEngine.create(patient)
-    assertThat(fhirEngine.getLocalChange(patient.resourceType, "nonexistent_patient")).isNull()
+    assertThat(fhirEngine.getLocalChanges(patient.resourceType, "nonexistent_patient")).isEmpty()
   }
 
   @Test
@@ -327,7 +329,7 @@ class FhirEngineImplTest {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     fhirEngine.create(patient)
 
-    assertThat(fhirEngine.getLocalChange(ResourceType.Encounter, patient.logicalId)).isNull()
+    assertThat(fhirEngine.getLocalChanges(ResourceType.Encounter, patient.logicalId)).isEmpty()
   }
 
   @Test
@@ -335,18 +337,19 @@ class FhirEngineImplTest {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     fhirEngine.create(patient)
     val patientString = services.parser.encodeResourceToString(patient)
-    val squashedLocalChange = fhirEngine.getLocalChange(patient.resourceType, patient.logicalId)
-    with(squashedLocalChange) {
-      assertThat(this!!.resourceId).isEqualTo(patient.logicalId)
-      assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(type).isEqualTo(Type.INSERT)
-      assertThat(payload).isEqualTo(patientString)
+    val resourceLocalChanges = fhirEngine.getLocalChanges(patient.resourceType, patient.logicalId)
+    with(resourceLocalChanges) {
+      assertThat(size).isEqualTo(1)
+      assertThat(get(0).resourceId).isEqualTo(patient.logicalId)
+      assertThat(get(0).resourceType).isEqualTo(patient.resourceType.name)
+      assertThat(get(0).type).isEqualTo(Type.INSERT)
+      assertThat(get(0).payload).isEqualTo(patientString)
     }
     assertResourceEquals(patient, fhirEngine.get(ResourceType.Patient, patient.logicalId))
     // clear databse
     runBlocking(Dispatchers.IO) { fhirEngine.clearDatabase() }
     // assert that previously present resource not available after clearing database
-    assertThat(fhirEngine.getLocalChange(patient.resourceType, patient.logicalId)).isNull()
+    assertThat(fhirEngine.getLocalChanges(patient.resourceType, patient.logicalId)).isEmpty()
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
         runBlocking { fhirEngine.get(ResourceType.Patient, patient.logicalId) }
@@ -367,7 +370,7 @@ class FhirEngineImplTest {
       .isEqualTo(
         "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID!"
       )
-    assertThat(fhirEngine.getLocalChange(ResourceType.Patient, TEST_PATIENT_1_ID)).isNull()
+    assertThat(fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_1_ID)).isEmpty()
   }
 
   @Test

@@ -35,6 +35,8 @@ import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
 import com.google.android.fhir.sync.Request
+import com.google.android.fhir.sync.UploadWorkManager
+import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.util.LinkedList
@@ -85,8 +87,11 @@ class H_FhirSyncWorkerBenchmark {
     }
     override fun getDownloadWorkManager(): DownloadWorkManager = BenchmarkTestDownloadManagerImpl()
     override fun getConflictResolver() = AcceptRemoteConflictResolver
+    override fun getUploadWorkManager(): UploadWorkManager = BenchmarkTestUploadWorkManagerImpl()
   }
 
+  open class BenchmarkTestUploadWorkManagerImpl() :
+    UploadWorkManager(TransactionBundleGenerator.getDefault())
   open class BenchmarkTestDownloadManagerImpl(queries: List<String> = listOf("List/sync-list")) :
     DownloadWorkManager {
     private val urls = LinkedList(queries)

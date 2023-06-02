@@ -121,17 +121,16 @@ internal interface Database {
   suspend fun clearDatabase()
 
   /**
-   * Retrieve [LocalChangeEntity] for [Resource] with given type and id, which can be used to purge
-   * resource from database. Each resource will have at most one
-   * [LocalChangeEntity](multiple
-   * changes are squashed). If there is no local change for given
-   * [resourceType] and [Resource.id], return `null`.
+   * Retrieve a list of [LocalChange] for [Resource] with given type and id, which can be used to
+   * purge resource from database. If there is no local change for given [resourceType] and
+   * [Resource.id], return an empty list.
    * @param type The [ResourceType]
    * @param id The resource id [Resource.id]
-   * @return [LocalChange] A squashed local changes for given [resourceType] and [Resource.id] . If
-   * there is no local change for given [resourceType] and [Resource.id], return `null`.
+   * @return [List]<[LocalChange]> A list of local changes for given [resourceType] and
+   * [Resource.id] . If there is no local change for given [resourceType] and [Resource.id], return
+   * empty list.
    */
-  suspend fun getLocalChange(type: ResourceType, id: String): LocalChange?
+  suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange>
 
   /**
    * Purge resource from database based on resource type and id without any deletion of data from
