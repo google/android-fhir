@@ -31,16 +31,17 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.fhir.datacapture.DisplayItemControlType
-import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_SYSTEM
-import com.google.android.fhir.datacapture.EXTENSION_ITEM_CONTROL_URL
-import com.google.android.fhir.datacapture.ItemControlTypes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
+import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.extensions.ItemControlTypes
 import com.google.android.fhir.datacapture.utilities.assertQuestionnaireResponseAtIndex
 import com.google.android.fhir.datacapture.utilities.clickOnText
 import com.google.android.fhir.datacapture.utilities.clickOnTextInDialog
 import com.google.android.fhir.datacapture.utilities.endIconClickInTextInputLayout
+import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDialogSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
@@ -200,31 +201,32 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
   @Test
   fun bindView_setHintText() {
+    val hintItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1.1"
+        text = "Select code"
+        type = Questionnaire.QuestionnaireItemType.DISPLAY
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ITEM_CONTROL_URL)
+            .setValue(
+              CodeableConcept()
+                .addCoding(
+                  Coding()
+                    .setCode(DisplayItemControlType.FLYOVER.extensionCode)
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                )
+            )
+        )
+      }
     val questionnaireViewItem =
       QuestionnaireViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5")
-          .addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "1.1"
-              text = "Select code"
-              type = Questionnaire.QuestionnaireItemType.DISPLAY
-              addExtension(
-                Extension()
-                  .setUrl(EXTENSION_ITEM_CONTROL_URL)
-                  .setValue(
-                    CodeableConcept()
-                      .addCoding(
-                        Coding()
-                          .setCode(DisplayItemControlType.FLYOVER.extensionCode)
-                          .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                      )
-                  )
-              )
-            }
-          ),
+          .addItem(hintItem),
         responseOptions(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        enabledDisplayItems = listOf(hintItem)
       )
     runOnUI { viewHolder.bind(questionnaireViewItem) }
 
@@ -368,6 +370,191 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     runOnUI { viewHolder.bind(questionnaireViewItem) }
 
     onView(withId(R.id.error_text_at_header)).check(matches(not(isDisplayed())))
+  }
+
+  @Test
+  fun show_asterisk() {
+    runOnUI {
+      viewHolder.bind(
+        QuestionnaireViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "1"
+            text = "Question?"
+            required = true
+          },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _, _ -> },
+          questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
+        )
+      )
+
+      assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+        .isEqualTo("Question? *")
+    }
+  }
+
+  @Test
+  fun hide_asterisk() {
+    runOnUI {
+      viewHolder.bind(
+        QuestionnaireViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "1"
+            text = "Question?"
+            required = true
+          },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _, _ -> },
+          questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
+        )
+      )
+
+      assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+        .isEqualTo("Question?")
+    }
+  }
+
+  @Test
+  fun show_requiredText() {
+    runOnUI {
+      viewHolder.bind(
+        QuestionnaireViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "1"
+            required = true
+            text = "Question?"
+          },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _, _ -> },
+          questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
+        )
+      )
+
+      assertThat(
+          viewHolder.itemView
+            .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
+            .helperText.toString()
+        )
+        .isEqualTo("Required")
+    }
+  }
+
+  @Test
+  fun hide_requiredText() {
+    runOnUI {
+      viewHolder.bind(
+        QuestionnaireViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "1"
+            required = true
+            text = "Question?"
+          },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _, _ -> },
+          questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
+        )
+      )
+
+      assertThat(
+          viewHolder.itemView
+            .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
+            .helperText
+        )
+        .isNull()
+    }
+  }
+
+  @Test
+  fun shows_optionalText() {
+    runOnUI {
+      viewHolder.bind(
+        QuestionnaireViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _, _ -> },
+          questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
+        )
+      )
+      assertThat(
+          viewHolder.itemView
+            .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
+            .helperText.toString()
+        )
+        .isEqualTo("Optional")
+    }
+  }
+
+  @Test
+  fun hide_optionalText() {
+    runOnUI {
+      viewHolder.bind(
+        QuestionnaireViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _, _ -> },
+          questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
+        )
+      )
+      assertThat(
+          viewHolder.itemView
+            .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
+            .helperText
+        )
+        .isNull()
+    }
+  }
+
+  @Test
+  fun multipleChoice_doNotShowErrorInitially() {
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5").apply {
+          required = true
+        },
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, answers, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireViewItem) }
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error
+      )
+      .isNull()
+  }
+
+  @Test
+  fun multipleChoice_unselectSelectedAnswer_showErrorWhenNoAnswerIsSelected() {
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        answerOptions(false, "Coding 1", "Coding 2").apply { required = true },
+        responseOptions(),
+        validationResult = Invalid(listOf("Missing answer for required field.")),
+        answersChangedCallback = { _, _, answers, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireViewItem) }
+
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
+    clickOnTextInDialog("Coding 2")
+    clickOnText("Save")
+    assertDisplayedText().isEqualTo("Coding 2")
+
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
+    clickOnTextInDialog("Coding 2")
+    clickOnText("Save")
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error
+      )
+      .isEqualTo("Missing answer for required field.")
   }
 
   /** Method to run code snippet on UI/main thread */

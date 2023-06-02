@@ -116,4 +116,9 @@
     >Number must be between <xliff:g id="min_value">%1$s</xliff:g> and <xliff:g
             id="max_value"
         >%2$s</xliff:g></string>
+    <string name="decimal_format_validation_error_msg">Invalid number</string>
+    <string name="optional_helper_text">Optional</string>
+    <string name="required">Required</string>
+    <string name="required_text_and_new_line">Required\n</string>
+    <string name="space_asterisk">\u0020\u002a</string>
 </resources>

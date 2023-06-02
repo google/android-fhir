@@ -16,12 +16,14 @@
 
 package com.google.android.fhir.sync.download
 
-import com.google.android.fhir.SyncDownloadContext
+import com.google.android.fhir.sync.BundleRequest
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.Downloader
+import com.google.android.fhir.sync.Request
 import com.google.android.fhir.sync.ResourceSyncException
+import com.google.android.fhir.sync.UrlRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.Bundle
@@ -40,47 +42,52 @@ internal class DownloaderImpl(
 ) : Downloader {
   private val resourceTypeList = ResourceType.values().map { it.name }
 
-  override suspend fun download(context: SyncDownloadContext): Flow<DownloadState> = flow {
+  override suspend fun download(): Flow<DownloadState> = flow {
     var resourceTypeToDownload: ResourceType = ResourceType.Bundle
-
     // download count summary of all resources for progress i.e. <type, total, completed>
-    val progressSummary =
-      downloadWorkManager
-        .getSummaryRequestUrls(context)
-        .map { summary ->
-          summary.key to
-            runCatching { dataSource.download(summary.value) }
-              .onFailure { Timber.e(it) }
-              .getOrNull()
-              .takeIf { it is Bundle }
-              ?.let { (it as Bundle).total }
-        }
-        .also { Timber.i("Download summary " + it.joinToString()) }
-        .toMap()
-
-    val total = progressSummary.values.sumOf { it ?: 0 }
-    var completed = 0
-
-    emit(DownloadState.Started(resourceTypeToDownload, total))
-
-    var url = downloadWorkManager.getNextRequestUrl(context)
-    while (url != null) {
+    val totalResourcesToDownloadCount = getProgressSummary().values.sumOf { it ?: 0 }
+    emit(DownloadState.Started(resourceTypeToDownload, totalResourcesToDownloadCount))
+    var downloadedResourcesCount = 0
+    var request = downloadWorkManager.getNextRequest()
+    while (request != null) {
       try {
-        resourceTypeToDownload =
-          ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
-
-        emit(
-          downloadWorkManager.processResponse(dataSource.download(url!!)).toList().let {
-            completed += it.size
-            DownloadState.Success(it, total, completed)
-          }
-        )
+        resourceTypeToDownload = request.toResourceType()
+        downloadWorkManager.processResponse(download(request)).toList().let {
+          downloadedResourcesCount += it.size
+          emit(DownloadState.Success(it, totalResourcesToDownloadCount, downloadedResourcesCount))
+        }
       } catch (exception: Exception) {
         Timber.e(exception)
         emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
       }
-
-      url = downloadWorkManager.getNextRequestUrl(context)
+      request = downloadWorkManager.getNextRequest()
     }
   }
+
+  private suspend fun download(request: Request) =
+    when (request) {
+      is UrlRequest -> dataSource.download(request.url)
+      is BundleRequest -> dataSource.download(request.bundle)
+    }
+
+  private fun Request.toResourceType() =
+    when (this) {
+      is UrlRequest ->
+        ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
+      is BundleRequest -> ResourceType.Bundle
+    }
+
+  private suspend fun getProgressSummary() =
+    downloadWorkManager
+      .getSummaryRequestUrls()
+      .map { summary ->
+        summary.key to
+          runCatching { dataSource.download(summary.value) }
+            .onFailure { Timber.e(it) }
+            .getOrNull()
+            .takeIf { it is Bundle }
+            ?.let { (it as Bundle).total }
+      }
+      .also { Timber.i("Download summary " + it.joinToString()) }
+      .toMap()
 }

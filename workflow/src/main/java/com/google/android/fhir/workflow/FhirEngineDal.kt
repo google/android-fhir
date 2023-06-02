@@ -18,21 +18,46 @@ package com.google.android.fhir.workflow
 
 import ca.uhn.fhir.rest.gclient.UriClientParam
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.getResourceType
+import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.search.Search
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.instance.model.api.IIdType
-import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.opencds.cqf.cql.evaluator.fhir.dal.FhirDal
+import timber.log.Timber
 
-internal class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
-  val libs = mutableMapOf<String, Library>()
+internal class FhirEngineDal(
+  private val fhirEngine: FhirEngine,
+  private val knowledgeManager: KnowledgeManager,
+) : FhirDal {
 
   override fun read(id: IIdType): IBaseResource = runBlockingOrThrowMainThreadException {
     val clazz = id.getResourceClass()
-    fhirEngine.get(getResourceType(clazz), id.idPart)
+    if (id.isAbsolute) {
+      knowledgeManager
+        .loadResources(
+          resourceType = id.resourceType,
+          url = "${id.baseUrl}/${id.resourceType}/${id.idPart}"
+        )
+        .single()
+    } else {
+      try {
+        fhirEngine.get(getResourceType(clazz), id.idPart)
+      } catch (resourceNotFoundException: ResourceNotFoundException) {
+        // Searching by resourceType and Id to workaround
+        // https://github.com/google/android-fhir/issues/1920
+        // remove when the issue is resolved.
+        val searchByNameWorkaround =
+          knowledgeManager.loadResources(resourceType = id.resourceType, id = id.toString())
+        if (searchByNameWorkaround.count() > 1) {
+          Timber.w("Found more than one value in the IgManager for the id $id")
+        }
+        searchByNameWorkaround.firstOrNull() ?: throw resourceNotFoundException
+      }
+    }
   }
 
   override fun create(resource: IBaseResource): Unit = runBlockingOrThrowMainThreadException {
@@ -51,21 +76,15 @@ internal class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
   override fun search(resourceType: String): Iterable<IBaseResource> =
     runBlockingOrThrowMainThreadException {
       val search = Search(type = ResourceType.fromCode(resourceType))
-      when (resourceType) {
-        "Library" -> libs.values.plus(fhirEngine.search(search))
-        else -> fhirEngine.search(search)
-      }.toMutableList()
+      knowledgeManager.loadResources(resourceType = resourceType) + fhirEngine.search(search)
     }
 
   override fun searchByUrl(resourceType: String, url: String): Iterable<IBaseResource> =
     runBlockingOrThrowMainThreadException {
       val search = Search(type = ResourceType.fromCode(resourceType))
       search.filter(UriClientParam("url"), { value = url })
-
-      when (resourceType) {
-        "Library" -> listOfNotNull(libs[url]).plus(fhirEngine.search(search))
-        else -> fhirEngine.search(search)
-      }.toMutableList()
+      // Searching for knowledge artifact, no need to lookup for fhirEngine
+      knowledgeManager.loadResources(resourceType = resourceType, url = url)
     }
 
   @Suppress("UNCHECKED_CAST")

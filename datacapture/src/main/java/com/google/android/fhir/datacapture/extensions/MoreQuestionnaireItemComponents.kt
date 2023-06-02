@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture
+package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -22,7 +22,8 @@ import android.graphics.BitmapFactory
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import ca.uhn.fhir.util.UrlUtil
-import com.google.android.fhir.datacapture.common.datatype.asStringValue
+import com.google.android.fhir.datacapture.DataCapture
+import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.android.fhir.datacapture.fhirpath.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
 import java.math.BigDecimal
@@ -92,6 +93,9 @@ internal const val EXTENSION_ENABLE_WHEN_EXPRESSION_URL: String =
 
 internal const val EXTENSION_ANSWER_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression"
+
+internal const val EXTENSION_CANDIDATE_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression"
 
 internal const val EXTENSION_CHOICE_COLUMN_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
@@ -272,18 +276,6 @@ internal val Questionnaire.QuestionnaireItemComponent.hasHelpButton: Boolean
     return item.any { it.isHelpCode }
   }
 
-/** Whether item type is display and [displayItemControl] is [DisplayItemControlType.HELP]. */
-internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
-  get() {
-    return when (type) {
-      Questionnaire.QuestionnaireItemType.DISPLAY -> {
-        displayItemControl == DisplayItemControlType.HELP
-      }
-      else -> {
-        false
-      }
-    }
-  }
 /** Converts Text with HTML Tag to formatted text. */
 private fun String.toSpanned(): Spanned {
   return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
@@ -308,9 +300,12 @@ val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
  * code is used as the instructions of the parent question.
  */
 internal val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spanned?
+  get() = item.localizedInstructionsSpanned
+
+/** [localizedInstructionsSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
+internal val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionsSpanned: Spanned?
   get() {
-    return item
-      .firstOrNull { questionnaireItem ->
+    return this.firstOrNull { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
           questionnaireItem.isInstructionsCode
       }
@@ -322,9 +317,12 @@ internal val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpann
  * present) is used as the fly-over text of the parent question.
  */
 internal val Questionnaire.QuestionnaireItemComponent.localizedFlyoverSpanned: Spanned?
+  get() = item.localizedFlyoverSpanned
+
+/** [localizedFlyoverSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
+internal val List<Questionnaire.QuestionnaireItemComponent>.localizedFlyoverSpanned: Spanned?
   get() =
-    item
-      .firstOrNull { questionnaireItem ->
+    this.firstOrNull { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
           questionnaireItem.displayItemControl == DisplayItemControlType.FLYOVER
       }
@@ -335,9 +333,12 @@ internal val Questionnaire.QuestionnaireItemComponent.localizedFlyoverSpanned: S
  * code is used as the instructions of the parent question.
  */
 internal val Questionnaire.QuestionnaireItemComponent.localizedHelpSpanned: Spanned?
+  get() = item.localizedHelpSpanned
+
+/** [localizedHelpSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
+internal val List<Questionnaire.QuestionnaireItemComponent>.localizedHelpSpanned: Spanned?
   get() {
-    return item
-      .firstOrNull { questionnaireItem -> questionnaireItem.isHelpCode }
+    return this.firstOrNull { questionnaireItem -> questionnaireItem.isHelpCode }
       ?.localizedTextSpanned
   }
 
@@ -404,6 +405,25 @@ internal val Questionnaire.QuestionnaireItemComponent.isFlyoverCode: Boolean
     }
   }
 
+/** Whether item type is display and [displayItemControl] is [DisplayItemControlType.HELP]. */
+internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.DISPLAY -> {
+        displayItemControl == DisplayItemControlType.HELP
+      }
+      else -> {
+        false
+      }
+    }
+  }
+
+/** Whether item type is display. */
+internal val Questionnaire.QuestionnaireItemComponent.isDisplayItem: Boolean
+  get() =
+    (type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+      (isInstructionsCode || isFlyoverCode || isHelpCode))
+
 /** Slider step extension value. */
 internal val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
   get() {
@@ -415,6 +435,33 @@ internal val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
     }
     return null
   }
+
+/**
+ * Returns a list of values built from the elements of `this` and the
+ * `questionnaireResponseItemList` with the same linkId using the provided `transform` function
+ * applied to each pair of questionnaire item and questionnaire response item.
+ *
+ * It is assumed that the linkIds are unique in `this` and in `questionnaireResponseItemList`.
+ *
+ * Although linkIds may appear more than once in questionnaire response, they would not appear more
+ * than once within a list of questionnaire response items sharing the same parent.
+ */
+internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLinkId(
+  questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+  transform:
+    (
+      Questionnaire.QuestionnaireItemComponent,
+      QuestionnaireResponse.QuestionnaireResponseItemComponent
+    ) -> T
+): List<T> {
+  val linkIdToQuestionnaireResponseItemMap = questionnaireResponseItemList.associateBy { it.linkId }
+  return mapNotNull { questionnaireItem ->
+    linkIdToQuestionnaireResponseItemMap[questionnaireItem.linkId]?.let { questionnaireResponseItem
+      ->
+      transform(questionnaireItem, questionnaireResponseItem)
+    }
+  }
+}
 
 /**
  * Whether the corresponding [QuestionnaireResponse.QuestionnaireResponseItemComponent] should have
@@ -514,6 +561,12 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
 internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expression?
   get() =
     ToolingExtensions.getExtension(this, EXTENSION_ANSWER_EXPRESSION_URL)?.value?.let {
+      it.castToExpression(it)
+    }
+
+internal val Questionnaire.QuestionnaireItemComponent.candidateExpression: Expression?
+  get() =
+    ToolingExtensions.getExtension(this, EXTENSION_CANDIDATE_EXPRESSION_URL)?.value?.let {
       it.castToExpression(it)
     }
 

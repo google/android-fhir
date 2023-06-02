@@ -24,17 +24,16 @@ import androidx.activity.viewModels
 import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
-import com.google.android.fhir.datacapture.ItemControlTypes
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.common.datatype.asStringValue
-import com.google.android.fhir.datacapture.common.datatype.displayString
-import com.google.android.fhir.datacapture.itemControl
-import com.google.android.fhir.datacapture.localizedFlyoverSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
-import com.google.android.fhir.datacapture.tryUnwrapContext
-import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
+import com.google.android.fhir.datacapture.extensions.ItemControlTypes
+import com.google.android.fhir.datacapture.extensions.asStringValue
+import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
+import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
+import com.google.android.fhir.datacapture.extensions.itemControl
+import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
+import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.OptionSelectDialogFragment
@@ -63,28 +62,26 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         cleanupOldState()
-        holder.summaryHolder.hint = questionnaireViewItem.questionnaireItem.localizedFlyoverSpanned
+        with(holder.summaryHolder) {
+          hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
+          helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
+        }
         val activity =
           requireNotNull(holder.header.context.tryUnwrapContext()) {
             "Can only use dialog select in an AppCompatActivity context"
           }
         val viewModel: QuestionnaireItemDialogSelectViewModel by activity.viewModels()
 
-        val item = questionnaireViewItem.questionnaireItem
-
         // Bind static data
-        holder.header.bind(item)
+        holder.header.bind(questionnaireViewItem)
 
+        val questionnaireItem = questionnaireViewItem.questionnaireItem
+        val selectedOptions = questionnaireViewItem.extractInitialOptions(holder.header.context)
+        holder.summary.text = selectedOptions.selectedSummary
         selectedOptionsJob =
           activity.lifecycleScope.launch {
-            // Set the initial selected options state from the FHIR data model
-            viewModel.updateSelectedOptions(
-              item.linkId,
-              questionnaireViewItem.extractInitialOptions(holder.header.context)
-            )
-
             // Listen for changes to selected options to update summary + FHIR data model
-            viewModel.getSelectedOptionsFlow(item.linkId).collect { selectedOptions ->
+            viewModel.getSelectedOptionsFlow(questionnaireItem.linkId).collect { selectedOptions ->
               holder.summary.text = selectedOptions.selectedSummary
               updateAnswers(selectedOptions)
             }
@@ -95,12 +92,13 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
           View.OnClickListener {
             val fragment =
               OptionSelectDialogFragment(
-                title = item.localizedTextSpanned ?: "",
-                config = item.buildConfig(),
+                title = questionnaireItem.localizedTextSpanned ?: "",
+                config = questionnaireItem.buildConfig(),
+                selectedOptions = selectedOptions
               )
             fragment.arguments =
               bundleOf(
-                OptionSelectDialogFragment.KEY_QUESTION_LINK_ID to item.linkId,
+                OptionSelectDialogFragment.KEY_QUESTION_LINK_ID to questionnaireItem.linkId,
               )
             fragment.show(activity.supportFragmentManager, null)
           }
@@ -116,11 +114,11 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
       private fun displayValidationResult(validationResult: ValidationResult) {
         holder.summaryHolder.error =
-          when (validationResult) {
-            is NotValidated,
-            Valid -> null
-            is Invalid -> validationResult.getSingleStringValidationMessage()
-          }
+          getValidationErrorMessage(
+            holder.summaryHolder.context,
+            questionnaireViewItem,
+            validationResult
+          )
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

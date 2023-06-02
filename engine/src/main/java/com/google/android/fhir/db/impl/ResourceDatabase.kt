@@ -23,7 +23,6 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.android.fhir.db.impl.dao.LocalChangeDao
 import com.google.android.fhir.db.impl.dao.ResourceDao
-import com.google.android.fhir.db.impl.dao.SyncedResourceDao
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -33,7 +32,6 @@ import com.google.android.fhir.db.impl.entities.QuantityIndexEntity
 import com.google.android.fhir.db.impl.entities.ReferenceIndexEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.StringIndexEntity
-import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
 
@@ -49,28 +47,30 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
       DateIndexEntity::class,
       DateTimeIndexEntity::class,
       NumberIndexEntity::class,
-      SyncedResourceEntity::class,
       LocalChangeEntity::class,
       PositionIndexEntity::class
     ],
-  version = 1,
-  exportSchema = false
+  version = 3,
+  exportSchema = true
 )
 @TypeConverters(DbTypeConverters::class)
 internal abstract class ResourceDatabase : RoomDatabase() {
   abstract fun resourceDao(): ResourceDao
-  abstract fun syncedResourceDao(): SyncedResourceDao
   abstract fun localChangeDao(): LocalChangeDao
 }
 
 val MIGRATION_1_2 =
-  object : Migration(1, 2) {
+  object : Migration(/* startVersion = */ 1, /* endVersion = */ 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.execSQL("DROP table if exists SyncedResourceEntity")
+    }
+  }
+
+val MIGRATION_2_3 =
+  object : Migration(/* startVersion = */ 2, /* endVersion = */ 3) {
     override fun migrate(database: SupportSQLiteDatabase) {
       database.execSQL(
-        "CREATE TABLE IF NOT EXISTS `SyncedResourceEntityPatientCentric` (`patientId` TEXT NOT NULL, `lastUpdateResource` TEXT NOT NULL, `resourceType` TEXT NOT NULL, PRIMARY KEY(`patientId`, `resourceType`))"
-      )
-      database.execSQL(
-        "CREATE INDEX IF NOT EXISTS `index_SyncedResourceEntityPatientCentric_patientId_resourceType` ON `SyncedResourceEntityPatientCentric` (`patientId`, `resourceType`)"
+        "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_index_from` ON `DateTimeIndexEntity` (`index_from`)"
       )
     }
   }

@@ -22,12 +22,15 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ResourceType
+import org.junit.AfterClass
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -61,6 +64,20 @@ class F_EngineDatabaseBenchmark {
         assertThat(fhirEngine.get(ResourceType.Patient, "d4d35004-24f8-40e4-8084-1ad75924514f"))
           .isNotNull()
       }
+    }
+  }
+
+  companion object {
+
+    @JvmStatic
+    @BeforeClass
+    fun oneTimeSetup() {
+      FhirEngineProvider.init(FhirEngineConfiguration(testMode = true))
+    }
+    @JvmStatic
+    @AfterClass
+    fun oneTimeTearDown() {
+      FhirEngineProvider.cleanup()
     }
   }
 }

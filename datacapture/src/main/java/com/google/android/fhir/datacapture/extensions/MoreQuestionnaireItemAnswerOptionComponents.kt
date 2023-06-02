@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture
+package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -54,7 +55,8 @@ fun Questionnaire.QuestionnaireItemAnswerOptionComponent.itemAnswerOptionImage(
         "image/jpg",
         "image/png" -> {
           val bitmap = BitmapFactory.decodeByteArray(it.data, 0, it.data.size)
-          val imageSize = context.resources.getDimensionPixelOffset(R.dimen.choice_button_image)
+          val imageSize =
+            context.resources.getDimensionPixelOffset(R.dimen.item_answer_media_image_size)
           val drawable: Drawable = BitmapDrawable(context.resources, bitmap)
           drawable.setBounds(0, 0, imageSize, imageSize)
           drawable

@@ -26,7 +26,6 @@ import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.dao.toLocalChange
-import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
@@ -34,7 +33,6 @@ import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.Resolved
-import com.google.android.fhir.toTimeZoneString
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -44,13 +42,8 @@ import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
 /** Implementation of [FhirEngine]. */
-internal class FhirEngineImpl(
-  private val database: Database,
-  private val context: Context,
-  private val dataSource: DataSource?
-) : FhirEngine {
-  private var syncUploadStrategyContext = SyncUploadContext()
-
+internal class FhirEngineImpl(private val database: Database, private val context: Context) :
+  FhirEngine {
   override suspend fun create(vararg resource: Resource): List<String> {
     return database.insert(*resource)
   }
@@ -101,25 +94,20 @@ internal class FhirEngineImpl(
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+    download: suspend () -> Flow<List<Resource>>
   ) {
-    download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
-        }
-      )
-      .collect { resources ->
-        database.withTransaction {
-          val resolved =
-            resolveConflictingResources(
-              resources,
-              getConflictingResourceIds(resources),
-              conflictResolver
-            )
-          saveRemoteResourcesToDatabase(resources, true)
-          saveResolvedResourcesToDatabase(resolved)
-        }
+    download().collect { resources ->
+      database.withTransaction {
+        val resolved =
+          resolveConflictingResources(
+            resources,
+            getConflictingResourceIds(resources),
+            conflictResolver
+          )
+        database.insertSyncedResources(resources)
+        saveResolvedResourcesToDatabase(resolved)
       }
+    }
   }
 
   private suspend fun saveResolvedResourcesToDatabase(resolved: List<Resource>?) {
@@ -127,19 +115,6 @@ internal class FhirEngineImpl(
       database.deleteUpdates(it)
       database.update(*it.toTypedArray())
     }
-  }
-
-  private suspend fun saveRemoteResourcesToDatabase(
-    resources: List<Resource>,
-    updateSyncedResourceTable: Boolean
-  ) {
-    val timeStamps =
-      resources
-        .groupBy { it.resourceType }
-        .entries.map {
-          SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
-        }
-    database.insertSyncedResources(timeStamps, resources, updateSyncedResourceTable)
   }
 
   private suspend fun resolveConflictingResources(

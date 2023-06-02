@@ -134,7 +134,7 @@ internal class FhirSynchronizer(
     val exceptions = mutableListOf<ResourceSyncException>()
     fhirEngine.syncDownload(conflictResolver) {
       flow {
-        downloader.download(it).collect {
+        downloader.download().collect {
           when (it) {
             is DownloadState.Started -> {
               setSyncState(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, it.total))
