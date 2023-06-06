@@ -42,12 +42,10 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-
-    - name: Setup Java JDK
-      uses: actions/setup-java@v3
       with:
-       distribution: 'temurin'
-       java-version: '17'
+        # Fetch origin/master for spotless ratchet to work
+        # https://github.com/diffplug/spotless/issues/1242
+        fetch-depth: 0
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
