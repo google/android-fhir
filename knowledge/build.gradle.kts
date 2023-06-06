@@ -95,6 +95,7 @@ dependencies {
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.timber)
+  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
 
   kapt(Dependencies.Room.compiler)
 

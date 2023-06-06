@@ -27,13 +27,14 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_READ_ONLY
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_SUBMIT_BUTTON
 import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
 import com.google.android.fhir.datacapture.extensions.EXTENSION_CALCULATED_EXPRESSION_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_CQF_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ENABLE_WHEN_EXPRESSION_URL
@@ -41,6 +42,7 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_ENTRY_MODE_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_HIDDEN_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_VARIABLE_URL
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
 import com.google.android.fhir.datacapture.extensions.asStringValue
@@ -59,6 +61,7 @@ import java.util.UUID
 import kotlin.test.assertFailsWith
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -77,6 +80,7 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
@@ -3916,13 +3920,7 @@ class QuestionnaireViewModelTest {
         )
 
       val patientId = "123"
-      val patient =
-        Patient().apply {
-          id = patientId
-          active = true
-          gender = Enumerations.AdministrativeGender.MALE
-          addName(HumanName().apply { this.family = "Johnny" })
-        }
+      val patient = Patient().apply { id = patientId }
 
       val questionnaire =
         Questionnaire().apply {
@@ -3963,8 +3961,8 @@ class QuestionnaireViewModelTest {
         }
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
       state.set(
-        EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING,
-        printer.encodeResourceToString(patient)
+        EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS,
+        listOf(printer.encodeResourceToString(patient))
       )
 
       val viewModel = QuestionnaireViewModel(context, state)
@@ -4737,6 +4735,141 @@ class QuestionnaireViewModelTest {
     assertThat(enabledDisplayItems[0].linkId).isEqualTo("1.2")
     assertThat(enabledDisplayItems[0].text).isEqualTo("Text when yes is selected")
   }
+
+  @Test
+  fun `should update question title for questionnaire item with cqf expression extension when corresponding item answer is updated`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-age"
+              type = Questionnaire.QuestionnaireItemType.INTEGER
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-description"
+              type = Questionnaire.QuestionnaireItemType.STRING
+              textElement.addExtension().apply {
+                url = EXTENSION_CQF_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression =
+                      "%resource.repeat(item).where(linkId='a-age' and answer.empty().not()).select('Notes for child of age ' + answer.value.toString() + ' years')"
+                  }
+                )
+              }
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+
+      val ageResponseItem = viewModel.getQuestionnaireResponse().item.first { it.linkId == "a-age" }
+
+      assertThat(ageResponseItem.answer).isEmpty()
+
+      var descriptionResponseItem: QuestionnaireViewItem? = null
+
+      val job =
+        this.launch {
+          viewModel.questionnaireStateFlow.collect {
+            descriptionResponseItem =
+              it.items
+                .find { it.asQuestion().questionnaireItem.linkId == "a-description" }!!.asQuestion()
+            this@launch.cancel()
+          }
+        }
+      job.join()
+
+      assertThat(descriptionResponseItem!!.questionText).isNull()
+      val ageItemUpdated =
+        viewModel.questionnaireStateFlow.value.items
+          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-age" }
+          .asQuestion()
+          .apply {
+            this.answersChangedCallback(
+              this.questionnaireItem,
+              this.getQuestionnaireResponseItem(),
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  this.value = IntegerType(2)
+                }
+              ),
+              null
+            )
+          }
+
+      assertThat(
+          ageItemUpdated.getQuestionnaireResponseItem().answer.first().valueIntegerType.value
+        )
+        .isEqualTo(2)
+
+      val descriptionItemUpdated =
+        viewModel.questionnaireStateFlow.value.items
+          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-description" }
+          .asQuestion()
+
+      assertThat(descriptionItemUpdated.questionText.toString())
+        .isEqualTo("Notes for child of age 2 years")
+    }
+
+  @Test
+  fun `should update question title for questionnaire item with cqf expression extension when expression has variable`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addExtension().apply {
+            url = EXTENSION_VARIABLE_URL
+            setValue(
+              Expression().apply {
+                name = "A"
+                language = "text/fhirpath"
+                expression = "1"
+              }
+            )
+          }
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-description"
+              type = Questionnaire.QuestionnaireItemType.STRING
+              addExtension().apply {
+                url = EXTENSION_VARIABLE_URL
+                setValue(
+                  Expression().apply {
+                    name = "B"
+                    language = "text/fhirpath"
+                    expression = "2"
+                  }
+                )
+              }
+              textElement.addExtension().apply {
+                url = EXTENSION_CQF_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression = "'Sum of variables is ' + ( %A + %B ).toString() "
+                  }
+                )
+              }
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+
+      val descriptionItem =
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-description" }
+          .asQuestion()
+
+      assertThat(descriptionItem.questionText.toString()).isEqualTo("Sum of variables is 3")
+    }
 
   private fun createQuestionnaireViewModel(
     questionnaire: Questionnaire,

@@ -17,10 +17,13 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
+import android.text.Spanned
+import androidx.core.text.toSpanned
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.answerExpression
 import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -57,6 +60,9 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * extension exists options
  * @param draftAnswer the draft input that cannot be stored in the [QuestionnaireResponse].
  * @param enabledDisplayItems the enabled display items in the given [questionnaireItem]
+ * @param showOptionalText the optional text is being added to the end of the question text
+ * @param questionViewTextConfiguration configuration to show asterisk, required and optional text
+ * in the header view.
  */
 data class QuestionnaireViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -81,7 +87,9 @@ data class QuestionnaireViewItem(
       emptyList()
     },
   internal val draftAnswer: Any? = null,
-  internal val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList()
+  internal val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
+  internal val questionViewTextConfiguration: QuestionTextConfiguration =
+    QuestionTextConfiguration(),
 ) {
 
   /**
@@ -200,6 +208,15 @@ data class QuestionnaireViewItem(
       }
 
   /**
+   * Fetches the question title that should be displayed to user. The title is first fetched from
+   * [Questionnaire.QuestionnaireResponseItemComponent] (derived from cqf-expression), otherwise it
+   * is derived from [localizedTextSpanned] of [QuestionnaireResponse.QuestionnaireItemComponent]
+   */
+  internal val questionText: Spanned? by lazy {
+    questionnaireResponseItem.text?.toSpanned() ?: questionnaireItem.localizedTextSpanned
+  }
+
+  /**
    * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem] have the
    * same [Questionnaire.QuestionnaireItemComponent] and
    * [QuestionnaireResponse.QuestionnaireResponseItemComponent].
@@ -214,12 +231,12 @@ data class QuestionnaireViewItem(
 
   /**
    * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem] have the
-   * same answers.
+   * same response.
    *
-   * This is useful for determining if the [QuestionnaireViewItem] has outdated answer(s) and
-   * therefore needs to be updated in the [RecyclerView] UI.
+   * This is useful for determining if the [QuestionnaireViewItem] has outdated answer(s) or
+   * question text and therefore needs to be updated in the [RecyclerView] UI.
    */
-  internal fun hasTheSameAnswer(other: QuestionnaireViewItem) =
+  internal fun hasTheSameResponse(other: QuestionnaireViewItem) =
     answers.size == other.answers.size &&
       answers
         .zip(other.answers) { answer, otherAnswer ->
@@ -228,7 +245,8 @@ data class QuestionnaireViewItem(
             answer.value.equalsShallow(otherAnswer.value)
         }
         .all { it } &&
-      draftAnswer == other.draftAnswer
+      draftAnswer == other.draftAnswer &&
+      questionText == other.questionText
 
   /**
    * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem] have the

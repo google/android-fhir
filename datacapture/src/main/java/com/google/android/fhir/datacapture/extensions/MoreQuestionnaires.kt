@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.extensions
 
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -39,6 +40,16 @@ internal val Questionnaire.variableExpressions: List<Expression>
     this.extension.filter { it.url == EXTENSION_VARIABLE_URL }.map { it.castToExpression(it.value) }
 
 /**
+ * A list of extensions that define the resources that provide context for form processing logic:
+ * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
+ */
+internal val Questionnaire.questionnaireLaunchContexts: List<Extension>?
+  get() =
+    this.extension
+      .filter { it.url == EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT }
+      .takeIf { it.isNotEmpty() }
+
+/**
  * Finds the specific variable name [String] at questionnaire [Questionnaire] level
  *
  * @param variableName the [String] to match the variable at questionnaire [Questionnaire] level
@@ -48,38 +59,57 @@ internal fun Questionnaire.findVariableExpression(variableName: String): Express
   variableExpressions.find { it.name == variableName }
 
 /**
- * Validates the questionnaire launch context extension, if it exists, and well formed, and
- * validates if the resource type is applicable as a launch context.
+ * Validates each questionnaire launch context extension matches:
+ * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
  */
-internal fun validateLaunchContext(extension: Extension, resourceType: String) {
-  val nameExtension =
-    extension.extension
-      .firstOrNull { it.url == "name" }
-      ?.value.takeIf { type ->
-        type is Coding &&
-          QuestionnaireLaunchContextSet.values().any {
-            it.code == type.code && it.display == type.display && it.system == type.system
-          }
+internal fun validateLaunchContextExtensions(launchContextExtensions: List<Extension>) =
+  launchContextExtensions.forEach { launchExtension ->
+    validateLaunchContextExtension(
+      Extension().apply {
+        addExtension(launchExtension.extension.firstOrNull { it.url == "name" })
+        addExtension(launchExtension.extension.firstOrNull { it.url == "type" })
       }
-
-  val typeExtension =
-    extension.extension
-      .firstOrNull { it.url == "type" }
-      ?.takeIf { it.valueAsPrimitive.valueAsString == resourceType }
-
-  if (nameExtension == null) {
-    error(
-      "The value of the extension:name field in " +
-        "$EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT is not one of the ones defined in " +
-        "$EXTENSION_LAUNCH_CONTEXT."
     )
   }
 
-  if (typeExtension == null) {
+/**
+ * Checks that the extension:name extension exists and its value contains a valid code from
+ * [QuestionnaireLaunchContextSet]
+ */
+private fun validateLaunchContextExtension(launchExtension: Extension) {
+  check(launchExtension.extension.size == 2) {
+    "The extension:name or extension:type extension is missing in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
+  }
+
+  val isValidExtension =
+    QuestionnaireLaunchContextSet.values().any {
+      launchExtension.equalsDeep(
+        Extension().apply {
+          addExtension(
+            Extension().apply {
+              url = "name"
+              setValue(
+                Coding().apply {
+                  code = it.code
+                  display = it.display
+                  system = it.system
+                }
+              )
+            }
+          )
+          addExtension(
+            Extension().apply {
+              url = "type"
+              setValue(CodeType().setValue(it.resourceType))
+            }
+          )
+        }
+      )
+    }
+  if (!isValidExtension) {
     error(
-      "The resource type set in the extension:type field in " +
-        "$EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT does not match the resource type of the " +
-        "context passed in: $resourceType."
+      "The extension:name extension and/or extension:type extension do not follow the format " +
+        "specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
     )
   }
 }
@@ -91,12 +121,16 @@ private enum class QuestionnaireLaunchContextSet(
   val code: String,
   val display: String,
   val system: String,
+  val resourceType: String,
 ) {
-  PATIENT("patient", "Patient", EXTENSION_LAUNCH_CONTEXT),
-  ENCOUNTER("encounter", "Encounter", EXTENSION_LAUNCH_CONTEXT),
-  LOCATION("location", "Location", EXTENSION_LAUNCH_CONTEXT),
-  USER("user", "User", EXTENSION_LAUNCH_CONTEXT),
-  STUDY("study", "ResearchStudy", EXTENSION_LAUNCH_CONTEXT),
+  PATIENT("patient", "Patient", EXTENSION_LAUNCH_CONTEXT, "Patient"),
+  ENCOUNTER("encounter", "Encounter", EXTENSION_LAUNCH_CONTEXT, "Encounter"),
+  LOCATION("location", "Location", EXTENSION_LAUNCH_CONTEXT, "Location"),
+  USER_AS_PATIENT("user", "User", EXTENSION_LAUNCH_CONTEXT, "Patient"),
+  USER_AS_PRACTITIONER("user", "User", EXTENSION_LAUNCH_CONTEXT, "Practitioner"),
+  USER_AS_PRACTITIONER_ROLE("user", "User", EXTENSION_LAUNCH_CONTEXT, "PractitionerRole"),
+  USER_AS_RELATED_PERSON("user", "User", EXTENSION_LAUNCH_CONTEXT, "RelatedPerson"),
+  STUDY("study", "ResearchStudy", EXTENSION_LAUNCH_CONTEXT, "ResearchStudy"),
 }
 
 /**
