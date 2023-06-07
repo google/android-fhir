@@ -22,6 +22,9 @@ import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.knowledge.db.impl.KnowledgeDatabase
+import com.google.android.fhir.knowledge.npm.CacheManager
+import com.google.android.fhir.knowledge.npm.NpmPackage
+import com.google.android.fhir.knowledge.npm.NpmPackageManager
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,6 +44,25 @@ internal class KnowledgeManagerTest {
   private val knowledgeManager = KnowledgeManager(knowledgeDb, context.cacheDir.absolutePath)
   private val implementationGuide = Dependency("anc-cds", "0.3.0", "http://url.com")
   private val dataFolder = File(javaClass.getResource("/anc-cds")!!.file)
+
+  private val knowledgeDb =
+    Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build()
+  private val cacheManager = CacheManager(context.dataDir)
+  private val knowledgeManager =
+    KnowledgeManager(
+      knowledgeDb,
+      context.dataDir,
+      npmPackageManager =
+        NpmPackageManager(cacheManager) { implementationGuide, _ ->
+          NpmPackage(
+            implementationGuide.packageId,
+            implementationGuide.version,
+            implementationGuide.uri,
+            emptyList(),
+            dataFolder
+          )
+        }
+    )
 
   @After
   fun closeDb() {
@@ -126,27 +148,22 @@ internal class KnowledgeManagerTest {
     }
   }
 
-  @Test
-  fun `installing from internet`() = runTest {
-    knowledgeManager.install(
-      Dependency(
-        "hl7.fhir.r4b.examples",
-        "4.3.0",
-        "http://hl7.org/fhir"
-      )
-    )
+fun `installing from npmPackageManager`() = runTest {
+    knowledgeManager.install(implementationGuide)
 
-    assertThat(knowledgeManager.loadResources(resourceType = "Library", name = "WHOCommon")).isNotNull()
-    assertThat(knowledgeManager.loadResources(resourceType = "Library", url = "FHIRCommon")).isNotNull()
-    // assertThat(igManager.loadResources(resourceType = "Measure")).hasSize(1)
-    // assertThat(
-    //   igManager.loadResources(
-    //     resourceType = "Measure",
-    //     url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01"
-    //   )
-    // )
-    //   .isNotEmpty()
-    // assertThat(igManager.loadResources(resourceType = "Measure", url = "Measure/ANCIND01"))
-    //   .isNotNull()
+    assertThat(knowledgeManager.loadResources(resourceType = "Library", name = "WHOCommon"))
+      .isNotNull()
+    assertThat(knowledgeManager.loadResources(resourceType = "Library", url = "FHIRCommon"))
+      .isNotNull()
+    assertThat(knowledgeManager.loadResources(resourceType = "Measure")).hasSize(1)
+    assertThat(
+        knowledgeManager.loadResources(
+          resourceType = "Measure",
+          url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01"
+        )
+      )
+      .isNotEmpty()
+    assertThat(knowledgeManager.loadResources(resourceType = "Measure", url = "Measure/ANCIND01"))
+      .isNotNull()
   }
 }

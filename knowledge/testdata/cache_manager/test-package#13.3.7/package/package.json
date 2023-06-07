@@ -1,0 +1,13 @@
+{
+  "name": "test-package",
+  "version": "13.3.7",
+  "type": "IG",
+  "canonical": "https://google.com/test-package",
+  "title": "Test package",
+  "fhirVersions": [
+    "4.0.1"
+  ],
+  "dependencies": {
+    "hl7.fhir.r4.core": "4.0.1"
+  }
+}

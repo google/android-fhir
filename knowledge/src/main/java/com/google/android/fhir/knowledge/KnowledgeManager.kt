@@ -17,7 +17,6 @@
 package com.google.android.fhir.knowledge
 
 import android.content.Context
-import android.util.Log
 import androidx.room.Room
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
@@ -33,7 +32,6 @@ import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.MetadataResource
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import org.hl7.fhir.utilities.npm.NpmPackage
 import timber.log.Timber
 
 /** Responsible for importing, accessing and deleting Implementation Guides. */
@@ -42,9 +40,8 @@ internal constructor(
   private val knowledgeDatabase: KnowledgeDatabase,
   private val dataFolder: File,
   private val jsonParser: IParser = FhirContext.forR4().newJsonParser(),
-  private val npmPackageManager: NpmPackageManager = NpmPackageManager(dataFolder)
+  private val npmPackageManager: NpmPackageManager = NpmPackageManager.create(dataFolder),
 ) {
-
   private val knowledgeDao = knowledgeDatabase.knowledgeDao()
 
   /**
@@ -53,23 +50,17 @@ internal constructor(
    * FHIR Resources)
    */
   suspend fun install(vararg implementationGuides: ImplementationGuide) {
-   for (npmRootDirectory in npmPackageManager.install(*implementationGuides)){
-     for (file in npmRootDirectory.listFiles().orEmpty()) {
-       if (!file.isDirectory && !NpmPackage.isInternalExemptFile(file) && !file.name.startsWith("Bundle") && !file.name.contains("ModelInfo")) {
-         try {
-           Log.d("TEST", file.name)
-           val resource = jsonParser.parseResource(FileInputStream(file))
-           if (resource is Resource) {
-             importResource(null, resource, file)
-           } else {
-             Timber.d("Unable to import file: %file")
-           }
-         } catch (exception: Exception) {
-           Timber.d(exception, "Unable to import file: %file")
-         }
-       }
-     }
-   }
+    for (implementationGuide in implementationGuides) {
+      for (npmPackage in npmPackageManager.install(implementationGuide)) {
+        val existingEntity =
+          knowledgeDao.getImplementationGuide(npmPackage.packageId, npmPackage.version)
+        if (existingEntity != null) continue
+        install(
+          ImplementationGuide(npmPackage.packageId, npmPackage.version, npmPackage.canonical),
+          npmPackage.rootDirectory
+        )
+      }
+    }
   }
 
   /**
@@ -181,6 +172,9 @@ internal constructor(
 
     /** Creates an [KnowledgeManager] backed by the in-memory DB. */
     fun createInMemory(context: Context) =
-      KnowledgeManager(Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build(), context.dataDir)
+      KnowledgeManager(
+        Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build(),
+        context.dataDir
+      )
   }
 }

@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.knowledge
+package com.google.android.fhir.knowledge.npm
 
-/**
- * Holds Implementation Guide attributes. Used to define dependencies, load dependencies from
- * Package Manager
- */
-data class ImplementationGuide(val packageId: String, val version: String, val uri: String? = null)
+import com.google.android.fhir.knowledge.ImplementationGuide
+
+/** Downloads Npm package from the provided package server. */
+fun interface PackageDownloader {
+
+  /** Downloads the [implementationGuide] from the [packageServerUrl]. */
+  suspend fun downloadPackage(
+    implementationGuide: ImplementationGuide,
+    packageServerUrl: String,
+  ): NpmPackage
+}

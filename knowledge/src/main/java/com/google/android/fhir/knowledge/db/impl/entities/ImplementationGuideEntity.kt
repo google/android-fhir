@@ -47,5 +47,5 @@ internal data class ImplementationGuideEntity(
 )
 
 internal fun ImplementationGuide.toEntity(rootFolder: File): ImplementationGuideEntity {
-  return ImplementationGuideEntity(0L, uri, packageId, version, rootFolder)
+  return ImplementationGuideEntity(0L, uri ?: "", packageId, version, rootFolder)
 }

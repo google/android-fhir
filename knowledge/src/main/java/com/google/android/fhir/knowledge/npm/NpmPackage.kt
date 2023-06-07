@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.implementationguide.npm
+package com.google.android.fhir.knowledge.npm
 
-/** This exception is thrown whenever there is an issue with the [NpmPackageManager]. */
-class NpmPackageManagerException(message: String? = null, cause: Throwable? = null) :
-  RuntimeException(message, cause) {
-  companion object {
-    const val serialVersionUID = 1L
-  }
-}
+import com.google.android.fhir.knowledge.ImplementationGuide
+import java.io.File
+
+/** Downloaded Npm Package metadata. */
+data class NpmPackage(
+  val packageId: String,
+  val version: String,
+  val canonical: String?,
+  val dependencies: List<ImplementationGuide>,
+  val rootDirectory: File,
+)
