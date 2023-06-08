@@ -31,9 +31,12 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
+import com.google.android.fhir.index.ResourceIndices
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
+import java.util.Date
+import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -110,22 +113,24 @@ internal class DatabaseImpl(
   override suspend fun <R : Resource> insert(vararg resource: R): List<String> {
     val logicalIds = mutableListOf<String>()
     db.withTransaction {
-      logicalIds.addAll(resourceDao.insertAll(resource.toList()))
-      localChangeDao.addInsertAll(resource.toList())
+      val timeOfLocalChange = Instant.now()
+      logicalIds.addAll(resourceDao.insertAllLocal(resource.toList(), timeOfLocalChange))
+      localChangeDao.addInsertAll(resource.toList(), timeOfLocalChange)
     }
     return logicalIds
   }
 
   override suspend fun <R : Resource> insertRemote(vararg resource: R) {
-    db.withTransaction { resourceDao.insertAll(resource.toList()) }
+    db.withTransaction { resourceDao.insertAllRemote(resource.toList()) }
   }
 
   override suspend fun update(vararg resources: Resource) {
     db.withTransaction {
       resources.forEach {
+        val timeOfLocalChange = Instant.now()
         val oldResourceEntity = selectEntity(it.resourceType, it.logicalId)
-        resourceDao.update(it)
-        localChangeDao.addUpdate(oldResourceEntity, it)
+        resourceDao.update(it, timeOfLocalChange)
+        localChangeDao.addUpdate(oldResourceEntity, it, timeOfLocalChange)
       }
     }
   }
@@ -143,6 +148,20 @@ internal class DatabaseImpl(
         versionId,
         lastUpdated
       )
+      // update the remote lastUpdated index
+      val entity = selectEntity(resourceType, resourceId)
+      val indicesToUpdate =
+        ResourceIndices.Builder(resourceType, resourceId)
+          .apply {
+            addDateTimeIndex(
+              ResourceIndexer.createLastUpdatedIndex(
+                resourceType,
+                InstantType(Date.from(lastUpdated))
+              )
+            )
+          }
+          .build()
+      resourceDao.updateIndicesForResource(indicesToUpdate, resourceType, entity.resourceUuid)
     }
   }
 

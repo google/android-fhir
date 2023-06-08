@@ -27,6 +27,7 @@ import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.toTimeZoneString
 import com.google.android.fhir.versionId
+import java.time.Instant
 import java.util.Date
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -46,14 +47,14 @@ internal abstract class LocalChangeDao {
   @Insert abstract suspend fun addLocalChange(localChangeEntity: LocalChangeEntity)
 
   @Transaction
-  open suspend fun addInsertAll(resources: List<Resource>) {
-    resources.forEach { resource -> addInsert(resource) }
+  open suspend fun addInsertAll(resources: List<Resource>, timeOfChange: Instant) {
+    resources.forEach { resource -> addInsert(resource, timeOfChange) }
   }
 
-  suspend fun addInsert(resource: Resource) {
+  suspend fun addInsert(resource: Resource, timeOfChange: Instant?) {
     val resourceId = resource.logicalId
     val resourceType = resource.resourceType
-    val timestamp = Date().toTimeZoneString()
+    val timestamp = Date.from(timeOfChange).toTimeZoneString()
     val resourceString = iParser.encodeResourceToString(resource)
 
     addLocalChange(
@@ -69,13 +70,13 @@ internal abstract class LocalChangeDao {
     )
   }
 
-  suspend fun addUpdate(oldEntity: ResourceEntity, resource: Resource) {
+  suspend fun addUpdate(oldEntity: ResourceEntity, resource: Resource, timeOfChange: Instant) {
     val resourceId = resource.logicalId
     val resourceType = resource.resourceType
-    val timestamp = Date().toTimeZoneString()
+    val timestamp = Date.from(timeOfChange).toTimeZoneString()
 
     if (!localChangeIsEmpty(resourceId, resourceType) &&
-        lastChangeType(resourceId, resourceType)!!.equals(Type.DELETE)
+        lastChangeType(resourceId, resourceType)!! == Type.DELETE
     ) {
       throw InvalidLocalChangeException(
         "Unexpected DELETE when updating $resourceType/$resourceId. UPDATE failed."

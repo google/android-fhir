@@ -30,6 +30,8 @@ import com.google.android.fhir.index.entities.StringIndex
 import com.google.android.fhir.index.entities.TokenIndex
 import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.search.LAST_UPDATED
+import com.google.android.fhir.search.LOCAL_LAST_UPDATED
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import org.hl7.fhir.r4.context.SimpleWorkerContext
@@ -53,6 +55,7 @@ import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.SearchParameter
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Timing
@@ -132,12 +135,7 @@ internal class ResourceIndexer(
     if (resource.meta.hasLastUpdated()) {
       val lastUpdatedElement = resource.meta.lastUpdatedElement
       indexBuilder.addDateTimeIndex(
-        DateTimeIndex(
-          name = "_lastUpdated",
-          path = arrayOf(resource.fhirType(), "meta", "lastUpdated").joinToString(separator = "."),
-          from = lastUpdatedElement.value.time,
-          to = lastUpdatedElement.value.time
-        )
+        createLastUpdatedIndex(resource.resourceType, lastUpdatedElement)
       )
     }
 
@@ -409,6 +407,22 @@ internal class ResourceIndexer(
      * https://www.hl7.org/fhir/valueset-currencies.html.
      */
     private const val FHIR_CURRENCY_CODE_SYSTEM = "urn:iso:std:iso:4217"
+
+    fun createLastUpdatedIndex(resourceType: ResourceType, instant: InstantType) =
+      DateTimeIndex(
+        name = LAST_UPDATED,
+        path = arrayOf(resourceType.name, "meta", "lastUpdated").joinToString(separator = "."),
+        from = instant.value.time,
+        to = instant.value.time
+      )
+
+    fun createLocalLastUpdatedIndex(resourceType: ResourceType, instant: InstantType) =
+      DateTimeIndex(
+        name = LOCAL_LAST_UPDATED,
+        path = arrayOf(resourceType.name, "meta", "localLastUpdated").joinToString(separator = "."),
+        from = instant.value.time,
+        to = instant.value.time
+      )
   }
 }
 

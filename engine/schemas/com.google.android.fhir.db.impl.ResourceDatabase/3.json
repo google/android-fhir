@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "6dd24dd7340c3808456a812933bc6838",
+    "identityHash": "229dd3fb6a2d9524db54c649e8ffb90d",
     "entities": [
       {
         "tableName": "ResourceEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceUuid` BLOB NOT NULL, `resourceType` TEXT NOT NULL, `resourceId` TEXT NOT NULL, `serializedResource` TEXT NOT NULL, `versionId` TEXT, `lastUpdatedRemote` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceUuid` BLOB NOT NULL, `resourceType` TEXT NOT NULL, `resourceId` TEXT NOT NULL, `serializedResource` TEXT NOT NULL, `versionId` TEXT, `lastUpdatedRemote` INTEGER, `lastUpdatedLocal` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -47,6 +47,12 @@
           {
             "fieldPath": "lastUpdatedRemote",
             "columnName": "lastUpdatedRemote",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastUpdatedLocal",
+            "columnName": "lastUpdatedLocal",
             "affinity": "INTEGER",
             "notNull": false
           }
@@ -935,7 +941,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6dd24dd7340c3808456a812933bc6838')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '229dd3fb6a2d9524db54c649e8ffb90d')"
     ]
   }
 }

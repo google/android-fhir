@@ -72,5 +72,8 @@ val MIGRATION_2_3 =
       database.execSQL(
         "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_index_from` ON `DateTimeIndexEntity` (`index_from`)"
       )
+      database.execSQL(
+        "ALTER TABLE `ResourceEntity` ADD COLUMN `lastUpdatedLocal` INTEGER DEFAULT NULL"
+      )
     }
   }
