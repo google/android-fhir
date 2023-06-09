@@ -61,7 +61,7 @@ internal abstract class HttpVerbBasedBundleEntryComponentGenerator(
         UriType("${localChange.resourceType}/${localChange.resourceId}")
       )
       .apply {
-        if (useETagForUpload) {
+        if (useETagForUpload && !localChange.versionId.isNullOrEmpty()) {
           // FHIR supports weak Etag, See ETag section https://hl7.org/fhir/http.html#Http-Headers
           when (localChange.type) {
             LocalChange.Type.UPDATE,
