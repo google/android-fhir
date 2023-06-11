@@ -19,6 +19,7 @@ package com.google.android.fhir.sync.upload
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.Request
 import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.UploadResult
 import com.google.android.fhir.sync.Uploader
@@ -47,7 +48,7 @@ internal class BundleUploader(
     bundleGenerator.generate(localChangesPaginator.page(localChanges)).forEach {
       (bundle, localChangeTokens) ->
       try {
-        val response = dataSource.upload(bundle)
+        val response = dataSource.upload(Request.of(bundle))
 
         completed += bundle.entry.size
         emit(getUploadResult(response, localChangeTokens, total, completed))
