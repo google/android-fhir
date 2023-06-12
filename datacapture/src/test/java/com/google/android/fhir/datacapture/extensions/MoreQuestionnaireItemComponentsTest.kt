@@ -34,7 +34,6 @@ import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
-import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
@@ -1477,12 +1476,11 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun createQuestionResponseWithoutGroupAndNestedQuestions() {
     val question =
-      Questionnaire.QuestionnaireItemComponent()
-        .apply {
-          linkId = "gender"
-          type = Questionnaire.QuestionnaireItemType.STRING
-          initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
-        }
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "gender"
+        type = Questionnaire.QuestionnaireItemType.STRING
+        initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
+      }
 
     val questionResponse = question.createQuestionnaireResponseItem()
 
