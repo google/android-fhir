@@ -136,11 +136,20 @@ internal constructor(
     )
   private val endpointConverter = EndpointConverter(adapterFactory)
 
+  // Keeps a cached copy of all **compiled** libraries.
+  // TODO: Migrate upstream's CQL Evaluator to a hashmap interface and then use an LruCache here.
+  val compiledLibraryCache =
+    HashMap<
+      org.cqframework.cql.elm.execution.VersionedIdentifier,
+      org.cqframework.cql.elm.execution.Library
+    >()
+
   private val evaluatorBuilderSupplier = Supplier {
     CqlEvaluatorBuilder()
       .withLibrarySourceProvider(libraryContentProvider)
       .withCqlOptions(CqlOptions.defaultOptions())
       .withTerminologyProvider(fhirEngineTerminologyProvider)
+      .withLibraryCache(compiledLibraryCache)
   }
 
   private val libraryProcessor =
