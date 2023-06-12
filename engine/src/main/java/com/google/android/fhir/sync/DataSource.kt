@@ -26,23 +26,13 @@ import org.hl7.fhir.r4.model.Resource
  * operations are [Bundle] based to optimize network traffic.
  */
 internal interface DataSource {
-  /**
-   * @return [Bundle] of type [BundleType.SEARCHSET] for a successful operation, [OperationOutcome]
-   * otherwise. Call this api with the relative path of the resource search url to be downloaded.
-   */
-  suspend fun download(path: String): Resource
-
-  /**
-   * @return [Bundle] on a successful operation, [OperationOutcome] otherwise. Call this api with
-   * the [Bundle] that contains individual requests bundled together to be downloaded from the
-   * server. (e.g. https://www.hl7.org/fhir/bundle-request-medsallergies.json.html)
-   */
-  suspend fun download(bundle: Bundle): Resource
+  /** @return [Bundle] on a successful operation, [OperationOutcome] otherwise. */
+  suspend fun download(request: Request): Resource
 
   /**
    * @return [Bundle] of type [BundleType.TRANSACTIONRESPONSE] for a successful operation,
    * [OperationOutcome] otherwise. Call this api with the [Bundle] that needs to be uploaded to the
    * server.
    */
-  suspend fun upload(bundle: Bundle): Resource
+  suspend fun upload(request: BundleRequest): Resource
 }

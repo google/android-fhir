@@ -25,10 +25,8 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
  * Resolves constants defined in the fhir path expressions beyond those defined in the specification
  */
 internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
-  override fun resolveConstant(appContext: Any?, name: String?, beforeContext: Boolean): Base? {
-    return if (appContext is Map<*, *> && appContext.containsKey(name)) appContext[name] as Base
-    else null
-  }
+  override fun resolveConstant(appContext: Any?, name: String?, beforeContext: Boolean): Base? =
+    (appContext as? Map<*, *>)?.get(name) as? Base
 
   override fun resolveConstantType(appContext: Any?, name: String?): TypeDetails {
     throw UnsupportedOperationException()
