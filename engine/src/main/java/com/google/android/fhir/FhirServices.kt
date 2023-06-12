@@ -89,7 +89,7 @@ internal data class FhirServices(
                 .build()
           )
         }
-      val engine = FhirEngineImpl(database = db, context = context, remoteDataSource)
+      val engine = FhirEngineImpl(database = db, context = context)
       return FhirServices(
         fhirEngine = engine,
         parser = parser,

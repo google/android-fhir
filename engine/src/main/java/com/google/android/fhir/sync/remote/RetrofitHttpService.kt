@@ -67,8 +67,8 @@ internal interface RetrofitHttpService : FhirHttpService {
               addInterceptor(
                 Interceptor { chain: Interceptor.Chain ->
                   val accessToken = it.getAccessToken()
-                  val signatureHeader = it.getSignatureHeader(accessToken)
                   val timestampHeader = it.getTimeStampHeader()
+                  val signatureHeader = it.getSignatureHeader(accessToken, timestampHeader)
                   val keyIdHeader = it.getKeyIdHeader()
                   val request =
                     chain

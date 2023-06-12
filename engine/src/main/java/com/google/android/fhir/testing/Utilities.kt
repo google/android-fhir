@@ -22,7 +22,9 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.SyncStrategyTypes
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
@@ -146,6 +148,10 @@ object TestFhirEngineImpl : FhirEngine {
     upload(listOf(getLocalChange(ResourceType.Patient, "123")))
   }
 
+  override fun setSyncUploadStrategy(syncUploadStrategy: SyncStrategyTypes) {
+    TODO("Not yet implemented")
+  }
+
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
     download: suspend () -> Flow<List<Resource>>
@@ -173,6 +179,13 @@ object TestFhirEngineImpl : FhirEngine {
   }
 
   override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {}
+  override suspend fun getSquashedLocalChangeCount(): Int {
+    TODO("Not yet implemented")
+  }
+
+  override suspend fun getSquashedLocalChangeList(): List<SquashedLocalChange> {
+    TODO("Not yet implemented")
+  }
 }
 
 object TestFailingDatasource : DataSource {

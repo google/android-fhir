@@ -59,9 +59,7 @@ class ResourceParamsBasedDownloadWorkManager(
   /**
    * Returns the map of resourceType and URL for summary of total count for each download request
    */
-  override suspend fun getSummaryRequestUrls(
-    context: SyncDownloadContext
-  ): Map<ResourceType, String> {
+  override suspend fun getSummaryRequestUrls(): Map<ResourceType, String> {
     return resourcesToDownloadWithSearchParams.associate { (resourceType, params) ->
       val newParams =
         params.toMutableMap().apply {
