@@ -24,10 +24,12 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.search.Search
+import com.google.android.fhir.sync.BundleRequest
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.Request
+import com.google.android.fhir.sync.UrlRequest
 import com.google.common.truth.Truth.assertThat
 import java.net.SocketTimeoutException
 import java.time.OffsetDateTime
@@ -93,15 +95,13 @@ fun readJsonArrayFromFile(filename: String): JSONArray {
 
 object TestDataSourceImpl : DataSource {
 
-  override suspend fun download(path: String): Resource {
-    return Bundle().apply { type = Bundle.BundleType.SEARCHSET }
-  }
+  override suspend fun download(request: Request) =
+    when (request) {
+      is UrlRequest -> Bundle().apply { type = Bundle.BundleType.SEARCHSET }
+      is BundleRequest -> Bundle().apply { type = Bundle.BundleType.BATCHRESPONSE }
+    }
 
-  override suspend fun download(bundle: Bundle): Resource {
-    return Bundle().apply { type = Bundle.BundleType.BATCHRESPONSE }
-  }
-
-  override suspend fun upload(bundle: Bundle): Resource {
+  override suspend fun upload(request: BundleRequest): Resource {
     return Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
   }
 }
@@ -177,32 +177,28 @@ object TestFhirEngineImpl : FhirEngine {
 
 object TestFailingDatasource : DataSource {
 
-  override suspend fun download(path: String): Resource {
-    val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
-    // data size exceeding the bytes acceptable by WorkManager serializer
-    val dataSize = Data.MAX_DATA_BYTES + 1
-    val hugeStackTraceMessage = (1..dataSize).map { allowedChars.random() }.joinToString("")
-    throw Exception(hugeStackTraceMessage)
-  }
+  override suspend fun download(request: Request) =
+    when (request) {
+      is UrlRequest -> {
+        val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+        // data size exceeding the bytes acceptable by WorkManager serializer
+        val dataSize = Data.MAX_DATA_BYTES + 1
+        val hugeStackTraceMessage = (1..dataSize).map { allowedChars.random() }.joinToString("")
+        throw Exception(hugeStackTraceMessage)
+      }
+      is BundleRequest -> throw SocketTimeoutException("Posting Download Bundle failed...")
+    }
 
-  override suspend fun download(bundle: Bundle): Resource {
-    throw SocketTimeoutException("Posting Download Bundle failed...")
-  }
-
-  override suspend fun upload(bundle: Bundle): Resource {
+  override suspend fun upload(request: BundleRequest): Resource {
     throw SocketTimeoutException("Posting Upload Bundle failed...")
   }
 }
 
 class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSource {
 
-  override suspend fun download(path: String): Resource {
+  override suspend fun download(request: Request): Resource {
     TODO("Not yet implemented")
   }
 
-  override suspend fun download(bundle: Bundle): Resource {
-    TODO("Not yet implemented")
-  }
-
-  override suspend fun upload(bundle: Bundle) = onPostBundle(bundle)
+  override suspend fun upload(request: BundleRequest) = onPostBundle(request.bundle)
 }

@@ -16,8 +16,10 @@
 
 package com.google.android.fhir.sync.remote
 
+import com.google.android.fhir.sync.BundleRequest
 import com.google.android.fhir.sync.DataSource
-import org.hl7.fhir.r4.model.Bundle
+import com.google.android.fhir.sync.Request
+import com.google.android.fhir.sync.UrlRequest
 
 /**
  * Implementation of [DataSource] to sync data with the FHIR server using HTTP method calls.
@@ -25,9 +27,12 @@ import org.hl7.fhir.r4.model.Bundle
  */
 internal class FhirHttpDataSource(private val fhirHttpService: FhirHttpService) : DataSource {
 
-  override suspend fun download(path: String) = fhirHttpService.get(path)
+  override suspend fun download(request: Request) =
+    when (request) {
+      is UrlRequest -> fhirHttpService.get(request.url, request.headers)
+      is BundleRequest -> fhirHttpService.post(request.bundle, request.headers)
+    }
 
-  override suspend fun download(bundle: Bundle) = fhirHttpService.post(bundle)
-
-  override suspend fun upload(bundle: Bundle) = fhirHttpService.post(bundle)
+  override suspend fun upload(request: BundleRequest) =
+    fhirHttpService.post(request.bundle, request.headers)
 }

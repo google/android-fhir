@@ -52,7 +52,7 @@ internal class DownloaderImpl(
     while (request != null) {
       try {
         resourceTypeToDownload = request.toResourceType()
-        downloadWorkManager.processResponse(download(request)).toList().let {
+        downloadWorkManager.processResponse(dataSource.download(request)).toList().let {
           downloadedResourcesCount += it.size
           emit(DownloadState.Success(it, totalResourcesToDownloadCount, downloadedResourcesCount))
         }
@@ -63,12 +63,6 @@ internal class DownloaderImpl(
       request = downloadWorkManager.getNextRequest()
     }
   }
-
-  private suspend fun download(request: Request) =
-    when (request) {
-      is UrlRequest -> dataSource.download(request.url)
-      is BundleRequest -> dataSource.download(request.bundle)
-    }
 
   private fun Request.toResourceType() =
     when (this) {
@@ -82,7 +76,7 @@ internal class DownloaderImpl(
       .getSummaryRequestUrls()
       .map { summary ->
         summary.key to
-          runCatching { dataSource.download(summary.value) }
+          runCatching { dataSource.download(Request.of(summary.value)) }
             .onFailure { Timber.e(it) }
             .getOrNull()
             .takeIf { it is Bundle }

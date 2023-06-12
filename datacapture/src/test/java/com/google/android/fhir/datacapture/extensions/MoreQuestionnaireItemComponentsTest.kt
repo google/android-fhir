@@ -1477,13 +1477,7 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun createQuestionResponseWithoutGroupAndNestedQuestions() {
     val question =
-      Questionnaire.QuestionnaireItemComponent(
-          StringType("gender"),
-          Enumeration(
-            Questionnaire.QuestionnaireItemTypeEnumFactory(),
-            Questionnaire.QuestionnaireItemType.STRING
-          )
-        )
+      Questionnaire.QuestionnaireItemComponent()
         .apply {
           linkId = "gender"
           type = Questionnaire.QuestionnaireItemType.STRING
