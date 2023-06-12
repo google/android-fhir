@@ -531,8 +531,9 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
   // quantity given as initial without value is for unit reference purpose only. Answer conversion
   // not needed
-  if (initial.isEmpty() ||
-      (initialFirstRep.hasValueQuantity() && initialFirstRep.valueQuantity.value == null)
+  if (answerOption.none { it.initialSelected } &&
+      (initial.isEmpty() ||
+        (initialFirstRep.hasValueQuantity() && initialFirstRep.valueQuantity.value == null))
   ) {
     return null
   }
@@ -545,17 +546,17 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
     )
   }
 
-  if (initial.size > 1 && !repeats) {
+  if ((answerOption.filter { it.initialSelected }.size > 1 || initial.size > 1) && !repeats) {
     throw IllegalArgumentException(
       "Questionnaire item $linkId can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
     )
   }
 
-  return mutableListOf(
-    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-      value = initial[0].value
-    }
-  )
+  return initial
+    .map { it.value }
+    .ifEmpty { answerOption.filter { it.initialSelected }.map { it.value } }
+    .map { QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply { value = it } }
+    .toMutableList()
 }
 
 internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expression?
