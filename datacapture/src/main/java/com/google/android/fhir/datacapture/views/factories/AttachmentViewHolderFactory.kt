@@ -142,6 +142,17 @@ internal object AttachmentViewHolderFactory :
         fileDeleteButton.isEnabled = !isReadOnly
       }
 
+      override fun addContentDescription() {
+        takePhotoButton.contentDescription = questionnaireViewItem.questionnaireItem.linkId + takePhotoButton::class.java.canonicalName
+        uploadPhotoButton.contentDescription = questionnaireViewItem.questionnaireItem.linkId + uploadPhotoButton::class.java.canonicalName
+        uploadAudioButton.contentDescription = questionnaireViewItem.questionnaireItem.linkId + uploadAudioButton::class.java.canonicalName
+        uploadVideoButton.contentDescription = questionnaireViewItem.questionnaireItem.linkId + uploadVideoButton::class.java.canonicalName
+        uploadDocumentButton.contentDescription = questionnaireViewItem.questionnaireItem.linkId + uploadDocumentButton::class.java.canonicalName
+        uploadFileButton.contentDescription = questionnaireViewItem.questionnaireItem.linkId + uploadFileButton::class.java.canonicalName
+        photoDeleteButton.contentDescription = questionnaireViewItem.questionnaireItem.linkId + photoDeleteButton::class.java.canonicalName
+        fileDeleteButton.contentDescription = questionnaireViewItem.questionnaireItem.linkId + fileDeleteButton::class.java.canonicalName
+      }
+
       private fun displayOrClearInitialPreview() {
         val answer = questionnaireViewItem.answers.firstOrNull()
 

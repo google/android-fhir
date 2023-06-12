@@ -125,6 +125,11 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
         holder.summaryHolder.isEnabled = !isReadOnly
       }
 
+      override fun addContentDescription() {
+        holder.summaryHolder.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId + "_" + holder::class.java
+      }
+
       private fun cleanupOldState() {
         selectedOptionsJob?.cancel()
       }

@@ -105,6 +105,13 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     textInputEditText.isEnabled = !isReadOnly
   }
 
+  override fun addContentDescription() {
+    textInputEditText.contentDescription =
+      questionnaireViewItem.questionnaireItem.linkId +
+        "_" +
+        textInputEditText::class.java.canonicalName
+  }
+
   /** Handles user input from the `editable` and updates the questionnaire. */
   abstract fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem)
 

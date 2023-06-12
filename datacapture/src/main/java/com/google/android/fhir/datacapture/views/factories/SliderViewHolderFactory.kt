@@ -91,6 +91,13 @@ internal object SliderViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
       override fun setReadOnly(isReadOnly: Boolean) {
         slider.isEnabled = !isReadOnly
       }
+
+      override fun addContentDescription() {
+        slider.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId +
+            "_" +
+            slider::class.java.canonicalName
+      }
     }
 }
 

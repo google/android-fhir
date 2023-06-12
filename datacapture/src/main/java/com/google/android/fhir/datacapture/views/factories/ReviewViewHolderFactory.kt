@@ -116,5 +116,6 @@ internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {}
+      override fun addContentDescription() {}
     }
 }

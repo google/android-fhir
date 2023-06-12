@@ -87,8 +87,8 @@ data class QuestionnaireViewItem(
       emptyList()
     },
   val draftAnswer: Any? = null,
-  internal val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
-  internal val questionViewTextConfiguration: QuestionTextConfiguration =
+  val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
+  val questionViewTextConfiguration: QuestionTextConfiguration =
     QuestionTextConfiguration(),
 ) {
 
@@ -212,7 +212,7 @@ data class QuestionnaireViewItem(
    * [Questionnaire.QuestionnaireResponseItemComponent] (derived from cqf-expression), otherwise it
    * is derived from [localizedTextSpanned] of [QuestionnaireResponse.QuestionnaireItemComponent]
    */
-  internal val questionText: Spanned? by lazy {
+  val questionText: Spanned? by lazy {
     questionnaireResponseItem.text?.toSpanned() ?: questionnaireItem.localizedTextSpanned
   }
 

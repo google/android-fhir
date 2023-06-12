@@ -27,7 +27,6 @@ import org.hl7.fhir.r4.model.ResourceType
  * manager be created or should there be an API to restart a new download job.
  */
 interface DownloadWorkManager {
-  val updateSyncedResourceEntity: Boolean
 
   /**
    * Returns the URL for the next download request, or `null` if there is no more download request

@@ -96,6 +96,15 @@ internal object RadioGroupViewHolderFactory :
         }
       }
 
+      override fun addContentDescription() {
+        radioGroup.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId +
+            "_" +
+            radioGroup::class.java.canonicalName
+        flow.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId + "_" + flow::class.java.canonicalName
+      }
+
       private fun populateViewWithAnswerOption(
         viewId: Int,
         answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,

@@ -39,7 +39,7 @@ internal fun TextView.updateTextAndVisibility(localizedText: Spanned? = null) {
 }
 
 /** Returns [VISIBLE] if any of the [view] is visible, [GONE] otherwise. */
-internal fun getHeaderViewVisibility(vararg view: TextView): Int {
+fun getHeaderViewVisibility(vararg view: TextView): Int {
   if (view.any { it.visibility == VISIBLE }) {
     return VISIBLE
   }

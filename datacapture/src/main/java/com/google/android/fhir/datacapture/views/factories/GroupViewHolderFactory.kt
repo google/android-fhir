@@ -74,5 +74,9 @@ internal object GroupViewHolderFactory :
       override fun setReadOnly(isReadOnly: Boolean) {
         // No user input
       }
+
+      override fun addContentDescription() {
+        addItemButton.contentDescription = questionnaireViewItem.questionnaireItem.linkId + "_" + addItemButton::class.java.canonicalName
+      }
     }
 }

@@ -132,6 +132,15 @@ internal object DropDownViewHolderFactory :
         textInputLayout.isEnabled = !isReadOnly
       }
 
+      override fun addContentDescription() {
+        textInputLayout.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId + "_" + textInputLayout::class.java
+        autoCompleteTextView.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId +
+            "_" +
+            autoCompleteTextView::class.java
+      }
+
       private fun cleanupOldState() {
         autoCompleteTextView.setAdapter(null)
         autoCompleteTextView.text = null

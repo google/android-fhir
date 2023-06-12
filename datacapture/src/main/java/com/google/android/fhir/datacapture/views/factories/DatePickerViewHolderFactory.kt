@@ -152,6 +152,11 @@ internal object DatePickerViewHolderFactory :
         textInputLayout.isEnabled = !isReadOnly
       }
 
+      override fun addContentDescription() {
+        textInputEditText.contentDescription = questionnaireViewItem.questionnaireItem.linkId + textInputEditText::class.java.canonicalName
+        textInputLayout.contentDescription = questionnaireViewItem.questionnaireItem.linkId + textInputLayout::class.java.canonicalName
+      }
+
       private fun buildMaterialDatePicker(localDate: LocalDate?): MaterialDatePicker<Long> {
         val selectedDateMillis =
           localDate?.atStartOfDay(ZONE_ID_UTC)?.toInstant()?.toEpochMilli()

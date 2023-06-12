@@ -825,19 +825,23 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>,
   ): List<QuestionnaireResponseItemComponent> {
     val linkIdToQuestionnaireResponseItemMap =
-      questionnaireResponseItemList.associateBy { it.linkId }
-    return questionnaireItemList.mapNotNull {
-      val questionnaireResponseItemComponent = linkIdToQuestionnaireResponseItemMap[it.linkId]
-      if (questionnaireResponseItemComponent == null) {
-        it.createQuestionnaireResponseItem()
-      } else if (it.type == Questionnaire.QuestionnaireItemType.GROUP &&
-          !it.repeats &&
-          questionnaireResponseItemComponent.item.isEmpty()
-      ) {
-        it.createQuestionnaireResponseItem()
+      questionnaireResponseItemList.groupBy { it.linkId }
+    return questionnaireItemList.flatMap {
+      val questionnaireResponseItemComponentList = linkIdToQuestionnaireResponseItemMap[it.linkId]
+      if (questionnaireResponseItemComponentList == null || questionnaireResponseItemList.isEmpty()) {
+        listOf(it.createQuestionnaireResponseItem())
       } else {
-        questionnaireResponseItemComponent.copy().apply {
-          item = getAllResponseItems(it.item, this.item)
+        questionnaireResponseItemComponentList.map { questionnaireResponseItemComponent ->
+          if (it.type == Questionnaire.QuestionnaireItemType.GROUP &&
+            !it.repeats &&
+            questionnaireResponseItemComponent.item.isEmpty()
+          ) {
+            it.createQuestionnaireResponseItem()
+          } else {
+            questionnaireResponseItemComponent.copy().apply {
+              item = getAllResponseItems(it.item, this.item)
+            }
+          }
         }
       }
     }

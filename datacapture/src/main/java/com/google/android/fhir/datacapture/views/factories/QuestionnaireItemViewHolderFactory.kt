@@ -67,6 +67,7 @@ open class QuestionnaireItemViewHolder(
     delegate.bind(questionnaireViewItem)
     itemMediaView.bind(questionnaireViewItem.questionnaireItem)
     delegate.setReadOnly(questionnaireViewItem.questionnaireItem.readOnly)
+    delegate.addContentDescription()
   }
 }
 
@@ -98,4 +99,6 @@ interface QuestionnaireItemViewHolderDelegate {
 
   /** Sets view read only if [isReadOnly] is true. */
   fun setReadOnly(isReadOnly: Boolean)
+
+  fun addContentDescription()
 }
