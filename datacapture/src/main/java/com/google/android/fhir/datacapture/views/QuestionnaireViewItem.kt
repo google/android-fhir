@@ -22,6 +22,7 @@ import androidx.core.text.toSpanned
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.answerExpression
+import com.google.android.fhir.datacapture.extensions.answerOptionsToggleExpressions
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -84,6 +85,14 @@ data class QuestionnaireViewItem(
     suspend (Questionnaire.QuestionnaireItemComponent) -> List<
         Questionnaire.QuestionnaireItemAnswerOptionComponent> =
     {
+      emptyList()
+    },
+  private val resolveAnswerOptionsToggleExpressions:
+    (
+      Questionnaire.QuestionnaireItemComponent,
+      List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
+    ) -> List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
+    { _, _ ->
       emptyList()
     },
   internal val draftAnswer: Any? = null,
@@ -198,13 +207,18 @@ data class QuestionnaireViewItem(
   internal val answerOption: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
     get() =
       runBlocking(Dispatchers.IO) {
-        when {
-          questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
-          !questionnaireItem.answerValueSet.isNullOrEmpty() ->
-            resolveAnswerValueSet(questionnaireItem.answerValueSet)
-          questionnaireItem.answerExpression != null -> resolveAnswerExpression(questionnaireItem)
-          else -> emptyList()
-        }
+        val options =
+          when {
+            questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
+            !questionnaireItem.answerValueSet.isNullOrEmpty() ->
+              resolveAnswerValueSet(questionnaireItem.answerValueSet)
+            questionnaireItem.answerExpression != null -> resolveAnswerExpression(questionnaireItem)
+            else -> emptyList()
+          }
+
+        if (questionnaireItem.answerOptionsToggleExpressions.isNotEmpty())
+          resolveAnswerOptionsToggleExpressions(questionnaireItem, options)
+        else options
       }
 
   /**

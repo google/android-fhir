@@ -33,6 +33,9 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_SUBMIT_BUTTON
 import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_CALCULATED_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_CQF_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
@@ -4061,6 +4064,461 @@ class QuestionnaireViewModelTest {
         "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
       )
   }
+
+  // ==================================================================== //
+  //                                                                      //
+  //                 Answer Options Toggle Expression                     //
+  //                                                                      //
+  // ==================================================================== //
+  @Test
+  fun `resolveAnswerOptionsToggleExpressions should return answer options for all expressions evaluated to true on initial load`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              text = "Is Married?"
+              addInitial().apply { value = BooleanType(false) }
+            }
+          )
+
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "b"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              text = "Select an option"
+              extension =
+                listOf(
+                  Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                    extension =
+                      listOf(
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                          Coding().apply {
+                            code = "option1"
+                            display = "Option 1"
+                          }
+                        ),
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                          Coding().apply {
+                            code = "option3"
+                            display = "Option 3"
+                          }
+                        ),
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                          Expression().apply {
+                            this.expression =
+                              "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value)"
+                            this.language = "text/fhirpath"
+                          }
+                        )
+                      )
+                  },
+                  Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                    extension =
+                      listOf(
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                          Coding().apply {
+                            code = "option2"
+                            display = "Option 2"
+                          }
+                        ),
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                          Expression().apply {
+                            this.expression =
+                              "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value.not())"
+                            this.language = "text/fhirpath"
+                          }
+                        )
+                      )
+                  }
+                )
+              answerOption =
+                listOf(
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option3"
+                        display = "Option 3"
+                      }
+                  }
+                )
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      assertThat(
+          viewModel
+            .getQuestionnaireResponse()
+            .item
+            .single { it.linkId == "a" }
+            .answerFirstRep.value.primitiveValue()
+        )
+        .isEqualTo(BooleanType(false).primitiveValue())
+
+      val bItem = questionnaire.item.single { it.linkId == "b" }
+      val resultingAnswerOptions =
+        viewModel.resolveAnswerOptionsToggleExpressions(bItem, bItem.answerOption)
+      assertThat(resultingAnswerOptions.map { it.valueCoding.code }).containsExactly("option2")
+    }
+
+  @Test
+  fun `resolveAnswerOptionsToggleExpressions should toggle answer options on dependent answers change`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              text = "Is Married?"
+              addInitial().apply { value = BooleanType(false) }
+            }
+          )
+
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "b"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              text = "Select an option"
+              extension =
+                listOf(
+                  Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                    extension =
+                      listOf(
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                          Coding().apply {
+                            code = "option1"
+                            display = "Option 1"
+                          }
+                        ),
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                          Coding().apply {
+                            code = "option3"
+                            display = "Option 3"
+                          }
+                        ),
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                          Expression().apply {
+                            this.expression =
+                              "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value)"
+                            this.language = "text/fhirpath"
+                          }
+                        )
+                      )
+                  },
+                  Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                    extension =
+                      listOf(
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                          Coding().apply {
+                            code = "option2"
+                            display = "Option 2"
+                          }
+                        ),
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                          Expression().apply {
+                            this.expression =
+                              "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value.not())"
+                            this.language = "text/fhirpath"
+                          }
+                        )
+                      )
+                  }
+                )
+              answerOption =
+                listOf(
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option3"
+                        display = "Option 3"
+                      }
+                  }
+                )
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "a" }
+          .setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = valueBooleanType.setValue(true)
+            }
+          )
+      }
+      assertThat(
+          viewModel
+            .getQuestionnaireResponse()
+            .item
+            .single { it.linkId == "a" }
+            .answerFirstRep.value.primitiveValue()
+        )
+        .isEqualTo(BooleanType(true).primitiveValue())
+
+      val bItem = questionnaire.item.single { it.linkId == "b" }
+      val resultingAnswerOptions =
+        viewModel.resolveAnswerOptionsToggleExpressions(bItem, bItem.answerOption)
+      assertThat(resultingAnswerOptions.map { it.valueCoding.code })
+        .containsExactly("option3", "option1")
+    }
+
+  @Test
+  fun `resolveAnswerOptionsToggleExpressions should return answer options not listed in evaluated expressions`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              text = "Is Married?"
+              addInitial().apply { value = BooleanType(false) }
+            }
+          )
+
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "b"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              text = "Select an option"
+              extension =
+                listOf(
+                  Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                    extension =
+                      listOf(
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                          Coding().apply {
+                            code = "option1"
+                            display = "Option 1"
+                          }
+                        ),
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                          Coding().apply {
+                            code = "option3"
+                            display = "Option 3"
+                          }
+                        ),
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                          Expression().apply {
+                            this.expression =
+                              "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value)"
+                            this.language = "text/fhirpath"
+                          }
+                        )
+                      )
+                  },
+                  Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                    extension =
+                      listOf(
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                          Coding().apply {
+                            code = "option2"
+                            display = "Option 2"
+                          }
+                        ),
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                          Expression().apply {
+                            this.expression =
+                              "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value.not())"
+                            this.language = "text/fhirpath"
+                          }
+                        )
+                      )
+                  }
+                )
+              answerOption =
+                listOf(
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option3"
+                        display = "Option 3"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option4"
+                        display = "Option 4"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option5"
+                        display = "Option 5"
+                      }
+                  }
+                )
+            }
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+
+      val bItem = questionnaire.item.single { it.linkId == "b" }
+      val resultingAnswerOptions =
+        viewModel.resolveAnswerOptionsToggleExpressions(bItem, bItem.answerOption)
+      assertThat(resultingAnswerOptions.map { it.valueCoding.code })
+        .containsAtLeast("option4", "option5")
+    }
+
+  @Test
+  fun `resolveAnswerOptionsToggleExpressions skips unknown options not listed in answer options`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              text = "Is Married?"
+              addInitial().apply { value = BooleanType(false) }
+            }
+          )
+
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "b"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              text = "Select an option"
+              extension =
+                listOf(
+                  Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                    extension =
+                      listOf(
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                          Coding().apply {
+                            code = "option2"
+                            display = "Option 2"
+                          }
+                        ),
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                          Coding().apply {
+                            code = "option75"
+                            display = "Option 75"
+                          }
+                        ),
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                          Expression().apply {
+                            this.expression =
+                              "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value.not())"
+                            this.language = "text/fhirpath"
+                          }
+                        )
+                      )
+                  }
+                )
+              answerOption =
+                listOf(
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option3"
+                        display = "Option 3"
+                      }
+                  }
+                )
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      assertThat(
+          viewModel
+            .getQuestionnaireResponse()
+            .item
+            .single { it.linkId == "a" }
+            .answerFirstRep.value.primitiveValue()
+        )
+        .isEqualTo(BooleanType(false).primitiveValue())
+
+      val bItem = questionnaire.item.single { it.linkId == "b" }
+      val resultingAnswerOptions =
+        viewModel.resolveAnswerOptionsToggleExpressions(bItem, bItem.answerOption)
+      assertThat(resultingAnswerOptions.map { it.valueCoding.code }).doesNotContain("option75")
+    }
 
   // ==================================================================== //
   //                                                                      //

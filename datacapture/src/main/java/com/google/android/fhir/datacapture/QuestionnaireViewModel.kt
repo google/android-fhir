@@ -30,6 +30,7 @@ import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
 import com.google.android.fhir.datacapture.extensions.answerExpression
+import com.google.android.fhir.datacapture.extensions.answerOptionsToggleExpressions
 import com.google.android.fhir.datacapture.extensions.cqfExpression
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
@@ -62,6 +63,7 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.equals
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -552,6 +554,41 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return options
   }
 
+  internal fun resolveAnswerOptionsToggleExpressions(
+    item: QuestionnaireItemComponent,
+    fullAnswerOptions: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
+  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+    val results =
+      item.answerOptionsToggleExpressions
+        .map {
+          val (expression, toggleOptions) = it
+          val evaluationResult =
+            if (expression.isFhirPath)
+              fhirPathEngine.convertToBoolean(
+                fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
+              )
+            else false
+          evaluationResult to toggleOptions
+        }
+        .partition { it.first }
+    val (enabled, disallowed) = results
+    val allowedOptions =
+      enabled.flatMap {
+        val (_, options) = it
+        options
+      }
+
+    val toggledOptions =
+      disallowed.flatMap {
+        val (_, options) = it
+        options.filterNot { option -> allowedOptions.any { type -> equals(type, option) } }
+      }
+
+    return fullAnswerOptions.filterNot { answerOption ->
+      toggledOptions.any { equals(answerOption.value, it) }
+    }
+  }
+
   private fun resolveCqfExpression(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent,
@@ -735,6 +772,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             answersChangedCallback = answersChangedCallback,
             resolveAnswerValueSet = { resolveAnswerValueSet(it) },
             resolveAnswerExpression = { resolveAnswerExpression(it) },
+            resolveAnswerOptionsToggleExpressions = { questionnaireItem, answerOptions ->
+              resolveAnswerOptionsToggleExpressions(questionnaireItem, answerOptions)
+            },
             draftAnswer = draftAnswerMap[questionnaireResponseItem],
             enabledDisplayItems =
               questionnaireItem.item.filter {
