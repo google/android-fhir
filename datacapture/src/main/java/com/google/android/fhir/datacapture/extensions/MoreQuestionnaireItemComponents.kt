@@ -528,6 +528,10 @@ val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
  */
 private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
   MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? {
+  require(answerOption.isEmpty() || initial.isEmpty()) {
+    "Questionnaire item $linkId has both initial value(s) and has answerOption. See rule que-11 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+  }
+
   // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
   // quantity given as initial without value is for unit reference purpose only. Answer conversion
   // not needed
