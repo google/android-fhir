@@ -528,7 +528,7 @@ val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
  */
 private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
   MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? {
-  require(answerOption.isEmpty() || initial.isEmpty()) {
+  require(answerOption.filter { it.initialSelected }.isEmpty() || initial.isEmpty()) {
     "Questionnaire item $linkId has both initial value(s) and has answerOption. See rule que-11 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
   }
 
