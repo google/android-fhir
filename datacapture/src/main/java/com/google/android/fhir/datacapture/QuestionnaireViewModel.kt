@@ -52,7 +52,6 @@ import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateExpression
-import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
@@ -537,6 +536,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   // https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
   internal suspend fun resolveAnswerExpression(
     item: QuestionnaireItemComponent,
+    responseItem: QuestionnaireResponseItemComponent,
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     // Check cache first for database queries
     val answerExpression = item.answerExpression ?: return emptyList()
@@ -545,7 +545,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       return answerExpressionMap[answerExpression.expression]!!
     }
 
-    val options = loadAnswerExpressionOptions(item, answerExpression)
+    val options = loadAnswerExpressionOptions(item, responseItem, answerExpression)
 
     if (answerExpression.isXFhirQuery) answerExpressionMap[answerExpression.expression] = options
 
@@ -574,6 +574,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   private suspend fun loadAnswerExpressionOptions(
     item: QuestionnaireItemComponent,
+    responseItemComponent: QuestionnaireResponseItemComponent,
     expression: Expression,
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     val data =
@@ -589,7 +590,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           )
         xFhirQueryResolver!!.resolve(xFhirExpressionString)
       } else if (expression.isFhirPath) {
-        fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
+        evaluateExpression(
+          questionnaire,
+          questionnaireResponse,
+          item,
+          responseItemComponent,
+          expression,
+          questionnaireItemParentMap
+        )
       } else {
         throw UnsupportedOperationException(
           "${expression.language} not supported for answer-expression yet"
@@ -734,7 +742,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             validationResult = validationResult,
             answersChangedCallback = answersChangedCallback,
             resolveAnswerValueSet = { resolveAnswerValueSet(it) },
-            resolveAnswerExpression = { resolveAnswerExpression(it) },
+            resolveAnswerExpression = { qItem, qrItem -> resolveAnswerExpression(qItem, qrItem) },
             draftAnswer = draftAnswerMap[questionnaireResponseItem],
             enabledDisplayItems =
               questionnaireItem.item.filter {

@@ -31,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 
 /**
  * Data item for [QuestionnaireItemViewHolder] in [RecyclerView].
@@ -71,7 +72,7 @@ data class QuestionnaireViewItem(
   internal val answersChangedCallback:
     (
       Questionnaire.QuestionnaireItemComponent,
-      QuestionnaireResponse.QuestionnaireResponseItemComponent,
+      QuestionnaireResponseItemComponent,
       List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
       Any?
     ) -> Unit,
@@ -81,9 +82,9 @@ data class QuestionnaireViewItem(
       emptyList()
     },
   private val resolveAnswerExpression:
-    suspend (Questionnaire.QuestionnaireItemComponent) -> List<
+    suspend (Questionnaire.QuestionnaireItemComponent, QuestionnaireResponseItemComponent) -> List<
         Questionnaire.QuestionnaireItemAnswerOptionComponent> =
-    {
+    { _, _ ->
       emptyList()
     },
   internal val draftAnswer: Any? = null,
@@ -202,7 +203,8 @@ data class QuestionnaireViewItem(
           questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
           !questionnaireItem.answerValueSet.isNullOrEmpty() ->
             resolveAnswerValueSet(questionnaireItem.answerValueSet)
-          questionnaireItem.answerExpression != null -> resolveAnswerExpression(questionnaireItem)
+          questionnaireItem.answerExpression != null ->
+            resolveAnswerExpression(questionnaireItem, questionnaireResponseItem)
           else -> emptyList()
         }
       }

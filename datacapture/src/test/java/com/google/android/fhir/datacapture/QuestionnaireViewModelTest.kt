@@ -3966,7 +3966,10 @@ class QuestionnaireViewModelTest {
       )
 
       val viewModel = QuestionnaireViewModel(context, state)
-      viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
+      viewModel.resolveAnswerExpression(
+        questionnaire.itemFirstRep,
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      )
 
       assertThat(searchString).isEqualTo("Observation?subject=Patient/$patientId")
     }
@@ -4014,7 +4017,11 @@ class QuestionnaireViewModelTest {
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
       val viewModel = QuestionnaireViewModel(context, state)
-      val answerOptions = viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
+      val answerOptions =
+        viewModel.resolveAnswerExpression(
+          questionnaire.itemFirstRep,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        )
 
       assertThat(answerOptions.first().valueReference.reference)
         .isEqualTo("Practitioner/${practitioner.logicalId}")
@@ -4054,7 +4061,12 @@ class QuestionnaireViewModelTest {
     val viewModel = QuestionnaireViewModel(context, state)
     val exception =
       assertThrows(null, IllegalStateException::class.java) {
-        runTest { viewModel.resolveAnswerExpression(questionnaire.itemFirstRep) }
+        runTest {
+          viewModel.resolveAnswerExpression(
+            questionnaire.itemFirstRep,
+            QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          )
+        }
       }
     assertThat(exception.message)
       .isEqualTo(
