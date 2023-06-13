@@ -27,7 +27,7 @@ import okhttp3.Credentials
  * sends to the FHIR server contain the correct user information for the request to be
  * authenticated.
  */
-interface HttpAuthenticator {
+fun interface HttpAuthenticator {
   fun getAuthenticationMethod(): HttpAuthenticationMethod
 }
 
