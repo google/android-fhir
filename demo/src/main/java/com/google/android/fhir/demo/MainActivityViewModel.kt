@@ -23,6 +23,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
+import androidx.work.WorkManager
 import com.google.android.fhir.demo.data.FhirSyncWorker
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.RepeatInterval
@@ -50,8 +51,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
   init {
     viewModelScope.launch {
-      Sync.periodicSync<FhirSyncWorker>(
-          application.applicationContext,
+      Sync(WorkManager.getInstance(application.applicationContext))
+        .periodicSync<FhirSyncWorker>(
           PeriodicSyncConfiguration(
             syncConstraints = Constraints.Builder().build(),
             repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
@@ -64,7 +65,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
   fun triggerOneTimeSync() {
     viewModelScope.launch {
-      Sync.oneTimeSync<FhirSyncWorker>(getApplication())
+      Sync(WorkManager.getInstance(getApplication()))
+        .oneTimeSync<FhirSyncWorker>()
         .shareIn(this, SharingStarted.Eagerly, 10)
         .collect { _pollState.emit(it) }
     }

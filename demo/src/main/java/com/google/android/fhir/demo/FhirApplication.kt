@@ -18,6 +18,7 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.content.Context
+import androidx.work.WorkManager
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
@@ -63,7 +64,7 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
         )
       )
     )
-    Sync.oneTimeSync<FhirSyncWorker>(this)
+    Sync(WorkManager.getInstance(this)).oneTimeSync<FhirSyncWorker>()
 
     dataCaptureConfig =
       DataCaptureConfig().apply {
