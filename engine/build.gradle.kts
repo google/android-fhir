@@ -70,7 +70,14 @@ android {
   }
 
   packagingOptions {
-    resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
+    resources.excludes.addAll(
+      listOf(
+        "META-INF/ASL2.0",
+        "META-INF/ASL-2.0.txt",
+        "META-INF/LGPL-3.0.txt",
+        "META-INF/INDEX.LIST"
+      )
+    )
   }
 
   kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
@@ -100,6 +107,7 @@ dependencies {
   androidTestImplementation(Dependencies.Room.testing)
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(Dependencies.AndroidxTest.archCore)
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
