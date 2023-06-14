@@ -31,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 
 /**
  * Data item for [QuestionnaireItemViewHolder] in [RecyclerView].
@@ -90,6 +91,7 @@ data class QuestionnaireViewItem(
   internal val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
   internal val questionViewTextConfiguration: QuestionTextConfiguration =
     QuestionTextConfiguration(),
+  internal val contextData: Map<String, Type> = mapOf()
 ) {
 
   /**
