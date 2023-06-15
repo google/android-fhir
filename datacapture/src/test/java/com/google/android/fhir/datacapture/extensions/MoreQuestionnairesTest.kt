@@ -17,7 +17,9 @@
 package com.google.android.fhir.datacapture.extensions
 
 import com.google.common.truth.Truth.assertThat
+import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
@@ -106,5 +108,132 @@ class MoreQuestionnairesTest {
   fun `entryMode should return null if no EntryMode is defined`() {
     val questionnaire = Questionnaire()
     assertThat(questionnaire.entryMode).isNull()
+  }
+
+  @Test
+  fun `should throw exception if resource type in context is not part of launchContext value set`() {
+    val launchContextExtension =
+      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
+        .apply {
+          addExtension(
+            "name",
+            Coding(
+              "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
+              "observation",
+              "Observation"
+            )
+          )
+          addExtension("type", CodeType("Observation"))
+        }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          validateLaunchContextExtensions(listOf(launchContextExtension))
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "The extension:name extension and/or extension:type extension do not follow " +
+          "the format specified in http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+      )
+  }
+
+  @Test
+  fun `should throw exception if resource type in type extension is different to what is in name extension`() {
+    val launchContextExtension =
+      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
+        .apply {
+          addExtension(
+            "name",
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "encounter", "Encounter")
+          )
+          addExtension("type", CodeType("Patient"))
+        }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          validateLaunchContextExtensions(listOf(launchContextExtension))
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "The extension:name extension and/or extension:type extension do not follow " +
+          "the format specified in http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+      )
+  }
+
+  @Test
+  fun `should throw exception if type extension is not a subset of User value set in name extension`() {
+    val launchContextExtension =
+      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
+        .apply {
+          addExtension(
+            "name",
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User")
+          )
+          addExtension("type", CodeType("Observation"))
+        }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          validateLaunchContextExtensions(listOf(launchContextExtension))
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "The extension:name extension and/or extension:type extension do not follow " +
+          "the format specified in http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+      )
+  }
+
+  @Test
+  fun `should throw exception if the type extension is not present`() {
+    val launchContextExtension =
+      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
+        .apply {
+          addExtension(
+            "name",
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User")
+          )
+        }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          validateLaunchContextExtensions(listOf(launchContextExtension))
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "The extension:name or extension:type extension is missing in " +
+          EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+      )
+  }
+
+  @Test
+  fun `should throw exception if the name extension is not present`() {
+    val launchContextExtension =
+      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
+        .apply {
+          addExtension(
+            "name",
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User")
+          )
+        }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          validateLaunchContextExtensions(listOf(launchContextExtension))
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "The extension:name or extension:type extension is missing in " +
+          EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+      )
   }
 }

@@ -20,7 +20,6 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
-import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
@@ -80,21 +79,11 @@ internal interface Database {
   suspend fun selectEntity(type: ResourceType, id: String): ResourceEntity
 
   /**
-   * Return the last update data of a resource based on the resource type. If no resource of
-   * [resourceType] is inserted, return `null`.
-   * @param resourceType The resource type
-   */
-  suspend fun lastUpdate(resourceType: ResourceType): String?
-
-  /**
    * Insert resources that were synchronised.
    *
    * @param syncedResources The synced resource
    */
-  suspend fun insertSyncedResources(
-    syncedResources: List<SyncedResourceEntity>,
-    resources: List<Resource>
-  )
+  suspend fun insertSyncedResources(resources: List<Resource>)
 
   /**
    * Deletes the FHIR resource of type `clazz` with `id`.
