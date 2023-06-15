@@ -42,8 +42,10 @@ import org.hl7.fhir.r4.model.SearchParameter
  * should be regenerated to reflect any change.
  *
  * To do this, replace the content of the file `codegen/src/main/res/search-parameters.json` with
- * the content at `http://www.hl7.org/fhir/search-parameters.json` and run the `main` function in
- * the `codegen` module.
+ * the content at `http://www.hl7.org/fhir/search-parameters.json` and execute the gradle task
+ * `generateSearchParamsTask`. If you are using Android Studio, you can usually find this task in
+ * the Gradle tasks under other. Alternatively, you clean and rebuild the project to ensure changes
+ * take effect.
  */
 internal data class SearchParamDefinition(
   val className: ClassName,
