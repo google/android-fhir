@@ -34,6 +34,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -50,8 +51,7 @@ import kotlinx.coroutines.launch
 
 internal class OptionSelectDialogFragment(
   private val title: CharSequence,
-  private val config: Config,
-  private val selectedOptions: SelectedOptions
+  private val config: Config
 ) : DialogFragment() {
 
   /** Configures this [OptionSelectDialogFragment]. */
@@ -93,7 +93,11 @@ internal class OptionSelectDialogFragment(
 
     val adapter = OptionSelectAdapter(multiSelectEnabled = config.multiSelect)
     recyclerView.adapter = adapter
-    adapter.submitList(selectedOptions.toOptionRows())
+    lifecycleScope.launch {
+      viewModel.getSelectedOptionsFlow(questionLinkId).collect { selectedOptions ->
+        adapter.submitList(selectedOptions.toOptionRows())
+      }
+    }
 
     val dialog =
       MaterialAlertDialogBuilder(requireContext()).setView(view).create().apply {
