@@ -39,9 +39,9 @@ class TimestampBasedDownloadWorkManagerImpl(private val dataStore: DemoDataStore
   private val urls =
     LinkedList(
       listOf(
-        "Patient?address-city=NAIROBI&_sort=_lastUpdated",
-        "Binary?_id=android-fhir-thermometer-image"
-      )
+        "Patient?_sort=_lastUpdated",
+        "Observation?_sort=_lastUpdated"
+        )
     )
 
   override suspend fun getNextRequest(): Request? {
@@ -111,7 +111,7 @@ class TimestampBasedDownloadWorkManagerImpl(private val dataStore: DemoDataStore
       .entries.map { map ->
         dataStore.saveLastUpdatedTimestamp(
           map.key,
-          map.value.maxOfOrNull { it.meta.lastUpdated }?.toTimeZoneString() ?: ""
+          map.value.maxOfOrNull { it.meta.lastUpdated ?: Date() }?.toTimeZoneString() ?: ""
         )
       }
   }
@@ -125,6 +125,7 @@ class TimestampBasedDownloadWorkManagerImpl(private val dataStore: DemoDataStore
  * using the `_lastUpdated` parameter.
  */
 private fun affixLastUpdatedTimestamp(url: String, lastUpdated: String): String {
+  if (lastUpdated.isNullOrEmpty()) return url
   var downloadUrl = url
 
   // Affix lastUpdate to a $everything query using _since as per:

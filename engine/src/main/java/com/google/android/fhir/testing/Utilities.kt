@@ -99,9 +99,10 @@ object TestDataSourceImpl : DataSource {
     when (request) {
       is UrlRequest -> Bundle().apply { type = Bundle.BundleType.SEARCHSET }
       is BundleRequest -> Bundle().apply { type = Bundle.BundleType.BATCHRESPONSE }
+      else -> throw UnsupportedOperationException("For uploads only.")
     }
 
-  override suspend fun upload(request: BundleRequest): Resource {
+  override suspend fun upload(request: Request): Resource {
     return Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
   }
 }
@@ -187,9 +188,10 @@ object TestFailingDatasource : DataSource {
         throw Exception(hugeStackTraceMessage)
       }
       is BundleRequest -> throw SocketTimeoutException("Posting Download Bundle failed...")
+      else -> throw UnsupportedOperationException("For uploads only.")
     }
 
-  override suspend fun upload(request: BundleRequest): Resource {
+  override suspend fun upload(request: Request): Resource {
     throw SocketTimeoutException("Posting Upload Bundle failed...")
   }
 }
@@ -200,5 +202,5 @@ class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSou
     TODO("Not yet implemented")
   }
 
-  override suspend fun upload(request: BundleRequest) = onPostBundle(request.bundle)
+  override suspend fun upload(request: Request) = onPostBundle((request as BundleRequest).bundle)
 }

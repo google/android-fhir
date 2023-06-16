@@ -22,6 +22,7 @@ import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.Downloader
 import com.google.android.fhir.sync.Request
+import com.google.android.fhir.sync.ResourceRequest
 import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.UrlRequest
 import kotlinx.coroutines.flow.Flow
@@ -69,6 +70,7 @@ internal class DownloaderImpl(
       is UrlRequest ->
         ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
       is BundleRequest -> ResourceType.Bundle
+      is ResourceRequest -> resource.resourceType
     }
 
   private suspend fun getProgressSummary() =

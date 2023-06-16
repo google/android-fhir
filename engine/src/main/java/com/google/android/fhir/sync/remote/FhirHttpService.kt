@@ -34,5 +34,7 @@ internal interface FhirHttpService {
    * Makes a HTTP-POST method request to the server with the [Bundle] as request-body.
    * @return The server may return [Bundle] or [OperationOutcome] based on the request processing.
    */
-  suspend fun post(bundle: Bundle, headers: Map<String, String>): Resource
+  suspend fun post(path: String, resource: Resource, headers: Map<String, String>): Resource
+
+  suspend fun put(path: String, resource: Resource, headers: Map<String, String>): Resource
 }

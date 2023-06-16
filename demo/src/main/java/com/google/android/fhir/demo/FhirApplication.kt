@@ -30,6 +30,7 @@ import com.google.android.fhir.demo.data.FhirSyncWorker
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.remote.HttpLogger
+import okio.ByteString.Companion.encode
 import org.hl7.fhir.r4.model.Patient
 import timber.log.Timber
 
@@ -52,14 +53,15 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
         enableEncryptionIfSupported = true,
         RECREATE_AT_OPEN,
         ServerConfiguration(
-          "https://hapi.fhir.org/baseR4/",
+          "your-openmrs-server-url",
           httpLogger =
             HttpLogger(
               HttpLogger.Configuration(
                 if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC
               )
             ) { Timber.tag("App-HttpLog").d(it) },
-          networkConfiguration = NetworkConfiguration(uploadWithGzip = false)
+          networkConfiguration = NetworkConfiguration(uploadWithGzip = false),
+          authenticator = { Pair("Basic", "your-username:your-password".encode().base64()) }
         )
       )
     )

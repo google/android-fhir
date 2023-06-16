@@ -58,7 +58,7 @@ object Sync {
     val flow = getWorkerInfo<W>(context)
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
-        W::class.java.name,
+        "onetime-${W::class.java.name}",
         ExistingWorkPolicy.KEEP,
         createOneTimeWorkRequest(retryConfiguration, W::class.java)
       )
@@ -83,7 +83,7 @@ object Sync {
     val flow = getWorkerInfo<W>(context)
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
-        W::class.java.name,
+        "periodic-${W::class.java.name}",
         ExistingPeriodicWorkPolicy.KEEP,
         createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java)
       )

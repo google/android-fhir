@@ -34,5 +34,5 @@ internal interface DataSource {
    * [OperationOutcome] otherwise. Call this api with the [Bundle] that needs to be uploaded to the
    * server.
    */
-  suspend fun upload(request: BundleRequest): Resource
+  suspend fun upload(request: Request): Resource
 }

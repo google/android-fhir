@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@ import androidx.annotation.WorkerThread
  * application may provide the implementation during the [FhirEngine] initial setup to obtain
  * authToken to the engine for successful calls.
  */
-interface Authenticator {
+fun interface Authenticator {
   /** @return Access token for the engine to make requests on user's behalf. */
-  @WorkerThread fun getAccessToken(): String
+  @WorkerThread fun getAccessToken(): AuthTypeAndCredentials
 }
+
+typealias AuthTypeAndCredentials = Pair<String, String>

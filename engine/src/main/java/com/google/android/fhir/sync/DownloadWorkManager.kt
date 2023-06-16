@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync
 
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Bundle.HTTPVerb
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -89,6 +90,9 @@ sealed class Request(open val headers: Map<String, String>) {
     /** @return [BundleRequest] for a FHIR search [bundle]. */
     fun of(bundle: Bundle, headers: Map<String, String> = emptyMap()) =
       BundleRequest(bundle, headers)
+
+    fun of(resource: Resource, headers: Map<String, String> = emptyMap(), http: HTTPVerb) =
+      ResourceRequest(resource, headers, http)
   }
 }
 
@@ -108,3 +112,10 @@ internal constructor(val url: String, override val headers: Map<String, String> 
 data class BundleRequest
 internal constructor(val bundle: Bundle, override val headers: Map<String, String> = emptyMap()) :
   Request(headers)
+
+data class ResourceRequest
+internal constructor(
+  val resource: Resource,
+  override val headers: Map<String, String> = emptyMap(),
+  val http: HTTPVerb
+) : Request(headers)

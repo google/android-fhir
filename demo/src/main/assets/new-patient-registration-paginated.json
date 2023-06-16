@@ -51,7 +51,7 @@
                   "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                   "valueExpression": {
                     "language": "text/fhirpath",
-                    "expression": "Patient.name.given",
+                    "expression": "Patient.name.first().given",
                     "name": "patientName"
                   }
                 }
@@ -85,7 +85,7 @@
                   "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                   "valueExpression": {
                     "language": "text/fhirpath",
-                    "expression": "Patient.name.family",
+                    "expression": "Patient.name.first().family",
                     "name": "patientFamily"
                   }
                 }
@@ -237,7 +237,7 @@
                   "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                   "valueExpression": {
                     "language": "text/fhirpath",
-                    "expression": "Patient.telecom.value",
+                    "expression": "Patient.telecom.first().value",
                     "name": "patientTelecom"
                   }
                 }
@@ -278,7 +278,7 @@
                   "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                   "valueExpression": {
                     "language": "text/fhirpath",
-                    "expression": "Patient.address.city",
+                    "expression": "Patient.address.first().city",
                     "name": "patientCity"
                   }
                 }
@@ -312,7 +312,7 @@
                   "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                   "valueExpression": {
                     "language": "text/fhirpath",
-                    "expression": "Patient.address.country",
+                    "expression": "Patient.address.first().country",
                     "name": "patientCity"
                   }
                 }

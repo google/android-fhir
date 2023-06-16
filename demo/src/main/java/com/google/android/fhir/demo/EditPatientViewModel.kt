@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,8 +48,8 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
     val question = readFileFromAssets("new-patient-registration-paginated.json").trimIndent()
     val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
     val questionnaire =
-      parser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, question) as
-        Questionnaire
+      parser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, question)
+        as Questionnaire
 
     val questionnaireResponse: QuestionnaireResponse =
       ResourceMapper.populate(questionnaire, patient)
@@ -63,8 +63,8 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
 
   private val questionnaireResource: Questionnaire
     get() =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire) as
-        Questionnaire
+      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire)
+        as Questionnaire
 
   private var questionnaireJson: String? = null
 
@@ -75,6 +75,7 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
    */
   fun updatePatient(questionnaireResponse: QuestionnaireResponse) {
     viewModelScope.launch {
+      val oldPatient = fhirEngine.get<Patient>(patientId)
       val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
       if (entry.resource !is Patient) return@launch
       val patient = entry.resource as Patient
@@ -85,8 +86,41 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
           patient.hasTelecom() &&
           patient.telecom[0].value != null
       ) {
-        patient.id = patientId
-        fhirEngine.update(patient)
+        oldPatient.birthDate = patient.birthDate
+        // gender
+        oldPatient.gender = patient.gender
+        // active
+        oldPatient.active = patient.active
+
+//         oldPatient.nameFirstRep.apply {
+//        if (family !=  patient.nameFirstRep.family || given.first().value !=  patient.nameFirstRep.given.first().value)
+//             id = UUID.randomUUID().toString()
+//          family = patient.nameFirstRep.family
+//          given.first().value = patient.nameFirstRep.given.first().value
+//          id = UUID.randomUUID().toString()
+//        }
+//        // dob
+//        oldPatient.birthDate = patient.birthDate
+//        // gender
+//        oldPatient.gender = patient.gender
+//        // telecom
+//        oldPatient.telecom.first().apply {
+//          if (value != patient.telecom.first().value)
+//            id = UUID.randomUUID().toString()
+//          value = patient.telecom.first().value
+//
+//        }
+//        // address
+//        oldPatient.address.first().apply {
+//          if (city != patient.address.first().city || country != patient.address.first().country)
+//          id = UUID.randomUUID().toString()
+//          city = patient.address.first().city
+//          country = patient.address.first().country
+//        }
+//
+//        oldPatient.active = patient.active
+
+        fhirEngine.update(oldPatient)
         isPatientSaved.value = true
         return@launch
       }
@@ -94,6 +128,32 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
       isPatientSaved.value = false
     }
   }
+
+
+
+  //        // name
+//        oldPatient.nameFirstRep.apply {
+//          family = patient.nameFirstRep.family
+//          given.first().value = patient.nameFirstRep.given.first().value
+//          id = UUID.randomUUID().toString()
+//        }
+//        // dob
+//        oldPatient.birthDate = patient.birthDate
+//        // gender
+//        oldPatient.gender = patient.gender
+//        // telecom
+//        oldPatient.telecom.first().apply {
+//          value = patient.telecom.first().value
+//          id = UUID.randomUUID().toString()
+//        }
+//        // address
+//        oldPatient.address.first().apply {
+//          id = UUID.randomUUID().toString()
+//          city = patient.address.first().city
+//          country = patient.address.first().country
+//        }
+//
+//        oldPatient.active = patient.active
 
   private fun getQuestionnaireJson(): String {
     questionnaireJson?.let {
