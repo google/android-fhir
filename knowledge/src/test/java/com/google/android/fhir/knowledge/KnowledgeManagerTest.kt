@@ -19,11 +19,14 @@ package com.google.android.fhir.knowledge
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.knowledge.db.impl.KnowledgeDatabase
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.hl7.fhir.r4.model.Library
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -90,5 +93,36 @@ internal class KnowledgeManagerTest {
       .isNotEmpty()
     assertThat(knowledgeManager.loadResources(resourceType = "Measure", url = "Measure/ANCIND01"))
       .isNotNull()
+  }
+
+  @Test
+  fun `inserting a library of a different version creates new entry`() = runTest {
+    val libraryAOld =
+      Library().apply {
+        id = "defaultA"
+        name = "defaultA"
+        url = "www.exampleA.com"
+        version = "A.1.0.0"
+      }
+    val libraryANew =
+      Library().apply {
+        id = "defaultA"
+        name = "defaultA"
+        url = "www.exampleA.com"
+        version = "A.1.0.1"
+      }
+
+    knowledgeManager.install(writeToFile(libraryAOld))
+    knowledgeManager.install(writeToFile(libraryANew))
+
+    val resources = knowledgeDb.knowledgeDao().getResources()
+    assertThat(resources).hasSize(2)
+  }
+
+  private val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+  private fun writeToFile(library: Library): File {
+    return File(context.filesDir, library.name).apply {
+      writeText(jsonParser.encodeResourceToString(library))
+    }
   }
 }

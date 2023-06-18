@@ -39,7 +39,7 @@ abstract class KnowledgeDao {
 
     val resourceMetadata =
       if (resource.url != null) {
-        getResourceWithUrl(resource.url)
+        getResourceWithUrlAndVersion(resource.url, resource.version.orEmpty())
       } else {
         getResourcesWithNameAndVersion(resource.resourceType, resource.name, resource.version)
       }
@@ -83,9 +83,10 @@ abstract class KnowledgeDao {
     resourceType: ResourceType,
   ): List<ResourceMetadataEntity>
 
-  @Query("SELECT * from ResourceMetadataEntity WHERE url = :url")
-  internal abstract suspend fun getResourceWithUrl(
+  @Query("SELECT * from ResourceMetadataEntity WHERE url = :url AND version = :version")
+  internal abstract suspend fun getResourceWithUrlAndVersion(
     url: String,
+    version: String
   ): ResourceMetadataEntity?
   // Remove after https://github.com/google/android-fhir/issues/1920
   @Query("SELECT * from ResourceMetadataEntity WHERE url LIKE :urlPart")
