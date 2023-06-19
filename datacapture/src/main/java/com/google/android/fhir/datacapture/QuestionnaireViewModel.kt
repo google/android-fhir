@@ -402,7 +402,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireItem.createQuestionnaireResponseItem()
         )
       }
-      // traverse the nested item list of group type.
+      // Add missing response items for non-repeating groups
       if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
           !questionnaireItem.repeats
       ) {
@@ -430,10 +430,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       val questionnaireItem = questionnaireIterator.next()
       val responseItemComponents = linkedToResponseItemsMap[questionnaireItem.linkId]!!
       if (!responseItems.containsAll(responseItemComponents)
-      ) { // checks if response items are already present in the list.
+      ) { // checks if response items present in the list.
         responseItems.addAll(responseItemComponents)
       }
-      // traverse nested item list of group type.
+      // Add missing response items for non-repeating groups
       if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
           !questionnaireItem.repeats
       ) {
@@ -458,13 +458,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       previousIndex = currentIndex
       val questionnaireItem = questionnaireIterator.next()
       currentIndex = responseItems.indexOfLast { it.linkId == questionnaireItem.linkId }
-      // add empty response item if missing.
+      // add empty response item.
       if (currentIndex == -1) {
         currentIndex = previousIndex + 1
         var responseItem = questionnaireItem.createQuestionnaireResponseItem()
         responseItems.add(currentIndex, responseItem)
       }
-      // traverse nested item list of group type.
+      // Add missing response items for non-repeating groups
       if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
           !questionnaireItem.repeats
       ) {
