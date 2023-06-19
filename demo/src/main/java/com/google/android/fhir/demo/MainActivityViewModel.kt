@@ -51,8 +51,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
   init {
     viewModelScope.launch {
-      Sync(
-        WorkManager.getInstance(application.applicationContext)).periodicSync<FhirSyncWorker>(
+      Sync(WorkManager.getInstance(application.applicationContext))
+        .periodicSync<FhirSyncWorker>(
           PeriodicSyncConfiguration(
             syncConstraints = Constraints.Builder().build(),
             repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
@@ -65,8 +65,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
   fun triggerOneTimeSync() {
     viewModelScope.launch {
-      Sync(
-        WorkManager.getInstance(getApplication())).oneTimeSync<FhirSyncWorker>()
+      Sync(WorkManager.getInstance(getApplication()))
+        .oneTimeSync<FhirSyncWorker>()
         .shareIn(this, SharingStarted.Eagerly, 10)
         .collect { _pollState.emit(it) }
     }
@@ -79,8 +79,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         if (DateFormat.is24HourFormat(getApplication())) formatString24 else formatString12
       )
     _lastSyncTimestampLiveData.value =
-      Sync(
-        WorkManager.getInstance(getApplication())).getLastSyncTimestamp(getApplication())?.toLocalDateTime()?.format(formatter) ?: ""
+      Sync.getLastSyncTimestamp(getApplication())?.toLocalDateTime()?.format(formatter) ?: ""
   }
 
   companion object {

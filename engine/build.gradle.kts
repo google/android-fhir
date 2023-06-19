@@ -108,6 +108,8 @@ dependencies {
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.AndroidxTest.archCore)
+  androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
+
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
@@ -121,6 +123,7 @@ dependencies {
     exclude(module = "httpclient")
   }
   implementation(Dependencies.Kotlin.stdlib)
+  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Retrofit.coreRetrofit)
   implementation(Dependencies.Room.ktx)

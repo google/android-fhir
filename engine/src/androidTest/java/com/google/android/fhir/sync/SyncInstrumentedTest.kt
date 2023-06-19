@@ -30,14 +30,19 @@ import com.google.android.fhir.testing.TestDownloadManagerImpl
 import com.google.android.fhir.testing.TestFhirEngineImpl
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.transformWhile
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class SyncInstrumentedTest {
 
@@ -60,23 +65,26 @@ class SyncInstrumentedTest {
   }
 
   @Test
-  fun oneTime_worker_runs() {
-    runBlocking {
+  fun oneTime_worker_runs() = runTest {
+    val job = launch(UnconfinedTestDispatcher(testScheduler)) {
       Sync(workManager)
         .oneTimeSync<TestSyncWorker>()
         .transformWhile {
-          emit(it)
+          println(it is SyncJobStatus.Finished)
+          emit(it is SyncJobStatus.Finished)
           it !is SyncJobStatus.Finished
         }
-        .shareIn(this, SharingStarted.Eagerly, 5)
     }
+
+    job.join()
 
     assertThat(workManager.getWorkInfosByTag(TestSyncWorker::class.java.name).get().first().state)
       .isEqualTo(WorkInfo.State.SUCCEEDED)
   }
 
   @Test
-  fun periodic_worker_runs_with_oneTime() {
+  fun periodic_worker_still_queued_to_run_after_oneTime_worker_started() {
+    // run and wait for periodic worker to finish
     runBlocking {
       Sync(workManager)
         .periodicSync<TestSyncWorker>(
@@ -93,15 +101,26 @@ class SyncInstrumentedTest {
         .shareIn(this, SharingStarted.Eagerly, 5)
     }
 
+    // Verify the periodic worker completed the run, and is queued to run again
     val periodicWorkerId =
       workManager.getWorkInfosByTag(TestSyncWorker::class.java.name).get().first().id
     assertThat(workManager.getWorkInfoById(periodicWorkerId).get().state)
       .isEqualTo(WorkInfo.State.ENQUEUED)
 
-    Sync(workManager).oneTimeSync<TestSyncWorker>()
+    // Start and complete a oneTime job, and verify it does not remove the periodic worker
+    runBlocking {
+      Sync(workManager)
+        .oneTimeSync<TestSyncWorker>()
+        .transformWhile {
+          emit(it)
+          it !is SyncJobStatus.Finished
+        }
+        .shareIn(this, SharingStarted.Eagerly, 5)
+    }
     assertThat(workManager.getWorkInfosByTag(TestSyncWorker::class.java.name).get().size)
       .isEqualTo(2)
 
+    // Move forward to the next epoch to trigger the periodic sync
     val testDriver = WorkManagerTestInitHelper.getTestDriver(context)
     testDriver?.setPeriodDelayMet(periodicWorkerId)
 

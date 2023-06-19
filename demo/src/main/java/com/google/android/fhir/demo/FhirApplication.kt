@@ -64,8 +64,7 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
         )
       )
     )
-    Sync(
-      WorkManager.getInstance(this)).oneTimeSync<FhirSyncWorker>()
+    Sync(WorkManager.getInstance(this)).oneTimeSync<FhirSyncWorker>()
 
     dataCaptureConfig =
       DataCaptureConfig().apply {

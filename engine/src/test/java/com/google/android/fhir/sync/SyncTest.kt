@@ -17,14 +17,18 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.BackoffPolicy
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.testing.TestDataSourceImpl
 import com.google.android.fhir.testing.TestDownloadManagerImpl
 import com.google.android.fhir.testing.TestFhirEngineImpl
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.TimeUnit
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -33,6 +37,10 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)
 class SyncTest {
+
+  private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
+  private lateinit var workManager: WorkManager
+
   class PassingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
     FhirSyncWorker(appContext, workerParams) {
 
@@ -42,13 +50,19 @@ class SyncTest {
     override fun getConflictResolver() = AcceptRemoteConflictResolver
   }
 
+  @Before
+  fun setUp() {
+    WorkManagerTestInitHelper.initializeTestWorkManager(context)
+    workManager = WorkManager.getInstance(context)
+  }
   @Test
   fun createOneTimeWorkRequestWithRetryConfiguration_shouldHave3MaxTries() {
     val workRequest =
-      Sync.createOneTimeWorkRequest(
-        RetryConfiguration(BackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3),
-        PassingPeriodicSyncWorker::class.java
-      )
+      Sync(workManager)
+        .createOneTimeWorkRequest(
+          RetryConfiguration(BackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3),
+          PassingPeriodicSyncWorker::class.java
+        )
     assertThat(workRequest.workSpec.backoffPolicy).isEqualTo(BackoffPolicy.LINEAR)
     assertThat(workRequest.workSpec.backoffDelayDuration).isEqualTo(TimeUnit.SECONDS.toMillis(30))
     assertThat(workRequest.workSpec.input.getInt(MAX_RETRIES_ALLOWED, 0)).isEqualTo(3)
@@ -56,7 +70,8 @@ class SyncTest {
 
   @Test
   fun createOneTimeWorkRequest_withoutRetryConfiguration_shouldHaveZeroMaxTries() {
-    val workRequest = Sync.createOneTimeWorkRequest(null, PassingPeriodicSyncWorker::class.java)
+    val workRequest =
+      Sync(workManager).createOneTimeWorkRequest(null, PassingPeriodicSyncWorker::class.java)
     assertThat(workRequest.workSpec.input.getInt(MAX_RETRIES_ALLOWED, 0)).isEqualTo(0)
     //    Not checking [workRequest.workSpec.backoffPolicy] and
     // [workRequest.workSpec.backoffDelayDuration] as they have default values.
@@ -65,14 +80,15 @@ class SyncTest {
   @Test
   fun createPeriodicWorkRequest_withRetryConfiguration_shouldHave3MaxTries() {
     val workRequest =
-      Sync.createPeriodicWorkRequest(
-        PeriodicSyncConfiguration(
-          repeat = RepeatInterval(20, TimeUnit.MINUTES),
-          retryConfiguration =
-            RetryConfiguration(BackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3)
-        ),
-        PassingPeriodicSyncWorker::class.java
-      )
+      Sync(workManager)
+        .createPeriodicWorkRequest(
+          PeriodicSyncConfiguration(
+            repeat = RepeatInterval(20, TimeUnit.MINUTES),
+            retryConfiguration =
+              RetryConfiguration(BackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3)
+          ),
+          PassingPeriodicSyncWorker::class.java
+        )
     assertThat(workRequest.workSpec.intervalDuration).isEqualTo(TimeUnit.MINUTES.toMillis(20))
     assertThat(workRequest.workSpec.backoffPolicy).isEqualTo(BackoffPolicy.LINEAR)
     assertThat(workRequest.workSpec.backoffDelayDuration).isEqualTo(TimeUnit.SECONDS.toMillis(30))
@@ -82,13 +98,14 @@ class SyncTest {
   @Test
   fun createPeriodicWorkRequest_withoutRetryConfiguration_shouldHaveZeroMaxRetries() {
     val workRequest =
-      Sync.createPeriodicWorkRequest(
-        PeriodicSyncConfiguration(
-          repeat = RepeatInterval(20, TimeUnit.MINUTES),
-          retryConfiguration = null
-        ),
-        PassingPeriodicSyncWorker::class.java
-      )
+      Sync(workManager)
+        .createPeriodicWorkRequest(
+          PeriodicSyncConfiguration(
+            repeat = RepeatInterval(20, TimeUnit.MINUTES),
+            retryConfiguration = null
+          ),
+          PassingPeriodicSyncWorker::class.java
+        )
     assertThat(workRequest.workSpec.intervalDuration).isEqualTo(TimeUnit.MINUTES.toMillis(20))
     assertThat(workRequest.workSpec.input.getInt(MAX_RETRIES_ALLOWED, 0)).isEqualTo(0)
   }
