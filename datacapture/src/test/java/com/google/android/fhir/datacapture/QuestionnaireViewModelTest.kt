@@ -501,7 +501,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should throw exception for non-matching question linkIds`() {
+  fun `should remove response item of non-matching question linkIds`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -528,18 +528,25 @@ class QuestionnaireViewModelTest {
         )
       }
 
-    val errorMessage =
-      assertFailsWith<IllegalArgumentException> {
-          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-        }
-        .localizedMessage
+    val expectedQuestionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+          }
+        )
+      }
 
-    assertThat(errorMessage)
-      .isEqualTo("Missing questionnaire item for questionnaire response item a-different-link-id")
+    assertResourceEquals(
+      createQuestionnaireViewModel(questionnaire, questionnaireResponse).getQuestionnaireResponse(),
+      expectedQuestionnaireResponse
+    )
   }
 
   @Test
-  fun `should throw an exception for extra questionnaire response items`() {
+  fun `should remove an extra questionnaire response items`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -557,6 +564,7 @@ class QuestionnaireViewModelTest {
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
+            text = "Basic question"
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(true)
@@ -567,6 +575,7 @@ class QuestionnaireViewModelTest {
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-different-link-id"
+            text = "Basic question"
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(true)
@@ -576,14 +585,26 @@ class QuestionnaireViewModelTest {
         )
       }
 
-    val errorMessage =
-      assertFailsWith<IllegalArgumentException> {
-          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-        }
-        .localizedMessage
+    val expectedQuestionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+      }
 
-    assertThat(errorMessage)
-      .isEqualTo("Missing questionnaire item for questionnaire response item a-different-link-id")
+    assertResourceEquals(
+      createQuestionnaireViewModel(questionnaire, questionnaireResponse).getQuestionnaireResponse(),
+      expectedQuestionnaireResponse
+    )
   }
 
   @Test
@@ -949,40 +970,20 @@ class QuestionnaireViewModelTest {
         {
           "resourceType": "Questionnaire",
           "id": "client-registration-sample",
-          "language": "en",
-          "status": "active",
-          "date": "2020-11-18T07:24:47.111Z",
-          "subjectType": [
-            "Patient"
-          ],
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-              "valueExpression": {
-                "language": "application/x-fhir-query",
-                "expression": "Patient",
-                "name": "patient"
-              }
-            }
-          ],
           "item": [
             {
               "linkId": "1",
-              "text": "Group Item",
               "type": "group",
-              "required": true,
               "item": [
                 {
                   "linkId": "1.1",
                   "text": "First Nested Item",
-                  "type": "boolean",
-                  "required": true
+                  "type": "boolean"
                 },
                 {
                   "linkId": "1.2",
                   "text": "Second Nested Item",
-                  "type": "boolean",
-                  "required": true
+                  "type": "boolean"
                 }
               ]
             }
@@ -996,8 +997,7 @@ class QuestionnaireViewModelTest {
           "resourceType": "QuestionnaireResponse",
           "item": [
             {
-              "linkId": "1",
-              "text":"Group Item"
+              "linkId": "1"
             }
           ]
         }
@@ -1010,7 +1010,6 @@ class QuestionnaireViewModelTest {
           "item": [
             {
               "linkId": "1",
-              "text": "Group Item",
               "item": [
                 {
                   "linkId": "1.1",
@@ -1024,6 +1023,129 @@ class QuestionnaireViewModelTest {
             }
           ]
         }
+      """.trimIndent()
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
+    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    val viewModel = QuestionnaireViewModel(context, state)
+    val value = viewModel.getQuestionnaireResponse()
+    val expectedResponse =
+      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+        as QuestionnaireResponse
+
+    assertResourceEquals(value, expectedResponse)
+  }
+
+  @Test
+  fun `maintain an order while adding empty QuestionnaireResponseItemComponent to the response items`() {
+    val questionnaireString =
+      """
+          {
+            "resourceType": "Questionnaire",
+            "item": [
+              {
+                "linkId": "1",
+                "type": "group",
+                "text": "Repeated Group",
+                "repeats": true,
+                "item": [
+                  {
+                    "linkId": "1-1",
+                    "type": "date",
+                    "extension": [
+                      {
+                        "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
+                        "valueString": "yyyy-mm-dd"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "linkId": "2",
+                "text": "Is this the first visit?",
+                "type": "boolean"
+              }
+            ]
+          }
+      """.trimIndent()
+
+    val questionnaireResponseString =
+      """
+              {
+                "resourceType": "QuestionnaireResponse",
+                "item": [
+                  {
+                    "linkId": "1",
+                    "text": "Repeated Group",
+                    "item": [
+                      {
+                        "linkId": "1-1",
+                        "answer": [
+                          {
+                            "valueDate": "2023-06-14"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "linkId": "1",
+                    "text": "Repeated Group",
+                    "item": [
+                      {
+                        "linkId": "1-1",
+                        "answer": [
+                          {
+                            "valueDate": "2023-06-13"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+      """.trimIndent()
+
+    val expectedResponseString =
+      """
+            {
+              "resourceType": "QuestionnaireResponse",
+              "item": [
+                {
+                  "linkId": "1",
+                  "text": "Repeated Group",
+                  "item": [
+                    {
+                      "linkId": "1-1",
+                      "answer": [
+                        {
+                          "valueDate": "2023-06-14"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "1",
+                  "text": "Repeated Group",
+                  "item": [
+                    {
+                      "linkId": "1-1",
+                      "answer": [
+                        {
+                          "valueDate": "2023-06-13"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "2",
+                  "text": "Is this the first visit?"
+                }
+              ]
+            }
       """.trimIndent()
 
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)

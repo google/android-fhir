@@ -142,7 +142,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]!!
         questionnaireResponse =
           parser.parseResource(questionnaireResponseJson) as QuestionnaireResponse
-        addMissingResponseItems(questionnaire.item, questionnaireResponse.item)
+        addMissingResponseItems()
         checkQuestionnaireResponse(questionnaire, questionnaireResponse)
       }
       else -> {
@@ -158,37 +158,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
     }
     questionnaireResponse.packRepeatedGroups()
-  }
-
-  /**
-   * Adds empty [QuestionnaireResponseItemComponent]s to `responseItems` so that each
-   * [QuestionnaireItemComponent] in `questionnaireItems` has at least one corresponding
-   * [QuestionnaireResponseItemComponent]. This is because user-provided [QuestionnaireResponse]
-   * might not contain answers to unanswered or disabled questions. Note : this only applies to
-   * [QuestionnaireItemComponent]s nested under a group.
-   */
-  private fun addMissingResponseItems(
-    questionnaireItems: List<QuestionnaireItemComponent>,
-    responseItems: MutableList<QuestionnaireResponseItemComponent>
-  ) {
-    val questionnaireIterator = questionnaireItems.iterator()
-    while (questionnaireIterator.hasNext()) {
-      val questionnaireItem = questionnaireIterator.next()
-      var responseItem = responseItems.firstOrNull { it.linkId == questionnaireItem.linkId }
-
-      // add missing item
-      if (responseItem == null) {
-        responseItem = questionnaireItem.createQuestionnaireResponseItem()
-        responseItems.add(questionnaireItems.indexOf(questionnaireItem), responseItem)
-      }
-
-      // recursion
-      if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
-          !questionnaireItem.repeats
-      ) {
-        addMissingResponseItems(questionnaireItem.item, responseItem.item)
-      }
-    }
   }
 
   /**
@@ -378,6 +347,131 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    */
   private val answerExpressionMap =
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
+
+  /**
+   * Adds empty [QuestionnaireResponseItemComponent]s to `responseItems` so that each
+   * [QuestionnaireItemComponent] in `questionnaireItems` has at least one corresponding
+   * [QuestionnaireResponseItemComponent]. This is because user-provided [QuestionnaireResponse]
+   * might not contain answers to unanswered or disabled questions. Note : this only applies to
+   * [QuestionnaireItemComponent]s nested under a group.
+   */
+  private fun addMissingResponseItems() {
+    val linkIdToResponseItemsMap =
+      mutableMapOf<String, MutableList<QuestionnaireResponseItemComponent>>()
+    associateLinkId(questionnaire.item, linkIdToResponseItemsMap)
+
+    addResponseItemsToMap(questionnaire.item, questionnaireResponse.item, linkIdToResponseItemsMap)
+
+    val responseItems = mutableListOf<QuestionnaireResponseItemComponent>()
+    buildResponseItemList(linkIdToResponseItemsMap, questionnaire.item, responseItems)
+    questionnaireResponse.item = responseItems
+  }
+
+  /**
+   * Adds linkId of the item present in the list [questionnaireItems] as a key, and an empty list of
+   * type [QuestionnaireResponseItemComponent] as a value to the map [linkIdToResponseItemsMap].
+   */
+  private fun associateLinkId(
+    questionnaireItems: List<QuestionnaireItemComponent>,
+    linkIdToResponseItemsMap: MutableMap<String, MutableList<QuestionnaireResponseItemComponent>>
+  ) {
+    questionnaireItems.forEach {
+      linkIdToResponseItemsMap[it.linkId] = mutableListOf()
+      associateLinkId(it.item, linkIdToResponseItemsMap)
+    }
+  }
+
+  /**
+   * Adds response item present in the list [responseItems] corresponding to the linkId present in
+   * [questionnaireItems] to the map [linkedToResponseItemsMap], and if response item is missing
+   * then adds empty response item.
+   */
+  private fun addResponseItemsToMap(
+    questionnaireItems: List<QuestionnaireItemComponent>,
+    responseItems: MutableList<QuestionnaireResponseItemComponent>,
+    linkedToResponseItemsMap: MutableMap<String, MutableList<QuestionnaireResponseItemComponent>>,
+  ) {
+    val questionnaireIterator = questionnaireItems.iterator()
+    while (questionnaireIterator.hasNext()) {
+      val questionnaireItem = questionnaireIterator.next()
+      val responseItemComponents = responseItems.filter { questionnaireItem.linkId == it.linkId }
+      if (responseItemComponents.isNotEmpty()) { // add existing response items to the map.
+        linkedToResponseItemsMap[questionnaireItem.linkId]!!.addAll(responseItemComponents)
+      } else { // add empty response items to the map
+        linkedToResponseItemsMap[questionnaireItem.linkId]!!.add(
+          questionnaireItem.createQuestionnaireResponseItem()
+        )
+      }
+      // traverse the nested item list of group type.
+      if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+          !questionnaireItem.repeats
+      ) {
+        addResponseItemsToMap(
+          questionnaireItem.item,
+          linkedToResponseItemsMap[questionnaireItem.linkId]!!.first().item,
+          linkedToResponseItemsMap
+        )
+      }
+    }
+  }
+
+  /**
+   * Adds response items present in the map [linkedToResponseItemsMap] to the list [responseItems].
+   * The added items to the list [responseItems] correspond to the linkId of the item present in the
+   * list [questionnaireItems]
+   */
+  private fun buildResponseItemList(
+    linkedToResponseItemsMap: MutableMap<String, MutableList<QuestionnaireResponseItemComponent>>,
+    questionnaireItems: List<QuestionnaireItemComponent>,
+    responseItems: MutableList<QuestionnaireResponseItemComponent>,
+  ) {
+    val questionnaireIterator = questionnaireItems.iterator()
+    while (questionnaireIterator.hasNext()) {
+      val questionnaireItem = questionnaireIterator.next()
+      val responseItemComponents = linkedToResponseItemsMap[questionnaireItem.linkId]!!
+      if (!responseItems.containsAll(responseItemComponents)
+      ) { // checks if response items are already present in the list.
+        responseItems.addAll(responseItemComponents)
+      }
+      // traverse nested item list of group type.
+      if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+          !questionnaireItem.repeats
+      ) {
+        buildResponseItemList(
+          linkedToResponseItemsMap,
+          questionnaireItem.item,
+          responseItemComponents.first().item,
+        )
+      }
+    }
+  }
+
+  // Index based approach, this function will be removed.
+  private fun addMissingResponseItems(
+    questionnaireItems: List<QuestionnaireItemComponent>,
+    responseItems: MutableList<QuestionnaireResponseItemComponent>
+  ) {
+    val questionnaireIterator = questionnaireItems.iterator()
+    var previousIndex = -1
+    var currentIndex = -1
+    while (questionnaireIterator.hasNext()) {
+      previousIndex = currentIndex
+      val questionnaireItem = questionnaireIterator.next()
+      currentIndex = responseItems.indexOfLast { it.linkId == questionnaireItem.linkId }
+      // add empty response item if missing.
+      if (currentIndex == -1) {
+        currentIndex = previousIndex + 1
+        var responseItem = questionnaireItem.createQuestionnaireResponseItem()
+        responseItems.add(currentIndex, responseItem)
+      }
+      // traverse nested item list of group type.
+      if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+          !questionnaireItem.repeats
+      ) {
+        addMissingResponseItems(questionnaireItem.item, responseItems[currentIndex].item)
+      }
+    }
+  }
 
   /**
    * Returns current [QuestionnaireResponse] captured by the UI which includes answers of enabled
