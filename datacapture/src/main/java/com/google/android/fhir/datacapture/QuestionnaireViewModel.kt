@@ -52,6 +52,7 @@ import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateExpression
+import com.google.android.fhir.datacapture.fhirpath.FHIRPathEngineHostServices.buildContextMap
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -746,7 +747,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                 showAsterisk = showAsterisk,
                 showRequiredText = showRequiredText,
                 showOptionalText = showOptionalText
-              )
+              ),
+            questionnaireItem.buildContextMap(questionnaire, questionnaireResponse, questionnaireResponseItem)
           )
         )
       )

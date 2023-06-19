@@ -91,7 +91,7 @@ data class QuestionnaireViewItem(
   internal val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
   internal val questionViewTextConfiguration: QuestionTextConfiguration =
     QuestionTextConfiguration(),
-  internal val contextData: Map<String, Type> = mapOf()
+  internal val contextData: List<Triple<String, Type, Boolean>>
 ) {
 
   /**
