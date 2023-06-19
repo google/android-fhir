@@ -551,7 +551,11 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
     )
   }
 
-  return initial.map { QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply { value = it.value} }.toMutableList()
+  return initial
+    .map {
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply { value = it.value }
+    }
+    .toMutableList()
 }
 
 internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expression?

@@ -149,8 +149,13 @@ class DemoQuestionnaireFragment : Fragment() {
             R.id.container,
             QuestionnaireFragment.builder()
               .setQuestionnaire(viewModel.getQuestionnaireJson())
-              .setQuestionnaireLaunchContext(FhirContext.forR4Cached().newJsonParser().encodeResourceToString(Patient().apply { id="P1" }))
-            .build(),
+              .setQuestionnaireLaunchContexts(
+                FhirContext.forR4Cached()
+                  .newJsonParser()
+                  .encodeResourceToString(Patient().apply { id = "P1" })
+                  .let { listOf(it) }
+              )
+              .build(),
             QUESTIONNAIRE_FRAGMENT_TAG
           )
         }
@@ -179,9 +184,15 @@ class DemoQuestionnaireFragment : Fragment() {
         setReorderingAllowed(true)
         replace(
           R.id.container,
-          QuestionnaireFragment.builder().setQuestionnaire(questionnaireJsonString)
-            .setQuestionnaireLaunchContext(FhirContext.forR4Cached().newJsonParser().encodeResourceToString(Patient().apply { id="P1" }))
-          .build(),
+          QuestionnaireFragment.builder()
+            .setQuestionnaire(questionnaireJsonString)
+            .setQuestionnaireLaunchContexts(
+              FhirContext.forR4Cached()
+                .newJsonParser()
+                .encodeResourceToString(Patient().apply { id = "P1" })
+                .let { listOf(it) }
+            )
+            .build(),
           QUESTIONNAIRE_FRAGMENT_TAG
         )
       }

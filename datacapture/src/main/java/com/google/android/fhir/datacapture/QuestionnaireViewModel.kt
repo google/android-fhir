@@ -26,7 +26,6 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
-import com.google.android.fhir.datacapture.extensions.EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
@@ -44,9 +43,10 @@ import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.extensions.isXFhirQuery
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
+import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
 import com.google.android.fhir.datacapture.extensions.unpackRepeatedGroups
-import com.google.android.fhir.datacapture.extensions.validateLaunchContext
+import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
 import com.google.android.fhir.datacapture.extensions.zipByLinkId
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
@@ -160,25 +160,24 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /**
    * The launch context allows information to be passed into questionnaire based on the context in
-   * which he questionnaire is being evaluated. For example, what patient, what encounter, what
-   * user, etc. is "in context" at the time the questionnaire response is being completed.
-   * Currently, we support at most one launch context.The supported launch contexts are defined in:
+   * which the questionnaire is being evaluated. For example, what patient, what encounter, what
+   * user, etc. is "in context" at the time the questionnaire response is being completed:
    * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
    */
-  private val questionnaireLaunchContext: Resource?
+  private val questionnaireLaunchContextMap: Map<String, Resource>?
 
   init {
-    questionnaireLaunchContext =
-      if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING)) {
-        val questionnaireLaunchContextJson: String =
-          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING]!!
-        questionnaire.extension
-          .firstOrNull { it.url == EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT }
-          ?.let {
-            val resource = parser.parseResource(questionnaireLaunchContextJson) as Resource
-            validateLaunchContext(it, resource.resourceType.name)
-            resource
-          }
+    questionnaireLaunchContextMap =
+      if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS)) {
+
+        val launchContextJsonStrings: List<String> =
+          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS]!!
+
+        val launchContexts = launchContextJsonStrings.map { parser.parseResource(it) as Resource }
+        questionnaire.questionnaireLaunchContexts?.let { launchContextExtensions ->
+          validateLaunchContextExtensions(launchContextExtensions)
+          launchContexts.associateBy { it.resourceType.name.lowercase() }
+        }
       } else {
         null
       }
@@ -584,7 +583,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
 
         val xFhirExpressionString =
-          ExpressionEvaluator.createXFhirQueryFromExpression(expression, questionnaireLaunchContext)
+          ExpressionEvaluator.createXFhirQueryFromExpression(
+            expression,
+            questionnaireLaunchContextMap
+          )
         xFhirQueryResolver!!.resolve(xFhirExpressionString)
       } else if (expression.isFhirPath) {
         fhirPathEngine.evaluate(questionnaireResponse, expression.expression)

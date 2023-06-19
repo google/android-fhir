@@ -24,8 +24,8 @@ import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Bundle
 
-internal object HttpPutForCreateEntryComponentGenerator :
-  HttpVerbBasedBundleEntryComponentGenerator(Bundle.HTTPVerb.PUT) {
+internal class HttpPutForCreateEntryComponentGenerator(useETagForUpload: Boolean) :
+  HttpVerbBasedBundleEntryComponentGenerator(Bundle.HTTPVerb.PUT, useETagForUpload) {
   override fun getEntryResource(localChange: LocalChange): IBaseResource {
     return FhirContext.forCached(FhirVersionEnum.R4)
       .newJsonParser()
@@ -33,8 +33,8 @@ internal object HttpPutForCreateEntryComponentGenerator :
   }
 }
 
-internal object HttpPatchForUpdateEntryComponentGenerator :
-  HttpVerbBasedBundleEntryComponentGenerator(Bundle.HTTPVerb.PATCH) {
+internal class HttpPatchForUpdateEntryComponentGenerator(useETagForUpload: Boolean) :
+  HttpVerbBasedBundleEntryComponentGenerator(Bundle.HTTPVerb.PATCH, useETagForUpload) {
   override fun getEntryResource(localChange: LocalChange): IBaseResource {
     return Binary().apply {
       contentType = ContentTypes.APPLICATION_JSON_PATCH
@@ -43,7 +43,7 @@ internal object HttpPatchForUpdateEntryComponentGenerator :
   }
 }
 
-internal object HttpDeleteEntryComponentGenerator :
-  HttpVerbBasedBundleEntryComponentGenerator(Bundle.HTTPVerb.DELETE) {
+internal class HttpDeleteEntryComponentGenerator(useETagForUpload: Boolean) :
+  HttpVerbBasedBundleEntryComponentGenerator(Bundle.HTTPVerb.DELETE, useETagForUpload) {
   override fun getEntryResource(localChange: LocalChange): IBaseResource? = null
 }
