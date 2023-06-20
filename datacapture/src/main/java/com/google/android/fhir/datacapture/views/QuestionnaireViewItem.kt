@@ -155,7 +155,7 @@ data class QuestionnaireViewItem(
 
   /** Removes an answer from the existing answers, as well as any draft answer. */
   internal fun removeAnswer(
-    questionnaireResponseItemAnswerComponent:
+    vararg questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
   ) {
     check(questionnaireItem.repeats) {
@@ -164,8 +164,8 @@ data class QuestionnaireViewItem(
     answersChangedCallback(
       questionnaireItem,
       questionnaireResponseItem,
-      answers.toMutableList().apply {
-        removeIf { it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value) }
+      answers.filterNot { ans ->
+        questionnaireResponseItemAnswerComponent.any { ans.value.equalsDeep(it.value) }
       },
       null
     )
@@ -217,7 +217,15 @@ data class QuestionnaireViewItem(
           }
 
         if (questionnaireItem.answerOptionsToggleExpressions.isNotEmpty())
-          resolveAnswerOptionsToggleExpressions(questionnaireItem, options)
+          resolveAnswerOptionsToggleExpressions(questionnaireItem, options).also {
+            toggledAnswerOptions ->
+            println(toggledAnswerOptions.joinToString { it.valueCoding.code })
+            // Remove answers not in toggled answerOptions
+            answers
+              .filterNot { ans -> toggledAnswerOptions.any { ans.value.equalsDeep(it.value) } }
+              .takeIf { it.isNotEmpty() }
+              ?.let { removeAnswer(*it.toTypedArray()) }
+          }
         else options
       }
 
