@@ -20,18 +20,15 @@ import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.toLocalChange
-import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
-import com.google.android.fhir.toTimeZoneString
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -85,29 +82,24 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+    download: suspend () -> Flow<List<Resource>>
   ) {
-    download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
+    download().collect { resources ->
+      try {
+        database.withTransaction {
+          val resolved =
+            resolveConflictingResources(
+              resources,
+              getConflictingResourceIds(resources),
+              conflictResolver
+            )
+          database.insertSyncedResources(resources)
+          saveResolvedResourcesToDatabase(resolved)
         }
-      )
-      .collect { resources ->
-        try {
-          database.withTransaction {
-            val resolved =
-              resolveConflictingResources(
-                resources,
-                getConflictingResourceIds(resources),
-                conflictResolver
-              )
-            saveRemoteResourcesToDatabase(resources)
-            saveResolvedResourcesToDatabase(resolved)
-          }
-        } catch (exception: Exception) {
-          Timber.e(exception, "Save remote and resolved conflicting resources to database failed")
-        }
+      } catch (exception: Exception) {
+        Timber.e(exception, "Error encountered while inserting synced resources")
       }
+    }
   }
 
   private suspend fun saveResolvedResourcesToDatabase(resolved: List<Resource>?) {
@@ -115,16 +107,6 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       database.deleteUpdates(it)
       database.update(*it.toTypedArray())
     }
-  }
-
-  private suspend fun saveRemoteResourcesToDatabase(resources: List<Resource>) {
-    val timeStamps =
-      resources
-        .groupBy { it.resourceType }
-        .entries.map {
-          SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
-        }
-    database.insertSyncedResources(timeStamps, resources)
   }
 
   private suspend fun resolveConflictingResources(
@@ -183,7 +165,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
         database.updateVersionIdAndLastUpdated(
           id,
           type,
-          response.etag,
+          getVersionFromETag(response.etag),
           response.lastModified.toInstant()
         )
       }
@@ -200,6 +182,20 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       )
     }
   }
+
+  /**
+   * FHIR uses weak ETag that look something like W/"MTY4NDMyODE2OTg3NDUyNTAwMA", so we need to
+   * extract version from it. See https://hl7.org/fhir/http.html#Http-Headers.
+   */
+  private fun getVersionFromETag(eTag: String) =
+    // The server should always return a weak etag that starts with W, but if it server returns a
+    // strong tag, we store it as-is. The http-headers for conditional upload like if-match will
+    // always add value as a weak tag.
+    if (eTag.startsWith("W/")) {
+      eTag.split("\"")[1]
+    } else {
+      eTag
+    }
 
   /**
    * May return a Pair of versionId and resource type extracted from the

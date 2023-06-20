@@ -29,7 +29,7 @@
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_default"
+            android:layout_marginVertical="@dimen/item_margin_vertical"
             android:layout_marginHorizontal="@dimen/item_margin_horizontal"
         />
 
@@ -38,8 +38,8 @@
             layout="@layout/input_error_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-            android:layout_marginVertical="@dimen/item_margin_vertical"
+            android:layout_marginHorizontal="@dimen/error_text_margin_horizontal"
+            android:layout_marginVertical="@dimen/error_text_margin_vertical"
         />
     </LinearLayout>
 

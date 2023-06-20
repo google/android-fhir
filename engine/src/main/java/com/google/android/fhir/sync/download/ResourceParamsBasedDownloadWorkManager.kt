@@ -16,12 +16,13 @@
 
 package com.google.android.fhir.sync.download
 
-import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.GREATER_THAN_PREFIX
 import com.google.android.fhir.sync.ParamMap
+import com.google.android.fhir.sync.Request
 import com.google.android.fhir.sync.SyncDataParams
 import com.google.android.fhir.sync.concatParams
+import com.google.android.fhir.toTimeZoneString
 import java.util.LinkedList
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
@@ -36,29 +37,29 @@ typealias ResourceSearchParams = Map<ResourceType, ParamMap>
  * implementation takes a DFS approach and downloads all available resources for a particular
  * [ResourceType] before moving on to the next [ResourceType].
  */
-class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
-  DownloadWorkManager {
+class ResourceParamsBasedDownloadWorkManager(
+  syncParams: ResourceSearchParams,
+  val context: TimestampContext
+) : DownloadWorkManager {
   private val resourcesToDownloadWithSearchParams = LinkedList(syncParams.entries)
   private val urlOfTheNextPagesToDownloadForAResource = LinkedList<String>()
 
-  override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? {
+  override suspend fun getNextRequest(): Request? {
     if (urlOfTheNextPagesToDownloadForAResource.isNotEmpty())
-      return urlOfTheNextPagesToDownloadForAResource.poll()
+      return urlOfTheNextPagesToDownloadForAResource.poll()?.let { Request.of(it) }
 
     return resourcesToDownloadWithSearchParams.poll()?.let { (resourceType, params) ->
       val newParams =
         params.toMutableMap().apply { putAll(getLastUpdatedParam(resourceType, params, context)) }
 
-      "${resourceType.name}?${newParams.concatParams()}"
+      Request.of("${resourceType.name}?${newParams.concatParams()}")
     }
   }
 
   /**
    * Returns the map of resourceType and URL for summary of total count for each download request
    */
-  override suspend fun getSummaryRequestUrls(
-    context: SyncDownloadContext
-  ): Map<ResourceType, String> {
+  override suspend fun getSummaryRequestUrls(): Map<ResourceType, String> {
     return resourcesToDownloadWithSearchParams.associate { (resourceType, params) ->
       val newParams =
         params.toMutableMap().apply {
@@ -73,14 +74,14 @@ class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
   private suspend fun getLastUpdatedParam(
     resourceType: ResourceType,
     params: ParamMap,
-    context: SyncDownloadContext
+    context: TimestampContext
   ): MutableMap<String, String> {
     val newParams = mutableMapOf<String, String>()
     if (!params.containsKey(SyncDataParams.SORT_KEY)) {
       newParams[SyncDataParams.SORT_KEY] = SyncDataParams.LAST_UPDATED_KEY
     }
     if (!params.containsKey(SyncDataParams.LAST_UPDATED_KEY)) {
-      val lastUpdate = context.getLatestTimestampFor(resourceType)
+      val lastUpdate = context.getLasUpdateTimestamp(resourceType)
       if (!lastUpdate.isNullOrEmpty()) {
         newParams[SyncDataParams.LAST_UPDATED_KEY] = "$GREATER_THAN_PREFIX$lastUpdate"
       }
@@ -106,9 +107,29 @@ class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
         .firstOrNull { component -> component.relation == "next" }
         ?.url?.let { next -> urlOfTheNextPagesToDownloadForAResource.add(next) }
 
-      response.entry.map { it.resource }
+      response.entry
+        .map { it.resource }
+        .also { resources ->
+          resources
+            .groupBy { it.resourceType }
+            .entries.map { map ->
+              map.value
+                .filter { it.meta.lastUpdated != null }
+                .let {
+                  context.saveLastUpdatedTimestamp(
+                    map.key,
+                    it.maxOfOrNull { it.meta.lastUpdated }?.toTimeZoneString()
+                  )
+                }
+            }
+        }
     } else {
       emptyList()
     }
+  }
+
+  interface TimestampContext {
+    suspend fun saveLastUpdatedTimestamp(resourceType: ResourceType, timestamp: String?)
+    suspend fun getLasUpdateTimestamp(resourceType: ResourceType): String?
   }
 }

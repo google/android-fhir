@@ -26,13 +26,13 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.extensions.format
 import com.google.android.fhir.datacapture.extensions.getDateSeparator
+import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
+import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.parseDate
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.MaxValueValidator.getMaxValue
 import com.google.android.fhir.datacapture.validation.MinValueValidator.getMinValue
-import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -112,7 +112,12 @@ internal object DatePickerViewHolderFactory :
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         clearPreviousState()
         header.bind(questionnaireViewItem)
-        textInputLayout.hint = canonicalizedDatePattern
+        with(textInputLayout) {
+          // Use 'mm' for month instead of 'MM' to avoid confusion.
+          // See https://developer.android.com/reference/kotlin/java/text/SimpleDateFormat.
+          hint = canonicalizedDatePattern.lowercase()
+          helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
+        }
         textInputEditText.removeTextChangedListener(textWatcher)
 
         val questionnaireItemViewItemDateAnswer =
@@ -204,11 +209,11 @@ internal object DatePickerViewHolderFactory :
 
       private fun displayValidationResult(validationResult: ValidationResult) {
         textInputLayout.error =
-          when (validationResult) {
-            is NotValidated,
-            Valid -> null
-            is Invalid -> validationResult.getSingleStringValidationMessage()
-          }
+          getValidationErrorMessage(
+            textInputLayout.context,
+            questionnaireViewItem,
+            validationResult
+          )
       }
 
       /** Automatically appends date separator (e.g. "/") during date input. */
@@ -325,6 +330,8 @@ internal fun Int.length() =
 internal fun invalidDateErrorText(context: Context, formatPattern: String) =
   context.getString(
     R.string.date_format_validation_error_msg,
-    formatPattern,
+    // Use 'mm' for month instead of 'MM' to avoid confusion.
+    // See https://developer.android.com/reference/kotlin/java/text/SimpleDateFormat.
+    formatPattern.lowercase(),
     formatPattern.replace("dd", "31").replace("MM", "01").replace("yyyy", "2023")
   )

@@ -17,7 +17,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="@dimen/padding_modal_card"
+    android:padding="@dimen/dialog_padding"
 >
 
     <TextView
@@ -30,7 +30,7 @@
     />
 
     <TextView
-        android:layout_marginTop="@dimen/padding_default"
+        android:layout_marginTop="@dimen/dialog_subtitle_margin_top"
         android:id="@+id/dialog_subtitle"
         style="?attr/questionnaireValidationDialogBodyStyle"
         android:layout_width="wrap_content"
@@ -41,7 +41,7 @@
     />
 
     <ScrollView
-        android:layout_marginVertical="@dimen/item_margin_vertical"
+        android:layout_marginVertical="@dimen/dialog_content_scroll_margin_vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
     >
