@@ -36,9 +36,9 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 /**
  * Data item for [QuestionnaireItemViewHolder] in [RecyclerView].
  *
- * The view should use [questionnaireItem], [answers], [answerOption], [validationResult] and
- * [enabledDisplayItems] to render the data item in the UI. The view SHOULD NOT mutate the data
- * using these properties.
+ * The view should use [questionnaireItem], [answers], [answerOption], [enabledAnswerOption],
+ * [validationResult] and [enabledDisplayItems] to render the data item in the UI. The view SHOULD
+ * NOT mutate the data using these properties.
  *
  * The view should use the following answer APIs to update the answer(s):
  * - [setAnswer] (for single and repeated answers)
@@ -87,7 +87,7 @@ data class QuestionnaireViewItem(
     {
       emptyList()
     },
-  private val resolveAnswerOptionsToggleExpressions:
+  private val evaluateAnswerOptionsToggleExpressions:
     (
       Questionnaire.QuestionnaireItemComponent,
       List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
@@ -207,26 +207,38 @@ data class QuestionnaireViewItem(
   internal val answerOption: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
     get() =
       runBlocking(Dispatchers.IO) {
-        val options =
-          when {
-            questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
-            !questionnaireItem.answerValueSet.isNullOrEmpty() ->
-              resolveAnswerValueSet(questionnaireItem.answerValueSet)
-            questionnaireItem.answerExpression != null -> resolveAnswerExpression(questionnaireItem)
-            else -> emptyList()
-          }
+        when {
+          questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
+          !questionnaireItem.answerValueSet.isNullOrEmpty() ->
+            resolveAnswerValueSet(questionnaireItem.answerValueSet)
+          questionnaireItem.answerExpression != null -> resolveAnswerExpression(questionnaireItem)
+          else -> emptyList()
+        }
+      }
 
-        if (questionnaireItem.answerOptionsToggleExpressions.isNotEmpty())
-          resolveAnswerOptionsToggleExpressions(questionnaireItem, options).also {
-            toggledAnswerOptions ->
-            println(toggledAnswerOptions.joinToString { it.valueCoding.code })
+  /**
+   * Returns allowed answer options that are enabled based on the evaluation of
+   * [Questionnaire.QuestionnaireItemComponent.answerOptionsToggleExpressions] expressions
+   */
+  internal val enabledAnswerOption: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
+    get() =
+      runBlocking(Dispatchers.IO) {
+        if (questionnaireItem.answerOptionsToggleExpressions.isNotEmpty() &&
+            answerOption.isNotEmpty()
+        ) {
+          evaluateAnswerOptionsToggleExpressions(questionnaireItem, answerOption).also {
+            allowedAnswerOptions ->
+            val answersNotInAllowedOptions =
+              answers.filterNot { ans ->
+                allowedAnswerOptions.any { ans.value.equalsDeep(it.value) }
+              }
+
             // Remove answers not in toggled answerOptions
-            answers
-              .filterNot { ans -> toggledAnswerOptions.any { ans.value.equalsDeep(it.value) } }
+            answersNotInAllowedOptions
               .takeIf { it.isNotEmpty() }
               ?.let { removeAnswer(*it.toTypedArray()) }
           }
-        else options
+        } else answerOption
       }
 
   /**

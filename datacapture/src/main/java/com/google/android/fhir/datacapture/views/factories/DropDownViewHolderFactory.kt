@@ -64,7 +64,7 @@ internal object DropDownViewHolderFactory :
           helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
         }
         val answerOptionList =
-          this.questionnaireViewItem.answerOption
+          this.questionnaireViewItem.enabledAnswerOption
             .map {
               DropDownAnswerOption(
                 it.value.displayString(context),
@@ -102,7 +102,7 @@ internal object DropDownViewHolderFactory :
               null
             )
             val selectedAnswer =
-              questionnaireViewItem.answerOption
+              questionnaireViewItem.enabledAnswerOption
                 .firstOrNull { it.value.displayString(context) == selectedItem?.answerOptionString }
                 ?.value
 

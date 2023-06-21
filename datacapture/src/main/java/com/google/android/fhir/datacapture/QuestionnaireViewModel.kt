@@ -554,9 +554,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return options
   }
 
-  internal fun resolveAnswerOptionsToggleExpressions(
+  internal fun evaluateAnswerOptionsToggleExpressions(
     item: QuestionnaireItemComponent,
-    fullAnswerOptions: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
+    answerOptions: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     val results =
       item.answerOptionsToggleExpressions
@@ -567,25 +567,28 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               fhirPathEngine.convertToBoolean(
                 fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
               )
-            else false
+            else
+              throw UnsupportedOperationException(
+                "${expression.language} not supported yet for answer-options-toggle-expression"
+              )
           evaluationResult to toggleOptions
         }
         .partition { it.first }
-    val (enabled, disallowed) = results
+    val (allowed, disallowed) = results
     val allowedOptions =
-      enabled.flatMap {
+      allowed.flatMap {
         val (_, options) = it
         options
       }
 
-    val toggledOptions =
+    val disallowedOptions =
       disallowed.flatMap {
         val (_, options) = it
         options.filterNot { option -> allowedOptions.any { type -> equals(type, option) } }
       }
 
-    return fullAnswerOptions.filterNot { answerOption ->
-      toggledOptions.any { equals(answerOption.value, it) }
+    return answerOptions.filterNot { answerOption ->
+      disallowedOptions.any { equals(answerOption.value, it) }
     }
   }
 
@@ -772,8 +775,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             answersChangedCallback = answersChangedCallback,
             resolveAnswerValueSet = { resolveAnswerValueSet(it) },
             resolveAnswerExpression = { resolveAnswerExpression(it) },
-            resolveAnswerOptionsToggleExpressions = { questionnaireItem, answerOptions ->
-              resolveAnswerOptionsToggleExpressions(questionnaireItem, answerOptions)
+            evaluateAnswerOptionsToggleExpressions = { questionnaireItem, answerOptions ->
+              evaluateAnswerOptionsToggleExpressions(questionnaireItem, answerOptions)
             },
             draftAnswer = draftAnswerMap[questionnaireResponseItem],
             enabledDisplayItems =

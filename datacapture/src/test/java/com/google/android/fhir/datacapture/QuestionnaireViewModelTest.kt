@@ -4071,19 +4071,10 @@ class QuestionnaireViewModelTest {
   //                                                                      //
   // ==================================================================== //
   @Test
-  fun `resolveAnswerOptionsToggleExpressions should return answer options for all expressions evaluated to true on initial load`() =
+  fun `evaluateAnswerOptionsToggleExpressions should return answer options for all expressions evaluated to true on initial load`() =
     runTest {
       val questionnaire =
         Questionnaire().apply {
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "a"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              text = "Is Married?"
-              addInitial().apply { value = BooleanType(false) }
-            }
-          )
-
           addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "b"
@@ -4111,8 +4102,7 @@ class QuestionnaireViewModelTest {
                         Extension(
                           EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
                           Expression().apply {
-                            this.expression =
-                              "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value)"
+                            this.expression = "false"
                             this.language = "text/fhirpath"
                           }
                         )
@@ -4131,8 +4121,7 @@ class QuestionnaireViewModelTest {
                         Extension(
                           EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
                           Expression().apply {
-                            this.expression =
-                              "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value.not())"
+                            this.expression = "true"
                             this.language = "text/fhirpath"
                           }
                         )
@@ -4168,23 +4157,15 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
-      assertThat(
-          viewModel
-            .getQuestionnaireResponse()
-            .item
-            .single { it.linkId == "a" }
-            .answerFirstRep.value.primitiveValue()
-        )
-        .isEqualTo(BooleanType(false).primitiveValue())
 
       val bItem = questionnaire.item.single { it.linkId == "b" }
       val resultingAnswerOptions =
-        viewModel.resolveAnswerOptionsToggleExpressions(bItem, bItem.answerOption)
+        viewModel.evaluateAnswerOptionsToggleExpressions(bItem, bItem.answerOption)
       assertThat(resultingAnswerOptions.map { it.valueCoding.code }).containsExactly("option2")
     }
 
   @Test
-  fun `resolveAnswerOptionsToggleExpressions should toggle answer options on dependent answers change`() =
+  fun `evaluateAnswerOptionsToggleExpressions should toggle answer options on dependent answers change`() =
     runTest {
       val questionnaire =
         Questionnaire().apply {
@@ -4303,25 +4284,16 @@ class QuestionnaireViewModelTest {
 
       val bItem = questionnaire.item.single { it.linkId == "b" }
       val resultingAnswerOptions =
-        viewModel.resolveAnswerOptionsToggleExpressions(bItem, bItem.answerOption)
+        viewModel.evaluateAnswerOptionsToggleExpressions(bItem, bItem.answerOption)
       assertThat(resultingAnswerOptions.map { it.valueCoding.code })
         .containsExactly("option3", "option1")
     }
 
   @Test
-  fun `resolveAnswerOptionsToggleExpressions should return answer options not listed in evaluated expressions`() =
+  fun `evaluateAnswerOptionsToggleExpressions should return answer options not listed in evaluated expressions`() =
     runTest {
       val questionnaire =
         Questionnaire().apply {
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "a"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              text = "Is Married?"
-              addInitial().apply { value = BooleanType(false) }
-            }
-          )
-
           addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "b"
@@ -4349,8 +4321,7 @@ class QuestionnaireViewModelTest {
                         Extension(
                           EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
                           Expression().apply {
-                            this.expression =
-                              "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value)"
+                            this.expression = "false"
                             this.language = "text/fhirpath"
                           }
                         )
@@ -4369,8 +4340,7 @@ class QuestionnaireViewModelTest {
                         Extension(
                           EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
                           Expression().apply {
-                            this.expression =
-                              "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value.not())"
+                            this.expression = "true"
                             this.language = "text/fhirpath"
                           }
                         )
@@ -4422,25 +4392,16 @@ class QuestionnaireViewModelTest {
 
       val bItem = questionnaire.item.single { it.linkId == "b" }
       val resultingAnswerOptions =
-        viewModel.resolveAnswerOptionsToggleExpressions(bItem, bItem.answerOption)
+        viewModel.evaluateAnswerOptionsToggleExpressions(bItem, bItem.answerOption)
       assertThat(resultingAnswerOptions.map { it.valueCoding.code })
         .containsAtLeast("option4", "option5")
     }
 
   @Test
-  fun `resolveAnswerOptionsToggleExpressions skips unknown options not listed in answer options`() =
+  fun `evaluateAnswerOptionsToggleExpressions skips unknown options not listed in answer options`() =
     runTest {
       val questionnaire =
         Questionnaire().apply {
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "a"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              text = "Is Married?"
-              addInitial().apply { value = BooleanType(false) }
-            }
-          )
-
           addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "b"
@@ -4468,8 +4429,33 @@ class QuestionnaireViewModelTest {
                         Extension(
                           EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
                           Expression().apply {
-                            this.expression =
-                              "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value.not())"
+                            this.expression = "true"
+                            this.language = "text/fhirpath"
+                          }
+                        )
+                      )
+                  },
+                  Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                    extension =
+                      listOf(
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                          Coding().apply {
+                            code = "option1"
+                            display = "Option 1"
+                          }
+                        ),
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                          Coding().apply {
+                            code = "option3"
+                            display = "Option 3"
+                          }
+                        ),
+                        Extension(
+                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                          Expression().apply {
+                            this.expression = "false"
                             this.language = "text/fhirpath"
                           }
                         )
@@ -4505,19 +4491,11 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
-      assertThat(
-          viewModel
-            .getQuestionnaireResponse()
-            .item
-            .single { it.linkId == "a" }
-            .answerFirstRep.value.primitiveValue()
-        )
-        .isEqualTo(BooleanType(false).primitiveValue())
-
       val bItem = questionnaire.item.single { it.linkId == "b" }
       val resultingAnswerOptions =
-        viewModel.resolveAnswerOptionsToggleExpressions(bItem, bItem.answerOption)
+        viewModel.evaluateAnswerOptionsToggleExpressions(bItem, bItem.answerOption)
       assertThat(resultingAnswerOptions.map { it.valueCoding.code }).doesNotContain("option75")
+      assertThat(resultingAnswerOptions.map { it.valueCoding.code }).containsExactly("option2")
     }
 
   // ==================================================================== //

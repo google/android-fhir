@@ -190,7 +190,7 @@ data class OptionSelectOption(
 
 private fun QuestionnaireViewItem.extractInitialOptions(context: Context): SelectedOptions {
   val options =
-    answerOption.map { answerOption ->
+    enabledAnswerOption.map { answerOption ->
       OptionSelectOption(
         item = answerOption,
         selected = isAnswerOptionSelected(answerOption),

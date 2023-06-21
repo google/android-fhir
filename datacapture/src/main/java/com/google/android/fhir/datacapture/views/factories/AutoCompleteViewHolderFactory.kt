@@ -62,7 +62,7 @@ internal object AutoCompleteViewHolderFactory :
             val answer =
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value =
-                  questionnaireViewItem.answerOption
+                  questionnaireViewItem.enabledAnswerOption
                     .first {
                       it.value.displayString(header.context) ==
                         autoCompleteTextView.adapter.getItem(position) as String
@@ -79,7 +79,7 @@ internal object AutoCompleteViewHolderFactory :
         header.bind(questionnaireViewItem)
         header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
         val answerOptionString =
-          questionnaireViewItem.answerOption.map { it.value.displayString(header.context) }
+          questionnaireViewItem.enabledAnswerOption.map { it.value.displayString(header.context) }
         val adapter = ArrayAdapter(header.context, R.layout.drop_down_list_item, answerOptionString)
         autoCompleteTextView.setAdapter(adapter)
         // Remove chips if any from the last bindView call on this VH.

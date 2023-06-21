@@ -71,7 +71,7 @@ internal object CheckBoxGroupViewHolderFactory :
             flow.setWrapMode(Flow.WRAP_NONE)
           }
         }
-        questionnaireViewItem.answerOption
+        questionnaireViewItem.enabledAnswerOption
           .map { answerOption -> View.generateViewId() to answerOption }
           .onEach { populateViewWithAnswerOption(it.first, it.second, choiceOrientation) }
           .map { it.first }
@@ -127,24 +127,24 @@ internal object CheckBoxGroupViewHolderFactory :
                     // if this answer option has optionExclusive extension, then deselect other
                     // answer options.
                     val optionExclusiveIndex = checkboxGroup.indexOfChild(it) - 1
-                    for (i in 0 until questionnaireViewItem.answerOption.size) {
+                    for (i in 0 until questionnaireViewItem.enabledAnswerOption.size) {
                       if (optionExclusiveIndex == i) {
                         continue
                       }
                       (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
                       newAnswers.removeIf {
-                        it.value.equalsDeep(questionnaireViewItem.answerOption[i].value)
+                        it.value.equalsDeep(questionnaireViewItem.enabledAnswerOption[i].value)
                       }
                     }
                   } else {
                     // deselect optionExclusive answer option.
-                    for (i in 0 until questionnaireViewItem.answerOption.size) {
-                      if (!questionnaireViewItem.answerOption[i].optionExclusive) {
+                    for (i in 0 until questionnaireViewItem.enabledAnswerOption.size) {
+                      if (!questionnaireViewItem.enabledAnswerOption[i].optionExclusive) {
                         continue
                       }
                       (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
                       newAnswers.removeIf {
-                        it.value.equalsDeep(questionnaireViewItem.answerOption[i].value)
+                        it.value.equalsDeep(questionnaireViewItem.enabledAnswerOption[i].value)
                       }
                     }
                   }
