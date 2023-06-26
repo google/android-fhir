@@ -50,7 +50,7 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
       LocalChangeEntity::class,
       PositionIndexEntity::class
     ],
-  version = 3,
+  version = 4,
   exportSchema = true
 )
 @TypeConverters(DbTypeConverters::class)
@@ -72,5 +72,18 @@ val MIGRATION_2_3 =
       database.execSQL(
         "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_index_from` ON `DateTimeIndexEntity` (`index_from`)"
       )
+    }
+  }
+
+val MIGRATION_3_4 =
+  object : Migration(/* startVersion = */ 3, /* endVersion = */ 4) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.execSQL(
+        "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceType_resourceUuid_index_name` ON `DateTimeIndexEntity` (`resourceType`, `resourceUuid`, `index_name` )"
+      )
+      database.execSQL(
+        "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceType_resourceUuid_index_name` ON `DateIndexEntity` (`resourceType`, `resourceUuid`, `index_name` )"
+      )
+      database.execSQL("DROP INDEX IF EXISTS `index_DateTimeIndexEntity_index_from`")
     }
   }

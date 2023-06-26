@@ -109,13 +109,44 @@ class ResourceDatabaseMigrationTest {
     assertThat(retrievedTask).isEqualTo(bedNetTask)
   }
 
+  @Test
+  @Throws(IOException::class)
+  fun migrate3To4_should_execute_with_no_exception(): Unit = runBlocking {
+    val taskId = "bed-net-001"
+    val bedNetTask: String =
+      Task()
+        .apply {
+          id = taskId
+          description = "Issue bed net"
+          meta.lastUpdated = Date()
+        }
+        .let { iParser.encodeResourceToString(it) }
+
+    helper.createDatabase(DB_NAME, 3).apply {
+      execSQL(
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask');"
+      )
+      close()
+    }
+
+    // Re-open the database with version 4 and provide MIGRATION_3_4 as the migration process.
+    helper.runMigrationsAndValidate(DB_NAME, 4, true, MIGRATION_3_4)
+
+    val retrievedTask: String?
+    getMigratedRoomDatabase().apply {
+      retrievedTask = this.resourceDao().getResource(taskId, ResourceType.Task)
+      openHelper.writableDatabase.close()
+    }
+
+    assertThat(retrievedTask).isEqualTo(bedNetTask)
+  }
   private fun getMigratedRoomDatabase(): ResourceDatabase =
     Room.databaseBuilder(
         InstrumentationRegistry.getInstrumentation().targetContext,
         ResourceDatabase::class.java,
         DB_NAME
       )
-      .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+      .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
       .build()
 
   companion object {
