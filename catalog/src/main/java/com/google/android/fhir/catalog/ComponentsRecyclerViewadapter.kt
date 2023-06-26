@@ -81,8 +81,8 @@ class ComponentListViewHolder(
 
 class ComponentHeaderViewHolder(private val binding: ComponentHeaderLayoutBinding) :
   RecyclerView.ViewHolder(binding.root), ComponentViewHolder {
-  override fun bind(viewItem: ComponentListViewModel.ViewItem) {
-    val headerItem = viewItem as ComponentListViewModel.ViewItem.HeaderItem
+  override fun bind(component: ComponentListViewModel.ViewItem) {
+    val headerItem = component as ComponentListViewModel.ViewItem.HeaderItem
     binding.tvComponentHeader.text =
       binding.tvComponentHeader.context.getString(headerItem.header.textId)
   }

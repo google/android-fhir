@@ -22,7 +22,7 @@ import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.datacapture.views.localDate
+import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
@@ -501,7 +501,7 @@ class ResourceMapperTest {
         "resourceType": "Questionnaire",
         "item": [
           {
-            "linkId": "9",
+            "linkId": "observation",
             "type": "group",
             "extension": [
               {
@@ -513,34 +513,14 @@ class ResourceMapperTest {
             ],
             "item": [
               {
-                "linkId": "9.1",
+                "linkId": "observation-value",
                 "type": "group",
                 "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept",
                 "item": [
                   {
-                    "linkId": "9.1.1",
+                    "linkId": "observation-value-coding",
                     "type": "choice",
                     "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept.coding"
-                  }
-                ]
-              },
-              {
-                "linkId": "9.1.3",
-                "type": "choice",
-                "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
-                "extension": [
-                  {
-                    "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
-                    "valueBoolean": true
-                  }
-                ],
-                "initial": [
-                  {
-                    "valueCoding": {
-                      "code": "8888",
-                      "display": "dummy",
-                      "system": "dummy"
-                    }
                   }
                 ]
               }
@@ -557,13 +537,13 @@ class ResourceMapperTest {
           "resourceType": "QuestionnaireResponse",
           "item": [
             {
-              "linkId": "9",
+              "linkId": "observation",
               "item": [
                 {
-                  "linkId": "9.1",
+                  "linkId": "observation-value",
                   "item": [
                     {
-                      "linkId": "9.1.1",
+                      "linkId": "observation-value-coding",
                       "answer": [
                         {
                           "valueCoding": {
@@ -573,18 +553,6 @@ class ResourceMapperTest {
                           }
                         }
                       ]
-                    }
-                  ]
-                },
-                {
-                  "linkId": "9.1.3",
-                  "answer": [
-                    {
-                      "valueCoding": {
-                        "system": "dummy",
-                        "code": "8888",
-                        "display": "dummy"
-                      }
                     }
                   ]
                 }

@@ -19,6 +19,7 @@ package com.google.android.fhir.sync.upload
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.Request
 import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.UploadResult
 import com.google.android.fhir.sync.Uploader
@@ -29,6 +30,7 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import timber.log.Timber
 
 /** [Uploader] implementation to work with Fhir [Bundle]. */
 internal class BundleUploader(
@@ -37,24 +39,40 @@ internal class BundleUploader(
   private val localChangesPaginator: LocalChangesPaginator
 ) : Uploader {
 
-  override suspend fun upload(
-    localChanges: List<LocalChange>,
-  ): Flow<UploadResult> = flow {
+  override suspend fun upload(localChanges: List<LocalChange>): Flow<UploadResult> = flow {
+    val total = localChanges.size
+    var completed = 0
+
+    emit(UploadResult.Started(total))
+
     bundleGenerator.generate(localChangesPaginator.page(localChanges)).forEach {
       (bundle, localChangeTokens) ->
       try {
-        val response = dataSource.upload(bundle)
-        emit(getUploadResult(response, localChangeTokens))
+        val response = dataSource.upload(Request.of(bundle))
+
+        completed += bundle.entry.size
+        emit(getUploadResult(response, localChangeTokens, total, completed))
       } catch (e: Exception) {
+        Timber.e(e)
         emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
       }
     }
   }
 
-  private fun getUploadResult(response: Resource, localChangeTokens: List<LocalChangeToken>) =
+  private fun getUploadResult(
+    response: Resource,
+    localChangeTokens: List<LocalChangeToken>,
+    total: Int,
+    completed: Int
+  ) =
     when {
       response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
-        UploadResult.Success(LocalChangeToken(localChangeTokens.flatMap { it.ids }), response)
+        UploadResult.Success(
+          LocalChangeToken(localChangeTokens.flatMap { it.ids }),
+          response,
+          total,
+          completed
+        )
       }
       response is OperationOutcome && response.issue.isNotEmpty() -> {
         UploadResult.Failure(

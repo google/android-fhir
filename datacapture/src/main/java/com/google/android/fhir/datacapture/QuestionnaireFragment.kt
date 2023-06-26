@@ -34,7 +34,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import org.hl7.fhir.r4.model.Questionnaire
 import timber.log.Timber
@@ -113,25 +113,29 @@ class QuestionnaireFragment : Fragment() {
     }
     val questionnaireProgressIndicator: LinearProgressIndicator =
       view.findViewById(R.id.questionnaire_progress_indicator)
-    val questionnaireItemEditAdapter =
-      QuestionnaireItemEditAdapter(questionnaireItemViewHolderFactoryMatchersProvider.get())
-    val questionnaireItemReviewAdapter = QuestionnaireItemReviewAdapter()
+    val questionnaireEditAdapter =
+      QuestionnaireEditAdapter(questionnaireItemViewHolderFactoryMatchersProvider.get())
+    val questionnaireReviewAdapter = QuestionnaireReviewAdapter()
 
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
 
-    val reviewModeEditButton = view.findViewById<View>(R.id.review_mode_edit_button)
-    reviewModeEditButton.setOnClickListener { viewModel.setReviewMode(false) }
+    val reviewModeEditButton =
+      view.findViewById<View>(R.id.review_mode_edit_button).apply {
+        setOnClickListener { viewModel.setReviewMode(false) }
+      }
 
-    val reviewModeButton = view.findViewById<View>(R.id.review_mode_button)
-    reviewModeButton.setOnClickListener { viewModel.setReviewMode(true) }
+    val reviewModeButton =
+      view.findViewById<View>(R.id.review_mode_button).apply {
+        setOnClickListener { viewModel.setReviewMode(true) }
+      }
 
-    questionnaireEditRecyclerView.adapter = questionnaireItemEditAdapter
+    questionnaireEditRecyclerView.adapter = questionnaireEditAdapter
     val linearLayoutManager = LinearLayoutManager(view.context)
     questionnaireEditRecyclerView.layoutManager = linearLayoutManager
     // Animation does work well with views that could gain focus
     questionnaireEditRecyclerView.itemAnimator = null
 
-    questionnaireReviewRecyclerView.adapter = questionnaireItemReviewAdapter
+    questionnaireReviewRecyclerView.adapter = questionnaireReviewAdapter
     questionnaireReviewRecyclerView.layoutManager = LinearLayoutManager(view.context)
 
     // Listen to updates from the view model.
@@ -141,7 +145,7 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.ReviewMode -> {
             // Set items
             questionnaireEditRecyclerView.visibility = View.GONE
-            questionnaireItemReviewAdapter.submitList(
+            questionnaireReviewAdapter.submitList(
               state.items.filterIsInstance<QuestionnaireAdapterItem.Question>()
             )
             questionnaireReviewRecyclerView.visibility = View.VISIBLE
@@ -164,7 +168,7 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.EditMode -> {
             // Set items
             questionnaireReviewRecyclerView.visibility = View.GONE
-            questionnaireItemEditAdapter.submitList(state.items)
+            questionnaireEditAdapter.submitList(state.items)
             questionnaireEditRecyclerView.visibility = View.VISIBLE
 
             // Set button visibility
@@ -300,6 +304,18 @@ class QuestionnaireFragment : Fragment() {
     }
 
     /**
+     * The launch context allows information to be passed into questionnaire based on the context in
+     * which the questionnaire is being evaluated. For example, what patient, what encounter, what
+     * user, etc. is "in context" at the time the questionnaire response is being completed:
+     * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
+     *
+     * @param launchContexts list of serialized resources
+     */
+    fun setQuestionnaireLaunchContexts(launchContexts: List<String>) = apply {
+      args.add(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS to launchContexts)
+    }
+
+    /**
      * An [Boolean] extra to control if the questionnaire is read-only. If review page and read-only
      * are both enabled, read-only will take precedence.
      */
@@ -320,6 +336,15 @@ class QuestionnaireFragment : Fragment() {
     fun showReviewPageFirst(value: Boolean) = apply {
       args.add(EXTRA_SHOW_REVIEW_PAGE_FIRST to value)
     }
+
+    /** A [Boolean] extra to control whether the asterisk text is shown. */
+    fun showAsterisk(value: Boolean) = apply { args.add(EXTRA_SHOW_ASTERISK_TEXT to value) }
+
+    /** A [Boolean] extra to control whether the required text is shown. */
+    fun showRequiredText(value: Boolean) = apply { args.add(EXTRA_SHOW_REQUIRED_TEXT to value) }
+
+    /** A [Boolean] extra to control whether the optional text is shown. */
+    fun showOptionalText(value: Boolean) = apply { args.add(EXTRA_SHOW_OPTIONAL_TEXT to value) }
 
     /**
      * A matcher to provide [QuestionnaireItemViewHolderFactoryMatcher]s for custom
@@ -381,6 +406,9 @@ class QuestionnaireFragment : Fragment() {
      */
     internal const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
 
+    /** A list of JSON encoded strings extra for each questionnaire context. */
+    internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS =
+      "questionnaire-launch-contexts"
     /**
      * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.
      *
@@ -415,6 +443,12 @@ class QuestionnaireFragment : Fragment() {
      * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
      */
     internal const val EXTRA_SHOW_SUBMIT_BUTTON = "show-submit-button"
+
+    internal const val EXTRA_SHOW_OPTIONAL_TEXT = "show-optional-text"
+
+    internal const val EXTRA_SHOW_ASTERISK_TEXT = "show-asterisk-text"
+
+    internal const val EXTRA_SHOW_REQUIRED_TEXT = "show-required-text"
 
     fun builder() = Builder()
   }

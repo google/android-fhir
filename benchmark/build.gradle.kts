@@ -24,10 +24,7 @@ android {
     targetSdk = Sdk.targetSdk
 
     testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
-    // Runs only once
-    testInstrumentationRunnerArguments["androidx.benchmark.dryRunMode.enable"] = "true"
-    // Includes Startup time
-    testInstrumentationRunnerArguments["androidx.benchmark.startupMode.enable"] = "true"
+    testInstrumentationRunnerArguments["androidx.benchmark.output.enable"] = "true"
   }
 
   testBuildType = "release"
@@ -68,6 +65,8 @@ android {
   }
 }
 
+afterEvaluate { configureFirebaseTestLabForMicroBenchmark() }
+
 configurations {
   all {
     removeIncompatibleDependencies()
@@ -85,8 +84,13 @@ dependencies {
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
   androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(Dependencies.Androidx.workRuntimeKtx)
+  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  androidTestImplementation(Dependencies.mockWebServer)
+  androidTestImplementation(Dependencies.Retrofit.coreRetrofit)
 
   androidTestImplementation(project(":engine"))
+  androidTestImplementation(project(":knowledge"))
   androidTestImplementation(project(":workflow"))
   androidTestImplementation(project(":workflow-testing"))
 }

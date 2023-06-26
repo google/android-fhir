@@ -16,22 +16,20 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.DataCapture
-import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
-import com.google.android.fhir.datacapture.targetStructureMap
-import com.google.android.fhir.datacapture.utilities.toCodeType
-import com.google.android.fhir.datacapture.utilities.toCoding
-import com.google.android.fhir.datacapture.utilities.toIdType
-import com.google.android.fhir.datacapture.utilities.toUriType
+import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
+import com.google.android.fhir.datacapture.extensions.targetStructureMap
+import com.google.android.fhir.datacapture.extensions.toCodeType
+import com.google.android.fhir.datacapture.extensions.toCoding
+import com.google.android.fhir.datacapture.extensions.toIdType
+import com.google.android.fhir.datacapture.extensions.toUriType
+import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.util.Locale
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.context.IWorkerContext
-import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CanonicalType
@@ -54,7 +52,6 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.StructureDefinition
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
-import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 import timber.log.Timber
 
@@ -78,11 +75,6 @@ import timber.log.Timber
  * for more information.
  */
 object ResourceMapper {
-
-  private val fhirPathEngine: FHIRPathEngine =
-    with(FhirContext.forCached(FhirVersionEnum.R4)) {
-      FHIRPathEngine(HapiWorkerContext(this, this.validationSupport))
-    }
 
   /**
    * Extract FHIR resources from a [questionnaire] and [questionnaireResponse].
@@ -605,14 +597,14 @@ private fun getFieldNameByDefinition(definition: String): String {
  * `addName` function for `name`.
  */
 private fun Base.addRepeatedFieldValue(fieldName: String) =
-  javaClass.getMethod("add${fieldName.capitalize(Locale.ROOT)}").invoke(this) as Base
+  javaClass.getMethod("add${fieldName.capitalize()}").invoke(this) as Base
 
 /**
  * Invokes the function to get a value in the choice of data type field in the `Base` object, e.g.,
  * `getValueQuantity` for `valueQuantity`.
  */
 private fun Base.getChoiceFieldValue(fieldName: String) =
-  javaClass.getMethod("get${fieldName.capitalize(Locale.ROOT)}").invoke(this) as Base
+  javaClass.getMethod("get${fieldName.capitalize()}").invoke(this) as Base
 
 /**
  * Updates a field of name [field.name] on this object with the generated enum from [value] using
@@ -633,7 +625,7 @@ private fun updateFieldWithEnum(base: Base, field: Field, value: Base) {
   val stringValue = if (value is Coding) value.code else value.toString()
 
   base.javaClass
-    .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.nonParameterizedType)
+    .getMethod("set${field.name.capitalize()}", field.nonParameterizedType)
     .invoke(base, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
 
@@ -675,7 +667,7 @@ private fun updateField(
 
 private fun setFieldElementValue(base: Base, field: Field, answerValue: Base) {
   base.javaClass
-    .getMethod("set${field.name.capitalize(Locale.ROOT)}Element", field.type)
+    .getMethod("set${field.name.capitalize()}Element", field.type)
     .invoke(base, answerValue)
 }
 
@@ -690,8 +682,12 @@ private fun addAnswerToListField(base: Base, field: Field, answerValue: List<Bas
 
 private fun updateListFieldWithAnswer(base: Base, field: Field, answerValue: List<Base>) {
   base.javaClass
-    .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.type)
+    .getMethod("set${field.name.capitalize()}", field.type)
     .invoke(base, if (field.isParameterized && field.isList) answerValue else answerValue.first())
+}
+
+private fun String.capitalize() = replaceFirstChar {
+  if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
 }
 
 /**
@@ -757,6 +753,15 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
 }
 
 /**
+ * Returns a newly created [Resource] from the item extraction context extension if one and only one
+ * such extension exists in the questionnaire, or null otherwise.
+ */
+private fun Questionnaire.createResource(): Resource? =
+  this.extension.itemExtractionContextExtensionValue?.let {
+    Class.forName("org.hl7.fhir.r4.model.$it").newInstance() as Resource
+  }
+
+/**
  * Returns the [Base] object as a [Type] as expected by
  * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue]. Also,
  * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue] only takes a certain [Type]
@@ -781,15 +786,6 @@ private fun Base.asExpectedReferenceType(): Type {
     else -> throw FHIRException("Expression supplied does not evaluate to IdType.")
   }
 }
-
-/**
- * Returns a newly created [Resource] from the item extraction context extension if one and only one
- * such extension exists in the questionnaire, or null otherwise.
- */
-private fun Questionnaire.createResource(): Resource? =
-  this.extension.itemExtractionContextExtensionValue?.let {
-    Class.forName("org.hl7.fhir.r4.model.$it").newInstance() as Resource
-  }
 
 /**
  * Returns a newly created [Resource] from the item extraction context extension if one and only one
