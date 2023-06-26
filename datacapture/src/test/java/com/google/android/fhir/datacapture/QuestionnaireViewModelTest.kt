@@ -382,7 +382,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should set the first of multiple initial values`() {
+  fun `should set all of multiple initial values`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -410,6 +410,11 @@ class QuestionnaireViewModelTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic question"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(true)
