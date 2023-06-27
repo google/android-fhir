@@ -551,11 +551,11 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
     )
   }
 
-  return mutableListOf(
-    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-      value = initial[0].value
+  return initial
+    .map {
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply { value = it.value }
     }
-  )
+    .toMutableList()
 }
 
 internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expression?
