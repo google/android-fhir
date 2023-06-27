@@ -26,6 +26,9 @@ import okhttp3.Credentials
  * authentication and provide the appropriate authentication method so the HTTP requests FHIR Engine
  * sends to the FHIR server contain the correct user information for the request to be
  * authenticated.
+ *
+ * The implementation can provide different `HttpAuthenticationMethod`s at runtime. This is
+ * important if the authentication token expires or the user needs to re-authenticate.
  */
 fun interface HttpAuthenticator {
   fun getAuthenticationMethod(): HttpAuthenticationMethod
