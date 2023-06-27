@@ -26,6 +26,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_POPULATE_CONTEXT_URL
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
@@ -39,6 +40,7 @@ import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isFhirPath
 import com.google.android.fhir.datacapture.extensions.isHidden
+import com.google.android.fhir.datacapture.extensions.isNamedExpression
 import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.extensions.isXFhirQuery
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
@@ -54,6 +56,7 @@ import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluate
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateExpression
 import com.google.android.fhir.datacapture.fhirpath.FHIRPathEngineHostServices.buildContextMap
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
+import com.google.android.fhir.datacapture.mapping.ITEM_INITIAL_EXPRESSION_URL
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
@@ -72,6 +75,7 @@ import kotlinx.coroutines.flow.update
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Element
+import org.hl7.fhir.r4.model.Enumerations.FHIRAllTypes
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
@@ -748,10 +752,47 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                 showRequiredText = showRequiredText,
                 showOptionalText = showOptionalText
               ),
-            questionnaireItem.buildContextMap(questionnaire, questionnaireResponse, questionnaireResponseItem)
+            contextData = listOf() + questionnaireItem.buildContextMap(questionnaire, questionnaireResponse, questionnaireResponseItem)
           )
         )
       )
+
+      suspend fun runContextExpressions(questionnaireItem: QuestionnaireItemComponent, questionnaireResponseItem: QuestionnaireResponseItemComponent){
+        // all expressions of itself and of its parents
+        questionnaireItem.extension.filter { it.value.isNamedExpression }.map { ext ->
+          ext.castToExpression(ext.value).let {
+            // only initial expression and item populate context expressions are run once and on start
+            if (ext.url == ITEM_INITIAL_EXPRESSION_URL || ext.url == EXTENSION_ITEM_POPULATE_CONTEXT_URL) {
+              ContextExpressionFixed(it, runExpression(questionnaireItem, questionnaireResponseItem, it))
+
+            }
+            else {}
+          }
+        }
+      }
+
+      suspend fun runExpression(questionnaireItem: QuestionnaireItemComponent, questionnaireResponseItem: QuestionnaireResponseItemComponent,
+                                expression: Expression): List<Base> {
+       return if (expression.isXFhirQuery) {
+            checkNotNull(xFhirQueryResolver) {
+              "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
+            }
+
+            val xFhirExpressionString =
+              ExpressionEvaluator.createXFhirQueryFromExpression(//TODO check to pass context data
+                expression,
+                questionnaireLaunchContextMap
+              )
+            xFhirQueryResolver!!.resolve(xFhirExpressionString)
+          } else if (expression.isFhirPath) {
+            evaluateExpression(questionnaire, questionnaireResponse, questionnaireItem, questionnaireResponseItem, expression, questionnaireItemParentMap)
+          } else {
+            throw UnsupportedOperationException(
+              "${expression.language} not supported for answer-expression yet"
+            )
+          }
+      }
+
 
       // Add nested questions after the parent item. We need to get the questionnaire items and
       // (possibly multiple sets of) matching questionnaire response items and generate the adapter

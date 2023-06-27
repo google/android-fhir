@@ -29,6 +29,7 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Enumerations.FHIRAllTypes
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.IntegerType
@@ -127,3 +128,6 @@ fun Type.valueOrCalculateValue(): Type {
     this
   }
 }
+
+val Type.isNamedExpression: Boolean
+  get() = this.hasType(FHIRAllTypes.EXPRESSION.toCode()) && this.castToExpression(this).hasName()
