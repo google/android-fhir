@@ -30,6 +30,7 @@ import com.google.android.fhir.demo.data.FhirSyncWorker
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.remote.HttpLogger
+import org.hl7.fhir.r4.model.Patient
 import timber.log.Timber
 
 class FhirApplication : Application(), DataCaptureConfig.Provider {
@@ -45,6 +46,7 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
     if (BuildConfig.DEBUG) {
       Timber.plant(Timber.DebugTree())
     }
+    Patient.IDENTIFIER
     FhirEngineProvider.init(
       FhirEngineConfiguration(
         enableEncryptionIfSupported = true,
