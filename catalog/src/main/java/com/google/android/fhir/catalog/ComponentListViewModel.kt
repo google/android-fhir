@@ -120,7 +120,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_attachment_with_validation.json"
     ),
     REPEATED_GROUP(
-      R.drawable.ic_textfield,
+      R.drawable.ic_repeatgroups,
       R.string.component_name_repeated_group,
       "component_repeated_group.json",
     ),

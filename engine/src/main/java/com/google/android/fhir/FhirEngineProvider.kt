@@ -161,5 +161,7 @@ data class NetworkConfiguration(
   /** Read timeout (in seconds) for network connection. The default is 10 seconds. */
   val readTimeOut: Long = 10,
   /** Write timeout (in seconds) for network connection. The default is 10 seconds. */
-  val writeTimeOut: Long = 10
+  val writeTimeOut: Long = 10,
+  /** Compresses requests when uploading to a server that supports gzip. */
+  val uploadWithGzip: Boolean = false,
 )

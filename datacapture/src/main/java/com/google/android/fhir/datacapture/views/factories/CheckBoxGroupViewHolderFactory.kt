@@ -54,6 +54,7 @@ internal object CheckBoxGroupViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         header.bind(questionnaireViewItem)
+        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
         val choiceOrientation =
           questionnaireViewItem.questionnaireItem.choiceOrientation
             ?: ChoiceOrientationTypes.VERTICAL

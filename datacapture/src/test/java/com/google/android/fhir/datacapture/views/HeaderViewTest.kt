@@ -36,6 +36,8 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -50,11 +52,13 @@ class HeaderViewTest {
   private val view = HeaderView(parent.context, null)
 
   private fun getQuestionnaireViewItemWithQuestionnaireItem(
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
   ): QuestionnaireViewItem {
     return QuestionnaireViewItem(
       questionnaireItem = questionnaireItem,
-      questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+      questionnaireResponseItem = questionnaireResponseItem,
       validationResult = Valid,
       answersChangedCallback = { _, _, _, _ -> }
     )
@@ -104,6 +108,39 @@ class HeaderViewTest {
           repeats = true
           text = "Question?"
         }
+      )
+    )
+
+    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question?")
+  }
+
+  @Test
+  fun `should show question from localized text`() {
+    view.bind(
+      getQuestionnaireViewItemWithQuestionnaireItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = true
+          textElement.apply {
+            addExtension(
+              Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                addExtension(Extension("lang", StringType("en")))
+                addExtension(Extension("content", StringType("Question?")))
+              }
+            )
+          }
+        }
+      )
+    )
+
+    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question?")
+  }
+
+  @Test
+  fun `should show question from questionnaire response item derived text`() {
+    view.bind(
+      getQuestionnaireViewItemWithQuestionnaireItem(
+        Questionnaire.QuestionnaireItemComponent().apply { repeats = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { text = "Question?" }
       )
     )
 

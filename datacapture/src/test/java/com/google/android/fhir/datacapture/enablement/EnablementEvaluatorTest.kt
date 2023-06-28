@@ -38,6 +38,8 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class EnablementEvaluatorTest {
+  val iParser: IParser = FhirContext.forR4Cached().newJsonParser()
+
   @Test
   fun evaluate_noEnableWhen_shouldReturnTrue() {
     assertEnableWhen().isTrue()
@@ -159,8 +161,6 @@ class EnablementEvaluatorTest {
       } 
       """.trimIndent()
 
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
-
     val questionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
@@ -241,8 +241,6 @@ class EnablementEvaluatorTest {
       } 
       """.trimIndent()
 
-    val iParser: IParser = FhirContext.forR4().newJsonParser()
-
     val questionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
@@ -262,6 +260,85 @@ class EnablementEvaluatorTest {
       )
       .isFalse()
   }
+
+  @Test
+  fun `evaluate() should evaluate enableWhenExpression with context fhirpath supplement literal`() =
+    runBlocking {
+      @Language("JSON")
+      val questionnaireJson =
+        """
+    {
+      "resourceType": "Questionnaire",
+          "item": [
+            {
+              "linkId": "1",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
+              "type": "choice",
+              "text": "Gender"
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
+                  "valueExpression": {
+                    "language": "text/fhirpath",
+                    "expression": "%resource.repeat(item).where(linkId='1').answer.value.code = %context.linkId"
+                  }
+                }
+              ],
+              "linkId" : "female",
+              "text": "Have you had mammogram before?(enableWhenExpression = only when gender is female)",
+              "type": "choice",
+              "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
+            }
+          ]
+    }
+        """.trimIndent()
+
+      @Language("JSON")
+      val questionnaireResponseJson =
+        """
+    {
+      "resourceType": "QuestionnaireResponse",
+      "item": [
+        {
+          "linkId": "1",
+          "answer": [
+            {
+              "valueCoding": {
+                "system": "http://hl7.org/fhir/administrative-gender",
+                "code": "female",
+                "display": "Female"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "female"
+        }
+      ]
+    } 
+        """.trimIndent()
+
+      val questionnaire =
+        iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+
+      val questionnaireItem: Questionnaire.QuestionnaireItemComponent =
+        questionnaire.item.find { it.linkId == "female" }!!
+
+      val questionnaireResponse =
+        iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+          as QuestionnaireResponse
+
+      assertThat(
+          EnablementEvaluator(questionnaireResponse)
+            .evaluate(
+              questionnaireItem,
+              questionnaireResponse.item[1],
+            )
+        )
+        .isTrue()
+    }
 
   @Test
   fun evaluate_expectAnswerDoesNotExist_answerDoesNotExist_shouldReturnTrue() {

@@ -27,15 +27,18 @@ import org.hl7.fhir.r4.model.Resource
 import retrofit2.Retrofit
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.HeaderMap
 import retrofit2.http.POST
 import retrofit2.http.Url
 
 /** Retrofit service to make http requests to the FHIR server. */
 internal interface RetrofitHttpService : FhirHttpService {
 
-  @GET override suspend fun get(@Url path: String): Resource
+  @GET
+  override suspend fun get(@Url path: String, @HeaderMap headers: Map<String, String>): Resource
 
-  @POST(".") override suspend fun post(@Body bundle: Bundle): Resource
+  @POST(".")
+  override suspend fun post(@Body bundle: Bundle, @HeaderMap headers: Map<String, String>): Resource
 
   class Builder(
     private val baseUrl: String,
@@ -59,6 +62,9 @@ internal interface RetrofitHttpService : FhirHttpService {
           .readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
           .writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
           .apply {
+            if (networkConfiguration.uploadWithGzip) {
+              addInterceptor(GzipUploadInterceptor)
+            }
             httpLoggingInterceptor?.let { addInterceptor(it) }
             authenticator?.let {
               addInterceptor(
