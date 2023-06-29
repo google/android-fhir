@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">FHIR Engine Codelab</string>
+    <string name="sync">Sync</string>
+    <string name="update">Update</string>
+</resources>
