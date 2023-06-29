@@ -33,8 +33,11 @@ import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
+import com.google.android.fhir.search.execute
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
+import com.google.android.fhir.search.include
+import com.google.android.fhir.search.revInclude
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.readFromFile
@@ -62,11 +65,12 @@ import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Observation
+import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.SearchParameter
@@ -2561,96 +2565,6 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun search_practitioner_has_patient_has_conditions_diabetes_and_hypertension() = runBlocking {
-    // Running this test with more resources than required to try and hit all the cases
-    // patient 1 has 2 practitioners & both conditions
-    // patient 2 has both conditions but no associated practitioner
-    // patient 3 has 1 practitioner & 1 condition
-    val diabetesCodeableConcept =
-      CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes"))
-    val hyperTensionCodeableConcept =
-      CodeableConcept(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1"))
-    val resources =
-      listOf(
-        Practitioner().apply { id = "practitioner-001" },
-        Practitioner().apply { id = "practitioner-002" },
-        Patient().apply {
-          gender = Enumerations.AdministrativeGender.MALE
-          id = "patient-001"
-          this.addGeneralPractitioner(Reference("Practitioner/practitioner-001"))
-          this.addGeneralPractitioner(Reference("Practitioner/practitioner-002"))
-        },
-        Condition().apply {
-          subject = Reference("Patient/patient-001")
-          id = "condition-001"
-          code = diabetesCodeableConcept
-        },
-        Condition().apply {
-          subject = Reference("Patient/patient-001")
-          id = "condition-002"
-          code = hyperTensionCodeableConcept
-        },
-        Patient().apply {
-          gender = Enumerations.AdministrativeGender.MALE
-          id = "patient-002"
-        },
-        Condition().apply {
-          subject = Reference("Patient/patient-002")
-          id = "condition-003"
-          code = hyperTensionCodeableConcept
-        },
-        Condition().apply {
-          subject = Reference("Patient/patient-002")
-          id = "condition-004"
-          code = diabetesCodeableConcept
-        },
-        Practitioner().apply { id = "practitioner-003" },
-        Patient().apply {
-          gender = Enumerations.AdministrativeGender.MALE
-          id = "patient-003"
-          this.addGeneralPractitioner(Reference("Practitioner/practitioner-00"))
-        },
-        Condition().apply {
-          subject = Reference("Patient/patient-003")
-          id = "condition-005"
-          code = diabetesCodeableConcept
-        }
-      )
-    database.insert(*resources.toTypedArray())
-
-    val result =
-      database.search<Practitioner>(
-        Search(ResourceType.Practitioner)
-          .apply {
-            has<Patient>(Patient.GENERAL_PRACTITIONER) {
-              has<Condition>(Condition.SUBJECT) {
-                filter(
-                  Condition.CODE,
-                  { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) }
-                )
-              }
-            }
-            has<Patient>(Patient.GENERAL_PRACTITIONER) {
-              has<Condition>(Condition.SUBJECT) {
-                filter(
-                  Condition.CODE,
-                  {
-                    value =
-                      of(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1"))
-                  }
-                )
-              }
-            }
-          }
-          .getQuery()
-      )
-
-    assertThat(result.map { it.logicalId })
-      .containsExactly("practitioner-001", "practitioner-002")
-      .inOrder()
-  }
-
-  @Test
   fun search_sortDescending_Date(): Unit = runBlocking {
     database.insert(
       Patient().apply {
@@ -3078,12 +2992,15 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun search_patient_has_revInclude(): Unit = runBlocking {
+  fun search_patient_with_reference_resources(): Unit = runBlocking {
     val diabetesCodeableConcept =
       CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes"))
     val hyperTensionCodeableConcept =
       CodeableConcept(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1"))
-    val resources =
+    val migraineCodeableConcept =
+      CodeableConcept(Coding("http://snomed.info/sct", "37796009", "Migraine"))
+
+    val patients =
       listOf(
         Patient().apply {
           id = "pa-01"
@@ -3093,6 +3010,10 @@ class DatabaseImplTest {
               family = "Gorden"
             }
           )
+          addGeneralPractitioner(Reference("Practitioner/gp-01"))
+          addGeneralPractitioner(Reference("Practitioner/gp-02"))
+          addGeneralPractitioner(Reference("Practitioner/gp-03"))
+          managingOrganization = Reference("Organization/org-01")
         },
         Patient().apply {
           id = "pa-02"
@@ -3102,46 +3023,293 @@ class DatabaseImplTest {
               family = "Bond"
             }
           )
+          addGeneralPractitioner(Reference("Practitioner/gp-01"))
+          addGeneralPractitioner(Reference("Practitioner/gp-02"))
+          addGeneralPractitioner(Reference("Practitioner/gp-03"))
+          managingOrganization = Reference("Organization/org-02")
         },
-        Patient().apply { id = "pa-04" },
-        Encounter().apply {
-          id = "en-01"
-          subject = Reference("Patient/pa-01")
+        Patient().apply {
+          id = "pa-03"
+          addName(
+            HumanName().apply {
+              addGiven("John")
+              family = "Doe"
+            }
+          )
+          addGeneralPractitioner(Reference("Practitioner/gp-01"))
+          addGeneralPractitioner(Reference("Practitioner/gp-02"))
+          addGeneralPractitioner(Reference("Practitioner/gp-03"))
+          managingOrganization = Reference("Organization/org-03")
+        }
+      )
+
+    val practitioners =
+      listOf(
+        Practitioner().apply {
+          id = "gp-01"
+          addName(
+            HumanName().apply {
+              family = "Practitioner-01"
+              addGiven("General-01")
+            }
+          )
+          active = true
         },
-        Encounter().apply {
-          id = "en-02"
-          subject = Reference("Patient/pa-02")
+        Practitioner().apply {
+          id = "gp-02"
+          addName(
+            HumanName().apply {
+              family = "Practitioner-02"
+              addGiven("General-02")
+            }
+          )
+          active = true
         },
-        Encounter().apply {
-          id = "en-03"
-          subject = Reference("Patient/pa-01")
+        Practitioner().apply {
+          id = "gp-03"
+          addName(
+            HumanName().apply {
+              family = "Practitioner-03"
+              addGiven("General-03")
+            }
+          )
+          active = false
+        }
+      )
+
+    val organizations =
+      listOf(
+        Organization().apply {
+          id = "org-01"
+          name = "Organization-01"
+          active = true
         },
+        Organization().apply {
+          id = "org-02"
+          name = "Organization-02"
+          active = true
+        },
+        Organization().apply {
+          id = "org-03"
+          name = "Organization-03"
+          active = false
+        }
+      )
+
+    val conditions =
+      listOf(
         Condition().apply {
-          id = "con-01"
+          id = "con-01-pa-01"
           code = diabetesCodeableConcept
           subject = Reference("Patient/pa-01")
         },
         Condition().apply {
-          id = "con-02"
+          id = "con-02-pa-01"
+          code = hyperTensionCodeableConcept
+          subject = Reference("Patient/pa-01")
+        },
+        Condition().apply {
+          id = "con-03-pa-01"
+          code = migraineCodeableConcept
+          subject = Reference("Patient/pa-01")
+        },
+        Condition().apply {
+          id = "con-01-pa-02"
+          code = diabetesCodeableConcept
+          subject = Reference("Patient/pa-02")
+        },
+        Condition().apply {
+          id = "con-02-pa-02"
           code = hyperTensionCodeableConcept
           subject = Reference("Patient/pa-02")
+        },
+        Condition().apply {
+          id = "con-03-pa-02"
+          code = migraineCodeableConcept
+          subject = Reference("Patient/pa-02")
+        },
+        Condition().apply {
+          id = "con-01-pa-03"
+          code = diabetesCodeableConcept
+          subject = Reference("Patient/pa-03")
+        },
+        Condition().apply {
+          id = "con-02-pa-03"
+          code = hyperTensionCodeableConcept
+          subject = Reference("Patient/pa-03")
+        },
+        Condition().apply {
+          id = "con-03-pa-03"
+          code = migraineCodeableConcept
+          subject = Reference("Patient/pa-03")
+        },
+      )
+
+    val encounters =
+      listOf(
+        Encounter().apply {
+          id = "en-01-pa-01"
+          subject = Reference("Patient/pa-01")
+          period =
+            Period().apply {
+              start = DateType(2023, 2, 1).value
+              end = DateType(2023, 11, 1).value
+            }
+        },
+        Encounter().apply {
+          id = "en-02-pa-01"
+          subject = Reference("Patient/pa-01")
+          period =
+            Period().apply {
+              start = DateType(2023, 2, 1).value
+              end = DateType(2023, 11, 1).value
+            }
+        },
+        Encounter().apply {
+          id = "en-03-pa-01"
+          subject = Reference("Patient/pa-01")
+          period =
+            Period().apply {
+              start = DateType(2022, 2, 1).value
+              end = DateType(2022, 11, 1).value
+            }
+        },
+        Encounter().apply {
+          id = "en-01-pa-02"
+          subject = Reference("Patient/pa-02")
+          period =
+            Period().apply {
+              start = DateType(2023, 2, 1).value
+              end = DateType(2023, 11, 1).value
+            }
+        },
+        Encounter().apply {
+          id = "en-02-pa-02"
+          subject = Reference("Patient/pa-02")
+          period =
+            Period().apply {
+              start = DateType(2023, 2, 1).value
+              end = DateType(2023, 11, 1).value
+            }
+        },
+        Encounter().apply {
+          id = "en-03-pa-02"
+          subject = Reference("Patient/pa-02")
+          period =
+            Period().apply {
+              start = DateType(2022, 2, 1).value
+              end = DateType(2022, 11, 1).value
+            }
+        },
+        Encounter().apply {
+          id = "en-01-pa-03"
+          subject = Reference("Patient/pa-03")
+          period =
+            Period().apply {
+              start = DateType(2023, 2, 1).value
+              end = DateType(2023, 11, 1).value
+            }
+        },
+        Encounter().apply {
+          id = "en-02-pa-03"
+          subject = Reference("Patient/pa-03")
+          period =
+            Period().apply {
+              start = DateType(2023, 2, 1).value
+              end = DateType(2023, 11, 1).value
+            }
+        },
+        Encounter().apply {
+          id = "en-03-pa-03"
+          subject = Reference("Patient/pa-03")
+          period =
+            Period().apply {
+              start = DateType(2022, 2, 1).value
+              end = DateType(2022, 11, 1).value
+            }
         }
       )
-    database.insertRemote(*resources.toTypedArray())
+    // 3 Patients.
+    // Each has 3 conditions, only 2 should match
+    // Each has 3 encounters, only 2 should match
+
+    // Each has 3 GP, only 2 should match
+    database.insertRemote(
+      *(patients + practitioners + organizations + conditions + encounters).toTypedArray()
+    )
 
     val result =
-      database.search<Resource>(
-        Search(ResourceType.Patient)
-          .apply {
-            filter(Patient.GIVEN, { value = "James" })
-            has<Condition>(Condition.SUBJECT) {
-              filter(Condition.CODE, { value = of(diabetesCodeableConcept) })
-            }
-            revInclude(ResourceType.Encounter, Encounter.SUBJECT)
+      Search(ResourceType.Patient)
+        .apply {
+          revInclude<Condition>(Condition.SUBJECT) {
+            filter(Condition.CODE, { value = of(diabetesCodeableConcept) })
+            filter(Condition.CODE, { value = of(migraineCodeableConcept) })
+            operations(Operation.OR)
           }
-          .getQuery()
-      )
-    assertThat(result.map { it.logicalId }).containsExactly("pa-01", "en-01", "en-03")
+
+          revInclude<Encounter>(Encounter.SUBJECT) {
+            filter(
+              Encounter.DATE,
+              {
+                value = of(DateTimeType("2023-01-01"))
+                prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              }
+            )
+          }
+
+          include<Practitioner>(Patient.GENERAL_PRACTITIONER) {
+            filter(Practitioner.ACTIVE, { value = of(true) })
+            filter(
+              Practitioner.FAMILY,
+              {
+                value = "Practitioner"
+                modifier = StringFilterModifier.STARTS_WITH
+              }
+            )
+            operations(Operation.AND)
+          }
+
+          include<Organization>(Patient.ORGANIZATION) {
+            filter(
+              Organization.NAME,
+              {
+                value = "Organization"
+                modifier = StringFilterModifier.STARTS_WITH
+              }
+            )
+            filter(Practitioner.ACTIVE, { value = of(true) })
+            operations(Operation.AND)
+          }
+        }
+        .execute<Patient>(database)
+
+    assertThat(result[0].resource.logicalId).isEqualTo("pa-01")
+    assertThat(result[0].included!![ResourceType.Practitioner]!!.map { it.logicalId })
+      .containsExactly("gp-01", "gp-02")
+    assertThat(result[0].included!![ResourceType.Organization]!!.map { it.logicalId })
+      .containsExactly("org-01")
+    assertThat(result[0].revIncluded!![ResourceType.Condition]!!.map { it.logicalId })
+      .containsExactly("con-01-pa-01", "con-03-pa-01")
+    assertThat(result[0].revIncluded!![ResourceType.Encounter]!!.map { it.logicalId })
+      .containsExactly("en-01-pa-01", "en-02-pa-01")
+
+    assertThat(result[1].resource.logicalId).isEqualTo("pa-02")
+    assertThat(result[1].included!![ResourceType.Practitioner]!!.map { it.logicalId })
+      .containsExactly("gp-01", "gp-02")
+    assertThat(result[1].included!![ResourceType.Organization]!!.map { it.logicalId })
+      .containsExactly("org-02")
+    assertThat(result[1].revIncluded!![ResourceType.Condition]!!.map { it.logicalId })
+      .containsExactly("con-01-pa-02", "con-03-pa-02")
+    assertThat(result[1].revIncluded!![ResourceType.Encounter]!!.map { it.logicalId })
+      .containsExactly("en-01-pa-02", "en-02-pa-02")
+
+    assertThat(result[2].resource.logicalId).isEqualTo("pa-03")
+    assertThat(result[2].included!![ResourceType.Practitioner]!!.map { it.logicalId })
+      .containsExactly("gp-01", "gp-02")
+    assertThat(result[2].revIncluded!![ResourceType.Condition]!!.map { it.logicalId })
+      .containsExactly("con-01-pa-03", "con-03-pa-03")
+    assertThat(result[2].revIncluded!![ResourceType.Encounter]!!.map { it.logicalId })
+      .containsExactly("en-01-pa-03", "en-02-pa-03")
   }
 
   private companion object {

@@ -17,11 +17,14 @@
 package com.google.android.fhir.search
 
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.SearchResult
 import com.google.android.fhir.search.query.XFhirQueryTranslator.translate
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
-suspend inline fun <reified R : Resource> FhirEngine.search(init: Search.() -> Unit): List<R> {
+suspend inline fun <reified R : Resource> FhirEngine.search(
+  init: Search.() -> Unit
+): List<SearchResult<R>> {
   val search = Search(type = R::class.java.newInstance().resourceType)
   search.init()
   return this.search(search)
@@ -33,28 +36,15 @@ suspend inline fun <reified R : Resource> FhirEngine.count(init: Search.() -> Un
   return this.count(search)
 }
 
-suspend fun FhirEngine.search(xFhirQuery: String): List<Resource> {
+suspend fun FhirEngine.search(xFhirQuery: String): List<SearchResult<Resource>> {
   return this.search(translate(xFhirQuery))
 }
 
-suspend fun FhirEngine.search(resourceType: ResourceType, init: Search.() -> Unit): List<Resource> {
+suspend fun FhirEngine.search(
+  resourceType: ResourceType,
+  init: Search.() -> Unit
+): List<SearchResult<Resource>> {
   val search = Search(type = resourceType)
   search.init()
   return this.search(search)
-}
-
-suspend inline fun <reified R : Resource> FhirEngine.searchWithRevInclude(
-  init: Search.() -> Unit
-): Map<R, Map<ResourceType, List<Resource>>> {
-  val search = Search(type = R::class.java.newInstance().resourceType)
-  search.init()
-  return this.searchWithRevInclude(true, search)
-}
-
-suspend inline fun <reified R : Resource> FhirEngine.searchWithForwardInclude(
-  init: Search.() -> Unit
-): Map<R, Map<ResourceType, List<Resource>>> {
-  val search = Search(type = R::class.java.newInstance().resourceType)
-  search.init()
-  return this.searchWithRevInclude(false, search)
 }

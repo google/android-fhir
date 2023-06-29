@@ -22,6 +22,7 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.BundleRequest
@@ -136,15 +137,8 @@ object TestFhirEngineImpl : FhirEngine {
 
   override suspend fun delete(type: ResourceType, id: String) {}
 
-  override suspend fun <R : Resource> search(search: Search): List<R> {
+  override suspend fun <R : Resource> search(search: Search): List<SearchResult<R>> {
     return emptyList()
-  }
-
-  override suspend fun <R : Resource> searchWithRevInclude(
-    isRevInclude: Boolean,
-    search: Search
-  ): Map<R, Map<ResourceType, List<Resource>>> {
-    TODO("Not yet implemented")
   }
 
   override suspend fun syncUpload(

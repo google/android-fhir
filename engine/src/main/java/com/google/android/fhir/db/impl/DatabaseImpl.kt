@@ -187,7 +187,7 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun <R : Resource> searchRev(query: SearchQuery): List<IndexedIdAndResource> {
+  override suspend fun searchReferencedResources(query: SearchQuery): List<IndexedIdAndResource> {
     return db.withTransaction {
       resourceDao.getResourcesRev(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).map {
         IndexedIdAndResource(

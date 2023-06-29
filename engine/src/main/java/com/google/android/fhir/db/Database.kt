@@ -95,7 +95,7 @@ internal interface Database {
 
   suspend fun <R : Resource> search(query: SearchQuery): List<R>
 
-  suspend fun <R : Resource> searchRev(query: SearchQuery): List<IndexedIdAndResource>
+  suspend fun searchReferencedResources(query: SearchQuery): List<IndexedIdAndResource>
 
   suspend fun count(query: SearchQuery): Long
 

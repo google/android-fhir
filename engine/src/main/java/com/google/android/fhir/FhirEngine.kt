@@ -46,12 +46,7 @@ interface FhirEngine {
   /**
    * Searches the database and returns a list resources according to the [search] specifications.
    */
-  suspend fun <R : Resource> search(search: Search): List<R>
-
-  suspend fun <R : Resource> searchWithRevInclude(
-    isRevInclude: Boolean,
-    search: Search
-  ): Map<R, Map<ResourceType, List<Resource>>>
+  suspend fun <R : Resource> search(search: Search): List<SearchResult<R>>
 
   /**
    * Synchronizes the [upload] result in the database. [upload] operation may result in multiple
@@ -132,3 +127,15 @@ suspend inline fun <reified R : Resource> FhirEngine.get(id: String): R {
 suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
   delete(getResourceType(R::class.java), id)
 }
+
+typealias ReferencedResources = Map<ResourceType, List<Resource>>
+
+/** It contains the searched resource and referenced resources as per the search query. */
+data class SearchResult<R : Resource>(
+  /** Matching resource as per the query. */
+  val resource: R,
+  /** Matching referenced resources as per the [Search.include] criteria in the query. */
+  val included: ReferencedResources?,
+  /** Matching referenced resources as per the [Search.revInclude] criteria in the query. */
+  val revIncluded: ReferencedResources?
+)

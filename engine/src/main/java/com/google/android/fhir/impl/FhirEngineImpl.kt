@@ -20,6 +20,7 @@ import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.toLocalChange
@@ -27,8 +28,6 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
-import com.google.android.fhir.search.getIncludeQuery
-import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
 import java.time.OffsetDateTime
@@ -58,38 +57,8 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     database.delete(type, id)
   }
 
-  override suspend fun <R : Resource> search(search: Search): List<R> {
+  override suspend fun <R : Resource> search(search: Search): List<SearchResult<R>> {
     return search.execute(database)
-  }
-
-  override suspend fun <R : Resource> searchWithRevInclude(
-    isRevInclude: Boolean,
-    search: Search
-  ): Map<R, Map<ResourceType, List<Resource>>> {
-    val baseResources = database.search<R>(search.getQuery()) // .subList(0,2)
-    val includedResources =
-      database.searchRev<R>(
-        search.getIncludeQuery(
-          isRevInclude,
-          includeIds =
-            baseResources.map {
-              if (isRevInclude) "\'${it.resourceType}/${it.logicalId}\'" else "\'${it.logicalId}\'"
-            }
-        )
-      )
-    val resultMap = mutableMapOf<R, Map<ResourceType, List<Resource>>>()
-    baseResources.forEach { patient ->
-      resultMap[patient] =
-        includedResources
-          .filter {
-            if (isRevInclude)
-              it.idOfBaseResourceOnWhichThisMatched == "${patient.fhirType()}/${patient.logicalId}"
-            else it.idOfBaseResourceOnWhichThisMatched == patient.logicalId
-          }
-          .map { it.resource }
-          .groupBy { it.resourceType }
-    }
-    return resultMap
   }
 
   override suspend fun count(search: Search): Long {

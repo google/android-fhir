@@ -18,15 +18,16 @@ package com.google.android.fhir.search
 
 import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
-import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.ConverterException
 import com.google.android.fhir.DateProvider
+import com.google.android.fhir.SearchResult
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.epochDay
+import com.google.android.fhir.logicalId
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import java.util.Date
@@ -35,7 +36,6 @@ import kotlin.math.roundToLong
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * The multiplier used to determine the range for the `ap` search prefix. See
@@ -43,8 +43,43 @@ import org.hl7.fhir.r4.model.ResourceType
  */
 private const val APPROXIMATION_COEFFICIENT = 0.1
 
-internal suspend fun <R : Resource> Search.execute(database: Database): List<R> {
-  return database.search(getQuery())
+internal suspend fun <R : Resource> Search.execute(database: Database): List<SearchResult<R>> {
+  val baseResources = database.search<R>(getQuery())
+  val includedResources =
+    if (forwardIncludes.isEmpty() || baseResources.isEmpty()) {
+      null
+    } else {
+      database.searchReferencedResources(
+        getIncludeQuery(includeIds = baseResources.map { it.logicalId })
+      )
+    }
+  val revIncludedResources =
+    if (revIncludes.isEmpty() || baseResources.isEmpty()) {
+      null
+    } else {
+      database.searchReferencedResources(
+        getRevIncludeQuery(includeIds = baseResources.map { "${it.resourceType}/${it.logicalId}" })
+      )
+    }
+
+  return baseResources.map { baseResource ->
+    SearchResult(
+      baseResource,
+      included =
+        includedResources
+          ?.filter { it.idOfBaseResourceOnWhichThisMatched == baseResource.logicalId }
+          ?.map { it.resource }
+          ?.groupBy { it.resourceType },
+      revIncluded =
+        revIncludedResources
+          ?.filter {
+            it.idOfBaseResourceOnWhichThisMatched ==
+              "${baseResource.fhirType()}/${baseResource.logicalId}"
+          }
+          ?.map { it.resource }
+          ?.groupBy { it.resourceType }
+    )
+  }
 }
 
 internal suspend fun Search.count(database: Database): Long {
@@ -55,41 +90,99 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
   return getQuery(isCount, null)
 }
 
-internal fun Search.getIncludeQuery(isRevInclude: Boolean, includeIds: List<String>) =
-  if (isRevInclude) {
-    getRevIncludeQuery(includeIds)
-  } else getIncludeQuery(includeIds)
-
 private fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
-  val match =
-    revIncludeMap
-      .map {
-        " ( a.resourceType = '${it.key}' and a.index_name IN (${it.value.joinToString { "\'${it.paramName}\'" }}) ) "
-      }
-      .joinToString(separator = "OR")
+  var matchQuery = ""
+  val args = mutableListOf<Any>()
+  args.addAll(includeIds)
+
+  // creating the match and filter query
+  revIncludes.forEachIndexed { index, (param, search) ->
+    val resourceToInclude = search.type
+    args.add(resourceToInclude.name)
+    args.add(param.paramName)
+    matchQuery += " ( a.resourceType = ? and a.index_name IN (?) "
+
+    val allFilters = search.getFilterQueries()
+
+    if (allFilters.isNotEmpty()) {
+      val iterator = allFilters.listIterator()
+      matchQuery += "AND b.resourceUuid IN (\n"
+      do {
+        iterator.next().let {
+          matchQuery += it.query
+          args.addAll(it.args)
+        }
+
+        if (iterator.hasNext()) {
+          matchQuery +=
+            if (search.operation == Operation.OR) {
+              "\n UNION \n"
+            } else {
+              "\n INTERSECT \n"
+            }
+        }
+      } while (iterator.hasNext())
+      matchQuery += "\n)"
+    }
+
+    matchQuery += " \n)"
+
+    if (index != revIncludes.lastIndex) matchQuery += " OR "
+  }
 
   return SearchQuery(
     query =
       """
-    SELECT  a.index_value, b.serializedResource
+    SELECT  a.index_value, b.serializedResource 
     FROM ReferenceIndexEntity a 
     JOIN  ResourceEntity b
     ON  a.resourceUuid = b.resourceUuid
-    AND  a.index_value IN( ${includeIds.joinToString()} ) 
-    AND ($match)
+    AND  a.index_value IN( ${ CharArray(includeIds.size) { '?' }.joinToString()} ) 
+    ${if (matchQuery.isEmpty()) "" else "AND ($matchQuery) " }
     """.trimIndent(),
-    args = listOf()
+    args = args
   )
 }
 
 private fun Search.getIncludeQuery(includeIds: List<String>): SearchQuery {
-  val match =
-    includeMap
-      .map {
-        " ( c.resourceType = '${it.key}' and b.index_name IN (${it.value.joinToString { "\'${it.paramName}\'" }}) ) "
-      }
-      .joinToString(separator = "OR")
-  //  SELECT a.resourceType||"/"||a.resourceId, c.serializedResource from ResourceEntity a
+  var matchQuery = ""
+  val args = mutableListOf<Any>(type.name)
+  args.addAll(includeIds)
+
+  // creating the match and filter query
+  forwardIncludes.forEachIndexed { index, (param, search) ->
+    val resourceToInclude = search.type
+    args.add(resourceToInclude.name)
+    args.add(param.paramName)
+    matchQuery += " ( c.resourceType = ? and b.index_name IN (?) "
+
+    val allFilters = search.getFilterQueries()
+
+    if (allFilters.isNotEmpty()) {
+      val iterator = allFilters.listIterator()
+      matchQuery += "AND c.resourceUuid IN (\n"
+      do {
+        iterator.next().let {
+          matchQuery += it.query
+          args.addAll(it.args)
+        }
+
+        if (iterator.hasNext()) {
+          matchQuery +=
+            if (search.operation == Operation.OR) {
+              "\n UNION \n"
+            } else {
+              "\n INTERSECT \n"
+            }
+        }
+      } while (iterator.hasNext())
+      matchQuery += "\n)"
+    }
+
+    matchQuery += " \n)"
+
+    if (index != forwardIncludes.lastIndex) matchQuery += " OR "
+  }
 
   return SearchQuery(
     query =
@@ -97,15 +190,25 @@ private fun Search.getIncludeQuery(includeIds: List<String>): SearchQuery {
     SELECT a.resourceId, c.serializedResource from ResourceEntity a 
     JOIN ReferenceIndexEntity b 
     On a.resourceUuid = b.resourceUuid
-    AND a.resourceType = '${type.name}'
-    AND a.resourceId in ( ${includeIds.joinToString()} ) 
+    AND a.resourceType = ?
+    AND a.resourceId IN ( ${ CharArray(includeIds.size) { '?' }.joinToString()} ) 
     JOIN ResourceEntity c
     ON c.resourceType||"/"||c.resourceId = b.index_value
-    AND ($match)
+    ${if (matchQuery.isEmpty()) "" else "AND ($matchQuery) " }
     """.trimIndent(),
-    args = listOf()
+    args = args
   )
 }
+
+private fun Search.getFilterQueries() =
+  (stringFilterCriteria +
+      quantityFilterCriteria +
+      numberFilterCriteria +
+      referenceFilterCriteria +
+      dateTimeFilterCriteria +
+      tokenFilterCriteria +
+      uriFilterCriteria)
+    .map { it.query(type) }
 
 internal fun Search.getQuery(
   isCount: Boolean = false,
@@ -155,15 +258,7 @@ internal fun Search.getQuery(
 
   var filterStatement = ""
   val filterArgs = mutableListOf<Any>()
-  val filterQuery =
-    (stringFilterCriteria +
-        quantityFilterCriteria +
-        numberFilterCriteria +
-        referenceFilterCriteria +
-        dateTimeFilterCriteria +
-        tokenFilterCriteria +
-        uriFilterCriteria)
-      .map { it.query(type) }
+  val filterQuery = getFilterQueries()
   filterQuery.forEachIndexed { i, it ->
     filterStatement +=
       """
@@ -220,22 +315,6 @@ internal fun Search.getQuery(
         $limitStatement)
         """
         }
-        //        revIncludeMap.isNotEmpty() -> {
-        //          """
-        //        select serializedResource from ResourceEntity where resourceUuid in (
-        //        with UUIDS as ( select '${type.name}/' || a.resourceId from ResourceEntity a
-        //        $sortJoinStatement
-        //        WHERE a.resourceType = ?
-        //        $filterStatement
-        //        $sortOrderStatement
-        //        $limitStatement
-        //        )
-        //        Select resourceUuid
-        //        FROM ResourceEntity
-        //        WHERE '${type.name}/' || resourceId in UUIDS ${revIncludeMap.toSQLQuery()}
-        //        )
-        //        """.trimIndent()
-        //        }
         else ->
           """ 
         SELECT a.serializedResource
@@ -512,12 +591,3 @@ private fun getApproximateDateRange(
 }
 
 private data class ApproximateDateRange(val start: Long, val end: Long)
-
-private fun Map<ResourceType, List<ReferenceClientParam>>.toSQLQuery() =
-  map { it ->
-      val indexes = it.value.joinToString { "\'${it.paramName}\'" }
-      """
-      SELECT DISTINCT resourceUuid from ReferenceIndexEntity WHERE resourceType = '${it.key}' AND index_name IN ($indexes) AND index_value IN UUIDS
-    """.trimIndent()
-    }
-    .joinToString(prefix = "\nUNION\n", separator = " \nUNION\n")

@@ -41,13 +41,135 @@ internal data class NestedContext(val parentType: ResourceType, val param: IPara
  */
 inline fun <reified R : Resource> Search.has(
   referenceParam: ReferenceClientParam,
-  init: Search.() -> Unit
+  init: @ISearchDsl ISearch.() -> Unit
 ) {
   nestedSearches.add(
     NestedSearch(referenceParam, Search(type = R::class.java.newInstance().resourceType)).apply {
       search.init()
     }
   )
+}
+
+/**
+ * Allows user to include additional resources to be included in the search results that reference
+ * the resource on which [include] is being called. The developers may call [include] multiple times
+ * with different [ResourceType] to allow search api to return multiple referenced resource types.
+ *
+ * e.g. The below example would return all the Patients with given-name as James and their
+ * associated active [Practitioner] and Organizations.
+ *
+ * ```
+ * fhirEngine.search<Patient> {
+ *  filter(Patient.GIVEN, { value = "James" })
+ *   include<Practitioner>(Patient.GENERAL_PRACTITIONER) {
+ *    filter(Practitioner.ACTIVE, { value = of(true) })
+ *   }
+ *   include<Organization>(Patient.ORGANIZATION)
+ * }
+ * ```
+ * **NOTE**: [include] doesn't support order OR count.
+ */
+inline fun <reified R : Resource> Search.include(
+  referenceParam: ReferenceClientParam,
+  init: @ISearchDsl ISearch.() -> Unit
+) {
+  forwardIncludes.add(
+    NestedSearch(referenceParam, Search(type = R::class.java.newInstance().resourceType)).apply {
+      search.init()
+    }
+  )
+}
+
+/**
+ * Allows user to include additional resources to be included in the search results that reference
+ * the resource on which [include] is being called. The developers may call [include] multiple times
+ * with different [ResourceType] to allow search api to return multiple referenced resource types.
+ *
+ * e.g. The below example would return all the Patients with given-name as James and their
+ * associated active [Practitioner] and Organizations.
+ *
+ * ```
+ * fhirEngine.search<Patient> {
+ *  filter(Patient.GIVEN, { value = "James" })
+ *   include(ResourceType.Practitioner, Patient.GENERAL_PRACTITIONER) {
+ *    filter(Practitioner.ACTIVE, { value = of(true) })
+ *   }
+ *   include(ResourceType.Organization,Patient.ORGANIZATION)
+ * }
+ * ```
+ *
+ * **NOTE**: [include] doesn't support order OR count.
+ */
+fun Search.include(
+  resourceType: ResourceType,
+  referenceParam: ReferenceClientParam,
+  init: @ISearchDsl ISearch.() -> Unit = {}
+) {
+  forwardIncludes.add(
+    NestedSearch(referenceParam, Search(type = resourceType)).apply { search.init() }
+  )
+}
+
+/**
+ * Allows user to include additional resources to be included in the search results that reference
+ * the resource on which [revInclude] is being called. The developers may call [revInclude] multiple
+ * times with different [ResourceType] to allow search api to return multiple referenced resource
+ * types.
+ *
+ * e.g. The below example would return all the Patients with given-name as James and their
+ * associated Encounters and diabetic Conditions.
+ *
+ * ```
+ * fhirEngine.search<Patient> {
+ *  filter(Patient.GIVEN, { value = "James" })
+ *  revInclude<Encounter>( Encounter.PATIENT)
+ *  revInclude<Condition>( Condition.PATIENT) {
+ *     filter(Condition.CODE, { value = of(diabetesCodeableConcept) })
+ *  }
+ * }
+ * ```
+ *
+ * **NOTE**: [revInclude] doesn't support order OR count.
+ */
+inline fun <reified R : Resource> Search.revInclude(
+  referenceParam: ReferenceClientParam,
+  init: @ISearchDsl ISearch.() -> Unit = {}
+) {
+
+  revIncludes.add(
+    NestedSearch(referenceParam, Search(type = R::class.java.newInstance().resourceType)).apply {
+      search.init()
+    }
+  )
+}
+
+/**
+ * Allows user to include additional resources to be included in the search results that reference
+ * the resource on which [revInclude] is being called. The developers may call [revInclude] multiple
+ * times with different [ResourceType] to allow search api to return multiple referenced resource
+ * types.
+ *
+ * e.g. The below example would return all the Patients with given-name as James and their
+ * associated Encounters and Conditions.
+ *
+ * ```
+ * fhirEngine.search<Patient> {
+ *  filter(Patient.GIVEN, { value = "James" })
+ *  revInclude(ResourceType.Encounter, Encounter.PATIENT)
+ *  revInclude(ResourceType.Condition, Condition.PATIENT) {
+ *     filter(Condition.CODE, { value = of(diabetesCodeableConcept) })
+ *  }
+ * }
+ * ```
+ *
+ * **NOTE**: [revInclude] doesn't support order OR count.
+ */
+fun Search.revInclude(
+  resourceType: ResourceType,
+  referenceParam: ReferenceClientParam,
+  init: @ISearchDsl ISearch.() -> Unit = {}
+) {
+  revIncludes.add(NestedSearch(referenceParam, Search(type = resourceType)).apply { search.init() })
 }
 
 /**
@@ -67,7 +189,7 @@ inline fun <reified R : Resource> Search.has(
 fun Search.has(
   resourceType: ResourceType,
   referenceParam: ReferenceClientParam,
-  init: Search.() -> Unit
+  init: @ISearchDsl ISearch.() -> Unit
 ) {
   nestedSearches.add(
     NestedSearch(referenceParam, Search(type = resourceType)).apply { search.init() }
