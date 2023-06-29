@@ -38,14 +38,15 @@ abstract class KnowledgeDao {
   ) {
 
     val resourceMetadata =
-      if (resource.url != null) {
-        getResourceWithUrlAndVersion(resource.url, resource.version.orEmpty())
+      if (resource.url != null && resource.version != null) {
+        getResourceWithUrlAndVersion(resource.url, resource.version)
+      } else if (resource.url != null) {
+        getResourceWithUrl(resource.url)
       } else {
         getResourcesWithNameAndVersion(resource.resourceType, resource.name, resource.version)
       }
     // TODO(ktarasenko) compare the substantive part of the old and new resource and thrown an
-    // exception if they
-    // are different.
+    // exception if they are different.
     val resourceMetadataId = resourceMetadata?.resourceMetadataId ?: insert(resource)
     insert(ImplementationGuideResourceMetadataEntity(0, implementationGuideId, resourceMetadataId))
   }
@@ -87,6 +88,11 @@ abstract class KnowledgeDao {
   internal abstract suspend fun getResourceWithUrlAndVersion(
     url: String,
     version: String
+  ): ResourceMetadataEntity?
+
+  @Query("SELECT * from ResourceMetadataEntity WHERE url = :url")
+  internal abstract suspend fun getResourceWithUrl(
+    url: String,
   ): ResourceMetadataEntity?
   // Remove after https://github.com/google/android-fhir/issues/1920
   @Query("SELECT * from ResourceMetadataEntity WHERE url LIKE :urlPart")
