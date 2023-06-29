@@ -80,7 +80,7 @@ internal class FhirEngineTerminologyProvider(
             filter(CodeSystem.SYSTEM, { value = codeSystem.id })
           }
           .first()
-          .concept
+          .resource.concept
           .first { it.code == code.code }
           .let {
             Code().apply {
@@ -101,12 +101,15 @@ internal class FhirEngineTerminologyProvider(
     if (url == null) return emptyList()
     return knowledgeManager
       .loadResources(resourceType = ResourceType.ValueSet.name, url = url)
-      .map { it as ValueSet } + fhirEngine.search { filter(ValueSet.URL, { value = url }) }
+      .map { it as ValueSet } +
+      fhirEngine.search<ValueSet> { filter(ValueSet.URL, { value = url }) }.map { it.resource }
   }
 
   private suspend fun searchByIdentifier(identifier: String?): List<ValueSet> {
     if (identifier == null) return emptyList()
-    return fhirEngine.search { filter(ValueSet.IDENTIFIER, { value = of(identifier) }) }
+    return fhirEngine
+      .search<ValueSet> { filter(ValueSet.IDENTIFIER, { value = of(identifier) }) }
+      .map { it.resource }
   }
 
   private suspend fun searchById(id: String): List<ValueSet> =

@@ -91,7 +91,7 @@ class FhirEngineDalTest {
     testPatient.name = listOf(HumanName().addGiven("Eve"))
 
     fhirEngineDal.update(testPatient)
-    val result = fhirEngine.search<Patient> {}.single()
+    val result = fhirEngine.search<Patient> {}.single().resource
 
     assertThat(result.nameFirstRep.givenAsSingleString).isEqualTo("Eve")
   }

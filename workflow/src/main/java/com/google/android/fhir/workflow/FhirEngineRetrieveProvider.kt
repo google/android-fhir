@@ -74,7 +74,7 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
       filterByCode(codePath, codes, search)
       filterByValueSet(codePath, valueSet, search)
       filterByDateRange(datePath, dateLowPath, dateHighPath, dateRange, search)
-      fhirEngine.search(search)
+      fhirEngine.search<Resource>(search).map { it.resource }
     }
   }
 
