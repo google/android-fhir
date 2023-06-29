@@ -24,6 +24,7 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.get
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.search.LOCAL_LAST_UPDATED
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
@@ -494,6 +495,41 @@ class FhirEngineImplTest {
         .isEqualTo(localChangeDiff)
       assertResourceEquals(fhirEngine.get<Patient>("original-002"), localChange)
     }
+
+  @Test
+  fun create_should_save_lastUpdated_Indexes(): Unit = runBlocking {
+    val patient = Patient().apply { id = "patient-id-create" }
+    fhirEngine.create(patient)
+    val indexes =
+      services.database.getDateTimeIndexEntities("patient-id-create", ResourceType.Patient)
+    assertThat(indexes.map { it.index.name }).contains(LOCAL_LAST_UPDATED)
+  }
+
+  @Test
+  fun update_should_save_lastUpdated_Indexes() = runBlocking {
+    val patient = Patient().apply { id = "patient-id-update" }
+    fhirEngine.create(patient)
+    val indexesWhenCreated =
+      services.database.getDateTimeIndexEntities("patient-id-update", ResourceType.Patient)
+    val patientUpdate =
+      Patient().apply {
+        id = "patient-id-update"
+        addName(
+          HumanName().apply {
+            addGiven("John")
+            family = "Doe"
+          }
+        )
+      }
+
+    fhirEngine.update(patientUpdate)
+    val indexesWhenUpdated =
+      services.database.getDateTimeIndexEntities("patient-id-update", ResourceType.Patient)
+
+    assertThat(indexesWhenUpdated.map { it.index.name }).contains(LOCAL_LAST_UPDATED)
+    assertThat(indexesWhenUpdated.first { it.index.name == LOCAL_LAST_UPDATED }.index.from)
+      .isGreaterThan(indexesWhenCreated.first { it.index.name == LOCAL_LAST_UPDATED }.index.from)
+  }
 
   companion object {
     private const val TEST_PATIENT_1_ID = "test_patient_1"

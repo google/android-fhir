@@ -47,11 +47,7 @@ internal abstract class LocalChangeDao {
   @Insert abstract suspend fun addLocalChange(localChangeEntity: LocalChangeEntity)
 
   @Transaction
-  open suspend fun addInsertAll(resources: List<Resource>, timeOfChange: Instant) {
-    resources.forEach { resource -> addInsert(resource, timeOfChange) }
-  }
-
-  suspend fun addInsert(resource: Resource, timeOfChange: Instant?) {
+  open suspend fun addInsert(resource: Resource, timeOfChange: Instant?) {
     val resourceId = resource.logicalId
     val resourceType = resource.resourceType
     val timestamp = Date.from(timeOfChange).toTimeZoneString()

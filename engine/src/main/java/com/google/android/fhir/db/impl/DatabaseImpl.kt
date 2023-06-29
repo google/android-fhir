@@ -113,9 +113,13 @@ internal class DatabaseImpl(
   override suspend fun <R : Resource> insert(vararg resource: R): List<String> {
     val logicalIds = mutableListOf<String>()
     db.withTransaction {
-      val timeOfLocalChange = Instant.now()
-      logicalIds.addAll(resourceDao.insertAllLocal(resource.toList(), timeOfLocalChange))
-      localChangeDao.addInsertAll(resource.toList(), timeOfLocalChange)
+      logicalIds.addAll(
+        resource.map {
+          val timeOfLocalChange = Instant.now()
+          localChangeDao.addInsert(it, timeOfLocalChange)
+          resourceDao.insertResourceLocal(it, timeOfLocalChange)
+        }
+      )
     }
     return logicalIds
   }
@@ -292,6 +296,12 @@ internal class DatabaseImpl(
       }
     }
   }
+
+  override suspend fun getDateTimeIndexEntities(resourceId: String, resourceType: ResourceType) =
+    resourceDao.getResourceEntity(resourceId, resourceType)?.let {
+      resourceDao.getDateTimeIndexes(it.resourceUuid)
+    }
+      ?: emptyList()
 
   companion object {
     /**

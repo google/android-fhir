@@ -91,13 +91,6 @@ internal abstract class ResourceDao {
       ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
   }
 
-  open suspend fun insertAllLocal(
-    resources: List<Resource>,
-    timeOfLocalChange: Instant
-  ): List<String> {
-    return resources.map { resource -> insertResourceLocal(resource, timeOfLocalChange) }
-  }
-
   open suspend fun insertAllRemote(resources: List<Resource>): List<String> {
     return resources.map { resource -> insertResourceRemote(resource) }
   }
@@ -131,6 +124,9 @@ internal abstract class ResourceDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   abstract suspend fun insertPositionIndex(positionIndexEntity: PositionIndexEntity)
+
+  @Query("select * from DateTimeIndexEntity where resourceUuid = :resourceUuid ")
+  abstract suspend fun getDateTimeIndexes(resourceUuid: UUID): List<DateTimeIndexEntity>
 
   @Query(
     """
@@ -179,7 +175,7 @@ internal abstract class ResourceDao {
 
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
-  private suspend fun insertResourceLocal(resource: Resource, timeOfChange: Instant) =
+  suspend fun insertResourceLocal(resource: Resource, timeOfChange: Instant) =
     insertResource(resource, timeOfChange)
 
   // Since the insert removes any old indexes and lastUpdatedLocal (data not contained in resource
