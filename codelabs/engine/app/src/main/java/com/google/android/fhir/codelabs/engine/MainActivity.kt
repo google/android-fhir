@@ -17,34 +17,12 @@
 package com.google.android.fhir.codelabs.engine
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.fhir.sync.Sync
 
 class MainActivity : AppCompatActivity() {
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
-  }
-
-  private fun sync() {
-    Sync.oneTimeSync<FhirSyncWorker>(this)
-  }
-
-  private fun update() {}
-
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    menuInflater.inflate(R.menu.menu, menu)
-    return super.onCreateOptionsMenu(menu)
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    when (item.itemId) {
-      R.id.sync -> sync()
-      R.id.update -> update()
-    }
-
-    return super.onOptionsItemSelected(item)
   }
 }

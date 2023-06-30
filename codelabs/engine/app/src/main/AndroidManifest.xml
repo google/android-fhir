@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Codelab"
+        android:name=".FhirApplication"
     >
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
@@ -20,5 +21,6 @@
             </intent-filter>
         </activity>
     </application>
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
