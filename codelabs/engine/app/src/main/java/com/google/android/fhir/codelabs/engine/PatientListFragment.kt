@@ -69,19 +69,15 @@ class PatientListFragment : Fragment() {
     binding.patientList.apply {
       this.adapter = adapter
       addItemDecoration(
-        DividerItemDecoration(
-          requireContext(),
-          DividerItemDecoration.VERTICAL
-        ).apply {
+        DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
           setDrawable(ColorDrawable(Color.LTGRAY))
-        })
+        }
+      )
     }
     initSearchView()
     initMenu()
 
-    viewModel.liveSearchedPatients.observe(viewLifecycleOwner) {
-      adapter.submitList(it)
-    }
+    viewModel.liveSearchedPatients.observe(viewLifecycleOwner) { adapter.submitList(it) }
 
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -90,44 +86,40 @@ class PatientListFragment : Fragment() {
         viewModel.pollState.collect {
           when (it) {
             is SyncJobStatus.Finished -> {
-              Toast.makeText(
-                requireContext(),
-                "Sync Finished",
-                Toast.LENGTH_SHORT
-              ).show()
+              Toast.makeText(requireContext(), "Sync Finished", Toast.LENGTH_SHORT).show()
               viewModel.searchPatientsByName("")
             }
-
             else -> {}
           }
-
         }
       }
     }
   }
 
   private fun initMenu() {
-    (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
-      override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-        menuInflater.inflate(R.menu.menu, menu)
-      }
-
-      override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-        return when (menuItem.itemId) {
-          R.id.sync -> {
-            viewModel.triggerOneTimeSync()
-            true
-          }
-
-          R.id.update -> {
-            viewModel.triggerUpdate()
-            true
-          }
-
-          else -> false
+    (requireActivity() as MenuHost).addMenuProvider(
+      object : MenuProvider {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+          menuInflater.inflate(R.menu.menu, menu)
         }
-      }
-    }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
+        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+          return when (menuItem.itemId) {
+            R.id.sync -> {
+              viewModel.triggerOneTimeSync()
+              true
+            }
+            R.id.update -> {
+              viewModel.triggerUpdate()
+              true
+            }
+            else -> false
+          }
+        }
+      },
+      viewLifecycleOwner,
+      Lifecycle.State.RESUMED
+    )
   }
 
   private fun initSearchView() {
@@ -167,7 +159,6 @@ class PatientListFragment : Fragment() {
         }
       )
   }
-
 
   override fun onDestroyView() {
     super.onDestroyView()

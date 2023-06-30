@@ -55,35 +55,33 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
   }
 
   /*
-  Fetches patients stored locally based on the city they are in, and then updates the city field for
-  each patient. Once that is complete, trigger a new sync so the changes can be uploaded.
- */
+   Fetches patients stored locally based on the city they are in, and then updates the city field for
+   each patient. Once that is complete, trigger a new sync so the changes can be uploaded.
+  */
   fun triggerUpdate() {
     viewModelScope.launch {
       val fhirEngine = FhirApplication.fhirEngine(getApplication())
       val patientsFromWakefield =
-        fhirEngine
-          .search<Patient> {
-            filter(
-              Patient.ADDRESS_CITY,
-              {
-                modifier = StringFilterModifier.CONTAINS
-                value = "WAKEFIELD"
-              }
-            )
-          }
+        fhirEngine.search<Patient> {
+          filter(
+            Patient.ADDRESS_CITY,
+            {
+              modifier = StringFilterModifier.CONTAINS
+              value = "WAKEFIELD"
+            }
+          )
+        }
 
       val patientsFromTaunton =
-        fhirEngine
-          .search<Patient> {
-            filter(
-              Patient.ADDRESS_CITY,
-              {
-                modifier = StringFilterModifier.CONTAINS
-                value = "TAUNTON"
-              }
-            )
-          }
+        fhirEngine.search<Patient> {
+          filter(
+            Patient.ADDRESS_CITY,
+            {
+              modifier = StringFilterModifier.CONTAINS
+              value = "TAUNTON"
+            }
+          )
+        }
 
       patientsFromWakefield.forEach {
         it.address.first().city = "TAUNTON"

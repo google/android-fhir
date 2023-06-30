@@ -39,11 +39,11 @@ class FhirApplication : Application() {
         ServerConfiguration(
           baseUrl = "http://10.0.2.2:8080/fhir/",
           httpLogger =
-          HttpLogger(
-            HttpLogger.Configuration(
-              if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC
-            )
-          ) { Log.d("App-HttpLog", it) },
+            HttpLogger(
+              HttpLogger.Configuration(
+                if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC
+              )
+            ) { Log.d("App-HttpLog", it) },
         ),
       )
     )

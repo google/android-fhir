@@ -48,9 +48,7 @@ class PatientDownloadWorkManagerImpl : DownloadWorkManager {
     }
   }
 
-  override suspend fun processResponse(
-    response: Resource
-  ): Collection<Resource> {
+  override suspend fun processResponse(response: Resource): Collection<Resource> {
     // As per FHIR documentation :
     // If the search fails (cannot be executed, not that there are no matches), the
     // return value SHALL be a status code 4xx or 5xx with an OperationOutcome.
