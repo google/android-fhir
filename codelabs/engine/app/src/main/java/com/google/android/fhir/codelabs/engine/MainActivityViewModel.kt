@@ -21,16 +21,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.Constraints
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.search
-import com.google.android.fhir.sync.PeriodicSyncConfiguration
-import com.google.android.fhir.sync.RepeatInterval
 import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.SyncJobStatus
 import java.time.LocalDate
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -44,18 +40,10 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
   val pollState: Flow<SyncJobStatus>
     get() = _pollState
 
+  val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
+
   init {
-    viewModelScope.launch {
-      Sync.periodicSync<FhirSyncWorker>(
-          application.applicationContext,
-          PeriodicSyncConfiguration(
-            syncConstraints = Constraints.Builder().build(),
-            repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
-          )
-        )
-        .shareIn(this, SharingStarted.Eagerly, 10)
-        .collect { _pollState.emit(it) }
-    }
+    updatePatientListAndPatientCount { getSearchResults() }
   }
 
   fun triggerOneTimeSync() {
@@ -64,12 +52,6 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         .shareIn(this, SharingStarted.Eagerly, 10)
         .collect { _pollState.emit(it) }
     }
-  }
-
-  val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
-
-  init {
-    updatePatientListAndPatientCount({ getSearchResults() })
   }
 
   fun searchPatientsByName(nameQuery: String) {

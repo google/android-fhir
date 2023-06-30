@@ -21,18 +21,26 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.codelabs.engine.databinding.FragmentPatientListBinding
+import com.google.android.fhir.sync.SyncJobStatus
 import kotlinx.coroutines.launch
 
 class PatientListFragment : Fragment() {
@@ -40,12 +48,13 @@ class PatientListFragment : Fragment() {
   private var _binding: FragmentPatientListBinding? = null
   private val binding
     get() = _binding!!
-  private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
+
+  private val viewModel: MainActivityViewModel by activityViewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     _binding = FragmentPatientListBinding.inflate(inflater, container, false)
     return binding.root
@@ -56,30 +65,81 @@ class PatientListFragment : Fragment() {
     (requireActivity() as AppCompatActivity).supportActionBar?.apply {
       setDisplayHomeAsUpEnabled(true)
     }
-
-    val recyclerView: RecyclerView = binding.patientList
     val adapter = PatientItemRecyclerViewAdapter()
-    recyclerView.adapter = adapter
-    recyclerView.addItemDecoration(
-      DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
-        setDrawable(ColorDrawable(Color.LTGRAY))
-      }
-    )
-
-    mainActivityViewModel.liveSearchedPatients.observe(viewLifecycleOwner) {
-      adapter.submitList(it)
+    binding.patientList.apply {
+      this.adapter = adapter
+      addItemDecoration(
+        DividerItemDecoration(
+          requireContext(),
+          DividerItemDecoration.VERTICAL
+        ).apply {
+          setDrawable(ColorDrawable(Color.LTGRAY))
+        })
     }
 
+    initSearchView()
+    viewModel.liveSearchedPatients.observe(viewLifecycleOwner) {
+      adapter.submitList(it)
+    }
+    initMenu()
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.pollState.collect {
+          when (it) {
+            is SyncJobStatus.Started -> Toast.makeText(
+              requireContext(),
+              "Sync Started",
+              Toast.LENGTH_SHORT
+            ).show()
+
+            is SyncJobStatus.InProgress -> {}
+            else -> {
+              Toast.makeText(requireContext(), "Sync Finished", Toast.LENGTH_SHORT).show()
+              viewModel.searchPatientsByName("")
+            }
+          }
+
+        }
+      }
+    }
+  }
+
+  private fun initMenu() {
+    (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
+      override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(R.menu.menu, menu)
+      }
+
+      override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        return when (menuItem.itemId) {
+          R.id.sync -> {
+            viewModel.triggerOneTimeSync()
+            true
+          }
+
+          R.id.update -> {
+            //TODO: add code when triggered
+            true
+          }
+
+          else -> false
+        }
+      }
+    }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+  }
+
+  private fun initSearchView() {
     searchView = binding.search
     searchView.setOnQueryTextListener(
       object : SearchView.OnQueryTextListener {
         override fun onQueryTextChange(newText: String): Boolean {
-          mainActivityViewModel.searchPatientsByName(newText)
+          viewModel.searchPatientsByName(newText)
           return true
         }
 
         override fun onQueryTextSubmit(query: String): Boolean {
-          mainActivityViewModel.searchPatientsByName(query)
+          viewModel.searchPatientsByName(query)
           return true
         }
       }
@@ -105,9 +165,8 @@ class PatientListFragment : Fragment() {
           }
         }
       )
-
-    lifecycleScope.launch { mainActivityViewModel.pollState.collect {} }
   }
+
 
   override fun onDestroyView() {
     super.onDestroyView()

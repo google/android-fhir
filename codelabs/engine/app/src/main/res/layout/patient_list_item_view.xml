@@ -19,15 +19,18 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
->
+    android:paddingVertical="@dimen/fab_margin">
 
   <TextView
         android:layout_alignWithParentIfMissing="true"
         android:id="@+id/name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
+        android:layout_marginStart="@dimen/text_margin"
+        android:layout_marginEnd="@dimen/small_text_margin"
+        android:layout_marginBottom="@dimen/small_text_margin"
         android:textAppearance="?attr/textAppearanceSubtitle1"
         android:textStyle="bold"
         tools:text="Navya Patel"
@@ -38,6 +41,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/name"
+        android:layout_marginTop="@dimen/small_text_margin"
+        android:layout_marginEnd="@dimen/text_margin"
+        android:layout_marginBottom="@dimen/small_text_margin"
         android:layout_alignStart="@id/name"
         android:singleLine="true"
         android:textAppearance="?attr/textAppearanceBody2"
@@ -51,6 +57,8 @@
         android:layout_below="@id/field_name"
         android:layout_alignParentEnd="true"
         android:layout_alignStart="@id/name"
+        android:layout_marginTop="@dimen/small_text_margin"
+        android:layout_marginEnd="@dimen/small_text_margin"
         android:textAppearance="?attr/textAppearanceBody2"
         tools:text="Id: #...456"
     />
