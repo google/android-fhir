@@ -1,14 +1,4 @@
----
-description: In this codelab, you'll learn how to build an Android app with FHIR Engine Library
-id: fhir-engine
-keywords: codelabs, openhealthstack, androidfhirsdk, fhir
-authors: Jing Tang & William Ito
-project: /open-health-stack/_project.yaml
-book: /open-health-stack/_book.yaml
-
----
-
-# Working with FHIR resources using FHIR Engine Library
+# Manage FHIR resources using FHIR Engine Library
 
 ## Before you begin
 
