@@ -88,6 +88,8 @@ internal constructor(
     val resType = ResourceType.fromCode(resourceType)
     val resourceEntities =
       when {
+        url != null && version != null ->
+          listOfNotNull(knowledgeDao.getResourceWithUrlAndVersion(url, version))
         url != null -> listOfNotNull(knowledgeDao.getResourceWithUrl(url))
         id != null -> listOfNotNull(knowledgeDao.getResourceWithUrlLike("%$id"))
         name != null && version != null ->
