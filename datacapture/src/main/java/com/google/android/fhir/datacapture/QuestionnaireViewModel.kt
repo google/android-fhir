@@ -372,7 +372,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val questionnaireResponseItems = mutableListOf<QuestionnaireResponseItemComponent>()
     questionnaireItems.forEach {
       val responseItems =
-        if (responseItemMap.get(it.linkId).isNullOrEmpty()) {
+        if (responseItemMap[it.linkId].isNullOrEmpty()) {
           listOf(it.createQuestionnaireResponseItem())
         } else {
           responseItemMap[it.linkId]!!
@@ -380,7 +380,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       if (it.type == Questionnaire.QuestionnaireItemType.GROUP && !it.repeats) {
         val responseItem = responseItems.first()
         // Clear the nested list, as the updated list with missing response items will be added back
-        // to the original list.
+        // to the  list.
         val nestedResponseItems = responseItem.copy().item
         responseItem.item.clear()
         addMissingResponseItems(
@@ -389,8 +389,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           parentResponseItem = responseItem
         )
       }
-      // Now update the existing nested response items by adding missing response items.
-      // Maintain the existing order of response items while adding missing items.
+      // Add the list of existing response items and missing items back to the list, maintaining the
+      // order of the items.
       if (parentResponseItem != null) {
         parentResponseItem.item.addAll(responseItems)
       } else {
