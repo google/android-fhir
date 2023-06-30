@@ -18,8 +18,8 @@ package com.google.android.fhir
 
 import android.content.Context
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
-import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.HttpAuthenticator
 import com.google.android.fhir.sync.remote.HttpLogger
 import org.hl7.fhir.r4.model.SearchParameter
 
@@ -145,11 +145,8 @@ data class ServerConfiguration(
   val baseUrl: String,
   /** A configuration to provide the network connection parameters. */
   val networkConfiguration: NetworkConfiguration = NetworkConfiguration(),
-  /**
-   * An [Authenticator] for supplying any auth token that may be necessary to communicate with the
-   * server
-   */
-  val authenticator: Authenticator? = null,
+  /** An [HttpAuthenticator] for providing HTTP authorization header. */
+  val authenticator: HttpAuthenticator? = null,
   /** Logs the communication between the engine and the remote server. */
   val httpLogger: HttpLogger = HttpLogger.NONE
 )
