@@ -54,6 +54,51 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     }
   }
 
+  /*
+  Fetches patients stored locally based on the city they are in, and then updates the city field for
+  each patient. Once that is complete, trigger a new sync so the changes can be uploaded.
+ */
+  fun triggerUpdate() {
+    viewModelScope.launch {
+      val fhirEngine = FhirApplication.fhirEngine(getApplication())
+      val patientsFromWakefield =
+        fhirEngine
+          .search<Patient> {
+            filter(
+              Patient.ADDRESS_CITY,
+              {
+                modifier = StringFilterModifier.CONTAINS
+                value = "WAKEFIELD"
+              }
+            )
+          }
+
+      val patientsFromTaunton =
+        fhirEngine
+          .search<Patient> {
+            filter(
+              Patient.ADDRESS_CITY,
+              {
+                modifier = StringFilterModifier.CONTAINS
+                value = "TAUNTON"
+              }
+            )
+          }
+
+      patientsFromWakefield.forEach {
+        it.address.first().city = "TAUNTON"
+        fhirEngine.update(it)
+      }
+
+      patientsFromTaunton.forEach {
+        it.address.first().city = "WAKEFIELD"
+        fhirEngine.update(it)
+      }
+
+      triggerOneTimeSync()
+    }
+  }
+
   fun searchPatientsByName(nameQuery: String) {
     updatePatientListAndPatientCount { getSearchResults(nameQuery) }
   }
@@ -82,9 +127,16 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
             }
           )
         }
+        // Always only show patients from one city to see how triggering an update changes the
+        // patients listed
+        filter(
+          Patient.ADDRESS_CITY,
+          {
+            modifier = StringFilterModifier.CONTAINS
+            value = "WAKEFIELD"
+          }
+        )
         sort(Patient.GIVEN, Order.ASCENDING)
-        count = 100
-        from = 0
       }
       .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
       .let { patients.addAll(it) }

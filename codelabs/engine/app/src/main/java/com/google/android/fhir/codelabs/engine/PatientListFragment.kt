@@ -76,28 +76,29 @@ class PatientListFragment : Fragment() {
           setDrawable(ColorDrawable(Color.LTGRAY))
         })
     }
-
     initSearchView()
+    initMenu()
+
     viewModel.liveSearchedPatients.observe(viewLifecycleOwner) {
       adapter.submitList(it)
     }
-    initMenu()
 
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        // Show the user a message when the sync is finished and then refresh the list of patients
+        // on the UI by sending a search patient request
         viewModel.pollState.collect {
           when (it) {
-            is SyncJobStatus.Started -> Toast.makeText(
-              requireContext(),
-              "Sync Started",
-              Toast.LENGTH_SHORT
-            ).show()
-
-            is SyncJobStatus.InProgress -> {}
-            else -> {
-              Toast.makeText(requireContext(), "Sync Finished", Toast.LENGTH_SHORT).show()
+            is SyncJobStatus.Finished -> {
+              Toast.makeText(
+                requireContext(),
+                "Sync Finished",
+                Toast.LENGTH_SHORT
+              ).show()
               viewModel.searchPatientsByName("")
             }
+
+            else -> {}
           }
 
         }
@@ -119,7 +120,7 @@ class PatientListFragment : Fragment() {
           }
 
           R.id.update -> {
-            //TODO: add code when triggered
+            viewModel.triggerUpdate()
             true
           }
 
