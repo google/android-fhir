@@ -27,7 +27,7 @@ class DownloadWorkManagerImpl : DownloadWorkManager {
   private val urls = LinkedList(listOf("Patient"))
 
   override suspend fun getNextRequest(): Request? {
-    var url = urls.poll() ?: return null
+    val url = urls.poll() ?: return null
     return Request.of(url)
   }
 
