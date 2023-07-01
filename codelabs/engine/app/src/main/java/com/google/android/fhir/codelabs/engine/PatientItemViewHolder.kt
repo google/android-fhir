@@ -19,21 +19,19 @@ package com.google.android.fhir.codelabs.engine
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.codelabs.engine.databinding.PatientListItemViewBinding
+import org.hl7.fhir.r4.model.Patient
 
 class PatientItemViewHolder(binding: PatientListItemViewBinding) :
   RecyclerView.ViewHolder(binding.root) {
-  private val nameView: TextView = binding.name
-  private val idView: TextView = binding.id
 
-  fun bindTo(
-    patientItem: MainActivityViewModel.PatientItem,
-  ) {
-    this.nameView.text = patientItem.name
-    this.idView.text = "Id: #---${getTruncatedId(patientItem)}"
-  }
+  private val nameTextView: TextView = binding.name
+  private val genderTextView: TextView = binding.gender
+  private val cityTextView = binding.city
 
-  /** The new ui just shows shortened id with just last 3 characters. */
-  private fun getTruncatedId(patientItem: MainActivityViewModel.PatientItem): String {
-    return patientItem.resourceId.takeLast(3)
+  fun bind(patientItem: Patient) {
+    nameTextView.text =
+      patientItem.name.first().let { it.given.joinToString(separator = " ") + " " + it.family }
+    genderTextView.text = patientItem.gender.display
+    cityTextView.text = patientItem.address.singleOrNull()?.city
   }
 }

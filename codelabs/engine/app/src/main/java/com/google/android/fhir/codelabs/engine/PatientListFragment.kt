@@ -17,8 +17,6 @@
 package com.google.android.fhir.codelabs.engine
 
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -29,55 +27,45 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.DividerItemDecoration
-import com.google.android.fhir.codelabs.engine.databinding.FragmentPatientListBinding
+import com.google.android.fhir.codelabs.engine.databinding.FragmentPatientListViewBinding
 import com.google.android.fhir.sync.SyncJobStatus
 import kotlinx.coroutines.launch
 
 class PatientListFragment : Fragment() {
   private lateinit var searchView: SearchView
-  private var _binding: FragmentPatientListBinding? = null
+  private var _binding: FragmentPatientListViewBinding? = null
   private val binding
     get() = _binding!!
 
-  private val viewModel: MainActivityViewModel by activityViewModels()
+  private val viewModel: PatientListViewModel by viewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?,
   ): View {
-    _binding = FragmentPatientListBinding.inflate(inflater, container, false)
+    _binding = FragmentPatientListViewBinding.inflate(inflater, container, false)
     return binding.root
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-      setDisplayHomeAsUpEnabled(true)
-    }
-    val adapter = PatientItemRecyclerViewAdapter()
-    binding.patientList.apply {
-      this.adapter = adapter
-      addItemDecoration(
-        DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
-          setDrawable(ColorDrawable(Color.LTGRAY))
-        }
-      )
-    }
+
     initSearchView()
     initMenu()
 
-    viewModel.liveSearchedPatients.observe(viewLifecycleOwner) { adapter.submitList(it) }
+    PatientItemRecyclerViewAdapter().apply {
+      binding.patientList.adapter = this
+      viewModel.liveSearchedPatients.observe(viewLifecycleOwner) { submitList(it) }
+    }
 
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {

@@ -21,21 +21,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.google.android.fhir.codelabs.engine.databinding.PatientListItemViewBinding
+import org.hl7.fhir.r4.model.Patient
 
-/** UI Controller helper class to monitor Patient viewmodel and display list of patients. */
 class PatientItemRecyclerViewAdapter :
-  ListAdapter<MainActivityViewModel.PatientItem, PatientItemViewHolder>(PatientItemDiffCallback()) {
+  ListAdapter<Patient, PatientItemViewHolder>(PatientItemDiffCallback()) {
 
-  class PatientItemDiffCallback : DiffUtil.ItemCallback<MainActivityViewModel.PatientItem>() {
-    override fun areItemsTheSame(
-      oldItem: MainActivityViewModel.PatientItem,
-      newItem: MainActivityViewModel.PatientItem
-    ): Boolean = oldItem.resourceId == newItem.resourceId
-
-    override fun areContentsTheSame(
-      oldItem: MainActivityViewModel.PatientItem,
-      newItem: MainActivityViewModel.PatientItem
-    ): Boolean = oldItem.id == newItem.id && oldItem.risk == newItem.risk
+  class PatientItemDiffCallback : DiffUtil.ItemCallback<Patient>() {
+    override fun areItemsTheSame(oldItem: Patient, newItem: Patient) = oldItem.id == newItem.id
+    override fun areContentsTheSame(oldItem: Patient, newItem: Patient) =
+      oldItem.equalsDeep(newItem)
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientItemViewHolder {
@@ -46,6 +40,6 @@ class PatientItemRecyclerViewAdapter :
 
   override fun onBindViewHolder(holder: PatientItemViewHolder, position: Int) {
     val item = currentList[position]
-    holder.bindTo(item)
+    holder.bind(item)
   }
 }
