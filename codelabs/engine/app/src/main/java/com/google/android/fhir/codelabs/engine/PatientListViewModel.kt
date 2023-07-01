@@ -26,7 +26,6 @@ import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.SyncJobStatus
-import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -34,13 +33,13 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
 
-class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
+class PatientListViewModel(application: Application) : AndroidViewModel(application) {
   private val _pollState = MutableSharedFlow<SyncJobStatus>()
 
   val pollState: Flow<SyncJobStatus>
     get() = _pollState
 
-  val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
+  val liveSearchedPatients = MutableLiveData<List<Patient>>()
 
   init {
     updatePatientListAndPatientCount { getSearchResults() }
@@ -107,13 +106,13 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
    * by the client every time search query changes or data-sync is completed.
    */
   private fun updatePatientListAndPatientCount(
-    search: suspend () -> List<PatientItem>,
+    search: suspend () -> List<Patient>,
   ) {
     viewModelScope.launch { liveSearchedPatients.value = search() }
   }
 
-  private suspend fun getSearchResults(nameQuery: String = ""): List<PatientItem> {
-    val patients: MutableList<PatientItem> = mutableListOf()
+  private suspend fun getSearchResults(nameQuery: String = ""): List<Patient> {
+    val patients: MutableList<Patient> = mutableListOf()
     FhirApplication.fhirEngine(this.getApplication())
       .search<Patient> {
         if (nameQuery.isNotEmpty()) {
@@ -125,65 +124,9 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
             }
           )
         }
-        // Always only show patients from one city to see how triggering an update changes the
-        // patients listed
-        filter(
-          Patient.ADDRESS_CITY,
-          {
-            modifier = StringFilterModifier.CONTAINS
-            value = "WAKEFIELD"
-          }
-        )
         sort(Patient.GIVEN, Order.ASCENDING)
       }
-      .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
       .let { patients.addAll(it) }
     return patients
   }
-
-  /** The Patient's details for display purposes. */
-  data class PatientItem(
-    val id: String,
-    val resourceId: String,
-    val name: String,
-    val gender: String,
-    val dob: LocalDate? = null,
-    val phone: String,
-    val city: String,
-    val country: String,
-    val isActive: Boolean,
-    val html: String,
-    var risk: String? = "",
-  ) {
-    override fun toString(): String = name
-  }
-}
-
-internal fun Patient.toPatientItem(position: Int): MainActivityViewModel.PatientItem {
-  // Show nothing if no values available for gender and date of birth.
-  val patientId = if (hasIdElement()) idElement.idPart else ""
-  val name = if (hasName()) name[0].nameAsSingleString else ""
-  val gender = if (hasGenderElement()) genderElement.valueAsString else ""
-  //  val dob =
-  //    if (hasBirthDateElement())
-  //      LocalDate.parse(birthDateElement.valueAsString, DateTimeFormatter.ISO_DATE)
-  //    else null
-  val phone = if (hasTelecom()) telecom[0].value else ""
-  val city = if (hasAddress()) address[0].city else ""
-  val country = if (hasAddress()) address[0].country else ""
-  val isActive = active
-  val html: String = if (hasText()) text.div.valueAsString else ""
-
-  return MainActivityViewModel.PatientItem(
-    id = position.toString(),
-    resourceId = patientId,
-    name = name,
-    gender = gender ?: "",
-    //    dob = dob,
-    phone = phone ?: "",
-    city = city ?: "",
-    country = country ?: "",
-    isActive = isActive,
-    html = html
-  )
 }

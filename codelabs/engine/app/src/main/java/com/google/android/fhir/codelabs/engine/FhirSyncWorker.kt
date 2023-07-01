@@ -24,7 +24,7 @@ import com.google.android.fhir.sync.FhirSyncWorker
 class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   FhirSyncWorker(appContext, workerParams) {
 
-  override fun getDownloadWorkManager() = PatientDownloadWorkManagerImpl()
+  override fun getDownloadWorkManager() = DownloadWorkManagerImpl()
 
   override fun getConflictResolver() = AcceptLocalConflictResolver
 
