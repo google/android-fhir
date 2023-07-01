@@ -23,7 +23,7 @@
     android:orientation="vertical"
 >
 
-  <TextView
+    <TextView
         android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
         android:textStyle="bold"
     />
 
-  <TextView
+    <TextView
         android:id="@+id/gender"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
         android:textAppearance="?attr/textAppearanceBody2"
     />
 
-  <TextView
+    <TextView
         android:id="@+id/city"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

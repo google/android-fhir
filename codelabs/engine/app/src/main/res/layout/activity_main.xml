@@ -9,9 +9,9 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container_view"
+        android:name="com.google.android.fhir.codelabs.engine.PatientListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.google.android.fhir.codelabs.engine.PatientListFragment"
     />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
