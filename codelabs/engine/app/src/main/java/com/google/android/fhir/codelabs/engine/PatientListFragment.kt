@@ -25,7 +25,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
@@ -71,18 +70,12 @@ class PatientListFragment : Fragment() {
       viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
         // Show the user a message when the sync is finished and then refresh the list of patients
         // on the UI by sending a search patient request
-        viewModel.pollState.collect {
-          when (it) {
-            is SyncJobStatus.Finished -> {
-              Toast.makeText(requireContext(), "Sync Finished", Toast.LENGTH_SHORT).show()
-              viewModel.searchPatientsByName("")
-            }
-            else -> {}
-          }
-        }
+        viewModel.pollState.collect { handleSyncJobStatus(it) }
       }
     }
   }
+
+  private fun handleSyncJobStatus(syncJobStatus: SyncJobStatus) {}
 
   private fun initMenu() {
     (requireActivity() as MenuHost).addMenuProvider(
@@ -127,7 +120,6 @@ class PatientListFragment : Fragment() {
     )
     searchView.setOnQueryTextFocusChangeListener { view, focused ->
       if (!focused) {
-        // hide soft keyboard
         (requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
           .hideSoftInputFromWindow(view.windowToken, 0)
       }
