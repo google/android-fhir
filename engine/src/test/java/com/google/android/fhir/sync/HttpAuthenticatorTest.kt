@@ -32,6 +32,6 @@ class HttpAuthenticatorTest {
   @Test
   fun `should generate bearer authentication token`() {
     assertThat(HttpAuthenticationMethod.Bearer("token").getAuthorizationHeader())
-      .isEqualTo("Bearer: token")
+      .isEqualTo("Bearer token")
   }
 }
