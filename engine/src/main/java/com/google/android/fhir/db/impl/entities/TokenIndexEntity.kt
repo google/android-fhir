@@ -29,8 +29,8 @@ import org.hl7.fhir.r4.model.ResourceType
   indices =
     [
       Index(value = ["resourceType", "index_name", "index_system", "index_value", "resourceUuid"]),
-      // keep this index for faster foreign lookup
-      Index(value = ["resourceUuid"])
+      // Keep this index for faster foreign lookup
+      Index(value = ["resourceUuid"]),
     ],
   foreignKeys =
     [
@@ -40,7 +40,7 @@ import org.hl7.fhir.r4.model.ResourceType
         childColumns = ["resourceUuid"],
         onDelete = ForeignKey.CASCADE,
         onUpdate = ForeignKey.NO_ACTION,
-        deferred = true
+        deferred = true,
       )
     ]
 )

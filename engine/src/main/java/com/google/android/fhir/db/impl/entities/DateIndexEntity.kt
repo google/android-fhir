@@ -28,9 +28,12 @@ import org.hl7.fhir.r4.model.ResourceType
 @Entity(
   indices =
     [
+      // Covering index for optimizing query performance by minimizing disk I/O and eliminating the
+      // need for accessing underlying table data.
+      // Column ordered to minimise time to run sortJoinStatement in [MoreSearch]
       Index(value = ["resourceType", "index_name", "resourceUuid", "index_from", "index_to"]),
-      // keep this index for faster foreign lookup
-      Index(value = ["resourceUuid"])
+      // Keep this index for faster foreign lookup
+      Index(value = ["resourceUuid"]),
     ],
   foreignKeys =
     [
@@ -40,7 +43,7 @@ import org.hl7.fhir.r4.model.ResourceType
         childColumns = ["resourceUuid"],
         onDelete = ForeignKey.CASCADE,
         onUpdate = ForeignKey.NO_ACTION,
-        deferred = true
+        deferred = true,
       )
     ]
 )
