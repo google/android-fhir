@@ -17,7 +17,7 @@
 package com.google.android.fhir.sync.remote
 
 import com.google.android.fhir.NetworkConfiguration
-import com.google.android.fhir.sync.Authenticator
+import com.google.android.fhir.sync.HttpAuthenticator
 import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -44,10 +44,10 @@ internal interface RetrofitHttpService : FhirHttpService {
     private val baseUrl: String,
     private val networkConfiguration: NetworkConfiguration
   ) {
-    private var authenticator: Authenticator? = null
+    private var authenticator: HttpAuthenticator? = null
     private var httpLoggingInterceptor: HttpLoggingInterceptor? = null
 
-    fun setAuthenticator(authenticator: Authenticator?) = apply {
+    fun setAuthenticator(authenticator: HttpAuthenticator?) = apply {
       this.authenticator = authenticator
     }
 
@@ -69,12 +69,14 @@ internal interface RetrofitHttpService : FhirHttpService {
             authenticator?.let {
               addInterceptor(
                 Interceptor { chain: Interceptor.Chain ->
-                  val accessToken = it.getAccessToken()
                   val request =
                     chain
                       .request()
                       .newBuilder()
-                      .addHeader("Authorization", "Bearer $accessToken")
+                      .addHeader(
+                        "Authorization",
+                        it.getAuthenticationMethod().getAuthorizationHeader()
+                      )
                       .build()
                   chain.proceed(request)
                 }
