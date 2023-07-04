@@ -36,7 +36,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.mapNotNull
 
-class Sync(val workManager: WorkManager) {
+object Sync {
   val gson: Gson =
     GsonBuilder()
       .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeTypeAdapter().nullSafe())
@@ -52,15 +52,17 @@ class Sync(val workManager: WorkManager) {
    * @return a [Flow] of [SyncJobStatus]
    */
   inline fun <reified W : FhirSyncWorker> oneTimeSync(
+    context: Context,
     retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
   ): Flow<SyncJobStatus> {
     val uniqueWorkName = "${W::class.java.name}-oneTimeSync"
-    val flow = getWorkerInfo(uniqueWorkName)
-    workManager.enqueueUniqueWork(
-      uniqueWorkName,
-      ExistingWorkPolicy.KEEP,
-      createOneTimeWorkRequest(retryConfiguration, W::class.java)
-    )
+    val flow = getWorkerInfo(context, uniqueWorkName)
+    WorkManager.getInstance(context)
+      .enqueueUniqueWork(
+        uniqueWorkName,
+        ExistingWorkPolicy.KEEP,
+        createOneTimeWorkRequest(retryConfiguration, W::class.java)
+      )
     return flow
   }
 
@@ -76,21 +78,23 @@ class Sync(val workManager: WorkManager) {
    */
   @ExperimentalCoroutinesApi
   inline fun <reified W : FhirSyncWorker> periodicSync(
+    context: Context,
     periodicSyncConfiguration: PeriodicSyncConfiguration
   ): Flow<SyncJobStatus> {
     val uniqueWorkName = "${W::class.java.name}-periodicSync"
-    val flow = getWorkerInfo(uniqueWorkName)
-    workManager.enqueueUniquePeriodicWork(
-      uniqueWorkName,
-      ExistingPeriodicWorkPolicy.KEEP,
-      createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java)
-    )
+    val flow = getWorkerInfo(context, uniqueWorkName)
+    WorkManager.getInstance(context)
+      .enqueueUniquePeriodicWork(
+        uniqueWorkName,
+        ExistingPeriodicWorkPolicy.KEEP,
+        createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java)
+      )
     return flow
   }
 
   /** Gets the worker info for the [FhirSyncWorker] */
-  fun getWorkerInfo(workName: String) =
-    workManager
+  fun getWorkerInfo(context: Context, workName: String) =
+    WorkManager.getInstance(context)
       .getWorkInfosForUniqueWorkLiveData(workName)
       .asFlow()
       .flatMapConcat { it.asFlow() }
@@ -149,10 +153,8 @@ class Sync(val workManager: WorkManager) {
     return periodicWorkRequestBuilder.build()
   }
 
-  companion object {
-    /** Gets the timestamp of the last sync job. */
-    fun getLastSyncTimestamp(context: Context): OffsetDateTime? {
-      return DatastoreUtil(context).readLastSyncTimestamp()
-    }
+  /** Gets the timestamp of the last sync job. */
+  fun getLastSyncTimestamp(context: Context): OffsetDateTime? {
+    return DatastoreUtil(context).readLastSyncTimestamp()
   }
 }

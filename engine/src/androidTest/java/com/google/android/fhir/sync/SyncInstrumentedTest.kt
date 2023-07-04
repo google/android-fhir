@@ -35,7 +35,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.runBlocking
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -44,7 +43,6 @@ import org.junit.runner.RunWith
 class SyncInstrumentedTest {
 
   private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
-  private lateinit var workManager: WorkManager
 
   class TestSyncWorker(appContext: Context, workerParams: WorkerParameters) :
     FhirSyncWorker(appContext, workerParams) {
@@ -55,17 +53,12 @@ class SyncInstrumentedTest {
     override fun getConflictResolver() = AcceptRemoteConflictResolver
   }
 
-  @Before
-  fun setUp() {
-    WorkManagerTestInitHelper.initializeTestWorkManager(context)
-    workManager = WorkManager.getInstance(context)
-  }
-
   @Test
   fun oneTime_worker_runs() {
+    WorkManagerTestInitHelper.initializeTestWorkManager(context)
+    val workManager = WorkManager.getInstance(context)
     runBlocking {
-      Sync(workManager)
-        .oneTimeSync<TestSyncWorker>()
+      Sync.oneTimeSync<TestSyncWorker>(context = context)
         .transformWhile {
           emit(it is SyncJobStatus.Finished)
           it !is SyncJobStatus.Finished
@@ -79,10 +72,12 @@ class SyncInstrumentedTest {
 
   @Test
   fun periodic_worker_still_queued_to_run_after_oneTime_worker_started() {
+    WorkManagerTestInitHelper.initializeTestWorkManager(context)
+    val workManager = WorkManager.getInstance(context)
     // run and wait for periodic worker to finish
     runBlocking {
-      Sync(workManager)
-        .periodicSync<TestSyncWorker>(
+      Sync.periodicSync<TestSyncWorker>(
+          context = context,
           periodicSyncConfiguration =
             PeriodicSyncConfiguration(
               syncConstraints = Constraints.Builder().build(),
@@ -104,8 +99,7 @@ class SyncInstrumentedTest {
 
     // Start and complete a oneTime job, and verify it does not remove the periodic worker
     runBlocking {
-      Sync(workManager)
-        .oneTimeSync<TestSyncWorker>()
+      Sync.oneTimeSync<TestSyncWorker>(context = context)
         .transformWhile {
           emit(it)
           it !is SyncJobStatus.Finished
