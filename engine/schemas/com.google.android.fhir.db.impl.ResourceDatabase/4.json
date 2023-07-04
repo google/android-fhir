@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "c1ad671e7e9d61e75954a423f1b6c458",
+    "identityHash": "8cb21e74ef8663b5dc48393c869b0714",
     "entities": [
       {
         "tableName": "ResourceEntity",
@@ -301,16 +301,17 @@
         },
         "indices": [
           {
-            "name": "index_TokenIndexEntity_resourceType_index_name_index_system_index_value",
+            "name": "index_TokenIndexEntity_resourceType_index_name_index_system_index_value_resourceUuid",
             "unique": false,
             "columnNames": [
               "resourceType",
               "index_name",
               "index_system",
-              "index_value"
+              "index_value",
+              "resourceUuid"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `index_system`, `index_value`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value_resourceUuid` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `index_system`, `index_value`, `resourceUuid`)"
           },
           {
             "name": "index_TokenIndexEntity_resourceUuid",
@@ -928,7 +929,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c1ad671e7e9d61e75954a423f1b6c458')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8cb21e74ef8663b5dc48393c869b0714')"
     ]
   }
 }
