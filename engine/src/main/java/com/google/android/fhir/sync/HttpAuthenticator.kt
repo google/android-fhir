@@ -50,6 +50,6 @@ sealed interface HttpAuthenticationMethod {
 
   /** See https://datatracker.ietf.org/doc/html/rfc6750. */
   data class Bearer(val token: String) : HttpAuthenticationMethod {
-    override fun getAuthorizationHeader() = "Bearer: $token"
+    override fun getAuthorizationHeader() = "Bearer $token"
   }
 }
