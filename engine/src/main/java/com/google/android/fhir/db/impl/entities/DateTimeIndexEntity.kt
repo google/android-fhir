@@ -30,7 +30,8 @@ import org.hl7.fhir.r4.model.ResourceType
     [
       // Covering index for optimizing query performance by minimizing disk I/O and eliminating the
       // need for accessing underlying table data.
-      // Column ordered to minimise time to run sortJoinStatement in [MoreSearch]
+      // Column ordered to minimise time to run sortJoinStatement in [MoreSearch], and to resolve:
+      // https://github.com/google/android-fhir/issues/2040
       Index(value = ["resourceType", "index_name", "resourceUuid", "index_from", "index_to"]),
       // Keep this index for faster foreign lookup
       Index(value = ["resourceUuid"]),
