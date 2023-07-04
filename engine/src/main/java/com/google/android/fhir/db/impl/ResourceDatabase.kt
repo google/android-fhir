@@ -50,7 +50,7 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
       LocalChangeEntity::class,
       PositionIndexEntity::class
     ],
-  version = 4,
+  version = 3,
   exportSchema = true
 )
 @TypeConverters(DbTypeConverters::class)
@@ -70,26 +70,22 @@ val MIGRATION_2_3 =
   object : Migration(/* startVersion = */ 2, /* endVersion = */ 3) {
     override fun migrate(database: SupportSQLiteDatabase) {
       database.execSQL(
-        "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_index_from` ON `DateTimeIndexEntity` (`index_from`)"
-      )
-    }
-  }
-
-val MIGRATION_3_4 =
-  object : Migration(/* startVersion = */ 3, /* endVersion = */ 4) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-      database.execSQL(
         "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceType_index_name_resourceUuid_index_from_index_to` ON `DateTimeIndexEntity` (`resourceType`, `index_name`, `resourceUuid`, `index_from`, `index_to`)"
       )
       database.execSQL(
         "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceType_index_name_resourceUuid_index_from_index_to` ON `DateIndexEntity` (`resourceType`, `index_name`, `resourceUuid`, `index_from`, `index_to`)"
       )
-      database.execSQL("DROP INDEX IF EXISTS `index_DateTimeIndexEntity_index_from`")
+      database.execSQL(
+        "CREATE INDEX IF NOT EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value_resourceUuid` ON `TokenIndexEntity` (`resourceType`, `index_name`, `index_system`, `index_value`, `resourceUuid`)"
+      )
       database.execSQL(
         "DROP INDEX IF EXISTS `index_DateTimeIndexEntity_resourceType_index_name_index_from_index_to`"
       )
       database.execSQL(
         "DROP INDEX IF EXISTS `index_DateIndexEntity_resourceType_index_name_index_from_index_to`"
+      )
+      database.execSQL(
+        "DROP INDEX IF EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value`"
       )
     }
   }

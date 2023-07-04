@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "6dd24dd7340c3808456a812933bc6838",
+    "identityHash": "8cb21e74ef8663b5dc48393c869b0714",
     "entities": [
       {
         "tableName": "ResourceEntity",
@@ -301,16 +301,17 @@
         },
         "indices": [
           {
-            "name": "index_TokenIndexEntity_resourceType_index_name_index_system_index_value",
+            "name": "index_TokenIndexEntity_resourceType_index_name_index_system_index_value_resourceUuid",
             "unique": false,
             "columnNames": [
               "resourceType",
               "index_name",
               "index_system",
-              "index_value"
+              "index_value",
+              "resourceUuid"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `index_system`, `index_value`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value_resourceUuid` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `index_system`, `index_value`, `resourceUuid`)"
           },
           {
             "name": "index_TokenIndexEntity_resourceUuid",
@@ -570,16 +571,17 @@
         },
         "indices": [
           {
-            "name": "index_DateIndexEntity_resourceType_index_name_index_from_index_to",
+            "name": "index_DateIndexEntity_resourceType_index_name_resourceUuid_index_from_index_to",
             "unique": false,
             "columnNames": [
               "resourceType",
               "index_name",
+              "resourceUuid",
               "index_from",
               "index_to"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceType_index_name_index_from_index_to` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `index_from`, `index_to`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceType_index_name_resourceUuid_index_from_index_to` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `resourceUuid`, `index_from`, `index_to`)"
           },
           {
             "name": "index_DateIndexEntity_resourceUuid",
@@ -660,25 +662,17 @@
         },
         "indices": [
           {
-            "name": "index_DateTimeIndexEntity_index_from",
-            "unique": false,
-            "columnNames": [
-              "index_from"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_index_from` ON `${TABLE_NAME}` (`index_from`)"
-          },
-          {
-            "name": "index_DateTimeIndexEntity_resourceType_index_name_index_from_index_to",
+            "name": "index_DateTimeIndexEntity_resourceType_index_name_resourceUuid_index_from_index_to",
             "unique": false,
             "columnNames": [
               "resourceType",
               "index_name",
+              "resourceUuid",
               "index_from",
               "index_to"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceType_index_name_index_from_index_to` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `index_from`, `index_to`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceType_index_name_resourceUuid_index_from_index_to` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `resourceUuid`, `index_from`, `index_to`)"
           },
           {
             "name": "index_DateTimeIndexEntity_resourceUuid",
@@ -935,7 +929,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6dd24dd7340c3808456a812933bc6838')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8cb21e74ef8663b5dc48393c869b0714')"
     ]
   }
 }
