@@ -55,10 +55,11 @@ object Sync {
     context: Context,
     retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
   ): Flow<SyncJobStatus> {
-    val flow = getWorkerInfo<W>(context)
+    val uniqueWorkName = "${W::class.java.name}-oneTimeSync"
+    val flow = getWorkerInfo(context, uniqueWorkName)
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
-        W::class.java.name,
+        uniqueWorkName,
         ExistingWorkPolicy.KEEP,
         createOneTimeWorkRequest(retryConfiguration, W::class.java)
       )
@@ -80,10 +81,11 @@ object Sync {
     context: Context,
     periodicSyncConfiguration: PeriodicSyncConfiguration
   ): Flow<SyncJobStatus> {
-    val flow = getWorkerInfo<W>(context)
+    val uniqueWorkName = "${W::class.java.name}-periodicSync"
+    val flow = getWorkerInfo(context, uniqueWorkName)
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
-        W::class.java.name,
+        uniqueWorkName,
         ExistingPeriodicWorkPolicy.KEEP,
         createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java)
       )
@@ -91,9 +93,9 @@ object Sync {
   }
 
   /** Gets the worker info for the [FhirSyncWorker] */
-  inline fun <reified W : FhirSyncWorker> getWorkerInfo(context: Context) =
+  fun getWorkerInfo(context: Context, workName: String) =
     WorkManager.getInstance(context)
-      .getWorkInfosForUniqueWorkLiveData(W::class.java.name)
+      .getWorkInfosForUniqueWorkLiveData(workName)
       .asFlow()
       .flatMapConcat { it.asFlow() }
       .mapNotNull { workInfo ->
@@ -105,11 +107,6 @@ object Sync {
             gson.fromJson(stateData, Class.forName(state)) as SyncJobStatus
           }
       }
-
-  /** Gets the timestamp of the last sync job. */
-  fun getLastSyncTimestamp(context: Context): OffsetDateTime? {
-    return DatastoreUtil(context).readLastSyncTimestamp()
-  }
 
   @PublishedApi
   internal inline fun <W : FhirSyncWorker> createOneTimeWorkRequest(
@@ -154,5 +151,10 @@ object Sync {
       )
     }
     return periodicWorkRequestBuilder.build()
+  }
+
+  /** Gets the timestamp of the last sync job. */
+  fun getLastSyncTimestamp(context: Context): OffsetDateTime? {
+    return DatastoreUtil(context).readLastSyncTimestamp()
   }
 }
