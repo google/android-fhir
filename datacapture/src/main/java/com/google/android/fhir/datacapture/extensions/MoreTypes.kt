@@ -94,6 +94,18 @@ fun Type.displayString(context: Context): String =
     else -> context.getString(R.string.not_answered)
   }
 
+/**
+ * Returns the unique identifier of a [Type]. Used to differentiate between item answer options that
+ * may have similar display strings
+ */
+fun Type.identifierString(context: Context): String =
+  id
+    ?: when {
+      this is Coding && this.code != null -> this.code
+      this is Reference && this.reference != null -> this.reference
+      else -> displayString(context)
+    }
+
 /** Converts StringType to toUriType. */
 internal fun StringType.toUriType(): UriType {
   return UriType(value)
