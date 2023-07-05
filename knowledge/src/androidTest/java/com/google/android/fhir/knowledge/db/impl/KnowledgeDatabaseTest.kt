@@ -47,7 +47,7 @@ internal class KnowledgeDatabaseTest {
 
   @Test
   fun igInserted(): Unit = runTest {
-    assertThat(knowledgeDao.insert(IG_ENTITY)).isGreaterThan(0)
+    assertThat(knowledgeDao.insert(IG_ENTITY)).isGreaterThan(0L)
     assertThat(knowledgeDao.getImplementationGuides().map { it.packageId })
       .containsExactly(IG_PACKAGE_ID)
   }

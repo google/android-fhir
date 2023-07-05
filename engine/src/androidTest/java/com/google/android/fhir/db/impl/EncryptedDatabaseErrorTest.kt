@@ -17,6 +17,7 @@
 package com.google.android.fhir.db.impl
 
 import android.content.Context
+import android.database.sqlite.SQLiteException
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -34,7 +35,6 @@ import com.google.android.fhir.search.getQuery
 import com.google.common.truth.Truth.assertThat
 import java.security.KeyStore
 import kotlinx.coroutines.runBlocking
-import net.sqlcipher.database.SQLiteException
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType

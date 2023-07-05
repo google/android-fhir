@@ -103,8 +103,7 @@ class DemoQuestionnaireFragment : Fragment() {
         NavHostFragment.findNavController(this).navigateUp()
         true
       }
-      // TODO https://github.com/google/android-fhir/issues/1088
-      R.id.submit_questionnaire -> {
+      com.google.android.fhir.datacapture.R.id.submit_questionnaire -> {
         onSubmitQuestionnaireClick()
         true
       }
