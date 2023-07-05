@@ -1587,6 +1587,32 @@ class ResourceMapperTest {
           .localizedMessage
       assertThat(errorMessage).isEqualTo("Expression supplied does not evaluate to IdType.")
     }
+
+  @Test
+  fun `populate() should correctly populate Reference value in QuestionnaireResponse when expression resolves to type Resource`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire()
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              addExtension(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "Patient"
+                  }
+                )
+              )
+            }
+          )
+      val patient = Patient().apply { id = UUID.randomUUID().toString() }
+      val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+
+      assertThat(questionnaireResponse.itemFirstRep.answerFirstRep.valueReference.reference)
+        .isEqualTo("Patient/${patient.id}")
+    }
   @Test
   fun `populate() should correctly populate IdType value with history in QuestionnaireResponse`() =
     runBlocking {

@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.mapping
 
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
+import com.google.android.fhir.datacapture.extensions.logicalId
 import com.google.android.fhir.datacapture.extensions.targetStructureMap
 import com.google.android.fhir.datacapture.extensions.toCodeType
 import com.google.android.fhir.datacapture.extensions.toCoding
@@ -777,8 +778,15 @@ private fun Base.asExpectedType(): Type {
 }
 
 private fun Base.asExpectedReferenceType(): Type {
-  return when (this) {
-    is IdType ->
+  return when {
+    this.isResource -> {
+      this@asExpectedReferenceType as Resource
+      Reference().apply {
+        reference =
+          "${this@asExpectedReferenceType.resourceType}/${this@asExpectedReferenceType.logicalId}"
+      }
+    }
+    this is IdType ->
       Reference().apply {
         reference =
           "${this@asExpectedReferenceType.resourceType}/${this@asExpectedReferenceType.idPart}"
