@@ -140,8 +140,8 @@ internal abstract class ResourceDao {
   abstract suspend fun updateRemoteVersionIdAndLastUpdate(
     resourceId: String,
     resourceType: ResourceType,
-    versionId: String?,
-    lastUpdatedRemote: Instant?
+    versionId: String,
+    lastUpdatedRemote: Instant
   )
 
   @Query(
@@ -223,7 +223,28 @@ internal abstract class ResourceDao {
     return resource.id
   }
 
-  suspend fun updateIndicesForResource(
+  suspend fun updateAndIndexRemoteVersionIdAndLastUpdate(
+    resourceId: String,
+    resourceType: ResourceType,
+    versionId: String,
+    lastUpdated: Instant
+  ) {
+    updateRemoteVersionIdAndLastUpdate(resourceId, resourceType, versionId, lastUpdated)
+    // update the remote lastUpdated index
+    getResourceEntity(resourceId, resourceType)?.let {
+      val indicesToUpdate =
+        ResourceIndices.Builder(resourceType, resourceId)
+          .apply {
+            addDateTimeIndex(
+              createLastUpdatedIndex(resourceType, InstantType(Date.from(lastUpdated)))
+            )
+          }
+          .build()
+      updateIndicesForResource(indicesToUpdate, resourceType, it.resourceUuid)
+    }
+  }
+
+  private suspend fun updateIndicesForResource(
     index: ResourceIndices,
     resourceType: ResourceType,
     resourceUuid: UUID

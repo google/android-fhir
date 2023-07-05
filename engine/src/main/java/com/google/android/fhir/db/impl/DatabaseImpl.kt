@@ -31,12 +31,9 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
-import com.google.android.fhir.index.ResourceIndices
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
-import java.util.Date
-import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -96,7 +93,7 @@ internal class DatabaseImpl(
             }
           }
 
-          addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+          addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
         }
         .build()
   }
@@ -146,26 +143,12 @@ internal class DatabaseImpl(
     lastUpdated: Instant
   ) {
     db.withTransaction {
-      resourceDao.updateRemoteVersionIdAndLastUpdate(
+      resourceDao.updateAndIndexRemoteVersionIdAndLastUpdate(
         resourceId,
         resourceType,
         versionId,
         lastUpdated
       )
-      // update the remote lastUpdated index
-      val entity = selectEntity(resourceType, resourceId)
-      val indicesToUpdate =
-        ResourceIndices.Builder(resourceType, resourceId)
-          .apply {
-            addDateTimeIndex(
-              ResourceIndexer.createLastUpdatedIndex(
-                resourceType,
-                InstantType(Date.from(lastUpdated))
-              )
-            )
-          }
-          .build()
-      resourceDao.updateIndicesForResource(indicesToUpdate, resourceType, entity.resourceUuid)
     }
   }
 
