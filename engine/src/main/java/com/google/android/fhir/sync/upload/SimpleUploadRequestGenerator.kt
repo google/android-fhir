@@ -41,7 +41,7 @@ open class SimpleUploadRequestGenerator(
   companion object Factory {
 
     fun getPutForCreateAndPatchForUpdateUploadRequestGenerator(
-      useETagForUpload: Boolean
+      useETagForUpload: Boolean = true
     ): SimpleUploadRequestGenerator {
       return SimpleUploadRequestGenerator(
         useETagForUpload,

@@ -18,6 +18,7 @@ package com.google.android.fhir.sync.upload
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.ContentTypes.APPLICATION_JSON_PATCH
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.sync.DeleteUploadRequest
 import com.google.android.fhir.sync.PatchUploadRequest
@@ -80,6 +81,7 @@ class HttpPatchForUpdateUploadRequestGenerator(useETagForUpload: Boolean) :
   HttpVerbBasedUploadRequestGenerator(Bundle.HTTPVerb.PATCH, useETagForUpload) {
   override fun getUploadRequest(localChange: LocalChange): UploadRequest {
     val headerMap = addIfMatchHeader(localChange, mutableMapOf())
+    headerMap["Content-Type"] = APPLICATION_JSON_PATCH
     return PatchUploadRequest(
       localChangeToken = localChange.token,
       patchBody = localChange.payload,

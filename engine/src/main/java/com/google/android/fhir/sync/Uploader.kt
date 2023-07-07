@@ -96,7 +96,7 @@ internal sealed class UploadResult {
   data class Started(val total: Int) : UploadResult()
   data class Success(
     val localChangeToken: LocalChangeToken,
-    val resource: Bundle,
+    val resource: Resource,
     val total: Int,
     val completed: Int
   ) : UploadResult()

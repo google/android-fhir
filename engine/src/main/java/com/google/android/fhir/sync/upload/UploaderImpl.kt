@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.DomainResource
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -78,6 +79,9 @@ internal class UploaderImpl(
             FHIRException(response.issueFirstRep.diagnostics)
           )
         )
+      }
+      response is DomainResource -> {
+        UploadResult.Success(localChangeToken, response, total, completed)
       }
       else -> {
         UploadResult.Failure(

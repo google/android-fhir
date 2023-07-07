@@ -24,6 +24,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.hl7.fhir.r4.model.Resource
 import retrofit2.Retrofit
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -118,6 +119,7 @@ internal interface RetrofitHttpService : FhirHttpService {
         .baseUrl(baseUrl)
         .client(client)
         .addConverterFactory(FhirConverterFactory.create())
+        .addConverterFactory(ScalarsConverterFactory.create())
         .build()
         .create(RetrofitHttpService::class.java)
     }

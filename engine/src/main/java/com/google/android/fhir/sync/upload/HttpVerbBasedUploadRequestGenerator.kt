@@ -37,7 +37,7 @@ abstract class HttpVerbBasedUploadRequestGenerator(
   fun addIfMatchHeader(
     localChange: LocalChange,
     headerMap: MutableMap<String, String>
-  ): Map<String, String> {
+  ): MutableMap<String, String> {
     if (useETagForUpload && !localChange.versionId.isNullOrEmpty()) {
       // FHIR supports weak Etag, See ETag section https://hl7.org/fhir/http.html#Http-Headers
       headerMap["If-Match"] = "W/\"${localChange.versionId}\""

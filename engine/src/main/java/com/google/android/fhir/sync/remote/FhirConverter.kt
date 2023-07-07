@@ -40,7 +40,12 @@ class FhirConverterFactory private constructor(val fhirContext: FhirContext) : C
     parameterAnnotations: Array<out Annotation>,
     methodAnnotations: Array<out Annotation>,
     retrofit: Retrofit
-  ): Converter<*, RequestBody> = FhirRequestBodyConverter(fhirContext.newJsonParser())
+  ): Converter<*, RequestBody>? {
+    if (type != Resource::class.java) {
+      return null
+    }
+    return FhirRequestBodyConverter(fhirContext.newJsonParser())
+  }
 
   companion object {
     fun create() = FhirConverterFactory(FhirContext.forCached(FhirVersionEnum.R4))
