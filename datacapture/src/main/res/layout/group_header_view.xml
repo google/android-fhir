@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/item_margin_vertical"
             android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-            style="?attr/questionnaireQuestionGroupTypeHeaderStyle"
+            style="?attr/questionnaireGroupTypeHeaderStyle"
         />
 
         <include
