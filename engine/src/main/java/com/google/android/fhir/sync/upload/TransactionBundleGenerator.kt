@@ -51,7 +51,8 @@ internal open class TransactionBundleGenerator(
 
   companion object Factory {
 
-    fun getDefault() = PutForCreateAndPatchForUpdateBasedTransactionGenerator
+    fun getDefault(useETagForUpload: Boolean = true) =
+      PutForCreateAndPatchForUpdateBasedTransactionGenerator(useETagForUpload)
 
     /**
      * Returns a [TransactionBundleGenerator] based on the provided [Bundle.HTTPVerb]s for creating
@@ -60,13 +61,14 @@ internal open class TransactionBundleGenerator(
      */
     fun getGenerator(
       httpVerbToUseForCreate: Bundle.HTTPVerb,
-      httpVerbToUseForUpdate: Bundle.HTTPVerb
+      httpVerbToUseForUpdate: Bundle.HTTPVerb,
+      useETagForUpload: Boolean,
     ): TransactionBundleGenerator {
 
       return if (httpVerbToUseForCreate == Bundle.HTTPVerb.PUT &&
           httpVerbToUseForUpdate == Bundle.HTTPVerb.PATCH
       ) {
-        PutForCreateAndPatchForUpdateBasedTransactionGenerator
+        PutForCreateAndPatchForUpdateBasedTransactionGenerator(useETagForUpload)
       } else {
         throw IllegalArgumentException(
           "Engine currently supports creation using [PUT] and updates using [PATCH]"
@@ -76,11 +78,11 @@ internal open class TransactionBundleGenerator(
   }
 }
 
-internal object PutForCreateAndPatchForUpdateBasedTransactionGenerator :
+internal class PutForCreateAndPatchForUpdateBasedTransactionGenerator(useETagForUpload: Boolean) :
   TransactionBundleGenerator({ type ->
     when (type) {
-      Type.INSERT -> HttpPutForCreateEntryComponentGenerator
-      Type.UPDATE -> HttpPatchForUpdateEntryComponentGenerator
-      Type.DELETE -> HttpDeleteEntryComponentGenerator
+      Type.INSERT -> HttpPutForCreateEntryComponentGenerator(useETagForUpload)
+      Type.UPDATE -> HttpPatchForUpdateEntryComponentGenerator(useETagForUpload)
+      Type.DELETE -> HttpDeleteEntryComponentGenerator(useETagForUpload)
     }
   })

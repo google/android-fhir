@@ -89,18 +89,20 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
 
     Timber.v("Subscribed to flow for progress")
     val result =
-      FhirSynchronizer(
-          applicationContext,
-          getFhirEngine(),
-          BundleUploader(
-            dataSource,
-            TransactionBundleGenerator.getDefault(),
-            LocalChangesPaginator.create(getUploadConfiguration())
-          ),
-          DownloaderImpl(dataSource, getDownloadWorkManager()),
-          getConflictResolver()
-        )
-        .apply { subscribe(flow) }
+      with(getUploadConfiguration()) {
+          FhirSynchronizer(
+              applicationContext,
+              getFhirEngine(),
+              BundleUploader(
+                dataSource,
+                TransactionBundleGenerator.getDefault(useETagForUpload),
+                LocalChangesPaginator.create(this)
+              ),
+              DownloaderImpl(dataSource, getDownloadWorkManager()),
+              getConflictResolver()
+            )
+            .apply { subscribe(flow) }
+        }
         .synchronize()
     val output = buildWorkData(result)
 

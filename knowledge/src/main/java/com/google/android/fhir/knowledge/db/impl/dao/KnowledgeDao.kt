@@ -38,14 +38,15 @@ abstract class KnowledgeDao {
   ) {
 
     val resourceMetadata =
-      if (resource.url != null) {
+      if (resource.url != null && resource.version != null) {
+        getResourceWithUrlAndVersion(resource.url, resource.version)
+      } else if (resource.url != null) {
         getResourceWithUrl(resource.url)
       } else {
         getResourcesWithNameAndVersion(resource.resourceType, resource.name, resource.version)
       }
     // TODO(ktarasenko) compare the substantive part of the old and new resource and thrown an
-    // exception if they
-    // are different.
+    // exception if they are different.
     val resourceMetadataId = resourceMetadata?.resourceMetadataId ?: insert(resource)
     insert(ImplementationGuideResourceMetadataEntity(0, implementationGuideId, resourceMetadataId))
   }
@@ -82,6 +83,12 @@ abstract class KnowledgeDao {
   internal abstract suspend fun getResources(
     resourceType: ResourceType,
   ): List<ResourceMetadataEntity>
+
+  @Query("SELECT * from ResourceMetadataEntity WHERE url = :url AND version = :version")
+  internal abstract suspend fun getResourceWithUrlAndVersion(
+    url: String,
+    version: String
+  ): ResourceMetadataEntity?
 
   @Query("SELECT * from ResourceMetadataEntity WHERE url = :url")
   internal abstract suspend fun getResourceWithUrl(

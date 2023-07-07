@@ -17,7 +17,7 @@
 package com.google.android.fhir.sync.remote
 
 import com.google.android.fhir.NetworkConfiguration
-import com.google.android.fhir.sync.Authenticator
+import com.google.android.fhir.sync.HttpAuthenticator
 import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -27,24 +27,27 @@ import org.hl7.fhir.r4.model.Resource
 import retrofit2.Retrofit
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.HeaderMap
 import retrofit2.http.POST
 import retrofit2.http.Url
 
 /** Retrofit service to make http requests to the FHIR server. */
 internal interface RetrofitHttpService : FhirHttpService {
 
-  @GET override suspend fun get(@Url path: String): Resource
+  @GET
+  override suspend fun get(@Url path: String, @HeaderMap headers: Map<String, String>): Resource
 
-  @POST(".") override suspend fun post(@Body bundle: Bundle): Resource
+  @POST(".")
+  override suspend fun post(@Body bundle: Bundle, @HeaderMap headers: Map<String, String>): Resource
 
   class Builder(
     private val baseUrl: String,
     private val networkConfiguration: NetworkConfiguration
   ) {
-    private var authenticator: Authenticator? = null
+    private var authenticator: HttpAuthenticator? = null
     private var httpLoggingInterceptor: HttpLoggingInterceptor? = null
 
-    fun setAuthenticator(authenticator: Authenticator?) = apply {
+    fun setAuthenticator(authenticator: HttpAuthenticator?) = apply {
       this.authenticator = authenticator
     }
 
@@ -59,16 +62,21 @@ internal interface RetrofitHttpService : FhirHttpService {
           .readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
           .writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
           .apply {
+            if (networkConfiguration.uploadWithGzip) {
+              addInterceptor(GzipUploadInterceptor)
+            }
             httpLoggingInterceptor?.let { addInterceptor(it) }
             authenticator?.let {
               addInterceptor(
                 Interceptor { chain: Interceptor.Chain ->
-                  val accessToken = it.getAccessToken()
                   val request =
                     chain
                       .request()
                       .newBuilder()
-                      .addHeader("Authorization", "Bearer $accessToken")
+                      .addHeader(
+                        "Authorization",
+                        it.getAuthenticationMethod().getAuthorizationHeader()
+                      )
                       .build()
                   chain.proceed(request)
                 }

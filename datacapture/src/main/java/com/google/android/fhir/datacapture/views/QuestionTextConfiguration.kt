@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync
+package com.google.android.fhir.datacapture.views
 
-import androidx.annotation.WorkerThread
-
-/**
- * [FhirEngine] depends on the developer app to handle user's authentication. The developer
- * application may provide the implementation during the [FhirEngine] initial setup to obtain
- * authToken to the engine for successful calls.
- */
-interface Authenticator {
-  /** @return Access token for the engine to make requests on user's behalf. */
-  @WorkerThread fun getAccessToken(): String
-}
+data class QuestionTextConfiguration(
+  val showAsterisk: Boolean = false,
+  val showRequiredText: Boolean = false,
+  val showOptionalText: Boolean = false
+)

@@ -59,6 +59,20 @@
             app:icon="@drawable/ic_help_48px"
         />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/required_optional_text"
+        style="?attr/questionnaireSubtitleTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/help_container_margin_top"
+        android:layout_gravity="center_vertical"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/helpContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="Sample helper text"
+    />
+
     <TextView
         android:id="@+id/error_text_at_header"
         style="?attr/questionnaireErrorTextStyle"
@@ -66,7 +80,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/error_text_at_header_margin_top"
         android:layout_gravity="center_vertical"
-        app:layout_constraintTop_toBottomOf="@id/helpContainer"
+        app:layout_constraintTop_toBottomOf="@id/required_optional_text"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="Sample error text"
         android:visibility="gone"

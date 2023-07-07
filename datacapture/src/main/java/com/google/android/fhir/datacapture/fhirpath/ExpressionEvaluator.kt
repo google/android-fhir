@@ -25,7 +25,9 @@ import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.Type
 import timber.log.Timber
@@ -82,15 +84,51 @@ object ExpressionEvaluator {
   }
 
   /**
+   * Returns the evaluation result of the expression.
+   *
+   * FHIRPath supplements are handled according to
+   * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements.
+   *
+   * %resource = [QuestionnaireResponse] %context = [QuestionnaireResponseItemComponent]
+   */
+  fun evaluateExpression(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse,
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent?,
+    expression: Expression,
+    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>
+  ): List<Base> {
+    val appContext =
+      mutableMapOf<String, Base?>().apply {
+        extractDependentVariables(
+          expression,
+          questionnaire,
+          questionnaireResponse,
+          questionnaireItemParentMap,
+          questionnaireItem,
+          this
+        )
+      }
+    return fhirPathEngine.evaluate(
+      appContext,
+      questionnaireResponse,
+      null,
+      questionnaireResponseItem,
+      expression.expression
+    )
+  }
+
+  /**
    * Returns a list of pair of item and the calculated and evaluated value for all items with
    * calculated expression extension, which is dependent on value of updated response
    */
   fun evaluateCalculatedExpressions(
-    updatedQuestionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    updatedQuestionnaireItem: QuestionnaireItemComponent,
+    updatedQuestionnaireResponseItemComponent: QuestionnaireResponseItemComponent?,
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    questionnaireItemParentMap:
-      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>
+    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>
   ): List<ItemToAnswersPair> {
     return questionnaire.item
       .flattened()
@@ -102,26 +140,14 @@ object ExpressionEvaluator {
             findDependentVariables(item.calculatedExpression!!).isNotEmpty())
       }
       .map { questionnaireItem ->
-        val appContext =
-          mutableMapOf<String, Base?>().apply {
-            extractDependentVariables(
-              questionnaireItem.calculatedExpression!!,
+        val updatedAnswer =
+          evaluateExpression(
               questionnaire,
               questionnaireResponse,
-              questionnaireItemParentMap,
               questionnaireItem,
-              this
-            )
-          }
-
-        val updatedAnswer =
-          fhirPathEngine
-            .evaluate(
-              appContext,
-              questionnaireResponse,
-              null,
-              null,
-              questionnaireItem.calculatedExpression!!.expression
+              updatedQuestionnaireResponseItemComponent,
+              questionnaireItem.calculatedExpression!!,
+              questionnaireItemParentMap
             )
             .map { it.castToType(it) }
         questionnaireItem to updatedAnswer
@@ -256,16 +282,16 @@ object ExpressionEvaluator {
    * Creates an x-fhir-query string for evaluation
    *
    * @param expression x-fhir-query expression
-   * @param launchContext if passed, the launch context to evaluate the expression against
+   * @param launchContextMap if passed, the launch context to evaluate the expression against
    */
   internal fun createXFhirQueryFromExpression(
     expression: Expression,
-    launchContext: Resource?
+    launchContextMap: Map<String, Resource>?
   ): String {
-    if (launchContext == null) {
+    if (launchContextMap == null) {
       return expression.expression
     }
-    return evaluateXFhirEnhancement(expression, launchContext).fold(expression.expression) {
+    return evaluateXFhirEnhancement(expression, launchContextMap).fold(expression.expression) {
       acc: String,
       pair: Pair<String, String> ->
       acc.replace(pair.first, pair.second)
@@ -279,11 +305,11 @@ object ExpressionEvaluator {
    *
    * @param expression x-fhir-query expression containing a FHIRpath, e.g.
    * Practitioner?active=true&{{Practitioner.name.family}}
-   * @param resource the launch context to evaluate the expression against
+   * @param launchContextMap the launch context to evaluate the expression against
    */
   private fun evaluateXFhirEnhancement(
     expression: Expression,
-    resource: Resource
+    launchContextMap: Map<String, Resource>
   ): Sequence<Pair<String, String>> =
     xFhirQueryEnhancementRegex
       .findAll(expression.expression)
@@ -292,12 +318,15 @@ object ExpressionEvaluator {
         // TODO(omarismail94): See if FHIRPathEngine.check() can be used to distinguish invalid
         // expression vs an expression that is valid, but does not return one resource only.
         val expressionNode = fhirPathEngine.parse(fhirPath)
+        val resourceType =
+          expressionNode.constant?.primitiveValue()?.substring(1)
+            ?: expressionNode.name?.lowercase()
         val evaluatedResult =
           fhirPathEngine.evaluateToString(
-            mapOf(resource.resourceType.name.lowercase() to resource),
+            launchContextMap,
             null,
             null,
-            resource,
+            launchContextMap[resourceType],
             expressionNode
           )
 
