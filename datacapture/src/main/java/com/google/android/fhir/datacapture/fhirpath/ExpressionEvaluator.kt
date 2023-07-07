@@ -285,13 +285,34 @@ object ExpressionEvaluator {
    * @param launchContextMap if passed, the launch context to evaluate the expression against
    */
   internal fun createXFhirQueryFromExpression(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse,
+    questionnaireItem: QuestionnaireItemComponent,
     expression: Expression,
+    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>,
     launchContextMap: Map<String, Resource>?
   ): String {
-    if (launchContextMap == null) {
-      return expression.expression
+    // get all dependent variables and their evaluated values
+    val variablesEvaluatedPairs =
+      mutableMapOf<String, Base?>()
+        .apply {
+          extractDependentVariables(
+            expression,
+            questionnaire,
+            questionnaireResponse,
+            questionnaireItemParentMap,
+            questionnaireItem,
+            this
+          )
+        }
+        .filterKeys { expression.expression.contains("{{%$it}}") }
+        .map { Pair("{{%${it.key}}}", it.value!!.primitiveValue()) }
+
+    var fhirPathsEvaluatedPairs = emptySequence<Pair<String, String>>()
+    if (launchContextMap != null) {
+      fhirPathsEvaluatedPairs = evaluateXFhirEnhancement(expression, launchContextMap)
     }
-    return evaluateXFhirEnhancement(expression, launchContextMap).fold(expression.expression) {
+    return (fhirPathsEvaluatedPairs + variablesEvaluatedPairs).fold(expression.expression) {
       acc: String,
       pair: Pair<String, String> ->
       acc.replace(pair.first, pair.second)
