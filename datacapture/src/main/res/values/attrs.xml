@@ -17,6 +17,9 @@
 <resources>
     <!-- Styles for widgets.   -->
 
+    <!--   Style for group type question header layout. -->
+    <attr name="questionnaireQuestionGroupTypeHeaderStyle" format="reference" />
+
     <!--   Style for group type question text. -->
     <attr name="questionnaireGroupTypeQuestionTextStyle" format="reference" />
 

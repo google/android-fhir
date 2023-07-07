@@ -37,6 +37,9 @@
         name="Theme.Questionnaire"
         parent="Theme.Material3.DayNight.NoActionBar"
     >
+        <item name="questionnaireQuestionGroupTypeHeaderStyle">
+            @style/Questionnaire.QuestionGroupTypeHeaderStyle
+        </item>
         <item name="questionnaireGroupTypeQuestionTextStyle">
             @style/TextAppearance.Material3.TitleMedium
         </item>
@@ -172,6 +175,10 @@
         <item name="questionnaireAttachmentPreviewTitleStyle">
             @style/Questionnaire.AttachmentPreviewTitleStyle
         </item>
+    </style>
+
+    <style name="Questionnaire.QuestionGroupTypeHeaderStyle" parent="">
+        <item name="android:paddingBottom">@dimen/header_padding_bottom</item>
     </style>
 
     <style name="Questionnaire.QuestionHeaderStyle" parent="">
