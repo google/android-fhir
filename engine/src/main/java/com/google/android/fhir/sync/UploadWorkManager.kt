@@ -25,7 +25,7 @@ import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 abstract class UploadWorkManager(private val uploadRequestGenerator: UploadRequestGenerator) {
 
   /**
-   * Transform the [localChanges] to the final set of changes that need to be uploaded to the
+   * Transform the [localChanges] to the final set of changes that needs to be uploaded to the
    * server. The default implementation is to squash all the changes by resource type so that there
    * is at most one local change to be uploaded per resource type
    */
@@ -35,8 +35,8 @@ abstract class UploadWorkManager(private val uploadRequestGenerator: UploadReque
       .values.map { localResourceChanges -> LocalChangeUtils.squash(localResourceChanges) }
   }
 
-  /** Generates a list of [BundleUploadRequest] from the [LocalChange] to be sent to the server */
-  fun createUploadRequestsFromChanges(localChanges: List<LocalChange>): List<BundleUploadRequest> {
+  /** Generates a list of [UploadRequest] from the [LocalChange] to be sent to the server */
+  fun createUploadRequestsFromChanges(localChanges: List<LocalChange>): List<UploadRequest> {
     return uploadRequestGenerator.generateUploadRequests(localChanges)
   }
 }

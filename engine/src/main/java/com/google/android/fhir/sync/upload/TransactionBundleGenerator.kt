@@ -29,8 +29,9 @@ import org.hl7.fhir.r4.model.Bundle
  */
 open class TransactionBundleGenerator(
   private val localChangesPaginator: LocalChangesPaginator,
+  private val useETagForUpload: Boolean,
   val getBundleEntryComponentGeneratorForLocalChangeType:
-    (type: Type) -> HttpVerbBasedBundleEntryComponentGenerator
+    (type: Type, useETagForUpload: Boolean) -> HttpVerbBasedBundleEntryComponentGenerator
 ) : UploadRequestGenerator {
 
   override fun generateUploadRequests(localChanges: List<LocalChange>): List<BundleUploadRequest> {
@@ -45,7 +46,10 @@ open class TransactionBundleGenerator(
       Bundle().apply {
         type = Bundle.BundleType.TRANSACTION
         localChanges.forEach {
-          this.addEntry(getBundleEntryComponentGeneratorForLocalChangeType(it.type).getEntry(it))
+          this.addEntry(
+            getBundleEntryComponentGeneratorForLocalChangeType(it.type, useETagForUpload)
+              .getEntry(it)
+          )
         }
       }
     return BundleUploadRequest(
@@ -56,9 +60,13 @@ open class TransactionBundleGenerator(
 
   companion object Factory {
 
-    fun getDefault() =
-      getGenerator(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, LocalChangesPaginator.DEFAULT)
-
+    fun getDefault(useETagForUpload: Boolean = true) =
+      getGenerator(
+        Bundle.HTTPVerb.PUT,
+        Bundle.HTTPVerb.PATCH,
+        LocalChangesPaginator.DEFAULT,
+        useETagForUpload
+      )
     /**
      * Returns a [TransactionBundleGenerator] based on the provided [Bundle.HTTPVerb]s for creating
      * and updating resources. The function may throw an [IllegalArgumentException] if the provided
@@ -67,7 +75,8 @@ open class TransactionBundleGenerator(
     fun getGenerator(
       httpVerbToUseForCreate: Bundle.HTTPVerb,
       httpVerbToUseForUpdate: Bundle.HTTPVerb,
-      localChangesPaginator: LocalChangesPaginator
+      localChangesPaginator: LocalChangesPaginator,
+      useETagForUpload: Boolean
     ): TransactionBundleGenerator {
 
       return if (httpVerbToUseForCreate == Bundle.HTTPVerb.PUT &&
@@ -75,6 +84,7 @@ open class TransactionBundleGenerator(
       ) {
         TransactionBundleGenerator(
           localChangesPaginator,
+          useETagForUpload,
           this::putForCreateAndPatchForUpdateBasedBundleComponentMapper
         )
       } else {
@@ -85,12 +95,13 @@ open class TransactionBundleGenerator(
     }
 
     private fun putForCreateAndPatchForUpdateBasedBundleComponentMapper(
-      type: Type
+      type: Type,
+      useETagForUpload: Boolean
     ): HttpVerbBasedBundleEntryComponentGenerator {
       return when (type) {
-        Type.INSERT -> HttpPutForCreateEntryComponentGenerator
-        Type.UPDATE -> HttpPatchForUpdateEntryComponentGenerator
-        Type.DELETE -> HttpDeleteEntryComponentGenerator
+        Type.INSERT -> HttpPutForCreateEntryComponentGenerator(useETagForUpload)
+        Type.UPDATE -> HttpPatchForUpdateEntryComponentGenerator(useETagForUpload)
+        Type.DELETE -> HttpDeleteEntryComponentGenerator(useETagForUpload)
       }
     }
   }

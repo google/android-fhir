@@ -17,10 +17,13 @@
 package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.sync.BundleRequest
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.Request
+import com.google.android.fhir.sync.UploadRequest
+import com.google.android.fhir.sync.UrlRequest
 import com.google.common.truth.Truth.assertThat
 import java.util.LinkedList
 import java.util.Queue
@@ -55,7 +58,7 @@ class DownloaderImplTest {
 
     val testDataSource: DataSource =
       object : DataSource {
-        override suspend fun download(path: String): Resource {
+        private fun download(path: String): Resource {
           return when (path) {
             "Patient" ->
               Bundle().apply {
@@ -92,7 +95,7 @@ class DownloaderImplTest {
           }
         }
 
-        override suspend fun download(bundle: Bundle): Resource {
+        private fun download(bundle: Bundle): Resource {
           return Bundle().apply {
             type = Bundle.BundleType.BATCHRESPONSE
             addEntry(
@@ -116,7 +119,13 @@ class DownloaderImplTest {
           }
         }
 
-        override suspend fun upload(bundle: Bundle): Resource {
+        override suspend fun download(request: Request) =
+          when (request) {
+            is UrlRequest -> download(request.url)
+            is BundleRequest -> download(request.bundle)
+          }
+
+        override suspend fun upload(request: UploadRequest): Resource {
           throw UnsupportedOperationException()
         }
       }
@@ -148,7 +157,7 @@ class DownloaderImplTest {
 
       val testDataSource: DataSource =
         object : DataSource {
-          override suspend fun download(path: String): Resource {
+          private fun download(path: String): Resource {
             return when (path) {
               "Patient" ->
                 Bundle().apply {
@@ -185,7 +194,7 @@ class DownloaderImplTest {
             }
           }
 
-          override suspend fun download(bundle: Bundle): Resource {
+          private fun download(bundle: Bundle): Resource {
             return Bundle().apply {
               type = Bundle.BundleType.BATCHRESPONSE
               addEntry(
@@ -209,7 +218,13 @@ class DownloaderImplTest {
             }
           }
 
-          override suspend fun upload(bundle: Bundle): Resource {
+          override suspend fun download(request: Request) =
+            when (request) {
+              is UrlRequest -> download(request.url)
+              is BundleRequest -> download(request.bundle)
+            }
+
+          override suspend fun upload(request: UploadRequest): Resource {
             throw UnsupportedOperationException()
           }
         }

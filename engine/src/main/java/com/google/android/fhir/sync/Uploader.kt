@@ -20,6 +20,7 @@ import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Resource
 
 /** Module for uploading local changes to a [DataSource]. */
 internal interface Uploader {
@@ -32,8 +33,64 @@ internal interface Uploader {
   suspend fun upload(localChanges: List<LocalChange>): Flow<UploadResult>
 }
 
+sealed class UploadRequest(
+  open val headers: Map<String, String>,
+  open val localChangeToken: LocalChangeToken
+)
+
 /** A FHIR [Bundle] based request for uploads */
-data class BundleUploadRequest(val bundle: Bundle, val localChangeToken: LocalChangeToken)
+data class BundleUploadRequest(
+  val bundle: Bundle,
+  override val localChangeToken: LocalChangeToken,
+  override val headers: Map<String, String> = emptyMap()
+) : UploadRequest(headers, localChangeToken)
+
+/**
+ * A FHIR PATCH based request for updates to a resource based on
+ * https://www.hl7.org/fhir/http.html#patch
+ */
+data class PatchUploadRequest(
+  val patchBody: String,
+  val resourceType: String,
+  val resourceId: String,
+  override val localChangeToken: LocalChangeToken,
+  override val headers: Map<String, String> = emptyMap()
+) : UploadRequest(headers, localChangeToken)
+
+/**
+ * A FHIR PUT based request for deletions of a resource based on
+ * https://www.hl7.org/fhir/http.html#delete Deletes will always be on a per resource basis as the
+ * current way of [LocalChange] supports that
+ */
+data class DeleteUploadRequest(
+  val resourceType: String,
+  val resourceId: String,
+  override val localChangeToken: LocalChangeToken,
+  override val headers: Map<String, String> = emptyMap()
+) : UploadRequest(headers, localChangeToken)
+
+/**
+ * A FHIR PUT based request for updates/creation of a resource based on
+ * https://www.hl7.org/fhir/http.html#update
+ */
+data class PutUploadRequest(
+  val resource: Resource,
+  val resourceType: String,
+  val resourceId: String,
+  override val localChangeToken: LocalChangeToken,
+  override val headers: Map<String, String> = emptyMap()
+) : UploadRequest(headers, localChangeToken)
+
+/**
+ * A FHIR POST based request for creation of a resource based on
+ * https://www.hl7.org/fhir/http.html#update
+ */
+data class PostUploadRequest(
+  val resource: Resource,
+  val resourceType: String,
+  override val localChangeToken: LocalChangeToken,
+  override val headers: Map<String, String> = emptyMap()
+) : UploadRequest(headers, localChangeToken)
 
 internal sealed class UploadResult {
   data class Started(val total: Int) : UploadResult()

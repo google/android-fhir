@@ -28,11 +28,47 @@ internal interface FhirHttpService {
    * @return The server may return a particular [Resource], [Bundle] or [OperationOutcome] based on
    * the request processing.
    */
-  suspend fun get(path: String): Resource
+  suspend fun get(path: String, headers: Map<String, String>): Resource
 
   /**
-   * Makes a HTTP-POST method request to the server with the [Bundle] as request-body.
-   * @return The server may return [Bundle] or [OperationOutcome] based on the request processing.
+   * Makes a HTTP-POST method request to the server.
+   * @return The server may return [Bundle], [Resource] or [OperationOutcome] based on the request
+   * processing.
    */
-  suspend fun post(bundle: Bundle): Resource
+  suspend fun post(requestPath: String, body: Resource, headers: Map<String, String>): Resource
+
+  /**
+   * Makes a HTTP-PATCH method request to the server for the given resource.
+   * @return The server may return a particular [Resource] or [OperationOutcome] based on the
+   * request processing.
+   */
+  suspend fun patch(
+    resourceType: String,
+    resourceId: String,
+    patchBody: String,
+    headers: Map<String, String>
+  ): Resource
+
+  /**
+   * Makes a HTTP-PUT method request to the server with a [Resource] as the request body
+   * @return The server may return a particular [Resource] or [OperationOutcome] based on the
+   * request processing.
+   */
+  suspend fun put(
+    resourceType: String,
+    resourceId: String,
+    resource: Resource,
+    headers: Map<String, String>
+  ): Resource
+
+  /**
+   * Makes a HTTP-DELETE method request to the server.
+   * @return The server may return a particular [Resource] or [OperationOutcome] or no response body
+   * based on the request processing.
+   */
+  suspend fun delete(
+    resourceType: String,
+    resourceId: String,
+    headers: Map<String, String>
+  ): Resource
 }

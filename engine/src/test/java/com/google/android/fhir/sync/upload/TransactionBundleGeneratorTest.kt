@@ -188,7 +188,8 @@ class TransactionBundleGeneratorTest {
                       )
                     }
                   )
-                  .toString()
+                  .toString(),
+              versionId = "v-p002-01"
             )
             .toLocalChange()
             .apply { LocalChangeToken(listOf(2)) },
@@ -208,7 +209,8 @@ class TransactionBundleGeneratorTest {
                       }
                     )
                   }
-                )
+                ),
+              versionId = "v-p003-01"
             )
             .toLocalChange()
             .apply { LocalChangeToken(listOf(3)) }
@@ -217,7 +219,8 @@ class TransactionBundleGeneratorTest {
         TransactionBundleGenerator.Factory.getGenerator(
           Bundle.HTTPVerb.PUT,
           Bundle.HTTPVerb.PATCH,
-          SizeBasedLocalChangesPaginator(1)
+          SizeBasedLocalChangesPaginator(1),
+          true
         )
       val result = generator.generateUploadRequests(changes)
 
@@ -234,5 +237,82 @@ class TransactionBundleGeneratorTest {
       assertThat(result.map { (it as BundleUploadRequest).bundle.entry.first().request.method })
         .containsExactly(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, Bundle.HTTPVerb.DELETE)
         .inOrder()
+      assertThat(result.map { it.bundle.entry.first().request.ifMatch })
+        .containsExactly(null, "W/\"v-p002-01\"", "W/\"v-p003-01\"")
+        .inOrder()
+    }
+
+  @Test
+  fun `generate() should return Bundle Entry without if-match when useETagForUpload is false`() =
+    runBlocking {
+      val changes =
+        listOf(
+          LocalChangeEntity(
+              id = 1,
+              resourceType = ResourceType.Patient.name,
+              resourceId = "Patient-002",
+              type = Type.UPDATE,
+              payload = "[]",
+              versionId = "patient-002-version-1"
+            )
+            .toLocalChange()
+        )
+      val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = false)
+      val result = generator.generateUploadRequests(changes)
+
+      assertThat(result.first().bundle.entry.first().request.ifMatch).isNull()
+    }
+
+  @Test
+  fun `generate() should return Bundle Entry with if-match when useETagForUpload is true`() =
+    runBlocking {
+      val changes =
+        listOf(
+          LocalChangeEntity(
+              id = 1,
+              resourceType = ResourceType.Patient.name,
+              resourceId = "Patient-002",
+              type = Type.UPDATE,
+              payload = "[]",
+              versionId = "patient-002-version-1"
+            )
+            .toLocalChange()
+        )
+      val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
+      val result = generator.generateUploadRequests(changes)
+
+      assertThat(result.first().bundle.entry.first().request.ifMatch)
+        .isEqualTo("W/\"patient-002-version-1\"")
+    }
+
+  @Test
+  fun `generate() should return Bundle Entry without if-match when the LocalChangeEntity has no versionId`() =
+    runBlocking {
+      val changes =
+        listOf(
+          LocalChangeEntity(
+              id = 1,
+              resourceType = ResourceType.Patient.name,
+              resourceId = "Patient-002",
+              type = Type.UPDATE,
+              payload = "[]",
+              versionId = ""
+            )
+            .toLocalChange(),
+          LocalChangeEntity(
+              id = 1,
+              resourceType = ResourceType.Patient.name,
+              resourceId = "Patient-003",
+              type = Type.UPDATE,
+              payload = "[]",
+              versionId = null
+            )
+            .toLocalChange()
+        )
+      val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
+      val result = generator.generateUploadRequests(changes)
+
+      assertThat(result.first().bundle.entry[0].request.ifMatch).isNull()
+      assertThat(result.first().bundle.entry[1].request.ifMatch).isNull()
     }
 }

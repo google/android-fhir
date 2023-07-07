@@ -45,13 +45,50 @@ interface DownloadWorkManager {
   suspend fun processResponse(response: Resource): Collection<Resource>
 }
 
-sealed class Request {
+/**
+ * Structure represents a request that can be made to download resources from the FHIR server. The
+ * request may contain http headers for conditional requests for getting precise results.
+ *
+ * Implementations of [Request] are [UrlRequest] and [BundleRequest] and the application developers
+ * may choose the appropriate [Request.of] companion functions to create request objects.
+ *
+ * **UrlRequest**
+ *
+ * The application developer may use a request like below to get an update on Patient/123 since it
+ * was last downloaded.
+ * ```
+ *  Request.of("/Patient/123", mapOf("If-Modified-Since" to "knownLastUpdatedOfPatient123"))
+ * ```
+ * **BundleRequest**
+ *
+ * The application developer may use a request like below to download multiple resources in a single
+ * shot.
+ *
+ * ```
+ * Request.of(Bundle().apply {
+ *  addEntry(Bundle.BundleEntryComponent().apply {
+ *    request = Bundle.BundleEntryRequestComponent().apply {
+ *       url = "Patient/123"
+ *       method = Bundle.HTTPVerb.GET
+ *    }
+ *  })
+ *  addEntry(Bundle.BundleEntryComponent().apply {
+ *    request = Bundle.BundleEntryRequestComponent().apply {
+ *       url = "Patient/124"
+ *       method = Bundle.HTTPVerb.GET
+ *    }
+ *  })
+ * })
+ * ```
+ */
+sealed class Request(open val headers: Map<String, String>) {
   companion object {
     /** @return [UrlRequest] for a FHIR search [url]. */
-    fun of(url: String) = UrlRequest(url)
+    fun of(url: String, headers: Map<String, String> = emptyMap()) = UrlRequest(url, headers)
 
     /** @return [BundleRequest] for a FHIR search [bundle]. */
-    fun of(bundle: Bundle) = BundleRequest(bundle)
+    fun of(bundle: Bundle, headers: Map<String, String> = emptyMap()) =
+      BundleRequest(bundle, headers)
   }
 }
 
@@ -59,11 +96,15 @@ sealed class Request {
  * A [url] based FHIR request to download resources from the server. e.g.
  * `Patient?given=valueGiven&family=valueFamily`
  */
-data class UrlRequest(val url: String) : Request()
+data class UrlRequest
+internal constructor(val url: String, override val headers: Map<String, String> = emptyMap()) :
+  Request(headers)
 
 /**
  * A [bundle] based FHIR request to download resources from the server. For an example, see
  * [bundle-request-medsallergies.json](https://www.hl7.org/fhir/bundle-request-medsallergies.json.html)
  * .
  */
-data class BundleRequest(val bundle: Bundle) : Request()
+data class BundleRequest
+internal constructor(val bundle: Bundle, override val headers: Map<String, String> = emptyMap()) :
+  Request(headers)

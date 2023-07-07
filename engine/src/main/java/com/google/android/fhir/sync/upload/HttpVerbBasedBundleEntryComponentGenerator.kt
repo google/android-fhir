@@ -31,7 +31,10 @@ import org.hl7.fhir.r4.model.UriType
  * [LocalChangeEntity]. See [https://www.hl7.org/fhir/http.html#transaction] for more info regarding
  * the supported [Bundle.HTTPVerb].
  */
-abstract class HttpVerbBasedBundleEntryComponentGenerator(private val httpVerb: Bundle.HTTPVerb) {
+abstract class HttpVerbBasedBundleEntryComponentGenerator(
+  private val httpVerb: Bundle.HTTPVerb,
+  private val useETagForUpload: Boolean,
+) {
 
   /**
    * Return [IBaseResource]? for the [LocalChangeEntity]. Implementation may return [null] when a
@@ -51,7 +54,17 @@ abstract class HttpVerbBasedBundleEntryComponentGenerator(private val httpVerb: 
 
   private fun getEntryRequest(localChange: LocalChange) =
     Bundle.BundleEntryRequestComponent(
-      Enumeration(Bundle.HTTPVerbEnumFactory()).apply { value = httpVerb },
-      UriType("${localChange.resourceType}/${localChange.resourceId}")
-    )
+        Enumeration(Bundle.HTTPVerbEnumFactory()).apply { value = httpVerb },
+        UriType("${localChange.resourceType}/${localChange.resourceId}")
+      )
+      .apply {
+        if (useETagForUpload && !localChange.versionId.isNullOrEmpty()) {
+          // FHIR supports weak Etag, See ETag section https://hl7.org/fhir/http.html#Http-Headers
+          when (localChange.type) {
+            LocalChange.Type.UPDATE,
+            LocalChange.Type.DELETE -> ifMatch = "W/\"${localChange.versionId}\""
+            LocalChange.Type.INSERT -> {}
+          }
+        }
+      }
 }

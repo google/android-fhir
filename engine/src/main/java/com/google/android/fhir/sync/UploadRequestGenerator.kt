@@ -18,8 +18,8 @@ package com.google.android.fhir.sync
 
 import com.google.android.fhir.LocalChange
 
-/** Generator that generates [BundleUploadRequest]s from the [LocalChange]s */
+/** Generator that generates [UploadRequest]s from the [LocalChange]s */
 interface UploadRequestGenerator {
-  /** Generates a list of [BundleUploadRequest] from the [localChanges] */
-  fun generateUploadRequests(localChanges: List<LocalChange>): List<BundleUploadRequest>
+  /** Generates a list of [UploadRequest] from the [localChanges] */
+  fun generateUploadRequests(localChanges: List<LocalChange>): List<UploadRequest>
 }

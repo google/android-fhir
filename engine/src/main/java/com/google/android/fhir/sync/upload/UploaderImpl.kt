@@ -51,7 +51,7 @@ internal class UploaderImpl(
     emit(UploadResult.Started(total))
     uploadRequests.forEach { uploadRequest ->
       try {
-        val response = dataSource.upload(uploadRequest.bundle)
+        val response = dataSource.upload(uploadRequest)
         completed += 1
         emit(getUploadResult(response, uploadRequest.localChangeToken, total, completed))
       } catch (e: Exception) {

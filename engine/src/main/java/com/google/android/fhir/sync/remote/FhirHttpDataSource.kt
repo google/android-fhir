@@ -16,8 +16,19 @@
 
 package com.google.android.fhir.sync.remote
 
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.sync.BundleRequest
+import com.google.android.fhir.sync.BundleUploadRequest
 import com.google.android.fhir.sync.DataSource
-import org.hl7.fhir.r4.model.Bundle
+import com.google.android.fhir.sync.DeleteUploadRequest
+import com.google.android.fhir.sync.PatchUploadRequest
+import com.google.android.fhir.sync.PostUploadRequest
+import com.google.android.fhir.sync.PutUploadRequest
+import com.google.android.fhir.sync.Request
+import com.google.android.fhir.sync.UploadRequest
+import com.google.android.fhir.sync.UrlRequest
+import org.hl7.fhir.r4.model.Resource
 
 /**
  * Implementation of [DataSource] to sync data with the FHIR server using HTTP method calls.
@@ -25,9 +36,35 @@ import org.hl7.fhir.r4.model.Bundle
  */
 internal class FhirHttpDataSource(private val fhirHttpService: FhirHttpService) : DataSource {
 
-  override suspend fun download(path: String) = fhirHttpService.get(path)
+  private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
+  private val jsonParser = fhirContext.newJsonParser()
 
-  override suspend fun download(bundle: Bundle) = fhirHttpService.post(bundle)
+  override suspend fun download(request: Request) =
+    when (request) {
+      is UrlRequest -> fhirHttpService.get(request.url, request.headers)
+      is BundleRequest -> fhirHttpService.post(".", request.bundle, request.headers)
+    }
 
-  override suspend fun upload(bundle: Bundle) = fhirHttpService.post(bundle)
+  override suspend fun upload(request: UploadRequest): Resource =
+    when (request) {
+      is BundleUploadRequest -> fhirHttpService.post(".", request.bundle, request.headers)
+      is PatchUploadRequest ->
+        fhirHttpService.patch(
+          request.resourceType,
+          request.resourceId,
+          request.patchBody,
+          request.headers
+        )
+      is PutUploadRequest ->
+        fhirHttpService.put(
+          request.resourceType,
+          request.resourceId,
+          request.resource,
+          request.headers
+        )
+      is DeleteUploadRequest ->
+        fhirHttpService.delete(request.resourceType, request.resourceId, request.headers)
+      is PostUploadRequest ->
+        fhirHttpService.post(request.resourceType, request.resource, request.headers)
+    }
 }
