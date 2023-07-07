@@ -24,7 +24,7 @@ import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
 import com.google.android.fhir.sync.UploadWorkManager
 
-class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
+class DemoFhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   FhirSyncWorker(appContext, workerParams) {
 
   override fun getDownloadWorkManager(): DownloadWorkManager {
