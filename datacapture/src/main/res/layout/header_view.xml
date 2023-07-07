@@ -7,35 +7,39 @@
     android:layout_height="wrap_content"
 >
 
-    <TextView
-        android:id="@+id/prefix"
-        style="?attr/questionnaireQuestionTextStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingEnd="@dimen/prefix_padding_end"
-        app:layout_constraintEnd_toStartOf="@+id/questionContainer"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-    />
 
-    <LinearLayout
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/questionContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/prefix"
-        app:layout_constraintTop_toTopOf="parent"
-    >
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/prefix"
+            style="?attr/questionnaireQuestionTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingEnd="@dimen/prefix_padding_end"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="@+id/questionContainer"
+            app:layout_constraintTop_toTopOf="parent"
+        />
 
         <TextView
             android:id="@+id/question"
             style="?attr/questionnaireQuestionTextStyle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@id/prefix"
+            android:layout_gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+           app:layout_constraintStart_toEndOf="@id/prefix"
             app:layout_constraintTop_toTopOf="parent"
-        />
+            app:layout_constraintEnd_toStartOf="@+id/helpButton"
+            app:layout_constraintWidth_default="wrap" />
 
         <Button
             style="?attr/questionnaireHelpButtonStyle"
@@ -43,12 +47,32 @@
             android:layout_width="@dimen/help_button_width"
             android:layout_height="@dimen/help_button_height"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="@dimen/help_button_margin_start"
+            android:layout_marginStart="@dimen/prefix_padding_end"
             app:icon="@drawable/ic_help_48px"
-            app:layout_constraintStart_toEndOf="@id/question"
+            android:padding="1dp"
+            android:visibility="visible"
+            app:layout_constraintVertical_bias="0.5"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-        />
-    </LinearLayout>
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/flow1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:flow_horizontalBias="0"
+            app:flow_horizontalGap="@dimen/option_item_margin_horizontal"
+            app:flow_verticalGap="@dimen/option_item_margin_vertical"
+            app:flow_horizontalStyle="spread_inside"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:padding="10dp"
+            android:orientation="horizontal"
+            app:constraint_referenced_ids="prefix,question,helpButton"
+
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/hint"

@@ -27,6 +27,7 @@ import com.google.android.fhir.datacapture.extensions.initHelpViews
 import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
+import com.google.android.fhir.datacapture.extensions.setIconifiedText
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 
 /** View for the prefix, question, and hint of a questionnaire item. */
@@ -48,6 +49,12 @@ internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout
       helpTextView = findViewById(R.id.helpText),
       questionnaireItem = questionnaireViewItem.questionnaireItem
     )
+//    question.setIconifiedText(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned ,
+//            questionnaireViewItem.questionnaireItem.localizedTextSpanned,
+//      R.drawable.ic_help_48px,
+//      helpCardView = findViewById(R.id.helpCardView),
+//      helpTextView = findViewById(R.id.helpText),
+//      questionnaireItem = questionnaireViewItem.questionnaireItem)
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
     question.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedTextSpanned)
     hint.updateTextAndVisibility(

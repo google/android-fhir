@@ -58,7 +58,7 @@
             name="questionnaireHelpTextStyle"
         >@style/TextAppearance.Material3.BodyMedium</item>
         <item name="questionnaireHelpButtonStyle">
-            @style/Widget.MaterialComponents.Button.TextButton.Icon
+            @style/Questionnaire.HelpIconStyle
         </item>
       <item
             name="questionnaireBottomNavContainerStyle"
@@ -177,6 +177,7 @@
         parent="TextAppearance.Material3.TitleSmall"
     >
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+        <item name="android:tint">?attr/colorPrimary</item>
     </style>
 
     <style
@@ -184,6 +185,10 @@
         parent="TextAppearance.Material3.BodyMedium"
     >
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="Questionnaire.HelpIconStyle" parent="Widget.MaterialComponents.Button.TextButton.Icon">
+        <item name="android:drawableTint">?attr/colorPrimary</item>
     </style>
 
     <style name="Questionnaire.BottomNavContainerStyle" parent="">
