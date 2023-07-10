@@ -5,6 +5,17 @@ plugins {
   jacoco
 }
 
+publishing{
+  repositories {
+    maven {
+
+      credentials(PasswordCredentials::class)
+      url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+      name = "sonatype"
+    }
+  }
+}
+
 publishArtifact(Releases.Common)
 
 createJacocoTestReportTask()
