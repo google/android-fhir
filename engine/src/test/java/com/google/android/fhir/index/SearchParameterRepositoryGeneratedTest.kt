@@ -73,7 +73,7 @@ class SearchParameterRepositoryGeneratedTest(private val resource: Resource) {
     searchParams.add(
       SearchParamDefinition(
         "_profile",
-        Enumerations.SearchParamType.REFERENCE,
+        Enumerations.SearchParamType.URI,
         "${resource.resourceType.name}.meta.profile"
       )
     )
