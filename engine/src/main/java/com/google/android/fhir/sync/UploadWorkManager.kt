@@ -27,7 +27,7 @@ abstract class UploadWorkManager(private val uploadRequestGenerator: UploadReque
   /**
    * Transform the [localChanges] to the final set of changes that needs to be uploaded to the
    * server. The default implementation is to squash all the changes by resource type so that there
-   * is at most one local change to be uploaded per resource type
+   * is at most one local change to be uploaded per resource
    */
   open fun preprocessLocalChanges(localChanges: List<LocalChange>): List<LocalChange> {
     return localChanges

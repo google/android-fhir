@@ -23,11 +23,11 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.testing.TestBundleUploadManagerImpl
 import com.google.android.fhir.testing.TestDataSourceImpl
 import com.google.android.fhir.testing.TestDownloadManagerImpl
 import com.google.android.fhir.testing.TestFailingDatasource
 import com.google.android.fhir.testing.TestFhirEngineImpl
-import com.google.android.fhir.testing.TestUploadManagerImpl
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -47,7 +47,7 @@ class FhirSyncWorkerTest {
     override fun getDataSource(): DataSource = TestDataSourceImpl
     override fun getDownloadWorkManager(): DownloadWorkManager = TestDownloadManagerImpl()
     override fun getConflictResolver() = AcceptRemoteConflictResolver
-    override fun getUploadWorkManager(): UploadWorkManager = TestUploadManagerImpl()
+    override fun getUploadWorkManager(): UploadWorkManager = TestBundleUploadManagerImpl()
   }
 
   class FailingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
@@ -57,7 +57,7 @@ class FhirSyncWorkerTest {
     override fun getDataSource(): DataSource = TestFailingDatasource
     override fun getDownloadWorkManager(): DownloadWorkManager = TestDownloadManagerImpl()
     override fun getConflictResolver() = AcceptRemoteConflictResolver
-    override fun getUploadWorkManager(): UploadWorkManager = TestUploadManagerImpl()
+    override fun getUploadWorkManager(): UploadWorkManager = TestBundleUploadManagerImpl()
   }
 
   class FailingPeriodicSyncWorkerWithoutDataSource(
@@ -69,7 +69,7 @@ class FhirSyncWorkerTest {
     override fun getDownloadWorkManager() = TestDownloadManagerImpl()
     override fun getDataSource(): DataSource? = null
     override fun getConflictResolver() = AcceptRemoteConflictResolver
-    override fun getUploadWorkManager(): UploadWorkManager = TestUploadManagerImpl()
+    override fun getUploadWorkManager(): UploadWorkManager = TestBundleUploadManagerImpl()
   }
 
   @Before

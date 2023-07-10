@@ -43,24 +43,6 @@ class HttpPostForCreateUploadRequestGenerator(useETagForUpload: Boolean) :
   }
 }
 
-class HttpPutForUpdateUploadRequestGenerator(useETagForUpload: Boolean) :
-  HttpVerbBasedUploadRequestGenerator(Bundle.HTTPVerb.PUT, useETagForUpload) {
-
-  override fun getUploadRequest(localChange: LocalChange): UploadRequest {
-    val resource =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(localChange.payload)
-        as Resource
-    val headerMap = addIfMatchHeader(localChange, mutableMapOf())
-    return PutUploadRequest(
-      localChangeToken = localChange.token,
-      resource = resource,
-      resourceId = resource.idElement.idPart,
-      resourceType = resource.fhirType(),
-      headers = headerMap
-    )
-  }
-}
-
 class HttpPutForCreateUploadRequestGenerator(useETagForUpload: Boolean) :
   HttpVerbBasedUploadRequestGenerator(Bundle.HTTPVerb.PUT, useETagForUpload) {
 
