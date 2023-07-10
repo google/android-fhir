@@ -21,8 +21,10 @@ import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
 import org.hl7.fhir.r4.model.ResourceType
 
 enum class SyncOperation {
@@ -97,16 +99,15 @@ internal class FhirSynchronizer(
 
   private suspend fun download(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
-    fhirEngine.syncDownload(conflictResolver) {
-      flow {
-        downloader.download().collect {
+    fhirEngine
+      .syncDownload(conflictResolver) {
+        downloader.download().onEach {
           when (it) {
             is DownloadState.Started -> {
               setSyncState(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, it.total))
             }
             is DownloadState.Success -> {
               setSyncState(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, it.total, it.completed))
-              emit(it.resources)
             }
             is DownloadState.Failure -> {
               exceptions.add(it.syncError)
@@ -114,7 +115,8 @@ internal class FhirSynchronizer(
           }
         }
       }
-    }
+      .catch { exceptions.add(ResourceSyncException(ResourceType.Bundle, Exception(it))) }
+      .collect()
     return if (exceptions.isEmpty()) {
       SyncResult.Success()
     } else {

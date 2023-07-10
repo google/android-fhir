@@ -27,17 +27,22 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
+import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.assertResourceNotEquals
 import com.google.android.fhir.testing.readFromFile
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
@@ -263,8 +268,35 @@ class FhirEngineImplTest {
   }
 
   @Test
+  fun `syncDownload catch invalid resource downloaded`() = runBlocking {
+    val exception = mutableListOf<Exception>()
+
+    val testEncounterId = "encounter-1"
+    val invalidEncounter =
+      Encounter().apply {
+        id = testEncounterId
+        class_ = Coding()
+        meta = Meta().apply { lastUpdated = Date() }
+      }
+
+    fhirEngine
+      .syncDownload(AcceptLocalConflictResolver) {
+        flow { emit(DownloadState.Success((listOf((invalidEncounter))), 1, 1)) }
+      }
+      .catch { exception.add(Exception(it)) }
+      .collect()
+
+    assertThat(exception.first().localizedMessage)
+      .isEqualTo("java.lang.NullPointerException: coding.code must not be null")
+  }
+
+  @Test
   fun syncDownload_downloadResources() = runBlocking {
-    fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf((TEST_PATIENT_2)))) }
+    fhirEngine
+      .syncDownload(AcceptLocalConflictResolver) {
+        flow { emit(DownloadState.Success((listOf((TEST_PATIENT_2))), 1, 1)) }
+      }
+      .collect()
 
     assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
   }
@@ -410,7 +442,9 @@ class FhirEngineImplTest {
           }
         )
       }
-    fhirEngine.syncDownload(AcceptRemoteConflictResolver) { flowOf((listOf((originalPatient)))) }
+    fhirEngine.syncDownload(AcceptRemoteConflictResolver) {
+      flowOf(DownloadState.Success(listOf((originalPatient)), 1, 1))
+    }
 
     val localChange =
       originalPatient.copy().apply { addAddress(Address().apply { city = "Malibu" }) }
@@ -426,7 +460,9 @@ class FhirEngineImplTest {
         addAddress(Address().apply { country = "USA" })
       }
 
-    fhirEngine.syncDownload(AcceptRemoteConflictResolver) { flowOf((listOf(remoteChange))) }
+    fhirEngine.syncDownload(AcceptRemoteConflictResolver) {
+      flowOf(DownloadState.Success(listOf(remoteChange), 1, 1))
+    }
 
     assertThat(
         services.database.getAllLocalChanges().filter {
@@ -455,11 +491,14 @@ class FhirEngineImplTest {
             }
           )
         }
-      fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf((originalPatient)))) }
+      fhirEngine
+        .syncDownload(AcceptLocalConflictResolver) {
+          flowOf(DownloadState.Success(listOf((originalPatient)), 1, 1))
+        }
+        .collect()
       var localChange =
         originalPatient.copy().apply { addAddress(Address().apply { city = "Malibu" }) }
       fhirEngine.update(localChange)
-
       localChange =
         localChange.copy().apply {
           addAddress(
@@ -481,7 +520,11 @@ class FhirEngineImplTest {
           addAddress(Address().apply { country = "USA" })
         }
 
-      fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf(remoteChange))) }
+      fhirEngine
+        .syncDownload(AcceptLocalConflictResolver) {
+          flowOf(DownloadState.Success(listOf(remoteChange), 1, 1))
+        }
+        .collect()
 
       val localChangeDiff =
         """[{"op":"remove","path":"\/address\/0\/country"},{"op":"add","path":"\/address\/0\/city","value":"Malibu"},{"op":"add","path":"\/address\/-","value":{"city":"Malibu","state":"California"}}]"""
