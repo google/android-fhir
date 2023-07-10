@@ -26,7 +26,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.work.Constraints
 import androidx.work.WorkManager
-import com.google.android.fhir.demo.data.FhirSyncWorker
+import com.google.android.fhir.demo.data.DemoFhirSyncWorker
 import com.google.android.fhir.demo.databinding.ActivityMainBinding
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.RepeatInterval
@@ -50,14 +50,15 @@ class MainActivity : AppCompatActivity() {
     initNavigationDrawer()
     observeLastSyncTime()
     viewModel.updateLastSyncTimestamp()
-    Sync(WorkManager.getInstance(application.applicationContext))
-      .periodicSync<FhirSyncWorker>(
-        this,
-        PeriodicSyncConfiguration(
-          syncConstraints = Constraints.Builder().build(),
-          repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
-        )
+    Sync.periodicSync<DemoFhirSyncWorker>(
+      this,
+      application.applicationContext,
+      periodicSyncConfiguration =
+      PeriodicSyncConfiguration(
+        syncConstraints = Constraints.Builder().build(),
+        repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
       )
+    )
 
 //    viewModel.triggerOneTimeSync()
   }

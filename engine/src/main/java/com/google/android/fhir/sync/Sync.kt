@@ -38,7 +38,7 @@ import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.mapNotNull
 import timber.log.Timber
 
-class Sync(val workManager: WorkManager) {
+object Sync {
   val gson: Gson =
     GsonBuilder()
       .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeTypeAdapter().nullSafe())
@@ -47,29 +47,31 @@ class Sync(val workManager: WorkManager) {
   /**
    * Starts a one time sync job based on [FhirSyncWorker].
    *
-   * Use the returned [Flow] to get updates of the sync job. Alternatively, use [observeProgress] with
+   * Use the returned [Flow] to get updates of the sync job. Alternatively, use [getWorkerInfo] with
    * the same [FhirSyncWorker] to retrieve the status of the job.
    *
    * @param retryConfiguration configuration to guide the retry mechanism, or `null` to stop retry.
    * @return a [Flow] of [SyncJobStatus]
    */
   inline fun <reified W : FhirSyncWorker> oneTimeSync(
+    context: Context,
     retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
   ): Flow<SyncJobStatus> {
     val uniqueWorkName = "${W::class.java.name}-oneTimeSync"
-    val flow = getWorkerInfo(uniqueWorkName)
-    workManager.enqueueUniqueWork(
-      uniqueWorkName,
-      ExistingWorkPolicy.KEEP,
-      createOneTimeWorkRequest(retryConfiguration, W::class.java)
-    )
+    val flow = getWorkerInfo(context, uniqueWorkName)
+    WorkManager.getInstance(context)
+      .enqueueUniqueWork(
+        uniqueWorkName,
+        ExistingWorkPolicy.KEEP,
+        createOneTimeWorkRequest(retryConfiguration, W::class.java)
+      )
     return flow
   }
 
   /**
    * Starts a periodic sync job based on [FhirSyncWorker].
    *
-   * Use the returned [Flow] to get updates of the sync job. Alternatively, use [observeProgress] with
+   * Use the returned [Flow] to get updates of the sync job. Alternatively, use [getWorkerInfo] with
    * the same [FhirSyncWorker] to retrieve the status of the job.
    *
    * @param periodicSyncConfiguration configuration to determine the sync frequency and retry
@@ -78,35 +80,47 @@ class Sync(val workManager: WorkManager) {
    */
   @ExperimentalCoroutinesApi
   inline fun <reified W : FhirSyncWorker> periodicSync(
+    context: Context,
     periodicSyncConfiguration: PeriodicSyncConfiguration
   ): Flow<SyncJobStatus> {
     val uniqueWorkName = "${W::class.java.name}-periodicSync"
-    val flow = getWorkerInfo(uniqueWorkName)
-    workManager.enqueueUniquePeriodicWork(
-      uniqueWorkName,
-      ExistingPeriodicWorkPolicy.KEEP,
-      createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java)
-    )
+    val flow = getWorkerInfo(context, uniqueWorkName)
+    WorkManager.getInstance(context)
+      .enqueueUniquePeriodicWork(
+        uniqueWorkName,
+        ExistingPeriodicWorkPolicy.KEEP,
+        createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java)
+      )
     return flow
   }
+
 
   @ExperimentalCoroutinesApi
   inline fun <reified W : FhirSyncWorker> periodicSync(
     owner: LifecycleOwner,
+    context: Context,
     periodicSyncConfiguration: PeriodicSyncConfiguration
   ) {
     val uniqueWorkName = "${W::class.java.name}-periodicSync"
-    observeProgress(owner,uniqueWorkName)
-    workManager.enqueueUniquePeriodicWork(
+    observeProgress(owner,context, uniqueWorkName)
+    WorkManager.getInstance(context).enqueueUniquePeriodicWork(
       uniqueWorkName,
       ExistingPeriodicWorkPolicy.KEEP,
       createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java)
     )
   }
 
+  fun observeProgress(owner: LifecycleOwner, context: Context, workName: String) {
+    WorkManager.getInstance(context)
+      .getWorkInfosForUniqueWorkLiveData(workName)
+      .observe(owner) {
+        Timber.i("${it[0].progress.getInt("Progress",-1)}")
+      }
+  }
+
   /** Gets the worker info for the [FhirSyncWorker] */
-  fun getWorkerInfo(workName: String) =
-    workManager
+  fun getWorkerInfo(context: Context, workName: String) =
+    WorkManager.getInstance(context)
       .getWorkInfosForUniqueWorkLiveData(workName)
       .asFlow()
       .flatMapConcat { it.asFlow() }
@@ -119,14 +133,6 @@ class Sync(val workManager: WorkManager) {
             gson.fromJson(stateData, Class.forName(state)) as SyncJobStatus
           }
       }
-
-  fun observeProgress(owner: LifecycleOwner, workName: String) {
-    workManager
-      .getWorkInfosForUniqueWorkLiveData(workName)
-      .observe(owner) {
-        Timber.i("${it[0].progress.getInt("Progress",-1)}")
-      }
-  }
 
   @PublishedApi
   internal inline fun <W : FhirSyncWorker> createOneTimeWorkRequest(
@@ -154,10 +160,10 @@ class Sync(val workManager: WorkManager) {
   ): PeriodicWorkRequest {
     val periodicWorkRequestBuilder =
       PeriodicWorkRequest.Builder(
-          clazz,
-          periodicSyncConfiguration.repeat.interval,
-          periodicSyncConfiguration.repeat.timeUnit
-        )
+        clazz,
+        periodicSyncConfiguration.repeat.interval,
+        periodicSyncConfiguration.repeat.timeUnit
+      )
         .setConstraints(periodicSyncConfiguration.syncConstraints)
 
     periodicSyncConfiguration.retryConfiguration?.let {
@@ -173,10 +179,8 @@ class Sync(val workManager: WorkManager) {
     return periodicWorkRequestBuilder.build()
   }
 
-  companion object {
-    /** Gets the timestamp of the last sync job. */
-    fun getLastSyncTimestamp(context: Context): OffsetDateTime? {
-      return DatastoreUtil(context).readLastSyncTimestamp()
-    }
+  /** Gets the timestamp of the last sync job. */
+  fun getLastSyncTimestamp(context: Context): OffsetDateTime? {
+    return DatastoreUtil(context).readLastSyncTimestamp()
   }
 }

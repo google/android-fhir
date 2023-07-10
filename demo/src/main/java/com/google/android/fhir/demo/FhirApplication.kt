@@ -28,14 +28,8 @@ import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.datacapture.DataCaptureConfig
 import com.google.android.fhir.datacapture.XFhirQueryResolver
-import com.google.android.fhir.demo.data.FhirSyncWorker
 import com.google.android.fhir.search.search
-import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.remote.HttpLogger
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.launch
-import org.hl7.fhir.r4.model.Patient
 import timber.log.Timber
 
 class FhirApplication : Application(), DataCaptureConfig.Provider {
@@ -51,7 +45,6 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
     if (BuildConfig.DEBUG) {
       Timber.plant(Timber.DebugTree())
     }
-    Patient.IDENTIFIER
     FhirEngineProvider.init(
       FhirEngineConfiguration(
         enableEncryptionIfSupported = true,
@@ -69,7 +62,6 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
       )
     )
 //    Sync(WorkManager.getInstance(this)).oneTimeSync<FhirSyncWorker>()
-
 
     dataCaptureConfig =
       DataCaptureConfig().apply {
