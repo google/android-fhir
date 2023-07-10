@@ -28,6 +28,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.testing.TestDataSourceImpl
 import com.google.android.fhir.testing.TestDownloadManagerImpl
 import com.google.android.fhir.testing.TestFhirEngineImpl
+import com.google.android.fhir.testing.TestUploadManagerImpl
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -51,6 +52,7 @@ class SyncInstrumentedTest {
     override fun getDataSource(): DataSource = TestDataSourceImpl
     override fun getDownloadWorkManager(): DownloadWorkManager = TestDownloadManagerImpl()
     override fun getConflictResolver() = AcceptRemoteConflictResolver
+    override fun getUploadWorkManager() = TestUploadManagerImpl()
   }
 
   @Test
