@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   internal val uriFilterCriteria = mutableListOf<UriFilterCriteria>()
   internal var sort: IParam? = null
   internal var order: Order? = null
+  internal val revIncludeMap = mutableMapOf<ResourceType, MutableList<ReferenceClientParam>>()
   @PublishedApi internal var nestedSearches = mutableListOf<NestedSearch>()
   var operation = Operation.AND
 
@@ -141,6 +142,27 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   fun sort(parameter: DateClientParam, order: Order) {
     sort = parameter
     this.order = order
+  }
+
+  /**
+   * Allows user to include additional resources to be included in the search results that reference
+   * the resource on which [revInclude] is being called. The developers may call [revInclude]
+   * multiple times with different [ResourceType] to allow search api to return multiple referenced
+   * resource types.
+   *
+   * e.g. The below example would return all the Patients with given-name as James and their
+   * associated Encounters and Conditions.
+   *
+   * ```
+   * fhirEngine.search<Resource>(Search(ResourceType.Patient).apply {
+   *  filter(Patient.GIVEN, { value = "James" })
+   *  revInclude(ResourceType.Encounter, Encounter.PATIENT)
+   *  revInclude(ResourceType.Condition, Condition.PATIENT)
+   * })
+   * ```
+   */
+  fun revInclude(resourceType: ResourceType, vararg clientParam: ReferenceClientParam) {
+    revIncludeMap.computeIfAbsent(resourceType) { mutableListOf() }.addAll(clientParam)
   }
 }
 

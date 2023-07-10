@@ -18,6 +18,7 @@ package com.google.android.fhir.search
 
 import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
+import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.ConverterException
@@ -34,6 +35,7 @@ import kotlin.math.roundToLong
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * The multiplier used to determine the range for the `ap` search prefix. See
@@ -166,6 +168,22 @@ internal fun Search.getQuery(
         $limitStatement)
         """
         }
+        revIncludeMap.isNotEmpty() -> {
+          """
+        select serializedResource from ResourceEntity where resourceUuid in (
+        with UUIDS as ( select '${type.name}/' || a.resourceId from ResourceEntity a 
+        $sortJoinStatement
+        WHERE a.resourceType = ?
+        $filterStatement
+        $sortOrderStatement
+        $limitStatement
+        )
+        Select resourceUuid
+        FROM ResourceEntity
+        WHERE '${type.name}/' || resourceId in UUIDS ${revIncludeMap.toSQLQuery()}
+        )
+        """.trimIndent()
+        }
         else ->
           """ 
         SELECT a.serializedResource
@@ -295,7 +313,8 @@ internal fun getConditionParamPair(
       (prefix != ParamPrefixEnum.STARTS_AFTER && prefix != ParamPrefixEnum.ENDS_BEFORE)
   ) { "Prefix $prefix not allowed for Integer type" }
   return when (prefix) {
-    ParamPrefixEnum.EQUAL, null -> {
+    ParamPrefixEnum.EQUAL,
+    null -> {
       val precision = value.getRange()
       ConditionParam(
         "index_value >= ? AND index_value < ?",
@@ -441,3 +460,12 @@ private fun getApproximateDateRange(
 }
 
 private data class ApproximateDateRange(val start: Long, val end: Long)
+
+private fun Map<ResourceType, List<ReferenceClientParam>>.toSQLQuery() =
+  map { it ->
+      val indexes = it.value.joinToString { "\'${it.paramName}\'" }
+      """
+      SELECT DISTINCT resourceUuid from ReferenceIndexEntity WHERE resourceType = '${it.key}' AND index_name IN ($indexes) AND index_value IN UUIDS
+    """.trimIndent()
+    }
+    .joinToString(prefix = "\nUNION\n", separator = " \nUNION\n")
