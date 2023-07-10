@@ -28,7 +28,6 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/header_margin_bottom"
     />
 
     <com.google.android.fhir.datacapture.views.MediaView

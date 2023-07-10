@@ -27,6 +27,7 @@
 
     <!--  Header  -->
     <dimen name="error_text_at_header_margin_top">4dp</dimen>
+    <dimen name="header_padding_bottom">4dp</dimen>
     <dimen name="header_margin_bottom">16dp</dimen>
     <dimen name="help_button_margin_start">4dp</dimen>
     <dimen name="help_button_height">24dp</dimen>
