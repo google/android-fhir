@@ -21,6 +21,7 @@ import android.text.format.DateFormat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
 import androidx.work.WorkManager
@@ -37,6 +38,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /** View model for [MainActivity]. */
 @OptIn(InternalCoroutinesApi::class)
@@ -49,26 +51,29 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
   val pollState: Flow<SyncJobStatus>
     get() = _pollState
 
-  init {
-    viewModelScope.launch {
-      Sync(WorkManager.getInstance(application.applicationContext))
-        .periodicSync<FhirSyncWorker>(
-          PeriodicSyncConfiguration(
-            syncConstraints = Constraints.Builder().build(),
-            repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
-          )
-        )
-        .shareIn(this, SharingStarted.Eagerly, 10)
-        .collect { _pollState.emit(it) }
-    }
-  }
+//  init {
+//    viewModelScope.launch {
+//      Sync(WorkManager.getInstance(application.applicationContext))
+//        .periodicSync<FhirSyncWorker>(
+//          PeriodicSyncConfiguration(
+//            syncConstraints = Constraints.Builder().build(),
+//            repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
+//          )
+//        )
+//        .shareIn(this, SharingStarted.Eagerly, 10)
+//        .collect { _pollState.emit(it) }
+//    }
+//  }
 
   fun triggerOneTimeSync() {
     viewModelScope.launch {
       Sync(WorkManager.getInstance(getApplication()))
         .oneTimeSync<FhirSyncWorker>()
         .shareIn(this, SharingStarted.Eagerly, 10)
-        .collect { _pollState.emit(it) }
+        .collect {
+          Timber.i("sync: one time sync $it")
+          _pollState.emit(it)
+        }
     }
   }
 

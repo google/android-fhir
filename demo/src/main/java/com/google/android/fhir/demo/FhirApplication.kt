@@ -18,6 +18,7 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.content.Context
+import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.FhirEngine
@@ -31,6 +32,9 @@ import com.google.android.fhir.demo.data.FhirSyncWorker
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.remote.HttpLogger
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
 import timber.log.Timber
 
@@ -64,7 +68,8 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
         )
       )
     )
-    Sync(WorkManager.getInstance(this)).oneTimeSync<FhirSyncWorker>()
+//    Sync(WorkManager.getInstance(this)).oneTimeSync<FhirSyncWorker>()
+
 
     dataCaptureConfig =
       DataCaptureConfig().apply {

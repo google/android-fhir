@@ -35,6 +35,7 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -62,7 +63,28 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   /** The purpose of this api makes it easy to stub [FhirSyncWorker] for testing. */
   internal open fun getDataSource() = FhirEngineProvider.getDataSource(applicationContext)
 
-  override suspend fun doWork(): Result {
+  companion object {
+    const val Progress = "Progress"
+    private const val delayDuration = 100L
+  }
+
+   override suspend fun doWork(): Result {
+    val firstUpdate = workDataOf(Progress to 0)
+    val intermediateUpdate = workDataOf(Progress to 50)
+    val lastUpdate = workDataOf(Progress to 100)
+    setProgress(firstUpdate)
+    Timber.i("first update ${firstUpdate.getInt("Progress",-1)}")
+    delay(delayDuration)
+    setProgress(intermediateUpdate)
+    Timber.i("intermediateUpdate  ${intermediateUpdate.getInt("Progress",-1)}")
+    delay(delayDuration)
+    setProgress(lastUpdate)
+    Timber.i("last update ${lastUpdate.getInt("Progress",-1)}")
+//    delay(delayDuration)
+    return Result.success()
+  }
+
+   suspend fun doWork1(): Result {
     val dataSource =
       getDataSource()
         ?: return Result.failure(

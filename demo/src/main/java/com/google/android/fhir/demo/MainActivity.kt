@@ -24,7 +24,16 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.work.Constraints
+import androidx.work.WorkManager
+import com.google.android.fhir.demo.data.FhirSyncWorker
 import com.google.android.fhir.demo.databinding.ActivityMainBinding
+import com.google.android.fhir.sync.PeriodicSyncConfiguration
+import com.google.android.fhir.sync.RepeatInterval
+import com.google.android.fhir.sync.Sync
+import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.shareIn
 
 const val MAX_RESOURCE_COUNT = 20
 
@@ -41,6 +50,16 @@ class MainActivity : AppCompatActivity() {
     initNavigationDrawer()
     observeLastSyncTime()
     viewModel.updateLastSyncTimestamp()
+    Sync(WorkManager.getInstance(application.applicationContext))
+      .periodicSync<FhirSyncWorker>(
+        this,
+        PeriodicSyncConfiguration(
+          syncConstraints = Constraints.Builder().build(),
+          repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
+        )
+      )
+
+//    viewModel.triggerOneTimeSync()
   }
 
   override fun onBackPressed() {
