@@ -83,7 +83,7 @@ class SimpleUploadRequestGeneratorTest {
       val putUploadRequest = result.get(0) as PutUploadRequest
       Truth.assertThat(putUploadRequest.resource).isInstanceOf(Patient::class.java)
       Truth.assertThat(putUploadRequest.resourceId).isEqualTo("Patient-001")
-      Truth.assertThat(putUploadRequest.resourceType).isEqualTo("Patient")
+      Truth.assertThat(putUploadRequest.resourceType).isEqualTo(ResourceType.Patient)
       Truth.assertThat(putUploadRequest.headers).isEqualTo(emptyMap<String, String>())
       Truth.assertThat(putUploadRequest.localChangeToken.ids).contains(1L)
     }
@@ -136,7 +136,7 @@ class SimpleUploadRequestGeneratorTest {
           "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]"
         )
       Truth.assertThat(patchUploadRequest.resourceId).isEqualTo("Patient-002")
-      Truth.assertThat(patchUploadRequest.resourceType).isEqualTo("Patient")
+      Truth.assertThat(patchUploadRequest.resourceType).isEqualTo(ResourceType.Patient)
       Truth.assertThat(patchUploadRequest.headers)
         .containsEntry("Content-Type", ContentTypes.APPLICATION_JSON_PATCH)
       Truth.assertThat(patchUploadRequest.headers).containsEntry("If-Match", "W/\"v-p002-01\"")
@@ -176,7 +176,7 @@ class SimpleUploadRequestGeneratorTest {
       Truth.assertThat(result).hasSize(1)
       val deleteUploadRequest = result.get(0) as DeleteUploadRequest
       Truth.assertThat(deleteUploadRequest.resourceId).isEqualTo("Patient-003")
-      Truth.assertThat(deleteUploadRequest.resourceType).isEqualTo("Patient")
+      Truth.assertThat(deleteUploadRequest.resourceType).isEqualTo(ResourceType.Patient)
       Truth.assertThat(deleteUploadRequest.headers).containsEntry("If-Match", "W/\"v-p003-01\"")
       Truth.assertThat(deleteUploadRequest.localChangeToken.ids).contains(3L)
     }

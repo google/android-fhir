@@ -37,8 +37,6 @@ import org.hl7.fhir.r4.model.Resource
 internal class FhirHttpDataSource(private val fhirHttpService: FhirHttpService) : DataSource {
 
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
-  private val jsonParser = fhirContext.newJsonParser()
-
   override suspend fun download(request: Request) =
     when (request) {
       is UrlRequest -> fhirHttpService.get(request.url, request.headers)
@@ -50,21 +48,21 @@ internal class FhirHttpDataSource(private val fhirHttpService: FhirHttpService) 
       is BundleUploadRequest -> fhirHttpService.post(".", request.bundle, request.headers)
       is PatchUploadRequest ->
         fhirHttpService.patch(
-          request.resourceType,
+          request.resourceType.name,
           request.resourceId,
           request.patchBody,
           request.headers
         )
       is PutUploadRequest ->
         fhirHttpService.put(
-          request.resourceType,
+          request.resourceType.name,
           request.resourceId,
           request.resource,
           request.headers
         )
       is DeleteUploadRequest ->
-        fhirHttpService.delete(request.resourceType, request.resourceId, request.headers)
+        fhirHttpService.delete(request.resourceType.name, request.resourceId, request.headers)
       is PostUploadRequest ->
-        fhirHttpService.post(request.resourceType, request.resource, request.headers)
+        fhirHttpService.post(request.resourceType.name, request.resource, request.headers)
     }
 }

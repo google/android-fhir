@@ -27,6 +27,7 @@ import com.google.android.fhir.sync.PutUploadRequest
 import com.google.android.fhir.sync.UploadRequest
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 
 class HttpPostForCreateUploadRequestGenerator(useETagForUpload: Boolean) :
   HttpVerbBasedUploadRequestGenerator(Bundle.HTTPVerb.PUT, useETagForUpload) {
@@ -38,7 +39,7 @@ class HttpPostForCreateUploadRequestGenerator(useETagForUpload: Boolean) :
     return PostUploadRequest(
       localChangeToken = localChange.token,
       resource = resource,
-      resourceType = resource.fhirType()
+      resourceType = ResourceType.fromCode(resource.fhirType())
     )
   }
 }
@@ -54,7 +55,7 @@ class HttpPutForCreateUploadRequestGenerator(useETagForUpload: Boolean) :
       localChangeToken = localChange.token,
       resource = resource,
       resourceId = resource.idElement.idPart,
-      resourceType = resource.fhirType()
+      resourceType = ResourceType.fromCode(resource.fhirType())
     )
   }
 }
@@ -68,7 +69,7 @@ class HttpPatchForUpdateUploadRequestGenerator(useETagForUpload: Boolean) :
       localChangeToken = localChange.token,
       patchBody = localChange.payload,
       resourceId = localChange.resourceId,
-      resourceType = localChange.resourceType,
+      resourceType = ResourceType.fromCode(localChange.resourceType),
       headers = headerMap
     )
   }
@@ -81,7 +82,7 @@ class HttpDeleteUploadRequestGenerator(useETagForUpload: Boolean) :
     return DeleteUploadRequest(
       localChangeToken = localChange.token,
       resourceId = localChange.resourceId,
-      resourceType = localChange.resourceType,
+      resourceType = ResourceType.fromCode(localChange.resourceType),
       headers = headerMap
     )
   }

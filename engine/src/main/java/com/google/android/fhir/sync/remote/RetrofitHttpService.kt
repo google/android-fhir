@@ -58,9 +58,9 @@ internal interface RetrofitHttpService : FhirHttpService {
 
   @DELETE("{resourceType}/{resourceId}")
   override suspend fun delete(
-    resourceType: String,
-    resourceId: String,
-    headers: Map<String, String>
+    @Path("resourceType") resourceType: String,
+    @Path("resourceId") resourceId: String,
+    @HeaderMap headers: Map<String, String>
   ): Resource
 
   @PUT("{resourceType}/{resourceId}")

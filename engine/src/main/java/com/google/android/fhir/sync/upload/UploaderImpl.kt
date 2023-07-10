@@ -44,6 +44,15 @@ internal class UploaderImpl(
   private val uploadWorkManager: UploadWorkManager
 ) : Uploader {
 
+  companion object {
+    private val erroneousOperationOutcomesCodes =
+      setOf<OperationOutcome.IssueSeverity>(
+        OperationOutcome.IssueSeverity.WARNING,
+        OperationOutcome.IssueSeverity.FATAL,
+        OperationOutcome.IssueSeverity.ERROR
+      )
+  }
+
   override suspend fun upload(localChanges: List<LocalChange>): Flow<UploadResult> = flow {
     val transformedChanges = uploadWorkManager.preprocessLocalChanges(localChanges)
     val uploadRequests = uploadWorkManager.createUploadRequestsFromChanges(transformedChanges)
@@ -54,7 +63,15 @@ internal class UploaderImpl(
       try {
         val response = dataSource.upload(uploadRequest)
         completed += 1
-        emit(getUploadResult(response, uploadRequest.localChangeToken, total, completed))
+        emit(
+          getUploadResult(
+            uploadRequest.resourceType,
+            response,
+            uploadRequest.localChangeToken,
+            total,
+            completed
+          )
+        )
       } catch (e: Exception) {
         Timber.e(e)
         emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
@@ -63,6 +80,7 @@ internal class UploaderImpl(
   }
 
   private fun getUploadResult(
+    requestResourceType: ResourceType,
     response: Resource,
     localChangeToken: LocalChangeToken,
     total: Int,
@@ -72,10 +90,12 @@ internal class UploaderImpl(
       response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
         UploadResult.Success(localChangeToken, response, total, completed)
       }
-      response is OperationOutcome && response.issue.isNotEmpty() -> {
+      response is OperationOutcome &&
+        response.issue.isNotEmpty() &&
+        response.issue.any { erroneousOperationOutcomesCodes.contains(it.severity) } -> {
         UploadResult.Failure(
           ResourceSyncException(
-            ResourceType.Bundle,
+            requestResourceType,
             FHIRException(response.issueFirstRep.diagnostics)
           )
         )
@@ -86,7 +106,7 @@ internal class UploaderImpl(
       else -> {
         UploadResult.Failure(
           ResourceSyncException(
-            ResourceType.Bundle,
+            requestResourceType,
             FHIRException("Unknown response for ${response.resourceType}")
           )
         )
