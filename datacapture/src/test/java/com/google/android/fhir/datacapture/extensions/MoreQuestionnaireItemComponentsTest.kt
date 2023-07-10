@@ -1639,6 +1639,54 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun `createQuestionnaireResponseItem should set answer for non repeating question initialSelected option`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phone"
+        type = Questionnaire.QuestionnaireItemType.CHOICE
+        answerOption =
+          listOf(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding("http://abc.com", "a", "A")
+            },
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "b", "B")
+            },
+          )
+      }
+
+    val responseItem = question.createQuestionnaireResponseItem()
+
+    assertThat(responseItem.answer.map { it.valueCoding.code }).containsExactly("b")
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should set answer for repeating question initialSelected options`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phones"
+        type = Questionnaire.QuestionnaireItemType.CHOICE
+        repeats = true
+        answerOption =
+          listOf(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "a", "A")
+            },
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "b", "B")
+            },
+          )
+      }
+
+    val responseItem = question.createQuestionnaireResponseItem()
+
+    assertThat(responseItem.answer.map { it.valueCoding.code }).containsExactly("a", "b")
+  }
+
+  @Test
   fun `createQuestionnaireResponseItem should throw exception for non repeating question with multiple initial values `() {
     val question =
       Questionnaire.QuestionnaireItemComponent().apply {
@@ -1657,6 +1705,70 @@ class MoreQuestionnaireItemComponentsTest {
         assertThat(this.message)
           .isEqualTo(
             "Questionnaire item ${question.linkId} can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+          )
+      }
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should throw exception for non repeating question with multiple initialSelected options`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phones"
+        type = Questionnaire.QuestionnaireItemType.CHOICE
+        answerOption =
+          listOf(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "a", "A")
+            },
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "b", "B")
+            },
+          )
+      }
+    assertThrows(IllegalArgumentException::class.java) {
+        question.createQuestionnaireResponseItem()
+      }
+      .run {
+        assertThat(this.message)
+          .isEqualTo(
+            "Questionnaire item ${question.linkId} can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+          )
+      }
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should throw exception for initial and answerOption both specified`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phones"
+        type = Questionnaire.QuestionnaireItemType.CHOICE
+        initial =
+          listOf(
+            Questionnaire.QuestionnaireItemInitialComponent().apply {
+              value = Coding("http://abc.com", "a", "A")
+            }
+          )
+        answerOption =
+          listOf(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "a", "A")
+            },
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "b", "B")
+            },
+          )
+      }
+    assertThrows(IllegalArgumentException::class.java) {
+        question.createQuestionnaireResponseItem()
+      }
+      .run {
+        assertThat(this.message)
+          .isEqualTo(
+            "Questionnaire item ${question.linkId} has both initial value(s) and has answerOption. See rule que-11 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
           )
       }
   }
