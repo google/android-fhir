@@ -95,6 +95,7 @@ class UploaderImplTest {
             OperationOutcome().apply {
               addIssue(
                 OperationOutcome.OperationOutcomeIssueComponent().apply {
+                  severity = OperationOutcome.IssueSeverity.WARNING
                   code = OperationOutcome.IssueType.CONFLICT
                   diagnostics = "The resource has already been updated."
                 }
@@ -118,6 +119,7 @@ class UploaderImplTest {
             OperationOutcome().apply {
               addIssue(
                 OperationOutcome.OperationOutcomeIssueComponent().apply {
+                  severity = OperationOutcome.IssueSeverity.WARNING
                   code = OperationOutcome.IssueType.CONFLICT
                   diagnostics = "The resource has already been updated."
                 }
