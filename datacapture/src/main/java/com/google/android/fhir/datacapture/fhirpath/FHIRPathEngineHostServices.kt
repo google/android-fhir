@@ -128,11 +128,13 @@ internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
     val results: MutableList<Base> = mutableListOf()
     focus?.let { f ->
       if (f.size > 1) throw IllegalArgumentException("Too many items specified")
-      val primitiveStringValue = f[0].primitiveValue()
-      when (f[0]) {
-        is IntegerType,
-        is DecimalType -> results.add(DecimalType(exp(primitiveStringValue.toDouble())))
-        else -> throw IllegalArgumentException("Wrong type of operand supplied")
+      for (focusItem in f) {
+        val primitiveStringValue = focusItem.primitiveValue()
+        when (focusItem) {
+          is IntegerType,
+          is DecimalType -> results.add(DecimalType(exp(primitiveStringValue.toDouble())))
+          else -> throw IllegalArgumentException("Wrong type of operand supplied")
+        }
       }
     }
     return results
