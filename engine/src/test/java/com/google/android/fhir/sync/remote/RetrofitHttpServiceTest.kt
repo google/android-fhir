@@ -26,7 +26,6 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.HumanName
-import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
 import org.junit.After
 import org.junit.Before
@@ -107,146 +106,11 @@ class RetrofitHttpServiceTest {
         type = Bundle.BundleType.TRANSACTION
       }
 
-    val result =
-      retrofitHttpService.post(".", request, mapOf("If-Match" to "randomResourceVersionID"))
+    val result = retrofitHttpService.post(request, mapOf("If-Match" to "randomResourceVersionID"))
     val serverRequest = mockWebServer.takeRequest()
     assertThat(serverRequest.headers["If-Match"]).isEqualTo("randomResourceVersionID")
     // No exception has occurred
     assertThat(result).isInstanceOf(Bundle::class.java)
-  }
-
-  @Test
-  fun `should assemble upload post resource request correctly`() = runTest {
-    // checks that a upload request can be made successfully with parameters without exception
-    val patientResource =
-      Patient().apply {
-        id = "Patient-002"
-        addName(
-          HumanName().apply {
-            addGiven("Janet")
-            family = "Doe"
-          }
-        )
-      }
-    val mockResponse =
-      MockResponse().apply {
-        setResponseCode(HttpURLConnection.HTTP_OK)
-        setBody(parser.encodeResourceToString(patientResource))
-      }
-    mockWebServer.enqueue(mockResponse)
-
-    val result = retrofitHttpService.post("Patient", patientResource, emptyMap())
-
-    val serverRequest = mockWebServer.takeRequest()
-    assertThat(String(serverRequest.body.readByteArray()))
-      .isEqualTo(parser.encodeResourceToString(patientResource))
-    // No exception has occurred
-    assertThat(result).isInstanceOf(Patient::class.java)
-  }
-
-  @Test
-  fun `should assemble upload put resource request correctly`() = runTest {
-    // checks that a upload request can be made successfully with parameters without exception
-    val patientResource =
-      Patient().apply {
-        id = "Patient-002"
-        addName(
-          HumanName().apply {
-            addGiven("Janet")
-            family = "Doe"
-          }
-        )
-      }
-    val mockResponse =
-      MockResponse().apply {
-        setResponseCode(HttpURLConnection.HTTP_OK)
-        setBody(parser.encodeResourceToString(patientResource))
-      }
-    mockWebServer.enqueue(mockResponse)
-
-    val result = retrofitHttpService.put("Patient", "Patient-002", patientResource, emptyMap())
-
-    val serverRequest = mockWebServer.takeRequest()
-    assertThat(String(serverRequest.body.readByteArray()))
-      .isEqualTo(parser.encodeResourceToString(patientResource))
-    // No exception has occurred
-    assertThat(result).isInstanceOf(Patient::class.java)
-  }
-
-  @Test
-  fun `should assemble upload patch resource request correctly`() = runTest {
-    // checks that a upload request can be made successfully with parameters without exception
-    val patientResource =
-      Patient().apply {
-        id = "Patient-002"
-        addName(
-          HumanName().apply {
-            addGiven("Janet")
-            family = "Doe"
-          }
-        )
-      }
-    val mockResponse =
-      MockResponse().apply {
-        setResponseCode(HttpURLConnection.HTTP_OK)
-        setBody(parser.encodeResourceToString(patientResource))
-      }
-    val patchRequest =
-      "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]"
-    mockWebServer.enqueue(mockResponse)
-
-    val result =
-      retrofitHttpService.patch(
-        "Patient",
-        "Patient-002",
-        patchRequest,
-        mapOf(
-          "If-Match" to "randomResourceVersionID",
-          "Content-Type" to "application/json-patch+json"
-        )
-      )
-
-    val serverRequest = mockWebServer.takeRequest()
-    assertThat(String(serverRequest.body.readByteArray())).isEqualTo(patchRequest)
-    assertThat(serverRequest.headers).contains("If-Match" to "randomResourceVersionID")
-    assertThat(serverRequest.headers).contains("Content-Type" to "application/json-patch+json")
-    // No exception has occurred
-    assertThat(result).isInstanceOf(Patient::class.java)
-  }
-
-  @Test
-  fun `should assemble upload delete resource request correctly`() = runTest {
-    val mockResponse =
-      MockResponse().apply {
-        setResponseCode(HttpURLConnection.HTTP_OK)
-        setBody(
-          parser.encodeResourceToString(
-            OperationOutcome().apply {
-              addIssue(
-                OperationOutcome.OperationOutcomeIssueComponent().apply {
-                  severity = OperationOutcome.IssueSeverity.INFORMATION
-                  code = OperationOutcome.IssueType.INFORMATIONAL
-                  diagnostics = "Successfully deleted 1 resource(s). Took 12ms."
-                }
-              )
-            }
-          )
-        )
-      }
-    mockWebServer.enqueue(mockResponse)
-
-    val result =
-      retrofitHttpService.delete(
-        "Patient",
-        "Patient-002",
-        mapOf("If-Match" to "randomResourceVersionID")
-      )
-
-    val serverRequest = mockWebServer.takeRequest()
-    assertThat(String(serverRequest.body.readByteArray())).isEqualTo("")
-    assertThat(serverRequest.headers).contains("If-Match" to "randomResourceVersionID")
-    // No exception has occurred
-    assertThat(result).isInstanceOf(OperationOutcome::class.java)
   }
 
   @Test
@@ -271,7 +135,7 @@ class RetrofitHttpServiceTest {
           type = Bundle.BundleType.TRANSACTION
         }
 
-      val result = retrofitHttpService.post(".", request, emptyMap())
+      val result = retrofitHttpService.post(request, emptyMap())
 
       assertThat(result).isInstanceOf(Bundle::class.java)
       assertThat((result as Bundle).type).isEqualTo(Bundle.BundleType.TRANSACTIONRESPONSE)

@@ -47,53 +47,6 @@ data class BundleUploadRequest(
   override val headers: Map<String, String> = emptyMap()
 ) : UploadRequest(headers, localChangeToken, ResourceType.Bundle)
 
-/**
- * A FHIR PATCH based request for updates to a resource based on
- * https://www.hl7.org/fhir/http.html#patch
- */
-data class PatchUploadRequest(
-  val patchBody: String,
-  val resourceId: String,
-  override val resourceType: ResourceType,
-  override val localChangeToken: LocalChangeToken,
-  override val headers: Map<String, String> = emptyMap()
-) : UploadRequest(headers, localChangeToken, resourceType)
-
-/**
- * A FHIR PUT based request for deletions of a resource based on
- * https://www.hl7.org/fhir/http.html#delete Deletes will always be on a per resource basis as the
- * current way of [LocalChange] supports that
- */
-data class DeleteUploadRequest(
-  val resourceId: String,
-  override val resourceType: ResourceType,
-  override val localChangeToken: LocalChangeToken,
-  override val headers: Map<String, String> = emptyMap()
-) : UploadRequest(headers, localChangeToken, resourceType)
-
-/**
- * A FHIR PUT based request for updates/creation of a resource based on
- * https://www.hl7.org/fhir/http.html#update
- */
-data class PutUploadRequest(
-  val resource: Resource,
-  val resourceId: String,
-  override val resourceType: ResourceType,
-  override val localChangeToken: LocalChangeToken,
-  override val headers: Map<String, String> = emptyMap()
-) : UploadRequest(headers, localChangeToken, resourceType)
-
-/**
- * A FHIR POST based request for creation of a resource based on
- * https://www.hl7.org/fhir/http.html#update
- */
-data class PostUploadRequest(
-  val resource: Resource,
-  override val resourceType: ResourceType,
-  override val localChangeToken: LocalChangeToken,
-  override val headers: Map<String, String> = emptyMap()
-) : UploadRequest(headers, localChangeToken, resourceType)
-
 internal sealed class UploadResult {
   data class Started(val total: Int) : UploadResult()
   data class Success(

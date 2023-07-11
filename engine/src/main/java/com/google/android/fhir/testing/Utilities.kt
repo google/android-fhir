@@ -33,7 +33,6 @@ import com.google.android.fhir.sync.Request
 import com.google.android.fhir.sync.UploadRequest
 import com.google.android.fhir.sync.UploadWorkManager
 import com.google.android.fhir.sync.UrlRequest
-import com.google.android.fhir.sync.upload.SimpleUploadRequestGenerator
 import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import com.google.common.truth.Truth.assertThat
 import java.net.SocketTimeoutException
@@ -132,11 +131,6 @@ open class TestDownloadManagerImpl(
 
 open class TestBundleUploadManagerImpl : UploadWorkManager(TransactionBundleGenerator.getDefault())
 
-open class TestSimpleUploadManagerImpl :
-  UploadWorkManager(
-    SimpleUploadRequestGenerator.getPutForCreateAndPatchForUpdateUploadRequestGenerator()
-  )
-
 object TestFhirEngineImpl : FhirEngine {
   override suspend fun create(vararg resource: Resource) = emptyList<String>()
 
@@ -216,14 +210,4 @@ class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSou
 
   override suspend fun upload(request: UploadRequest) =
     onPostBundle((request as BundleUploadRequest).bundle)
-}
-
-class SimpleUploadRequestsDataSource(val onUploadResource: suspend (UploadRequest) -> Resource) :
-  DataSource {
-
-  override suspend fun download(request: Request): Resource {
-    TODO("Not yet implemented")
-  }
-
-  override suspend fun upload(request: UploadRequest) = onUploadResource(request)
 }

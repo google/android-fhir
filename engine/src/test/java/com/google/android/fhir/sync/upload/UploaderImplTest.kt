@@ -23,9 +23,7 @@ import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.sync.UploadResult
 import com.google.android.fhir.testing.BundleDataSource
-import com.google.android.fhir.testing.SimpleUploadRequestsDataSource
 import com.google.android.fhir.testing.TestBundleUploadManagerImpl
-import com.google.android.fhir.testing.TestSimpleUploadManagerImpl
 import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
 import kotlinx.coroutines.flow.toList
@@ -49,22 +47,6 @@ class UploaderImplTest {
           BundleDataSource { Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE } },
           TestBundleUploadManagerImpl()
         )
-        .upload(localChanges)
-        .toList()
-
-    assertThat(result).hasSize(2)
-    assertThat(result.first()).isInstanceOf(UploadResult.Started::class.java)
-    assertThat(result.last()).isInstanceOf(UploadResult.Success::class.java)
-
-    val success = result.last() as UploadResult.Success
-    assertThat(success.total).isEqualTo(1)
-    assertThat(success.completed).isEqualTo(1)
-  }
-
-  @Test
-  fun `upload simple requests should emit Success`() = runBlocking {
-    val result =
-      UploaderImpl(SimpleUploadRequestsDataSource { Patient() }, TestSimpleUploadManagerImpl())
         .upload(localChanges)
         .toList()
 
@@ -112,30 +94,6 @@ class UploaderImplTest {
   }
 
   @Test
-  fun `upload simple requests server error should emit Failure`() = runBlocking {
-    val result =
-      UploaderImpl(
-          SimpleUploadRequestsDataSource {
-            OperationOutcome().apply {
-              addIssue(
-                OperationOutcome.OperationOutcomeIssueComponent().apply {
-                  severity = OperationOutcome.IssueSeverity.WARNING
-                  code = OperationOutcome.IssueType.CONFLICT
-                  diagnostics = "The resource has already been updated."
-                }
-              )
-            }
-          },
-          TestSimpleUploadManagerImpl()
-        )
-        .upload(localChanges)
-        .toList()
-
-    assertThat(result).hasSize(2)
-    assertThat(result.last()).isInstanceOf(UploadResult.Failure::class.java)
-  }
-
-  @Test
   fun `upload Bundle transaction error during upload should emit Failure`() = runBlocking {
     val result =
       UploaderImpl(
@@ -148,21 +106,6 @@ class UploaderImplTest {
     assertThat(result).hasSize(2)
     assertThat(result.last()).isInstanceOf(UploadResult.Failure::class.java)
   }
-
-  @Test
-  fun `upload simple request error during upload should emit Failure`() = runBlocking {
-    val result =
-      UploaderImpl(
-          SimpleUploadRequestsDataSource { throw ConnectException("Failed to connect to server.") },
-          TestSimpleUploadManagerImpl()
-        )
-        .upload(localChanges)
-        .toList()
-
-    assertThat(result).hasSize(2)
-    assertThat(result.last()).isInstanceOf(UploadResult.Failure::class.java)
-  }
-
   companion object {
     val localChanges =
       listOf(

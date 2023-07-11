@@ -149,7 +149,6 @@ object Dependencies {
 
   object Retrofit {
     const val coreRetrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
-    const val scalarConverter = "com.squareup.retrofit2:converter-scalars:${Versions.retrofit}"
   }
 
   object Room {

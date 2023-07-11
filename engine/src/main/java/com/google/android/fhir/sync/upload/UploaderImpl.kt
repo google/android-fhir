@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.DomainResource
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -43,15 +42,6 @@ internal class UploaderImpl(
   private val dataSource: DataSource,
   private val uploadWorkManager: UploadWorkManager
 ) : Uploader {
-
-  companion object {
-    private val erroneousOperationOutcomesCodes =
-      setOf<OperationOutcome.IssueSeverity>(
-        OperationOutcome.IssueSeverity.WARNING,
-        OperationOutcome.IssueSeverity.FATAL,
-        OperationOutcome.IssueSeverity.ERROR
-      )
-  }
 
   override suspend fun upload(localChanges: List<LocalChange>): Flow<UploadResult> = flow {
     val transformedChanges = uploadWorkManager.preprocessLocalChanges(localChanges)
@@ -90,18 +80,13 @@ internal class UploaderImpl(
       response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
         UploadResult.Success(localChangeToken, response, total, completed)
       }
-      response is OperationOutcome &&
-        response.issue.isNotEmpty() &&
-        response.issue.any { erroneousOperationOutcomesCodes.contains(it.severity) } -> {
+      response is OperationOutcome && response.issue.isNotEmpty() -> {
         UploadResult.Failure(
           ResourceSyncException(
             requestResourceType,
             FHIRException(response.issueFirstRep.diagnostics)
           )
         )
-      }
-      response is DomainResource -> {
-        UploadResult.Success(localChangeToken, response, total, completed)
       }
       else -> {
         UploadResult.Failure(
