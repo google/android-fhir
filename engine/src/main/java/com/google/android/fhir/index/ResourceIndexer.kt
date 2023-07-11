@@ -43,17 +43,16 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations.SearchParamType
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.ICoding
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Location
 import org.hl7.fhir.r4.model.Money
-import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.SearchParameter
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.UriType
@@ -104,71 +103,7 @@ internal class ResourceIndexer(
         }
       }
 
-    addIndexesFromResourceClass(resource, indexBuilder)
     return indexBuilder.build()
-  }
-
-  /**
-   * Manually add indexes for [SearchParameter]s defined in [Resource] class. This is because:
-   * 1. There is no clear way defined in the search parameter definitions to figure out the class
-   * hierarchy of the model classes in codegen.
-   * 2. Common [SearchParameter]'s paths are defined for [Resource] class e.g even for the [Patient]
-   * model, the [SearchParameter] expression for id would be `Resource.id` and
-   * [FHIRPathEngine.evaluate] doesn't return anything when [Patient] is passed to the function.
-   */
-  private fun <R : Resource> addIndexesFromResourceClass(
-    resource: R,
-    indexBuilder: ResourceIndices.Builder
-  ) {
-    indexBuilder.addTokenIndex(
-      TokenIndex(
-        "_id",
-        arrayOf(resource.fhirType(), "id").joinToString(separator = "."),
-        null,
-        resource.logicalId
-      )
-    )
-    // Add 'lastUpdated' index to all resources.
-    if (resource.meta.hasLastUpdated()) {
-      val lastUpdatedElement = resource.meta.lastUpdatedElement
-      indexBuilder.addDateTimeIndex(
-        DateTimeIndex(
-          name = "_lastUpdated",
-          path = arrayOf(resource.fhirType(), "meta", "lastUpdated").joinToString(separator = "."),
-          from = lastUpdatedElement.value.time,
-          to = lastUpdatedElement.value.time
-        )
-      )
-    }
-
-    if (resource.meta.hasProfile()) {
-      resource.meta.profile
-        .filter { it.value != null && it.value.isNotEmpty() }
-        .forEach {
-          indexBuilder.addReferenceIndex(
-            ReferenceIndex(
-              "_profile",
-              arrayOf(resource.fhirType(), "meta", "profile").joinToString(separator = "."),
-              it.value
-            )
-          )
-        }
-    }
-
-    if (resource.meta.hasTag()) {
-      resource.meta.tag
-        .filter { it.code != null && it.code!!.isNotEmpty() }
-        .forEach {
-          indexBuilder.addTokenIndex(
-            TokenIndex(
-              "_tag",
-              arrayOf(resource.fhirType(), "meta", "tag").joinToString(separator = "."),
-              it.system ?: "",
-              it.code
-            )
-          )
-        }
-    }
   }
 
   private fun numberIndex(searchParam: SearchParamDefinition, value: Base): NumberIndex? =
@@ -319,18 +254,34 @@ internal class ResourceIndexer(
       "code",
       "Coding" -> {
         val coding = value as ICoding
-        listOf(TokenIndex(searchParam.name, searchParam.path, coding.system ?: "", coding.code))
+        if (coding.code != null) {
+          listOf(TokenIndex(searchParam.name, searchParam.path, coding.system ?: "", coding.code))
+        } else {
+          listOf()
+        }
+      }
+      "id" -> {
+        val id = value as IdType
+        if (id.value != null) {
+          listOf(TokenIndex(searchParam.name, searchParam.path, null, id.idPart ?: id.value))
+        } else {
+          listOf()
+        }
       }
       else -> listOf()
     }
 
   private fun referenceIndex(searchParam: SearchParamDefinition, value: Base): ReferenceIndex? {
-    return when (value) {
-      is Reference -> value.reference
-      is CanonicalType -> value.value
-      is UriType -> value.value
-      else -> throw UnsupportedOperationException("Value $value is not readable by SDK")
-    }?.let { ReferenceIndex(searchParam.name, searchParam.path, it) }
+    return if (!value.isEmpty) {
+      when (value) {
+        is Reference -> value.reference
+        is CanonicalType -> value.value
+        is UriType -> value.value
+        else -> throw UnsupportedOperationException("Value $value is not readable by SDK")
+      }?.let { ReferenceIndex(searchParam.name, searchParam.path, it) }
+    } else {
+      null
+    }
   }
 
   private fun quantityIndex(searchParam: SearchParamDefinition, value: Base): List<QuantityIndex> =
