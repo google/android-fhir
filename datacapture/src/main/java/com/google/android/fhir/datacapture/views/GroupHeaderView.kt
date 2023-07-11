@@ -28,8 +28,7 @@ import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpann
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 
-internal class GroupHeaderView(context: Context, attrs: AttributeSet?) :
-  LinearLayout(context, attrs) {
+class GroupHeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
 
   init {
     LayoutInflater.from(context).inflate(R.layout.group_type_header_view, this, true)

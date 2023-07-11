@@ -46,7 +46,7 @@ import org.hl7.fhir.r4.utils.ToolingExtensions
 import timber.log.Timber
 
 /** UI controls relevant to capturing question data. */
-internal enum class ItemControlTypes(
+enum class ItemControlTypes(
   val extensionCode: String,
   val viewHolderType: QuestionnaireViewHolderType,
 ) {
@@ -154,7 +154,7 @@ internal fun Questionnaire.QuestionnaireItemComponent.isReferencedBy(
   }
 
 // Item control code, or null
-internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
+val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
   get() {
     val codeableConcept =
       this.extension
@@ -173,7 +173,7 @@ internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTy
     return ItemControlTypes.values().firstOrNull { it.extensionCode == code }
   }
 
-internal enum class ChoiceOrientationTypes(val extensionCode: String) {
+enum class ChoiceOrientationTypes(val extensionCode: String) {
   HORIZONTAL("horizontal"),
   VERTICAL("vertical")
 }
@@ -182,7 +182,7 @@ internal const val EXTENSION_CHOICE_ORIENTATION_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation"
 
 /** Desired orientation to render a list of choices. */
-internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceOrientationTypes?
+val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceOrientationTypes?
   get() {
     val code =
       (this.extension.firstOrNull { it.url == EXTENSION_CHOICE_ORIENTATION_URL }?.value
@@ -194,7 +194,7 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceO
 internal const val EXTENSION_MIME_TYPE = "http://hl7.org/fhir/StructureDefinition/mimeType"
 
 /** Identifies the kinds of attachment allowed to be sent for an element. */
-internal val Questionnaire.QuestionnaireItemComponent.mimeTypes: List<String>
+val Questionnaire.QuestionnaireItemComponent.mimeTypes: List<String>
   get() {
     return extension
       .filter { it.url == EXTENSION_MIME_TYPE }
@@ -203,7 +203,7 @@ internal val Questionnaire.QuestionnaireItemComponent.mimeTypes: List<String>
   }
 
 /** Currently supported mime types. */
-internal enum class MimeType(val value: String) {
+enum class MimeType(val value: String) {
   AUDIO("audio"),
   DOCUMENT("application"),
   IMAGE("image"),
@@ -214,12 +214,12 @@ internal enum class MimeType(val value: String) {
 private fun getMimeType(mimeType: String): String = mimeType.substringBefore("/")
 
 /** Returns true if at least one mime type matches the given type. */
-internal fun Questionnaire.QuestionnaireItemComponent.hasMimeType(type: String): Boolean {
+fun Questionnaire.QuestionnaireItemComponent.hasMimeType(type: String): Boolean {
   return mimeTypes.any { it.substringBefore("/") == type }
 }
 
 /** Returns true if all mime types match the given type. */
-internal fun Questionnaire.QuestionnaireItemComponent.hasMimeTypeOnly(type: String): Boolean {
+fun Questionnaire.QuestionnaireItemComponent.hasMimeTypeOnly(type: String): Boolean {
   return mimeTypes.all { it.substringBefore("/") == type }
 }
 
@@ -271,7 +271,7 @@ internal val Questionnaire.QuestionnaireItemComponent.displayItemControl: Displa
   }
 
 /** Whether any one of the nested display item has [DisplayItemControlType.HELP] control. */
-internal val Questionnaire.QuestionnaireItemComponent.hasHelpButton: Boolean
+val Questionnaire.QuestionnaireItemComponent.hasHelpButton: Boolean
   get() {
     return item.any { it.isHelpCode }
   }
@@ -299,11 +299,11 @@ val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
  * A nested questionnaire item of type display with displayCategory extension with [INSTRUCTIONS]
  * code is used as the instructions of the parent question.
  */
-internal val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spanned?
+val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spanned?
   get() = item.localizedInstructionsSpanned
 
 /** [localizedInstructionsSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
-internal val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionsSpanned: Spanned?
+val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionsSpanned: Spanned?
   get() {
     return this.firstOrNull { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
@@ -320,7 +320,7 @@ internal val Questionnaire.QuestionnaireItemComponent.localizedFlyoverSpanned: S
   get() = item.localizedFlyoverSpanned
 
 /** [localizedFlyoverSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
-internal val List<Questionnaire.QuestionnaireItemComponent>.localizedFlyoverSpanned: Spanned?
+val List<Questionnaire.QuestionnaireItemComponent>.localizedFlyoverSpanned: Spanned?
   get() =
     this.firstOrNull { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
@@ -332,11 +332,11 @@ internal val List<Questionnaire.QuestionnaireItemComponent>.localizedFlyoverSpan
  * A nested questionnaire item of type display with displayCategory extension with [INSTRUCTIONS]
  * code is used as the instructions of the parent question.
  */
-internal val Questionnaire.QuestionnaireItemComponent.localizedHelpSpanned: Spanned?
+val Questionnaire.QuestionnaireItemComponent.localizedHelpSpanned: Spanned?
   get() = item.localizedHelpSpanned
 
 /** [localizedHelpSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
-internal val List<Questionnaire.QuestionnaireItemComponent>.localizedHelpSpanned: Spanned?
+val List<Questionnaire.QuestionnaireItemComponent>.localizedHelpSpanned: Spanned?
   get() {
     return this.firstOrNull { questionnaireItem -> questionnaireItem.isHelpCode }
       ?.localizedTextSpanned
@@ -425,7 +425,7 @@ internal val Questionnaire.QuestionnaireItemComponent.isDisplayItem: Boolean
       (isInstructionsCode || isFlyoverCode || isHelpCode))
 
 /** Slider step extension value. */
-internal val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
+val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
   get() {
     val extension =
       this.extension.singleOrNull { it.url == EXTENSION_SLIDER_STEP_VALUE_URL } ?: return null
