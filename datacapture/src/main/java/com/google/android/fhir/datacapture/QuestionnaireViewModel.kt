@@ -68,8 +68,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Element
@@ -451,7 +453,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         viewModelScope,
         SharingStarted.Lazily,
         initialValue =
-          getQuestionnaireState()
+          runBlocking { getQuestionnaireState() }
             .also { detectExpressionCyclicDependency(questionnaire.item) }
             .also {
               questionnaire.item.flattened().forEach { qItem ->
@@ -554,8 +556,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return options
   }
 
-  internal fun evaluateAnswerOptionsToggleExpressions(
+  private fun evaluateAnswerOptionsToggleExpressions(
     item: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
     answerOptions: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     val results =
@@ -575,16 +578,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
         .partition { it.first }
     val (allowed, disallowed) = results
-    val allowedOptions =
-      allowed.flatMap {
-        val (_, options) = it
-        options
-      }
+    val allowedOptions = allowed.flatMap { it.second }
 
     val disallowedOptions =
       disallowed.flatMap {
-        val (_, options) = it
-        options.filterNot { option -> allowedOptions.any { type -> equals(type, option) } }
+        it.second.filterNot { option -> allowedOptions.any { type -> equals(type, option) } }
       }
 
     return answerOptions.filterNot { answerOption ->
@@ -640,6 +638,74 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
+   * In a `choice` or `open-choice` type question, the answer options are defined in one of the
+   * three elements in the questionnaire:
+   *
+   * - `Questionnaire.item.answerOption`: a list of permitted answers to the question
+   * - `Questionnaire.item.answerValueSet`: a reference to a value set containing a list of
+   * permitted answers to the question
+   * - `Extension answer-expression`: an expression based extension which defines the x-fhir-query
+   * or fhirpath to evaluate permitted answer options
+   *
+   * Returns the answer options defined in one of the sources above. If the answer options are
+   * defined in `Questionnaire.item.answerValueSet`, the answer value set will be expanded.
+   */
+  private suspend fun answerOptions(
+    questionnaireItem: QuestionnaireItemComponent
+  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
+    when {
+      questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
+      !questionnaireItem.answerValueSet.isNullOrEmpty() ->
+        resolveAnswerValueSet(questionnaireItem.answerValueSet)
+      questionnaireItem.answerExpression != null -> resolveAnswerExpression(questionnaireItem)
+      else -> emptyList()
+    }
+
+  private fun removeDisabledAnswers(
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
+    disabledAnswers: List<QuestionnaireResponseItemAnswerComponent>
+  ) {
+    val validAnswers =
+      questionnaireResponseItem.answer.filterNot { ans ->
+        disabledAnswers.any { ans.value.equalsDeep(it.value) }
+      }
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, validAnswers, null)
+  }
+
+  /**
+   * Returns allowed answer options that are enabled based on the evaluation of
+   * [Questionnaire.QuestionnaireItemComponent.answerOptionsToggleExpressions] expressions
+   */
+  internal suspend fun evaluateEnabledAnswerOptions(
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent
+  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+    val answerOptions = answerOptions(questionnaireItem)
+
+    return if (questionnaireItem.answerOptionsToggleExpressions.isNotEmpty() &&
+        answerOptions.isNotEmpty()
+    ) {
+      evaluateAnswerOptionsToggleExpressions(
+          questionnaireItem,
+          questionnaireResponseItem,
+          answerOptions
+        )
+        .also { allowedAnswerOptions ->
+          questionnaireResponseItem.answer
+            .takeIf { it.isNotEmpty() }
+            ?.let {
+              val disabledAnswers =
+                it.filterNot { ans -> allowedAnswerOptions.any { ans.value.equalsDeep(it.value) } }
+
+              if (disabledAnswers.isNotEmpty())
+                removeDisabledAnswers(questionnaireItem, questionnaireResponseItem, disabledAnswers)
+            }
+        }
+    } else answerOptions
+  }
+
+  /**
    * Traverses through the list of questionnaire items, the list of questionnaire response items and
    * the list of items in the questionnaire response answer list and populates
    * [questionnaireStateFlow] with matching pairs of questionnaire item and questionnaire response
@@ -647,7 +713,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    *
    * The traverse is carried out in the two lists in tandem.
    */
-  private fun getQuestionnaireState(): QuestionnaireState {
+  private suspend fun getQuestionnaireState(): QuestionnaireState {
     val questionnaireItemList = questionnaire.item
     val questionnaireResponseItemList = questionnaireResponse.item
 
@@ -710,7 +776,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * Returns the list of [QuestionnaireViewItem]s generated for the questionnaire items and
    * questionnaire response items.
    */
-  private fun getQuestionnaireAdapterItems(
+  private suspend fun getQuestionnaireAdapterItems(
     questionnaireItemList: List<QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>,
   ): List<QuestionnaireAdapterItem> {
@@ -725,7 +791,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * Returns the list of [QuestionnaireViewItem]s generated for the questionnaire item and
    * questionnaire response item.
    */
-  private fun getQuestionnaireAdapterItems(
+  private suspend fun getQuestionnaireAdapterItems(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent,
   ): List<QuestionnaireAdapterItem> {
@@ -773,11 +839,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             questionnaireResponseItem,
             validationResult = validationResult,
             answersChangedCallback = answersChangedCallback,
-            resolveAnswerValueSet = { resolveAnswerValueSet(it) },
-            resolveAnswerExpression = { resolveAnswerExpression(it) },
-            evaluateAnswerOptionsToggleExpressions = { questionnaireItem, answerOptions ->
-              evaluateAnswerOptionsToggleExpressions(questionnaireItem, answerOptions)
-            },
+            enabledAnswerOptions =
+              evaluateEnabledAnswerOptions(questionnaireItem, questionnaireResponseItem),
             draftAnswer = draftAnswerMap[questionnaireResponseItem],
             enabledDisplayItems =
               questionnaireItem.item.filter {

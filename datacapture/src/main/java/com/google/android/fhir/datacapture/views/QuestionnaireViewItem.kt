@@ -21,24 +21,20 @@ import android.text.Spanned
 import androidx.core.text.toSpanned
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.extensions.answerExpression
-import com.google.android.fhir.datacapture.extensions.answerOptionsToggleExpressions
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /**
  * Data item for [QuestionnaireItemViewHolder] in [RecyclerView].
  *
- * The view should use [questionnaireItem], [answers], [answerOption], [enabledAnswerOption],
- * [validationResult] and [enabledDisplayItems] to render the data item in the UI. The view SHOULD
- * NOT mutate the data using these properties.
+ * The view should use [questionnaireItem], [answers], [enabledAnswerOptions], [validationResult]
+ * and [enabledDisplayItems] to render the data item in the UI. The view SHOULD NOT mutate the data
+ * using these properties.
  *
  * The view should use the following answer APIs to update the answer(s):
  * - [setAnswer] (for single and repeated answers)
@@ -76,25 +72,8 @@ data class QuestionnaireViewItem(
       List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
       Any?
     ) -> Unit,
-  private val resolveAnswerValueSet:
-    suspend (String) -> List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
-    {
-      emptyList()
-    },
-  private val resolveAnswerExpression:
-    suspend (Questionnaire.QuestionnaireItemComponent) -> List<
-        Questionnaire.QuestionnaireItemAnswerOptionComponent> =
-    {
-      emptyList()
-    },
-  private val evaluateAnswerOptionsToggleExpressions:
-    (
-      Questionnaire.QuestionnaireItemComponent,
-      List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
-    ) -> List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
-    { _, _ ->
-      emptyList()
-    },
+  internal val enabledAnswerOptions: List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
+    questionnaireItem.answerOption.ifEmpty { emptyList() },
   internal val draftAnswer: Any? = null,
   internal val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
   internal val questionViewTextConfiguration: QuestionTextConfiguration =
@@ -189,57 +168,6 @@ data class QuestionnaireViewItem(
   ): Boolean {
     return answers.any { it.value.equalsDeep(answerOption.value) }
   }
-
-  /**
-   * In a `choice` or `open-choice` type question, the answer options are defined in one of the
-   * three elements in the questionnaire:
-   *
-   * - `Questionnaire.item.answerOption`: a list of permitted answers to the question
-   * - `Questionnaire.item.answerValueSet`: a reference to a value set containing a list of
-   * permitted answers to the question
-   * - `Extension answer-expression`: an expression based extension which defines the x-fhir-query
-   * or fhirpath to evaluate permitted answer options
-   *
-   * This property returns the answer options defined in one of the sources above. If the answer
-   * options are defined in `Questionnaire.item.answerValueSet`, the answer value set will be
-   * expanded.
-   */
-  internal val answerOption: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
-    get() =
-      runBlocking(Dispatchers.IO) {
-        when {
-          questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
-          !questionnaireItem.answerValueSet.isNullOrEmpty() ->
-            resolveAnswerValueSet(questionnaireItem.answerValueSet)
-          questionnaireItem.answerExpression != null -> resolveAnswerExpression(questionnaireItem)
-          else -> emptyList()
-        }
-      }
-
-  /**
-   * Returns allowed answer options that are enabled based on the evaluation of
-   * [Questionnaire.QuestionnaireItemComponent.answerOptionsToggleExpressions] expressions
-   */
-  internal val enabledAnswerOption: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
-    get() =
-      runBlocking(Dispatchers.IO) {
-        if (questionnaireItem.answerOptionsToggleExpressions.isNotEmpty() &&
-            answerOption.isNotEmpty()
-        ) {
-          evaluateAnswerOptionsToggleExpressions(questionnaireItem, answerOption).also {
-            allowedAnswerOptions ->
-            val answersNotInAllowedOptions =
-              answers.filterNot { ans ->
-                allowedAnswerOptions.any { ans.value.equalsDeep(it.value) }
-              }
-
-            // Remove answers not in toggled answerOptions
-            answersNotInAllowedOptions
-              .takeIf { it.isNotEmpty() }
-              ?.let { removeAnswer(*it.toTypedArray()) }
-          }
-        } else answerOption
-      }
 
   /**
    * Fetches the question title that should be displayed to user. The title is first fetched from

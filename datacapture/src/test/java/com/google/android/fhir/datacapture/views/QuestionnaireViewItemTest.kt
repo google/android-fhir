@@ -20,9 +20,6 @@ import android.app.Application
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.extensions.EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION
-import com.google.android.fhir.datacapture.extensions.EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION
-import com.google.android.fhir.datacapture.extensions.EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -31,8 +28,6 @@ import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.Expression
-import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
@@ -804,7 +799,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `enabledAnswerOption should just return answerOption when item has no answerOptionsToggleExtension`() {
+  fun `enabledAnswerOption should return default questionnaire answerOption when item has no arg passed`() {
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -834,211 +829,8 @@ class QuestionnaireViewItemTest {
         answersChangedCallback = { _, _, _, _ -> }
       )
 
-    val enabledOptions = questionnaireViewItem.enabledAnswerOption
+    val enabledOptions = questionnaireViewItem.enabledAnswerOptions
 
     assertThat(enabledOptions.map { it.valueCoding.code }).containsExactly("option1", "option2")
-  }
-
-  @Test
-  fun `enabledAnswerOption should return only enabled answer options from evaluateAnswerOptionsToggleExpressions`() {
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          linkId = "a-question"
-          extension =
-            listOf(
-              Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
-                extension =
-                  listOf(
-                    Extension(
-                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                      Coding().apply {
-                        code = "option1"
-                        display = "Option 1"
-                      }
-                    ),
-                    Extension(
-                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
-                      Expression().apply {
-                        expression = "true"
-                        language = "text/fhirpath"
-                      }
-                    )
-                  )
-              },
-              Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
-                extension =
-                  listOf(
-                    Extension(
-                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                      Coding().apply {
-                        code = "option2"
-                        display = "Option 2"
-                      }
-                    ),
-                    Extension(
-                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
-                      Expression().apply {
-                        expression = "false"
-                        language = "text/fhirpath"
-                      }
-                    )
-                  )
-              }
-            )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent()
-              .setValue(
-                Coding().apply {
-                  code = "option1"
-                  display = "Option 1"
-                }
-              )
-          )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent()
-              .setValue(
-                Coding().apply {
-                  code = "option2"
-                  display = "Option 2"
-                }
-              )
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = Valid,
-        answersChangedCallback = { _, _, _, _ -> },
-        evaluateAnswerOptionsToggleExpressions = { _, _ ->
-          listOf(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent(
-              Coding().apply {
-                code = "option1"
-                display = "Option 1"
-              }
-            )
-          )
-        }
-      )
-
-    val enabledOption = questionnaireViewItem.enabledAnswerOption
-    assertThat(enabledOption.map { it.valueCoding.code }).containsExactly("option1")
-  }
-
-  @Test
-  fun `enabledAnswerOption removes answers no longer in allowed answer options evaluated from evaluateAnswerOptionsToggleExpressions`() {
-    var updatedAnswers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
-
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          extension =
-            listOf(
-              Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
-                extension =
-                  listOf(
-                    Extension(
-                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                      Coding().apply {
-                        code = "option1"
-                        display = "Option 1"
-                      }
-                    ),
-                    Extension(
-                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                      Coding().apply {
-                        code = "option2"
-                        display = "Option 2"
-                      }
-                    ),
-                    Extension(
-                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
-                      Expression().apply {
-                        expression = "false"
-                        language = "text/fhirpath"
-                      }
-                    )
-                  )
-              }
-            )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent()
-              .setValue(
-                Coding().apply {
-                  code = "option1"
-                  display = "Option 1"
-                }
-              )
-          )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent()
-              .setValue(
-                Coding().apply {
-                  code = "option2"
-                  display = "Option 2"
-                }
-              )
-          )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent()
-              .setValue(
-                Coding().apply {
-                  code = "option3"
-                  display = "Option 3"
-                }
-              )
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(
-                Coding().apply {
-                  code = "option1"
-                  display = "Option 1"
-                }
-              )
-          )
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(
-                Coding().apply {
-                  code = "option2"
-                  display = "Option 2"
-                }
-              )
-          )
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(
-                Coding().apply {
-                  code = "option3"
-                  display = "Option 3"
-                }
-              )
-          )
-        },
-        validationResult = Valid,
-        answersChangedCallback = { _, _, answers, _ -> updatedAnswers = answers.toList() },
-        evaluateAnswerOptionsToggleExpressions = { _, _ ->
-          listOf(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent(
-              Coding().apply {
-                code = "option3"
-                display = "Option 3"
-              }
-            )
-          )
-        }
-      )
-
-    assertThat(questionnaireViewItem.answers.map { it.valueCoding.code })
-      .containsExactly("option1", "option2", "option3")
-    val enabledOptions = questionnaireViewItem.enabledAnswerOption
-    assertThat(enabledOptions.map { it.valueCoding.code }).containsExactly("option3")
-    assertThat(updatedAnswers).isNotNull()
-    assertThat(updatedAnswers).hasSize(1)
-    assertThat(updatedAnswers!!.map { it.valueCoding.code }).containsExactly("option3")
   }
 }

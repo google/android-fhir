@@ -4059,9 +4059,9 @@ class QuestionnaireViewModelTest {
         )
       }
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-    val viewModel = QuestionnaireViewModel(context, state)
     val exception =
       assertThrows(null, IllegalStateException::class.java) {
+        val viewModel = QuestionnaireViewModel(context, state)
         runTest { viewModel.resolveAnswerExpression(questionnaire.itemFirstRep) }
       }
     assertThat(exception.message)
@@ -4076,7 +4076,7 @@ class QuestionnaireViewModelTest {
   //                                                                      //
   // ==================================================================== //
   @Test
-  fun `evaluateAnswerOptionsToggleExpressions should return answer options for all expressions evaluated to true on initial load`() =
+  fun `only answer options evaluating to true in answerOptionsToggleExpression occurrences should be enabled on initial load`() =
     runTest {
       val questionnaire =
         Questionnaire().apply {
@@ -4085,54 +4085,59 @@ class QuestionnaireViewModelTest {
               linkId = "b"
               type = Questionnaire.QuestionnaireItemType.CHOICE
               text = "Select an option"
-              extension =
-                listOf(
-                  Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
-                    extension =
-                      listOf(
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                          Coding().apply {
-                            code = "option1"
-                            display = "Option 1"
-                          }
-                        ),
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                          Coding().apply {
-                            code = "option3"
-                            display = "Option 3"
-                          }
-                        ),
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
-                          Expression().apply {
-                            this.expression = "false"
-                            this.language = "text/fhirpath"
-                          }
-                        )
-                      )
-                  },
-                  Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
-                    extension =
-                      listOf(
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                          Coding().apply {
-                            code = "option2"
-                            display = "Option 2"
-                          }
-                        ),
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
-                          Expression().apply {
-                            this.expression = "true"
-                            this.language = "text/fhirpath"
-                          }
-                        )
-                      )
-                  }
-                )
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option3"
+                        display = "Option 3"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "false"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "true"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
               answerOption =
                 listOf(
                   Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
@@ -4162,15 +4167,17 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
-
-      val bItem = questionnaire.item.single { it.linkId == "b" }
-      val resultingAnswerOptions =
-        viewModel.evaluateAnswerOptionsToggleExpressions(bItem, bItem.answerOption)
-      assertThat(resultingAnswerOptions.map { it.valueCoding.code }).containsExactly("option2")
+      val viewItem =
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+      assertThat(viewItem.enabledAnswerOptions.map { it.value as Coding }.map { it.code })
+        .containsExactly("option2")
     }
 
   @Test
-  fun `evaluateAnswerOptionsToggleExpressions should toggle answer options on dependent answers change`() =
+  fun `enabledAnswerOptions should toggle options in answerOptionsToggleExpression occurrence  when answers to depended question change`() =
     runTest {
       val questionnaire =
         Questionnaire().apply {
@@ -4188,56 +4195,61 @@ class QuestionnaireViewModelTest {
               linkId = "b"
               type = Questionnaire.QuestionnaireItemType.CHOICE
               text = "Select an option"
-              extension =
-                listOf(
-                  Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
-                    extension =
-                      listOf(
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                          Coding().apply {
-                            code = "option1"
-                            display = "Option 1"
-                          }
-                        ),
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                          Coding().apply {
-                            code = "option3"
-                            display = "Option 3"
-                          }
-                        ),
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
-                          Expression().apply {
-                            this.expression =
-                              "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value)"
-                            this.language = "text/fhirpath"
-                          }
-                        )
-                      )
-                  },
-                  Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
-                    extension =
-                      listOf(
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                          Coding().apply {
-                            code = "option2"
-                            display = "Option 2"
-                          }
-                        ),
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
-                          Expression().apply {
-                            this.expression =
-                              "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value.not())"
-                            this.language = "text/fhirpath"
-                          }
-                        )
-                      )
-                  }
-                )
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option3"
+                        display = "Option 3"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression =
+                          "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value)"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression =
+                          "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value.not())"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
               answerOption =
                 listOf(
                   Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
@@ -4267,6 +4279,14 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .map { it.asQuestion() }
+        .single { it.questionnaireItem.linkId == "b" }
+        .run {
+          assertThat(this.enabledAnswerOptions.map { it.valueCoding.code })
+            .containsExactly("option2")
+        }
       viewModel.runViewModelBlocking {
         viewModel
           .getQuestionnaireItemViewItemList()
@@ -4274,28 +4294,32 @@ class QuestionnaireViewModelTest {
           .single { it.questionnaireItem.linkId == "a" }
           .setAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = valueBooleanType.setValue(true)
+              value = BooleanType(true)
             }
           )
-      }
-      assertThat(
-          viewModel
-            .getQuestionnaireResponse()
-            .item
-            .single { it.linkId == "a" }
-            .answerFirstRep.value.primitiveValue()
-        )
-        .isEqualTo(BooleanType(true).primitiveValue())
 
-      val bItem = questionnaire.item.single { it.linkId == "b" }
-      val resultingAnswerOptions =
-        viewModel.evaluateAnswerOptionsToggleExpressions(bItem, bItem.answerOption)
-      assertThat(resultingAnswerOptions.map { it.valueCoding.code })
-        .containsExactly("option3", "option1")
+        assertThat(
+            viewModel
+              .getQuestionnaireResponse()
+              .item
+              .single { it.linkId == "a" }
+              .answerFirstRep.value.primitiveValue()
+          )
+          .isEqualTo(BooleanType(true).primitiveValue())
+
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run {
+            assertThat(this.enabledAnswerOptions.map { it.valueCoding.code })
+              .containsExactly("option3", "option1")
+          }
+      }
     }
 
   @Test
-  fun `evaluateAnswerOptionsToggleExpressions should return answer options not listed in evaluated expressions`() =
+  fun `enabledAnswerOptions should include answer options not listed in any answerOptionsToggleExpression occurrences`() =
     runTest {
       val questionnaire =
         Questionnaire().apply {
@@ -4304,54 +4328,59 @@ class QuestionnaireViewModelTest {
               linkId = "b"
               type = Questionnaire.QuestionnaireItemType.CHOICE
               text = "Select an option"
-              extension =
-                listOf(
-                  Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
-                    extension =
-                      listOf(
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                          Coding().apply {
-                            code = "option1"
-                            display = "Option 1"
-                          }
-                        ),
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                          Coding().apply {
-                            code = "option3"
-                            display = "Option 3"
-                          }
-                        ),
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
-                          Expression().apply {
-                            this.expression = "false"
-                            this.language = "text/fhirpath"
-                          }
-                        )
-                      )
-                  },
-                  Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
-                    extension =
-                      listOf(
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                          Coding().apply {
-                            code = "option2"
-                            display = "Option 2"
-                          }
-                        ),
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
-                          Expression().apply {
-                            this.expression = "true"
-                            this.language = "text/fhirpath"
-                          }
-                        )
-                      )
-                  }
-                )
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option3"
+                        display = "Option 3"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "false"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "true"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
               answerOption =
                 listOf(
                   Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
@@ -4394,16 +4423,18 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire)
-
-      val bItem = questionnaire.item.single { it.linkId == "b" }
-      val resultingAnswerOptions =
-        viewModel.evaluateAnswerOptionsToggleExpressions(bItem, bItem.answerOption)
-      assertThat(resultingAnswerOptions.map { it.valueCoding.code })
-        .containsAtLeast("option4", "option5")
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .map { it.asQuestion() }
+        .single { it.questionnaireItem.linkId == "b" }
+        .run {
+          assertThat(enabledAnswerOptions.map { it.valueCoding.code })
+            .containsAtLeast("option4", "option5")
+        }
     }
 
   @Test
-  fun `evaluateAnswerOptionsToggleExpressions skips unknown options not listed in answer options`() =
+  fun `enabledAnswerOptions should not include unknown options listed in answerOptionsToggleExpression occurrences`() =
     runTest {
       val questionnaire =
         Questionnaire().apply {
@@ -4412,61 +4443,68 @@ class QuestionnaireViewModelTest {
               linkId = "b"
               type = Questionnaire.QuestionnaireItemType.CHOICE
               text = "Select an option"
-              extension =
-                listOf(
-                  Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
-                    extension =
-                      listOf(
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                          Coding().apply {
-                            code = "option2"
-                            display = "Option 2"
-                          }
-                        ),
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                          Coding().apply {
-                            code = "option75"
-                            display = "Option 75"
-                          }
-                        ),
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
-                          Expression().apply {
-                            this.expression = "true"
-                            this.language = "text/fhirpath"
-                          }
-                        )
-                      )
-                  },
-                  Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
-                    extension =
-                      listOf(
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                          Coding().apply {
-                            code = "option1"
-                            display = "Option 1"
-                          }
-                        ),
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
-                          Coding().apply {
-                            code = "option3"
-                            display = "Option 3"
-                          }
-                        ),
-                        Extension(
-                          EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
-                          Expression().apply {
-                            this.expression = "false"
-                            this.language = "text/fhirpath"
-                          }
-                        )
-                      )
-                  }
-                )
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option75"
+                        display = "Option 75"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "true"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option3"
+                        display = "Option 3"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "false"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
               answerOption =
                 listOf(
                   Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
@@ -4496,11 +4534,237 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
-      val bItem = questionnaire.item.single { it.linkId == "b" }
-      val resultingAnswerOptions =
-        viewModel.evaluateAnswerOptionsToggleExpressions(bItem, bItem.answerOption)
-      assertThat(resultingAnswerOptions.map { it.valueCoding.code }).doesNotContain("option75")
-      assertThat(resultingAnswerOptions.map { it.valueCoding.code }).containsExactly("option2")
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .map { it.asQuestion() }
+        .single { it.questionnaireItem.linkId == "b" }
+        .run {
+          assertThat(enabledAnswerOptions.map { it.valueCoding.code }).doesNotContain("option75")
+          assertThat(enabledAnswerOptions.map { it.valueCoding.code }).containsExactly("option2")
+        }
+    }
+
+  @Test
+  fun `enabledAnswerOptions should include options listed in both allowed and disallowed answerOptionsToggleExtension options`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "b"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              text = "Select an option"
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "false"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "true"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+              answerOption =
+                listOf(
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                  }
+                )
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .map { it.asQuestion() }
+        .single { it.questionnaireItem.linkId == "b" }
+        .run { assertThat(enabledAnswerOptions.map { it.valueCoding.code }).contains("option1") }
+    }
+
+  @Test
+  fun `should remove previously selected answers that toggled off and disallowed in answerOptionsToggleExpression occurrences`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              text = "Is Married?"
+              addInitial().apply { value = BooleanType(false) }
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "b"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              text = "Select an option"
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression =
+                          "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value.not())"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression =
+                          "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value)"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+
+              addAnswerOption(
+                Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                  value =
+                    Coding().apply {
+                      code = "option1"
+                      display = "Option 1"
+                    }
+                }
+              )
+              addAnswerOption(
+                Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                  value =
+                    Coding().apply {
+                      code = "option2"
+                      display = "Option 2"
+                    }
+                }
+              )
+            }
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run {
+            assertThat(enabledAnswerOptions.map { it.valueCoding.code }).containsExactly("option1")
+            setAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value =
+                  Coding().apply {
+                    code = "option1"
+                    display = "Option 1"
+                  }
+              }
+            )
+          }
+        assertThat(
+            viewModel
+              .getQuestionnaireResponse()
+              .item
+              .single { it.linkId == "b" }
+              .answerFirstRep.valueCoding.code
+          )
+          .isEqualTo("option1")
+        // change answer to depended question to trigger re-evaluation of
+        // answerOptionsToggleExpression expression
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "a" }
+          .run {
+            setAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run {
+            assertThat(enabledAnswerOptions.map { it.valueCoding.code }).containsExactly("option2")
+            assertThat(answers).isEmpty()
+          }
+        assertThat(viewModel.getQuestionnaireResponse().item.single { it.linkId == "b" }.answer)
+          .isEmpty()
+      }
     }
 
   // ==================================================================== //

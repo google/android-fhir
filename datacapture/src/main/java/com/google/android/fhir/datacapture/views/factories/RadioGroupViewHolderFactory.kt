@@ -70,7 +70,7 @@ internal object RadioGroupViewHolderFactory :
             flow.setWrapMode(Flow.WRAP_NONE)
           }
         }
-        questionnaireViewItem.enabledAnswerOption
+        questionnaireViewItem.enabledAnswerOptions
           .map { answerOption -> View.generateViewId() to answerOption }
           .onEach { populateViewWithAnswerOption(it.first, it.second, choiceOrientation) }
           .map { it.first }

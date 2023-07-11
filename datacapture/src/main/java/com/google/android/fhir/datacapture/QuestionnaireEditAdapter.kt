@@ -169,7 +169,7 @@ internal class QuestionnaireEditAdapter(
       }
     }
 
-    if (questionnaireViewItem.enabledAnswerOption.isNotEmpty()) {
+    if (questionnaireViewItem.enabledAnswerOptions.isNotEmpty()) {
       return getChoiceViewHolderType(questionnaireViewItem).value
     }
 
@@ -200,7 +200,7 @@ internal class QuestionnaireEditAdapter(
     return questionnaireItem.itemControl?.viewHolderType
     // Otherwise, choose a sensible UI element automatically
     ?: run {
-        val numOptions = questionnaireViewItem.enabledAnswerOption.size
+        val numOptions = questionnaireViewItem.enabledAnswerOptions.size
         when {
           // Always use a dialog for questions with a large number of options
           numOptions >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG ->
