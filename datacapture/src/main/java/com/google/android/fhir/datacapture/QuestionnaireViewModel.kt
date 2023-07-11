@@ -568,7 +568,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           val evaluationResult =
             if (expression.isFhirPath)
               fhirPathEngine.convertToBoolean(
-                fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
+                evaluateExpression(
+                  questionnaire,
+                  questionnaireResponse,
+                  item,
+                  questionnaireResponseItem,
+                  expression,
+                  questionnaireItemParentMap
+                )
               )
             else
               throw UnsupportedOperationException(

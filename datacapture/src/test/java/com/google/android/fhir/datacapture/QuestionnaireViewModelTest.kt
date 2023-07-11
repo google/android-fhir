@@ -4628,6 +4628,105 @@ class QuestionnaireViewModelTest {
     }
 
   @Test
+  fun `enabledAnswerOptions should include options toggled from answerOptionsToggleExpression occurrences with variable expression`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addExtension(
+            Extension(EXTENSION_VARIABLE_URL).apply {
+              setValue(
+                Expression().apply {
+                  name = "textVal"
+                  language = "text/fhirpath"
+                  expression = "10"
+                }
+              )
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "b-link"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              text = "Select an option"
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "%textVal > 10"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "%textVal = 10"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+
+              addAnswerOption(
+                Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                  value =
+                    Coding().apply {
+                      code = "option1"
+                      display = "Option 1"
+                    }
+                }
+              )
+              addAnswerOption(
+                Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                  value =
+                    Coding().apply {
+                      code = "option2"
+                      display = "Option 2"
+                    }
+                }
+              )
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .map { it.asQuestion() }
+        .single { it.questionnaireItem.linkId == "b-link" }
+        .run {
+          assertThat(enabledAnswerOptions.map { it.valueCoding.code }).containsExactly("option2")
+        }
+    }
+
+  @Test
   fun `should remove previously selected answers that toggled off and disallowed in answerOptionsToggleExpression occurrences`() =
     runTest {
       val questionnaire =
