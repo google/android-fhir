@@ -134,8 +134,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaireResponse =
           parser.parseResource(application.contentResolver.openInputStream(uri))
             as QuestionnaireResponse
-        questionnaireResponse.item =
-          addMissingResponseItems(questionnaire.item, questionnaireResponse.item)
+        addMissingResponseItems(questionnaire.item, questionnaireResponse.item)
         checkQuestionnaireResponse(questionnaire, questionnaireResponse)
       }
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING) -> {
@@ -143,8 +142,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]!!
         questionnaireResponse =
           parser.parseResource(questionnaireResponseJson) as QuestionnaireResponse
-        questionnaireResponse.item =
-          addMissingResponseItems(questionnaire.item, questionnaireResponse.item)
+        addMissingResponseItems(questionnaire.item, questionnaireResponse.item)
         checkQuestionnaireResponse(questionnaire, questionnaireResponse)
       }
       else -> {
@@ -357,47 +355,33 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * might not contain answers to unanswered or disabled questions. Note : this only applies to
    * [QuestionnaireItemComponent]s nested under a group.
    */
-  fun addMissingResponseItems(
+  private fun addMissingResponseItems(
     questionnaireItems: List<QuestionnaireItemComponent>,
     responseItems: MutableList<QuestionnaireResponseItemComponent>,
-    parentResponseItem: QuestionnaireResponseItemComponent? = null,
-  ): List<QuestionnaireResponseItemComponent> {
+  ) {
     // To associate the linkId to QuestionnaireResponseItemComponent, do not use associateBy().
     // Instead, use groupBy().
     // This is because a questionnaire response may have multiple
     // QuestionnaireResponseItemComponents with the same linkId.
     val responseItemMap = responseItems.groupBy { it.linkId }
-    // Create a list to add missing response items to the existing items to update the questionnaire
-    // response items.
-    val questionnaireResponseItems = mutableListOf<QuestionnaireResponseItemComponent>()
+
+    // Clear the response item list, and then add the missing and existing response items back to
+    // the list
+    responseItems.clear()
+
     questionnaireItems.forEach {
-      val responseItems =
-        if (responseItemMap[it.linkId].isNullOrEmpty()) {
-          listOf(it.createQuestionnaireResponseItem())
-        } else {
-          responseItemMap[it.linkId]!!
-        }
-      if (it.type == Questionnaire.QuestionnaireItemType.GROUP && !it.repeats) {
-        val responseItem = responseItems.first()
-        // Clear the nested list, as the updated list with missing response items will be added back
-        // to the  list.
-        val nestedResponseItems = responseItem.copy().item
-        responseItem.item.clear()
-        addMissingResponseItems(
-          questionnaireItems = it.item,
-          responseItems = nestedResponseItems,
-          parentResponseItem = responseItem
-        )
-      }
-      // Add the list of existing response items and missing items back to the list, maintaining the
-      // order of the items.
-      if (parentResponseItem != null) {
-        parentResponseItem.item.addAll(responseItems)
+      if (responseItemMap[it.linkId].isNullOrEmpty()) {
+        responseItems.add(it.createQuestionnaireResponseItem())
       } else {
-        questionnaireResponseItems.addAll(responseItems)
+        if (it.type == Questionnaire.QuestionnaireItemType.GROUP && !it.repeats) {
+          addMissingResponseItems(
+            questionnaireItems = it.item,
+            responseItems = responseItemMap[it.linkId]!!.first().item,
+          )
+        }
+        responseItems.addAll(responseItemMap[it.linkId]!!)
       }
     }
-    return questionnaireResponseItems
   }
   /**
    * Returns current [QuestionnaireResponse] captured by the UI which includes answers of enabled
