@@ -116,8 +116,8 @@ class ResourceIndexerTest {
         meta = Meta().setProfile(mutableListOf(CanonicalType("Profile/lipid")))
       }
     val resourceIndices = resourceIndexer.index(patient)
-    assertThat(resourceIndices.referenceIndices)
-      .contains(ReferenceIndex("_profile", "Patient.meta.profile", "Profile/lipid"))
+    assertThat(resourceIndices.uriIndices)
+      .contains(UriIndex("_profile", "Patient.meta.profile", "Profile/lipid"))
   }
 
   @Test
