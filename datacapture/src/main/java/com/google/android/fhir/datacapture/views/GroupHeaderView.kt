@@ -30,7 +30,7 @@ import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 
 /**
- * Generic view for the prefix, question, and hint of a header of group of questions [QuestionnaireViewHolderType.GROUP]
+ * Generic view for the prefix, question, and hint as the header of a group using a view holder of type [QuestionnaireViewHolderType.GROUP].
  */
 class GroupHeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
 
