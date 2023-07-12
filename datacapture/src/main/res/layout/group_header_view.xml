@@ -29,8 +29,9 @@
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/item_margin_vertical"
+            android:layout_marginTop="@dimen/item_margin_vertical"
             android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+            style="?attr/questionnaireGroupTypeHeaderStyle"
         />
 
         <include
