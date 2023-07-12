@@ -21,6 +21,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
 import com.google.android.fhir.datacapture.extensions.initHelpViews
@@ -28,6 +29,9 @@ import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpann
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 
+/**
+ * Generic view for the prefix, question, and hint of a header of group of questions [QuestionnaireViewHolderType.GROUP]
+ */
 class GroupHeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
 
   init {

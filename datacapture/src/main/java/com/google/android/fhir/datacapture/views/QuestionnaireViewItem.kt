@@ -169,6 +169,7 @@ data class QuestionnaireViewItem(
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), draftAnswer)
   }
 
+  /** Returns a given answer (The respondent's answer(s) to the question) along with [displayString] if question is answered else 'Not Answered'*/
   fun answerString(context: Context): String {
     if (!questionnaireResponseItem.hasAnswer()) return context.getString(R.string.not_answered)
     return questionnaireResponseItem.answer.joinToString { it.value.displayString(context) }

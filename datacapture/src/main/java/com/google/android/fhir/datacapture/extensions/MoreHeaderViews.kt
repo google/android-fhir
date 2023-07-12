@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.card.MaterialCardView
 import org.hl7.fhir.r4.model.Questionnaire
 
+/** Displays `localizedText` if it is not null or empty, or hide the [TextView]. */
 fun TextView.updateTextAndVisibility(localizedText: Spanned? = null) {
   text = localizedText
   visibility =
