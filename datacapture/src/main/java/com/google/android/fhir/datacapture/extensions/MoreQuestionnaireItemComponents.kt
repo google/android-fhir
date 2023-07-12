@@ -45,7 +45,11 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions
 import timber.log.Timber
 
-/** Item control types supported by the SDC library with `extensionCode` from the value set http://hl7.org/fhir/R4/valueset-questionnaire-item-control.html and `viewHolderType` as the [QuestionnaireViewHolderType] to be used to render the question. */
+/**
+ * Item control types supported by the SDC library with `extensionCode` from the value set
+ * http://hl7.org/fhir/R4/valueset-questionnaire-item-control.html and `viewHolderType` as the
+ * [QuestionnaireViewHolderType] to be used to render the question.
+ */
 enum class ItemControlTypes(
   val extensionCode: String,
   val viewHolderType: QuestionnaireViewHolderType,
@@ -154,7 +158,8 @@ internal fun Questionnaire.QuestionnaireItemComponent.isReferencedBy(
   }
 
 /**
- * The [ItemControlTypes] of the questionnaire item if it is specified by the item control extension, or `null`.
+ * The [ItemControlTypes] of the questionnaire item if it is specified by the item control
+ * extension, or `null`.
  *
  * See http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html.
  */
