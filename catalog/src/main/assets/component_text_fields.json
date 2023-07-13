@@ -82,6 +82,16 @@
     {
       "linkId": "4",
       "type": "integer",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
+          "valueCoding": {
+            "system": "http://unitsofmeasure.org",
+            "code": "kg",
+            "display": "kilogram"
+          }
+        }
+      ],
       "item": [
         {
           "linkId": "4.1",
@@ -103,7 +113,11 @@
             }
           ]
         }
-      ],
+      ]
+    },
+    {
+      "linkId": "5",
+      "type": "decimal",
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
@@ -113,11 +127,7 @@
             "display": "kilogram"
           }
         }
-      ]
-    },
-    {
-      "linkId": "5",
-      "type": "decimal",
+      ],
       "item": [
         {
           "linkId": "5.1",
@@ -138,16 +148,6 @@
               }
             }
           ]
-        }
-      ],
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
-          "valueCoding": {
-            "system": "http://unitsofmeasure.org",
-            "code": "kg",
-            "display": "kilogram"
-          }
         }
       ]
     }
