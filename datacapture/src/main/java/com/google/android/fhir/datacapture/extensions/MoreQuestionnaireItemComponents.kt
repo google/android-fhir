@@ -116,11 +116,17 @@ internal const val EXTENSION_SLIDER_STEP_VALUE_URL =
 /**
  * Extension for questionnaire items of integer and decimal types including a single unit to be
  * displayed.
+ *
+ * See https://hl7.org/fhir/extensions/StructureDefinition-questionnaire-unit.html.
  */
 internal const val EXTENSION_QUESTIONNAIRE_UNIT_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
 
-/** Extension for questionnaire items of quantity type including unit options to choose from. */
+/**
+ * Extension for questionnaire items of quantity type including unit options to choose from.
+ *
+ * See https://hl7.org/fhir/extensions/StructureDefinition-questionnaire-unitOption.html.
+ */
 internal const val EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption"
 
