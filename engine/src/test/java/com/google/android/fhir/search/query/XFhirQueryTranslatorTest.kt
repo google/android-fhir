@@ -337,4 +337,28 @@ class XFhirQueryTranslatorTest {
       }
     assertThat(exception.message).isEqualTo("SPECIAL type not supported in x-fhir-query")
   }
+
+  @Test
+  fun `translate() should add a filter for search parameter _tag`() {
+    val search = translate("Location?_tag=salima-catchment")
+
+    search.tokenFilterCriteria.first().run {
+      assertThat(this.parameter.paramName).isEqualTo("_tag")
+      assertThat(this.filters.first().value!!.tokenFilters.first().code)
+        .isEqualTo("salima-catchment")
+    }
+  }
+
+  @Test
+  fun `translate() should add a filter for search parameter _profile`() {
+
+    val search =
+      translate("Patient?_profile=http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient")
+
+    search.uriFilterCriteria.first().run {
+      assertThat(this.parameter.paramName).isEqualTo("_profile")
+      assertThat(this.filters.first().value)
+        .isEqualTo("http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient")
+    }
+  }
 }
