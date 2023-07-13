@@ -17,26 +17,18 @@
 package com.google.android.fhir.sync
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 
 /**
  * Manager that pre-processes the local FHIR changes and handles how to upload them to the server.
  */
-abstract class UploadWorkManager(private val uploadRequestGenerator: UploadRequestGenerator) {
+interface UploadWorkManager {
 
   /**
    * Transform the [localChanges] to the final set of changes that needs to be uploaded to the
-   * server. The default implementation is to squash all the changes by resource type so that there
-   * is at most one local change to be uploaded per resource
+   * server.
    */
-  open fun preprocessLocalChanges(localChanges: List<LocalChange>): List<LocalChange> {
-    return localChanges
-      .groupBy { it.resourceId to it.resourceType }
-      .values.map { localResourceChanges -> LocalChangeUtils.squash(localResourceChanges) }
-  }
+  fun preprocessLocalChanges(localChanges: List<LocalChange>): List<LocalChange>
 
-  /** Generates a list of [UploadRequest] from the [LocalChange] to be sent to the server */
-  fun createUploadRequestsFromChanges(localChanges: List<LocalChange>): List<UploadRequest> {
-    return uploadRequestGenerator.generateUploadRequests(localChanges)
-  }
+  /** Generates a list of [UploadRequest] from the [LocalChange]s to be uploaded to the server */
+  fun createUploadRequestsFromLocalChanges(localChanges: List<LocalChange>): List<UploadRequest>
 }

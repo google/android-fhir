@@ -43,8 +43,8 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDownloadWorkManager(): DownloadWorkManager
-  abstract fun getConflictResolver(): ConflictResolver
   abstract fun getUploadWorkManager(): UploadWorkManager
+  abstract fun getConflictResolver(): ConflictResolver
 
   private val gson =
     GsonBuilder()

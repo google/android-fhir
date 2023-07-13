@@ -32,11 +32,11 @@ import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
+import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
-import com.google.android.fhir.sync.Request
 import com.google.android.fhir.sync.UploadWorkManager
-import com.google.android.fhir.sync.upload.TransactionBundleGenerator
+import com.google.android.fhir.sync.upload.SquashedChangesUploadWorkManager
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.util.LinkedList
@@ -87,16 +87,14 @@ class H_FhirSyncWorkerBenchmark {
     }
     override fun getDownloadWorkManager(): DownloadWorkManager = BenchmarkTestDownloadManagerImpl()
     override fun getConflictResolver() = AcceptRemoteConflictResolver
-    override fun getUploadWorkManager(): UploadWorkManager = BenchmarkTestUploadWorkManagerImpl()
+    override fun getUploadWorkManager(): UploadWorkManager = SquashedChangesUploadWorkManager()
   }
 
-  open class BenchmarkTestUploadWorkManagerImpl() :
-    UploadWorkManager(TransactionBundleGenerator.getDefault())
   open class BenchmarkTestDownloadManagerImpl(queries: List<String> = listOf("List/sync-list")) :
     DownloadWorkManager {
     private val urls = LinkedList(queries)
 
-    override suspend fun getNextRequest() = urls.poll()?.let { Request.of(it) }
+    override suspend fun getNextRequest() = urls.poll()?.let { DownloadRequest.of(it) }
     override suspend fun getSummaryRequestUrls(): Map<ResourceType, String> {
       return emptyMap()
     }

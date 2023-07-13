@@ -19,9 +19,7 @@ package com.google.android.fhir.sync
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import kotlinx.coroutines.flow.Flow
-import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 
 /** Module for uploading local changes to a [DataSource]. */
 internal interface Uploader {
@@ -31,29 +29,16 @@ internal interface Uploader {
    * transforming the [LocalChange]s to particular network operations. If [ProgressCallback] is
    * provided it also reports the intermediate progress
    */
-  suspend fun upload(localChanges: List<LocalChange>): Flow<UploadResult>
+  suspend fun upload(localChanges: List<LocalChange>): Flow<UploadState>
 }
 
-sealed class UploadRequest(
-  open val headers: Map<String, String>,
-  open val localChangeToken: LocalChangeToken,
-  open val resourceType: ResourceType
-)
-
-/** A FHIR [Bundle] based request for uploads */
-data class BundleUploadRequest(
-  val bundle: Bundle,
-  override val localChangeToken: LocalChangeToken,
-  override val headers: Map<String, String> = emptyMap()
-) : UploadRequest(headers, localChangeToken, ResourceType.Bundle)
-
-internal sealed class UploadResult {
-  data class Started(val total: Int) : UploadResult()
+internal sealed class UploadState {
+  data class Started(val total: Int) : UploadState()
   data class Success(
     val localChangeToken: LocalChangeToken,
     val resource: Resource,
     val total: Int,
     val completed: Int
-  ) : UploadResult()
-  data class Failure(val syncError: ResourceSyncException) : UploadResult()
+  ) : UploadState()
+  data class Failure(val syncError: ResourceSyncException) : UploadState()
 }

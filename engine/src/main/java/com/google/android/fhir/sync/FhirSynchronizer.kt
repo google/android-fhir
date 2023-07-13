@@ -129,15 +129,15 @@ internal class FhirSynchronizer(
       flow {
         uploader.upload(list).collect { result ->
           when (result) {
-            is UploadResult.Started ->
+            is UploadState.Started ->
               setSyncState(SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total))
-            is UploadResult.Success ->
+            is UploadState.Success ->
               emit(result.localChangeToken to result.resource).also {
                 setSyncState(
                   SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total, result.completed)
                 )
               }
-            is UploadResult.Failure -> exceptions.add(result.syncError)
+            is UploadState.Failure -> exceptions.add(result.syncError)
           }
         }
       }

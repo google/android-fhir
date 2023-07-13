@@ -97,7 +97,7 @@ internal interface Database {
   suspend fun count(query: SearchQuery): Long
 
   /**
-   * Retrieves all [LocalChange] s for all [Resource] s, which can be used to update the remote FHIR
+   * Retrieves all [LocalChange]s for all [Resource]s, which can be used to update the remote FHIR
    * server.
    */
   suspend fun getAllLocalChanges(): List<LocalChange>

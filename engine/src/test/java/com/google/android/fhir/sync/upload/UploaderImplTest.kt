@@ -21,9 +21,8 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
-import com.google.android.fhir.sync.UploadResult
+import com.google.android.fhir.sync.UploadState
 import com.google.android.fhir.testing.BundleDataSource
-import com.google.android.fhir.testing.TestBundleUploadManagerImpl
 import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
 import kotlinx.coroutines.flow.toList
@@ -45,16 +44,16 @@ class UploaderImplTest {
     val result =
       UploaderImpl(
           BundleDataSource { Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE } },
-          TestBundleUploadManagerImpl()
+          SquashedChangesUploadWorkManager()
         )
         .upload(localChanges)
         .toList()
 
     assertThat(result).hasSize(2)
-    assertThat(result.first()).isInstanceOf(UploadResult.Started::class.java)
-    assertThat(result.last()).isInstanceOf(UploadResult.Success::class.java)
+    assertThat(result.first()).isInstanceOf(UploadState.Started::class.java)
+    assertThat(result.last()).isInstanceOf(UploadState.Success::class.java)
 
-    val success = result.last() as UploadResult.Success
+    val success = result.last() as UploadState.Success
     assertThat(success.total).isEqualTo(1)
     assertThat(success.completed).isEqualTo(1)
   }
@@ -62,11 +61,11 @@ class UploaderImplTest {
   @Test
   fun `upload Bundle transaction should emit Started state`() = runBlocking {
     val result =
-      UploaderImpl(BundleDataSource { Bundle() }, TestBundleUploadManagerImpl())
+      UploaderImpl(BundleDataSource { Bundle() }, SquashedChangesUploadWorkManager())
         .upload(localChanges)
         .toList()
 
-    assertThat(result.first()).isInstanceOf(UploadResult.Started::class.java)
+    assertThat(result.first()).isInstanceOf(UploadState.Started::class.java)
   }
 
   @Test
@@ -84,13 +83,13 @@ class UploaderImplTest {
               )
             }
           },
-          TestBundleUploadManagerImpl()
+          SquashedChangesUploadWorkManager()
         )
         .upload(localChanges)
         .toList()
 
     assertThat(result).hasSize(2)
-    assertThat(result.last()).isInstanceOf(UploadResult.Failure::class.java)
+    assertThat(result.last()).isInstanceOf(UploadState.Failure::class.java)
   }
 
   @Test
@@ -98,13 +97,13 @@ class UploaderImplTest {
     val result =
       UploaderImpl(
           BundleDataSource { throw ConnectException("Failed to connect to server.") },
-          TestBundleUploadManagerImpl()
+          SquashedChangesUploadWorkManager()
         )
         .upload(localChanges)
         .toList()
 
     assertThat(result).hasSize(2)
-    assertThat(result.last()).isInstanceOf(UploadResult.Failure::class.java)
+    assertThat(result.last()).isInstanceOf(UploadState.Failure::class.java)
   }
   companion object {
     val localChanges =

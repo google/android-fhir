@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync
+package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.sync.UploadRequest
 
 /** Generator that generates [UploadRequest]s from the [LocalChange]s */
 interface UploadRequestGenerator {

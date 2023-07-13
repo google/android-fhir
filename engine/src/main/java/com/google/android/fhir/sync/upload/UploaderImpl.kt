@@ -20,7 +20,7 @@ import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
-import com.google.android.fhir.sync.UploadResult
+import com.google.android.fhir.sync.UploadState
 import com.google.android.fhir.sync.UploadWorkManager
 import com.google.android.fhir.sync.Uploader
 import kotlinx.coroutines.flow.Flow
@@ -36,19 +36,19 @@ import timber.log.Timber
  * Implementation of the [Uploader]. It orchestrates the pre processing of [LocalChange] and
  * constructing appropriate upload requests via [UploadWorkManager] and uploading of requests via
  * [DataSource]. [Uploader] clients should call upload and listen to the various states emitted by
- * [UploadWorkManager] as [UploadResult].
+ * [UploadWorkManager] as [UploadState].
  */
 internal class UploaderImpl(
   private val dataSource: DataSource,
-  private val uploadWorkManager: UploadWorkManager
+  private val uploadWorkManager: UploadWorkManager,
 ) : Uploader {
 
-  override suspend fun upload(localChanges: List<LocalChange>): Flow<UploadResult> = flow {
+  override suspend fun upload(localChanges: List<LocalChange>): Flow<UploadState> = flow {
     val transformedChanges = uploadWorkManager.preprocessLocalChanges(localChanges)
-    val uploadRequests = uploadWorkManager.createUploadRequestsFromChanges(transformedChanges)
+    val uploadRequests = uploadWorkManager.createUploadRequestsFromLocalChanges(transformedChanges)
     val total = uploadRequests.size
     var completed = 0
-    emit(UploadResult.Started(total))
+    emit(UploadState.Started(total))
     uploadRequests.forEach { uploadRequest ->
       try {
         val response = dataSource.upload(uploadRequest)
@@ -64,7 +64,7 @@ internal class UploaderImpl(
         )
       } catch (e: Exception) {
         Timber.e(e)
-        emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
+        emit(UploadState.Failure(ResourceSyncException(ResourceType.Bundle, e)))
       }
     }
   }
@@ -78,10 +78,10 @@ internal class UploaderImpl(
   ) =
     when {
       response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
-        UploadResult.Success(localChangeToken, response, total, completed)
+        UploadState.Success(localChangeToken, response, total, completed)
       }
       response is OperationOutcome && response.issue.isNotEmpty() -> {
-        UploadResult.Failure(
+        UploadState.Failure(
           ResourceSyncException(
             requestResourceType,
             FHIRException(response.issueFirstRep.diagnostics)
@@ -89,7 +89,7 @@ internal class UploaderImpl(
         )
       }
       else -> {
-        UploadResult.Failure(
+        UploadState.Failure(
           ResourceSyncException(
             requestResourceType,
             FHIRException("Unknown response for ${response.resourceType}")
