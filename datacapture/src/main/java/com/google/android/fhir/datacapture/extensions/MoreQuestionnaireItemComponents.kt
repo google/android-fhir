@@ -475,6 +475,11 @@ val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
     return null
   }
 
+/**
+ * The unit for the numerical question.
+ *
+ * See http://hl7.org/fhir/R4/extension-questionnaire-unit.html.
+ */
 internal val Questionnaire.QuestionnaireItemComponent.unit: Coding?
   get() {
     val extension =
@@ -486,6 +491,11 @@ internal val Questionnaire.QuestionnaireItemComponent.unit: Coding?
     return null
   }
 
+/**
+ * The unit options for the quantity question.
+ *
+ * See http://hl7.org/fhir/R4/extension-questionnaire-unitoption.html.
+ */
 internal val Questionnaire.QuestionnaireItemComponent.unitOption: List<Coding>
   get() {
     return this.extension
