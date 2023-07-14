@@ -16,13 +16,11 @@
 
 package com.google.android.fhir.datacapture.fhirpath
 
+import com.google.android.fhir.datacapture.ContextVariable
+import com.google.android.fhir.datacapture.ContextVariableImmutable
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
-import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.TypeDetails
 import org.hl7.fhir.r4.model.ValueSet
 import org.hl7.fhir.r4.utils.FHIRPathEngine
@@ -31,26 +29,20 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
  * Resolves constants defined in the fhir path expressions beyond those defined in the specification
  */
 internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
-  public enum class ContextVariable(val constant: String) {
-    Q_ITEM("%qItem"),
-    QUESTIONNAIRE("%questionnaire"),
-    RESOURCE("%resource"),
-    ROOT_RESOURCE("%rootResource"),
-    CONTEXT("%context");
+  enum class ContextVariableType(val constant: String) {
+    Q_ITEM("qItem"),
+    QUESTIONNAIRE("questionnaire");
 
     fun toPair(base: Base) = this.constant to base
+    fun toContextExpression(base: Base) = this.constant to ContextVariableImmutable(this.constant, base)
   }
 
-  fun QuestionnaireItemComponent.buildContextMap(questionnaire: Questionnaire, questionnaireResponse: QuestionnaireResponse
-                                                 , questionnaireResponseItemComponent: QuestionnaireResponseItemComponent,
-  launchContextMap: Map<String, Resource>):
-          Map<String, Base> {
+  fun QuestionnaireItemComponent.buildContextMap(questionnaire: Questionnaire):
+          Map<String, ContextVariable> {
     return mapOf(
-      ContextVariable.CONTEXT.toPair(questionnaireResponseItemComponent),
-      ContextVariable.QUESTIONNAIRE.toPair(questionnaire),
-      ContextVariable.Q_ITEM.toPair(this),
-      ContextVariable.RESOURCE.toPair(questionnaireResponse)
-    ).plus(launchContextMap)
+      ContextVariableType.QUESTIONNAIRE.toContextExpression(questionnaire),
+      ContextVariableType.Q_ITEM.toContextExpression(this),
+    )
   }
 
   override fun resolveConstant(appContext: Any?, name: String?, beforeContext: Boolean): Base? =

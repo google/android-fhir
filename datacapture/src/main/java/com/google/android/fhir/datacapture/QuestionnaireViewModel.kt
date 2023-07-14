@@ -42,6 +42,7 @@ import com.google.android.fhir.datacapture.extensions.isFhirPath
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isNamedExpression
 import com.google.android.fhir.datacapture.extensions.isPaginated
+import com.google.android.fhir.datacapture.extensions.isRunOnceExpression
 import com.google.android.fhir.datacapture.extensions.isXFhirQuery
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
@@ -51,9 +52,6 @@ import com.google.android.fhir.datacapture.extensions.unpackRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
 import com.google.android.fhir.datacapture.extensions.zipByLinkId
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
-import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
-import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
-import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateExpression
 import com.google.android.fhir.datacapture.fhirpath.FHIRPathEngineHostServices.buildContextMap
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import com.google.android.fhir.datacapture.mapping.ITEM_INITIAL_EXPRESSION_URL
@@ -75,7 +73,6 @@ import kotlinx.coroutines.flow.update
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Element
-import org.hl7.fhir.r4.model.Enumerations.FHIRAllTypes
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
@@ -209,6 +206,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         buildParentList(item, this)
       }
     }
+  }
+
+  @VisibleForTesting
+  private val expressionEvaluator by lazy { ExpressionEvaluator.forContext(questionnaire, questionnaireResponse,
+    questionnaireLaunchContextMap, questionnaireItemParentMap, xFhirQueryResolver)
   }
 
   @VisibleForTesting
@@ -455,7 +457,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         SharingStarted.Lazily,
         initialValue =
           getQuestionnaireState()
-            .also { detectExpressionCyclicDependency(questionnaire.item) }
+            .also { expressionEvaluator.detectExpressionCyclicDependency(questionnaire.item) }
             .also {
               questionnaire.item.flattened().forEach { qItem ->
                 updateDependentQuestionnaireResponseItems(
@@ -470,12 +472,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     updatedQuestionnaireItem: QuestionnaireItemComponent,
     updatedQuestionnaireResponseItem: QuestionnaireResponseItemComponent?,
   ) {
-    evaluateCalculatedExpressions(
+    expressionEvaluator.evaluateCalculatedExpressions(
         updatedQuestionnaireItem,
-        updatedQuestionnaireResponseItem,
-        questionnaire,
-        questionnaireResponse,
-        questionnaireItemParentMap
+        updatedQuestionnaireResponseItem
       )
       .forEach { (questionnaireItem, calculatedAnswers) ->
         // update all response item with updated values
@@ -567,13 +566,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     if (!cqfExpression.isFhirPath) {
       throw UnsupportedOperationException("${cqfExpression.language} not supported yet")
     }
-    return evaluateExpression(
-      questionnaire,
-      questionnaireResponse,
+    return expressionEvaluator.evaluateFhirpathExpression(
       questionnaireItem,
       questionnaireResponseItem,
-      cqfExpression,
-      questionnaireItemParentMap
+      cqfExpression
     )
   }
 
@@ -588,10 +584,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
 
         val xFhirExpressionString =
-          ExpressionEvaluator.createXFhirQueryFromExpression(
-            expression,
-            questionnaireLaunchContextMap
-          )
+          expressionEvaluator.createXFhirQueryFromExpression(
+            expression)
         xFhirQueryResolver!!.resolve(xFhirExpressionString)
       } else if (expression.isFhirPath) {
         fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
@@ -752,46 +746,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                 showRequiredText = showRequiredText,
                 showOptionalText = showOptionalText
               ),
-            contextData = listOf() + questionnaireItem.buildContextMap(questionnaire, questionnaireResponse, questionnaireResponseItem)
+            contextData = questionnaireItem.buildContextMap(questionnaire).toMutableMap().let {
+              runContextExpressions(questionnaireItem, questionnaireResponseItem, it))
+            }
           )
         )
       )
-
-      suspend fun runContextExpressions(questionnaireItem: QuestionnaireItemComponent, questionnaireResponseItem: QuestionnaireResponseItemComponent){
-        // all expressions of itself and of its parents
-        questionnaireItem.extension.filter { it.value.isNamedExpression }.map { ext ->
-          ext.castToExpression(ext.value).let {
-            // only initial expression and item populate context expressions are run once and on start
-            if (ext.url == ITEM_INITIAL_EXPRESSION_URL || ext.url == EXTENSION_ITEM_POPULATE_CONTEXT_URL) {
-              ContextExpressionFixed(it, runExpression(questionnaireItem, questionnaireResponseItem, it))
-
-            }
-            else {}
-          }
-        }
-      }
-
-      suspend fun runExpression(questionnaireItem: QuestionnaireItemComponent, questionnaireResponseItem: QuestionnaireResponseItemComponent,
-                                expression: Expression): List<Base> {
-       return if (expression.isXFhirQuery) {
-            checkNotNull(xFhirQueryResolver) {
-              "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
-            }
-
-            val xFhirExpressionString =
-              ExpressionEvaluator.createXFhirQueryFromExpression(//TODO check to pass context data
-                expression,
-                questionnaireLaunchContextMap
-              )
-            xFhirQueryResolver!!.resolve(xFhirExpressionString)
-          } else if (expression.isFhirPath) {
-            evaluateExpression(questionnaire, questionnaireResponse, questionnaireItem, questionnaireResponseItem, expression, questionnaireItemParentMap)
-          } else {
-            throw UnsupportedOperationException(
-              "${expression.language} not supported for answer-expression yet"
-            )
-          }
-      }
 
 
       // Add nested questions after the parent item. We need to get the questionnaire items and
@@ -827,6 +787,38 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     currentPageItems = items
     return items
   }
+
+  // initial expression
+  // candidate expression
+  // answer expression
+  // enableExpression
+  // variable todo ??? do it here? or filter out
+  suspend fun runContextExpressions(questionnaireItem: QuestionnaireItemComponent,
+                                    questionnaireResponseItem: QuestionnaireResponseItemComponent,
+                                    itemContext: MutableMap<String, ContextVariable>) {
+    // all expressions of itself and of its parents
+    // add context data todo
+    questionnaireItem.extension.filter { it.value.isNamedExpression }.map { ext ->
+      ext.castToExpression(ext.value).let {
+        if (!itemContext.containsKey(it.name) && ext.isRunOnceExpression)
+        expressionEvaluator.runExpression(questionnaireItem, questionnaireResponseItem, it, itemContext)
+
+        // Only Group can have named expression with list data as variables can not have list type
+        if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP){
+          ContextVariableGroup(it.name, it, expressionEvaluator.runExpression(questionnaireItem, questionnaireResponseItem, it, itemContext))
+        }
+        // only initial expression and item populate context expressions are run once and on start
+        else if (!itemContext.containsKey(it.name) && (ext.url == ITEM_INITIAL_EXPRESSION_URL || ext.url == EXTENSION_ITEM_POPULATE_CONTEXT_URL)) {
+          ContextVariableImmutable(it.name, expressionEvaluator.runExpression(questionnaireItem, questionnaireResponseItem, it, itemContext).singleOrNull())
+        }
+        else {
+          ContextVariableMutable(it.name, it, expressionEvaluator.runExpression(questionnaireItem, questionnaireResponseItem, it, itemContext).singleOrNull())
+        }
+      }
+    }
+  }
+
+
 
   /**
    * If the item is not enabled, clear the answers that it may have from the previous enabled state.
