@@ -875,6 +875,16 @@ class ExpressionEvaluatorTest {
                 }
               )
             }
+            addExtension().apply {
+              url = EXTENSION_VARIABLE_URL
+              setValue(
+                Expression().apply {
+                  name = "B"
+                  language = "text/fhirpath"
+                  expression = "2"
+                }
+              )
+            }
             addItem(
               Questionnaire.QuestionnaireItemComponent().apply {
                 linkId = "an-item"
@@ -885,7 +895,7 @@ class ExpressionEvaluatorTest {
                   setValue(
                     Expression().apply {
                       language = "application/x-fhir-query"
-                      expression = "Patient?address-city={{%A}}"
+                      expression = "Patient?address-city={{%A}}&gender={{%B}}"
                     }
                   )
                 }
@@ -905,6 +915,6 @@ class ExpressionEvaluatorTest {
         null
       )
 
-    assertThat(result).isEqualTo("Patient?address-city=1")
+    assertThat(result).isEqualTo("Patient?address-city=1&gender=2")
   }
 }

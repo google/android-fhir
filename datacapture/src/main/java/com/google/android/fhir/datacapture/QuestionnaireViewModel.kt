@@ -633,9 +633,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         )
       }
     val options = item.extractAnswerOptions(data)
-    if (expression.isXFhirQuery) {
-      answerExpressionMap[xFhirExpressionString] = options
-    }
+    if (expression.isXFhirQuery) answerExpressionMap[xFhirExpressionString] = options
     return options
   }
 
