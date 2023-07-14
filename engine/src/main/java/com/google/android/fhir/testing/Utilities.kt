@@ -115,6 +115,7 @@ open class TestDownloadManagerImpl(
 
   override suspend fun getNextRequest(): DownloadRequest? =
     urls.poll()?.let { DownloadRequest.of(it) }
+
   override suspend fun getSummaryRequestUrls() =
     queries
       .stream()

@@ -22,13 +22,12 @@ import com.google.android.fhir.LocalChange
  * Manager that pre-processes the local FHIR changes and handles how to upload them to the server.
  */
 interface UploadWorkManager {
-
   /**
-   * Transform the [localChanges] to the final set of changes that needs to be uploaded to the
+   * Transform the [LocalChange]s to the final set of changes that needs to be uploaded to the
    * server.
    */
-  fun preprocessLocalChanges(localChanges: List<LocalChange>): List<LocalChange>
+  fun prepareChangesForUpload(localChanges: List<LocalChange>): List<LocalChange>
 
-  /** Generates a list of [UploadRequest] from the [LocalChange]s to be uploaded to the server */
+  /** Generates a list of [UploadRequest]s from the [LocalChange]s to be uploaded to the server */
   fun createUploadRequestsFromLocalChanges(localChanges: List<LocalChange>): List<UploadRequest>
 }

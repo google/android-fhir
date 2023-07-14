@@ -44,7 +44,7 @@ internal class UploaderImpl(
 ) : Uploader {
 
   override suspend fun upload(localChanges: List<LocalChange>): Flow<UploadState> = flow {
-    val transformedChanges = uploadWorkManager.preprocessLocalChanges(localChanges)
+    val transformedChanges = uploadWorkManager.prepareChangesForUpload(localChanges)
     val uploadRequests = uploadWorkManager.createUploadRequestsFromLocalChanges(transformedChanges)
     val total = uploadRequests.size
     var completed = 0

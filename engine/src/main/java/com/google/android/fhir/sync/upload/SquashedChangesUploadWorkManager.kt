@@ -33,7 +33,7 @@ class SquashedChangesUploadWorkManager : UploadWorkManager {
    * The implementation is to squash all the changes by resource type so that there is at most one
    * local change to be uploaded per resource
    */
-  override fun preprocessLocalChanges(localChanges: List<LocalChange>): List<LocalChange> {
+  override fun prepareChangesForUpload(localChanges: List<LocalChange>): List<LocalChange> {
     return localChanges
       .groupBy { it.resourceId to it.resourceType }
       .values.map { localResourceChanges -> LocalChangeUtils.squash(localResourceChanges) }
