@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.knowledge.npm
 
-import com.google.android.fhir.knowledge.ImplementationGuide
+import com.google.android.fhir.knowledge.Dependency
 import java.io.File
 
 /** Downloaded Npm Package metadata. */
@@ -24,6 +24,6 @@ data class NpmPackage(
   val packageId: String,
   val version: String,
   val canonical: String?,
-  val dependencies: List<ImplementationGuide>,
+  val dependencies: List<Dependency>,
   val rootDirectory: File,
 )

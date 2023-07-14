@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.knowledge.npm
 
-import com.google.android.fhir.knowledge.ImplementationGuide
+import com.google.android.fhir.knowledge.Dependency
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,13 +27,13 @@ import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
-class CacheManagerTest {
+class NpmFileManagerTest {
   private val testDataFolder = File(javaClass.getResource("/cache_manager")!!.file)
-  private val cacheManager: CacheManager = CacheManager(testDataFolder)
+  private val npmFileManager: NpmFileManager = NpmFileManager(testDataFolder)
 
   @Test
   fun getPackageFolder() {
-    val packageFolder = cacheManager.getPackageFolder(PACKAGE_ID, VERSION)
+    val packageFolder = npmFileManager.getPackageFolder(PACKAGE_ID, VERSION)
 
     assertThat(packageFolder.absolutePath)
       .isEqualTo("${testDataFolder.absolutePath}/$PACKAGE_ID#$VERSION")
@@ -41,7 +41,7 @@ class CacheManagerTest {
 
   @Test
   fun getPackage() = runTest {
-    val npmPackage = cacheManager.getPackage(PACKAGE_ID, VERSION)
+    val npmPackage = npmFileManager.getPackage(PACKAGE_ID, VERSION)
 
     assertThat(npmPackage.packageId).isEqualTo(PACKAGE_ID)
     assertThat(npmPackage.version).isEqualTo(VERSION)
@@ -52,7 +52,7 @@ class CacheManagerTest {
 
   @Test
   fun getPackage_notFound() = runTest {
-    val npmPackage = cacheManager.getPackage(PACKAGE_ID, MISSING_VERSION)
+    val npmPackage = npmFileManager.getPackage(PACKAGE_ID, MISSING_VERSION)
 
     assertThat(npmPackage).isNull()
   }
@@ -63,9 +63,9 @@ class CacheManagerTest {
     const val MISSING_VERSION = "13.3.8"
     val DEPENDENCIES =
       listOf(
-        ImplementationGuide("hl7.fhir.r4.core", "4.0.1"),
-        ImplementationGuide("hl7.terminology.r4", "5.0.0"),
-        ImplementationGuide("hl7.fhir.fr.core", "1.1.0")
+        Dependency("hl7.fhir.r4.core", "4.0.1"),
+        Dependency("hl7.terminology.r4", "5.0.0"),
+        Dependency("hl7.fhir.fr.core", "1.1.0")
       )
   }
 }

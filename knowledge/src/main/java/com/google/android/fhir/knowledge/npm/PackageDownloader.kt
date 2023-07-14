@@ -16,14 +16,14 @@
 
 package com.google.android.fhir.knowledge.npm
 
-import com.google.android.fhir.knowledge.ImplementationGuide
+import com.google.android.fhir.knowledge.Dependency
 
 /** Downloads Npm package from the provided package server. */
 fun interface PackageDownloader {
 
-  /** Downloads the [implementationGuide] from the [packageServerUrl]. */
+  /** Downloads the [dependency] from the [packageServerUrl]. */
   suspend fun downloadPackage(
-    implementationGuide: ImplementationGuide,
+    dependency: Dependency,
     packageServerUrl: String,
   ): NpmPackage
 }

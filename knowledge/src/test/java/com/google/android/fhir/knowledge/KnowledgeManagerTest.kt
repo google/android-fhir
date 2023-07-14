@@ -22,9 +22,8 @@ import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.knowledge.db.impl.KnowledgeDatabase
-import com.google.android.fhir.knowledge.npm.CacheManager
+import com.google.android.fhir.knowledge.npm.NpmFileManager
 import com.google.android.fhir.knowledge.npm.NpmPackage
-import com.google.android.fhir.knowledge.npm.NpmPackageManager
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -43,25 +42,26 @@ internal class KnowledgeManagerTest {
     Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build()
   private val knowledgeManager = KnowledgeManager(knowledgeDb, context.cacheDir.absolutePath)
   private val implementationGuide = Dependency("anc-cds", "0.3.0", "http://url.com")
+  private val dependency = Dependency("anc-cds", "0.3.0", "http://url.com")
   private val dataFolder = File(javaClass.getResource("/anc-cds")!!.file)
 
   private val knowledgeDb =
     Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build()
-  private val cacheManager = CacheManager(context.dataDir)
+  private val npmFileManager = NpmFileManager(context.dataDir)
   private val knowledgeManager =
     KnowledgeManager(
       knowledgeDb,
       context.dataDir,
-      npmPackageManager =
-        NpmPackageManager(cacheManager) { implementationGuide, _ ->
-          NpmPackage(
-            implementationGuide.packageId,
-            implementationGuide.version,
-            implementationGuide.uri,
-            emptyList(),
-            dataFolder
-          )
-        }
+      npmFileManager = npmFileManager,
+      packageDownloader = { implementationGuide, _ ->
+        NpmPackage(
+          implementationGuide.packageId,
+          implementationGuide.version,
+          implementationGuide.uri,
+          emptyList(),
+          dataFolder
+        )
+      }
     )
 
   @After
@@ -71,7 +71,7 @@ internal class KnowledgeManagerTest {
 
   @Test
   fun `importing IG creates entries in DB`() = runTest {
-    knowledgeManager.install(implementationGuide, dataFolder)
+    knowledgeManager.install(dependency, dataFolder)
     val implementationGuideId =
       knowledgeDb.knowledgeDao().getImplementationGuide("anc-cds", "0.3.0")!!.implementationGuideId
 
@@ -89,9 +89,9 @@ internal class KnowledgeManagerTest {
     val igRoot = File(dataFolder.parentFile, "anc-cds.copy")
     igRoot.deleteOnExit()
     dataFolder.copyRecursively(igRoot)
-    knowledgeManager.install(implementationGuide, igRoot)
+    knowledgeManager.install(dependency, igRoot)
 
-    knowledgeManager.delete(implementationGuide)
+    knowledgeManager.delete(dependency)
 
     assertThat(knowledgeDb.knowledgeDao().getImplementationGuides()).isEmpty()
     assertThat(igRoot.exists()).isFalse()
@@ -99,7 +99,7 @@ internal class KnowledgeManagerTest {
 
   @Test
   fun `imported entries are readable`() = runTest {
-    knowledgeManager.install(implementationGuide, dataFolder)
+    knowledgeManager.install(dependency, dataFolder)
 
     assertThat(knowledgeManager.loadResources(resourceType = "Library", name = "WHOCommon"))
       .isNotNull()
@@ -148,8 +148,8 @@ internal class KnowledgeManagerTest {
     }
   }
 
-fun `installing from npmPackageManager`() = runTest {
-    knowledgeManager.install(implementationGuide)
+  fun `installing from npmPackageManager`() = runTest {
+    knowledgeManager.install(dependency)
 
     assertThat(knowledgeManager.loadResources(resourceType = "Library", name = "WHOCommon"))
       .isNotNull()

@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.knowledge.npm
 
-import com.google.android.fhir.knowledge.ImplementationGuide
+import com.google.android.fhir.knowledge.Dependency
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -32,19 +32,19 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 
 /** Downloads Npm package from the provided package server using OkHttp library. */
 internal class OkHttpPackageDownloader(
-  private val cacheManager: CacheManager,
+  private val npmFileManager: NpmFileManager,
 ) : PackageDownloader {
 
   val client = OkHttpClient()
 
   @Throws(IOException::class)
   override suspend fun downloadPackage(
-    implementationGuide: ImplementationGuide,
+    dependency: Dependency,
     packageServerUrl: String,
   ): NpmPackage {
     return withContext(Dispatchers.IO) {
-      val packageName = implementationGuide.packageId
-      val version = implementationGuide.version
+      val packageName = dependency.packageId
+      val version = dependency.version
       val url = "$packageServerUrl$packageName/$version"
 
       val request = Request.Builder().url(url).get().build()
@@ -54,8 +54,7 @@ internal class OkHttpPackageDownloader(
       if (!response.isSuccessful) {
         throw IOException("Unexpected code $response")
       }
-      val packageFolder =
-        cacheManager.getPackageFolder(implementationGuide.packageId, implementationGuide.version)
+      val packageFolder = npmFileManager.getPackageFolder(dependency.packageId, dependency.version)
 
       response.body?.use { responseBody ->
         packageFolder.mkdirs()
@@ -66,7 +65,7 @@ internal class OkHttpPackageDownloader(
 
         tgzFile.delete()
       }
-      cacheManager.getPackage(implementationGuide.packageId, implementationGuide.version)
+      npmFileManager.getPackage(dependency.packageId, dependency.version)
     }
   }
 

@@ -16,14 +16,14 @@
 
 package com.google.android.fhir.knowledge.npm
 
-import com.google.android.fhir.knowledge.ImplementationGuide
+import com.google.android.fhir.knowledge.Dependency
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 /** Manages stored NPM packages. */
-internal class CacheManager(private val cacheRoot: File) {
+internal class NpmFileManager(private val cacheRoot: File) {
 
   /**
    * Returns the NpmPackage for the given [packageId] and [version] from cache or `null` if the
@@ -59,7 +59,7 @@ internal class CacheManager(private val cacheRoot: File) {
       val dependenciesList = optJSONObject("dependencies")
       val dependencies =
         dependenciesList?.keys()?.asSequence()?.map { key ->
-          ImplementationGuide(key, dependenciesList.getString(key))
+          Dependency(key, dependenciesList.getString(key))
         }
 
       return NpmPackage(

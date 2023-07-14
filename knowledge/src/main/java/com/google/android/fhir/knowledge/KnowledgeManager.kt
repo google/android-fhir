@@ -23,7 +23,9 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.knowledge.db.impl.KnowledgeDatabase
 import com.google.android.fhir.knowledge.db.impl.entities.ResourceMetadataEntity
 import com.google.android.fhir.knowledge.db.impl.entities.toEntity
-import com.google.android.fhir.knowledge.npm.NpmPackageManager
+import com.google.android.fhir.knowledge.npm.NpmFileManager
+import com.google.android.fhir.knowledge.npm.OkHttpPackageDownloader
+import com.google.android.fhir.knowledge.npm.PackageDownloader
 import java.io.File
 import java.io.FileInputStream
 import kotlinx.coroutines.Dispatchers
@@ -38,38 +40,42 @@ import timber.log.Timber
 class KnowledgeManager
 internal constructor(
   private val knowledgeDatabase: KnowledgeDatabase,
-  private val dataFolder: File,
+  dataFolder: File,
   private val jsonParser: IParser = FhirContext.forR4().newJsonParser(),
-  private val npmPackageManager: NpmPackageManager = NpmPackageManager.create(dataFolder),
+  private val npmFileManager: NpmFileManager =
+    NpmFileManager(File(dataFolder, ".fhir_package_cache")),
+  private val packageDownloader: PackageDownloader = OkHttpPackageDownloader(npmFileManager),
 ) {
   private val knowledgeDao = knowledgeDatabase.knowledgeDao()
 
   /**
-   * * Checks if the [implementationGuides] are present in DB. If necessary, downloads the
-   * dependencies from NPM and imports data from the package manager (populates the metadata of the
-   * FHIR Resources)
+   * * Checks if the [dependencies] are present in DB. If necessary, downloads the dependencies from
+   * NPM and imports data from the package manager (populates the metadata of the FHIR Resources)
    */
-  suspend fun install(vararg implementationGuides: ImplementationGuide) {
-    for (implementationGuide in implementationGuides) {
-      for (npmPackage in npmPackageManager.install(implementationGuide)) {
-        val existingEntity =
-          knowledgeDao.getImplementationGuide(npmPackage.packageId, npmPackage.version)
-        if (existingEntity != null) continue
-        install(
-          ImplementationGuide(npmPackage.packageId, npmPackage.version, npmPackage.canonical),
-          npmPackage.rootDirectory
-        )
-      }
+  suspend fun install(vararg dependencies: Dependency) {
+    for (dependency in dependencies) {
+      if (knowledgeDao.getImplementationGuide(dependency.packageId, dependency.version) != null)
+        continue
+
+      val containsPackage = npmFileManager.containsPackage(dependency.packageId, dependency.version)
+      val npmPackage =
+        if (containsPackage) {
+          npmFileManager.getPackage(dependency.packageId, dependency.version)
+        } else {
+          packageDownloader.downloadPackage(dependency, PACKAGE_SERVER)
+        }
+      install(dependency, npmPackage.rootDirectory)
+      install(*npmPackage.dependencies.toTypedArray())
     }
   }
 
   /**
-   * Checks if the [implementationGuide] is present in DB. If necessary, populates the database with
-   * the metadata of FHIR Resource from the provided [rootDirectory].
+   * Checks if the [dependency] is present in DB. If necessary, populates the database with the
+   * metadata of FHIR Resource from the provided [rootDirectory].
    */
-  suspend fun install(implementationGuide: ImplementationGuide, rootDirectory: File) {
+  suspend fun install(dependency: Dependency, rootDirectory: File) {
     // TODO(ktarasenko) copy files to the safe space?
-    val igId = knowledgeDao.insert(implementationGuide.toEntity(rootDirectory))
+    val igId = knowledgeDao.insert(dependency.toEntity(rootDirectory))
     rootDirectory.listFiles()?.forEach { file ->
       try {
         val resource = jsonParser.parseResource(FileInputStream(file))
@@ -113,7 +119,7 @@ internal constructor(
   }
 
   /** Deletes Implementation Guide, cleans up files. */
-  suspend fun delete(vararg igDependencies: ImplementationGuide) {
+  suspend fun delete(vararg igDependencies: Dependency) {
     igDependencies.forEach { igDependency ->
       val igEntity =
         knowledgeDao.getImplementationGuide(igDependency.packageId, igDependency.version)
@@ -162,6 +168,7 @@ internal constructor(
 
   companion object {
     private const val DB_NAME = "knowledge.db"
+    private const val PACKAGE_SERVER = "https://packages.fhir.org/packages/"
 
     /** Creates an [KnowledgeManager] backed by the Room DB. */
     fun create(context: Context) =

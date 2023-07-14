@@ -20,4 +20,4 @@ package com.google.android.fhir.knowledge
  * Holds Implementation Guide attributes. Used to define dependencies, load dependencies from
  * Package Manager
  */
-data class ImplementationGuide(val packageId: String, val version: String, val uri: String? = null)
+data class Dependency(val packageId: String, val version: String, val uri: String? = null)
