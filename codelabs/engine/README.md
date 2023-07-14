@@ -238,7 +238,7 @@ class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
 }
 ```
 
-3.   In `PatientListFragment,kt`, add the following code to the body of
+3.   In `PatientListViewModel.kt`, add the following code to the body of
      `triggerOneTimeSync()` function
 
 ```kotlin
