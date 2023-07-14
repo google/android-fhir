@@ -45,7 +45,7 @@ Open Android Studio, select **Import Project (Gradle, Eclipse ADT, etc.)** and
 choose the `codelabs/datacapture` folder from the source code that you have downloaded
 earlier.
 
-![Android Studio start screen](images/image1.png "Android Studio start screen")
+![Android Studio start screen](../images/image1.png "Android Studio start screen")
 
 ### Run the starter app
 
@@ -54,10 +54,10 @@ for the first time.
 
 Connect your Android device via USB to your host, or
 [Start the Android Studio emulator,](https://developer.android.com/studio/run/emulator)
-and click Run (![Run button](images/image2.png "Run button")) in the Android
+and click Run (![Run button](../images/image2.png "Run button")) in the Android
 Studio toolbar.
 
-![Hello World app](images/image5.png "Hello World app")
+![Hello World app](../images/image5.png "Hello World app")
 
 As you can see there isn't much here yet, so let's get right into displaying a
 questionnaire in your app!
@@ -85,7 +85,7 @@ To be sure that all dependencies are available to your app, you should sync your
 project with gradle files at this point.
 
 Select **Sync Project with Gradle Files**
-(![Gradle sync button](images/image3.png "Gradle sync button")) from the Android Studio
+(![Gradle sync button](../images/image3.png "Gradle sync button")) from the Android Studio
 toolbar. You an also run the app again to check the dependencies are working correctly.
 
 ## 4. Display a Questionnaire
@@ -109,7 +109,7 @@ Add a `FragmentContainerView` to the application's layout. This is where the
 2.  Find the options for Code, Split, and Design views in the upper right of the
     Layout Editor.
 3.  Select the Code view.\
-    ![Layout view options](images/image4.png "Layout view options")
+    ![Layout view options](../images/image4.png "Layout view options")
 4.  You don't need the `TextView`, so delete it. Be sure to delete everything
     from the `<TextView` to the closing `/>`.
 5.  Add a `FragmentContainerView` inside the `ConstraintLayout`. Your
@@ -177,7 +177,7 @@ Learn more about
 [how to use fragments](https://developer.android.com/guide/fragments).
 
 Let's run the codelab by clicking Run
-(![Run button](images/image2.png "Run button")) in the Android Studio toolbar.
+(![Run button](../images/image2.png "Run button")) in the Android Studio toolbar.
 You should see something similar to this:
 
 TODO: Screenshot showing questionnaire rendered in an emulator
