@@ -115,8 +115,7 @@ Open Android Studio, select **Import Project (Gradle, Eclipse ADT, etc.)** and
 choose the `codelabs/engine/` folder from the source code that you have
 downloaded earlier.
 
-![Android Studio start screen](fhir-engine/image3.png "Android Studio start
-screen")
+![Android Studio start screen](../images/image1.png "Android Studio start screen")
 
 ### Sync your project with Gradle files
 
@@ -136,8 +135,7 @@ dependencies {
 To be sure that all dependencies are available to your app, you should sync your
 project with gradle files at this point.
 
-Select **Sync Project with Gradle Files** (![Gradle sync
-button](data-capture/image3.png "Gradle sync button")) from the Android Studio
+Select **Sync Project with Gradle Files** (![Gradle sync button](../images/image3.png "Gradle sync button"))from the Android Studio
 toolbar. You an also run the app again to check the dependencies are working
 correctly.
 
@@ -148,10 +146,10 @@ the app for the first time.
 
 [Start the Android Studio emulator](
 https://developer.android.com/studio/run/emulator), and click Run
-(![Run button](fhir-engine/image4.png "Run button")) in the Android Studio
+(![Run button](../images/image2.png "Run button")) in the Android Studio
 toolbar.
 
-<img src="fhir-engine/image5.png" alt="Hello World app" width="300">
+<img src="../images/image5.png" alt="Hello World app" width="300">
 
 ## Create FHIR Engine instance
 
