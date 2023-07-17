@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,14 +121,15 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   }
 
   private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {
-    return fhirEngine.search<RiskAssessment> {}.groupBy { it.subject.reference }.mapValues { entry
-      ->
-      entry
-        .value
-        .filter { it.hasOccurrence() }
-        .sortedByDescending { it.occurrenceDateTimeType.value }
-        .firstOrNull()
-    }
+    return fhirEngine
+      .search<RiskAssessment> {}
+      .groupBy { it.subject.reference }
+      .mapValues { entry ->
+        entry.value
+          .filter { it.hasOccurrence() }
+          .sortedByDescending { it.occurrenceDateTimeType.value }
+          .firstOrNull()
+      }
   }
 
   /** The Patient's details for display purposes. */
@@ -173,7 +174,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     private val fhirEngine: FhirEngine
   ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
       if (modelClass.isAssignableFrom(PatientListViewModel::class.java)) {
         return PatientListViewModel(application, fhirEngine) as T
       }

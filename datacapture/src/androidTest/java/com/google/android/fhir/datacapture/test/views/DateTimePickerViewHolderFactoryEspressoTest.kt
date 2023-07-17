@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir.datacapture.test.views
 
 import android.view.View
 import android.widget.FrameLayout
@@ -29,9 +29,10 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.TestActivity
-import com.google.android.fhir.datacapture.utilities.clickIcon
+import com.google.android.fhir.datacapture.test.TestActivity
+import com.google.android.fhir.datacapture.test.utilities.clickIcon
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.DateTimePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import org.hamcrest.CoreMatchers.allOf
@@ -77,7 +78,7 @@ class DateTimePickerViewHolderFactoryEspressoTest {
       .perform(ViewActions.click())
     onView(withId(R.id.time_input_edit_text)).perform(ViewActions.click())
     // R.id.material_textinput_timepicker is the id for the text input in the time picker.
-    onView(allOf(withId(R.id.material_textinput_timepicker)))
+    onView(allOf(withId(com.google.android.material.R.id.material_textinput_timepicker)))
       .inRoot(isDialog())
       .check(matches(isDisplayed()))
   }
@@ -100,7 +101,9 @@ class DateTimePickerViewHolderFactoryEspressoTest {
       .perform(ViewActions.click())
     onView(withId(R.id.time_input_layout)).perform(clickIcon(true))
     // R.id.material_clock_face is the id for the clock input in the time picker.
-    onView(allOf(withId(R.id.material_clock_face))).inRoot(isDialog()).check(matches(isDisplayed()))
+    onView(allOf(withId(com.google.android.material.R.id.material_clock_face)))
+      .inRoot(isDialog())
+      .check(matches(isDisplayed()))
   }
 
   /** Method to run code snippet on UI/main thread */

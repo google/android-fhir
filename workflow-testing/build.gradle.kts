@@ -7,18 +7,10 @@ plugins {
 }
 
 android {
+  namespace = "com.google.android.fhir.workflow.testing"
   compileSdk = Sdk.compileSdk
-
-  defaultConfig {
-    minSdk = Sdk.minSdkWorkflow
-    targetSdk = Sdk.targetSdk
-  }
-  compileOptions {
-    sourceCompatibility = Java.sourceCompatibility
-    targetCompatibility = Java.targetCompatibility
-  }
-
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
+  defaultConfig { minSdk = Sdk.minSdkWorkflow }
+  kotlin { jvmToolchain(11) }
 }
 
 configurations {
