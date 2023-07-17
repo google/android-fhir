@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
 
 class SyncUploadContext {
-  private var syncStrategy: SyncStrategy = AllLocalChangesSyncStrategy()
+  private var syncStrategy: SyncStrategy = SequentialSyncStrategy()
 
   fun setSyncStrategy(syncType: SyncStrategyTypes) {
     syncStrategy =
