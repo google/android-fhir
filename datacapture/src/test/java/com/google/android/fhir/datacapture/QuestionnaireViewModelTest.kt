@@ -88,6 +88,7 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.ValueSet
@@ -978,19 +979,20 @@ class QuestionnaireViewModelTest {
       }
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+      assertThat(questionnaireItemViewItemList).hasSize(2)
 
-    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    assertThat(questionnaireItemViewItemList).hasSize(2)
+      val firstQuestionnaireItem = questionnaireItemViewItemList[0].asQuestion().questionnaireItem
+      assertThat(firstQuestionnaireItem.linkId).isEqualTo("a-link-id")
+      assertThat(firstQuestionnaireItem.text).isEqualTo("Basic questions")
+      assertThat(firstQuestionnaireItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.GROUP)
 
-    val firstQuestionnaireItem = questionnaireItemViewItemList[0].asQuestion().questionnaireItem
-    assertThat(firstQuestionnaireItem.linkId).isEqualTo("a-link-id")
-    assertThat(firstQuestionnaireItem.text).isEqualTo("Basic questions")
-    assertThat(firstQuestionnaireItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.GROUP)
-
-    val secondQuestionnaireItem = questionnaireItemViewItemList[1].asQuestion().questionnaireItem
-    assertThat(secondQuestionnaireItem.linkId).isEqualTo("another-link-id")
-    assertThat(secondQuestionnaireItem.text).isEqualTo("Name?")
-    assertThat(secondQuestionnaireItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.STRING)
+      val secondQuestionnaireItem = questionnaireItemViewItemList[1].asQuestion().questionnaireItem
+      assertThat(secondQuestionnaireItem.linkId).isEqualTo("another-link-id")
+      assertThat(secondQuestionnaireItem.text).isEqualTo("Name?")
+      assertThat(secondQuestionnaireItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.STRING)
+    }
   }
 
   @Test
@@ -1008,9 +1010,11 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    assertThat(questionnaireItemViewItemList.single().asQuestion().validationResult)
-      .isEqualTo(NotValidated)
+    viewModel.runViewModelBlocking {
+      val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+      assertThat(questionnaireItemViewItemList.single().asQuestion().validationResult)
+        .isEqualTo(NotValidated)
+    }
   }
 
   @Test
@@ -1065,11 +1069,16 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-
-    assertThat(
-        viewModel.getQuestionnaireItemViewItemList().single().asQuestion().questionnaireItem.linkId
-      )
-      .isEqualTo("question-1")
+    viewModel.runViewModelBlocking {
+      assertThat(
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .single()
+            .asQuestion()
+            .questionnaireItem.linkId
+        )
+        .isEqualTo("question-1")
+    }
   }
 
   @Test
@@ -1097,14 +1106,15 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
 
-    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-
-    assertThat(questionnaireItemViewItemList).hasSize(2)
-    assertThat(questionnaireItemViewItemList[0].asQuestion().questionnaireItem.linkId)
-      .isEqualTo("question-1")
-    assertThat(questionnaireItemViewItemList[1].asQuestion().questionnaireItem.linkId)
-      .isEqualTo("question-2")
+      assertThat(questionnaireItemViewItemList).hasSize(2)
+      assertThat(questionnaireItemViewItemList[0].asQuestion().questionnaireItem.linkId)
+        .isEqualTo("question-1")
+      assertThat(questionnaireItemViewItemList[1].asQuestion().questionnaireItem.linkId)
+        .isEqualTo("question-2")
+    }
   }
 
   @Test
@@ -1151,11 +1161,16 @@ class QuestionnaireViewModelTest {
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
 
     val viewModel = QuestionnaireViewModel(context, state)
-
-    assertThat(
-        viewModel.getQuestionnaireItemViewItemList().single().asQuestion().questionnaireItem.linkId
-      )
-      .isEqualTo("a-boolean-item-1")
+    viewModel.runViewModelBlocking {
+      assertThat(
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .single()
+            .asQuestion()
+            .questionnaireItem.linkId
+        )
+        .isEqualTo("a-boolean-item-1")
+    }
   }
 
   // ==================================================================== //
@@ -1827,10 +1842,12 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.goToNextPage()
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
 
-    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.last()?.index)
+      assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
+      assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.last()?.index)
+    }
   }
 
   @Test
@@ -1874,11 +1891,13 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.goToNextPage()
-    viewModel.goToPreviousPage()
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
+      viewModel.goToPreviousPage()
 
-    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.first()?.index)
+      assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
+      assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.first()?.index)
+    }
   }
 
   @Test
@@ -1916,10 +1935,12 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.goToNextPage()
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
 
-    assertThat(viewModel.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.last()?.index)
+      assertThat(viewModel.entryMode).isEqualTo(EntryMode.RANDOM)
+      assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.last()?.index)
+    }
   }
 
   @Test
@@ -1957,11 +1978,13 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.goToNextPage()
-    viewModel.goToPreviousPage()
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
+      viewModel.goToPreviousPage()
 
-    assertThat(viewModel.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.first()?.index)
+      assertThat(viewModel.entryMode).isEqualTo(EntryMode.RANDOM)
+      assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.first()?.index)
+    }
   }
 
   @Test
@@ -2363,12 +2386,13 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
-
-      assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
-            .pagination.showReviewButton
-        )
-        .isFalse()
+      viewModel.runViewModelBlocking {
+        assertThat(
+            (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
+              .pagination.showReviewButton
+          )
+          .isFalse()
+      }
     }
 
   @Test
@@ -2454,12 +2478,13 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
-
-      assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
-            .pagination.showReviewButton
-        )
-        .isTrue()
+      viewModel.runViewModelBlocking {
+        assertThat(
+            (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
+              .pagination.showReviewButton
+          )
+          .isTrue()
+      }
     }
 
   @Test
@@ -3510,17 +3535,18 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      viewModel
+        .getQuestionnaireItemViewItemList()[1]
+        .asQuestion()
+        .setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            this.value = valueBooleanType.setValue(false)
+          }
+        )
 
-    viewModel
-      .getQuestionnaireItemViewItemList()[1]
-      .asQuestion()
-      .setAnswer(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          this.value = valueBooleanType.setValue(false)
-        }
-      )
-
-    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+      assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+    }
   }
 
   @Test
@@ -4167,13 +4193,15 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
-      val viewItem =
-        viewModel
-          .getQuestionnaireItemViewItemList()
-          .map { it.asQuestion() }
-          .single { it.questionnaireItem.linkId == "b" }
-      assertThat(viewItem.enabledAnswerOptions.map { it.value as Coding }.map { it.code })
-        .containsExactly("option2")
+      viewModel.runViewModelBlocking {
+        val viewItem =
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .map { it.asQuestion() }
+            .single { it.questionnaireItem.linkId == "b" }
+        assertThat(viewItem.enabledAnswerOptions.map { it.value as Coding }.map { it.code })
+          .containsExactly("option2")
+      }
     }
 
   @Test
@@ -4279,15 +4307,15 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
-      viewModel
-        .getQuestionnaireItemViewItemList()
-        .map { it.asQuestion() }
-        .single { it.questionnaireItem.linkId == "b" }
-        .run {
-          assertThat(this.enabledAnswerOptions.map { it.valueCoding.code })
-            .containsExactly("option2")
-        }
       viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run {
+            assertThat(this.enabledAnswerOptions.map { it.valueCoding.code })
+              .containsExactly("option2")
+          }
         viewModel
           .getQuestionnaireItemViewItemList()
           .map { it.asQuestion() }
@@ -4423,14 +4451,16 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire)
-      viewModel
-        .getQuestionnaireItemViewItemList()
-        .map { it.asQuestion() }
-        .single { it.questionnaireItem.linkId == "b" }
-        .run {
-          assertThat(enabledAnswerOptions.map { it.valueCoding.code })
-            .containsAtLeast("option4", "option5")
-        }
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run {
+            assertThat(enabledAnswerOptions.map { it.valueCoding.code })
+              .containsAtLeast("option4", "option5")
+          }
+      }
     }
 
   @Test
@@ -4534,14 +4564,16 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
-      viewModel
-        .getQuestionnaireItemViewItemList()
-        .map { it.asQuestion() }
-        .single { it.questionnaireItem.linkId == "b" }
-        .run {
-          assertThat(enabledAnswerOptions.map { it.valueCoding.code }).doesNotContain("option75")
-          assertThat(enabledAnswerOptions.map { it.valueCoding.code }).containsExactly("option2")
-        }
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run {
+            assertThat(enabledAnswerOptions.map { it.valueCoding.code }).doesNotContain("option75")
+            assertThat(enabledAnswerOptions.map { it.valueCoding.code }).containsExactly("option2")
+          }
+      }
     }
 
   @Test
@@ -4620,11 +4652,13 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
-      viewModel
-        .getQuestionnaireItemViewItemList()
-        .map { it.asQuestion() }
-        .single { it.questionnaireItem.linkId == "b" }
-        .run { assertThat(enabledAnswerOptions.map { it.valueCoding.code }).contains("option1") }
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run { assertThat(enabledAnswerOptions.map { it.valueCoding.code }).contains("option1") }
+      }
     }
 
   @Test
@@ -4717,13 +4751,15 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
-      viewModel
-        .getQuestionnaireItemViewItemList()
-        .map { it.asQuestion() }
-        .single { it.questionnaireItem.linkId == "b-link" }
-        .run {
-          assertThat(enabledAnswerOptions.map { it.valueCoding.code }).containsExactly("option2")
-        }
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b-link" }
+          .run {
+            assertThat(enabledAnswerOptions.map { it.valueCoding.code }).containsExactly("option2")
+          }
+      }
     }
 
   @Test
@@ -4906,24 +4942,25 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        assertThat(
+            viewModel
+              .getQuestionnaireResponse()
+              .item
+              .single { it.linkId == "a-birthdate" }
+              .answerFirstRep.value.asStringValue()
+          )
+          .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -1) }.asStringValue())
 
-      assertThat(
-          viewModel
-            .getQuestionnaireResponse()
-            .item
-            .single { it.linkId == "a-birthdate" }
-            .answerFirstRep.value.asStringValue()
-        )
-        .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -1) }.asStringValue())
-
-      assertThat(
-          viewModel
-            .getQuestionnaireResponse()
-            .item
-            .single { it.linkId == "a-age-years" }
-            .answerFirstRep.valueQuantity.value.toString()
-        )
-        .isEqualTo("1")
+        assertThat(
+            viewModel
+              .getQuestionnaireResponse()
+              .item
+              .single { it.linkId == "a-age-years" }
+              .answerFirstRep.valueQuantity.value.toString()
+          )
+          .isEqualTo("1")
+      }
     }
 
   @Test
@@ -4957,36 +4994,37 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        val birthdateItem =
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-birthdate" }
+            .asQuestion()
 
-      val birthdateItem =
+        assertThat(birthdateItem.getQuestionnaireResponseItem().answer).isEmpty()
+
         viewModel
           .getQuestionnaireItemViewItemList()
-          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-birthdate" }
+          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-age-years" }
           .asQuestion()
+          .apply {
+            this.answersChangedCallback(
+              this.questionnaireItem,
+              this.getQuestionnaireResponseItem(),
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  this.value = Quantity.fromUcum("2", "years")
+                }
+              ),
+              null
+            )
+          }
 
-      assertThat(birthdateItem.getQuestionnaireResponseItem().answer).isEmpty()
-
-      viewModel
-        .getQuestionnaireItemViewItemList()
-        .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-age-years" }
-        .asQuestion()
-        .apply {
-          this.answersChangedCallback(
-            this.questionnaireItem,
-            this.getQuestionnaireResponseItem(),
-            listOf(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                this.value = Quantity.fromUcum("2", "years")
-              }
-            ),
-            null
+        assertThat(
+            birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
           )
-        }
-
-      assertThat(
-          birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
-        )
-        .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -2) }.valueAsString)
+          .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -2) }.valueAsString)
+      }
     }
 
   @Test
@@ -5020,51 +5058,53 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
-      val birthdateItem =
-        viewModel
-          .getQuestionnaireItemViewItemList()
-          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-birthdate" }
-          .asQuestion()
-      val birthdateValue = DateType(Date())
-      birthdateItem.apply {
-        this.answersChangedCallback(
-          this.questionnaireItem,
-          this.getQuestionnaireResponseItem(),
-          listOf(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              this.value = birthdateValue
-            }
-          ),
-          null
-        )
-      }
-
-      assertThat(
-          birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
-        )
-        .isEqualTo(birthdateValue.valueAsString)
-
-      viewModel
-        .getQuestionnaireItemViewItemList()
-        .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-age-years" }
-        .asQuestion()
-        .apply {
+      viewModel.runViewModelBlocking {
+        val birthdateItem =
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-birthdate" }
+            .asQuestion()
+        val birthdateValue = DateType(Date())
+        birthdateItem.apply {
           this.answersChangedCallback(
             this.questionnaireItem,
             this.getQuestionnaireResponseItem(),
             listOf(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                this.value = Quantity.fromUcum("2", "years")
+                this.value = birthdateValue
               }
             ),
             null
           )
         }
 
-      assertThat(
-          birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
-        )
-        .isEqualTo(birthdateValue.valueAsString)
+        assertThat(
+            birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
+          )
+          .isEqualTo(birthdateValue.valueAsString)
+
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-age-years" }
+          .asQuestion()
+          .apply {
+            this.answersChangedCallback(
+              this.questionnaireItem,
+              this.getQuestionnaireResponseItem(),
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  this.value = Quantity.fromUcum("2", "years")
+                }
+              ),
+              null
+            )
+          }
+
+        assertThat(
+            birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
+          )
+          .isEqualTo(birthdateValue.valueAsString)
+      }
     }
 
   @Test
@@ -5218,11 +5258,12 @@ class QuestionnaireViewModelTest {
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
     val viewModel = QuestionnaireViewModel(context, state)
-
-    assertThat(
-        viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
-      )
-      .isEqualTo("nested-display-question")
+    viewModel.runViewModelBlocking {
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
+        )
+        .isEqualTo("nested-display-question")
+    }
   }
 
   @Test
@@ -5267,11 +5308,16 @@ class QuestionnaireViewModelTest {
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
       val viewModel = QuestionnaireViewModel(context, state)
-
-      assertThat(
-          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
-        )
-        .isEqualTo("parent-question")
+      viewModel.runViewModelBlocking {
+        assertThat(
+            viewModel
+              .getQuestionnaireItemViewItemList()
+              .last()
+              .asQuestion()
+              .questionnaireItem.linkId
+          )
+          .isEqualTo("parent-question")
+      }
     }
 
   @Test
@@ -5316,11 +5362,16 @@ class QuestionnaireViewModelTest {
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
       val viewModel = QuestionnaireViewModel(context, state)
-
-      assertThat(
-          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
-        )
-        .isEqualTo("parent-question")
+      viewModel.runViewModelBlocking {
+        assertThat(
+            viewModel
+              .getQuestionnaireItemViewItemList()
+              .last()
+              .asQuestion()
+              .questionnaireItem.linkId
+          )
+          .isEqualTo("parent-question")
+      }
     }
 
   @Test
@@ -5365,11 +5416,16 @@ class QuestionnaireViewModelTest {
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
       val viewModel = QuestionnaireViewModel(context, state)
-
-      assertThat(
-          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
-        )
-        .isEqualTo("parent-question")
+      viewModel.runViewModelBlocking {
+        assertThat(
+            viewModel
+              .getQuestionnaireItemViewItemList()
+              .last()
+              .asQuestion()
+              .questionnaireItem.linkId
+          )
+          .isEqualTo("parent-question")
+      }
     }
 
   // ==================================================================== //
@@ -5490,12 +5546,14 @@ class QuestionnaireViewModelTest {
 
     // empty initial value
     var viewModel = QuestionnaireViewModel(context, state)
-    assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
-    // enabledDisplayItems is 0 when no choice is present
-    assertThat(
-        viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems.size
-      )
-      .isEqualTo(0)
+    viewModel.runViewModelBlocking {
+      assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
+      // enabledDisplayItems is 0 when no choice is present
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems.size
+        )
+        .isEqualTo(0)
+    }
 
     // initial value is set to false
     state.set(
@@ -5510,13 +5568,16 @@ class QuestionnaireViewModelTest {
     )
 
     viewModel = QuestionnaireViewModel(context, state)
-    assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
-    var enabledDisplayItems =
-      viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems
-    assertThat(enabledDisplayItems.size).isEqualTo(1)
-    assertThat(enabledDisplayItems[0].type).isEqualTo(Questionnaire.QuestionnaireItemType.DISPLAY)
-    assertThat(enabledDisplayItems[0].linkId).isEqualTo("1.1")
-    assertThat(enabledDisplayItems[0].text).isEqualTo("Text when no is selected")
+    var enabledDisplayItems: List<QuestionnaireItemComponent>
+    viewModel.runViewModelBlocking {
+      assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
+      enabledDisplayItems =
+        viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems
+      assertThat(enabledDisplayItems.size).isEqualTo(1)
+      assertThat(enabledDisplayItems[0].type).isEqualTo(Questionnaire.QuestionnaireItemType.DISPLAY)
+      assertThat(enabledDisplayItems[0].linkId).isEqualTo("1.1")
+      assertThat(enabledDisplayItems[0].text).isEqualTo("Text when no is selected")
+    }
 
     // initial value is set to true
     state.set(
@@ -5531,13 +5592,15 @@ class QuestionnaireViewModelTest {
     )
 
     viewModel = QuestionnaireViewModel(context, state)
-    assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
-    enabledDisplayItems =
-      viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems
-    assertThat(enabledDisplayItems.size).isEqualTo(1)
-    assertThat(enabledDisplayItems[0].type).isEqualTo(Questionnaire.QuestionnaireItemType.DISPLAY)
-    assertThat(enabledDisplayItems[0].linkId).isEqualTo("1.2")
-    assertThat(enabledDisplayItems[0].text).isEqualTo("Text when yes is selected")
+    viewModel.runViewModelBlocking {
+      assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
+      enabledDisplayItems =
+        viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems
+      assertThat(enabledDisplayItems.size).isEqualTo(1)
+      assertThat(enabledDisplayItems[0].type).isEqualTo(Questionnaire.QuestionnaireItemType.DISPLAY)
+      assertThat(enabledDisplayItems[0].linkId).isEqualTo("1.2")
+      assertThat(enabledDisplayItems[0].text).isEqualTo("Text when yes is selected")
+    }
   }
 
   @Test
@@ -5665,14 +5728,15 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        val descriptionItem =
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-description" }
+            .asQuestion()
 
-      val descriptionItem =
-        viewModel
-          .getQuestionnaireItemViewItemList()
-          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-description" }
-          .asQuestion()
-
-      assertThat(descriptionItem.questionText.toString()).isEqualTo("Sum of variables is 3")
+        assertThat(descriptionItem.questionText.toString()).isEqualTo("Sum of variables is 3")
+      }
     }
 
   private fun createQuestionnaireViewModel(

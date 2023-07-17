@@ -68,10 +68,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Element
@@ -453,7 +451,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         viewModelScope,
         SharingStarted.Lazily,
         initialValue =
-          runBlocking { getQuestionnaireState() }
+          QuestionnaireState(items = emptyList(), displayMode = DisplayMode.InitMode)
             .also { detectExpressionCyclicDependency(questionnaire.item) }
             .also {
               questionnaire.item.flattened().forEach { qItem ->
@@ -1017,6 +1015,8 @@ internal data class QuestionnaireState(
 internal sealed class DisplayMode {
   class EditMode(val pagination: QuestionnairePagination) : DisplayMode()
   data class ReviewMode(val showEditButton: Boolean, val showSubmitButton: Boolean) : DisplayMode()
+
+  object InitMode : DisplayMode()
 }
 
 /**
