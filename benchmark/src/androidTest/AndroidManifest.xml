@@ -2,7 +2,6 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.google.android.fhir.benchmark"
 >
 
     <!--
@@ -12,10 +11,7 @@
       manifest, as it is not possible to override this flag from Gradle.
     -->
     <application
-        android:debuggable="false"
         android:usesCleartextTraffic="true"
-        tools:ignore="HardcodedDebugMode"
-        tools:replace="android:debuggable"
         android:requestLegacyExternalStorage="true"
     >
         <profileable android:shell="true" />
