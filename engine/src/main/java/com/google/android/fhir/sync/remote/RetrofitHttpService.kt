@@ -16,9 +16,12 @@
 
 package com.google.android.fhir.sync.remote
 
+import android.content.Context
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.Authenticator
+import java.io.File
 import java.util.concurrent.TimeUnit
+import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -38,6 +41,7 @@ internal interface RetrofitHttpService : FhirHttpService {
   @POST(".") override suspend fun post(@Body bundle: Bundle): Resource
 
   class Builder(
+    private val context: Context,
     private val baseUrl: String,
     private val networkConfiguration: NetworkConfiguration
   ) {
@@ -55,6 +59,13 @@ internal interface RetrofitHttpService : FhirHttpService {
     fun build(): RetrofitHttpService {
       val client =
         OkHttpClient.Builder()
+          .cache(
+            Cache(
+              directory = File(context.cacheDir, "fhir_cache"),
+              // $0.05 worth of phone storage in 2020
+              maxSize = 50L * 1024L * 1024L // 50 MiB
+            )
+          )
           .connectTimeout(networkConfiguration.connectionTimeOut, TimeUnit.SECONDS)
           .readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
           .writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
@@ -95,7 +106,7 @@ internal interface RetrofitHttpService : FhirHttpService {
   }
 
   companion object {
-    fun builder(baseUrl: String, networkConfiguration: NetworkConfiguration) =
-      Builder(baseUrl, networkConfiguration)
+    fun builder(context: Context, baseUrl: String, networkConfiguration: NetworkConfiguration) =
+      Builder(context, baseUrl, networkConfiguration)
   }
 }
