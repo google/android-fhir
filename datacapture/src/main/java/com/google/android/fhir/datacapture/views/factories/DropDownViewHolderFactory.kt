@@ -136,9 +136,7 @@ internal object DropDownViewHolderFactory :
         textInputLayout.contentDescription =
           questionnaireViewItem.questionnaireItem.linkId + "_" + textInputLayout::class.java
         autoCompleteTextView.contentDescription =
-          questionnaireViewItem.questionnaireItem.linkId +
-            "_" +
-            autoCompleteTextView::class.java
+          questionnaireViewItem.questionnaireItem.linkId + "_" + autoCompleteTextView::class.java
       }
 
       private fun cleanupOldState() {

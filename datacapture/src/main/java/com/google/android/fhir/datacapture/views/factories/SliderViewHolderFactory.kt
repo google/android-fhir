@@ -94,9 +94,7 @@ internal object SliderViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
 
       override fun addContentDescription() {
         slider.contentDescription =
-          questionnaireViewItem.questionnaireItem.linkId +
-            "_" +
-            slider::class.java.canonicalName
+          questionnaireViewItem.questionnaireItem.linkId + "_" + slider::class.java.canonicalName
       }
     }
 }

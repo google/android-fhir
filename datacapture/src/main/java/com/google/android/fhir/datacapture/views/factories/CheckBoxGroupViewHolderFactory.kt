@@ -89,7 +89,8 @@ internal object CheckBoxGroupViewHolderFactory :
       }
 
       override fun addContentDescription() {
-        checkboxGroup.contentDescription = questionnaireViewItem.questionnaireItem.linkId + checkboxGroup::class.java.canonicalName
+        checkboxGroup.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId + checkboxGroup::class.java.canonicalName
       }
 
       private fun populateViewWithAnswerOption(

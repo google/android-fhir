@@ -179,10 +179,16 @@ internal object DateTimePickerViewHolderFactory :
       }
 
       override fun addContentDescription() {
-        dateInputLayout.contentDescription = questionnaireViewItem.questionnaireItem.linkId + dateInputLayout::class.java.canonicalName
-        dateInputEditText.contentDescription = questionnaireViewItem.questionnaireItem.linkId + dateInputEditText::class.java.canonicalName
-        timeInputLayout.contentDescription = questionnaireViewItem.questionnaireItem.linkId + timeInputLayout::class.java.canonicalName
-        timeInputEditText.contentDescription = questionnaireViewItem.questionnaireItem.linkId + timeInputEditText::class.java.canonicalName
+        dateInputLayout.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId + dateInputLayout::class.java.canonicalName
+        dateInputEditText.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId +
+            dateInputEditText::class.java.canonicalName
+        timeInputLayout.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId + timeInputLayout::class.java.canonicalName
+        timeInputEditText.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId +
+            timeInputEditText::class.java.canonicalName
       }
 
       private fun buildMaterialDatePicker(localDate: LocalDate?): MaterialDatePicker<Long> {

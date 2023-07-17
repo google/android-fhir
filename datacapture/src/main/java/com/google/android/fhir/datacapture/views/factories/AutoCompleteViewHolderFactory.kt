@@ -90,9 +90,13 @@ internal object AutoCompleteViewHolderFactory :
       }
 
       override fun addContentDescription() {
-        autoCompleteTextView.contentDescription = questionnaireViewItem.questionnaireItem.linkId + autoCompleteTextView::class.java.canonicalName
-        chipContainer.contentDescription = questionnaireViewItem.questionnaireItem.linkId + chipContainer::class.java.canonicalName
-        textInputLayout.contentDescription = questionnaireViewItem.questionnaireItem.linkId + textInputLayout::class.java.canonicalName
+        autoCompleteTextView.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId +
+            autoCompleteTextView::class.java.canonicalName
+        chipContainer.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId + chipContainer::class.java.canonicalName
+        textInputLayout.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId + textInputLayout::class.java.canonicalName
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

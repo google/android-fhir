@@ -824,17 +824,17 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireItemList: List<QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>,
   ): List<QuestionnaireResponseItemComponent> {
-    val linkIdToQuestionnaireResponseItemMap =
-      questionnaireResponseItemList.groupBy { it.linkId }
+    val linkIdToQuestionnaireResponseItemMap = questionnaireResponseItemList.groupBy { it.linkId }
     return questionnaireItemList.flatMap {
       val questionnaireResponseItemComponentList = linkIdToQuestionnaireResponseItemMap[it.linkId]
-      if (questionnaireResponseItemComponentList == null || questionnaireResponseItemList.isEmpty()) {
+      if (questionnaireResponseItemComponentList == null || questionnaireResponseItemList.isEmpty()
+      ) {
         listOf(it.createQuestionnaireResponseItem())
       } else {
         questionnaireResponseItemComponentList.map { questionnaireResponseItemComponent ->
           if (it.type == Questionnaire.QuestionnaireItemType.GROUP &&
-            !it.repeats &&
-            questionnaireResponseItemComponent.item.isEmpty()
+              !it.repeats &&
+              questionnaireResponseItemComponent.item.isEmpty()
           ) {
             it.createQuestionnaireResponseItem()
           } else {

@@ -25,7 +25,6 @@ import com.google.android.fhir.datacapture.extensions.toIdType
 import com.google.android.fhir.datacapture.extensions.toUriType
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import java.lang.reflect.Field
-import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.util.Locale
@@ -43,7 +42,6 @@ import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.IntegerType
-import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -439,9 +437,11 @@ object ResourceMapper {
         // choice of data type field, e.g., by calling `Observation#getValueQuantity`
         base.getChoiceFieldValue(fieldName)
       }
-    if (fieldName == "valueCodeableConcept" && questionnaireResponseItem.hasItem() && questionnaireResponseItem.item.first()
-        .hasAnswer() && questionnaireResponseItem.item.first().answer.isNotEmpty() && questionnaireResponseItem.item.first().answer.first()
-        .hasValueStringType()
+    if (fieldName == "valueCodeableConcept" &&
+        questionnaireResponseItem.hasItem() &&
+        questionnaireResponseItem.item.first().hasAnswer() &&
+        questionnaireResponseItem.item.first().answer.isNotEmpty() &&
+        questionnaireResponseItem.item.first().answer.first().hasValueStringType()
     ) {
       extractByDefinition(
         questionnaireItem.item,

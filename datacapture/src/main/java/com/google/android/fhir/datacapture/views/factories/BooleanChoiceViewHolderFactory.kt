@@ -132,10 +132,12 @@ internal object BooleanChoiceViewHolderFactory :
       }
 
       override fun addContentDescription() {
-        yesRadioButton.contentDescription = questionnaireViewItem.questionnaireItem.linkId + yesRadioButton::class.java.canonicalName
-        noRadioButton.contentDescription = questionnaireViewItem.questionnaireItem.linkId + noRadioButton::class.java.canonicalName
-        radioGroup.contentDescription = questionnaireViewItem.questionnaireItem.linkId + radioGroup::class.java.canonicalName
-
+        yesRadioButton.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId + yesRadioButton::class.java.canonicalName
+        noRadioButton.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId + noRadioButton::class.java.canonicalName
+        radioGroup.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId + radioGroup::class.java.canonicalName
       }
 
       private fun RadioButton.setLayoutParamsByOrientation(

@@ -76,7 +76,10 @@ internal object GroupViewHolderFactory :
       }
 
       override fun addContentDescription() {
-        addItemButton.contentDescription = questionnaireViewItem.questionnaireItem.linkId + "_" + addItemButton::class.java.canonicalName
+        addItemButton.contentDescription =
+          questionnaireViewItem.questionnaireItem.linkId +
+            "_" +
+            addItemButton::class.java.canonicalName
       }
     }
 }
