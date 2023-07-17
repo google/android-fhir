@@ -62,12 +62,14 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Element
@@ -182,6 +184,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         null
       }
   }
+
+  private val questionnaireVariablesMap: MutableMap<String, Base?> = mutableMapOf()
 
   /** The map from each item in the [Questionnaire] to its parent. */
   private var questionnaireItemParentMap:
@@ -465,32 +469,37 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     updatedQuestionnaireItem: QuestionnaireItemComponent,
     updatedQuestionnaireResponseItem: QuestionnaireResponseItemComponent?,
   ) {
-    evaluateCalculatedExpressions(
-        updatedQuestionnaireItem,
-        updatedQuestionnaireResponseItem,
-        questionnaire,
-        questionnaireResponse,
-        questionnaireItemParentMap
-      )
-      .forEach { (questionnaireItem, calculatedAnswers) ->
-        // update all response item with updated values
-        questionnaireResponse.allItems
-          // Item answer should not be modified and touched by user;
-          // https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-calculatedExpression.html
-          .filter {
-            it.linkId == questionnaireItem.linkId &&
-              !modifiedQuestionnaireResponseItemSet.contains(it)
-          }
-          .forEach { questionnaireResponseItem ->
-            // update and notify only if new answer has changed to prevent any event loop
-            if (questionnaireResponseItem.answer.hasDifferentAnswerSet(calculatedAnswers)) {
-              questionnaireResponseItem.answer =
-                calculatedAnswers.map {
-                  QuestionnaireResponseItemAnswerComponent().apply { value = it }
-                }
+    runBlocking(Dispatchers.IO) {
+      evaluateCalculatedExpressions(
+          updatedQuestionnaireItem,
+          updatedQuestionnaireResponseItem,
+          questionnaire,
+          questionnaireResponse,
+          questionnaireItemParentMap,
+          questionnaireVariablesMap,
+          questionnaireLaunchContextMap,
+          xFhirQueryResolver
+        )
+        .forEach { (questionnaireItem, calculatedAnswers) ->
+          // update all response item with updated values
+          questionnaireResponse.allItems
+            // Item answer should not be modified and touched by user;
+            // https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-calculatedExpression.html
+            .filter {
+              it.linkId == questionnaireItem.linkId &&
+                !modifiedQuestionnaireResponseItemSet.contains(it)
             }
-          }
-      }
+            .forEach { questionnaireResponseItem ->
+              // update and notify only if new answer has changed to prevent any event loop
+              if (questionnaireResponseItem.answer.hasDifferentAnswerSet(calculatedAnswers)) {
+                questionnaireResponseItem.answer =
+                  calculatedAnswers.map {
+                    QuestionnaireResponseItemAnswerComponent().apply { value = it }
+                  }
+              }
+            }
+        }
+    }
   }
 
   internal suspend fun resolveAnswerValueSet(
@@ -540,19 +549,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     // Check cache first for database queries
     val answerExpression = item.answerExpression ?: return emptyList()
-    if (answerExpression.isXFhirQuery && answerExpressionMap.contains(answerExpression.expression)
-    ) {
-      return answerExpressionMap[answerExpression.expression]!!
-    }
 
-    val options = loadAnswerExpressionOptions(item, answerExpression)
-
-    if (answerExpression.isXFhirQuery) answerExpressionMap[answerExpression.expression] = options
-
-    return options
+    return loadAnswerExpressionOptions(item, answerExpression)
   }
 
-  private fun resolveCqfExpression(
+  private suspend fun resolveCqfExpression(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent,
     element: Element,
@@ -568,7 +569,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       questionnaireItem,
       questionnaireResponseItem,
       cqfExpression,
-      questionnaireItemParentMap
+      questionnaireItemParentMap,
+      questionnaireVariablesMap,
+      questionnaireLaunchContextMap,
+      xFhirQueryResolver
     )
   }
 
@@ -576,17 +580,37 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     item: QuestionnaireItemComponent,
     expression: Expression,
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+    var xFhirExpressionString = ""
     val data =
       if (expression.isXFhirQuery) {
         checkNotNull(xFhirQueryResolver) {
           "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
         }
 
-        val xFhirExpressionString =
+        val variablesMap =
+          mutableMapOf<String, Base?>().apply {
+            ExpressionEvaluator.extractDependentVariables(
+              expression,
+              questionnaire,
+              questionnaireResponse,
+              questionnaireItemParentMap,
+              item,
+              this,
+              questionnaireLaunchContextMap,
+              xFhirQueryResolver
+            )
+          }
+
+        xFhirExpressionString =
           ExpressionEvaluator.createXFhirQueryFromExpression(
             expression,
-            questionnaireLaunchContextMap
+            questionnaireLaunchContextMap,
+            variablesMap
           )
+
+        if (answerExpressionMap.contains(xFhirExpressionString)) {
+          return answerExpressionMap[xFhirExpressionString]!!
+        }
         xFhirQueryResolver!!.resolve(xFhirExpressionString)
       } else if (expression.isFhirPath) {
         fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
@@ -595,8 +619,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           "${expression.language} not supported for answer-expression yet"
         )
       }
-
-    return item.extractAnswerOptions(data)
+    val options = item.extractAnswerOptions(data)
+    if (expression.isXFhirQuery) answerExpressionMap[xFhirExpressionString] = options
+    return options
   }
 
   /**
@@ -717,11 +742,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         NotValidated
       }
 
-    // Set question text dynamically from CQL expression
-    questionnaireResponseItem.apply {
-      resolveCqfExpression(questionnaireItem, this, questionnaireItem.textElement)
-        .firstOrNull()
-        ?.let { text = it.primitiveValue() }
+    runBlocking(Dispatchers.IO) {
+      // Set question text dynamically from CQL expression
+      questionnaireResponseItem.apply {
+        resolveCqfExpression(questionnaireItem, this, questionnaireItem.textElement)
+          .firstOrNull()
+          ?.let { text = it.primitiveValue() }
+      }
     }
 
     val items = buildList {
