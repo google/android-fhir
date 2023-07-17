@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.fhirpath
 
+import com.google.android.fhir.datacapture.XFhirQueryResolver
 import com.google.android.fhir.datacapture.extensions.EXTENSION_CALCULATED_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_VARIABLE_URL
 import com.google.android.fhir.datacapture.extensions.asStringValue
@@ -28,6 +29,7 @@ import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Address
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
@@ -319,6 +321,38 @@ class ExpressionEvaluatorTest {
     }
 
   @Test
+  fun `resource should exists with variable expression that uses x-fhir-query`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        addExtension().apply {
+          url = EXTENSION_VARIABLE_URL
+          setValue(
+            Expression().apply {
+              name = "A"
+              language = "application/x-fhir-query"
+              expression = "Patient?name=fikri"
+            }
+          )
+        }
+      }
+
+    val patient = Patient().apply { addName().apply { addGiven("fikri") } }
+    val result =
+      ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+        questionnaire.variableExpressions.first(),
+        questionnaire,
+        QuestionnaireResponse(),
+        xFhirQueryResolver =
+          XFhirQueryResolver {
+            return@XFhirQueryResolver listOf(patient)
+          }
+      )
+
+    val resultAsResourceList = (result as Bundle).entry.map { it.resource }
+    assertThat(resultAsResourceList).contains(patient)
+  }
+
+  @Test
   fun `should throw illegal argument exception with missing expression name for questionnaire variables`() {
     assertThrows(IllegalArgumentException::class.java) {
       runBlocking {
@@ -346,7 +380,7 @@ class ExpressionEvaluatorTest {
   }
 
   @Test
-  fun `should throw illegal argument exception with missing exception language for questionnaire variables`() {
+  fun `should throw illegal argument exception with missing language for questionnaire variables`() {
     assertThrows(IllegalArgumentException::class.java) {
       runBlocking {
         val questionnaire =
@@ -373,8 +407,36 @@ class ExpressionEvaluatorTest {
   }
 
   @Test
-  fun `should throw illegal argument exception with unsupported expression language for questionnaire variables`() {
-    assertThrows(IllegalArgumentException::class.java) {
+  fun `should throw illegal state exception with missing x-fhir-query resolver for questionnaire variables`() {
+    assertThrows(IllegalStateException::class.java) {
+      runBlocking {
+        val questionnaire =
+          Questionnaire().apply {
+            id = "a-questionnaire"
+            addExtension().apply {
+              url = EXTENSION_VARIABLE_URL
+              setValue(
+                Expression().apply {
+                  name = "X"
+                  expression = "Patient?name=fikri"
+                  language = "application/x-fhir-query"
+                }
+              )
+            }
+          }
+
+        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+          questionnaire.variableExpressions.first(),
+          questionnaire,
+          QuestionnaireResponse()
+        )
+      }
+    }
+  }
+
+  @Test
+  fun `should throw unsupported operation exception with cql expression language for questionnaire variables`() {
+    assertThrows(UnsupportedOperationException::class.java) {
       runBlocking {
         val questionnaire =
           Questionnaire().apply {
@@ -385,7 +447,7 @@ class ExpressionEvaluatorTest {
                 Expression().apply {
                   name = "X"
                   expression = "1"
-                  language = "application/x-fhir-query"
+                  language = "text/cql"
                 }
               )
             }
@@ -687,7 +749,8 @@ class ExpressionEvaluatorTest {
     val expressionsToEvaluate =
       ExpressionEvaluator.createXFhirQueryFromExpression(
         expression,
-        mapOf(Practitioner().resourceType.name.lowercase() to Practitioner())
+        mapOf(Practitioner().resourceType.name.lowercase() to Practitioner()),
+        emptyMap(),
       )
 
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?var1=&var2=&var3=&var4=")
@@ -711,7 +774,8 @@ class ExpressionEvaluatorTest {
     val expressionsToEvaluate =
       ExpressionEvaluator.createXFhirQueryFromExpression(
         expression,
-        mapOf(practitioner.resourceType.name to practitioner)
+        mapOf(practitioner.resourceType.name to practitioner),
+        emptyMap(),
       )
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
   }
@@ -735,7 +799,8 @@ class ExpressionEvaluatorTest {
     val expressionsToEvaluate =
       ExpressionEvaluator.createXFhirQueryFromExpression(
         expression,
-        mapOf(practitioner.resourceType.name.lowercase() to practitioner)
+        mapOf(practitioner.resourceType.name.lowercase() to practitioner),
+        emptyMap(),
       )
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=male")
   }
@@ -759,7 +824,8 @@ class ExpressionEvaluatorTest {
     val expressionsToEvaluate =
       ExpressionEvaluator.createXFhirQueryFromExpression(
         expression,
-        mapOf(practitioner.resourceType.name to practitioner)
+        mapOf(practitioner.resourceType.name to practitioner),
+        emptyMap(),
       )
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
   }
@@ -783,7 +849,8 @@ class ExpressionEvaluatorTest {
     val expressionsToEvaluate =
       ExpressionEvaluator.createXFhirQueryFromExpression(
         expression,
-        mapOf(patient.resourceType.name.lowercase() to patient)
+        mapOf(patient.resourceType.name.lowercase() to patient),
+        emptyMap(),
       )
     assertThat(expressionsToEvaluate).isEqualTo("Patient?family=John")
   }
@@ -824,7 +891,8 @@ class ExpressionEvaluatorTest {
         mapOf(
           patient.resourceType.name.lowercase() to patient,
           location.resourceType.name.lowercase() to location
-        )
+        ),
+        emptyMap()
       )
     assertThat(expressionsToEvaluate).isEqualTo("Patient?family=John&address-city=NAIROBI")
   }
