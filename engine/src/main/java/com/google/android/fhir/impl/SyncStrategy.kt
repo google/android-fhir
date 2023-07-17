@@ -104,7 +104,9 @@ class SequentialSyncStrategy() : SyncStrategy() {
     resourceId: String,
     contextWorkSpace: ContextObject
   ) {
-    if (contextWorkSpace.listOfLocalChange.size >= 10) {
+    if (contextWorkSpace.listOfLocalChange.size >= 10 ||
+        contextWorkSpace.listOfLocalChange.toString().toByteArray().size > 1000000
+    ) {
       contextWorkSpace.mapOfResourceIdLocalChange[resourceId]?.let { it ->
         contextWorkSpace.listOfLocalChange.add(it)
       }
