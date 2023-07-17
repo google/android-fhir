@@ -95,7 +95,7 @@ internal class DatabaseImpl(
             }
           }
 
-          addMigrations(MIGRATION_2_1 ,MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+          addMigrations(MIGRATION_2_1, MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
         }
         .build()
   }
