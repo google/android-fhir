@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,22 +32,74 @@ class SearchParameterRepositoryGeneratedTest(private val resource: Resource) {
   }
 
   private fun getSearchParamListReflection(resource: Resource): MutableList<SearchParamDefinition> {
-    return resource
-      .javaClass
-      .fields
-      .asSequence()
-      .mapNotNull {
-        it.getAnnotation(ca.uhn.fhir.model.api.annotation.SearchParamDefinition::class.java)
-      }
-      .filter { it.path.isNotEmpty() }
-      .map {
-        SearchParamDefinition(
-          it.name,
-          Enumerations.SearchParamType.valueOf(it.type.toUpperCase()),
-          it.path
-        )
-      }
-      .toMutableList()
+    val searchParams = getBaseSearchParameters()
+    searchParams.addAll(
+      resource.javaClass.fields
+        .asSequence()
+        .mapNotNull {
+          it.getAnnotation(ca.uhn.fhir.model.api.annotation.SearchParamDefinition::class.java)
+        }
+        .filter { it.path.isNotEmpty() }
+        .map {
+          SearchParamDefinition(
+            it.name,
+            Enumerations.SearchParamType.valueOf(it.type.toUpperCase()),
+            it.path
+          )
+        }
+        .toMutableList()
+    )
+
+    return searchParams
+  }
+
+  // We are adding these manually because they don't exists in HAPI FHIR java classes
+  private fun getBaseSearchParameters(): MutableList<SearchParamDefinition> {
+    val searchParams = mutableListOf<SearchParamDefinition>()
+    searchParams.add(
+      SearchParamDefinition(
+        "_id",
+        Enumerations.SearchParamType.TOKEN,
+        "${resource.resourceType.name}.id"
+      )
+    )
+    searchParams.add(
+      SearchParamDefinition(
+        "_lastUpdated",
+        Enumerations.SearchParamType.DATE,
+        "${resource.resourceType.name}.meta.lastUpdated"
+      )
+    )
+    searchParams.add(
+      SearchParamDefinition(
+        "_profile",
+        Enumerations.SearchParamType.URI,
+        "${resource.resourceType.name}.meta.profile"
+      )
+    )
+    searchParams.add(
+      SearchParamDefinition(
+        "_security",
+        Enumerations.SearchParamType.TOKEN,
+        "${resource.resourceType.name}.meta.security"
+      )
+    )
+    searchParams.add(
+      SearchParamDefinition(
+        "_source",
+        Enumerations.SearchParamType.URI,
+        "${resource.resourceType.name}.meta.source"
+      )
+    )
+    searchParams.add(
+      SearchParamDefinition(
+        "_tag",
+        Enumerations.SearchParamType.TOKEN,
+        "${resource.resourceType.name}.meta.tag"
+      )
+    )
+
+    return searchParams
   }
 
   private companion object {
