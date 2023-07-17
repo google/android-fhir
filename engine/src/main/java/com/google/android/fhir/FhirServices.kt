@@ -83,7 +83,7 @@ internal data class FhirServices(
         serverConfiguration?.let {
           FhirHttpDataSource(
             fhirHttpService =
-              RetrofitHttpService.builder(it.baseUrl, it.networkConfiguration)
+              RetrofitHttpService.builder(context, it.baseUrl, it.networkConfiguration)
                 .setAuthenticator(it.authenticator)
                 .setHttpLogger(it.httpLogger)
                 .build()
