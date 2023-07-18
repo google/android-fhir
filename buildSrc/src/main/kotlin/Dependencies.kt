@@ -173,17 +173,15 @@ object Dependencies {
   const val androidFhirEngine =
     "$androidFhirGroup:$androidFhirEngineModule:${Versions.androidFhirEngine}"
 
-  const val lifecycleExtensions =
-    "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
+  const val gson = "com.google.code.gson:gson:${Versions.gson}"
   const val guava = "com.google.guava:guava:${Versions.guava}"
   const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.http}"
   const val http = "com.squareup.okhttp3:okhttp:${Versions.http}"
   const val mockWebServer = "com.squareup.okhttp3:mockwebserver:${Versions.http}"
 
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
-  const val kotlinPoet = "com.squareup:kotlinpoet:${Versions.kotlinPoet}"
   const val material = "com.google.android.material:material:${Versions.material}"
   const val sqlcipher = "net.zetetic:android-database-sqlcipher:${Versions.sqlcipher}"
   const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
@@ -219,29 +217,27 @@ object Dependencies {
   const val mockitoKotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mockitoKotlin}"
   const val mockitoInline = "org.mockito:mockito-inline:${Versions.mockitoInline}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
-  const val slf4j = "org.slf4j:slf4j-android:${Versions.slf4j}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
   // Makes XML assertions where the order of elements, tabs/whitespaces are not important.
   const val xmlUnit = "org.xmlunit:xmlunit-core:${Versions.xmlUnit}"
 
   object Versions {
     object Androidx {
-      const val activity = "1.2.1"
-      const val appCompat = "1.1.0"
-      const val constraintLayout = "2.1.1"
-      const val coreKtx = "1.2.0"
+      const val activity = "1.7.2"
+      const val appCompat = "1.6.1"
+      const val constraintLayout = "2.1.4"
+      const val coreKtx = "1.10.1"
       const val datastorePref = "1.0.0"
-      const val fragmentKtx = "1.3.1"
-      const val lifecycle = "2.2.0"
-      const val navigation = "2.3.4"
-      const val recyclerView = "1.1.0"
-      const val room = "2.4.2"
-      const val sqliteKtx = "2.1.0"
-      const val workRuntimeKtx = "2.7.1"
+      const val fragmentKtx = "1.6.0"
+      const val lifecycle = "2.6.1"
+      const val navigation = "2.6.0"
+      const val recyclerView = "1.3.0"
+      const val room = "2.5.2"
+      const val sqliteKtx = "2.3.1"
+      const val workRuntimeKtx = "2.8.1"
     }
 
     object Cql {
-      const val antlr = "4.10.1"
       const val engine = "2.4.0"
       const val evaluator = "2.4.0"
       const val translator = "2.4.0"
@@ -252,15 +248,16 @@ object Dependencies {
     }
 
     object Kotlin {
-      const val kotlinCoroutinesCore = "1.6.4"
-      const val stdlib = "1.6.10"
+      const val kotlinCoroutinesCore = "1.7.2"
+      const val stdlib = "1.8.20"
     }
 
     const val androidFhirCommon = "0.1.0-alpha03"
     const val androidFhirEngine = "0.1.0-beta02"
-    const val desugarJdkLibs = "1.1.5"
+    const val desugarJdkLibs = "2.0.3"
     const val caffeine = "2.9.1"
     const val fhirUcum = "1.0.3"
+    const val gson = "2.9.1"
     const val guava = "28.2-android"
 
     // Hapi FHIR and HL7 Core Components are interlinked.
@@ -271,39 +268,36 @@ object Dependencies {
     // Wait for this fix: https://github.com/hapifhir/org.hl7.fhir.core/issues/1046
     const val hapiFhirCore = "5.6.36"
 
-    const val http = "4.9.1"
+    const val http = "4.11.0"
     const val jackson = "2.14.1"
     const val jsonToolsPatch = "1.13"
     const val jsonAssert = "1.5.1"
-    const val kotlinPoet = "1.9.0"
-    const val material = "1.6.0"
-    const val retrofit = "2.7.2"
-    const val slf4j = "1.7.36"
-    const val sqlcipher = "4.5.0"
+    const val material = "1.9.0"
+    const val retrofit = "2.9.0"
+    const val sqlcipher = "4.5.4"
     const val timber = "5.0.1"
-    const val truth = "1.1.3"
-    const val woodstox = "6.2.7"
+    const val truth = "1.1.5"
+    const val woodstox = "6.5.1"
     const val xerces = "2.12.2"
-    const val xmlUnit = "2.9.0"
+    const val xmlUnit = "2.9.1"
 
     // Test dependencies
-
     object AndroidxTest {
       const val benchmarkJUnit = "1.1.1"
-      const val core = "1.4.0"
-      const val archCore = "2.1.0"
+      const val core = "1.5.0"
+      const val archCore = "2.2.0"
       const val extJunit = "1.1.5"
-      const val rules = "1.4.0"
-      const val runner = "1.5.2"
-      const val fragmentVersion = "1.3.6"
+      const val rules = "1.5.0"
+      const val runner = "1.5.0"
+      const val fragmentVersion = "1.6.0"
     }
 
-    const val espresso = "3.4.0"
-    const val jacoco = "0.8.7"
+    const val espresso = "3.5.1"
+    const val jacoco = "0.8.10"
     const val junit = "4.13.2"
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
-    const val robolectric = "4.7.3"
+    const val robolectric = "4.10.3"
 
     object Mlkit {
       const val barcodeScanning = "16.1.1"
@@ -324,7 +318,6 @@ object Dependencies {
   fun Configuration.forceHapiVersion() {
     // Removes newer versions of caffeine and manually imports 2.9
     // Removes newer versions of hapi and keeps on 6.0.1
-    // Removes newer versions of HL7 core and keeps it on 5.6.36
     // (newer versions don't work on Android)
     resolutionStrategy {
       force(HapiFhir.caffeine)

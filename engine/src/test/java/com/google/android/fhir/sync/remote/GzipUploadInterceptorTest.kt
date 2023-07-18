@@ -66,7 +66,7 @@ class GzipUploadInterceptorTest {
     client.newCall(request).execute()
 
     val recordedRequest = server.takeRequest()
-    assertThat(recordedRequest.getHeader("Content-Length")?.toLong()).isGreaterThan(-1)
+    assertThat(recordedRequest.getHeader("Content-Length")?.toLong()).isGreaterThan(-1L)
   }
 
   @Test

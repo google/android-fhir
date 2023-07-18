@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,10 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
 
     promptChip = binding.bottomPromptChip
     promptChipAnimator =
-      (AnimatorInflater.loadAnimator(context, R.animator.bottom_prompt_chip_enter) as AnimatorSet)
+      (AnimatorInflater.loadAnimator(
+          context,
+          com.google.android.fhir.datacapture.R.animator.bottom_prompt_chip_enter
+        ) as AnimatorSet)
         .apply { setTarget(promptChip) }
 
     binding.topActionBarInLiveCamera.closeButton.setOnClickListener(this)
@@ -155,64 +158,67 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
 
     // Observes the workflow state changes, if happens, update the overlay view indicators and
     // camera preview state.
-    workflowModel!!.workflowState.observe(
-      viewLifecycleOwner,
-      Observer { workflowState ->
-        if (workflowState == null || Objects.equal(currentWorkflowState, workflowState)) {
-          return@Observer
+    workflowModel!!
+      .workflowState.observe(
+        viewLifecycleOwner,
+        Observer { workflowState ->
+          if (workflowState == null || Objects.equal(currentWorkflowState, workflowState)) {
+            return@Observer
+          }
+
+          currentWorkflowState = workflowState
+          Timber.d("Current workflow state: ${currentWorkflowState!!.name}")
+
+          val wasPromptChipGone = promptChip?.visibility == View.GONE
+
+          when (workflowState) {
+            WorkflowState.DETECTING -> {
+              promptChip?.visibility = View.VISIBLE
+              promptChip?.setText(R.string.prompt_point_at_a_barcode)
+              startCameraPreview()
+            }
+            WorkflowState.CONFIRMING -> {
+              promptChip?.visibility = View.VISIBLE
+              promptChip?.setText(R.string.prompt_move_camera_closer)
+              startCameraPreview()
+            }
+            WorkflowState.SEARCHING -> {
+              promptChip?.visibility = View.VISIBLE
+              promptChip?.setText(R.string.prompt_searching)
+              stopCameraPreview()
+            }
+            WorkflowState.DETECTED,
+            WorkflowState.SEARCHED -> {
+              promptChip?.visibility = View.GONE
+              stopCameraPreview()
+            }
+            else -> promptChip?.visibility = View.GONE
+          }
+
+          val shouldPlayPromptChipEnteringAnimation =
+            wasPromptChipGone && promptChip?.visibility == View.VISIBLE
+          promptChipAnimator?.let {
+            if (shouldPlayPromptChipEnteringAnimation && !it.isRunning) it.start()
+          }
         }
+      )
 
-        currentWorkflowState = workflowState
-        Timber.d("Current workflow state: ${currentWorkflowState!!.name}")
+    workflowModel
+      ?.detectedBarcode?.observe(
+        viewLifecycleOwner,
+        { barcode ->
+          if (barcode != null) {
 
-        val wasPromptChipGone = promptChip?.visibility == View.GONE
-
-        when (workflowState) {
-          WorkflowState.DETECTING -> {
-            promptChip?.visibility = View.VISIBLE
-            promptChip?.setText(R.string.prompt_point_at_a_barcode)
-            startCameraPreview()
-          }
-          WorkflowState.CONFIRMING -> {
-            promptChip?.visibility = View.VISIBLE
-            promptChip?.setText(R.string.prompt_move_camera_closer)
-            startCameraPreview()
-          }
-          WorkflowState.SEARCHING -> {
-            promptChip?.visibility = View.VISIBLE
-            promptChip?.setText(R.string.prompt_searching)
-            stopCameraPreview()
-          }
-          WorkflowState.DETECTED, WorkflowState.SEARCHED -> {
-            promptChip?.visibility = View.GONE
-            stopCameraPreview()
-          }
-          else -> promptChip?.visibility = View.GONE
-        }
-
-        val shouldPlayPromptChipEnteringAnimation =
-          wasPromptChipGone && promptChip?.visibility == View.VISIBLE
-        promptChipAnimator?.let {
-          if (shouldPlayPromptChipEnteringAnimation && !it.isRunning) it.start()
-        }
-      }
-    )
-
-    workflowModel?.detectedBarcode?.observe(
-      viewLifecycleOwner,
-      { barcode ->
-        if (barcode != null) {
-
-          setFragmentResult(
-            RESULT_REQUEST_KEY,
-            bundleOf(
-              RESULT_REQUEST_KEY to barcode.rawValue,
+            setFragmentResult(
+              RESULT_REQUEST_KEY,
+              bundleOf(
+                RESULT_REQUEST_KEY to barcode.rawValue,
+              )
             )
-          )
-          dismiss()
+            dismiss()
+          }
         }
-      }
-    )
+      )
   }
 
   companion object {

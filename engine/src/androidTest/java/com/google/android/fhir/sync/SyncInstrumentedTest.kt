@@ -35,11 +35,13 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.runBlocking
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
+@Ignore("Flaky/fails due to https://github.com/google/android-fhir/issues/2046")
 class SyncInstrumentedTest {
 
   private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
