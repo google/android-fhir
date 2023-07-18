@@ -82,7 +82,7 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
       .apply {
         findViewById<TextView>(R.id.body).apply {
           val viewModel: QuestionnaireValidationErrorViewModel by
-            activityViewModels(factoryProducer)
+            activityViewModels(factoryProducer = factoryProducer)
           text =
             viewModel.getItemsTextWithValidationErrors().joinToString(separator = "\n") {
               context.getString(R.string.questionnaire_validation_error_item_text_with_bullet, it)
