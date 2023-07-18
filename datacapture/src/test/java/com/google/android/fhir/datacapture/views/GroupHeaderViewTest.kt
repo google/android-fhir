@@ -47,7 +47,9 @@ import org.robolectric.RuntimeEnvironment
 class GroupHeaderViewTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
+      RuntimeEnvironment.getApplication().apply {
+        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
+      }
     )
   private val view = GroupHeaderView(parent.context, null)
 
