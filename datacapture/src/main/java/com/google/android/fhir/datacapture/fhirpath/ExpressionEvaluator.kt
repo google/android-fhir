@@ -107,18 +107,19 @@ object ExpressionEvaluator {
     launchContextMap: Map<String, Resource>? = mapOf(),
     xFhirQueryResolver: XFhirQueryResolver? = null
   ): List<Base> {
+    val copyVariablesMap = mutableMapOf<String, Base?>().apply { putAll(variablesMap) }
     extractDependentVariables(
       expression,
       questionnaire,
       questionnaireResponse,
       questionnaireItemParentMap,
       questionnaireItem,
-      variablesMap,
+      copyVariablesMap,
       launchContextMap,
       xFhirQueryResolver
     )
     return fhirPathEngine.evaluate(
-      variablesMap,
+      copyVariablesMap,
       questionnaireResponse,
       null,
       questionnaireResponseItem,
@@ -323,7 +324,7 @@ object ExpressionEvaluator {
    */
   internal fun createXFhirQueryFromExpression(
     expression: Expression,
-    launchContextMap: Map<String, Resource>? = mapOf(),
+    launchContextMap: Map<String, Resource>?,
     variablesMap: Map<String, Base?>
   ): String {
     // get all dependent variables and their evaluated values

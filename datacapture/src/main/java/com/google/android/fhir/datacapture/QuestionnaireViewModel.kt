@@ -587,25 +587,24 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
         }
 
-        val variablesMap =
-          mutableMapOf<String, Base?>().apply {
-            ExpressionEvaluator.extractDependentVariables(
-              expression,
-              questionnaire,
-              questionnaireResponse,
-              questionnaireItemParentMap,
-              item,
-              this,
-              questionnaireLaunchContextMap,
-              xFhirQueryResolver
-            )
-          }
+        val copyVariablesMap =
+          mutableMapOf<String, Base?>().apply { putAll(questionnaireVariablesMap) }
+        ExpressionEvaluator.extractDependentVariables(
+          expression,
+          questionnaire,
+          questionnaireResponse,
+          questionnaireItemParentMap,
+          item,
+          copyVariablesMap,
+          questionnaireLaunchContextMap,
+          xFhirQueryResolver
+        )
 
         xFhirExpressionString =
           ExpressionEvaluator.createXFhirQueryFromExpression(
             expression,
             questionnaireLaunchContextMap,
-            variablesMap
+            copyVariablesMap
           )
 
         if (answerExpressionMap.contains(xFhirExpressionString)) {

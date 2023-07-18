@@ -17,18 +17,22 @@
 package com.google.android.fhir.datacapture.fhirpath
 
 import com.google.android.fhir.datacapture.XFhirQueryResolver
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ANSWER_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_CALCULATED_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_VARIABLE_URL
+import com.google.android.fhir.datacapture.extensions.answerExpression
 import com.google.android.fhir.datacapture.extensions.asStringValue
 import com.google.android.fhir.datacapture.extensions.variableExpressions
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.extractDependentVariables
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Address
+import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
@@ -895,5 +899,79 @@ class ExpressionEvaluatorTest {
         emptyMap()
       )
     assertThat(expressionsToEvaluate).isEqualTo("Patient?family=John&address-city=NAIROBI")
+  }
+
+  @Test
+  fun `createXFhirQueryFromExpression() should evaluate variables in answer expression`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-group-item"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension().apply {
+              url = EXTENSION_VARIABLE_URL
+              setValue(
+                Expression().apply {
+                  name = "A"
+                  language = "text/fhirpath"
+                  expression = "1"
+                }
+              )
+            }
+            addExtension().apply {
+              url = EXTENSION_VARIABLE_URL
+              setValue(
+                Expression().apply {
+                  name = "B"
+                  language = "text/fhirpath"
+                  expression = "2"
+                }
+              )
+            }
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "an-item"
+                text = "a question"
+                type = Questionnaire.QuestionnaireItemType.TEXT
+                addExtension().apply {
+                  url = EXTENSION_ANSWER_EXPRESSION_URL
+                  setValue(
+                    Expression().apply {
+                      language = "application/x-fhir-query"
+                      expression = "Patient?address-city={{%A}}&gender={{%B}}"
+                    }
+                  )
+                }
+              }
+            )
+          }
+        )
+      }
+
+    runBlocking {
+      val variablesMap = mutableMapOf<String, Base?>()
+      extractDependentVariables(
+        questionnaire.item[0].item[0].answerExpression!!,
+        questionnaire,
+        QuestionnaireResponse(),
+        mapOf(),
+        questionnaire.item[0],
+        variablesMap,
+        mapOf(),
+        null
+      )
+
+      val result =
+        ExpressionEvaluator.createXFhirQueryFromExpression(
+          questionnaire.item[0].item[0].answerExpression!!,
+          null,
+          variablesMap
+        )
+
+      assertThat(result).isEqualTo("Patient?address-city=1&gender=2")
+    }
   }
 }
