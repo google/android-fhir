@@ -31,6 +31,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
+import org.hl7.fhir.r4.model.StringType
 
 /**
  * Data item for [QuestionnaireItemViewHolder] in [RecyclerView].
@@ -86,6 +88,12 @@ data class QuestionnaireViewItem(
     {
       emptyList()
     },
+  private val resolveDynamicText:
+    suspend (
+      Questionnaire.QuestionnaireItemComponent,
+      QuestionnaireResponseItemComponent,
+      StringType
+    ) -> String?,
   val draftAnswer: Any? = null,
   val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
   val questionViewTextConfiguration: QuestionTextConfiguration = QuestionTextConfiguration(),
@@ -216,7 +224,15 @@ data class QuestionnaireViewItem(
    * is derived from [localizedTextSpanned] of [QuestionnaireResponse.QuestionnaireItemComponent]
    */
   val questionText: Spanned? by lazy {
-    questionnaireResponseItem.text?.toSpanned() ?: questionnaireItem.localizedTextSpanned
+    runBlocking(Dispatchers.IO) {
+      questionnaireResponseItem.text =
+        resolveDynamicText(
+          questionnaireItem,
+          questionnaireResponseItem,
+          questionnaireItem.textElement
+        )
+      questionnaireResponseItem.text?.toSpanned() ?: questionnaireItem.localizedTextSpanned
+    }
   }
 
   /**
