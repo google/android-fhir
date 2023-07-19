@@ -31,7 +31,7 @@ import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 import org.hl7.fhir.r4.model.Questionnaire
 
 /** View for the prefix, question, and hint of a questionnaire item. */
-internal class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
+class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
 
   init {
     LayoutInflater.from(context).inflate(R.layout.header_view, this, true)
