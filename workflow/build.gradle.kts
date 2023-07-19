@@ -15,11 +15,10 @@ publishArtifact(Releases.Workflow)
 createJacocoTestReportTask()
 
 android {
+  namespace = "com.google.android.fhir.workflow"
   compileSdk = Sdk.compileSdk
-
   defaultConfig {
     minSdk = Sdk.minSdkWorkflow
-    targetSdk = Sdk.targetSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.workflow"
@@ -38,18 +37,13 @@ android {
   }
 
   buildTypes {
-    getByName("release") {
+    release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
   }
 
-  compileOptions {
-    sourceCompatibility = Java.sourceCompatibility
-    targetCompatibility = Java.targetCompatibility
-  }
-
-  packagingOptions {
+  packaging {
     resources.excludes.addAll(
       listOf(
         "license.html",
@@ -73,13 +67,11 @@ android {
       )
     )
   }
-
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
-
   configureJacocoTestOptions()
+  kotlin { jvmToolchain(11) }
 }
 
-afterEvaluate { configureFirebaseTestLab() }
+afterEvaluate { configureFirebaseTestLabForLibraries() }
 
 configurations {
   all {

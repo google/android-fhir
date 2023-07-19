@@ -7,22 +7,21 @@ plugins {
 configureRuler()
 
 android {
+  namespace = "com.google.android.fhir.catalog"
   compileSdk = Sdk.compileSdk
-
   defaultConfig {
     applicationId = Releases.Catalog.applicationId
     minSdk = Sdk.minSdk
     targetSdk = Sdk.targetSdk
     versionCode = Releases.Catalog.versionCode
     versionName = Releases.Catalog.versionName
-
     testInstrumentationRunner = Dependencies.androidJunitRunner
   }
 
   buildFeatures { viewBinding = true }
 
   buildTypes {
-    getByName("release") {
+    release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
@@ -31,18 +30,14 @@ android {
     // Flag to enable support for the new language APIs
     // See https://developer.android.com/studio/write/java8-support
     isCoreLibraryDesugaringEnabled = true
-
-    sourceCompatibility = Java.sourceCompatibility
-    targetCompatibility = Java.targetCompatibility
   }
 
-  packagingOptions {
+  packaging {
     resources.excludes.addAll(
       listOf("META-INF/ASL2.0", "META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")
     )
   }
-
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
+  kotlin { jvmToolchain(11) }
 }
 
 dependencies {

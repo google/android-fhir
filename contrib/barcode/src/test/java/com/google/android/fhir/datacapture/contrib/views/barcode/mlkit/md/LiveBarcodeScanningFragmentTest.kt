@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,9 @@ class LiveBarcodeScanningFragmentTest {
   fun setUp() {
     mockUtils()
     cameraSource = mock()
-    launchFragment<LiveBarcodeScanningFragment>(themeResId = R.style.Theme_Questionnaire)
+    launchFragment<LiveBarcodeScanningFragment>(
+        themeResId = com.google.android.fhir.datacapture.R.style.Theme_Questionnaire
+      )
       .onFragment {
         liveBarcodeScanningFragment = spy(it)
         fragmentActivity = mock()
