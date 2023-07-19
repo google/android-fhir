@@ -38,6 +38,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
+import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
@@ -240,6 +242,67 @@ class FhirEngineImplTest {
         runBlocking { fhirEngine.search("Patient?customParam=true&gender=male&_sort=name") }
       }
     assertThat(exception.message).isEqualTo("customParam not found in Patient")
+  }
+
+  @Test
+  fun `search() by x-fhir-query should return patients for _tag param`() = runBlocking {
+    val patients =
+      listOf(
+        buildPatient("1", "Patient1", Enumerations.AdministrativeGender.FEMALE).apply {
+          meta = Meta().setTag(mutableListOf(Coding("https://d-tree.org/", "Tag1", "Tag 1")))
+        },
+        buildPatient("2", "Patient2", Enumerations.AdministrativeGender.FEMALE).apply {
+          meta = Meta().setTag(mutableListOf(Coding("http://d-tree.org/", "Tag2", "Tag 2")))
+        }
+      )
+
+    fhirEngine.create(*patients.toTypedArray())
+
+    val result = fhirEngine.search("Patient?_tag=Tag1").map { it as Patient }
+
+    assertThat(result.size).isEqualTo(1)
+    assertThat(result.all { patient -> patient.meta.tag.all { it.code == "Tag1" } }).isTrue()
+  }
+
+  @Test
+  fun `search() by x-fhir-query should return patients for _profile param`() = runBlocking {
+    val patients =
+      listOf(
+        buildPatient("3", "C", Enumerations.AdministrativeGender.FEMALE).apply {
+          meta =
+            Meta()
+              .setProfile(
+                mutableListOf(
+                  CanonicalType(
+                    "http://fhir.org/STU3/StructureDefinition/Example-Patient-Profile-1"
+                  )
+                )
+              )
+        },
+        buildPatient("4", "C", Enumerations.AdministrativeGender.FEMALE).apply {
+          meta =
+            Meta().setProfile(mutableListOf(CanonicalType("http://d-tree.org/Diabetes-Patient")))
+        }
+      )
+
+    fhirEngine.create(*patients.toTypedArray())
+
+    val result =
+      fhirEngine
+        .search(
+          "Patient?_profile=http://fhir.org/STU3/StructureDefinition/Example-Patient-Profile-1"
+        )
+        .map { it as Patient }
+
+    assertThat(result.size).isEqualTo(1)
+    assertThat(
+        result.all { patient ->
+          patient.meta.profile.all {
+            it.value.equals("http://fhir.org/STU3/StructureDefinition/Example-Patient-Profile-1")
+          }
+        }
+      )
+      .isTrue()
   }
 
   @Test

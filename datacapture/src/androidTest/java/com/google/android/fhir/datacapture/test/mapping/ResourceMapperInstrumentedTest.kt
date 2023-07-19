@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.mapping
+package com.google.android.fhir.datacapture.test.mapping
 
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -22,6 +22,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.datacapture.mapping.ProfileLoader
+import com.google.android.fhir.datacapture.mapping.ResourceMapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.CanonicalType

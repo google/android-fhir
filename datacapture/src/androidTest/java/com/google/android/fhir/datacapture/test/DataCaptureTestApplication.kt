@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture
+package com.google.android.fhir.datacapture.test
 
 import android.app.Application
+import com.google.android.fhir.datacapture.DataCaptureConfig
 
 /** Application class when you want to test the DataCaptureConfig.Provider */
 internal class DataCaptureTestApplication : Application(), DataCaptureConfig.Provider {
