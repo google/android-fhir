@@ -66,16 +66,11 @@ operator fun Type.compareTo(value: Type): Int {
       return this.dateTimeValue().value.compareTo(value.dateTimeValue().value)
     }
     this.fhirType().equals("Quantity") -> {
-      Log.d("compareTo","*** brefore")
       val quantity =
         UnitConverter.getCanonicalFormOrOriginal(UcumValue((this as Quantity).code, this.value))
       val anotherQuantity =
         UnitConverter.getCanonicalFormOrOriginal(UcumValue((value as Quantity).code, value.value))
-      Log.d("compareTo","*** after 1")
-
       if (quantity.code != anotherQuantity.code) {
-        Log.d("compareTo","*** after 2")
-
         throw IllegalArgumentException(
           "Cannot compare different quantity codes: ${quantity.code} and ${anotherQuantity.code}"
         )
