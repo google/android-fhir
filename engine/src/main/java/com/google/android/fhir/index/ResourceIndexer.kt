@@ -56,7 +56,6 @@ import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import org.hl7.fhir.r4.model.SearchParameter
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.UriType
@@ -111,14 +110,14 @@ internal class ResourceIndexer(
   }
 
   companion object {
-    
+
     private fun numberIndex(searchParam: SearchParamDefinition, value: Base): NumberIndex? =
-    when (value.fhirType()) {
-      "integer" ->
-        NumberIndex(searchParam.name, searchParam.path, BigDecimal((value as IntegerType).value))
-      "decimal" -> NumberIndex(searchParam.name, searchParam.path, (value as DecimalType).value)
-      else -> null
-    }
+      when (value.fhirType()) {
+        "integer" ->
+          NumberIndex(searchParam.name, searchParam.path, BigDecimal((value as IntegerType).value))
+        "decimal" -> NumberIndex(searchParam.name, searchParam.path, (value as DecimalType).value)
+        else -> null
+      }
 
     private fun dateIndex(searchParam: SearchParamDefinition, value: Base): DateIndex {
       val date = value as DateType
@@ -290,7 +289,10 @@ internal class ResourceIndexer(
       }
     }
 
-    private fun quantityIndex(searchParam: SearchParamDefinition, value: Base): List<QuantityIndex> =
+    private fun quantityIndex(
+      searchParam: SearchParamDefinition,
+      value: Base
+    ): List<QuantityIndex> =
       when (value.fhirType()) {
         "Money" -> {
           val money = value as Money
@@ -320,7 +322,8 @@ internal class ResourceIndexer(
           var canonicalValue = quantity.value
           if (quantity.system == ucumUrl && quantity.code != null) {
             try {
-              val ucumUnit = UnitConverter.getCanonicalForm(UcumValue(quantity.code, quantity.value))
+              val ucumUnit =
+                UnitConverter.getCanonicalForm(UcumValue(quantity.code, quantity.value))
               canonicalCode = ucumUnit.code
               canonicalValue = ucumUnit.value
             } catch (exception: ConverterException) {
