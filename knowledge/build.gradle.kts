@@ -36,7 +36,11 @@ android {
     }
   }
 
-  compileOptions { isCoreLibraryDesugaringEnabled = true }
+  compileOptions {
+    isCoreLibraryDesugaringEnabled = true
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+  }
 
   packaging {
     resources.excludes.addAll(

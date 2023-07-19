@@ -69,6 +69,10 @@ android {
   }
   configureJacocoTestOptions()
   kotlin { jvmToolchain(11) }
+  compileOptions {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+  }
 }
 
 afterEvaluate { configureFirebaseTestLabForLibraries() }
