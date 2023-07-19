@@ -44,7 +44,9 @@ import org.robolectric.RuntimeEnvironment
 class BooleanChoiceViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
+      RuntimeEnvironment.getApplication().apply {
+        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
+      }
     )
   private val viewHolder = BooleanChoiceViewHolderFactory.create(parent)
 

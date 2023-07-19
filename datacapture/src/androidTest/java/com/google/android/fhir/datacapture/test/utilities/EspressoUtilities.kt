@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.utilities
+package com.google.android.fhir.datacapture.test.utilities
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click

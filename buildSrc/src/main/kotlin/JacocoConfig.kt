@@ -48,7 +48,6 @@ fun Project.createJacocoTestReportTask() {
     dependsOn(
       setOf(
         "testDebugUnitTest", // Generates unit test coverage report
-        "createDebugCoverageReport", // Generates instrumentation test coverage report
       )
     )
     reports {
@@ -100,7 +99,7 @@ fun Project.createJacocoTestReportTask() {
 
 /** Configures jacoco test options in the `LibraryExtension`. */
 fun LibraryExtension.configureJacocoTestOptions() {
-  buildTypes { getByName("debug") { isTestCoverageEnabled = true } }
+  buildTypes { getByName("debug") { enableUnitTestCoverage = true } }
   testOptions {
     unitTests.isIncludeAndroidResources = true
     unitTests.isReturnDefaultValues = true
