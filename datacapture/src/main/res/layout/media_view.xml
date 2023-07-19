@@ -11,8 +11,6 @@
         android:id="@+id/image_attachment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/item_media_image_margin_horizontal"
-        android:layout_marginVertical="@dimen/item_media_image_margin_vertical"
         android:adjustViewBounds="true"
         android:visibility="gone"
     />
