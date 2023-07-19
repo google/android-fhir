@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture
+package com.google.android.fhir.datacapture.test
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.fhir.datacapture.test.R
 
 /** Only exists so we can use an AppCompatActivity in ActivityScenario tests. */
 class TestActivity : AppCompatActivity(R.layout.activity_test) {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setTheme(R.style.Theme_Material3_DayNight)
+    setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
   }
 }

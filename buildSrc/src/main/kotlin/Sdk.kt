@@ -15,7 +15,7 @@
  */
 
 object Sdk {
-  const val compileSdk = 31
+  const val compileSdk = 33
   const val targetSdk = 31
 
   // Engine and SDC must support API 24.

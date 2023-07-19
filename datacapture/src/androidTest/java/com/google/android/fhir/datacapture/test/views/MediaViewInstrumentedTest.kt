@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir.datacapture.test.views
 
 import android.util.Base64
 import android.view.View
@@ -24,8 +24,9 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_MEDIA
+import com.google.android.fhir.datacapture.test.TestActivity
+import com.google.android.fhir.datacapture.views.MediaView
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Attachment
