@@ -44,9 +44,8 @@ object Plugins {
   const val flankGradlePlugin = "com.osacky.flank.gradle:fladle:0.17.4"
 
   object Versions {
-    const val androidGradlePlugin = "7.2.1"
+    const val androidGradlePlugin = "8.1.0-rc01"
     const val benchmarkPlugin = "1.1.0"
-    // Change dokka to 1.7.20 once androidGradlePlugin upgrades to 7.3+
-    const val dokka = "1.6.10"
+    const val dokka = "1.7.20"
   }
 }

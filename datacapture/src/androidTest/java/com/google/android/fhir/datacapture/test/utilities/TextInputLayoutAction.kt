@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.utilities
+package com.google.android.fhir.datacapture.test.utilities
 
 import android.view.View
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.matcher.ViewMatchers
-import com.google.android.fhir.datacapture.R
 import com.google.android.material.internal.CheckableImageButton
 import com.google.android.material.textfield.TextInputLayout
 
@@ -38,7 +37,10 @@ fun clickIcon(isEndIcon: Boolean): ViewAction {
     override fun perform(uiController: UiController?, view: View?) {
       val item = view as TextInputLayout
       val iconView: CheckableImageButton =
-        item.findViewById(if (isEndIcon) R.id.text_input_end_icon else R.id.text_input_start_icon)
+        item.findViewById(
+          if (isEndIcon) com.google.android.material.R.id.text_input_end_icon
+          else com.google.android.material.R.id.text_input_start_icon
+        )
       iconView.performClick()
       uiController!!.loopMainThreadForAtLeast(1000)
     }

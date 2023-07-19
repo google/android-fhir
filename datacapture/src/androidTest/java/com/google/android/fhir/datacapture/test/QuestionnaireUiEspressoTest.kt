@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture
+package com.google.android.fhir.datacapture.test
 
 import android.view.View
 import android.widget.FrameLayout
@@ -34,9 +34,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.datacapture.test.R
-import com.google.android.fhir.datacapture.utilities.clickIcon
-import com.google.android.fhir.datacapture.utilities.clickOnText
+import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.datacapture.test.utilities.clickIcon
+import com.google.android.fhir.datacapture.test.utilities.clickOnText
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.android.fhir.datacapture.validation.Valid

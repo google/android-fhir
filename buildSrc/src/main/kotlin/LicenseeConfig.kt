@@ -56,7 +56,7 @@ fun Project.configureLicensee() {
     }
 
     // SQLCipher
-    allowDependency("net.zetetic", "android-database-sqlcipher", "4.5.0") {
+    allowDependency("net.zetetic", "android-database-sqlcipher", "4.5.4") {
       because("Custom license, essentially BSD-3. https://www.zetetic.net/sqlcipher/license/")
     }
 
