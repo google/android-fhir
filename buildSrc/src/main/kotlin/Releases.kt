@@ -42,7 +42,7 @@ object Releases {
 
   object Common : LibraryArtifact {
     override val artifactId = "common"
-    override val version = "0.1.0-alpha03"
+    override val version = "0.1.0-alpha04"
     override val name = "Android FHIR Common Library"
   }
 

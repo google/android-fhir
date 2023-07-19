@@ -40,7 +40,7 @@ internal object MaxDecimalPlacesValidator :
         maxDecimalPlaces != null &&
         answer.valueDecimalType.valueAsString.substringAfter(".").length > maxDecimalPlaces
     },
-    { extension: Extension, context: Context ->
+    messageGenerator = { extension: Extension, context: Context ->
       context.getString(R.string.max_decimal_validation_error_msg, extension.value.primitiveValue())
     }
   )
