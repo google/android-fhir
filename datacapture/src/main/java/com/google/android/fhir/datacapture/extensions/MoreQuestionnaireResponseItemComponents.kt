@@ -24,18 +24,17 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  */
 val QuestionnaireResponse.QuestionnaireResponseItemComponent.descendant:
   List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-  get() {
-    val preOrderedList = mutableListOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
-    appendDescendantTo(preOrderedList)
-    return preOrderedList
-  }
+  get() =
+    mutableListOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>().also {
+      appendDescendantTo(it)
+    }
 
 private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.appendDescendantTo(
   output: MutableList<QuestionnaireResponse.QuestionnaireResponseItemComponent>
 ) {
   output.add(this)
-  this.item.forEach { it.appendDescendantTo(output) }
-  this.answer.forEach { answer -> answer.item.forEach { it.appendDescendantTo(output) } }
+  item.forEach { it.appendDescendantTo(output) }
+  answer.forEach { answer -> answer.item.forEach { it.appendDescendantTo(output) } }
 }
 
 /**
