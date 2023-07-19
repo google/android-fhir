@@ -376,7 +376,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         if (it.type == Questionnaire.QuestionnaireItemType.GROUP && !it.repeats) {
           addMissingResponseItems(
             questionnaireItems = it.item,
-            responseItems = responseItemMap[it.linkId]!!.first().item,
+            responseItems = responseItemMap[it.linkId]!!.single().item,
           )
         }
         responseItems.addAll(responseItemMap[it.linkId]!!)

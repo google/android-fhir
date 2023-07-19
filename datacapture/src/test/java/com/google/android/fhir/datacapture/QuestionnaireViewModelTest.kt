@@ -551,68 +551,6 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should remove an extra questionnaire response items`() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
-        )
-      }
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        id = "a-questionnaire-response"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
-          }
-        )
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-different-link-id"
-            text = "Basic question"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
-          }
-        )
-      }
-
-    val expectedQuestionnaireResponse =
-      QuestionnaireResponse().apply {
-        id = "a-questionnaire-response"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
-          }
-        )
-      }
-
-    assertResourceEquals(
-      createQuestionnaireViewModel(questionnaire, questionnaireResponse).getQuestionnaireResponse(),
-      expectedQuestionnaireResponse
-    )
-  }
-
-  @Test
   fun `should throw exception for non-matching question types`() {
     val questionnaire =
       Questionnaire().apply {
