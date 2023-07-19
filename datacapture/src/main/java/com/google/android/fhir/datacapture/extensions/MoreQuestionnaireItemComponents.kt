@@ -670,7 +670,18 @@ internal fun Questionnaire.QuestionnaireItemComponent.extractAnswerOptions(
  */
 fun List<Questionnaire.QuestionnaireItemComponent>.flattened():
   List<Questionnaire.QuestionnaireItemComponent> {
-  return this + this.flatMap { it.item.flattened() }
+  val flattenedList = mutableListOf<Questionnaire.QuestionnaireItemComponent>()
+  this.flattenInto(flattenedList)
+  return flattenedList
+}
+
+private fun List<Questionnaire.QuestionnaireItemComponent>.flattenInto(
+  output: MutableList<Questionnaire.QuestionnaireItemComponent>
+) {
+  this.forEach {
+    output.add(it)
+    it.item.flattenInto(output)
+  }
 }
 
 val Resource.logicalId: String
