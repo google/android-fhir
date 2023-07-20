@@ -279,7 +279,8 @@ object ExpressionEvaluator {
   }
 
   /**
-   * Creates an x-fhir-query string for evaluation
+   * Creates an x-fhir-query string for evaluation. For this, it evaluates both variables and
+   * fhir-paths in the expression.
    *
    * @param expression x-fhir-query expression
    * @param launchContextMap if passed, the launch context to evaluate the expression against
@@ -308,10 +309,8 @@ object ExpressionEvaluator {
         .filterKeys { expression.expression.contains("{{%$it}}") }
         .map { Pair("{{%${it.key}}}", it.value!!.primitiveValue()) }
 
-    var fhirPathsEvaluatedPairs = emptySequence<Pair<String, String>>()
-    if (launchContextMap != null) {
-      fhirPathsEvaluatedPairs = evaluateXFhirEnhancement(expression, launchContextMap)
-    }
+    val fhirPathsEvaluatedPairs =
+      launchContextMap?.let { evaluateXFhirEnhancement(expression, it) } ?: emptySequence()
     return (fhirPathsEvaluatedPairs + variablesEvaluatedPairs).fold(expression.expression) {
       acc: String,
       pair: Pair<String, String> ->
