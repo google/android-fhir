@@ -51,9 +51,9 @@ inline fun <reified R : Resource> Search.has(
 }
 
 /**
- * Allows user to include additional resources to be included in the search results that reference
- * the resource on which [include] is being called. The developers may call [include] multiple times
- * with different [ResourceType] to allow search api to return multiple referenced resource types.
+ * Includes additional resources in the search results that reference that reference the resource on
+ * which [include] is being called. The developers may call [include] multiple times with different
+ * [ResourceType] to allow search api to return multiple referenced resource types.
  *
  * e.g. The below example would return all the Patients with given-name as James and their
  * associated active [Practitioner] and Organizations.
@@ -81,9 +81,9 @@ inline fun <reified R : Resource> Search.include(
 }
 
 /**
- * Allows user to include additional resources to be included in the search results that reference
- * the resource on which [include] is being called. The developers may call [include] multiple times
- * with different [ResourceType] to allow search api to return multiple referenced resource types.
+ * Includes additional resources in the search results that reference the resource on which
+ * [include] is being called. The developers may call [include] multiple times with different
+ * [ResourceType] to allow search api to return multiple referenced resource types.
  *
  * e.g. The below example would return all the Patients with given-name as James and their
  * associated active [Practitioner] and Organizations.
@@ -111,10 +111,9 @@ fun Search.include(
 }
 
 /**
- * Allows user to include additional resources to be included in the search results that reference
- * the resource on which [revInclude] is being called. The developers may call [revInclude] multiple
- * times with different [ResourceType] to allow search api to return multiple referenced resource
- * types.
+ * Includes additional resources in the search results that reference the resource on which
+ * [revInclude] is being called. The developers may call [revInclude] multiple times with different
+ * [ResourceType] to allow search api to return multiple referenced resource types.
  *
  * e.g. The below example would return all the Patients with given-name as James and their
  * associated Encounters and diabetic Conditions.
@@ -144,10 +143,9 @@ inline fun <reified R : Resource> Search.revInclude(
 }
 
 /**
- * Allows user to include additional resources to be included in the search results that reference
- * the resource on which [revInclude] is being called. The developers may call [revInclude] multiple
- * times with different [ResourceType] to allow search api to return multiple referenced resource
- * types.
+ * Includes additional resources in the search results that reference the resource on which
+ * [revInclude] is being called. The developers may call [revInclude] multiple times with different
+ * [ResourceType] to allow search api to return multiple referenced resource types.
  *
  * e.g. The below example would return all the Patients with given-name as James and their
  * associated Encounters and Conditions.
