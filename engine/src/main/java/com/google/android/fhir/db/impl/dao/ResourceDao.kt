@@ -125,9 +125,6 @@ internal abstract class ResourceDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   abstract suspend fun insertPositionIndex(positionIndexEntity: PositionIndexEntity)
 
-  @Query("select * from DateTimeIndexEntity where resourceUuid = :resourceUuid ")
-  abstract suspend fun getDateTimeIndexes(resourceUuid: UUID): List<DateTimeIndexEntity>
-
   @Query(
     """
         UPDATE ResourceEntity

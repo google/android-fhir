@@ -16,10 +16,8 @@
 
 package com.google.android.fhir.db
 
-import androidx.annotation.VisibleForTesting
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.search.SearchQuery
@@ -147,11 +145,4 @@ internal interface Database {
    * delete resource entry from LocalChangeEntity table.
    */
   suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
-
-  /** @return DateTimeIndexEntities for the resource. */
-  @VisibleForTesting
-  suspend fun getDateTimeIndexEntities(
-    resourceId: String,
-    resourceType: ResourceType
-  ): List<DateTimeIndexEntity>
 }

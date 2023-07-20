@@ -280,12 +280,6 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun getDateTimeIndexEntities(resourceId: String, resourceType: ResourceType) =
-    resourceDao.getResourceEntity(resourceId, resourceType)?.let {
-      resourceDao.getDateTimeIndexes(it.resourceUuid)
-    }
-      ?: emptyList()
-
   companion object {
     /**
      * The name for unencrypted database.

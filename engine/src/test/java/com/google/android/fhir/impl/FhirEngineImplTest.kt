@@ -17,6 +17,7 @@
 package com.google.android.fhir.impl
 
 import androidx.test.core.app.ApplicationProvider
+import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
@@ -24,7 +25,7 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.get
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.search.LOCAL_LAST_UPDATED
+import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
@@ -41,6 +42,7 @@ import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
@@ -560,39 +562,64 @@ class FhirEngineImplTest {
     }
 
   @Test
-  fun create_should_save_lastUpdated_Indexes(): Unit = runBlocking {
+  fun `create should allow patient search with LOCAL_LAST_UPDATED_PARAM`(): Unit = runBlocking {
     val patient = Patient().apply { id = "patient-id-create" }
     fhirEngine.create(patient)
-    val indexes =
-      services.database.getDateTimeIndexEntities("patient-id-create", ResourceType.Patient)
-    assertThat(indexes.map { it.index.name }).contains(LOCAL_LAST_UPDATED)
-  }
+    val localChangeTimestamp =
+      fhirEngine.getLocalChange(ResourceType.Patient, "patient-id-create")!!.timestamp
 
-  @Test
-  fun update_should_save_lastUpdated_Indexes() = runBlocking {
-    val patient = Patient().apply { id = "patient-id-update" }
-    fhirEngine.create(patient)
-    val indexesWhenCreated =
-      services.database.getDateTimeIndexEntities("patient-id-update", ResourceType.Patient)
-    val patientUpdate =
-      Patient().apply {
-        id = "patient-id-update"
-        addName(
-          HumanName().apply {
-            addGiven("John")
-            family = "Doe"
+    val result =
+      fhirEngine.search<Patient> {
+        filter(
+          LOCAL_LAST_UPDATED_PARAM,
+          {
+            value = of(DateTimeType(localChangeTimestamp))
+            prefix = ParamPrefixEnum.EQUAL
           }
         )
       }
 
-    fhirEngine.update(patientUpdate)
-    val indexesWhenUpdated =
-      services.database.getDateTimeIndexEntities("patient-id-update", ResourceType.Patient)
-
-    assertThat(indexesWhenUpdated.map { it.index.name }).contains(LOCAL_LAST_UPDATED)
-    assertThat(indexesWhenUpdated.first { it.index.name == LOCAL_LAST_UPDATED }.index.from)
-      .isGreaterThan(indexesWhenCreated.first { it.index.name == LOCAL_LAST_UPDATED }.index.from)
+    assertThat(result).isNotEmpty()
+    assertThat(result.map { it.logicalId }).containsExactly("patient-id-create").inOrder()
   }
+
+  @Test
+  fun `update should allow patient search with LOCAL_LAST_UPDATED_PARAM and update local entity`() =
+    runBlocking {
+      val patient = Patient().apply { id = "patient-id-update" }
+      fhirEngine.create(patient)
+      val localChangeTimestampWhenCreated =
+        fhirEngine.getLocalChange(ResourceType.Patient, "patient-id-update")!!.timestamp
+      val patientUpdate =
+        Patient().apply {
+          id = "patient-id-update"
+          addName(
+            HumanName().apply {
+              addGiven("John")
+              family = "Doe"
+            }
+          )
+        }
+      fhirEngine.update(patientUpdate)
+      val localChangeTimestampWhenUpdated =
+        fhirEngine.getLocalChange(ResourceType.Patient, "patient-id-update")!!.timestamp
+
+      val result =
+        fhirEngine.search<Patient> {
+          filter(
+            LOCAL_LAST_UPDATED_PARAM,
+            {
+              value = of(DateTimeType(localChangeTimestampWhenUpdated))
+              prefix = ParamPrefixEnum.EQUAL
+            }
+          )
+        }
+
+      assertThat(DateTimeType(localChangeTimestampWhenUpdated).value)
+        .isGreaterThan(DateTimeType(localChangeTimestampWhenCreated).value)
+      assertThat(result).isNotEmpty()
+      assertThat(result.map { it.logicalId }).containsExactly("patient-id-update").inOrder()
+    }
 
   companion object {
     private const val TEST_PATIENT_1_ID = "test_patient_1"
