@@ -36,6 +36,7 @@ fun Project.configureSpotless() {
         // It is necessary to tell spotless the top level of a file in order to apply config to it
         // See: https://github.com/diffplug/spotless/issues/135
         )
+      toggleOffOn()
     }
     kotlinGradle {
       target("*.gradle.kts")

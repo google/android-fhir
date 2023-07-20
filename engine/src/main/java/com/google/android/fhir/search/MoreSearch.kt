@@ -189,7 +189,8 @@ private fun Search.getIncludeQuery(includeIds: List<String>): SearchQuery {
 
   return SearchQuery(
     query =
-      """
+      //  spotless:off
+    """
     SELECT b.index_name,  a.resourceId, c.serializedResource from ResourceEntity a 
     JOIN ReferenceIndexEntity b 
     On a.resourceUuid = b.resourceUuid
@@ -199,6 +200,7 @@ private fun Search.getIncludeQuery(includeIds: List<String>): SearchQuery {
     ON c.resourceType||"/"||c.resourceId = b.index_value
     ${if (matchQuery.isEmpty()) "" else "AND ($matchQuery) " }
     """.trimIndent(),
+    //  spotless:on
     args = args
   )
 }
@@ -238,11 +240,12 @@ internal fun Search.getQuery(
       val tableAlias = 'b' + index
 
       sortJoinStatement +=
-        """
+        //  spotless:off
+      """
       LEFT JOIN ${sortTableName.tableName} $tableAlias
       ON a.resourceType = $tableAlias.resourceType AND a.resourceUuid = $tableAlias.resourceUuid AND $tableAlias.index_name = ?
       """
-
+      //  spotless:on
       sortArgs += sort.paramName
     }
 
@@ -264,12 +267,14 @@ internal fun Search.getQuery(
   val filterQuery = getFilterQueries()
   filterQuery.forEachIndexed { i, it ->
     filterStatement +=
+      //  spotless:off
       """
       ${if (i == 0) "AND a.resourceUuid IN (" else "a.resourceUuid IN ("}
       ${it.query}
       )
       ${if (i != filterQuery.lastIndex) "${operation.logicalOperator} " else ""}
       """.trimIndent()
+    //  spotless:on
     filterArgs.addAll(it.args)
   }
 
@@ -292,7 +297,8 @@ internal fun Search.getQuery(
   val query =
     when {
         isCount -> {
-          """ 
+          //  spotless:off
+        """ 
         SELECT COUNT(*)
         FROM ResourceEntity a
         $sortJoinStatement
@@ -301,11 +307,13 @@ internal fun Search.getQuery(
         $sortOrderStatement
         $limitStatement
         """
+          //  spotless:on
         }
         nestedContext != null -> {
           whereArgs.add(nestedContext.param.paramName)
           val start = "${nestedContext.parentType.name}/".length + 1
-          """
+          //  spotless:off
+        """
         SELECT resourceUuid
         FROM ResourceEntity a
         WHERE a.resourceId IN (
@@ -317,9 +325,11 @@ internal fun Search.getQuery(
         $sortOrderStatement
         $limitStatement)
         """
+          //  spotless:on
         }
         else ->
-          """ 
+          //  spotless:off
+        """ 
         SELECT a.serializedResource
         FROM ResourceEntity a
         $sortJoinStatement
@@ -328,6 +338,7 @@ internal fun Search.getQuery(
         $sortOrderStatement
         $limitStatement
         """
+      //  spotless:on
       }
       .split("\n")
       .filter { it.isNotBlank() }
