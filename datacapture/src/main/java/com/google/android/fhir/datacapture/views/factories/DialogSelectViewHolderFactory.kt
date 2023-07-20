@@ -168,7 +168,7 @@ internal class QuestionnaireItemDialogSelectViewModel : ViewModel() {
   }
 
   private fun selectedOptionsFlow(linkId: String) =
-    linkIdsToSelectedOptionsFlow.getOrPut(linkId) { MutableSharedFlow(replay = 1) }
+    linkIdsToSelectedOptionsFlow.getOrPut(linkId) { MutableSharedFlow(replay = 0) }
 }
 
 data class SelectedOptions(

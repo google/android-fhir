@@ -11,6 +11,10 @@ android {
   compileSdk = Sdk.compileSdk
   defaultConfig { minSdk = Sdk.minSdkWorkflow }
   kotlin { jvmToolchain(11) }
+  compileOptions {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+  }
 }
 
 configurations {
