@@ -60,7 +60,7 @@ Learn [more](https://github.com/hapifhir/hapi-fhir-jpaserver-starter#running-via
 3. Inspect the server by opening the URL `http://localhost:8080/` in a browser.
    You should see the HAPI FHIR web interface.
 
-![HAPI FHIR web interface](images/image7.png "HAPI FHIR web interface")
+![HAPI FHIR web interface](images/image4.png "HAPI FHIR web interface")
 
 ### Populate the local HAPI FHIR server with test data
 
@@ -96,7 +96,7 @@ codelab.
    `HTTP 200 OK` and the `Response Body` section of the page containing patient
    data in a FHIR Bundle as the search result with a `total` count.
 
-![Test data on server](images/image8.png "Test data on server")
+![Test data on server](images/image5.png "Test data on server")
 
 ## Set up the Android app
 
@@ -149,7 +149,7 @@ https://developer.android.com/studio/run/emulator), and click Run
 (![Run button](images/image2.png "Run button")) in the Android Studio
 toolbar.
 
-<img src="../images/image5.png" alt="Hello World app" width="400">
+<img src="images/image6.png" alt="Hello World app" width="400">
 
 ## Create FHIR Engine instance
 
@@ -265,7 +265,7 @@ when (syncJobStatus) {
 Now click the `Sync` button in the menu, and you should see the patients in your
 local FHIR server being downloaded to the application.
 
-<img src="../images/image9.png" alt="Patient list" width="400">
+<img src="images/image7.png" alt="Patient list" width="400">
 
 ## Modify and upload patient data
 
