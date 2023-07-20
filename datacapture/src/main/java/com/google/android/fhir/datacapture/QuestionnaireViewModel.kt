@@ -134,6 +134,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaireResponse =
           parser.parseResource(application.contentResolver.openInputStream(uri))
             as QuestionnaireResponse
+        addMissingResponseItems(questionnaire.item, questionnaireResponse.item)
         checkQuestionnaireResponse(questionnaire, questionnaireResponse)
       }
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING) -> {
@@ -141,6 +142,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]!!
         questionnaireResponse =
           parser.parseResource(questionnaireResponseJson) as QuestionnaireResponse
+        addMissingResponseItems(questionnaire.item, questionnaireResponse.item)
         checkQuestionnaireResponse(questionnaire, questionnaireResponse)
       }
       else -> {
@@ -346,6 +348,41 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val answerExpressionMap =
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
 
+  /**
+   * Adds empty [QuestionnaireResponseItemComponent]s to `responseItems` so that each
+   * [QuestionnaireItemComponent] in `questionnaireItems` has at least one corresponding
+   * [QuestionnaireResponseItemComponent]. This is because user-provided [QuestionnaireResponse]
+   * might not contain answers to unanswered or disabled questions. Note : this only applies to
+   * [QuestionnaireItemComponent]s nested under a group.
+   */
+  private fun addMissingResponseItems(
+    questionnaireItems: List<QuestionnaireItemComponent>,
+    responseItems: MutableList<QuestionnaireResponseItemComponent>,
+  ) {
+    // To associate the linkId to QuestionnaireResponseItemComponent, do not use associateBy().
+    // Instead, use groupBy().
+    // This is because a questionnaire response may have multiple
+    // QuestionnaireResponseItemComponents with the same linkId.
+    val responseItemMap = responseItems.groupBy { it.linkId }
+
+    // Clear the response item list, and then add the missing and existing response items back to
+    // the list
+    responseItems.clear()
+
+    questionnaireItems.forEach {
+      if (responseItemMap[it.linkId].isNullOrEmpty()) {
+        responseItems.add(it.createQuestionnaireResponseItem())
+      } else {
+        if (it.type == Questionnaire.QuestionnaireItemType.GROUP && !it.repeats) {
+          addMissingResponseItems(
+            questionnaireItems = it.item,
+            responseItems = responseItemMap[it.linkId]!!.single().item,
+          )
+        }
+        responseItems.addAll(responseItemMap[it.linkId]!!)
+      }
+    }
+  }
   /**
    * Returns current [QuestionnaireResponse] captured by the UI which includes answers of enabled
    * questions.
