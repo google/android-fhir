@@ -60,7 +60,7 @@ Learn [more](https://github.com/hapifhir/hapi-fhir-jpaserver-starter#running-via
 3. Inspect the server by opening the URL `http://localhost:8080/` in a browser.
    You should see the HAPI FHIR web interface.
 
-![HAPI FHIR web interface](../images/image7.png "HAPI FHIR web interface")
+![HAPI FHIR web interface](images/image7.png "HAPI FHIR web interface")
 
 ### Populate the local HAPI FHIR server with test data
 
@@ -96,7 +96,7 @@ codelab.
    `HTTP 200 OK` and the `Response Body` section of the page containing patient
    data in a FHIR Bundle as the search result with a `total` count.
 
-![Test data on server](../images/image8.png "Test data on server")
+![Test data on server](images/image8.png "Test data on server")
 
 ## Set up the Android app
 
@@ -115,7 +115,7 @@ Open Android Studio, select **Import Project (Gradle, Eclipse ADT, etc.)** and
 choose the `codelabs/engine/` folder from the source code that you have
 downloaded earlier.
 
-![Android Studio start screen](../images/image1.png "Android Studio start screen")
+![Android Studio start screen](images/image1.png "Android Studio start screen")
 
 ### Sync your project with Gradle files
 
@@ -135,7 +135,7 @@ dependencies {
 To be sure that all dependencies are available to your app, you should sync your
 project with gradle files at this point.
 
-Select **Sync Project with Gradle Files** (![Gradle sync button](../images/image3.png "Gradle sync button"))from the Android Studio
+Select **Sync Project with Gradle Files** (![Gradle sync button](images/image3.png "Gradle sync button"))from the Android Studio
 toolbar. You an also run the app again to check the dependencies are working
 correctly.
 
@@ -146,7 +146,7 @@ the app for the first time.
 
 [Start the Android Studio emulator](
 https://developer.android.com/studio/run/emulator), and click Run
-(![Run button](../images/image2.png "Run button")) in the Android Studio
+(![Run button](images/image2.png "Run button")) in the Android Studio
 toolbar.
 
 <img src="../images/image5.png" alt="Hello World app" width="400">
