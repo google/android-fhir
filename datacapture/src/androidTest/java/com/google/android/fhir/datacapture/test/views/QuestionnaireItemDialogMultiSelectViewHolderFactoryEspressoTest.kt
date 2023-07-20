@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir.datacapture.test.views
 
 import android.view.View
 import android.widget.FrameLayout
@@ -32,17 +32,19 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
 import com.google.android.fhir.datacapture.extensions.ItemControlTypes
-import com.google.android.fhir.datacapture.utilities.assertQuestionnaireResponseAtIndex
-import com.google.android.fhir.datacapture.utilities.clickOnText
-import com.google.android.fhir.datacapture.utilities.clickOnTextInDialog
-import com.google.android.fhir.datacapture.utilities.endIconClickInTextInputLayout
+import com.google.android.fhir.datacapture.test.TestActivity
+import com.google.android.fhir.datacapture.test.utilities.assertQuestionnaireResponseAtIndex
+import com.google.android.fhir.datacapture.test.utilities.clickOnText
+import com.google.android.fhir.datacapture.test.utilities.clickOnTextInDialog
+import com.google.android.fhir.datacapture.test.utilities.endIconClickInTextInputLayout
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDialogSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.material.textfield.TextInputLayout

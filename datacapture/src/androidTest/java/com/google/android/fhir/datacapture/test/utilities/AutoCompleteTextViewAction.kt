@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.utilities
+package com.google.android.fhir.datacapture.test.utilities
 
 import android.view.View
 import android.widget.AutoCompleteTextView

@@ -46,7 +46,7 @@ class BarCodeReaderViewHolderFactoryInstrumentedTest {
     context =
       ContextThemeWrapper(
         InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_MaterialComponents
+        com.google.android.material.R.style.Theme_MaterialComponents
       )
     parent = FrameLayout(context)
     viewHolder = BarCodeReaderViewHolderFactory.create(parent)
