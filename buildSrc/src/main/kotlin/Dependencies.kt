@@ -217,6 +217,7 @@ object Dependencies {
 
   const val androidBenchmarkRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
+
   // Makes Json assertions where the order of elements, tabs/whitespaces are not important.
   const val jsonAssert = "org.skyscreamer:jsonassert:${Versions.jsonAssert}"
   const val junit = "junit:junit:${Versions.junit}"
@@ -224,6 +225,7 @@ object Dependencies {
   const val mockitoInline = "org.mockito:mockito-inline:${Versions.mockitoInline}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
+
   // Makes XML assertions where the order of elements, tabs/whitespaces are not important.
   const val xmlUnit = "org.xmlunit:xmlunit-core:${Versions.xmlUnit}"
 
@@ -272,6 +274,7 @@ object Dependencies {
     // Newer versions of HapiFhir don't work on Android due to the use of Caffeine 3+
     // Wait for this to release (6.3): https://github.com/hapifhir/hapi-fhir/pull/4196
     const val hapiFhir = "6.0.1"
+
     // Newer versions don't work on Android due to Apache Commons Codec:
     // Wait for this fix: https://github.com/hapifhir/org.hl7.fhir.core/issues/1046
     const val hapiFhirCore = "5.6.36"
