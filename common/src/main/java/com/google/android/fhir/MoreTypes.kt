@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.google.android.fhir
 
-import android.util.Log
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -81,7 +80,6 @@ operator fun Type.compareTo(value: Type): Int {
       throw NotImplementedError()
     }
   }
-  return 0
 }
 
 private fun clearTimeFromDateValue(dateValue: Date): Date {

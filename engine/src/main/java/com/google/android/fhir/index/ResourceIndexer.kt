@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@ internal class ResourceIndexer(
           SearchParamType.REFERENCE ->
             referenceIndex(searchParam, value)?.also { indexBuilder.addReferenceIndex(it) }
           SearchParamType.QUANTITY ->
-            quantityIndex(searchParam, value)?.forEach { indexBuilder.addQuantityIndex(it) }
+            quantityIndex(searchParam, value).forEach { indexBuilder.addQuantityIndex(it) }
           SearchParamType.URI -> uriIndex(searchParam, value)?.also { indexBuilder.addUriIndex(it) }
           SearchParamType.SPECIAL -> specialIndex(value)?.also { indexBuilder.addPositionIndex(it) }
           // TODO: Handle composite type https://github.com/google/android-fhir/issues/292.
@@ -314,7 +314,8 @@ internal class ResourceIndexer(
         var canonicalValue = quantity.value
         if (quantity.system == ucumUrl && quantity.code != null) {
           try {
-            val ucumUnit = UnitConverter.getCanonicalFormOrOriginal(UcumValue(quantity.code, quantity.value))
+            val ucumUnit =
+              UnitConverter.getCanonicalFormOrOriginal(UcumValue(quantity.code, quantity.value))
             canonicalCode = ucumUnit.code
             canonicalValue = ucumUnit.value
           } catch (exception: ConverterException) {
