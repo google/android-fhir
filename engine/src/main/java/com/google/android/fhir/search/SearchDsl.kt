@@ -41,7 +41,11 @@ import com.google.android.fhir.search.filter.UriParamFilterCriterion
 import org.hl7.fhir.r4.model.ResourceType
 
 @SearchDslMarker
-class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) : ISearch {
+class Search(
+  val type: ResourceType,
+  override var count: Int? = null,
+  override var from: Int? = null
+) : BaseSearch {
   internal val stringFilterCriteria = mutableListOf<StringParamFilterCriteria>()
   internal val dateTimeFilterCriteria = mutableListOf<DateClientParamFilterCriteria>()
   internal val numberFilterCriteria = mutableListOf<NumberParamFilterCriteria>()
@@ -55,7 +59,7 @@ class Search(val type: ResourceType, var count: Int? = null, var from: Int? = nu
   @PublishedApi internal var revIncludes = mutableListOf<NestedSearch>()
   @PublishedApi internal var forwardIncludes = mutableListOf<NestedSearch>()
 
-  var operation = Operation.AND
+  override var operation = Operation.AND
 
   override fun filter(
     stringParameter: StringClientParam,
@@ -142,10 +146,6 @@ class Search(val type: ResourceType, var count: Int? = null, var from: Int? = nu
   override fun sort(parameter: DateClientParam, order: Order) {
     sort = parameter
     this.order = order
-  }
-
-  override fun operations(operation: Operation) {
-    this.operation = operation
   }
 }
 

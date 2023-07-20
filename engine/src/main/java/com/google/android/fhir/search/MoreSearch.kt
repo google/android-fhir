@@ -26,6 +26,7 @@ import com.google.android.fhir.SearchResult
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
+import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
 import com.google.android.fhir.epochDay
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.ucumUrl
@@ -68,16 +69,14 @@ internal suspend fun <R : Resource> Search.execute(database: Database): List<Sea
       included =
         includedResources
           ?.filter { it.idOfBaseResourceOnWhichThisMatched == baseResource.logicalId }
-          ?.map { it.resource }
-          ?.groupBy { it.resourceType },
+          ?.toReferencedResources(),
       revIncluded =
         revIncludedResources
           ?.filter {
             it.idOfBaseResourceOnWhichThisMatched ==
               "${baseResource.fhirType()}/${baseResource.logicalId}"
           }
-          ?.map { it.resource }
-          ?.groupBy { it.resourceType }
+          ?.toReferencedResources()
     )
   }
 }
@@ -133,7 +132,7 @@ private fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
   return SearchQuery(
     query =
       """
-    SELECT  a.index_value, b.serializedResource 
+    SELECT a.index_name, a.index_value, b.serializedResource 
     FROM ReferenceIndexEntity a 
     JOIN  ResourceEntity b
     ON  a.resourceUuid = b.resourceUuid
@@ -143,6 +142,10 @@ private fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
     args = args
   )
 }
+
+private fun List<IndexedIdAndResource>.toReferencedResources() =
+  groupBy { it.resource.resourceType }
+    .mapValues { it.value.groupBy { it.matchingIndex }.mapValues { it.value.map { it.resource } } }
 
 private fun Search.getIncludeQuery(includeIds: List<String>): SearchQuery {
   var matchQuery = ""
@@ -187,7 +190,7 @@ private fun Search.getIncludeQuery(includeIds: List<String>): SearchQuery {
   return SearchQuery(
     query =
       """
-    SELECT a.resourceId, c.serializedResource from ResourceEntity a 
+    SELECT b.index_name,  a.resourceId, c.serializedResource from ResourceEntity a 
     JOIN ReferenceIndexEntity b 
     On a.resourceUuid = b.resourceUuid
     AND a.resourceType = ?

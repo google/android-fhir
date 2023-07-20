@@ -3244,7 +3244,7 @@ class DatabaseImplTest {
           revInclude<Condition>(Condition.SUBJECT) {
             filter(Condition.CODE, { value = of(diabetesCodeableConcept) })
             filter(Condition.CODE, { value = of(migraineCodeableConcept) })
-            operations(Operation.OR)
+            operation = Operation.OR
           }
 
           revInclude<Encounter>(Encounter.SUBJECT) {
@@ -3266,7 +3266,7 @@ class DatabaseImplTest {
                 modifier = StringFilterModifier.STARTS_WITH
               }
             )
-            operations(Operation.AND)
+            operation = Operation.AND
           }
 
           include<Organization>(Patient.ORGANIZATION) {
@@ -3278,37 +3278,84 @@ class DatabaseImplTest {
               }
             )
             filter(Practitioner.ACTIVE, { value = of(true) })
-            operations(Operation.AND)
+            operation = Operation.AND
           }
         }
         .execute<Patient>(database)
 
     assertThat(result[0].resource.logicalId).isEqualTo("pa-01")
-    assertThat(result[0].included!![ResourceType.Practitioner]!!.map { it.logicalId })
+    assertThat(
+        result[0]
+          .included!![ResourceType.Practitioner]!![Patient.GENERAL_PRACTITIONER.paramName]!!.map {
+            it.logicalId
+          }
+      )
       .containsExactly("gp-01", "gp-02")
-    assertThat(result[0].included!![ResourceType.Organization]!!.map { it.logicalId })
+    assertThat(
+        result[0].included!![ResourceType.Organization]!![Patient.ORGANIZATION.paramName]!!.map {
+          it.logicalId
+        }
+      )
       .containsExactly("org-01")
-    assertThat(result[0].revIncluded!![ResourceType.Condition]!!.map { it.logicalId })
+    assertThat(
+        result[0].revIncluded!![ResourceType.Condition]!![Condition.SUBJECT.paramName]!!.map {
+          it.logicalId
+        }
+      )
       .containsExactly("con-01-pa-01", "con-03-pa-01")
-    assertThat(result[0].revIncluded!![ResourceType.Encounter]!!.map { it.logicalId })
+    assertThat(
+        result[0].revIncluded!![ResourceType.Encounter]!![Encounter.SUBJECT.paramName]!!.map {
+          it.logicalId
+        }
+      )
       .containsExactly("en-01-pa-01", "en-02-pa-01")
 
     assertThat(result[1].resource.logicalId).isEqualTo("pa-02")
-    assertThat(result[1].included!![ResourceType.Practitioner]!!.map { it.logicalId })
+    assertThat(
+        result[1]
+          .included!![ResourceType.Practitioner]!![Patient.GENERAL_PRACTITIONER.paramName]!!.map {
+            it.logicalId
+          }
+      )
       .containsExactly("gp-01", "gp-02")
-    assertThat(result[1].included!![ResourceType.Organization]!!.map { it.logicalId })
+    assertThat(
+        result[1].included!![ResourceType.Organization]!![Patient.ORGANIZATION.paramName]!!.map {
+          it.logicalId
+        }
+      )
       .containsExactly("org-02")
-    assertThat(result[1].revIncluded!![ResourceType.Condition]!!.map { it.logicalId })
+    assertThat(
+        result[1].revIncluded!![ResourceType.Condition]!![Condition.SUBJECT.paramName]!!.map {
+          it.logicalId
+        }
+      )
       .containsExactly("con-01-pa-02", "con-03-pa-02")
-    assertThat(result[1].revIncluded!![ResourceType.Encounter]!!.map { it.logicalId })
+    assertThat(
+        result[1].revIncluded!![ResourceType.Encounter]!![Encounter.SUBJECT.paramName]!!.map {
+          it.logicalId
+        }
+      )
       .containsExactly("en-01-pa-02", "en-02-pa-02")
 
     assertThat(result[2].resource.logicalId).isEqualTo("pa-03")
-    assertThat(result[2].included!![ResourceType.Practitioner]!!.map { it.logicalId })
+    assertThat(
+        result[2]
+          .included!![ResourceType.Practitioner]!![Patient.GENERAL_PRACTITIONER.paramName]!!.map {
+            it.logicalId
+          }
+      )
       .containsExactly("gp-01", "gp-02")
-    assertThat(result[2].revIncluded!![ResourceType.Condition]!!.map { it.logicalId })
+    assertThat(
+        result[2].revIncluded!![ResourceType.Condition]!![Condition.SUBJECT.paramName]!!.map {
+          it.logicalId
+        }
+      )
       .containsExactly("con-01-pa-03", "con-03-pa-03")
-    assertThat(result[2].revIncluded!![ResourceType.Encounter]!!.map { it.logicalId })
+    assertThat(
+        result[2].revIncluded!![ResourceType.Encounter]!![Encounter.SUBJECT.paramName]!!.map {
+          it.logicalId
+        }
+      )
       .containsExactly("en-01-pa-03", "en-02-pa-03")
   }
 

@@ -128,7 +128,9 @@ suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
   delete(getResourceType(R::class.java), id)
 }
 
-typealias ReferencedResources = Map<ResourceType, List<Resource>>
+typealias SearchParamName = String
+
+typealias ReferencedResources = Map<ResourceType, Map<SearchParamName, List<Resource>>>
 
 /** It contains the searched resource and referenced resources as per the search query. */
 data class SearchResult<R : Resource>(

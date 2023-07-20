@@ -189,12 +189,15 @@ internal class DatabaseImpl(
 
   override suspend fun searchReferencedResources(query: SearchQuery): List<IndexedIdAndResource> {
     return db.withTransaction {
-      resourceDao.getResourcesRev(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).map {
-        IndexedIdAndResource(
-          it.idOfBaseResourceOnWhichThisMatchedInc ?: it.idOfBaseResourceOnWhichThisMatchedRev!!,
-          iParser.parseResource(it.serializedResource) as Resource
-        )
-      }
+      resourceDao
+        .getReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+        .map {
+          IndexedIdAndResource(
+            it.matchingIndex,
+            it.idOfBaseResourceOnWhichThisMatchedInc ?: it.idOfBaseResourceOnWhichThisMatchedRev!!,
+            iParser.parseResource(it.serializedResource) as Resource
+          )
+        }
     }
   }
 

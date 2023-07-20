@@ -31,10 +31,22 @@ import com.google.android.fhir.search.filter.StringParamFilterCriterion
 import com.google.android.fhir.search.filter.TokenParamFilterCriterion
 import com.google.android.fhir.search.filter.UriParamFilterCriterion
 
-@DslMarker @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE) annotation class ISearchDsl
+@DslMarker @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE) annotation class BaseSearchDsl
 
-@ISearchDsl
-interface ISearch {
+/**
+ * Defines the basic functionality provided by the search including [filter], [sort] and logical
+ * [operation] on filters.
+ */
+@BaseSearchDsl
+interface BaseSearch {
+  /** Logical operator between the filters. */
+  var operation: Operation
+
+  /** Count of the maximum expected search results. */
+  var count: Int?
+
+  /** Index from which the matching search results should be returned. */
+  var from: Int?
 
   fun filter(
     stringParameter: StringClientParam,
@@ -83,6 +95,4 @@ interface ISearch {
   fun sort(parameter: NumberClientParam, order: Order)
 
   fun sort(parameter: DateClientParam, order: Order)
-
-  fun operations(operation: Operation)
 }

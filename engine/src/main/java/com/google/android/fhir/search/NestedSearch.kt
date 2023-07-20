@@ -41,7 +41,7 @@ internal data class NestedContext(val parentType: ResourceType, val param: IPara
  */
 inline fun <reified R : Resource> Search.has(
   referenceParam: ReferenceClientParam,
-  init: @ISearchDsl ISearch.() -> Unit
+  init: @BaseSearchDsl BaseSearch.() -> Unit
 ) {
   nestedSearches.add(
     NestedSearch(referenceParam, Search(type = R::class.java.newInstance().resourceType)).apply {
@@ -71,7 +71,7 @@ inline fun <reified R : Resource> Search.has(
  */
 inline fun <reified R : Resource> Search.include(
   referenceParam: ReferenceClientParam,
-  init: @ISearchDsl ISearch.() -> Unit
+  init: @BaseSearchDsl BaseSearch.() -> Unit = {}
 ) {
   forwardIncludes.add(
     NestedSearch(referenceParam, Search(type = R::class.java.newInstance().resourceType)).apply {
@@ -103,7 +103,7 @@ inline fun <reified R : Resource> Search.include(
 fun Search.include(
   resourceType: ResourceType,
   referenceParam: ReferenceClientParam,
-  init: @ISearchDsl ISearch.() -> Unit = {}
+  init: @BaseSearchDsl BaseSearch.() -> Unit = {}
 ) {
   forwardIncludes.add(
     NestedSearch(referenceParam, Search(type = resourceType)).apply { search.init() }
@@ -133,7 +133,7 @@ fun Search.include(
  */
 inline fun <reified R : Resource> Search.revInclude(
   referenceParam: ReferenceClientParam,
-  init: @ISearchDsl ISearch.() -> Unit = {}
+  init: @BaseSearchDsl BaseSearch.() -> Unit = {}
 ) {
 
   revIncludes.add(
@@ -167,7 +167,7 @@ inline fun <reified R : Resource> Search.revInclude(
 fun Search.revInclude(
   resourceType: ResourceType,
   referenceParam: ReferenceClientParam,
-  init: @ISearchDsl ISearch.() -> Unit = {}
+  init: @BaseSearchDsl BaseSearch.() -> Unit = {}
 ) {
   revIncludes.add(NestedSearch(referenceParam, Search(type = resourceType)).apply { search.init() })
 }
@@ -189,7 +189,7 @@ fun Search.revInclude(
 fun Search.has(
   resourceType: ResourceType,
   referenceParam: ReferenceClientParam,
-  init: @ISearchDsl ISearch.() -> Unit
+  init: @BaseSearchDsl BaseSearch.() -> Unit
 ) {
   nestedSearches.add(
     NestedSearch(referenceParam, Search(type = resourceType)).apply { search.init() }
