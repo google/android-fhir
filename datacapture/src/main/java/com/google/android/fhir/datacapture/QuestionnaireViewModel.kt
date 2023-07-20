@@ -465,6 +465,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                     questionnaireResponse.allItems.find { it.linkId == qItem.linkId }
                   )
                 }
+                modificationCount.update { it + 1 }
               }
             }
       )
