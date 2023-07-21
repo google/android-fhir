@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -252,7 +252,7 @@ object Dependencies {
       const val stdlib = "1.8.20"
     }
 
-    const val androidFhirCommon = "0.1.0-alpha03"
+    const val androidFhirCommon = "0.1.0-alpha04"
     const val androidFhirEngine = "0.1.0-beta02"
     const val desugarJdkLibs = "2.0.3"
     const val caffeine = "2.9.1"
