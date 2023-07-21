@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ internal abstract class ResourceDao {
   }
 
   open suspend fun insertAllRemote(resources: List<Resource>): List<String> {
-    return resources.map { resource -> insertResourceRemote(resource) }
+    return resources.map { resource -> insertRemoteResource(resource) }
   }
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -172,12 +172,12 @@ internal abstract class ResourceDao {
 
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
-  suspend fun insertResourceLocal(resource: Resource, timeOfChange: Instant) =
+  suspend fun insertLocalResource(resource: Resource, timeOfChange: Instant) =
     insertResource(resource, timeOfChange)
 
   // Since the insert removes any old indexes and lastUpdatedLocal (data not contained in resource
   // itself), we extract the lastUpdatedLocal if any and then set it back again.
-  private suspend fun insertResourceRemote(resource: Resource) =
+  private suspend fun insertRemoteResource(resource: Resource) =
     insertResource(
       resource,
       getResourceEntity(resource.logicalId, resource.resourceType)?.lastUpdatedLocal
