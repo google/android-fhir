@@ -51,7 +51,7 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    inflater.inflate(R.menu.select_questionnaire_menu, menu)
+    inflater.inflate(R.menu.open_questionnaire_menu, menu)
     true
   }
 

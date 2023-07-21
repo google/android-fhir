@@ -69,4 +69,5 @@
     <string name="error">Error</string>
     <string name="widgets">Widgets</string>
     <string name="misc_components">Miscellaneous components</string>
+    <string name="open_questionnaire">Open questionnaire</string>
 </resources>
