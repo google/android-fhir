@@ -18,7 +18,6 @@ package com.google.android.fhir.catalog
 
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuInflater
@@ -31,8 +30,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import java.io.BufferedReader
-import java.io.InputStreamReader
 
 /** Fragment for the component list. */
 class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
@@ -99,21 +96,6 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
               }
           }
     }
-  }
-
-  fun readFileContent(uri: Uri) {
-    val inputStream = requireActivity().contentResolver.openInputStream(uri)
-    val reader = BufferedReader(InputStreamReader(inputStream))
-    val stringBuilder = StringBuilder()
-    var line: String? = reader.readLine()
-    while (line != null) {
-      stringBuilder.append(line)
-      line = reader.readLine()
-    }
-    reader.close()
-    val fileContent = stringBuilder.toString()
-    Log.d("SAF", fileContent)
-    // Do something with the file content
   }
 
   private fun onItemClick(component: ComponentListViewModel.Component) {
