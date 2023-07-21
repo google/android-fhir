@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@ import org.hl7.fhir.r4.model.ResourceType
   indices =
     [
       Index(value = ["resourceUuid"], unique = true),
-      Index(value = ["resourceType", "resourceId"], unique = true)]
+      Index(value = ["resourceType", "resourceId"], unique = true),
+    ]
 )
 internal data class ResourceEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
@@ -36,5 +37,6 @@ internal data class ResourceEntity(
   val resourceId: String,
   val serializedResource: String,
   val versionId: String?,
-  val lastUpdatedRemote: Instant?
+  val lastUpdatedRemote: Instant?,
+  val lastUpdatedLocal: Instant?,
 )

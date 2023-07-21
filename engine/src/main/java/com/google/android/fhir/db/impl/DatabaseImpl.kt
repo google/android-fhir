@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ internal class DatabaseImpl(
             }
           }
 
-          addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+          addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
         }
         .build()
   }
@@ -110,22 +110,28 @@ internal class DatabaseImpl(
   override suspend fun <R : Resource> insert(vararg resource: R): List<String> {
     val logicalIds = mutableListOf<String>()
     db.withTransaction {
-      logicalIds.addAll(resourceDao.insertAll(resource.toList()))
-      localChangeDao.addInsertAll(resource.toList())
+      logicalIds.addAll(
+        resource.map {
+          val timeOfLocalChange = Instant.now()
+          localChangeDao.addInsert(it, timeOfLocalChange)
+          resourceDao.insertLocalResource(it, timeOfLocalChange)
+        }
+      )
     }
     return logicalIds
   }
 
   override suspend fun <R : Resource> insertRemote(vararg resource: R) {
-    db.withTransaction { resourceDao.insertAll(resource.toList()) }
+    db.withTransaction { resourceDao.insertAllRemote(resource.toList()) }
   }
 
   override suspend fun update(vararg resources: Resource) {
     db.withTransaction {
       resources.forEach {
+        val timeOfLocalChange = Instant.now()
         val oldResourceEntity = selectEntity(it.resourceType, it.logicalId)
-        resourceDao.update(it)
-        localChangeDao.addUpdate(oldResourceEntity, it)
+        resourceDao.update(it, timeOfLocalChange)
+        localChangeDao.addUpdate(oldResourceEntity, it, timeOfLocalChange)
       }
     }
   }
@@ -137,7 +143,7 @@ internal class DatabaseImpl(
     lastUpdated: Instant
   ) {
     db.withTransaction {
-      resourceDao.updateRemoteVersionIdAndLastUpdate(
+      resourceDao.updateAndIndexRemoteVersionIdAndLastUpdate(
         resourceId,
         resourceType,
         versionId,
