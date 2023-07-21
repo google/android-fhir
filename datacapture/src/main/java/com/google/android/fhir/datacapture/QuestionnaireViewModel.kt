@@ -872,6 +872,7 @@ internal sealed class DisplayMode {
   class EditMode(val pagination: QuestionnairePagination) : DisplayMode()
   data class ReviewMode(val showEditButton: Boolean, val showSubmitButton: Boolean) : DisplayMode()
 
+  // Sentinel displayMode that's used in setting the initial default QuestionnaireState
   object InitMode : DisplayMode()
 }
 
