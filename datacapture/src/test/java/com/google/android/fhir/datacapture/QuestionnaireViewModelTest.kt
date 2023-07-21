@@ -506,7 +506,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should throw exception for non-matching question linkIds`() {
+  fun `should remove response item of non-matching question linkIds`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -533,62 +533,21 @@ class QuestionnaireViewModelTest {
         )
       }
 
-    val errorMessage =
-      assertFailsWith<IllegalArgumentException> {
-          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-        }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo("Missing questionnaire item for questionnaire response item a-different-link-id")
-  }
-
-  @Test
-  fun `should throw an exception for extra questionnaire response items`() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
-        )
-      }
-    val questionnaireResponse =
+    val expectedQuestionnaireResponse =
       QuestionnaireResponse().apply {
         id = "a-questionnaire-response"
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
-          }
-        )
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-different-link-id"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
+            text = "Basic question"
           }
         )
       }
 
-    val errorMessage =
-      assertFailsWith<IllegalArgumentException> {
-          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-        }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo("Missing questionnaire item for questionnaire response item a-different-link-id")
+    assertResourceEquals(
+      createQuestionnaireViewModel(questionnaire, questionnaireResponse).getQuestionnaireResponse(),
+      expectedQuestionnaireResponse
+    )
   }
 
   @Test
@@ -945,6 +904,202 @@ class QuestionnaireViewModelTest {
         )
       }
     createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+  }
+
+  @Test
+  fun `add empty nested QuestionnaireResponseItemComponent to the group if questions are not answered`() {
+    val questionnaireString =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "id": "client-registration-sample",
+          "item": [
+            {
+              "linkId": "1",
+              "type": "group",
+              "item": [
+                {
+                  "linkId": "1.1",
+                  "text": "First Nested Item",
+                  "type": "boolean"
+                },
+                {
+                  "linkId": "1.2",
+                  "text": "Second Nested Item",
+                  "type": "boolean"
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    val questionnaireResponseString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "1"
+            }
+          ]
+        }
+      """.trimIndent()
+
+    val expectedResponseString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "1",
+              "item": [
+                {
+                  "linkId": "1.1",
+                  "text": "First Nested Item"
+                },
+                {
+                  "linkId": "1.2",
+                  "text": "Second Nested Item"
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
+    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    val viewModel = QuestionnaireViewModel(context, state)
+    val value = viewModel.getQuestionnaireResponse()
+    val expectedResponse =
+      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+        as QuestionnaireResponse
+
+    assertResourceEquals(value, expectedResponse)
+  }
+
+  @Test
+  fun `maintain an order while adding empty QuestionnaireResponseItemComponent to the response items`() {
+    val questionnaireString =
+      """
+          {
+            "resourceType": "Questionnaire",
+            "item": [
+              {
+                "linkId": "1",
+                "type": "group",
+                "text": "Repeated Group",
+                "repeats": true,
+                "item": [
+                  {
+                    "linkId": "1-1",
+                    "type": "date",
+                    "extension": [
+                      {
+                        "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
+                        "valueString": "yyyy-mm-dd"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "linkId": "2",
+                "text": "Is this the first visit?",
+                "type": "boolean"
+              }
+            ]
+          }
+      """.trimIndent()
+
+    val questionnaireResponseString =
+      """
+              {
+                "resourceType": "QuestionnaireResponse",
+                "item": [
+                  {
+                    "linkId": "1",
+                    "text": "Repeated Group",
+                    "item": [
+                      {
+                        "linkId": "1-1",
+                        "answer": [
+                          {
+                            "valueDate": "2023-06-14"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "linkId": "1",
+                    "text": "Repeated Group",
+                    "item": [
+                      {
+                        "linkId": "1-1",
+                        "answer": [
+                          {
+                            "valueDate": "2023-06-13"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+      """.trimIndent()
+
+    val expectedResponseString =
+      """
+            {
+              "resourceType": "QuestionnaireResponse",
+              "item": [
+                {
+                  "linkId": "1",
+                  "text": "Repeated Group",
+                  "item": [
+                    {
+                      "linkId": "1-1",
+                      "answer": [
+                        {
+                          "valueDate": "2023-06-14"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "1",
+                  "text": "Repeated Group",
+                  "item": [
+                    {
+                      "linkId": "1-1",
+                      "answer": [
+                        {
+                          "valueDate": "2023-06-13"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "2",
+                  "text": "Is this the first visit?"
+                }
+              ]
+            }
+      """.trimIndent()
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
+    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    val viewModel = QuestionnaireViewModel(context, state)
+    val value = viewModel.getQuestionnaireResponse()
+    val expectedResponse =
+      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+        as QuestionnaireResponse
+
+    assertResourceEquals(value, expectedResponse)
   }
 
   // ==================================================================== //
