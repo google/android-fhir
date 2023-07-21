@@ -3848,7 +3848,7 @@ class QuestionnaireViewModelTest {
   // ==================================================================== //
 
   @Test
-  fun questionnaire_resolveContainedAnswerValueSet() = runTest {
+  fun questionnaire_resolveContainedAnswerValueSetInEnabledAnswerOptions() = runTest {
     val valueSetId = "yesnodontknow"
     val questionnaire =
       Questionnaire().apply {
@@ -3883,20 +3883,30 @@ class QuestionnaireViewModelTest {
               }
           }
         )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "q-yesnodontknow"
+            answerValueSet = "#$valueSetId"
+          }
+        )
       }
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val codeSet = viewModel.resolveAnswerValueSet("#$valueSetId")
-
-    assertThat(codeSet.map { it.valueCoding.display })
-      .containsExactly("Yes", "No", "Don't Know")
-      .inOrder()
+    viewModel.runViewModelBlocking {
+      val viewItem =
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "q-yesnodontknow" }
+      val answerOptions = viewItem.enabledAnswerOptions
+      assertThat(answerOptions.map { it.valueCoding.display })
+        .containsExactly("Yes", "No", "Don't Know")
+        .inOrder()
+    }
   }
 
   @Test
-  fun questionnaire_resolveAnswerValueSetExternalResolved() = runTest {
-    val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
-
+  fun questionnaire_resolveAnswerValueSetExternalResolvedInEnabledAnswerOptions() = runTest {
     ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
       .dataCaptureConfiguration =
       DataCaptureConfig(
@@ -3927,11 +3937,29 @@ class QuestionnaireViewModelTest {
           }
       )
 
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "q-codesystemyesno"
+            answerValueSet = CODE_SYSTEM_YES_NO
+          }
+        )
+      }
+
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val codeSet = viewModel.resolveAnswerValueSet(CODE_SYSTEM_YES_NO)
-    assertThat(codeSet.map { it.valueCoding.display })
-      .containsExactly("Yes", "No", "Don't Know")
-      .inOrder()
+    viewModel.runViewModelBlocking {
+      val viewItem =
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "q-codesystemyesno" }
+      val codeSet = viewItem.enabledAnswerOptions
+      assertThat(codeSet.map { it.valueCoding.display })
+        .containsExactly("Yes", "No", "Don't Know")
+        .inOrder()
+    }
   }
 
   // ==================================================================== //
@@ -3941,72 +3969,77 @@ class QuestionnaireViewModelTest {
   // ==================================================================== //
 
   @Test
-  fun `resolveAnswerExpression() should return x-fhir-query referring to patient in context`() =
-    runTest {
-      var searchString = ""
-      ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
-        .dataCaptureConfiguration =
-        DataCaptureConfig(
-          xFhirQueryResolver = { xFhirQuery ->
-            searchString = xFhirQuery
-            emptyList()
-          }
-        )
-
-      val patientId = "123"
-      val patient = Patient().apply { id = patientId }
-
-      val questionnaire =
-        Questionnaire().apply {
-          extension =
-            listOf(
-              Extension(
-                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
-                )
-                .apply {
-                  addExtension(
-                    "name",
-                    Coding(
-                      "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
-                      "patient",
-                      "Patient"
-                    )
-                  )
-                  addExtension("type", CodeType("Patient"))
-                }
-            )
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "a"
-              text = "answer expression question text"
-              type = Questionnaire.QuestionnaireItemType.REFERENCE
-              extension =
-                listOf(
-                  Extension(
-                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
-                    Expression().apply {
-                      this.expression = "Observation?subject={{%patient.id}}"
-                      this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
-                    }
-                  )
-                )
-            }
-          )
+  fun `should return x-fhir-query referring to patient in context on start`() = runTest {
+    var searchString = ""
+    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+      .dataCaptureConfiguration =
+      DataCaptureConfig(
+        xFhirQueryResolver = { xFhirQuery ->
+          searchString = xFhirQuery
+          emptyList()
         }
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-      state.set(
-        EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS,
-        listOf(printer.encodeResourceToString(patient))
       )
 
-      val viewModel = QuestionnaireViewModel(context, state)
-      viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
+    val patientId = "123"
+    val patient = Patient().apply { id = patientId }
 
+    val questionnaire =
+      Questionnaire().apply {
+        extension =
+          listOf(
+            Extension(
+                "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+              )
+              .apply {
+                addExtension(
+                  "name",
+                  Coding(
+                    "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
+                    "patient",
+                    "Patient"
+                  )
+                )
+                addExtension("type", CodeType("Patient"))
+              }
+          )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a"
+            text = "answer expression question text"
+            type = Questionnaire.QuestionnaireItemType.REFERENCE
+            extension =
+              listOf(
+                Extension(
+                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                  Expression().apply {
+                    this.expression = "Observation?subject={{%patient.id}}"
+                    this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                  }
+                )
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    state.set(
+      EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS,
+      listOf(printer.encodeResourceToString(patient))
+    )
+
+    val viewModel = QuestionnaireViewModel(context, state)
+    viewModel.runViewModelBlocking {
+      val viewItem =
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "a" }
+      assertThat(viewItem.enabledAnswerOptions).isEmpty()
       assertThat(searchString).isEqualTo("Observation?subject=Patient/$patientId")
     }
+  }
 
   @Test
-  fun `resolveAnswerExpression() should return questionnaire item answer options for answer expression and choice column`() =
+  fun `should return questionnaire item answer options for answer expression and choice column`() =
     runTest {
       val practitioner =
         Practitioner().apply {
@@ -4048,14 +4081,19 @@ class QuestionnaireViewModelTest {
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
       val viewModel = QuestionnaireViewModel(context, state)
-      val answerOptions = viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
-
-      assertThat(answerOptions.first().valueReference.reference)
-        .isEqualTo("Practitioner/${practitioner.logicalId}")
+      viewModel.runViewModelBlocking {
+        val viewItem =
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .map { it.asQuestion() }
+            .single { it.questionnaireItem.linkId == "a" }
+        assertThat(viewItem.enabledAnswerOptions.first().valueReference.reference)
+          .isEqualTo("Practitioner/${practitioner.logicalId}")
+      }
     }
 
   @Test
-  fun `resolveAnswerExpression() should throw exception when XFhirQueryResolver is not provided`() {
+  fun `should throw exception when XFhirQueryResolver is not provided for x-fhir-query answer expressions`() {
     val questionnaire =
       Questionnaire().apply {
         addItem(
@@ -4085,10 +4123,10 @@ class QuestionnaireViewModelTest {
         )
       }
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    val viewModel = QuestionnaireViewModel(context, state)
     val exception =
-      assertThrows(null, IllegalStateException::class.java) {
-        val viewModel = QuestionnaireViewModel(context, state)
-        runTest { viewModel.resolveAnswerExpression(questionnaire.itemFirstRep) }
+      assertThrows(IllegalStateException::class.java) {
+        runTest { viewModel.runViewModelBlocking {} }
       }
     assertThat(exception.message)
       .isEqualTo(
