@@ -585,8 +585,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               questionnaire,
               questionnaireResponse,
               item,
-              answerExpression,
               questionnaireItemParentMap,
+              answerExpression,
               questionnaireLaunchContextMap
             )
           if (answerExpressionMap.containsKey(xFhirExpressionString)) {

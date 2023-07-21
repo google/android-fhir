@@ -691,8 +691,8 @@ class ExpressionEvaluatorTest {
         Questionnaire(),
         QuestionnaireResponse(),
         Questionnaire.QuestionnaireItemComponent(),
-        expression,
         emptyMap(),
+        expression,
         mapOf(Practitioner().resourceType.name.lowercase() to Practitioner())
       )
 
@@ -719,8 +719,8 @@ class ExpressionEvaluatorTest {
         Questionnaire(),
         QuestionnaireResponse(),
         Questionnaire.QuestionnaireItemComponent(),
-        expression,
         emptyMap(),
+        expression,
         mapOf(practitioner.resourceType.name to practitioner)
       )
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
@@ -747,8 +747,8 @@ class ExpressionEvaluatorTest {
         Questionnaire(),
         QuestionnaireResponse(),
         Questionnaire.QuestionnaireItemComponent(),
-        expression,
         emptyMap(),
+        expression,
         mapOf(practitioner.resourceType.name.lowercase() to practitioner)
       )
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=male")
@@ -775,8 +775,8 @@ class ExpressionEvaluatorTest {
         Questionnaire(),
         QuestionnaireResponse(),
         Questionnaire.QuestionnaireItemComponent(),
-        expression,
         emptyMap(),
+        expression,
         mapOf(practitioner.resourceType.name to practitioner)
       )
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
@@ -803,8 +803,8 @@ class ExpressionEvaluatorTest {
         Questionnaire(),
         QuestionnaireResponse(),
         Questionnaire.QuestionnaireItemComponent(),
-        expression,
         emptyMap(),
+        expression,
         mapOf(patient.resourceType.name.lowercase() to patient)
       )
     assertThat(expressionsToEvaluate).isEqualTo("Patient?family=John")
@@ -845,8 +845,8 @@ class ExpressionEvaluatorTest {
         Questionnaire(),
         QuestionnaireResponse(),
         Questionnaire.QuestionnaireItemComponent(),
-        expression,
         emptyMap(),
+        expression,
         mapOf(
           patient.resourceType.name.lowercase() to patient,
           location.resourceType.name.lowercase() to location
@@ -910,8 +910,8 @@ class ExpressionEvaluatorTest {
         questionnaire,
         QuestionnaireResponse(),
         questionnaire.item[0].item[0],
-        questionnaire.item[0].item[0].answerExpression!!,
         mapOf(questionnaire.item[0].item[0] to questionnaire.item[0]),
+        questionnaire.item[0].item[0].answerExpression!!,
         null
       )
 
