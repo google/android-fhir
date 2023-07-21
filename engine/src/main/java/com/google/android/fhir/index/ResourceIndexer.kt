@@ -323,7 +323,7 @@ internal class ResourceIndexer(
           if (quantity.system == ucumUrl && quantity.code != null) {
             try {
               val ucumUnit =
-                UnitConverter.getCanonicalForm(UcumValue(quantity.code, quantity.value))
+                UnitConverter.getCanonicalFormOrOriginal(UcumValue(quantity.code, quantity.value))
               canonicalCode = ucumUnit.code
               canonicalValue = ucumUnit.value
             } catch (exception: ConverterException) {
