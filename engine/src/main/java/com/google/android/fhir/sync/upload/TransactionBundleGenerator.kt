@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,12 +60,7 @@ open class TransactionBundleGenerator(
   companion object Factory {
 
     fun getDefault(useETagForUpload: Boolean = true, bundleSize: Int = 500) =
-      getGenerator(
-        Bundle.HTTPVerb.PUT,
-        Bundle.HTTPVerb.PATCH,
-        bundleSize,
-        useETagForUpload
-      )
+      getGenerator(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, bundleSize, useETagForUpload)
     /**
      * Returns a [TransactionBundleGenerator] based on the provided [Bundle.HTTPVerb]s for creating
      * and updating resources. The function may throw an [IllegalArgumentException] if the provided

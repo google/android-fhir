@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync.upload
+package com.google.android.fhir.search
 
-import com.google.android.fhir.LocalChange
-import com.google.android.fhir.sync.UploadRequest
+import ca.uhn.fhir.rest.gclient.DateClientParam
 
-/** Generator that generates [UploadRequest]s from the [LocalChange]s */
-interface UploadRequestGenerator {
-  /** Generates a list of [UploadRequest] from the [localChanges] */
-  fun generateUploadRequests(localChanges: List<LocalChange>): List<UploadRequest>
-}
+internal const val LOCAL_LAST_UPDATED = "local_lastUpdated"
+internal const val LAST_UPDATED = "_lastUpdated"
+
+/** Resource Date Parameter to search using local last updated date. */
+val LOCAL_LAST_UPDATED_PARAM = DateClientParam(LOCAL_LAST_UPDATED)
+
+/** Resource Date Parameter to search using remote last updated date. */
+val LAST_UPDATED_PARAM = DateClientParam(LAST_UPDATED)
