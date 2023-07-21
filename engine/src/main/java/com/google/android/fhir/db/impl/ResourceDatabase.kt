@@ -50,7 +50,7 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
       LocalChangeEntity::class,
       PositionIndexEntity::class
     ],
-  version = 4,
+  version = 5,
   exportSchema = true
 )
 @TypeConverters(DbTypeConverters::class)
@@ -96,6 +96,15 @@ val MIGRATION_3_4 =
       )
       database.execSQL(
         "DROP INDEX IF EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value`"
+      )
+    }
+  }
+
+val MIGRATION_4_5 =
+  object : Migration(/* startVersion = */ 4, /* endVersion = */ 5) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.execSQL(
+        "ALTER TABLE `ResourceEntity` ADD COLUMN `lastUpdatedLocal` INTEGER DEFAULT NULL"
       )
     }
   }
