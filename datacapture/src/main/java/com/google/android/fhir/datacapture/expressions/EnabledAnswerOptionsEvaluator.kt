@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.enablement
+package com.google.android.fhir.datacapture.expressions
 
 import com.google.android.fhir.datacapture.ExternalAnswerValueSetResolver
 import com.google.android.fhir.datacapture.XFhirQueryResolver

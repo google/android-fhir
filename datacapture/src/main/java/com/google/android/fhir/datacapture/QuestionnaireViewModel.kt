@@ -25,8 +25,8 @@ import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.datacapture.enablement.EnabledAnswerOptionsEvaluator
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.expressions.EnabledAnswerOptionsEvaluator
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
@@ -62,8 +62,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.withIndex
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Element
 import org.hl7.fhir.r4.model.Questionnaire
@@ -474,20 +477,23 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     combine(modificationCount, currentPageIndexFlow, isInReviewModeFlow) { _, _, _ ->
         getQuestionnaireState()
       }
+      .withIndex()
+      .onEach {
+        if (it.index == 0) {
+          detectExpressionCyclicDependency(questionnaire.item)
+          questionnaire.item.flattened().forEach { qItem ->
+            updateDependentQuestionnaireResponseItems(
+              qItem,
+              questionnaireResponse.allItems.find { it.linkId == qItem.linkId }
+            )
+          }
+        }
+      }
+      .map { it.value }
       .stateIn(
         viewModelScope,
         SharingStarted.Lazily,
-        initialValue =
-          QuestionnaireState(items = emptyList(), displayMode = DisplayMode.InitMode)
-            .also { detectExpressionCyclicDependency(questionnaire.item) }
-            .also {
-              questionnaire.item.flattened().forEach { qItem ->
-                updateDependentQuestionnaireResponseItems(
-                  qItem,
-                  questionnaireResponse.allItems.find { it.linkId == qItem.linkId }
-                )
-              }
-            }
+        initialValue = QuestionnaireState(items = emptyList(), displayMode = DisplayMode.InitMode)
       )
 
   private fun updateDependentQuestionnaireResponseItems(

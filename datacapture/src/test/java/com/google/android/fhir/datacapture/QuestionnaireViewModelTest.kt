@@ -5301,12 +5301,67 @@ class QuestionnaireViewModelTest {
     }
 
   @Test
-  fun `should detect cyclic dependency for questionnaire item with calculated expression extension in flat list`() =
-    runTest {
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
+  fun `should detect cyclic dependency for questionnaire item with calculated expression extension in flat list`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-birthdate"
+            type = Questionnaire.QuestionnaireItemType.DATE
+            addInitial(
+              Questionnaire.QuestionnaireItemInitialComponent(
+                DateType(Date()).apply { add(Calendar.YEAR, -2) }
+              )
+            )
+            addExtension().apply {
+              url = EXTENSION_CALCULATED_EXPRESSION_URL
+              setValue(
+                Expression().apply {
+                  this.language = "text/fhirpath"
+                  this.expression =
+                    "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+                }
+              )
+            }
+          }
+        )
+
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-age-years"
+            type = Questionnaire.QuestionnaireItemType.INTEGER
+            addExtension().apply {
+              url = EXTENSION_CALCULATED_EXPRESSION_URL
+              setValue(
+                Expression().apply {
+                  this.language = "text/fhirpath"
+                  this.expression =
+                    "today().toString().substring(0, 4).toInteger() - %resource.repeat(item).where(linkId='a-birthdate').answer.value.toString().substring(0, 4).toInteger()"
+                }
+              )
+            }
+          }
+        )
+      }
+
+    val exception =
+      assertThrows(null, IllegalStateException::class.java) {
+        runTest {
+          val viewModel = createQuestionnaireViewModel(questionnaire)
+          viewModel.runViewModelBlocking {}
+        }
+      }
+    assertThat(exception.message)
+      .isEqualTo("a-birthdate and a-age-years have cyclic dependency in expression based extension")
+  }
+
+  @Test
+  fun `should detect cyclic dependency for questionnaire item with calculated expression extension in nested list`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "a-birthdate"
               type = Questionnaire.QuestionnaireItemType.DATE
@@ -5327,8 +5382,17 @@ class QuestionnaireViewModelTest {
               }
             }
           )
-
-          addItem(
+          .addItem()
+          .apply {
+            linkId = "a.1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+          }
+          .addItem()
+          .apply {
+            linkId = "a.1.1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+          }
+          .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "a-age-years"
               type = Questionnaire.QuestionnaireItemType.INTEGER
@@ -5344,82 +5408,18 @@ class QuestionnaireViewModelTest {
               }
             }
           )
-        }
+      }
 
-      val exception =
-        assertThrows(null, IllegalStateException::class.java) {
-          createQuestionnaireViewModel(questionnaire)
+    val exception =
+      assertThrows(null, IllegalStateException::class.java) {
+        runTest {
+          val viewModel = createQuestionnaireViewModel(questionnaire)
+          viewModel.runViewModelBlocking {}
         }
-      assertThat(exception.message)
-        .isEqualTo(
-          "a-birthdate and a-age-years have cyclic dependency in expression based extension"
-        )
-    }
-
-  @Test
-  fun `should detect cyclic dependency for questionnaire item with calculated expression extension in nested list`() =
-    runTest {
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "a-birthdate"
-                type = Questionnaire.QuestionnaireItemType.DATE
-                addInitial(
-                  Questionnaire.QuestionnaireItemInitialComponent(
-                    DateType(Date()).apply { add(Calendar.YEAR, -2) }
-                  )
-                )
-                addExtension().apply {
-                  url = EXTENSION_CALCULATED_EXPRESSION_URL
-                  setValue(
-                    Expression().apply {
-                      this.language = "text/fhirpath"
-                      this.expression =
-                        "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
-                    }
-                  )
-                }
-              }
-            )
-            .addItem()
-            .apply {
-              linkId = "a.1"
-              type = Questionnaire.QuestionnaireItemType.GROUP
-            }
-            .addItem()
-            .apply {
-              linkId = "a.1.1"
-              type = Questionnaire.QuestionnaireItemType.GROUP
-            }
-            .addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "a-age-years"
-                type = Questionnaire.QuestionnaireItemType.INTEGER
-                addExtension().apply {
-                  url = EXTENSION_CALCULATED_EXPRESSION_URL
-                  setValue(
-                    Expression().apply {
-                      this.language = "text/fhirpath"
-                      this.expression =
-                        "today().toString().substring(0, 4).toInteger() - %resource.repeat(item).where(linkId='a-birthdate').answer.value.toString().substring(0, 4).toInteger()"
-                    }
-                  )
-                }
-              }
-            )
-        }
-
-      val exception =
-        assertThrows(null, IllegalStateException::class.java) {
-          createQuestionnaireViewModel(questionnaire)
-        }
-      assertThat(exception.message)
-        .isEqualTo(
-          "a-birthdate and a-age-years have cyclic dependency in expression based extension"
-        )
-    }
+      }
+    assertThat(exception.message)
+      .isEqualTo("a-birthdate and a-age-years have cyclic dependency in expression based extension")
+  }
 
   // ==================================================================== //
   //                                                                      //
