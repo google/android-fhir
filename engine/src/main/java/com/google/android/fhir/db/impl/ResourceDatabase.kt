@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
       LocalChangeEntity::class,
       PositionIndexEntity::class
     ],
-  version = 4,
+  version = 5,
   exportSchema = true
 )
 @TypeConverters(DbTypeConverters::class)
@@ -96,6 +96,15 @@ val MIGRATION_3_4 =
       )
       database.execSQL(
         "DROP INDEX IF EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value`"
+      )
+    }
+  }
+
+val MIGRATION_4_5 =
+  object : Migration(/* startVersion = */ 4, /* endVersion = */ 5) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.execSQL(
+        "ALTER TABLE `ResourceEntity` ADD COLUMN `lastUpdatedLocal` INTEGER DEFAULT NULL"
       )
     }
   }
