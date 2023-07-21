@@ -58,6 +58,7 @@ fun initHelpViews(
   helpTextView: TextView,
   questionnaireItem: Questionnaire.QuestionnaireItemComponent
 ) {
+  helpCardView.visibility = GONE
   helpButton.visibility =
     if (questionnaireItem.hasHelpButton) {
       VISIBLE

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,7 @@
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
@@ -42,7 +40,7 @@ object Releases {
 
   object Common : LibraryArtifact {
     override val artifactId = "common"
-    override val version = "0.1.0-alpha03"
+    override val version = "0.1.0-alpha04"
     override val name = "Android FHIR Common Library"
   }
 
@@ -94,24 +92,18 @@ object Releases {
 }
 
 fun Project.publishArtifact(artifact: LibraryArtifact) {
+  val variantToPublish = "release"
+  project.extensions
+    .getByType<com.android.build.gradle.LibraryExtension>()
+    .publishing.singleVariant(variantToPublish) { withSourcesJar() }
   afterEvaluate {
     configure<PublishingExtension> {
       publications {
-        register("release", MavenPublication::class) {
-          from(components["release"])
+        register<MavenPublication>(variantToPublish) {
           groupId = Releases.groupId
           artifactId = artifact.artifactId
           version = artifact.version
-          // Also publish source code for developers' convenience
-          artifact(
-            tasks.create<Jar>("androidSourcesJar") {
-              archiveClassifier.set("sources")
-
-              val android =
-                project.extensions.getByType<com.android.build.gradle.LibraryExtension>()
-              from(android.sourceSets.getByName("main").java.srcDirs)
-            }
-          )
+          from(components[variantToPublish])
           pom {
             name.set(artifact.name)
             licenses {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -168,7 +168,7 @@ internal class QuestionnaireItemDialogSelectViewModel : ViewModel() {
   }
 
   private fun selectedOptionsFlow(linkId: String) =
-    linkIdsToSelectedOptionsFlow.getOrPut(linkId) { MutableSharedFlow(replay = 1) }
+    linkIdsToSelectedOptionsFlow.getOrPut(linkId) { MutableSharedFlow(replay = 0) }
 }
 
 data class SelectedOptions(
