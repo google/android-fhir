@@ -41,6 +41,9 @@
     <!--   Style for help button -->
     <attr name="questionnaireHelpButtonStyle" format="reference" />
 
+    <!--   Style for media image -->
+    <attr name="questionnaireMediaImageStyle" format="reference" />
+
     <!--   Style for question text in review mode -->
     <attr name="questionnaireReviewModeQuestionTextStyle" format="reference" />
 
