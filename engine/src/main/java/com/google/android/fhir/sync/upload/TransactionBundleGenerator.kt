@@ -27,15 +27,15 @@ import org.hl7.fhir.r4.model.Bundle
  * associated with the resources present in the transaction bundle.
  */
 open class TransactionBundleGenerator(
-  private val localChangesPaginator: LocalChangesPaginator,
+  private val generatedBundleSize: Int,
   private val useETagForUpload: Boolean,
   val getBundleEntryComponentGeneratorForLocalChangeType:
     (type: Type, useETagForUpload: Boolean) -> HttpVerbBasedBundleEntryComponentGenerator
 ) : UploadRequestGenerator {
 
   override fun generateUploadRequests(localChanges: List<LocalChange>): List<BundleUploadRequest> {
-    return localChangesPaginator
-      .page(localChanges)
+    return localChanges
+      .chunked(generatedBundleSize)
       .filter { it.isNotEmpty() }
       .map { generateBundleRequest(it) }
   }
@@ -59,11 +59,11 @@ open class TransactionBundleGenerator(
 
   companion object Factory {
 
-    fun getDefault(useETagForUpload: Boolean = true) =
+    fun getDefault(useETagForUpload: Boolean = true, bundleSize: Int = 500) =
       getGenerator(
         Bundle.HTTPVerb.PUT,
         Bundle.HTTPVerb.PATCH,
-        LocalChangesPaginator.DEFAULT,
+        bundleSize,
         useETagForUpload
       )
     /**
@@ -74,7 +74,7 @@ open class TransactionBundleGenerator(
     fun getGenerator(
       httpVerbToUseForCreate: Bundle.HTTPVerb,
       httpVerbToUseForUpdate: Bundle.HTTPVerb,
-      localChangesPaginator: LocalChangesPaginator,
+      generatedBundleSize: Int,
       useETagForUpload: Boolean
     ): TransactionBundleGenerator {
 
@@ -82,7 +82,7 @@ open class TransactionBundleGenerator(
           httpVerbToUseForUpdate == Bundle.HTTPVerb.PATCH
       ) {
         TransactionBundleGenerator(
-          localChangesPaginator,
+          generatedBundleSize,
           useETagForUpload,
           this::putForCreateAndPatchForUpdateBasedBundleComponentMapper
         )
