@@ -281,16 +281,13 @@ object ExpressionEvaluator {
   /**
    * Creates an x-fhir-query string for evaluation. For this, it evaluates both variables and
    * fhir-paths in the expression.
-   *
-   * @param expression x-fhir-query expression
-   * @param launchContextMap if passed, the launch context to evaluate the expression against
    */
   internal fun createXFhirQueryFromExpression(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     questionnaireItem: QuestionnaireItemComponent,
-    expression: Expression,
     questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>,
+    expression: Expression,
     launchContextMap: Map<String, Resource>?
   ): String {
     // get all dependent variables and their evaluated values
