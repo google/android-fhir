@@ -66,10 +66,9 @@ class BehaviorListFragment : Fragment(R.layout.behavior_list_fragment) {
     findNavController()
       .navigate(
         BehaviorListFragmentDirections.actionBehaviorsFragmentToGalleryQuestionnaireFragment(
-          context?.getString(behavior.textId) ?: "",
-          behavior.questionnaireFileName,
-          null,
-          behavior.workFlow
+          questionnaireTitleKey = context?.getString(behavior.textId) ?: "",
+          questionnaireFilePathKey = behavior.questionnaireFileName,
+          workflow = behavior.workFlow
         )
       )
   }

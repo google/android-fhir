@@ -16,19 +16,31 @@
 
 package com.google.android.fhir.catalog
 
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 /** Fragment for the component list. */
 class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
   private val viewModel: ComponentListViewModel by viewModels()
+  val getContent =
+    registerForActivityResult(ActivityResultContracts.GetContent()) {
+      it?.let { launchQuestionnaireFragmentWithUri(it) }
+    }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -39,6 +51,21 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
     super.onResume()
     setUpActionBar()
     (activity as MainActivity).showBottomNavigationView(View.VISIBLE)
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    inflater.inflate(R.menu.select_questionnaire_menu, menu)
+    true
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    return when (item.itemId) {
+      R.id.select_questionnaire_menu -> {
+        getContent.launch("application/json")
+        true
+      }
+      else -> super.onOptionsItemSelected(item)
+    }
   }
 
   private fun setUpActionBar() {
@@ -74,6 +101,21 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
     }
   }
 
+  fun readFileContent(uri: Uri) {
+    val inputStream = requireActivity().contentResolver.openInputStream(uri)
+    val reader = BufferedReader(InputStreamReader(inputStream))
+    val stringBuilder = StringBuilder()
+    var line: String? = reader.readLine()
+    while (line != null) {
+      stringBuilder.append(line)
+      line = reader.readLine()
+    }
+    reader.close()
+    val fileContent = stringBuilder.toString()
+    Log.d("SAF", fileContent)
+    // Do something with the file content
+  }
+
   private fun onItemClick(component: ComponentListViewModel.Component) {
     // TODO Remove check when all components questionnaire json are updated.
     // https://github.com/google/android-fhir/issues/1076
@@ -87,10 +129,20 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
     findNavController()
       .navigate(
         ComponentListFragmentDirections.actionComponentsFragmentToGalleryQuestionnaireFragment(
-          context?.getString(component.textId) ?: "",
-          component.questionnaireFile,
-          component.questionnaireFileWithValidation,
-          component.workflow
+          questionnaireTitleKey = context?.getString(component.textId) ?: "",
+          questionnaireFilePathKey = component.questionnaireFile,
+          questionnaireFileWithValidationPathKey = component.questionnaireFileWithValidation,
+          workflow = component.workflow,
+        )
+      )
+  }
+
+  private fun launchQuestionnaireFragmentWithUri(uri: Uri) {
+    findNavController()
+      .navigate(
+        ComponentListFragmentDirections.actionComponentsFragmentToGalleryQuestionnaireFragment(
+          workflow = WorkflowType.DEFAULT,
+          questionnaireFileUri = uri,
         )
       )
   }

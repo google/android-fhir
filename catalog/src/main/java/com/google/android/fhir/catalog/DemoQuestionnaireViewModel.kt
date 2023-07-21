@@ -36,8 +36,10 @@ class DemoQuestionnaireViewModel(application: Application, private val state: Sa
 
   init {
     viewModelScope.launch {
-      getQuestionnaireJson()
-      // TODO remove check once all files are added
+      if (!state.get<String>(QUESTIONNAIRE_FILE_PATH_KEY).isNullOrEmpty()) {
+        getQuestionnaireJson()
+      }
+
       if (!state.get<String>(QUESTIONNAIRE_FILE_WITH_VALIDATION_PATH_KEY).isNullOrEmpty()) {
         getQuestionnaireWithValidationJson()
       }

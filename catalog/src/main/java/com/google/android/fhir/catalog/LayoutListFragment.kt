@@ -70,10 +70,9 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
     findNavController()
       .navigate(
         LayoutListFragmentDirections.actionLayoutsFragmentToGalleryQuestionnaireFragment(
-          context?.getString(layout.textId) ?: "",
-          layout.questionnaireFileName,
-          null,
-          layout.workflow
+          questionnaireTitleKey = context?.getString(layout.textId) ?: "",
+          questionnaireFilePathKey = layout.questionnaireFileName,
+          workflow = layout.workflow
         )
       )
   }

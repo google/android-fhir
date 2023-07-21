@@ -135,6 +135,7 @@ class DemoQuestionnaireFragment : Fragment() {
         QUESTIONNAIRE_FILE_WITH_VALIDATION_PATH_KEY,
         args.questionnaireFileWithValidationPathKey
       )
+    requireArguments().putParcelable(QUESTIONNAIRE_FILE_URI_KEY, args.questionnaireFileUri)
   }
 
   private fun addQuestionnaireFragment() {
@@ -142,13 +143,18 @@ class DemoQuestionnaireFragment : Fragment() {
       if (childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) == null) {
         childFragmentManager.commit {
           setReorderingAllowed(true)
-          add(
-            R.id.container,
+          val questionnaireFragment =
             QuestionnaireFragment.builder()
-              .setQuestionnaire(viewModel.getQuestionnaireJson())
-              .build(),
-            QUESTIONNAIRE_FRAGMENT_TAG
-          )
+              .apply {
+                if (!args.questionnaireFilePathKey.isNullOrEmpty()) {
+                  setQuestionnaire(viewModel.getQuestionnaireJson())
+                }
+                if (args.questionnaireFileUri != null) {
+                  setQuestionnaire(args.questionnaireFileUri!!)
+                }
+              }
+              .build()
+          add(R.id.container, questionnaireFragment, QUESTIONNAIRE_FRAGMENT_TAG)
         }
       }
     }
@@ -228,6 +234,7 @@ class DemoQuestionnaireFragment : Fragment() {
     const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
     const val QUESTIONNAIRE_FILE_WITH_VALIDATION_PATH_KEY =
       "questionnaire-file-with-validation-path-key"
+    const val QUESTIONNAIRE_FILE_URI_KEY = "questionnaire-file-uri-key"
   }
 }
 
