@@ -26,7 +26,6 @@ import com.google.android.fhir.datacapture.extensions.isXFhirQuery
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -69,7 +68,8 @@ internal class EnabledAnswerOptionsEvaluator(
       ) -> Unit
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
 
-    val resolvedAnswerOptions = answerOptions(questionnaireItem, questionnaireResponse)
+    val resolvedAnswerOptions =
+      answerOptions(questionnaireItem, questionnaireResponse, questionnaireItemParentMap)
 
     return if (questionnaireItem.answerOptionsToggleExpressions.isNotEmpty() &&
         resolvedAnswerOptions.isNotEmpty()
@@ -116,14 +116,19 @@ internal class EnabledAnswerOptionsEvaluator(
    */
   private suspend fun answerOptions(
     questionnaireItem: QuestionnaireItemComponent,
-    questionnaireResponse: QuestionnaireResponse
+    questionnaireResponse: QuestionnaireResponse,
+    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
     when {
       questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
       !questionnaireItem.answerValueSet.isNullOrEmpty() ->
         resolveAnswerValueSet(questionnaireItem.answerValueSet)
       questionnaireItem.answerExpression != null ->
-        resolveAnswerExpression(questionnaireItem, questionnaireResponse)
+        resolveAnswerExpression(
+          questionnaireItem,
+          questionnaireResponse,
+          questionnaireItemParentMap
+        )
       else -> emptyList()
     }
 
@@ -170,48 +175,47 @@ internal class EnabledAnswerOptionsEvaluator(
   // https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
   private suspend fun resolveAnswerExpression(
     item: QuestionnaireItemComponent,
-    questionnaireResponse: QuestionnaireResponse
+    questionnaireResponse: QuestionnaireResponse,
+    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     // Check cache first for database queries
     val answerExpression = item.answerExpression ?: return emptyList()
-    if (answerExpression.isXFhirQuery && answerExpressionMap.contains(answerExpression.expression)
-    ) {
-      return answerExpressionMap[answerExpression.expression]!!
-    }
 
-    val options = loadAnswerExpressionOptions(item, answerExpression, questionnaireResponse)
+    return when {
+      answerExpression.isXFhirQuery -> {
+        xFhirQueryResolver?.let { xFhirQueryResolver ->
+          val xFhirExpressionString =
+            ExpressionEvaluator.createXFhirQueryFromExpression(
+              questionnaire,
+              questionnaireResponse,
+              item,
+              questionnaireItemParentMap,
+              answerExpression,
+              questionnaireLaunchContextMap
+            )
+          if (answerExpressionMap.containsKey(xFhirExpressionString)) {
+            answerExpressionMap[xFhirExpressionString]
+          }
 
-    if (answerExpression.isXFhirQuery) answerExpressionMap[answerExpression.expression] = options
+          val data = xFhirQueryResolver.resolve(xFhirExpressionString)
+          val options = item.extractAnswerOptions(data)
 
-    return options
-  }
-
-  private suspend fun loadAnswerExpressionOptions(
-    item: QuestionnaireItemComponent,
-    expression: Expression,
-    questionnaireResponse: QuestionnaireResponse
-  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-    val data =
-      if (expression.isXFhirQuery) {
-        checkNotNull(xFhirQueryResolver) {
-          "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
+          answerExpressionMap[xFhirExpressionString] = options
+          options
         }
-
-        val xFhirExpressionString =
-          ExpressionEvaluator.createXFhirQueryFromExpression(
-            expression,
-            questionnaireLaunchContextMap
+          ?: error(
+            "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
           )
-        xFhirQueryResolver.resolve(xFhirExpressionString)
-      } else if (expression.isFhirPath) {
-        fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
-      } else {
-        throw UnsupportedOperationException(
-          "${expression.language} not supported for answer-expression yet"
-        )
       }
-
-    return item.extractAnswerOptions(data)
+      answerExpression.isFhirPath -> {
+        val data = fhirPathEngine.evaluate(questionnaireResponse, answerExpression.expression)
+        item.extractAnswerOptions(data)
+      }
+      else ->
+        throw UnsupportedOperationException(
+          "${answerExpression.language} not supported for answer-expression yet"
+        )
+    }
   }
 
   private fun evaluateAnswerOptionsToggleExpressions(

@@ -484,7 +484,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaire.item.flattened().forEach { qItem ->
             updateDependentQuestionnaireResponseItems(
               qItem,
-              questionnaireResponse.allItems.find { it.linkId == qItem.linkId }
+              questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId }
             )
           }
         }
