@@ -96,13 +96,23 @@
         name="min_value_validation_error_msg"
     >Minimum value allowed is:<xliff:g id="min_value">%1$s</xliff:g> </string>
     <string
+        name="max_value_validation_error_msg"
+    >Maximum value allowed is:<xliff:g id="max_value">%1$s</xliff:g> </string>
+    <string
+        name="min_length_validation_error_msg"
+    >The minimum number of characters that are permitted in the answer is: <xliff:g
+            id="min_length"
+        >%1$s</xliff:g>  </string>
+    <string
         name="max_decimal_validation_error_msg"
     >The maximum number of decimal places that are permitted in the answer is: <xliff:g
             id="max_value"
         >%1$s</xliff:g>  </string>
     <string
-        name="max_value_validation_error_msg"
-    >Maximum value allowed is:<xliff:g id="max_value">%1$s</xliff:g> </string>
+        name="regex_validation_error_msg"
+    >The answer doesn\'t match regular expression: <xliff:g
+            id="answer_value"
+        >%1$s</xliff:g> </string>
     <string
         name="number_format_validation_error_msg"
     >Only use (.) between two numbers. Other special characters are not supported.</string>

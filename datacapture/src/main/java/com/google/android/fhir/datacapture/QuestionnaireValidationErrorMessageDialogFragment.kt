@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
       .apply {
         findViewById<TextView>(R.id.body).apply {
           val viewModel: QuestionnaireValidationErrorViewModel by
-            activityViewModels(factoryProducer)
+            activityViewModels(factoryProducer = factoryProducer)
           text =
             viewModel.getItemsTextWithValidationErrors().joinToString(separator = "\n") {
               context.getString(R.string.questionnaire_validation_error_item_text_with_bullet, it)

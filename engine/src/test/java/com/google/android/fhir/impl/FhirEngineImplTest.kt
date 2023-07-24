@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir.impl
 
 import androidx.test.core.app.ApplicationProvider
+import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
@@ -24,6 +25,7 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.get
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
@@ -38,6 +40,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
+import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
@@ -240,6 +245,67 @@ class FhirEngineImplTest {
         runBlocking { fhirEngine.search("Patient?customParam=true&gender=male&_sort=name") }
       }
     assertThat(exception.message).isEqualTo("customParam not found in Patient")
+  }
+
+  @Test
+  fun `search() by x-fhir-query should return patients for _tag param`() = runBlocking {
+    val patients =
+      listOf(
+        buildPatient("1", "Patient1", Enumerations.AdministrativeGender.FEMALE).apply {
+          meta = Meta().setTag(mutableListOf(Coding("https://d-tree.org/", "Tag1", "Tag 1")))
+        },
+        buildPatient("2", "Patient2", Enumerations.AdministrativeGender.FEMALE).apply {
+          meta = Meta().setTag(mutableListOf(Coding("http://d-tree.org/", "Tag2", "Tag 2")))
+        }
+      )
+
+    fhirEngine.create(*patients.toTypedArray())
+
+    val result = fhirEngine.search("Patient?_tag=Tag1").map { it as Patient }
+
+    assertThat(result.size).isEqualTo(1)
+    assertThat(result.all { patient -> patient.meta.tag.all { it.code == "Tag1" } }).isTrue()
+  }
+
+  @Test
+  fun `search() by x-fhir-query should return patients for _profile param`() = runBlocking {
+    val patients =
+      listOf(
+        buildPatient("3", "C", Enumerations.AdministrativeGender.FEMALE).apply {
+          meta =
+            Meta()
+              .setProfile(
+                mutableListOf(
+                  CanonicalType(
+                    "http://fhir.org/STU3/StructureDefinition/Example-Patient-Profile-1"
+                  )
+                )
+              )
+        },
+        buildPatient("4", "C", Enumerations.AdministrativeGender.FEMALE).apply {
+          meta =
+            Meta().setProfile(mutableListOf(CanonicalType("http://d-tree.org/Diabetes-Patient")))
+        }
+      )
+
+    fhirEngine.create(*patients.toTypedArray())
+
+    val result =
+      fhirEngine
+        .search(
+          "Patient?_profile=http://fhir.org/STU3/StructureDefinition/Example-Patient-Profile-1"
+        )
+        .map { it as Patient }
+
+    assertThat(result.size).isEqualTo(1)
+    assertThat(
+        result.all { patient ->
+          patient.meta.profile.all {
+            it.value.equals("http://fhir.org/STU3/StructureDefinition/Example-Patient-Profile-1")
+          }
+        }
+      )
+      .isTrue()
   }
 
   @Test
@@ -493,6 +559,66 @@ class FhirEngineImplTest {
         )
         .isEqualTo(localChangeDiff)
       assertResourceEquals(fhirEngine.get<Patient>("original-002"), localChange)
+    }
+
+  @Test
+  fun `create should allow patient search with LOCAL_LAST_UPDATED_PARAM`(): Unit = runBlocking {
+    val patient = Patient().apply { id = "patient-id-create" }
+    fhirEngine.create(patient)
+    val localChangeTimestamp =
+      fhirEngine.getLocalChange(ResourceType.Patient, "patient-id-create")!!.timestamp
+
+    val result =
+      fhirEngine.search<Patient> {
+        filter(
+          LOCAL_LAST_UPDATED_PARAM,
+          {
+            value = of(DateTimeType(localChangeTimestamp))
+            prefix = ParamPrefixEnum.EQUAL
+          }
+        )
+      }
+
+    assertThat(result).isNotEmpty()
+    assertThat(result.map { it.logicalId }).containsExactly("patient-id-create").inOrder()
+  }
+
+  @Test
+  fun `update should allow patient search with LOCAL_LAST_UPDATED_PARAM and update local entity`() =
+    runBlocking {
+      val patient = Patient().apply { id = "patient-id-update" }
+      fhirEngine.create(patient)
+      val localChangeTimestampWhenCreated =
+        fhirEngine.getLocalChange(ResourceType.Patient, "patient-id-update")!!.timestamp
+      val patientUpdate =
+        Patient().apply {
+          id = "patient-id-update"
+          addName(
+            HumanName().apply {
+              addGiven("John")
+              family = "Doe"
+            }
+          )
+        }
+      fhirEngine.update(patientUpdate)
+      val localChangeTimestampWhenUpdated =
+        fhirEngine.getLocalChange(ResourceType.Patient, "patient-id-update")!!.timestamp
+
+      val result =
+        fhirEngine.search<Patient> {
+          filter(
+            LOCAL_LAST_UPDATED_PARAM,
+            {
+              value = of(DateTimeType(localChangeTimestampWhenUpdated))
+              prefix = ParamPrefixEnum.EQUAL
+            }
+          )
+        }
+
+      assertThat(DateTimeType(localChangeTimestampWhenUpdated).value)
+        .isGreaterThan(DateTimeType(localChangeTimestampWhenCreated).value)
+      assertThat(result).isNotEmpty()
+      assertThat(result.map { it.logicalId }).containsExactly("patient-id-update").inOrder()
     }
 
   companion object {

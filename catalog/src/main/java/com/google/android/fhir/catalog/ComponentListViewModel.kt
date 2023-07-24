@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,7 +120,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_attachment_with_validation.json"
     ),
     REPEATED_GROUP(
-      R.drawable.ic_textfield,
+      R.drawable.ic_repeatgroups,
       R.string.component_name_repeated_group,
       "component_repeated_group.json",
     ),
