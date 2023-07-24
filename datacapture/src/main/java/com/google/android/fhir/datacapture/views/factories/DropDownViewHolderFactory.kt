@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ internal object DropDownViewHolderFactory :
         val selectedAnswerIdentifier =
           questionnaireViewItem.answers.singleOrNull()?.value?.identifierString(header.context)
         answerOptionList
-          .firstOrNull { it.answerIdentifierString == selectedAnswerIdentifier }
+          .firstOrNull { it.answerId == selectedAnswerIdentifier }
           ?.let {
             autoCompleteTextView.setText(it.answerOptionString)
             autoCompleteTextView.setSelection(it.answerOptionString.length)
@@ -111,9 +111,7 @@ internal object DropDownViewHolderFactory :
             )
             val selectedAnswer =
               questionnaireViewItem.answerOption
-                .firstOrNull {
-                  it.value.identifierString(context) == selectedItem?.answerIdentifierString
-                }
+                .firstOrNull { it.value.identifierString(context) == selectedItem?.answerId }
                 ?.value
 
             if (selectedAnswer == null) {
@@ -177,7 +175,7 @@ internal class AnswerOptionDropDownArrayAdapter(
 }
 
 internal data class DropDownAnswerOption(
-  val answerIdentifierString: String,
+  val answerId: String,
   val answerOptionString: String,
   val answerOptionImage: Drawable?
 ) {
