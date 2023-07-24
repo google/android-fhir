@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package com.google.android.fhir.demo
 import android.app.Application
 import android.content.res.Resources
 import android.icu.text.DateFormat
-import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -173,7 +172,7 @@ class PatientDetailsViewModel(
     }
 
   // Android ICU is supported API level 24 onwards.
-  private fun isAndroidIcuSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+  private fun isAndroidIcuSupported() = true
 
   private fun getString(resId: Int) = getApplication<Application>().resources.getString(resId)
 
@@ -354,7 +353,7 @@ class PatientDetailsViewModelFactory(
   private val patientId: String
 ) : ViewModelProvider.Factory {
   @Suppress("UNCHECKED_CAST")
-  override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+  override fun <T : ViewModel> create(modelClass: Class<T>): T {
     require(modelClass.isAssignableFrom(PatientDetailsViewModel::class.java)) {
       "Unknown ViewModel class"
     }

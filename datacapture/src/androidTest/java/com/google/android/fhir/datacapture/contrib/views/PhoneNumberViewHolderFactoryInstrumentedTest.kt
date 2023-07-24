@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ class PhoneNumberViewHolderFactoryInstrumentedTest {
     context =
       ContextThemeWrapper(
         InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_Material3_DayNight
+        com.google.android.material.R.style.Theme_Material3_DayNight
       )
     parent = FrameLayout(context)
     viewHolder = PhoneNumberViewHolderFactory.create(parent)
