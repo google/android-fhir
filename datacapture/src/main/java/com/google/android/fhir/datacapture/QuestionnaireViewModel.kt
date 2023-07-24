@@ -71,7 +71,6 @@ import kotlinx.coroutines.flow.update
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Element
-import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -577,16 +576,42 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     // Check cache first for database queries
     val answerExpression = item.answerExpression ?: return emptyList()
-    if (answerExpression.isXFhirQuery && answerExpressionMap.contains(answerExpression.expression)
-    ) {
-      return answerExpressionMap[answerExpression.expression]!!
+
+    return when {
+      answerExpression.isXFhirQuery -> {
+        xFhirQueryResolver?.let { xFhirQueryResolver ->
+          val xFhirExpressionString =
+            ExpressionEvaluator.createXFhirQueryFromExpression(
+              questionnaire,
+              questionnaireResponse,
+              item,
+              questionnaireItemParentMap,
+              answerExpression,
+              questionnaireLaunchContextMap
+            )
+          if (answerExpressionMap.containsKey(xFhirExpressionString)) {
+            answerExpressionMap[xFhirExpressionString]
+          }
+
+          val data = xFhirQueryResolver.resolve(xFhirExpressionString)
+          val options = item.extractAnswerOptions(data)
+
+          answerExpressionMap[xFhirExpressionString] = options
+          options
+        }
+          ?: error(
+            "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
+          )
+      }
+      answerExpression.isFhirPath -> {
+        val data = fhirPathEngine.evaluate(questionnaireResponse, answerExpression.expression)
+        item.extractAnswerOptions(data)
+      }
+      else ->
+        throw UnsupportedOperationException(
+          "${answerExpression.language} not supported for answer-expression yet"
+        )
     }
-
-    val options = loadAnswerExpressionOptions(item, answerExpression)
-
-    if (answerExpression.isXFhirQuery) answerExpressionMap[answerExpression.expression] = options
-
-    return options
   }
 
   private fun resolveCqfExpression(
@@ -607,33 +632,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       cqfExpression,
       questionnaireItemParentMap
     )
-  }
-
-  private suspend fun loadAnswerExpressionOptions(
-    item: QuestionnaireItemComponent,
-    expression: Expression,
-  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-    val data =
-      if (expression.isXFhirQuery) {
-        checkNotNull(xFhirQueryResolver) {
-          "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
-        }
-
-        val xFhirExpressionString =
-          ExpressionEvaluator.createXFhirQueryFromExpression(
-            expression,
-            questionnaireLaunchContextMap
-          )
-        xFhirQueryResolver!!.resolve(xFhirExpressionString)
-      } else if (expression.isFhirPath) {
-        fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
-      } else {
-        throw UnsupportedOperationException(
-          "${expression.language} not supported for answer-expression yet"
-        )
-      }
-
-    return item.extractAnswerOptions(data)
   }
 
   /**
