@@ -169,6 +169,7 @@ object Dependencies {
 
   const val androidFhirGroup = "com.google.android.fhir"
   const val androidFhirEngineModule = "engine"
+  const val androidFhirKnowledgeModule = "knowledge"
   const val androidFhirCommon = "$androidFhirGroup:common:${Versions.androidFhirCommon}"
   const val androidFhirEngine =
     "$androidFhirGroup:$androidFhirEngineModule:${Versions.androidFhirEngine}"
