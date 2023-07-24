@@ -90,6 +90,35 @@
           "valueDate": "2022-01-22"
         }
       ]
+    },
+    {
+      "linkId": "6.0",
+      "type": "quantity",
+      "text": "Initially provided quantity value",
+      "initial": [
+        {
+          "valueQuantity": {
+            "value": 30,
+            "unit": "$",
+            "system": "http://measureunit.org",
+            "code": "USD"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "7.0",
+      "type": "quantity",
+      "text": "Initially provided quantity unit only",
+      "initial": [
+        {
+          "valueQuantity": {
+            "unit": "$",
+            "system": "http://measureunit.org",
+            "code": "USD"
+          }
+        }
+      ]
     }
   ]
 }

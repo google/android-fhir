@@ -52,11 +52,6 @@ class BehaviorListViewModel(application: Application) : AndroidViewModel(applica
       R.drawable.ic_dynamic_text_behavior,
       R.string.behavior_name_dynamic_question_text,
       "behavior_dynamic_question_text.json"
-    ),
-    INITIAL_VALUE(
-      R.drawable.ic_initial_value_behavior,
-      R.string.behavior_name_initial_value,
-      "behavior_initial_value.json"
     )
   }
 }

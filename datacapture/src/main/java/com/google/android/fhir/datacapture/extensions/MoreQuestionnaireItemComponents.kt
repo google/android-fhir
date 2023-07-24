@@ -528,14 +528,14 @@ val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
  */
 private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
   MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? {
-  require(answerOption.filter { it.initialSelected }.isEmpty() || initial.isEmpty()) {
+  require(answerOption.initial.isEmpty() || initial.isEmpty()) {
     "Questionnaire item $linkId has both initial value(s) and has answerOption. See rule que-11 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
   }
 
   // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
   // quantity given as initial without value is for unit reference purpose only. Answer conversion
   // not needed
-  if (answerOption.none { it.initialSelected } &&
+  if (answerOption.initial.isEmpty() &&
       (initial.isEmpty() ||
         (initialFirstRep.hasValueQuantity() && initialFirstRep.valueQuantity.value == null))
   ) {
@@ -550,7 +550,7 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
     )
   }
 
-  if ((answerOption.filter { it.initialSelected }.size > 1 || initial.size > 1) && !repeats) {
+  if ((answerOption.initial.size > 1 || initial.size > 1) && !repeats) {
     throw IllegalArgumentException(
       "Questionnaire item $linkId can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
     )
@@ -558,7 +558,7 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
 
   return initial
     .map { it.value }
-    .ifEmpty { answerOption.filter { it.initialSelected }.map { it.value } }
+    .plus(answerOption.initial)
     .map { QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply { value = it } }
     .toMutableList()
 }
