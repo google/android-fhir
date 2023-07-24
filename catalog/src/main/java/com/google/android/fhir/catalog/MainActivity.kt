@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
   private var showOpenQuestionnaireMenu = true
   val getContent =
     registerForActivityResult(ActivityResultContracts.GetContent()) {
-      it?.let { launchQuestionnaireFragmentWithUri(it) }
+      it?.let { launchQuestionnaireFragment(it) }
     }
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     }
   }
 
-  fun showOptionsMenu(showMenu: Boolean) {
+  fun showOpenQuestionnaireMenu(showMenu: Boolean) {
     showOpenQuestionnaireMenu = showMenu
     invalidateOptionsMenu()
   }
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     NavigationUI.setupWithNavController(bottomNavigationView, navController)
   }
 
-  private fun launchQuestionnaireFragmentWithUri(uri: Uri) {
+  private fun launchQuestionnaireFragment(uri: Uri) {
     val navHostFragment =
       supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
     val currentFragment = navHostFragment.childFragmentManager.fragments.lastOrNull()

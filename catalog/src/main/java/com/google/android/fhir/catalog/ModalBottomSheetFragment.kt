@@ -60,7 +60,7 @@ class ModalBottomSheetFragment : BottomSheetDialogFragment() {
       )
       NavHostFragment.findNavController(this).navigateUp()
     }
-    (activity as? MainActivity)?.showOptionsMenu(false)
+    (activity as? MainActivity)?.showOpenQuestionnaireMenu(false)
   }
 
   companion object {

@@ -39,7 +39,7 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment), MainView {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     setUpLayoutsRecyclerView()
-    (activity as? MainActivity)?.showOptionsMenu(true)
+    (activity as? MainActivity)?.showOpenQuestionnaireMenu(true)
   }
 
   private fun setUpLayoutsRecyclerView() {

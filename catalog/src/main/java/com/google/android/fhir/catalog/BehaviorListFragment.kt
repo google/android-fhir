@@ -31,7 +31,7 @@ class BehaviorListFragment : Fragment(R.layout.behavior_list_fragment), MainView
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     setUpBehaviorsRecyclerView()
-    (activity as? MainActivity)?.showOptionsMenu(true)
+    (activity as? MainActivity)?.showOpenQuestionnaireMenu(true)
   }
 
   override fun onResume() {

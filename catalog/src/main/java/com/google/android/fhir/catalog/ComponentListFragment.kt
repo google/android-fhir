@@ -34,7 +34,7 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment), MainVi
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     setUpComponentsRecyclerView()
-    (activity as? MainActivity)?.showOptionsMenu(true)
+    (activity as? MainActivity)?.showOpenQuestionnaireMenu(true)
   }
 
   override fun onResume() {
