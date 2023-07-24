@@ -64,7 +64,7 @@ dependencies {
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
   implementation(project(":datacapture")) {
-    exclude(group = Releases.groupId, module = Releases.Engine.artifactId)
+    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
   }
   implementation(project(":engine"))
 
