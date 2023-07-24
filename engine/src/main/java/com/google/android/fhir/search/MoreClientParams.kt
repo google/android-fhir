@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.codelabs.engine
+package com.google.android.fhir.search
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import ca.uhn.fhir.rest.gclient.DateClientParam
 
-class MainActivity : AppCompatActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
-  }
-}
+internal const val LOCAL_LAST_UPDATED = "local_lastUpdated"
+internal const val LAST_UPDATED = "_lastUpdated"
+
+/** Resource Date Parameter to search using local last updated date. */
+val LOCAL_LAST_UPDATED_PARAM = DateClientParam(LOCAL_LAST_UPDATED)
+
+/** Resource Date Parameter to search using remote last updated date. */
+val LAST_UPDATED_PARAM = DateClientParam(LAST_UPDATED)

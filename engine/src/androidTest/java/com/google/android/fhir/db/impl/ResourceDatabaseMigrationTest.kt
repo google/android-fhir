@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,13 +140,45 @@ class ResourceDatabaseMigrationTest {
 
     assertThat(retrievedTask).isEqualTo(bedNetTask)
   }
+
+  @Test
+  fun migrate4To5_should_execute_with_no_exception(): Unit = runBlocking {
+    val taskId = "bed-net-001"
+    val bedNetTask: String =
+      Task()
+        .apply {
+          id = taskId
+          description = "Issue bed net"
+          meta.lastUpdated = Date()
+        }
+        .let { iParser.encodeResourceToString(it) }
+
+    helper.createDatabase(DB_NAME, 4).apply {
+      execSQL(
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask');"
+      )
+      close()
+    }
+
+    // Re-open the database with version 4 and provide MIGRATION_3_4 as the migration process.
+    helper.runMigrationsAndValidate(DB_NAME, 5, true, MIGRATION_4_5)
+
+    val retrievedTask: String?
+    getMigratedRoomDatabase().apply {
+      retrievedTask = this.resourceDao().getResource(taskId, ResourceType.Task)
+      openHelper.writableDatabase.close()
+    }
+
+    assertThat(retrievedTask).isEqualTo(bedNetTask)
+  }
+
   private fun getMigratedRoomDatabase(): ResourceDatabase =
     Room.databaseBuilder(
         InstrumentationRegistry.getInstrumentation().targetContext,
         ResourceDatabase::class.java,
         DB_NAME
       )
-      .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+      .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
       .build()
 
   companion object {

@@ -9,6 +9,10 @@ android {
   defaultConfig { minSdk = Sdk.minSdk }
   packaging { resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")) }
   kotlin { jvmToolchain(11) }
+  compileOptions {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+  }
 }
 
 dependencies {
