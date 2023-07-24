@@ -19,11 +19,7 @@ package com.google.android.fhir.catalog
 import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -32,37 +28,19 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 /** Fragment for the component list. */
-class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
+class ComponentListFragment : Fragment(R.layout.component_list_fragment), MainView {
   private val viewModel: ComponentListViewModel by viewModels()
-  val getContent =
-    registerForActivityResult(ActivityResultContracts.GetContent()) {
-      it?.let { launchQuestionnaireFragmentWithUri(it) }
-    }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     setUpComponentsRecyclerView()
+    (activity as? MainActivity)?.showOptionsMenu(true)
   }
 
   override fun onResume() {
     super.onResume()
     setUpActionBar()
     (activity as MainActivity).showBottomNavigationView(View.VISIBLE)
-  }
-
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    inflater.inflate(R.menu.open_questionnaire_menu, menu)
-    true
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    return when (item.itemId) {
-      R.id.select_questionnaire_menu -> {
-        getContent.launch("application/json")
-        true
-      }
-      else -> super.onOptionsItemSelected(item)
-    }
   }
 
   private fun setUpActionBar() {
@@ -119,7 +97,7 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
       )
   }
 
-  private fun launchQuestionnaireFragmentWithUri(uri: Uri) {
+  override fun launchQuestionnaireFragment(uri: Uri) {
     findNavController()
       .navigate(
         ComponentListFragmentDirections.actionComponentsFragmentToGalleryQuestionnaireFragment(

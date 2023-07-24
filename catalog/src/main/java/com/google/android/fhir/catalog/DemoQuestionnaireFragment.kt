@@ -55,6 +55,7 @@ class DemoQuestionnaireFragment : Fragment() {
     savedInstanceState: Bundle?
   ): View {
     requireContext().setTheme(getThemeId())
+    (activity as MainActivity).showOptionsMenu(false)
     return inflater.inflate(R.layout.fragment_demo_questionnaire, container, false)
   }
 
@@ -89,6 +90,7 @@ class DemoQuestionnaireFragment : Fragment() {
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
     }
+    (activity as? MainActivity)?.showOptionsMenu(false)
   }
 
   override fun onResume() {

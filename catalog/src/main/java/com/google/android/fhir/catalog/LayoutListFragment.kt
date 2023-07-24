@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.catalog
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -26,7 +27,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 /** Fragment for the layout list. */
-class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
+class LayoutListFragment : Fragment(R.layout.layout_list_fragment), MainView {
   private val viewModel: LayoutListViewModel by viewModels()
 
   override fun onResume() {
@@ -38,6 +39,7 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     setUpLayoutsRecyclerView()
+    (activity as? MainActivity)?.showOptionsMenu(true)
   }
 
   private fun setUpLayoutsRecyclerView() {
@@ -73,6 +75,16 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
           questionnaireTitleKey = context?.getString(layout.textId) ?: "",
           questionnaireFilePathKey = layout.questionnaireFileName,
           workflow = layout.workflow
+        )
+      )
+  }
+
+  override fun launchQuestionnaireFragment(uri: Uri) {
+    findNavController()
+      .navigate(
+        LayoutListFragmentDirections.actionLayoutsFragmentToGalleryQuestionnaireFragment(
+          workflow = WorkflowType.DEFAULT,
+          questionnaireFileUri = uri,
         )
       )
   }
