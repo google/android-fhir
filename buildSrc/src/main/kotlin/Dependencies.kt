@@ -167,14 +167,10 @@ object Dependencies {
       "com.google.mlkit:object-detection-custom:${Versions.Mlkit.objectDetectionCustom}"
   }
 
-  val androidFhirCommon =
-    "${Releases.groupId}:${Releases.Common.artifactId}:${Releases.Common.version}"
-  val androidFhirEngine =
-    "${Releases.groupId}:${Releases.Engine.artifactId}:${Releases.Engine.version}"
-  val androidFhirKnowledge =
-    "${Releases.groupId}:${Releases.Knowledge.artifactId}:${Releases.Knowledge.version}"
-  val androidFhirDataCapture =
-    "${Releases.groupId}:${Releases.DataCapture.artifactId}:${Releases.DataCapture.version}"
+  const val androidFhirGroup = "com.google.android.fhir"
+  const val androidFhirCommon = "$androidFhirGroup:common:${Versions.androidFhirCommon}"
+  const val androidFhirEngine = "$androidFhirGroup:engine:${Versions.androidFhirEngine}"
+  const val androidFhirKnowledge = "$androidFhirGroup:knowledge:${Versions.androidFhirKnowledge}"
 
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
@@ -257,6 +253,9 @@ object Dependencies {
       const val stdlib = "1.8.20"
     }
 
+    const val androidFhirCommon = "0.1.0-alpha04"
+    const val androidFhirEngine = "0.1.0-beta03"
+    const val androidFhirKnowledge = "0.1.0-alpha01"
     const val desugarJdkLibs = "2.0.3"
     const val caffeine = "2.9.1"
     const val fhirUcum = "1.0.3"
