@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
@@ -3073,6 +3074,33 @@ class DatabaseImplTest {
       )
 
     assertThat(result.map { it.nameFirstRep.nameAsSingleString }).contains("Darcy Smith")
+  }
+
+  @Test
+  fun search_patient_with_local_lastUpdated() = runBlocking {
+    database.insert(
+      Patient().apply { id = "patient-test-001" },
+      Patient().apply { id = "patient-test-002" },
+      Patient().apply { id = "patient-test-003" }
+    )
+
+    database.update(
+      Patient().apply {
+        id = "patient-test-002"
+        gender = Enumerations.AdministrativeGender.FEMALE
+      }
+    )
+
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply { sort(LOCAL_LAST_UPDATED_PARAM, Order.DESCENDING) }
+          .getQuery()
+      )
+
+    assertThat(result.map { it.logicalId })
+      .containsAtLeast("patient-test-002", "patient-test-003", "patient-test-001")
+      .inOrder()
   }
 
   private companion object {
