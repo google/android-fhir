@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ internal object MaxDecimalPlacesValidator :
         maxDecimalPlaces != null &&
         answer.valueDecimalType.valueAsString.substringAfter(".").length > maxDecimalPlaces
     },
-    { extension: Extension, context: Context ->
+    messageGenerator = { extension: Extension, context: Context ->
       context.getString(R.string.max_decimal_validation_error_msg, extension.value.primitiveValue())
     }
   )
