@@ -60,7 +60,7 @@ Learn [more](https://github.com/hapifhir/hapi-fhir-jpaserver-starter#running-via
 3. Inspect the server by opening the URL `http://localhost:8080/` in a browser.
    You should see the HAPI FHIR web interface.
 
-![HAPI FHIR web interface](fhir-engine/image1.png "HAPI FHIR web interface")
+![HAPI FHIR web interface](images/image4.png "HAPI FHIR web interface")
 
 ### Populate the local HAPI FHIR server with test data
 
@@ -96,7 +96,7 @@ codelab.
    `HTTP 200 OK` and the `Response Body` section of the page containing patient
    data in a FHIR Bundle as the search result with a `total` count.
 
-![Test data on server](fhir-engine/image2.png "Test data on server")
+![Test data on server](images/image5.png "Test data on server")
 
 ## Set up the Android app
 
@@ -115,8 +115,7 @@ Open Android Studio, select **Import Project (Gradle, Eclipse ADT, etc.)** and
 choose the `codelabs/engine/` folder from the source code that you have
 downloaded earlier.
 
-![Android Studio start screen](fhir-engine/image3.png "Android Studio start
-screen")
+![Android Studio start screen](images/image1.png "Android Studio start screen")
 
 ### Sync your project with Gradle files
 
@@ -136,8 +135,7 @@ dependencies {
 To be sure that all dependencies are available to your app, you should sync your
 project with gradle files at this point.
 
-Select **Sync Project with Gradle Files** (![Gradle sync
-button](data-capture/image3.png "Gradle sync button")) from the Android Studio
+Select **Sync Project with Gradle Files** (![Gradle sync button](images/image3.png "Gradle sync button"))from the Android Studio
 toolbar. You an also run the app again to check the dependencies are working
 correctly.
 
@@ -148,10 +146,10 @@ the app for the first time.
 
 [Start the Android Studio emulator](
 https://developer.android.com/studio/run/emulator), and click Run
-(![Run button](fhir-engine/image4.png "Run button")) in the Android Studio
+(![Run button](images/image2.png "Run button")) in the Android Studio
 toolbar.
 
-<img src="fhir-engine/image5.png" alt="Hello World app" width="300">
+<img src="images/image6.png" alt="Hello World app" width="400">
 
 ## Create FHIR Engine instance
 
@@ -240,7 +238,7 @@ class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
 }
 ```
 
-3.   In `PatientListFragment,kt`, add the following code to the body of
+3.   In `PatientListViewModel.kt`, add the following code to the body of
      `triggerOneTimeSync()` function
 
 ```kotlin
@@ -267,7 +265,7 @@ when (syncJobStatus) {
 Now click the `Sync` button in the menu, and you should see the patients in your
 local FHIR server being downloaded to the application.
 
-![Patient list](fhir-engine/image6.png "Patient list")
+<img src="images/image7.png" alt="Patient list" width="400">
 
 ## Modify and upload patient data
 
