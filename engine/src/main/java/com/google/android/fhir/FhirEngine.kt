@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,14 +130,47 @@ suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
 
 typealias SearchParamName = String
 
-typealias ReferencedResources = Map<ResourceType, Map<SearchParamName, List<Resource>>>
-
 /** It contains the searched resource and referenced resources as per the search query. */
 data class SearchResult<R : Resource>(
   /** Matching resource as per the query. */
   val resource: R,
   /** Matching referenced resources as per the [Search.include] criteria in the query. */
-  val included: ReferencedResources?,
+  val included: Map<SearchParamName, List<Resource>>?,
   /** Matching referenced resources as per the [Search.revInclude] criteria in the query. */
-  val revIncluded: ReferencedResources?
-)
+  val revIncluded: Map<ResourceType, Map<SearchParamName, List<Resource>>>?
+) {
+  override fun equals(other: Any?) =
+    other is SearchResult<*> &&
+      equalsShallow(resource, other.resource) &&
+      equalsShallow(included, other.included) &&
+      equalsShallow2(revIncluded, other.revIncluded)
+
+  private fun equalsShallow(first: Resource, second: Resource) =
+    first.resourceType == second.resourceType && first.logicalId == second.logicalId
+
+  private fun equalsShallow(
+    first: Map<SearchParamName, List<Resource>>?,
+    second: Map<SearchParamName, List<Resource>>?
+  ) =
+    if (first != null && second != null && first.size == second.size) {
+      first.entries.zip(second.entries).all { (x, y) ->
+        x.key == y.key &&
+          x.value.size == y.value.size &&
+          x.value.zip(y.value).all { (x, y) -> equalsShallow(x, y) }
+      }
+    } else {
+      first?.size == second?.size
+    }
+
+  private fun equalsShallow2(
+    first: Map<ResourceType, Map<SearchParamName, List<Resource>>>?,
+    second: Map<ResourceType, Map<SearchParamName, List<Resource>>>?
+  ) =
+    if (first != null && second != null && first.size == second.size) {
+      first.entries.zip(second.entries).all { (x, y) ->
+        x.key == y.key && x.value.size == y.value.size && equalsShallow(x.value, y.value)
+      }
+    } else {
+      first?.size == second?.size
+    }
+}

@@ -69,7 +69,8 @@ internal suspend fun <R : Resource> Search.execute(database: Database): List<Sea
       included =
         includedResources
           ?.filter { it.idOfBaseResourceOnWhichThisMatched == baseResource.logicalId }
-          ?.toReferencedResources(),
+          ?.groupBy { it.matchingIndex }
+          ?.mapValues { it.value.map { it.resource } },
       revIncluded =
         revIncludedResources
           ?.filter {

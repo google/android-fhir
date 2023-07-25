@@ -24,6 +24,7 @@ import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.FhirServices
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.toLocalChange
@@ -2991,7 +2992,7 @@ class DatabaseImplTest {
 
     assertThat(result.map { it.nameFirstRep.nameAsSingleString }).contains("Darcy Smith")
   }
-  
+
   @Test
   fun search_patient_with_local_lastUpdated() = runBlocking {
     database.insert(
@@ -3017,6 +3018,199 @@ class DatabaseImplTest {
     assertThat(result.map { it.logicalId })
       .containsAtLeast("patient-test-002", "patient-test-003", "patient-test-001")
       .inOrder()
+  }
+
+  @Test
+  fun search_patient_and_include_practitioners(): Unit = runBlocking {
+    val patient01 =
+      Patient().apply {
+        id = "pa-01"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Gorden"
+          }
+        )
+        addGeneralPractitioner(Reference("Practitioner/gp-01"))
+        addGeneralPractitioner(Reference("Practitioner/gp-02"))
+      }
+
+    val patient02 =
+      Patient().apply {
+        id = "pa-02"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Bond"
+          }
+        )
+        addGeneralPractitioner(Reference("Practitioner/gp-02"))
+        addGeneralPractitioner(Reference("Practitioner/gp-03"))
+      }
+    val patients = listOf(patient01, patient02)
+
+    val gp01 =
+      Practitioner().apply {
+        id = "gp-01"
+        addName(
+          HumanName().apply {
+            family = "Practitioner-01"
+            addGiven("General-01")
+          }
+        )
+        active = true
+      }
+    val gp02 =
+      Practitioner().apply {
+        id = "gp-02"
+        addName(
+          HumanName().apply {
+            family = "Practitioner-02"
+            addGiven("General-02")
+          }
+        )
+        active = false
+      }
+    val gp03 =
+      Practitioner().apply {
+        id = "gp-03"
+        addName(
+          HumanName().apply {
+            family = "Practitioner-03"
+            addGiven("General-03")
+          }
+        )
+        active = true
+      }
+
+    val practitioners = listOf(gp01, gp02, gp03)
+
+    database.insertRemote(*(patients + practitioners).toTypedArray())
+
+    val result =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.GIVEN,
+            {
+              value = "James"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            }
+          )
+
+          include<Practitioner>(Patient.GENERAL_PRACTITIONER) {
+            filter(Practitioner.ACTIVE, { value = of(true) })
+          }
+        }
+        .execute<Patient>(database)
+
+    assertThat(result)
+      .isEqualTo(
+        listOf(
+          SearchResult(
+            patient01,
+            included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp01)),
+            revIncluded = null
+          ),
+          SearchResult(
+            patient02,
+            included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp03)),
+            revIncluded = null
+          )
+        )
+      )
+  }
+
+  @Test
+  fun search_patient_and_revInclude_conditions(): Unit = runBlocking {
+    val patient01 =
+      Patient().apply {
+        id = "pa-01"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Gorden"
+          }
+        )
+        addGeneralPractitioner(Reference("Practitioner/gp-01"))
+      }
+
+    val patient02 =
+      Patient().apply {
+        id = "pa-02"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Bond"
+          }
+        )
+        addGeneralPractitioner(Reference("Practitioner/gp-02"))
+      }
+    val patients = listOf(patient01, patient02)
+    val diabetesCodeableConcept =
+      CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+    val hyperTensionCodeableConcept =
+      CodeableConcept(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1"))
+    val migraineCodeableConcept =
+      CodeableConcept(Coding("http://snomed.info/sct", "37796009", "Migraine"))
+
+    val con1 =
+      Condition().apply {
+        id = "con-01"
+        code = diabetesCodeableConcept
+        subject = Reference("Patient/pa-01")
+      }
+    val con2 =
+      Condition().apply {
+        id = "con-02"
+        code = hyperTensionCodeableConcept
+        subject = Reference("Patient/pa-01")
+      }
+    val con3 =
+      Condition().apply {
+        id = "con-03"
+        code = migraineCodeableConcept
+        subject = Reference("Patient/pa-02")
+      }
+    val conditions = listOf(con1, con2, con3)
+
+    database.insertRemote(*(patients + conditions).toTypedArray())
+
+    val result =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.GIVEN,
+            {
+              value = "James"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            }
+          )
+          revInclude<Condition>(Condition.SUBJECT) {
+            filter(Condition.CODE, { value = of(diabetesCodeableConcept) })
+            filter(Condition.CODE, { value = of(migraineCodeableConcept) })
+            operation = Operation.OR
+          }
+        }
+        .execute<Patient>(database)
+
+    assertThat(result)
+      .isEqualTo(
+        listOf(
+          SearchResult(
+            patient01,
+            included = null,
+            revIncluded =
+              mapOf(ResourceType.Condition to mapOf(Condition.SUBJECT.paramName to listOf(con1)))
+          ),
+          SearchResult(
+            patient02,
+            included = null,
+            revIncluded =
+              mapOf(ResourceType.Condition to mapOf(Condition.SUBJECT.paramName to listOf(con3)))
+          )
+        )
+      )
   }
 
   @Test
@@ -3312,18 +3506,9 @@ class DatabaseImplTest {
         .execute<Patient>(database)
 
     assertThat(result[0].resource.logicalId).isEqualTo("pa-01")
-    assertThat(
-        result[0]
-          .included!![ResourceType.Practitioner]!![Patient.GENERAL_PRACTITIONER.paramName]!!.map {
-            it.logicalId
-          }
-      )
+    assertThat(result[0].included!![Patient.GENERAL_PRACTITIONER.paramName]!!.map { it.logicalId })
       .containsExactly("gp-01", "gp-02")
-    assertThat(
-        result[0].included!![ResourceType.Organization]!![Patient.ORGANIZATION.paramName]!!.map {
-          it.logicalId
-        }
-      )
+    assertThat(result[0].included!![Patient.ORGANIZATION.paramName]!!.map { it.logicalId })
       .containsExactly("org-01")
     assertThat(
         result[0].revIncluded!![ResourceType.Condition]!![Condition.SUBJECT.paramName]!!.map {
@@ -3339,18 +3524,9 @@ class DatabaseImplTest {
       .containsExactly("en-01-pa-01", "en-02-pa-01")
 
     assertThat(result[1].resource.logicalId).isEqualTo("pa-02")
-    assertThat(
-        result[1]
-          .included!![ResourceType.Practitioner]!![Patient.GENERAL_PRACTITIONER.paramName]!!.map {
-            it.logicalId
-          }
-      )
+    assertThat(result[1].included!![Patient.GENERAL_PRACTITIONER.paramName]!!.map { it.logicalId })
       .containsExactly("gp-01", "gp-02")
-    assertThat(
-        result[1].included!![ResourceType.Organization]!![Patient.ORGANIZATION.paramName]!!.map {
-          it.logicalId
-        }
-      )
+    assertThat(result[1].included!![Patient.ORGANIZATION.paramName]!!.map { it.logicalId })
       .containsExactly("org-02")
     assertThat(
         result[1].revIncluded!![ResourceType.Condition]!![Condition.SUBJECT.paramName]!!.map {
@@ -3366,12 +3542,7 @@ class DatabaseImplTest {
       .containsExactly("en-01-pa-02", "en-02-pa-02")
 
     assertThat(result[2].resource.logicalId).isEqualTo("pa-03")
-    assertThat(
-        result[2]
-          .included!![ResourceType.Practitioner]!![Patient.GENERAL_PRACTITIONER.paramName]!!.map {
-            it.logicalId
-          }
-      )
+    assertThat(result[2].included!![Patient.GENERAL_PRACTITIONER.paramName]!!.map { it.logicalId })
       .containsExactly("gp-01", "gp-02")
     assertThat(
         result[2].revIncluded!![ResourceType.Condition]!![Condition.SUBJECT.paramName]!!.map {
