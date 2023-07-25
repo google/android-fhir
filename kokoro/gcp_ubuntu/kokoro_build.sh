@@ -35,7 +35,7 @@ set -e
 # Code under repo is checked out to ${KOKORO_ARTIFACTS_DIR}/git.
 # The final directory name in this path is determined by the scm name specified
 # in the job configuration.
-export JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-amd64"
+export JAVA_HOME="/usr/lib/jvm/java-1.17.0-openjdk-amd64"
 export ANDROID_HOME=${HOME}/android_sdk
 export PATH=$PATH:$JAVA_HOME/bin:${ANDROID_HOME}/cmdline-tools/latest/bin
 export GCS_BUCKET="android-fhir-build-artifacts"
@@ -64,6 +64,7 @@ function setup() {
   sudo npm cache clean -f
   sudo npm install -g n
   sudo n 16.18.0
+  sudo apt install -y openjdk-17-jdk openjdk-17-jre
 
   gcloud components update --quiet
 
@@ -91,7 +92,7 @@ function build_only() {
 function device_tests() {
   ./gradlew packageDebugAndroidTest --scan --stacktrace
   ./gradlew packageReleaseAndroidTest --scan --stacktrace
-    local lib_names=("datacapture" "engine" "workflow" "benchmark")
+    local lib_names=("benchmark" "datacapture" "engine" "knowledge" "workflow")
     firebase_pids=()
     for lib_name in "${lib_names[@]}"; do
       ./gradlew :$lib_name:runFlank  --scan --stacktrace &
@@ -107,7 +108,7 @@ function device_tests() {
 # Before uploading to Codecov, run an Integrity Check on the Uploader binary.
 # See: https://docs.codecov.com/docs/codecov-uploader#using-the-uploader-with-codecovio-cloud
 function code_coverage() {
-  ./gradlew jacocoTestReport --exclude-task createDebugCoverageReport --scan --stacktrace
+  ./gradlew jacocoTestReport --scan --stacktrace
 
   curl https://keybase.io/codecovsecurity/pgp_keys.asc \
     | gpg --no-default-keyring --keyring trustedkeys.gpg --import
@@ -124,6 +125,7 @@ function code_coverage() {
     -f common/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
     -f datacapture/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
     -f engine/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
+    -f knowledge/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
     -f workflow/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
     -t "$(cat "${KOKORO_KEYSTORE_DIR}/76773_android-fhir-codecov-token")"
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,10 +86,9 @@ data class QuestionnaireViewItem(
     {
       emptyList()
     },
-  internal val draftAnswer: Any? = null,
-  internal val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
-  internal val questionViewTextConfiguration: QuestionTextConfiguration =
-    QuestionTextConfiguration(),
+  val draftAnswer: Any? = null,
+  val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
+  val questionViewTextConfiguration: QuestionTextConfiguration = QuestionTextConfiguration(),
 ) {
 
   /**
@@ -129,7 +128,7 @@ data class QuestionnaireViewItem(
   }
 
   /** Adds an answer to the existing answers and removes the draft answer. */
-  internal fun addAnswer(
+  fun addAnswer(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
   ) {
@@ -145,7 +144,7 @@ data class QuestionnaireViewItem(
   }
 
   /** Removes an answer from the existing answers, as well as any draft answer. */
-  internal fun removeAnswer(
+  fun removeAnswer(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
   ) {
@@ -170,7 +169,11 @@ data class QuestionnaireViewItem(
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), draftAnswer)
   }
 
-  internal fun answerString(context: Context): String {
+  /**
+   * Returns a given answer (The respondent's answer(s) to the question) along with [displayString]
+   * if question is answered else 'Not Answered'
+   */
+  fun answerString(context: Context): String {
     if (!questionnaireResponseItem.hasAnswer()) return context.getString(R.string.not_answered)
     return questionnaireResponseItem.answer.joinToString { it.value.displayString(context) }
   }
@@ -195,7 +198,7 @@ data class QuestionnaireViewItem(
    * options are defined in `Questionnaire.item.answerValueSet`, the answer value set will be
    * expanded.
    */
-  internal val answerOption: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
+  val answerOption: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
     get() =
       runBlocking(Dispatchers.IO) {
         when {
@@ -212,7 +215,7 @@ data class QuestionnaireViewItem(
    * [Questionnaire.QuestionnaireResponseItemComponent] (derived from cqf-expression), otherwise it
    * is derived from [localizedTextSpanned] of [QuestionnaireResponse.QuestionnaireItemComponent]
    */
-  internal val questionText: Spanned? by lazy {
+  val questionText: Spanned? by lazy {
     questionnaireResponseItem.text?.toSpanned() ?: questionnaireItem.localizedTextSpanned
   }
 

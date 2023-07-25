@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,8 @@ internal object LocalChangeUtils {
       resourceType = second.resourceType,
       type = type,
       payload = payload,
-      versionId = second.versionId
+      versionId = second.versionId,
+      timestamp = second.timestamp
     )
   }
 
@@ -136,9 +137,11 @@ internal object LocalChangeUtils {
     with(JSONArray(jsonDiff.toString())) {
       val ignorePaths = setOf("/meta", "/text")
       return@with JSONArray(
-        (0 until length()).map { optJSONObject(it) }.filterNot { jsonObject ->
-          ignorePaths.any { jsonObject.optString("path").startsWith(it) }
-        }
+        (0 until length())
+          .map { optJSONObject(it) }
+          .filterNot { jsonObject ->
+            ignorePaths.any { jsonObject.optString("path").startsWith(it) }
+          }
       )
     }
 }

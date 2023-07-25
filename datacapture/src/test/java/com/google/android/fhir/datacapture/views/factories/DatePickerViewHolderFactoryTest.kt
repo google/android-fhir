@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,9 @@ import org.robolectric.RuntimeEnvironment
 @RunWith(RobolectricTestRunner::class)
 class DatePickerViewHolderFactoryTest {
   private val context =
-    RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
+    RuntimeEnvironment.getApplication().apply {
+      setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
+    }
   private val parent = FrameLayout(context)
   private val viewHolder = DatePickerViewHolderFactory.create(parent)
 
