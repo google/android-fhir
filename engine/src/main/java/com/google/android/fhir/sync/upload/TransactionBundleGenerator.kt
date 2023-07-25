@@ -30,7 +30,7 @@ open class TransactionBundleGenerator(
   private val generatedBundleSize: Int,
   private val useETagForUpload: Boolean,
   val getBundleEntryComponentGeneratorForLocalChangeType:
-    (type: Type, useETagForUpload: Boolean) -> HttpVerbBasedBundleEntryComponentGenerator
+    (type: Type, useETagForUpload: Boolean) -> BundleEntryComponentGenerator
 ) : UploadRequestGenerator {
 
   override fun generateUploadRequests(localChanges: List<LocalChange>): List<BundleUploadRequest> {
@@ -91,7 +91,7 @@ open class TransactionBundleGenerator(
     private fun putForCreateAndPatchForUpdateBasedBundleComponentMapper(
       type: Type,
       useETagForUpload: Boolean
-    ): HttpVerbBasedBundleEntryComponentGenerator {
+    ): BundleEntryComponentGenerator {
       return when (type) {
         Type.INSERT -> HttpPutForCreateEntryComponentGenerator(useETagForUpload)
         Type.UPDATE -> HttpPatchForUpdateEntryComponentGenerator(useETagForUpload)

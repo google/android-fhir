@@ -31,7 +31,7 @@ import org.hl7.fhir.r4.model.UriType
  * [LocalChangeEntity]. See [https://www.hl7.org/fhir/http.html#transaction] for more info regarding
  * the supported [Bundle.HTTPVerb].
  */
-abstract class HttpVerbBasedBundleEntryComponentGenerator(
+abstract class BundleEntryComponentGenerator(
   private val httpVerb: Bundle.HTTPVerb,
   private val useETagForUpload: Boolean,
 ) {

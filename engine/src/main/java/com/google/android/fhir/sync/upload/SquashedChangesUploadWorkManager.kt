@@ -39,9 +39,16 @@ class SquashedChangesUploadWorkManager : UploadWorkManager {
       .values.map { localResourceChanges -> LocalChangeUtils.squash(localResourceChanges) }
   }
 
+  /**
+   * Use the [TransactionBundleGenerator] to bundle the [LocalChange]s into [BundleUploadRequest]s
+   */
   override fun createUploadRequestsFromLocalChanges(
     localChanges: List<LocalChange>
   ): List<UploadRequest> {
     return bundleUploadRequestGenerator.generateUploadRequests(localChanges)
   }
+
+  /** Simple progress indicator determined by the number of pending requests. */
+  override fun getPendingUploadsIndicator(uploadRequests: List<UploadRequest>): Int =
+    uploadRequests.size
 }

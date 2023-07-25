@@ -46,13 +46,16 @@ internal class UploaderImpl(
   override suspend fun upload(localChanges: List<LocalChange>): Flow<UploadState> = flow {
     val transformedChanges = uploadWorkManager.prepareChangesForUpload(localChanges)
     val uploadRequests = uploadWorkManager.createUploadRequestsFromLocalChanges(transformedChanges)
-    val total = uploadRequests.size
+    val total = uploadWorkManager.getPendingUploadsIndicator(uploadRequests)
     var completed = 0
     emit(UploadState.Started(total))
-    uploadRequests.forEach { uploadRequest ->
+    val pendingRequests = uploadRequests.toMutableList()
+    while (pendingRequests.isNotEmpty()) {
+      val uploadRequest = pendingRequests.first()
+      pendingRequests.remove(uploadRequest)
       try {
         val response = dataSource.upload(uploadRequest)
-        completed += 1
+        completed = total - uploadWorkManager.getPendingUploadsIndicator(pendingRequests)
         emit(
           getUploadResult(
             uploadRequest.resourceType,
