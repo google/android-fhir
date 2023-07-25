@@ -577,8 +577,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     // Check cache first for database queries
     val answerExpression = item.answerExpression ?: return emptyList()
 
-    val options = loadAnswerExpressionOptions(item, responseItem, answerExpression)
-
     return when {
       answerExpression.isXFhirQuery -> {
         xFhirQueryResolver?.let { xFhirQueryResolver ->
@@ -594,7 +592,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           if (answerExpressionMap.containsKey(xFhirExpressionString)) {
             answerExpressionMap[xFhirExpressionString]
           }
-          
+
           val data = xFhirQueryResolver.resolve(xFhirExpressionString)
           val options = item.extractAnswerOptions(data)
 
@@ -606,7 +604,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           )
       }
       answerExpression.isFhirPath -> {
-        val data = fhirPathEngine.evaluate(questionnaireResponse, answerExpression.expression)
+        val data =
+          evaluateExpression(
+            questionnaire,
+            questionnaireResponse,
+            item,
+            responseItem,
+            answerExpression,
+            questionnaireItemParentMap
+          )
         item.extractAnswerOptions(data)
       }
       else ->
@@ -634,41 +640,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       cqfExpression,
       questionnaireItemParentMap
     )
-  }
-
-  private suspend fun loadAnswerExpressionOptions(
-    item: QuestionnaireItemComponent,
-    responseItemComponent: QuestionnaireResponseItemComponent,
-    expression: Expression,
-  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-    val data =
-      if (expression.isXFhirQuery) {
-        checkNotNull(xFhirQueryResolver) {
-          "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
-        }
-
-        val xFhirExpressionString =
-          ExpressionEvaluator.createXFhirQueryFromExpression(
-            expression,
-            questionnaireLaunchContextMap
-          )
-        xFhirQueryResolver!!.resolve(xFhirExpressionString)
-      } else if (expression.isFhirPath) {
-        evaluateExpression(
-          questionnaire,
-          questionnaireResponse,
-          item,
-          responseItemComponent,
-          expression,
-          questionnaireItemParentMap
-        )
-      } else {
-        throw UnsupportedOperationException(
-          "${expression.language} not supported for answer-expression yet"
-        )
-      }
-
-    return item.extractAnswerOptions(data)
   }
 
   /**
