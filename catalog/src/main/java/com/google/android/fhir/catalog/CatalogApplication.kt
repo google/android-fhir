@@ -37,7 +37,7 @@ class CatalogApplication : Application(), DataCaptureConfig.Provider {
   override fun onCreate() {
     super.onCreate()
 
-    FhirEngineProvider.init(FhirEngineConfiguration(testMode = true))
+    FhirEngineProvider.init(FhirEngineConfiguration())
 
     dataCaptureConfig = DataCaptureConfig(xFhirQueryResolver = { fhirEngine.search(it) })
 
