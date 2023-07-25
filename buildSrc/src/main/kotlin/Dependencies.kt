@@ -107,11 +107,11 @@ object Dependencies {
   }
 
   object Jackson {
-    const val mainGroup = "com.fasterxml.jackson"
-    const val coreGroup = "$mainGroup.core"
-    const val dataformatGroup = "$mainGroup.dataformat"
-    const val datatypeGroup = "$mainGroup.datatype"
-    const val moduleGroup = "$mainGroup.module"
+    private const val mainGroup = "com.fasterxml.jackson"
+    private const val coreGroup = "$mainGroup.core"
+    private const val dataformatGroup = "$mainGroup.dataformat"
+    private const val datatypeGroup = "$mainGroup.datatype"
+    private const val moduleGroup = "$mainGroup.module"
 
     const val annotations = "$coreGroup:jackson-annotations:${Versions.jackson}"
     const val bom = "$mainGroup:jackson-bom:${Versions.jackson}"
@@ -275,7 +275,9 @@ object Dependencies {
     const val hapiFhirCore = "5.6.36"
 
     const val http = "4.11.0"
-    const val jackson = "2.14.1"
+    // Maximum version that supports Android API Level 24:
+    // https://github.com/FasterXML/jackson-databind/issues/3658
+    const val jackson = "2.13.5"
     const val jsonToolsPatch = "1.13"
     const val jsonAssert = "1.5.1"
     const val material = "1.9.0"
@@ -349,6 +351,18 @@ object Dependencies {
       force(HapiFhir.validationDstu3)
       force(HapiFhir.validationR4)
       force(HapiFhir.validationR5)
+    }
+  }
+
+  fun Configuration.forceJacksonVersion() {
+    resolutionStrategy {
+      force(Jackson.annotations)
+      force(Jackson.bom)
+      force(Jackson.core)
+      force(Jackson.databind)
+      force(Jackson.jaxbAnnotations)
+      force(Jackson.jsr310)
+      force(Jackson.dataformatXml)
     }
   }
 }
