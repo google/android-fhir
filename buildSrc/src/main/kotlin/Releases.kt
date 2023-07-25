@@ -37,6 +37,8 @@ object Releases {
   const val groupId = "com.google.android.fhir"
 
   // Libraries
+  // After releasing a new version of a library, you will need to bump up the library version
+  // in Dependencies.kt (in a separate PR)
 
   object Common : LibraryArtifact {
     override val artifactId = "common"
