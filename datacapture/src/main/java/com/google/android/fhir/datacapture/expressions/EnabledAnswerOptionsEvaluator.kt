@@ -59,46 +59,33 @@ internal class EnabledAnswerOptionsEvaluator(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     questionnaireResponse: QuestionnaireResponse,
-    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>,
-    answersDisabledCallback:
-      (
-        QuestionnaireItemComponent,
-        QuestionnaireResponse.QuestionnaireResponseItemComponent,
-        List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
-      ) -> Unit
-  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>
+  ): Pair<
+    List<Questionnaire.QuestionnaireItemAnswerOptionComponent>,
+    List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
+  > {
 
     val resolvedAnswerOptions =
       answerOptions(questionnaireItem, questionnaireResponse, questionnaireItemParentMap)
 
-    return if (questionnaireItem.answerOptionsToggleExpressions.isNotEmpty() &&
-        resolvedAnswerOptions.isNotEmpty()
-    ) {
-      evaluateAnswerOptionsToggleExpressions(
+    return if (questionnaireItem.answerOptionsToggleExpressions.isNotEmpty()) {
+      val enabledQuestionnaireAnswerOptions =
+        evaluateAnswerOptionsToggleExpressions(
           questionnaireItem,
           questionnaireResponseItem,
           questionnaireResponse,
           resolvedAnswerOptions,
           questionnaireItemParentMap
         )
-        .also { allowedAnswerOptions ->
-          questionnaireResponseItem.answer
-            .takeIf { it.isNotEmpty() }
-            ?.let { answers ->
-              val disabledAnswers =
-                answers.filterNot { ans ->
-                  allowedAnswerOptions.any { ans.value.equalsDeep(it.value) }
-                }
-
-              if (disabledAnswers.isNotEmpty())
-                answersDisabledCallback.invoke(
-                  questionnaireItem,
-                  questionnaireResponseItem,
-                  disabledAnswers
-                )
-            }
-        }
-    } else resolvedAnswerOptions
+      val disabledAnswers =
+        questionnaireResponseItem.answer
+          .takeIf { it.isNotEmpty() }
+          ?.filterNot { ans ->
+            enabledQuestionnaireAnswerOptions.any { ans.value.equalsDeep(it.value) }
+          }
+          ?: emptyList()
+      Pair(enabledQuestionnaireAnswerOptions, disabledAnswers)
+    } else Pair(resolvedAnswerOptions, emptyList())
   }
 
   /**

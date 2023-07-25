@@ -684,6 +684,20 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         .firstOrNull()
         ?.let { text = it.primitiveValue() }
     }
+    val (enabledQuestionnaireAnswerOptions, disabledQuestionnaireResponseAnswers) =
+      answerOptionsEvaluator.evaluate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        questionnaireResponse,
+        questionnaireItemParentMap
+      )
+    if (disabledQuestionnaireResponseAnswers.isNotEmpty()) {
+      removeDisabledAnswers(
+        questionnaireItem,
+        questionnaireResponseItem,
+        disabledQuestionnaireResponseAnswers
+      )
+    }
 
     val items = buildList {
       // Add an item for the question itself
@@ -694,14 +708,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             questionnaireResponseItem,
             validationResult = validationResult,
             answersChangedCallback = answersChangedCallback,
-            enabledAnswerOptions =
-              answerOptionsEvaluator.evaluate(
-                questionnaireItem,
-                questionnaireResponseItem,
-                questionnaireResponse,
-                questionnaireItemParentMap,
-                answersDisabledCallback = this@QuestionnaireViewModel::removeDisabledAnswers
-              ),
+            enabledAnswerOptions = enabledQuestionnaireAnswerOptions,
             draftAnswer = draftAnswerMap[questionnaireResponseItem],
             enabledDisplayItems =
               questionnaireItem.item.filter {
