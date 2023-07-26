@@ -161,6 +161,21 @@ data class QuestionnaireViewItem(
     )
   }
 
+  internal fun removeAnswerAt(index: Int) {
+    check(questionnaireItem.repeats) {
+      "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
+    }
+    require(index in answers.indices) {
+      "removeAnswerAt($index), but ${questionnaireItem.linkId} only has ${answers.size} answers"
+    }
+    answersChangedCallback(
+      questionnaireItem,
+      questionnaireResponseItem,
+      answers.filterIndexed { currentIndex, _ -> currentIndex != index },
+      null
+    )
+  }
+
   /**
    * Updates the draft answer stored in `QuestionnaireViewModel`. This clears any actual answer for
    * the question.
