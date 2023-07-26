@@ -21,11 +21,12 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.text.toSpanned
 import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
 import com.google.android.fhir.datacapture.extensions.initHelpViews
-import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpanned
+import com.google.android.fhir.datacapture.extensions.localizedInstructionSpannedList
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 
@@ -54,7 +55,9 @@ class GroupHeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(con
     // CQF expression takes precedence over static question text
     question.updateTextAndVisibility(questionnaireViewItem.questionText)
     hint.updateTextAndVisibility(
-      questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
+      questionnaireViewItem.enabledDisplayItems.localizedInstructionSpannedList
+        .joinToString(separator = "\n")
+        .toSpanned()
     )
     visibility = getHeaderViewVisibility(prefix, question, hint)
   }

@@ -326,6 +326,15 @@ val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionsSpanned:
       ?.localizedTextSpanned
   }
 
+val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionSpannedList: List<Spanned?>
+  get() {
+    return this.filter { questionnaireItem ->
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+          questionnaireItem.isInstructionsCode
+      }
+      .map { it.localizedTextSpanned }
+  }
+
 /**
  * A nested questionnaire item of type display with code [DisplayItemControlType.FLYOVER] (if
  * present) is used as the fly-over text of the parent question.
