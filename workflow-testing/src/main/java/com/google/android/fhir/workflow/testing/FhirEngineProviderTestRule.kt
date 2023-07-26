@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.workflow
+package com.google.android.fhir.workflow.testing
 
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
@@ -28,11 +28,13 @@ class FhirEngineProviderTestRule : TestRule {
   override fun apply(base: Statement, description: Description): Statement {
     return object : Statement() {
       override fun evaluate() {
-        FhirEngineProvider.init(FhirEngineConfiguration(testMode = true))
+        com.google.android.fhir.FhirEngineProvider.init(
+          com.google.android.fhir.FhirEngineConfiguration(testMode = true)
+        )
         try {
           base.evaluate()
         } finally {
-          FhirEngineProvider.cleanup()
+          com.google.android.fhir.FhirEngineProvider.cleanup()
         }
       }
     }
