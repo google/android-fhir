@@ -16,7 +16,7 @@ android {
 }
 
 dependencies {
-  api(project(":engine"))
+  api(Dependencies.androidFhirEngine)
 
   implementation(Dependencies.AndroidxTest.rules)
 }

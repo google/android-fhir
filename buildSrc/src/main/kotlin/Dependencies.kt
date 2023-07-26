@@ -168,10 +168,12 @@ object Dependencies {
   }
 
   const val androidFhirGroup = "com.google.android.fhir"
-  const val androidFhirCommon = "$androidFhirGroup:common:${Versions.androidFhirCommon}"
   const val androidFhirEngineModule = "engine"
+  const val androidFhirKnowledgeModule = "knowledge"
+  const val androidFhirCommon = "$androidFhirGroup:common:${Versions.androidFhirCommon}"
   const val androidFhirEngine =
     "$androidFhirGroup:$androidFhirEngineModule:${Versions.androidFhirEngine}"
+  const val androidFhirKnowledge = "$androidFhirGroup:knowledge:${Versions.androidFhirKnowledge}"
 
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
@@ -211,6 +213,7 @@ object Dependencies {
 
   const val androidBenchmarkRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
+
   // Makes Json assertions where the order of elements, tabs/whitespaces are not important.
   const val jsonAssert = "org.skyscreamer:jsonassert:${Versions.jsonAssert}"
   const val junit = "junit:junit:${Versions.junit}"
@@ -218,6 +221,7 @@ object Dependencies {
   const val mockitoInline = "org.mockito:mockito-inline:${Versions.mockitoInline}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
+
   // Makes XML assertions where the order of elements, tabs/whitespaces are not important.
   const val xmlUnit = "org.xmlunit:xmlunit-core:${Versions.xmlUnit}"
 
@@ -253,7 +257,8 @@ object Dependencies {
     }
 
     const val androidFhirCommon = "0.1.0-alpha04"
-    const val androidFhirEngine = "0.1.0-beta02"
+    const val androidFhirEngine = "0.1.0-beta03"
+    const val androidFhirKnowledge = "0.1.0-alpha01"
     const val desugarJdkLibs = "2.0.3"
     const val caffeine = "2.9.1"
     const val fhirUcum = "1.0.3"
@@ -264,6 +269,7 @@ object Dependencies {
     // Newer versions of HapiFhir don't work on Android due to the use of Caffeine 3+
     // Wait for this to release (6.3): https://github.com/hapifhir/hapi-fhir/pull/4196
     const val hapiFhir = "6.0.1"
+
     // Newer versions don't work on Android due to Apache Commons Codec:
     // Wait for this fix: https://github.com/hapifhir/org.hl7.fhir.core/issues/1046
     const val hapiFhirCore = "5.6.36"
