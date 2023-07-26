@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,7 @@ import org.hl7.fhir.r4.model.Questionnaire
  * [Questionnaire.QuestionnaireItemComponent.required] is true, or [R.string.optional_text] if
  * [QuestionnaireViewItem.showOptionalText] is true.
  */
-internal fun getRequiredOrOptionalText(
-  questionnaireViewItem: QuestionnaireViewItem,
-  context: Context
-) =
+fun getRequiredOrOptionalText(questionnaireViewItem: QuestionnaireViewItem, context: Context) =
   when {
     (questionnaireViewItem.questionnaireItem.required &&
       questionnaireViewItem.questionViewTextConfiguration.showRequiredText) -> {
@@ -53,7 +50,7 @@ internal fun getRequiredOrOptionalText(
  * true, the error message starts with `Required` text and the rest of the error message is placed
  * on the next line.
  */
-internal fun getValidationErrorMessage(
+fun getValidationErrorMessage(
   context: Context,
   questionnaireViewItem: QuestionnaireViewItem,
   validationResult: ValidationResult

@@ -4,26 +4,19 @@ plugins {
 }
 
 android {
+  namespace = "com.google.android.fhir.testing"
   compileSdk = Sdk.compileSdk
-
-  defaultConfig {
-    minSdk = Sdk.minSdk
-    targetSdk = Sdk.targetSdk
-  }
+  defaultConfig { minSdk = Sdk.minSdk }
+  packaging { resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")) }
+  kotlin { jvmToolchain(11) }
   compileOptions {
-    sourceCompatibility = Java.sourceCompatibility
-    targetCompatibility = Java.targetCompatibility
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
   }
-
-  packagingOptions {
-    resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
-  }
-
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
 }
 
 dependencies {
-  api(project(":engine"))
+  api(Dependencies.androidFhirEngine)
 
   implementation(Dependencies.AndroidxTest.rules)
 }

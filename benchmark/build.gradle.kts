@@ -4,42 +4,20 @@ import Dependencies.removeIncompatibleDependencies
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.benchmark)
-  id(Plugins.BuildPlugins.jetbrainsKotlinAndroid)
 }
 
 android {
+  namespace = "com.google.android.fhir.benchmark"
   compileSdk = Sdk.compileSdk
-
-  compileOptions {
-    sourceCompatibility = Java.sourceCompatibility
-    targetCompatibility = Java.targetCompatibility
-  }
-
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
-
   defaultConfig {
     minSdk = Sdk.minSdkWorkflow
-    targetSdk = Sdk.targetSdk
-
-    testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
-    testInstrumentationRunnerArguments["androidx.benchmark.output.enable"] = "true"
+    testInstrumentationRunner = Dependencies.androidBenchmarkRunner
   }
 
   testBuildType = "release"
-  buildTypes {
-    debug {
-      // Since isDebuggable can't be modified by gradle for library modules,
-      // it must be done in a manifest - see src/androidTest/AndroidManifest.xml
-      isMinifyEnabled = true
-      proguardFiles(
-        getDefaultProguardFile("proguard-android-optimize.txt"),
-        "benchmark-proguard-rules.pro"
-      )
-    }
-  }
-  packagingOptions {
+  buildTypes { release {} }
+  packaging {
     resources.excludes.addAll(
       listOf(
         "license.html",
@@ -62,6 +40,11 @@ android {
         "readme.html",
       )
     )
+  }
+  kotlin { jvmToolchain(11) }
+  compileOptions {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
   }
 }
 
@@ -90,7 +73,12 @@ dependencies {
   androidTestImplementation(Dependencies.Retrofit.coreRetrofit)
 
   androidTestImplementation(project(":engine"))
-  androidTestImplementation(project(":knowledge"))
-  androidTestImplementation(project(":workflow"))
+  androidTestImplementation(project(":knowledge")) {
+    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
+  }
+  androidTestImplementation(project(":workflow")) {
+    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
+    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirKnowledgeModule)
+  }
   androidTestImplementation(project(":workflow-testing"))
 }

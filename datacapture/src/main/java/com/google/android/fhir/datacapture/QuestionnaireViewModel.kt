@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,6 @@ import kotlinx.coroutines.flow.update
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Element
-import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -136,6 +135,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaireResponse =
           parser.parseResource(application.contentResolver.openInputStream(uri))
             as QuestionnaireResponse
+        addMissingResponseItems(questionnaire.item, questionnaireResponse.item)
         checkQuestionnaireResponse(questionnaire, questionnaireResponse)
       }
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING) -> {
@@ -143,6 +143,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]!!
         questionnaireResponse =
           parser.parseResource(questionnaireResponseJson) as QuestionnaireResponse
+        addMissingResponseItems(questionnaire.item, questionnaireResponse.item)
         checkQuestionnaireResponse(questionnaire, questionnaireResponse)
       }
       else -> {
@@ -354,6 +355,41 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
 
   /**
+   * Adds empty [QuestionnaireResponseItemComponent]s to `responseItems` so that each
+   * [QuestionnaireItemComponent] in `questionnaireItems` has at least one corresponding
+   * [QuestionnaireResponseItemComponent]. This is because user-provided [QuestionnaireResponse]
+   * might not contain answers to unanswered or disabled questions. Note : this only applies to
+   * [QuestionnaireItemComponent]s nested under a group.
+   */
+  private fun addMissingResponseItems(
+    questionnaireItems: List<QuestionnaireItemComponent>,
+    responseItems: MutableList<QuestionnaireResponseItemComponent>,
+  ) {
+    // To associate the linkId to QuestionnaireResponseItemComponent, do not use associateBy().
+    // Instead, use groupBy().
+    // This is because a questionnaire response may have multiple
+    // QuestionnaireResponseItemComponents with the same linkId.
+    val responseItemMap = responseItems.groupBy { it.linkId }
+
+    // Clear the response item list, and then add the missing and existing response items back to
+    // the list
+    responseItems.clear()
+
+    questionnaireItems.forEach {
+      if (responseItemMap[it.linkId].isNullOrEmpty()) {
+        responseItems.add(it.createQuestionnaireResponseItem())
+      } else {
+        if (it.type == Questionnaire.QuestionnaireItemType.GROUP && !it.repeats) {
+          addMissingResponseItems(
+            questionnaireItems = it.item,
+            responseItems = responseItemMap[it.linkId]!!.single().item,
+          )
+        }
+        responseItems.addAll(responseItemMap[it.linkId]!!)
+      }
+    }
+  }
+  /**
    * Returns current [QuestionnaireResponse] captured by the UI which includes answers of enabled
    * questions.
    */
@@ -544,16 +580,42 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     // Check cache first for database queries
     val answerExpression = item.answerExpression ?: return emptyList()
-    if (answerExpression.isXFhirQuery && answerExpressionMap.contains(answerExpression.expression)
-    ) {
-      return answerExpressionMap[answerExpression.expression]!!
+
+    return when {
+      answerExpression.isXFhirQuery -> {
+        xFhirQueryResolver?.let { xFhirQueryResolver ->
+          val xFhirExpressionString =
+            ExpressionEvaluator.createXFhirQueryFromExpression(
+              questionnaire,
+              questionnaireResponse,
+              item,
+              questionnaireItemParentMap,
+              answerExpression,
+              questionnaireLaunchContextMap
+            )
+          if (answerExpressionMap.containsKey(xFhirExpressionString)) {
+            answerExpressionMap[xFhirExpressionString]
+          }
+
+          val data = xFhirQueryResolver.resolve(xFhirExpressionString)
+          val options = item.extractAnswerOptions(data)
+
+          answerExpressionMap[xFhirExpressionString] = options
+          options
+        }
+          ?: error(
+            "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
+          )
+      }
+      answerExpression.isFhirPath -> {
+        val data = fhirPathEngine.evaluate(questionnaireResponse, answerExpression.expression)
+        item.extractAnswerOptions(data)
+      }
+      else ->
+        throw UnsupportedOperationException(
+          "${answerExpression.language} not supported for answer-expression yet"
+        )
     }
-
-    val options = loadAnswerExpressionOptions(item, answerExpression)
-
-    if (answerExpression.isXFhirQuery) answerExpressionMap[answerExpression.expression] = options
-
-    return options
   }
 
   private fun resolveCqfExpression(
@@ -571,31 +633,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       questionnaireResponseItem,
       cqfExpression
     )
-  }
-
-  private suspend fun loadAnswerExpressionOptions(
-    item: QuestionnaireItemComponent,
-    expression: Expression,
-  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-    val data =
-      if (expression.isXFhirQuery) {
-        checkNotNull(xFhirQueryResolver) {
-          "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
-        }
-
-        val xFhirExpressionString =
-          expressionEvaluator.createXFhirQueryFromExpression(
-            expression)
-        xFhirQueryResolver!!.resolve(xFhirExpressionString)
-      } else if (expression.isFhirPath) {
-        fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
-      } else {
-        throw UnsupportedOperationException(
-          "${expression.language} not supported for answer-expression yet"
-        )
-      }
-
-    return item.extractAnswerOptions(data)
   }
 
   /**

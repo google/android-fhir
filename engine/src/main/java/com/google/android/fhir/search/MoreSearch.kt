@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -295,7 +295,8 @@ internal fun getConditionParamPair(
       (prefix != ParamPrefixEnum.STARTS_AFTER && prefix != ParamPrefixEnum.ENDS_BEFORE)
   ) { "Prefix $prefix not allowed for Integer type" }
   return when (prefix) {
-    ParamPrefixEnum.EQUAL, null -> {
+    ParamPrefixEnum.EQUAL,
+    null -> {
       val precision = value.getRange()
       ConditionParam(
         "index_value >= ? AND index_value < ?",
@@ -348,7 +349,7 @@ internal fun getConditionParamPair(
   // Canonicalize the unit if possible. For example, 1 kg will be canonicalized to 1000 g
   if (system == ucumUrl && unit != null) {
     try {
-      val ucumValue = UnitConverter.getCanonicalForm(UcumValue(unit, value))
+      val ucumValue = UnitConverter.getCanonicalFormOrOriginal(UcumValue(unit, value))
       canonicalizedUnit = ucumValue.code
       canonicalizedValue = ucumValue.value
     } catch (exception: ConverterException) {
