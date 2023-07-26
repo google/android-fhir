@@ -811,7 +811,6 @@ class MoreQuestionnaireItemComponentsTest {
               Questionnaire.QuestionnaireItemComponent().apply {
                 linkId = "nested-display-question"
                 text = "text"
-                type = Questionnaire.QuestionnaireItemType.DISPLAY
               }
             )
         }

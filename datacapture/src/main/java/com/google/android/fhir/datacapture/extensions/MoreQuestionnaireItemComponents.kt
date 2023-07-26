@@ -326,6 +326,11 @@ val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionsSpanned:
       ?.localizedTextSpanned
   }
 
+/**
+ * Returns a filtered list of localized instructions as a list of Spanned objects for a given list
+ * of QuestionnaireItemComponent. Only items of type QuestionnaireItemType.DISPLAY and with the
+ * isInstructionsCode flag set to true are included in the result.
+ */
 val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionSpannedList: List<Spanned?>
   get() {
     return this.filter { questionnaireItem ->

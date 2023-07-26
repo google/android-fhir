@@ -172,7 +172,7 @@ class GroupHeaderViewTest {
   }
 
   @Test
-  fun `shows all instructions`() {
+  fun `show all present instructions for given item`() {
     val itemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
