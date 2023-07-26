@@ -94,7 +94,6 @@ dependencies {
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.xmlUnit)
-  androidTestImplementation(project(":testing"))
   androidTestImplementation(project(":workflow-testing"))
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
@@ -142,7 +141,6 @@ dependencies {
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.xmlUnit)
-  testImplementation(project(":testing"))
   testImplementation(project(":workflow-testing"))
 }
 

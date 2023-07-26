@@ -23,8 +23,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS
@@ -56,7 +54,6 @@ import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
 import java.util.Date
@@ -131,20 +128,16 @@ class MainDispatcherRule(
 }
 
 @RunWith(RobolectricTestRunner::class)
-@OptIn(ExperimentalCoroutinesApi::class)
 @Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
 class QuestionnaireViewModelTest {
-  @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
 
   @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
-  private lateinit var fhirEngine: FhirEngine
   private lateinit var state: SavedStateHandle
   private val context = ApplicationProvider.getApplicationContext<Application>()
 
   @Before
   fun setUp() {
-    fhirEngine = FhirEngineProvider.getInstance(context)
     state = SavedStateHandle()
     check(
       ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
