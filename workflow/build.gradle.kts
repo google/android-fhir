@@ -1,4 +1,5 @@
 import Dependencies.forceHapiVersion
+import Dependencies.forceJacksonVersion
 import Dependencies.removeIncompatibleDependencies
 import java.net.URL
 
@@ -18,7 +19,7 @@ android {
   namespace = "com.google.android.fhir.workflow"
   compileSdk = Sdk.compileSdk
   defaultConfig {
-    minSdk = Sdk.minSdkWorkflow
+    minSdk = Sdk.minSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.workflow"
@@ -70,6 +71,7 @@ android {
   configureJacocoTestOptions()
   kotlin { jvmToolchain(11) }
   compileOptions {
+    isCoreLibraryDesugaringEnabled = true
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
   }
@@ -81,10 +83,13 @@ configurations {
   all {
     removeIncompatibleDependencies()
     forceHapiVersion()
+    forceJacksonVersion()
   }
 }
 
 dependencies {
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)

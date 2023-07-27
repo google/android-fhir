@@ -1,4 +1,5 @@
 import Dependencies.forceHapiVersion
+import Dependencies.forceJacksonVersion
 import Dependencies.removeIncompatibleDependencies
 
 plugins {
@@ -9,7 +10,7 @@ plugins {
 android {
   namespace = "com.google.android.fhir.workflow.testing"
   compileSdk = Sdk.compileSdk
-  defaultConfig { minSdk = Sdk.minSdkWorkflow }
+  defaultConfig { minSdk = Sdk.minSdk }
   kotlin { jvmToolchain(11) }
   compileOptions {
     sourceCompatibility = javaVersion
@@ -21,6 +22,7 @@ configurations {
   all {
     removeIncompatibleDependencies()
     forceHapiVersion()
+    forceJacksonVersion()
   }
 }
 
