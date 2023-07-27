@@ -276,26 +276,30 @@ class RadioGroupViewHolderFactoryTest {
 
   @Test
   fun click_shouldCheckRadioButton() {
+    val fakeAnswerValueSetResolver = { uri: String ->
+      if (uri == "http://coding-value-set-url") {
+        listOf(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding 1" }
+          },
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding 2" }
+          }
+        )
+      } else {
+        emptyList()
+      }
+    }
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        answerValueSet = "http://coding-value-set-url"
+      }
+
     val questionnaireViewItem =
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          answerValueSet = "http://coding-value-set-url"
-        },
+        questionnaireItem,
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        resolveAnswerValueSet = {
-          if (it == "http://coding-value-set-url") {
-            listOf(
-              Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-                value = Coding().apply { display = "Coding 1" }
-              },
-              Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-                value = Coding().apply { display = "Coding 2" }
-              }
-            )
-          } else {
-            emptyList()
-          }
-        },
+        enabledAnswerOptions = fakeAnswerValueSetResolver.invoke(questionnaireItem.answerValueSet),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
