@@ -130,7 +130,10 @@ suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
 
 typealias SearchParamName = String
 
-/** It contains the searched resource and referenced resources as per the search query. */
+/**
+ * Contains a FHIR resource that satisfies the search criteria in the query together with any
+ * referenced resources as specified in the query.
+ */
 data class SearchResult<R : Resource>(
   /** Matching resource as per the query. */
   val resource: R,
@@ -143,7 +146,7 @@ data class SearchResult<R : Resource>(
     other is SearchResult<*> &&
       equalsShallow(resource, other.resource) &&
       equalsShallow(included, other.included) &&
-      equalsShallow2(revIncluded, other.revIncluded)
+      equalsShallow(revIncluded, other.revIncluded)
 
   private fun equalsShallow(first: Resource, second: Resource) =
     first.resourceType == second.resourceType && first.logicalId == second.logicalId
@@ -162,7 +165,8 @@ data class SearchResult<R : Resource>(
       first?.size == second?.size
     }
 
-  private fun equalsShallow2(
+  @JvmName("equalsShallowRevInclude")
+  private fun equalsShallow(
     first: Map<ResourceType, Map<SearchParamName, List<Resource>>>?,
     second: Map<ResourceType, Map<SearchParamName, List<Resource>>>?
   ) =
