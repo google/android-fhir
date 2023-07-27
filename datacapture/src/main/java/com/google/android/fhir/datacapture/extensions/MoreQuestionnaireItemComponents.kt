@@ -112,6 +112,33 @@ internal const val EXTENSION_CQF_CALCULATED_VALUE_URL: String =
 internal const val EXTENSION_SLIDER_STEP_VALUE_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue"
 
+internal const val EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerOptionsToggleExpression"
+
+internal const val EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION = "option"
+
+internal const val EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION = "expression"
+
+internal val Questionnaire.QuestionnaireItemComponent.answerOptionsToggleExpressions
+  get() =
+    this.extension
+      .filter { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL }
+      .map { rootExtension ->
+        val options =
+          rootExtension.extension
+            .filter { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION }
+            .map { it.value }
+        if (options.isEmpty())
+          throw IllegalArgumentException(
+            "Questionnaire item $linkId with extension '$EXTENSION_ANSWER_EXPRESSION_URL' requires at least one option. See http://hl7.org/fhir/uv/sdc/STU3/StructureDefinition-sdc-questionnaire-answerOptionsToggleExpression.html."
+          )
+        val expression =
+          rootExtension.extension
+            .single { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION }
+            .let { it.castToExpression(it.value) }
+        expression to options
+      }
+
 internal val Questionnaire.QuestionnaireItemComponent.variableExpressions: List<Expression>
   get() =
     this.extension.filter { it.url == EXTENSION_VARIABLE_URL }.map { it.castToExpression(it.value) }
