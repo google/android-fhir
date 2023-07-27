@@ -799,7 +799,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `nested display item without instructions code returns null`() {
+  fun `nested display item without instructions code returns empty spanned`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -845,7 +845,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `localizedInstructionsSpanned returns text for all of the items that have instruction code and type is display`() {
+  fun `localizedInstructionsSpanned returns spanned for all of the items that have instruction code and type is display`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
