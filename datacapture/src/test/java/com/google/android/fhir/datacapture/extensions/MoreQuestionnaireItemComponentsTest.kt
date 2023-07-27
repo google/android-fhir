@@ -850,7 +850,7 @@ class MoreQuestionnaireItemComponentsTest {
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
           linkId = "display-question"
-          text = "instruction-1"
+          text = "<strong>instruction-1<strong>"
           extension = listOf(displayCategoryExtensionWithInstructionsCode)
           type = Questionnaire.QuestionnaireItemType.DISPLAY
         },

@@ -19,9 +19,9 @@ package com.google.android.fhir.datacapture.extensions
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.text.SpannableStringBuilder
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
-import androidx.core.text.toSpanned
 import ca.uhn.fhir.util.UrlUtil
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
@@ -351,13 +351,14 @@ val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spann
  */
 val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionsSpanned: Spanned
   get() {
-    return this.filter { questionnaireItem ->
-        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-          questionnaireItem.isInstructionsCode
-      }
-      .map { it.localizedTextSpanned }
-      .joinToString(separator = "\n")
-      .toSpanned()
+    return SpannableStringBuilder().apply {
+      this@localizedInstructionsSpanned.filter { questionnaireItem ->
+          questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+            questionnaireItem.isInstructionsCode
+        }
+        .map { it.localizedTextSpanned }
+        .joinTo(this, "\n")
+    }
   }
 
 /**
