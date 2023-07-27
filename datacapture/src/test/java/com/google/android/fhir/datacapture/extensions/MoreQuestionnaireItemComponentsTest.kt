@@ -845,17 +845,17 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `localizedInstructionsSpanned returns text for all of the items that have instruction code`() {
+  fun `localizedInstructionsSpanned returns text for all of the items that have instruction code and type is display`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
-          linkId = "nested-display-question"
+          linkId = "display-question"
           text = "instruction-1"
           extension = listOf(displayCategoryExtensionWithInstructionsCode)
           type = Questionnaire.QuestionnaireItemType.DISPLAY
         },
         Questionnaire.QuestionnaireItemComponent().apply {
-          linkId = "nested-display-question"
+          linkId = "display-question"
           text = "instruction-2"
           extension = listOf(displayCategoryExtensionWithInstructionsCode)
           type = Questionnaire.QuestionnaireItemType.DISPLAY
