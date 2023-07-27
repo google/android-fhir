@@ -21,12 +21,11 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.text.toSpanned
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.appendAsteriskToQuestionText
 import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
 import com.google.android.fhir.datacapture.extensions.initHelpViews
-import com.google.android.fhir.datacapture.extensions.localizedInstructionSpannedList
+import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 import org.hl7.fhir.r4.model.Questionnaire
@@ -57,9 +56,7 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
       appendAsteriskToQuestionText(question.context, questionnaireViewItem)
     )
     hint.updateTextAndVisibility(
-      questionnaireViewItem.enabledDisplayItems.localizedInstructionSpannedList
-        .joinToString(separator = "\n")
-        .toSpanned()
+      questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
     )
     // Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.

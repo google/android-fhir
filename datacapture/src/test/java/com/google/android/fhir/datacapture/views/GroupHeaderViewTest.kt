@@ -172,35 +172,6 @@ class GroupHeaderViewTest {
   }
 
   @Test
-  fun `show all present instructions for given item`() {
-    val itemList =
-      listOf(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          linkId = "nested-display-question-1"
-          text = "instructions-1"
-          extension = listOf(displayCategoryExtensionWithInstructionsCode)
-          type = Questionnaire.QuestionnaireItemType.DISPLAY
-        },
-        Questionnaire.QuestionnaireItemComponent().apply {
-          linkId = "nested-display-question-2"
-          text = "instructions-2"
-          extension = listOf(displayCategoryExtensionWithInstructionsCode)
-          type = Questionnaire.QuestionnaireItemType.DISPLAY
-        }
-      )
-    view.bind(
-      getQuestionnaireViewItemWithQuestionnaireItemAndEnabledDisplayItems(
-        Questionnaire.QuestionnaireItemComponent().apply { item = itemList },
-        itemList
-      )
-    )
-
-    assertThat(view.findViewById<TextView>(R.id.hint).isVisible).isTrue()
-    assertThat(view.findViewById<TextView>(R.id.hint).text.toString())
-      .isEqualTo("instructions-1\ninstructions-2")
-  }
-
-  @Test
   fun `hides instructions`() {
     view.bind(
       getQuestionnaireViewItemWithQuestionnaireItem(

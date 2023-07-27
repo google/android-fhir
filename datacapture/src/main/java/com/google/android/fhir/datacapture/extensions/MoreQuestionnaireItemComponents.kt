@@ -21,6 +21,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
+import androidx.core.text.toSpanned
 import ca.uhn.fhir.util.UrlUtil
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
@@ -316,28 +317,20 @@ val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
 val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spanned?
   get() = item.localizedInstructionsSpanned
 
-/** [localizedInstructionsSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
-val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionsSpanned: Spanned?
-  get() {
-    return this.firstOrNull { questionnaireItem ->
-        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-          questionnaireItem.isInstructionsCode
-      }
-      ?.localizedTextSpanned
-  }
-
 /**
- * Returns a filtered list of localized instructions as a list of Spanned objects for a given list
- * of QuestionnaireItemComponent. Only items of type QuestionnaireItemType.DISPLAY and with the
- * isInstructionsCode flag set to true are included in the result.
+ * Returns a Spanned object that contains the localized instructions for all of the items in this
+ * list that are of type `Questionnaire.QuestionnaireItemType.DISPLAY` and have the
+ * `isInstructionsCode` flag set. The instructions are separated by newlines.
  */
-val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionSpannedList: List<Spanned?>
+val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionsSpanned: Spanned
   get() {
     return this.filter { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
           questionnaireItem.isInstructionsCode
       }
       .map { it.localizedTextSpanned }
+      .joinToString(separator = "\n")
+      .toSpanned()
   }
 
 /**

@@ -816,7 +816,7 @@ class MoreQuestionnaireItemComponentsTest {
         }
       )
 
-    assertThat(questionItemList.first().localizedInstructionsSpanned).isNull()
+    assertThat(questionItemList.first().localizedInstructionsSpanned.toString()).isEmpty()
   }
 
   @Test
@@ -842,6 +842,29 @@ class MoreQuestionnaireItemComponentsTest {
 
     assertThat(questionItemList.first().localizedInstructionsSpanned.toString())
       .isEqualTo("subtitle text")
+  }
+
+  @Test
+  fun `localizedInstructionsSpanned returns text for all of the items that have instruction code`() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "nested-display-question"
+          text = "instruction-1"
+          extension = listOf(displayCategoryExtensionWithInstructionsCode)
+          type = Questionnaire.QuestionnaireItemType.DISPLAY
+        },
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "nested-display-question"
+          text = "instruction-2"
+          extension = listOf(displayCategoryExtensionWithInstructionsCode)
+          type = Questionnaire.QuestionnaireItemType.DISPLAY
+        },
+      )
+    Locale.setDefault(Locale.US)
+
+    assertThat(questionItemList.localizedInstructionsSpanned.toString())
+      .isEqualTo("instruction-1\ninstruction-2")
   }
 
   @Test
