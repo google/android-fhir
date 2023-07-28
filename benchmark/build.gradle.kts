@@ -1,4 +1,5 @@
 import Dependencies.forceHapiVersion
+import Dependencies.forceJacksonVersion
 import Dependencies.removeIncompatibleDependencies
 
 plugins {
@@ -11,7 +12,7 @@ android {
   namespace = "com.google.android.fhir.benchmark"
   compileSdk = Sdk.compileSdk
   defaultConfig {
-    minSdk = Sdk.minSdkWorkflow
+    minSdk = Sdk.minSdk
     testInstrumentationRunner = Dependencies.androidBenchmarkRunner
   }
 
@@ -54,6 +55,7 @@ configurations {
   all {
     removeIncompatibleDependencies()
     forceHapiVersion()
+    forceJacksonVersion()
   }
 }
 
@@ -73,7 +75,12 @@ dependencies {
   androidTestImplementation(Dependencies.Retrofit.coreRetrofit)
 
   androidTestImplementation(project(":engine"))
-  androidTestImplementation(project(":knowledge"))
-  androidTestImplementation(project(":workflow"))
+  androidTestImplementation(project(":knowledge")) {
+    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
+  }
+  androidTestImplementation(project(":workflow")) {
+    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
+    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirKnowledgeModule)
+  }
   androidTestImplementation(project(":workflow-testing"))
 }
