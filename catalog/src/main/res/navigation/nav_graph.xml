@@ -86,12 +86,7 @@
         android:name="com.google.android.fhir.catalog.DemoQuestionnaireFragment"
         tools:layout="@layout/fragment_demo_questionnaire"
     >
-    <argument
-            android:name="questionnaireTitleKey"
-            app:argType="string"
-            app:nullable="true"
-            android:defaultValue="@null"
-        />
+    <argument android:name="questionnaireTitleKey" app:argType="string" />
     <argument
             android:name="questionnaireFilePathKey"
             app:argType="string"

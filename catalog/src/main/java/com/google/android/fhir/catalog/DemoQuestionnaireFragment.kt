@@ -125,12 +125,7 @@ class DemoQuestionnaireFragment : Fragment() {
     (requireActivity() as AppCompatActivity).supportActionBar?.apply {
       setDisplayHomeAsUpEnabled(true)
     }
-    args.questionnaireTitleKey?.let {
-      (requireActivity() as MainActivity).setActionBar(
-        args.questionnaireTitleKey as? String ?: "",
-        Gravity.TOP
-      )
-    }
+    (requireActivity() as MainActivity).setActionBar(args.questionnaireTitleKey, Gravity.TOP)
     setHasOptionsMenu(true)
   }
 
