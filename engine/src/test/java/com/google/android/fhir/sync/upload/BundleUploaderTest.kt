@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import com.google.android.fhir.sync.UploadResult
 import com.google.android.fhir.testing.BundleDataSource
 import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
+import java.time.Instant
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
@@ -133,7 +134,8 @@ class BundleUploaderTest {
                       }
                     )
                   }
-                )
+                ),
+            timestamp = Instant.now()
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(1)) }

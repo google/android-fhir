@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.common.truth.Truth.assertThat
+import java.time.Instant
 import junit.framework.TestCase
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.HumanName
@@ -53,7 +54,8 @@ class LocalChangeUtilsTest : TestCase() {
                 }
               )
             }
-          )
+          ),
+        timestamp = Instant.now()
       )
 
     val localChange = localChangeEntity.toLocalChange()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.sync.upload
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.common.truth.Truth.assertThat
+import java.time.Instant
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -36,35 +37,40 @@ class LocalChangesPaginatorTest {
           "patient-001",
           type = LocalChange.Type.INSERT,
           payload = "{}",
-          token = LocalChangeToken(listOf(1L))
+          token = LocalChangeToken(listOf(1L)),
+          timestamp = Instant.now()
         ),
         LocalChange(
           ResourceType.Patient.name,
           "patient-002",
           type = LocalChange.Type.INSERT,
           payload = "{}",
-          token = LocalChangeToken(listOf(2L))
+          token = LocalChangeToken(listOf(2L)),
+          timestamp = Instant.now()
         ),
         LocalChange(
           ResourceType.Patient.name,
           "patient-003",
           type = LocalChange.Type.INSERT,
           payload = "{}",
-          token = LocalChangeToken(listOf(3L))
+          token = LocalChangeToken(listOf(3L)),
+          timestamp = Instant.now()
         ),
         LocalChange(
           ResourceType.Patient.name,
           "patient-004",
           type = LocalChange.Type.INSERT,
           payload = "{}",
-          token = LocalChangeToken(listOf(4L))
+          token = LocalChangeToken(listOf(4L)),
+          timestamp = Instant.now()
         ),
         LocalChange(
           ResourceType.Patient.name,
           "patient-005",
           type = LocalChange.Type.INSERT,
           payload = "{}",
-          token = LocalChangeToken(listOf(5L))
+          token = LocalChangeToken(listOf(5L)),
+          timestamp = Instant.now()
         )
       )
 
