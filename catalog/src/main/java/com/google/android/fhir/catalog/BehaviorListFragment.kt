@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.catalog
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -26,7 +25,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class BehaviorListFragment : Fragment(R.layout.behavior_list_fragment), MainView {
+class BehaviorListFragment : Fragment(R.layout.behavior_list_fragment) {
   private val viewModel: BehaviorListViewModel by viewModels()
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -71,16 +70,6 @@ class BehaviorListFragment : Fragment(R.layout.behavior_list_fragment), MainView
           questionnaireTitleKey = context?.getString(behavior.textId) ?: "",
           questionnaireFilePathKey = behavior.questionnaireFileName,
           workflow = behavior.workFlow
-        )
-      )
-  }
-
-  override fun launchQuestionnaireFragment(uri: Uri) {
-    findNavController()
-      .navigate(
-        BehaviorListFragmentDirections.actionBehaviorsFragmentToGalleryQuestionnaireFragment(
-          workflow = WorkflowType.DEFAULT,
-          questionnaireFileUri = uri,
         )
       )
   }

@@ -18,6 +18,7 @@ package com.google.android.fhir.catalog
 
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
@@ -25,7 +26,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.Navigation
-import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -89,9 +90,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
   }
 
   private fun launchQuestionnaireFragment(uri: Uri) {
-    val navHostFragment =
-      supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-    val currentFragment = navHostFragment.childFragmentManager.fragments.lastOrNull()
-    (currentFragment as? MainView)?.launchQuestionnaireFragment(uri)
+    val args =
+      Bundle().apply {
+        putString("questionnaireTitleKey", "")
+        putSerializable("workflow", WorkflowType.DEFAULT)
+        putParcelable("questionnaireFileUri", uri as Parcelable)
+      }
+    findNavController(R.id.nav_host_fragment).navigate(R.id.galleryQuestionnaireFragment, args)
   }
 }

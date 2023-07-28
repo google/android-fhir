@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
- Copyright 2023 Google LLC
+ Copyright 2021 Google LLC
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -89,12 +89,14 @@
     <argument
             android:name="questionnaireTitleKey"
             app:argType="string"
-            android:defaultValue=""
+            app:nullable="true"
+            android:defaultValue="@null"
         />
     <argument
             android:name="questionnaireFilePathKey"
             app:argType="string"
-            android:defaultValue=""
+            app:nullable="true"
+            android:defaultValue="@null"
         />
     <argument
             android:name="questionnaireFileWithValidationPathKey"

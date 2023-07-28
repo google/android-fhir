@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.catalog
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -27,7 +26,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 /** Fragment for the layout list. */
-class LayoutListFragment : Fragment(R.layout.layout_list_fragment), MainView {
+class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
   private val viewModel: LayoutListViewModel by viewModels()
 
   override fun onResume() {
@@ -75,16 +74,6 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment), MainView {
           questionnaireTitleKey = context?.getString(layout.textId) ?: "",
           questionnaireFilePathKey = layout.questionnaireFileName,
           workflow = layout.workflow
-        )
-      )
-  }
-
-  override fun launchQuestionnaireFragment(uri: Uri) {
-    findNavController()
-      .navigate(
-        LayoutListFragmentDirections.actionLayoutsFragmentToGalleryQuestionnaireFragment(
-          workflow = WorkflowType.DEFAULT,
-          questionnaireFileUri = uri,
         )
       )
   }
