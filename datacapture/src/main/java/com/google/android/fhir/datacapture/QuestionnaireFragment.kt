@@ -216,6 +216,16 @@ class QuestionnaireFragment : Fragment() {
               )
             }
           }
+          is DisplayMode.InitMode -> {
+            questionnaireReviewRecyclerView.visibility = View.GONE
+            questionnaireEditRecyclerView.visibility = View.GONE
+            paginationPreviousButton.visibility = View.GONE
+            paginationNextButton.visibility = View.GONE
+            questionnaireProgressIndicator.visibility = View.GONE
+            submitButton.visibility = View.GONE
+            reviewModeButton.visibility = View.GONE
+            reviewModeEditButton.visibility = View.GONE
+          }
         }
       }
     }

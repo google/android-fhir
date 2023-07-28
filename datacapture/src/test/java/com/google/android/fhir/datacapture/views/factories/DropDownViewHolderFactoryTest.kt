@@ -184,11 +184,20 @@ class DropDownViewHolderFactoryTest {
             display = "Test Code"
           }
       }
+    val fakeAnswerValueSetResolver = { uri: String ->
+      if (uri == "http://coding-value-set-url") {
+        listOf(answerOption)
+      } else {
+        emptyList()
+      }
+    }
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        answerValueSet = "http://coding-value-set-url"
+      }
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          answerValueSet = "http://coding-value-set-url"
-        },
+        questionnaireItem,
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -196,13 +205,7 @@ class DropDownViewHolderFactoryTest {
             }
           )
         },
-        resolveAnswerValueSet = {
-          if (it == "http://coding-value-set-url") {
-            listOf(answerOption)
-          } else {
-            emptyList()
-          }
-        },
+        enabledAnswerOptions = fakeAnswerValueSetResolver.invoke(questionnaireItem.answerValueSet),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
