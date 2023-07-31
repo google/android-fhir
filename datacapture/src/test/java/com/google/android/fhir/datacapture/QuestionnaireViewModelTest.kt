@@ -4171,7 +4171,7 @@ class QuestionnaireViewModelTest {
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
     state.set(
       EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS,
-      listOf(printer.encodeResourceToString(patient))
+      mapOf("patient" to printer.encodeResourceToString(patient))
     )
 
     val viewModel = QuestionnaireViewModel(context, state)

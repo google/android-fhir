@@ -140,14 +140,11 @@ class MoreQuestionnairesTest {
   }
 
   @Test
-  fun `should throw exception if resource type in type extension is different to what is in name extension`() {
+  fun `should throw exception if system in name extension is different to the fhir standard`() {
     val launchContextExtension =
       Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
         .apply {
-          addExtension(
-            "name",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "encounter", "Encounter")
-          )
+          addExtension("name", Coding("http://idk-bro", "grandma", "Grandma"))
           addExtension("type", CodeType("Patient"))
         }
 
@@ -217,12 +214,7 @@ class MoreQuestionnairesTest {
   fun `should throw exception if the name extension is not present`() {
     val launchContextExtension =
       Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
-        .apply {
-          addExtension(
-            "name",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User")
-          )
-        }
+        .apply { addExtension("type", CodeType("Patient")) }
 
     val errorMessage =
       assertFailsWith<IllegalStateException> {
