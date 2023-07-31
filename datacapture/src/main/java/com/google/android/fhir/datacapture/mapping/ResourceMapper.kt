@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package com.google.android.fhir.datacapture.mapping
 
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
+import com.google.android.fhir.datacapture.extensions.getMatchingLaunchContexts
+import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
 import com.google.android.fhir.datacapture.extensions.targetStructureMap
 import com.google.android.fhir.datacapture.extensions.toCodeType
 import com.google.android.fhir.datacapture.extensions.toCoding
@@ -217,9 +219,14 @@ object ResourceMapper {
    */
   suspend fun populate(
     questionnaire: Questionnaire,
-    vararg resources: Resource
+    launchContexts: Map<String, Resource>
   ): QuestionnaireResponse {
-    populateInitialValues(questionnaire.item, *resources)
+    val filteredLaunchContexts =
+      getMatchingLaunchContexts(
+        launchContexts,
+        questionnaire.questionnaireLaunchContexts ?: listOf()
+      )
+    populateInitialValues(questionnaire.item, filteredLaunchContexts)
     return QuestionnaireResponse().apply {
       item = questionnaire.item.map { it.createQuestionnaireResponseItem() }
     }
@@ -227,14 +234,14 @@ object ResourceMapper {
 
   private suspend fun populateInitialValues(
     questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
-    vararg resources: Resource
+    launchContexts: Map<String, Resource>
   ) {
-    questionnaireItems.forEach { populateInitialValue(it, *resources) }
+    questionnaireItems.forEach { populateInitialValue(it, launchContexts) }
   }
 
   private suspend fun populateInitialValue(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    vararg resources: Resource
+    launchContexts: Map<String, Resource>
   ) {
     check(questionnaireItem.initial.isEmpty() || questionnaireItem.initialExpression == null) {
       "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."
@@ -242,12 +249,7 @@ object ResourceMapper {
 
     questionnaireItem.initialExpression
       ?.let {
-        fhirPathEngine
-          .evaluate(
-            selectPopulationContext(resources.asList(), it),
-            it.expression.removePrefix("%")
-          )
-          .singleOrNull()
+        fhirPathEngine.evaluate(launchContexts, null, null, null, it.expression).firstOrNull()
       }
       ?.let {
         // Set initial value for the questionnaire item. Questionnaire items should not have both
@@ -258,24 +260,7 @@ object ResourceMapper {
           )
       }
 
-    populateInitialValues(questionnaireItem.item, *resources)
-  }
-
-  /**
-   * Returns the population context for the questionnaire/group.
-   *
-   * The resource of the same type as the expected type of the initial expression will be selected
-   * first. Otherwise, the first resource in the list will be selected.
-   *
-   * TODO: rewrite this using the launch context and population context.
-   */
-  private fun selectPopulationContext(
-    resources: List<Resource>,
-    initialExpression: Expression
-  ): Resource? {
-    val resourceType = initialExpression.expression.substringBefore(".").removePrefix("%")
-    return resources.singleOrNull { it.resourceType.name.lowercase() == resourceType.lowercase() }
-      ?: resources.firstOrNull()
+    populateInitialValues(questionnaireItem.item, launchContexts)
   }
 
   private val Questionnaire.QuestionnaireItemComponent.initialExpression: Expression?

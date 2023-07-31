@@ -34,6 +34,7 @@ import com.google.android.fhir.datacapture.extensions.cqfExpression
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.flattened
+import com.google.android.fhir.datacapture.extensions.getMatchingLaunchContexts
 import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isFhirPath
@@ -170,13 +171,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireLaunchContextMap =
       if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS)) {
 
-        val launchContextJsonStrings: List<String> =
+        val launchContextJsonStrings: Map<String, String> =
           state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS]!!
 
-        val launchContexts = launchContextJsonStrings.map { parser.parseResource(it) as Resource }
+        val launchContexts =
+          launchContextJsonStrings.mapValues { parser.parseResource(it.value) as Resource }
         questionnaire.questionnaireLaunchContexts?.let { launchContextExtensions ->
           validateLaunchContextExtensions(launchContextExtensions)
-          launchContexts.associateBy { it.resourceType.name.lowercase() }
+          getMatchingLaunchContexts(launchContexts, launchContextExtensions)
         }
       } else {
         null

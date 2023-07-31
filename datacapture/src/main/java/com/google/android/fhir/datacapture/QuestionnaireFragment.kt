@@ -319,9 +319,9 @@ class QuestionnaireFragment : Fragment() {
      * user, etc. is "in context" at the time the questionnaire response is being completed:
      * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
      *
-     * @param launchContexts list of serialized resources
+     * @param launchContexts map of launchContext name and serialized resources
      */
-    fun setQuestionnaireLaunchContexts(launchContexts: List<String>) = apply {
+    fun setQuestionnaireLaunchContexts(launchContexts: Map<String, String>) = apply {
       args.add(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS to launchContexts)
     }
 
@@ -416,7 +416,9 @@ class QuestionnaireFragment : Fragment() {
      */
     internal const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
 
-    /** A list of JSON encoded strings extra for each questionnaire context. */
+    /**
+     * A map of launchContext name and JSON encoded strings extra for each questionnaire context.
+     */
     internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS =
       "questionnaire-launch-contexts"
     /**

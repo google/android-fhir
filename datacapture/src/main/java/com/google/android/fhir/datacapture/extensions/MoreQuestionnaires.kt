@@ -22,6 +22,7 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Resource
 
 /**
  * The StructureMap url in the
@@ -73,36 +74,44 @@ internal fun validateLaunchContextExtensions(launchContextExtensions: List<Exten
   }
 
 /**
- * Checks that the extension:name extension exists and its value contains a valid code from
- * [QuestionnaireLaunchContextSet]
+ * Verifies the existence of extension:name and extension:type with valid system and type values
+ * from the [QuestionnaireLaunchContextSet].
  */
 private fun validateLaunchContextExtension(launchExtension: Extension) {
   check(launchExtension.extension.size == 2) {
     "The extension:name or extension:type extension is missing in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
   }
 
+  val nameCoding = launchExtension.getExtensionByUrl("name").value as Coding
+
+  val commonExtension =
+    Extension().apply {
+      addExtension(
+        Extension().apply {
+          url = "name"
+          setValue(
+            Coding().apply {
+              code = nameCoding.code
+              display = nameCoding.display
+              system = ""
+            }
+          )
+        }
+      )
+      addExtension(
+        Extension().apply {
+          url = "type"
+          setValue(CodeType().setValue(""))
+        }
+      )
+    }
+
   val isValidExtension =
     QuestionnaireLaunchContextSet.values().any {
       launchExtension.equalsDeep(
-        Extension().apply {
-          addExtension(
-            Extension().apply {
-              url = "name"
-              setValue(
-                Coding().apply {
-                  code = it.code
-                  display = it.display
-                  system = it.system
-                }
-              )
-            }
-          )
-          addExtension(
-            Extension().apply {
-              url = "type"
-              setValue(CodeType().setValue(it.resourceType))
-            }
-          )
+        commonExtension.apply {
+          (getExtensionByUrl("name").value as Coding).system = it.system
+          (getExtensionByUrl("type").value as CodeType).value = it.resourceType
         }
       )
     }
@@ -115,22 +124,36 @@ private fun validateLaunchContextExtension(launchExtension: Extension) {
 }
 
 /**
+ * Gets the launch contexts resource map, filtered based on the matching nameCode values found in
+ * the launchContextExtensions list.
+ */
+internal fun getMatchingLaunchContexts(
+  launchContexts: Map<String, Resource>,
+  launchContextExtensions: List<Extension>
+): Map<String, Resource> {
+  val nameCodes =
+    launchContextExtensions.mapNotNull { extension ->
+      (extension.getExtensionByUrl("name").value as? Coding)?.code
+    }
+
+  return launchContexts.filterKeys { nameCodes.contains(it) }
+}
+
+/**
  * The set of supported launch contexts, as per: http://hl7.org/fhir/uv/sdc/ValueSet/launchContext
  */
 private enum class QuestionnaireLaunchContextSet(
-  val code: String,
-  val display: String,
   val system: String,
   val resourceType: String,
 ) {
-  PATIENT("patient", "Patient", EXTENSION_LAUNCH_CONTEXT, "Patient"),
-  ENCOUNTER("encounter", "Encounter", EXTENSION_LAUNCH_CONTEXT, "Encounter"),
-  LOCATION("location", "Location", EXTENSION_LAUNCH_CONTEXT, "Location"),
-  USER_AS_PATIENT("user", "User", EXTENSION_LAUNCH_CONTEXT, "Patient"),
-  USER_AS_PRACTITIONER("user", "User", EXTENSION_LAUNCH_CONTEXT, "Practitioner"),
-  USER_AS_PRACTITIONER_ROLE("user", "User", EXTENSION_LAUNCH_CONTEXT, "PractitionerRole"),
-  USER_AS_RELATED_PERSON("user", "User", EXTENSION_LAUNCH_CONTEXT, "RelatedPerson"),
-  STUDY("study", "ResearchStudy", EXTENSION_LAUNCH_CONTEXT, "ResearchStudy"),
+  PATIENT(EXTENSION_LAUNCH_CONTEXT, "Patient"),
+  ENCOUNTER(EXTENSION_LAUNCH_CONTEXT, "Encounter"),
+  LOCATION(EXTENSION_LAUNCH_CONTEXT, "Location"),
+  USER_AS_PATIENT(EXTENSION_LAUNCH_CONTEXT, "Patient"),
+  USER_AS_PRACTITIONER(EXTENSION_LAUNCH_CONTEXT, "Practitioner"),
+  USER_AS_PRACTITIONER_ROLE(EXTENSION_LAUNCH_CONTEXT, "PractitionerRole"),
+  USER_AS_RELATED_PERSON(EXTENSION_LAUNCH_CONTEXT, "RelatedPerson"),
+  STUDY(EXTENSION_LAUNCH_CONTEXT, "ResearchStudy"),
 }
 
 /**
