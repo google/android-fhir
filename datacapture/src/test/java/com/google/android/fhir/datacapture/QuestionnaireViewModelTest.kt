@@ -4282,6 +4282,65 @@ class QuestionnaireViewModelTest {
       )
   }
 
+  @Test
+  fun `should return questionnaire item answer options for answer expression with fhirpath and variable`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              text = "Question 1"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              repeats = true
+              initial =
+                listOf(
+                  Questionnaire.QuestionnaireItemInitialComponent(Coding("test", "1", "One")),
+                  Questionnaire.QuestionnaireItemInitialComponent(Coding("test", "2", "Two"))
+                )
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "b"
+              text = "Question 2"
+              type = Questionnaire.QuestionnaireItemType.STRING
+              extension =
+                listOf(
+                  Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                    Expression().apply {
+                      this.expression = "%resource.item[0].answer.value.select(%VAR1 + code)"
+                      this.language = Expression.ExpressionLanguage.TEXT_FHIRPATH.toCode()
+                    }
+                  ),
+                  Extension(
+                    "http://hl7.org/fhir/StructureDefinition/variable",
+                    Expression().apply {
+                      this.name = "VAR1"
+                      this.expression = "'Class '"
+                      this.language = Expression.ExpressionLanguage.TEXT_FHIRPATH.toCode()
+                    }
+                  )
+                )
+            }
+          )
+        }
+
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      val viewModel = QuestionnaireViewModel(context, state)
+
+      viewModel.runViewModelBlocking {
+        val viewItem =
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .map { it.asQuestion() }
+            .single { it.questionnaireItem.linkId == "b" }
+        assertThat(viewItem.enabledAnswerOptions.map { it.valueStringType.value })
+          .containsExactly("Class 1", "Class 2")
+      }
+    }
+
   // ==================================================================== //
   //                                                                      //
   //                 Answer Options Toggle Expression                     //

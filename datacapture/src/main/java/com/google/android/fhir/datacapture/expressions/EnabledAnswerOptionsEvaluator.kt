@@ -29,6 +29,7 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ValueSet
@@ -60,7 +61,7 @@ internal class EnabledAnswerOptionsEvaluator(
    */
   internal suspend fun evaluate(
     questionnaireItem: QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
     questionnaireResponse: QuestionnaireResponse,
     questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>
   ): Pair<
@@ -69,7 +70,12 @@ internal class EnabledAnswerOptionsEvaluator(
   > {
 
     val resolvedAnswerOptions =
-      answerOptions(questionnaireItem, questionnaireResponse, questionnaireItemParentMap)
+      answerOptions(
+        questionnaireItem,
+        questionnaireResponseItem,
+        questionnaireResponse,
+        questionnaireItemParentMap
+      )
 
     if (questionnaireItem.answerOptionsToggleExpressions.isEmpty())
       return Pair(resolvedAnswerOptions, emptyList())
@@ -107,6 +113,7 @@ internal class EnabledAnswerOptionsEvaluator(
    */
   private suspend fun answerOptions(
     questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
     questionnaireResponse: QuestionnaireResponse,
     questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
@@ -117,6 +124,7 @@ internal class EnabledAnswerOptionsEvaluator(
       questionnaireItem.answerExpression != null ->
         resolveAnswerExpression(
           questionnaireItem,
+          questionnaireResponseItem,
           questionnaireResponse,
           questionnaireItemParentMap
         )
@@ -166,6 +174,7 @@ internal class EnabledAnswerOptionsEvaluator(
   // https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
   private suspend fun resolveAnswerExpression(
     item: QuestionnaireItemComponent,
+    responseItem: QuestionnaireResponseItemComponent,
     questionnaireResponse: QuestionnaireResponse,
     questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
@@ -199,7 +208,15 @@ internal class EnabledAnswerOptionsEvaluator(
           )
       }
       answerExpression.isFhirPath -> {
-        val data = fhirPathEngine.evaluate(questionnaireResponse, answerExpression.expression)
+        val data =
+          ExpressionEvaluator.evaluateExpression(
+            questionnaire,
+            questionnaireResponse,
+            item,
+            responseItem,
+            answerExpression,
+            questionnaireItemParentMap
+          )
         item.extractAnswerOptions(data)
       }
       else ->
