@@ -34,6 +34,7 @@ import com.google.android.fhir.sync.UploadRequest
 import com.google.android.fhir.sync.UrlDownloadRequest
 import com.google.common.truth.Truth.assertThat
 import java.net.SocketTimeoutException
+import java.time.Instant
 import java.time.OffsetDateTime
 import java.util.Date
 import java.util.LinkedList
@@ -173,7 +174,8 @@ object TestFhirEngineImpl : FhirEngine {
         resourceId = id,
         payload = "{}",
         token = LocalChangeToken(listOf()),
-        type = LocalChange.Type.INSERT
+        type = LocalChange.Type.INSERT,
+        timestamp = Instant.now()
       )
     )
   }

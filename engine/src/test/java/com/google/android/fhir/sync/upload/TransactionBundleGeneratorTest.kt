@@ -25,6 +25,7 @@ import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
 import com.google.android.fhir.sync.BundleUploadRequest
 import com.google.common.truth.Truth.assertThat
+import java.time.Instant
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.HumanName
@@ -67,7 +68,8 @@ class TransactionBundleGeneratorTest {
                       }
                     )
                   }
-                )
+                ),
+              timestamp = Instant.now()
             )
             .toLocalChange()
             .apply { token = LocalChangeToken(listOf(1)) },
@@ -98,7 +100,8 @@ class TransactionBundleGeneratorTest {
                       )
                     }
                   )
-                  .toString()
+                  .toString(),
+              timestamp = Instant.now()
             )
             .toLocalChange()
             .apply { LocalChangeToken(listOf(2)) },
@@ -118,7 +121,8 @@ class TransactionBundleGeneratorTest {
                       }
                     )
                   }
-                )
+                ),
+              timestamp = Instant.now()
             )
             .toLocalChange()
             .apply { LocalChangeToken(listOf(3)) }
@@ -157,7 +161,8 @@ class TransactionBundleGeneratorTest {
                       }
                     )
                   }
-                )
+                ),
+              timestamp = Instant.now()
             )
             .toLocalChange()
             .apply { token = LocalChangeToken(listOf(1)) },
@@ -189,7 +194,8 @@ class TransactionBundleGeneratorTest {
                     }
                   )
                   .toString(),
-              versionId = "v-p002-01"
+              versionId = "v-p002-01",
+              timestamp = Instant.now()
             )
             .toLocalChange()
             .apply { LocalChangeToken(listOf(2)) },
@@ -210,7 +216,8 @@ class TransactionBundleGeneratorTest {
                     )
                   }
                 ),
-              versionId = "v-p003-01"
+              versionId = "v-p003-01",
+              timestamp = Instant.now()
             )
             .toLocalChange()
             .apply { LocalChangeToken(listOf(3)) }
@@ -253,7 +260,8 @@ class TransactionBundleGeneratorTest {
               resourceId = "Patient-002",
               type = Type.UPDATE,
               payload = "[]",
-              versionId = "patient-002-version-1"
+              versionId = "patient-002-version-1",
+              timestamp = Instant.now()
             )
             .toLocalChange()
         )
@@ -274,7 +282,8 @@ class TransactionBundleGeneratorTest {
               resourceId = "Patient-002",
               type = Type.UPDATE,
               payload = "[]",
-              versionId = "patient-002-version-1"
+              versionId = "patient-002-version-1",
+              timestamp = Instant.now()
             )
             .toLocalChange()
         )
@@ -296,7 +305,8 @@ class TransactionBundleGeneratorTest {
               resourceId = "Patient-002",
               type = Type.UPDATE,
               payload = "[]",
-              versionId = ""
+              versionId = "",
+              timestamp = Instant.now()
             )
             .toLocalChange(),
           LocalChangeEntity(
@@ -305,7 +315,8 @@ class TransactionBundleGeneratorTest {
               resourceId = "Patient-003",
               type = Type.UPDATE,
               payload = "[]",
-              versionId = null
+              versionId = null,
+              timestamp = Instant.now()
             )
             .toLocalChange()
         )

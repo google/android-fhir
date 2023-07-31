@@ -571,7 +571,7 @@ class FhirEngineImplTest {
         filter(
           LOCAL_LAST_UPDATED_PARAM,
           {
-            value = of(DateTimeType(localChangeTimestamp))
+            value = of(DateTimeType(Date.from(localChangeTimestamp)))
             prefix = ParamPrefixEnum.EQUAL
           }
         )
@@ -607,14 +607,14 @@ class FhirEngineImplTest {
           filter(
             LOCAL_LAST_UPDATED_PARAM,
             {
-              value = of(DateTimeType(localChangeTimestampWhenUpdated))
+              value = of(DateTimeType(Date.from(localChangeTimestampWhenUpdated)))
               prefix = ParamPrefixEnum.EQUAL
             }
           )
         }
 
-      assertThat(DateTimeType(localChangeTimestampWhenUpdated).value)
-        .isAtLeast(DateTimeType(localChangeTimestampWhenCreated).value)
+      assertThat(DateTimeType(Date.from(localChangeTimestampWhenUpdated)).value)
+        .isAtLeast(DateTimeType(Date.from(localChangeTimestampWhenCreated)).value)
       assertThat(result).isNotEmpty()
       assertThat(result.map { it.logicalId }).containsExactly("patient-id-update").inOrder()
     }
