@@ -85,7 +85,7 @@ class RetrofitHttpServiceTest {
   }
 
   @Test // https://github.com/google/android-fhir/issues/1892
-  fun `should assemble upload request correctly`() = runTest {
+  fun `should assemble upload bundle request correctly`() = runTest {
     // checks that a upload request can be made successfully with parameters without exception
     val mockResponse =
       MockResponse().apply {
