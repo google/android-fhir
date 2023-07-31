@@ -28,7 +28,7 @@ data class LocalChange(
   val resourceId: String,
   /** This is the id of the version of the resource that this local change is based of */
   val versionId: String? = null,
-  /** This signifies the instant a CUD operation was performed on the resource. */
+  /** The time instant the app user performed a CUD operation on the resource. */
   val timestamp: Instant,
   /** Type of local change like insert, delete, etc */
   val type: Type,
