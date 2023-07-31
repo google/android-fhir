@@ -22,8 +22,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.JsonPatch
 import com.github.fge.jsonpatch.diff.JsonDiff
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
 import org.hl7.fhir.r4.model.Resource
 import org.json.JSONArray
 import org.json.JSONObject
@@ -31,10 +31,10 @@ import org.json.JSONObject
 internal object LocalChangeUtils {
 
   /** Squash the changes by merging them two at a time. */
-  fun squash(localChangeEntities: List<LocalChangeEntity>): LocalChangeEntity =
-    localChangeEntities.reduce { first, second -> mergeLocalChanges(first, second) }
+  fun squash(localChanges: List<LocalChange>): LocalChange =
+    localChanges.reduce { first, second -> mergeLocalChanges(first, second) }
 
-  fun mergeLocalChanges(first: LocalChangeEntity, second: LocalChangeEntity): LocalChangeEntity {
+  private fun mergeLocalChanges(first: LocalChange, second: LocalChange): LocalChange {
     // TODO (maybe this should throw exception when two entities don't have the same versionID)
     val type: Type
     val payload: String
@@ -64,13 +64,13 @@ internal object LocalChangeUtils {
         payload = second.payload
       }
     }
-    return LocalChangeEntity(
-      id = 0,
+    return LocalChange(
       resourceId = second.resourceId,
       resourceType = second.resourceType,
       type = type,
       payload = payload,
       versionId = second.versionId,
+      token = LocalChangeToken(first.token.ids + second.token.ids),
       timestamp = second.timestamp
     )
   }
@@ -160,21 +160,3 @@ internal fun LocalChangeEntity.toLocalChange(): LocalChange {
 }
 
 data class LocalChangeToken(val ids: List<Long>)
-
-internal data class SquashedLocalChange(
-  val token: LocalChangeToken,
-  val localChange: LocalChangeEntity
-)
-
-/** Method to convert internal SquashedLocalChange to LocalChange instance. */
-internal fun SquashedLocalChange.toLocalChange(): LocalChange {
-  return LocalChange(
-    localChange.resourceType,
-    localChange.resourceId,
-    localChange.versionId,
-    localChange.timestamp,
-    LocalChange.Type.from(localChange.type.value),
-    localChange.payload,
-    token
-  )
-}

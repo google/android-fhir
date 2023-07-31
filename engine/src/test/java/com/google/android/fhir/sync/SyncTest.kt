@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.work.BackoffPolicy
 import androidx.work.WorkerParameters
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.sync.upload.SquashedChangesUploadWorkManager
 import com.google.android.fhir.testing.TestDataSourceImpl
 import com.google.android.fhir.testing.TestDownloadManagerImpl
 import com.google.android.fhir.testing.TestFhirEngineImpl
@@ -39,6 +40,8 @@ class SyncTest {
     override fun getFhirEngine(): FhirEngine = TestFhirEngineImpl
     override fun getDataSource(): DataSource = TestDataSourceImpl
     override fun getDownloadWorkManager(): DownloadWorkManager = TestDownloadManagerImpl()
+    override fun getUploadWorkManager(): UploadWorkManager = SquashedChangesUploadWorkManager()
+
     override fun getConflictResolver() = AcceptRemoteConflictResolver
   }
 

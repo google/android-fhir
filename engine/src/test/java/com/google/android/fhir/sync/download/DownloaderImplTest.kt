@@ -17,12 +17,13 @@
 package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.sync.BundleRequest
+import com.google.android.fhir.sync.BundleDownloadRequest
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
-import com.google.android.fhir.sync.Request
-import com.google.android.fhir.sync.UrlRequest
+import com.google.android.fhir.sync.UploadRequest
+import com.google.android.fhir.sync.UrlDownloadRequest
 import com.google.common.truth.Truth.assertThat
 import java.util.LinkedList
 import java.util.Queue
@@ -47,12 +48,12 @@ class DownloaderImplTest {
 
   @Test
   fun `downloader should download all the requests even when some fail`() = runBlocking {
-    val requests =
+    val downloadRequests =
       listOf(
-        Request.of("Patient"),
-        Request.of("Encounter"),
-        Request.of("Medication/med-123-that-fails"),
-        Request.of(bundleOf("Observation/ob-123", "Condition/con-123"))
+        DownloadRequest.of("Patient"),
+        DownloadRequest.of("Encounter"),
+        DownloadRequest.of("Medication/med-123-that-fails"),
+        DownloadRequest.of(bundleOf("Observation/ob-123", "Condition/con-123"))
       )
 
     val testDataSource: DataSource =
@@ -118,18 +119,18 @@ class DownloaderImplTest {
           }
         }
 
-        override suspend fun download(request: Request) =
-          when (request) {
-            is UrlRequest -> download(request.url)
-            is BundleRequest -> download(request.bundle)
+        override suspend fun download(downloadRequest: DownloadRequest) =
+          when (downloadRequest) {
+            is UrlDownloadRequest -> download(downloadRequest.url)
+            is BundleDownloadRequest -> download(downloadRequest.bundle)
           }
 
-        override suspend fun upload(request: BundleRequest): Resource {
+        override suspend fun upload(request: UploadRequest): Resource {
           throw UnsupportedOperationException()
         }
       }
 
-    val downloader = DownloaderImpl(testDataSource, TestDownloadWorkManager(requests))
+    val downloader = DownloaderImpl(testDataSource, TestDownloadWorkManager(downloadRequests))
 
     val result = mutableListOf<Resource>()
     downloader.download().collectIndexed { _, value ->
@@ -146,12 +147,12 @@ class DownloaderImplTest {
   @Test
   fun `downloader should emit all the states for requests whether they pass or fail`() =
     runBlocking {
-      val requests =
+      val downloadRequests =
         listOf(
-          Request.of("Patient"),
-          Request.of("Encounter"),
-          Request.of("Medication/med-123-that-fails"),
-          Request.of(bundleOf("Observation/ob-123", "Condition/con-123"))
+          DownloadRequest.of("Patient"),
+          DownloadRequest.of("Encounter"),
+          DownloadRequest.of("Medication/med-123-that-fails"),
+          DownloadRequest.of(bundleOf("Observation/ob-123", "Condition/con-123"))
         )
 
       val testDataSource: DataSource =
@@ -217,17 +218,17 @@ class DownloaderImplTest {
             }
           }
 
-          override suspend fun download(request: Request) =
-            when (request) {
-              is UrlRequest -> download(request.url)
-              is BundleRequest -> download(request.bundle)
+          override suspend fun download(downloadRequest: DownloadRequest) =
+            when (downloadRequest) {
+              is UrlDownloadRequest -> download(downloadRequest.url)
+              is BundleDownloadRequest -> download(downloadRequest.bundle)
             }
 
-          override suspend fun upload(request: BundleRequest): Resource {
+          override suspend fun upload(request: UploadRequest): Resource {
             throw UnsupportedOperationException()
           }
         }
-      val downloader = DownloaderImpl(testDataSource, TestDownloadWorkManager(requests))
+      val downloader = DownloaderImpl(testDataSource, TestDownloadWorkManager(downloadRequests))
 
       val result = mutableListOf<DownloadState>()
       downloader.download().collectIndexed { _, value -> result.add(value) }
@@ -267,10 +268,10 @@ class DownloaderImplTest {
   }
 }
 
-class TestDownloadWorkManager(requests: List<Request>) : DownloadWorkManager {
-  private val queue: Queue<Request> = LinkedList(requests)
+class TestDownloadWorkManager(downloadRequests: List<DownloadRequest>) : DownloadWorkManager {
+  private val queue: Queue<DownloadRequest> = LinkedList(downloadRequests)
 
-  override suspend fun getNextRequest(): Request? = queue.poll()
+  override suspend fun getNextRequest(): DownloadRequest? = queue.poll()
 
   override suspend fun getSummaryRequestUrls() = emptyMap<ResourceType, String>()
 

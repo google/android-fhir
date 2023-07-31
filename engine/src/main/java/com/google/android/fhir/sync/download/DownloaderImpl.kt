@@ -16,14 +16,14 @@
 
 package com.google.android.fhir.sync.download
 
-import com.google.android.fhir.sync.BundleRequest
+import com.google.android.fhir.sync.BundleDownloadRequest
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.Downloader
-import com.google.android.fhir.sync.Request
 import com.google.android.fhir.sync.ResourceSyncException
-import com.google.android.fhir.sync.UrlRequest
+import com.google.android.fhir.sync.UrlDownloadRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.Bundle
@@ -64,11 +64,11 @@ internal class DownloaderImpl(
     }
   }
 
-  private fun Request.toResourceType() =
+  private fun DownloadRequest.toResourceType() =
     when (this) {
-      is UrlRequest ->
+      is UrlDownloadRequest ->
         ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
-      is BundleRequest -> ResourceType.Bundle
+      is BundleDownloadRequest -> ResourceType.Bundle
     }
 
   private suspend fun getProgressSummary() =
@@ -76,7 +76,7 @@ internal class DownloaderImpl(
       .getSummaryRequestUrls()
       .map { summary ->
         summary.key to
-          runCatching { dataSource.download(Request.of(summary.value)) }
+          runCatching { dataSource.download(DownloadRequest.of(summary.value)) }
             .onFailure { Timber.e(it) }
             .getOrNull()
             .takeIf { it is Bundle }
