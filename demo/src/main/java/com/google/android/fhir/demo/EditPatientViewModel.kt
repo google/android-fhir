@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Resource
 
 /**
  * The ViewModel helper class for [EditPatientFragment], that is responsible for preparing data for
@@ -45,14 +46,15 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
 
   private suspend fun prepareEditPatient(): Pair<String, String> {
     val patient = fhirEngine.get<Patient>(patientId)
+    val launchContexts = mapOf<String, Resource>("client" to patient)
     val question = readFileFromAssets("new-patient-registration-paginated.json").trimIndent()
     val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
     val questionnaire =
-      parser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, question) as
-        Questionnaire
+      parser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, question)
+        as Questionnaire
 
     val questionnaireResponse: QuestionnaireResponse =
-      ResourceMapper.populate(questionnaire, patient)
+      ResourceMapper.populate(questionnaire, launchContexts)
     val questionnaireResponseJson = parser.encodeResourceToString(questionnaireResponse)
     return question to questionnaireResponseJson
   }
@@ -63,8 +65,8 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
 
   private val questionnaireResource: Questionnaire
     get() =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire) as
-        Questionnaire
+      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire)
+        as Questionnaire
 
   private var questionnaireJson: String? = null
 
