@@ -49,9 +49,7 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
     val launchContexts = mapOf<String, Resource>("client" to patient)
     val question = readFileFromAssets("new-patient-registration-paginated.json").trimIndent()
     val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-    val questionnaire =
-      parser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, question)
-        as Questionnaire
+    val questionnaire = parser.parseResource(Questionnaire::class.java, question) as Questionnaire
 
     val questionnaireResponse: QuestionnaireResponse =
       ResourceMapper.populate(questionnaire, launchContexts)
