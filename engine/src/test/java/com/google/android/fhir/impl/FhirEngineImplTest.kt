@@ -580,7 +580,7 @@ class FhirEngineImplTest {
       }
 
     assertThat(result).isNotEmpty()
-    assertThat(result.map { it.logicalId }).containsExactly("patient-id-create").inOrder()
+    assertThat(result.map { it.resource.logicalId }).containsExactly("patient-id-create").inOrder()
   }
 
   @Test
@@ -618,7 +618,9 @@ class FhirEngineImplTest {
       assertThat(DateTimeType(Date.from(localChangeTimestampWhenUpdated)).value)
         .isAtLeast(DateTimeType(Date.from(localChangeTimestampWhenCreated)).value)
       assertThat(result).isNotEmpty()
-      assertThat(result.map { it.logicalId }).containsExactly("patient-id-update").inOrder()
+      assertThat(result.map { it.resource.logicalId })
+        .containsExactly("patient-id-update")
+        .inOrder()
     }
 
   companion object {

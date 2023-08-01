@@ -75,13 +75,16 @@ class PatientDetailsViewModel(
     searchResult.first().let {
       data.addPatientDetailData(
         it.resource,
-        getRiskItem(it.revIncluded?.get(ResourceType.RiskAssessment) as List<RiskAssessment>?)
+        getRiskItem(
+          it.revIncluded?.get(ResourceType.RiskAssessment to RiskAssessment.SUBJECT.paramName)
+            as List<RiskAssessment>?
+        )
       )
 
-      it.revIncluded?.get(ResourceType.Observation)?.let {
+      it.revIncluded?.get(ResourceType.Observation to Observation.SUBJECT.paramName)?.let {
         data.addObservationsData(it as List<Observation>)
       }
-      it.revIncluded?.get(ResourceType.Condition)?.let {
+      it.revIncluded?.get(ResourceType.Condition to Condition.SUBJECT.paramName)?.let {
         data.addConditionsData(it as List<Condition>)
       }
     }
