@@ -145,9 +145,7 @@ object TestFhirEngineImpl : FhirEngine {
     return emptyList()
   }
 
-  override suspend fun syncUpload(
-    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
-  ) {
+  override suspend fun syncUpload(upload: suspend (List<LocalChange>) -> Unit) {
     upload(getLocalChanges(ResourceType.Patient, "123"))
   }
 

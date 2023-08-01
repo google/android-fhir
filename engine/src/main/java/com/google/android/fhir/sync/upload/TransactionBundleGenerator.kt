@@ -20,6 +20,7 @@ import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.sync.BundleUploadRequest
+import com.google.android.fhir.sync.UploadRequest
 import org.hl7.fhir.r4.model.Bundle
 
 /**
@@ -33,14 +34,13 @@ open class TransactionBundleGenerator(
     (type: Type, useETagForUpload: Boolean) -> BundleEntryComponentGenerator
 ) : UploadRequestGenerator {
 
-  override fun generateUploadRequests(localChanges: List<LocalChange>): List<BundleUploadRequest> {
-    return localChanges
-      .chunked(generatedBundleSize)
-      .filter { it.isNotEmpty() }
-      .map { generateBundleRequest(it) }
-  }
+  override fun generateUploadRequests(localChanges: List<LocalChange>): List<UploadRequest> =
+    chunkLocalChanges(localChanges).map { generateBundleRequest(it) }
 
-  private fun generateBundleRequest(localChanges: List<LocalChange>): BundleUploadRequest {
+  fun chunkLocalChanges(localChanges: List<LocalChange>): List<List<LocalChange>> =
+    localChanges.chunked(generatedBundleSize).filter { it.isNotEmpty() }
+
+  fun generateBundleRequest(localChanges: List<LocalChange>): BundleUploadRequest {
     val bundleRequest =
       Bundle().apply {
         type = Bundle.BundleType.TRANSACTION
@@ -83,7 +83,7 @@ open class TransactionBundleGenerator(
         )
       } else {
         throw IllegalArgumentException(
-          "Engine currently supports creation using [PUT] and updates using [PATCH]"
+          "Engine currently supports creation using [USE_CLIENT] and updates using [PATCH]"
         )
       }
     }

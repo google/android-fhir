@@ -21,6 +21,7 @@ import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.HttpAuthenticator
 import com.google.android.fhir.sync.remote.HttpLogger
+import com.google.android.fhir.sync.upload.UploadStrategy
 import org.hl7.fhir.r4.model.SearchParameter
 
 /** The provider for [FhirEngine] instance. */
@@ -59,6 +60,11 @@ object FhirEngineProvider {
   }
 
   @Synchronized
+  @JvmStatic // needed for mockito
+  internal fun getUploadStrategy(context: Context): UploadStrategy {
+    return getOrCreateFhirService(context).uploadStrategy
+  }
+  @Synchronized
   private fun getOrCreateFhirService(context: Context): FhirServices {
     if (fhirServices == null) {
       fhirEngineConfiguration = fhirEngineConfiguration ?: FhirEngineConfiguration()
@@ -70,6 +76,7 @@ object FhirEngineProvider {
             setDatabaseErrorStrategy(configuration.databaseErrorStrategy)
             configuration.serverConfiguration?.let { setServerConfiguration(it) }
             configuration.customSearchParameters?.let { setSearchParameters(it) }
+            setIdGenerationStrategy(configuration.idGenerationStrategy)
             if (configuration.testMode) {
               inMemory()
             }
@@ -107,6 +114,7 @@ data class FhirEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
   val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
   val serverConfiguration: ServerConfiguration? = null,
+  val idGenerationStrategy: IdGenerationStrategy = IdGenerationStrategy.USE_CLIENT,
   val testMode: Boolean = false,
   /**
    * Additional search parameters to be used to query FHIR engine using the search API. These are in
@@ -137,6 +145,11 @@ enum class DatabaseErrorStrategy {
    * configuration or vice versa. An [IllegalStateException] is thrown instead.
    */
   RECREATE_AT_OPEN
+}
+
+enum class IdGenerationStrategy {
+  USE_CLIENT,
+  USE_SERVER,
 }
 
 /** A configuration to provide necessary params for network connection. */

@@ -17,7 +17,6 @@
 package com.google.android.fhir
 
 import com.google.android.fhir.db.ResourceNotFoundException
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
 import java.time.OffsetDateTime
@@ -53,9 +52,7 @@ interface FhirEngine {
    * calls to the server to upload the data. Result of each call will be emitted by [upload] and the
    * api caller should [Flow.collect] it.
    */
-  suspend fun syncUpload(
-    upload: (suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>)
-  )
+  suspend fun syncUpload(upload: (suspend (List<LocalChange>) -> Unit))
 
   /**
    * Synchronizes the [download] result in the database. The database will be updated to reflect the
