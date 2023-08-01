@@ -16,8 +16,8 @@
 
 package com.google.android.fhir.db
 
-import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity

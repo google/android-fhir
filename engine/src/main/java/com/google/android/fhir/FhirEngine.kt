@@ -139,7 +139,7 @@ data class SearchResult<R : Resource>(
   /** Matching referenced resources as per the [Search.include] criteria in the query. */
   val included: Map<SearchParamName, List<Resource>>?,
   /** Matching referenced resources as per the [Search.revInclude] criteria in the query. */
-  val revIncluded: Map<ResourceType, Map<SearchParamName, List<Resource>>>?
+  val revIncluded: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?
 ) {
   override fun equals(other: Any?) =
     other is SearchResult<*> &&
@@ -150,15 +150,17 @@ data class SearchResult<R : Resource>(
   private fun equalsShallow(first: Resource, second: Resource) =
     first.resourceType == second.resourceType && first.logicalId == second.logicalId
 
+  private fun equalsShallow(first: List<Resource>, second: List<Resource>) =
+    first.size == second.size &&
+      first.asSequence().zip(second.asSequence()).all { (x, y) -> equalsShallow(x, y) }
+
   private fun equalsShallow(
     first: Map<SearchParamName, List<Resource>>?,
     second: Map<SearchParamName, List<Resource>>?
   ) =
     if (first != null && second != null && first.size == second.size) {
-      first.entries.zip(second.entries).all { (x, y) ->
-        x.key == y.key &&
-          x.value.size == y.value.size &&
-          x.value.zip(y.value).all { (x, y) -> equalsShallow(x, y) }
+      first.entries.asSequence().zip(second.entries.asSequence()).all { (x, y) ->
+        x.key == y.key && equalsShallow(x.value, y.value)
       }
     } else {
       first?.size == second?.size
@@ -166,12 +168,12 @@ data class SearchResult<R : Resource>(
 
   @JvmName("equalsShallowRevInclude")
   private fun equalsShallow(
-    first: Map<ResourceType, Map<SearchParamName, List<Resource>>>?,
-    second: Map<ResourceType, Map<SearchParamName, List<Resource>>>?
+    first: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?,
+    second: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?
   ) =
     if (first != null && second != null && first.size == second.size) {
-      first.entries.zip(second.entries).all { (x, y) ->
-        x.key == y.key && x.value.size == y.value.size && equalsShallow(x.value, y.value)
+      first.entries.asSequence().zip(second.entries.asSequence()).all { (x, y) ->
+        x.key == y.key && equalsShallow(x.value, y.value)
       }
     } else {
       first?.size == second?.size

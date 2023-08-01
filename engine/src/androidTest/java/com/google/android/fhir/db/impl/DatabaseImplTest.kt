@@ -72,6 +72,7 @@ import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.SearchParameter
@@ -3124,13 +3125,13 @@ class DatabaseImplTest {
             patient01,
             included = null,
             revIncluded =
-              mapOf(ResourceType.Condition to mapOf(Condition.SUBJECT.paramName to listOf(con1)))
+              mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con1))
           ),
           SearchResult(
             patient02,
             included = null,
             revIncluded =
-              mapOf(ResourceType.Condition to mapOf(Condition.SUBJECT.paramName to listOf(con3)))
+              mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con3))
           )
         )
       )
@@ -3177,7 +3178,7 @@ class DatabaseImplTest {
           id = "pa-03"
           addName(
             HumanName().apply {
-              addGiven("John")
+              addGiven("James")
               family = "Doe"
             }
           )
@@ -3378,29 +3379,23 @@ class DatabaseImplTest {
     // Each has 3 conditions, only 2 should match
     // Each has 3 encounters, only 2 should match
 
+    val resources: Map<String, Resource> =
+      (patients + practitioners + organizations + conditions + encounters).associateBy {
+        it.logicalId
+      }
     // Each has 3 GP, only 2 should match
-    database.insertRemote(
-      *(patients + practitioners + organizations + conditions + encounters).toTypedArray()
-    )
+    database.insertRemote(*resources.values.toTypedArray())
 
     val result =
       Search(ResourceType.Patient)
         .apply {
-          revInclude<Condition>(Condition.SUBJECT) {
-            filter(Condition.CODE, { value = of(diabetesCodeableConcept) })
-            filter(Condition.CODE, { value = of(migraineCodeableConcept) })
-            operation = Operation.OR
-          }
-
-          revInclude<Encounter>(Encounter.SUBJECT) {
-            filter(
-              Encounter.DATE,
-              {
-                value = of(DateTimeType("2023-01-01"))
-                prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-              }
-            )
-          }
+          filter(
+            Patient.GIVEN,
+            {
+              value = "James"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            }
+          )
 
           include<Practitioner>(Patient.GENERAL_PRACTITIONER) {
             filter(Practitioner.ACTIVE, { value = of(true) })
@@ -3413,7 +3408,6 @@ class DatabaseImplTest {
             )
             operation = Operation.AND
           }
-
           include<Organization>(Patient.ORGANIZATION) {
             filter(
               Organization.NAME,
@@ -3425,60 +3419,67 @@ class DatabaseImplTest {
             filter(Practitioner.ACTIVE, { value = of(true) })
             operation = Operation.AND
           }
+
+          revInclude<Condition>(Condition.SUBJECT) {
+            filter(Condition.CODE, { value = of(diabetesCodeableConcept) })
+            filter(Condition.CODE, { value = of(migraineCodeableConcept) })
+            operation = Operation.OR
+          }
+          revInclude<Encounter>(Encounter.SUBJECT) {
+            filter(
+              Encounter.DATE,
+              {
+                value = of(DateTimeType("2023-01-01"))
+                prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              }
+            )
+          }
         }
         .execute<Patient>(database)
 
-    assertThat(result[0].resource.logicalId).isEqualTo("pa-01")
-    assertThat(result[0].included!![Patient.GENERAL_PRACTITIONER.paramName]!!.map { it.logicalId })
-      .containsExactly("gp-01", "gp-02")
-    assertThat(result[0].included!![Patient.ORGANIZATION.paramName]!!.map { it.logicalId })
-      .containsExactly("org-01")
-    assertThat(
-        result[0].revIncluded!![ResourceType.Condition]!![Condition.SUBJECT.paramName]!!.map {
-          it.logicalId
-        }
+    assertThat(result)
+      .isEqualTo(
+        listOf(
+          SearchResult(
+            resources["pa-01"]!!,
+            mapOf(
+              "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
+              "organization" to listOf(resources["org-01"]!!),
+            ),
+            mapOf(
+              Pair(ResourceType.Condition, "subject") to
+                listOf(resources["con-01-pa-01"]!!, resources["con-03-pa-01"]!!),
+              Pair(ResourceType.Encounter, "subject") to
+                listOf(resources["en-01-pa-01"]!!, resources["en-02-pa-01"]!!)
+            )
+          ),
+          SearchResult(
+            resources["pa-02"]!!,
+            mapOf(
+              "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
+              "organization" to listOf(resources["org-02"]!!)
+            ),
+            mapOf(
+              Pair(ResourceType.Condition, "subject") to
+                listOf(resources["con-01-pa-02"]!!, resources["con-03-pa-02"]!!),
+              Pair(ResourceType.Encounter, "subject") to
+                listOf(resources["en-01-pa-02"]!!, resources["en-02-pa-02"]!!)
+            )
+          ),
+          SearchResult(
+            resources["pa-03"]!!,
+            mapOf(
+              "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
+            ),
+            mapOf(
+              Pair(ResourceType.Condition, "subject") to
+                listOf(resources["con-01-pa-03"]!!, resources["con-03-pa-03"]!!),
+              Pair(ResourceType.Encounter, "subject") to
+                listOf(resources["en-01-pa-03"]!!, resources["en-02-pa-03"]!!)
+            )
+          )
+        )
       )
-      .containsExactly("con-01-pa-01", "con-03-pa-01")
-    assertThat(
-        result[0].revIncluded!![ResourceType.Encounter]!![Encounter.SUBJECT.paramName]!!.map {
-          it.logicalId
-        }
-      )
-      .containsExactly("en-01-pa-01", "en-02-pa-01")
-
-    assertThat(result[1].resource.logicalId).isEqualTo("pa-02")
-    assertThat(result[1].included!![Patient.GENERAL_PRACTITIONER.paramName]!!.map { it.logicalId })
-      .containsExactly("gp-01", "gp-02")
-    assertThat(result[1].included!![Patient.ORGANIZATION.paramName]!!.map { it.logicalId })
-      .containsExactly("org-02")
-    assertThat(
-        result[1].revIncluded!![ResourceType.Condition]!![Condition.SUBJECT.paramName]!!.map {
-          it.logicalId
-        }
-      )
-      .containsExactly("con-01-pa-02", "con-03-pa-02")
-    assertThat(
-        result[1].revIncluded!![ResourceType.Encounter]!![Encounter.SUBJECT.paramName]!!.map {
-          it.logicalId
-        }
-      )
-      .containsExactly("en-01-pa-02", "en-02-pa-02")
-
-    assertThat(result[2].resource.logicalId).isEqualTo("pa-03")
-    assertThat(result[2].included!![Patient.GENERAL_PRACTITIONER.paramName]!!.map { it.logicalId })
-      .containsExactly("gp-01", "gp-02")
-    assertThat(
-        result[2].revIncluded!![ResourceType.Condition]!![Condition.SUBJECT.paramName]!!.map {
-          it.logicalId
-        }
-      )
-      .containsExactly("con-01-pa-03", "con-03-pa-03")
-    assertThat(
-        result[2].revIncluded!![ResourceType.Encounter]!![Encounter.SUBJECT.paramName]!!.map {
-          it.logicalId
-        }
-      )
-      .containsExactly("en-01-pa-03", "en-02-pa-03")
   }
 
   private companion object {

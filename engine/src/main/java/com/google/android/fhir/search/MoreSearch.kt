@@ -26,7 +26,6 @@ import com.google.android.fhir.SearchResult
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
-import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
 import com.google.android.fhir.epochDay
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.ucumUrl
@@ -68,16 +67,17 @@ internal suspend fun <R : Resource> Search.execute(database: Database): List<Sea
       baseResource,
       included =
         includedResources
+          ?.asSequence()
           ?.filter { it.idOfBaseResourceOnWhichThisMatched == baseResource.logicalId }
-          ?.groupBy { it.matchingIndex }
-          ?.mapValues { it.value.map { it.resource } },
+          ?.groupBy({ it.matchingIndex }, { it.resource }),
       revIncluded =
         revIncludedResources
+          ?.asSequence()
           ?.filter {
             it.idOfBaseResourceOnWhichThisMatched ==
               "${baseResource.fhirType()}/${baseResource.logicalId}"
           }
-          ?.toReferencedResources()
+          ?.groupBy({ it.resource.resourceType to it.matchingIndex }, { it.resource })
     )
   }
 }
@@ -143,10 +143,6 @@ private fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
     args = args
   )
 }
-
-private fun List<IndexedIdAndResource>.toReferencedResources() =
-  groupBy { it.resource.resourceType }
-    .mapValues { it.value.groupBy { it.matchingIndex }.mapValues { it.value.map { it.resource } } }
 
 private fun Search.getIncludeQuery(includeIds: List<String>): SearchQuery {
   var matchQuery = ""
