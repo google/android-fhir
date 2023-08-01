@@ -35,6 +35,7 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
+import com.google.android.fhir.sync.upload.PutUploadStrategy
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.readFromFile
@@ -164,7 +165,7 @@ class DatabaseImplTest {
     // update patient with no local change
     database.update(patient)
     val resourceLocalChangesWithNoFurtherUpdate =
-      database.getAllLocalChanges().filter { it.resourceId.equals(patient.logicalId) }
+      database.getAllLocalChanges().filter { it.resourceId == patient.logicalId }
     assertThat(resourceLocalChangesWithNoFurtherUpdate.size).isEqualTo(3)
     with(resourceLocalChangesWithNoFurtherUpdate) {
       assertThat(all { it.resourceId == patient.logicalId }).isTrue()
@@ -356,7 +357,7 @@ class DatabaseImplTest {
     val testPatient2String = services.parser.encodeResourceToString(TEST_PATIENT_2)
     database.insert(TEST_PATIENT_2)
     val resourceLocalChanges =
-      database.getAllLocalChanges().filter { it.resourceId.equals(TEST_PATIENT_2_ID) }
+      database.getAllLocalChanges().filter { it.resourceId == TEST_PATIENT_2_ID }
     assertThat(resourceLocalChanges.size).isEqualTo(1)
     with(resourceLocalChanges[0]) {
       assertThat(type).isEqualTo(LocalChange.Type.INSERT)
@@ -448,8 +449,7 @@ class DatabaseImplTest {
         .filter { it.resourceId == patient.logicalId }
         .flatMap { it.token.ids }
     database.deleteUpdates(LocalChangeToken(localChangeTokenIds))
-    assertThat(database.getAllLocalChanges().none { it.resourceId.equals(patient.logicalId) })
-      .isTrue()
+    assertThat(database.getAllLocalChanges().none { it.resourceId == patient.logicalId }).isTrue()
   }
 
   @Test
@@ -504,7 +504,7 @@ class DatabaseImplTest {
         lastUpdated = Date()
       }
     database.insert(patient)
-    services.fhirEngine.syncUpload { it ->
+    services.fhirEngine.syncUpload(PutUploadStrategy(database)) { it ->
       it
         .first { it.resourceId == "remote-patient-3" }
         .let {
@@ -675,7 +675,7 @@ class DatabaseImplTest {
     database.insertRemote(TEST_PATIENT_2)
     database.delete(ResourceType.Patient, TEST_PATIENT_2_ID)
     val resourceLocalChanges =
-      database.getAllLocalChanges().map { it }.filter { it.resourceId.equals(TEST_PATIENT_2_ID) }
+      database.getAllLocalChanges().map { it }.filter { it.resourceId == TEST_PATIENT_2_ID }
     assertThat(resourceLocalChanges.size).isEqualTo(1)
     with(resourceLocalChanges[0]) {
       assertThat(type).isEqualTo(LocalChange.Type.DELETE)
@@ -2362,7 +2362,7 @@ class DatabaseImplTest {
 
   @Test
   fun search_nameGivenDuplicate_deduplicatePatient() = runBlocking {
-    var patient: Patient = readFromFile(Patient::class.java, "/patient_name_given_duplicate.json")
+    val patient: Patient = readFromFile(Patient::class.java, "/patient_name_given_duplicate.json")
     database.insertRemote(patient)
     val result =
       database.search<Patient>(

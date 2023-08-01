@@ -34,7 +34,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -54,6 +53,8 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
 
   /** The purpose of this api makes it easy to stub [FhirSyncWorker] for testing. */
   internal open fun getDataSource() = FhirEngineProvider.getDataSource(applicationContext)
+
+  internal open fun getUploadStrategy() = FhirEngineProvider.getUploadStrategy(applicationContext)
 
   override suspend fun doWork(): Result {
     val dataSource =
@@ -87,7 +88,8 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
           getFhirEngine(),
           UploaderImpl(dataSource, getUploadWorkManager()),
           DownloaderImpl(dataSource, getDownloadWorkManager()),
-          getConflictResolver()
+          getConflictResolver(),
+          getUploadStrategy()
         )
         .apply { subscribe(flow) }
         .synchronize()
