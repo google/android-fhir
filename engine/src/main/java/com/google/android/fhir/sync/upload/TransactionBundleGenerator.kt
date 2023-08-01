@@ -19,12 +19,12 @@ package com.google.android.fhir.sync.upload
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.sync.BundleUploadRequest
+import com.google.android.fhir.sync.UploadRequest
 import org.hl7.fhir.r4.model.Bundle
 
 /**
- * Generates list of [BundleUploadRequest] with Transaction [Bundle] and [LocalChangeToken]s
- * associated with the resources present in the transaction bundle.
+ * Generates list of [UploadRequest]s with Transaction [Bundle] and [LocalChangeToken]s associated
+ * with the resources present in the transaction bundle.
  */
 open class TransactionBundleGenerator(
   private val generatedBundleSize: Int,
@@ -33,14 +33,14 @@ open class TransactionBundleGenerator(
     (type: Type, useETagForUpload: Boolean) -> BundleEntryComponentGenerator
 ) : UploadRequestGenerator {
 
-  override fun generateUploadRequests(localChanges: List<LocalChange>): List<BundleUploadRequest> {
+  override fun generateUploadRequests(localChanges: List<LocalChange>): List<UploadRequest> {
     return localChanges
       .chunked(generatedBundleSize)
       .filter { it.isNotEmpty() }
       .map { generateBundleRequest(it) }
   }
 
-  private fun generateBundleRequest(localChanges: List<LocalChange>): BundleUploadRequest {
+  private fun generateBundleRequest(localChanges: List<LocalChange>): UploadRequest {
     val bundleRequest =
       Bundle().apply {
         type = Bundle.BundleType.TRANSACTION
@@ -51,7 +51,8 @@ open class TransactionBundleGenerator(
           )
         }
       }
-    return BundleUploadRequest(
+    return UploadRequest(
+      ".",
       bundleRequest,
       LocalChangeToken(localChanges.flatMap { it.token.ids })
     )

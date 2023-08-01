@@ -106,7 +106,8 @@ class RetrofitHttpServiceTest {
         type = Bundle.BundleType.TRANSACTION
       }
 
-    val result = retrofitHttpService.post(request, mapOf("If-Match" to "randomResourceVersionID"))
+    val result =
+      retrofitHttpService.post(".", request, mapOf("If-Match" to "randomResourceVersionID"))
     val serverRequest = mockWebServer.takeRequest()
     assertThat(serverRequest.headers["If-Match"]).isEqualTo("randomResourceVersionID")
     // No exception has occurred
@@ -135,7 +136,7 @@ class RetrofitHttpServiceTest {
           type = Bundle.BundleType.TRANSACTION
         }
 
-      val result = retrofitHttpService.post(request, emptyMap())
+      val result = retrofitHttpService.post(".", request, emptyMap())
 
       assertThat(result).isInstanceOf(Bundle::class.java)
       assertThat((result as Bundle).type).isEqualTo(Bundle.BundleType.TRANSACTIONRESPONSE)

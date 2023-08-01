@@ -18,7 +18,7 @@ package com.google.android.fhir.sync
 
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.Resource
 
 /**
  * Structure represents a request that can be made to download resources from the FHIR server. The
@@ -89,18 +89,9 @@ internal constructor(val bundle: Bundle, override val headers: Map<String, Strin
  * Structure represents a request that can be made to upload resources/resource modifications to the
  * FHIR server.
  */
-sealed class UploadRequest(
-  open val headers: Map<String, String>,
-  open val localChangeToken: LocalChangeToken,
-  open val resourceType: ResourceType
+data class UploadRequest(
+  val url: String,
+  val resource: Resource,
+  val localChangeToken: LocalChangeToken,
+  val headers: Map<String, String> = emptyMap()
 )
-
-/**
- * A FHIR [Bundle] based request for uploads. Multiple resources/resource modifications can be
- * uploaded as a single request using this.
- */
-data class BundleUploadRequest(
-  val bundle: Bundle,
-  override val localChangeToken: LocalChangeToken,
-  override val headers: Map<String, String> = emptyMap()
-) : UploadRequest(headers, localChangeToken, ResourceType.Bundle)
