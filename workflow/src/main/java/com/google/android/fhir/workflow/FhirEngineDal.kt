@@ -76,8 +76,7 @@ internal class FhirEngineDal(
   override fun search(resourceType: String): Iterable<IBaseResource> =
     runBlockingOrThrowMainThreadException {
       val search = Search(type = ResourceType.fromCode(resourceType))
-      knowledgeManager.loadResources(resourceType = resourceType) +
-        fhirEngine.search<Resource>(search).map { it.resource }
+      knowledgeManager.loadResources(resourceType = resourceType) + fhirEngine.search(search)
     }
 
   override fun searchByUrl(resourceType: String, url: String): Iterable<IBaseResource> =
