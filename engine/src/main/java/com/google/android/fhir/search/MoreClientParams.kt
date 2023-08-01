@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.workflow.testing
+package com.google.android.fhir.search
 
-import java.time.LocalDate
-import org.hl7.fhir.r4.model.DateType
+import ca.uhn.fhir.rest.gclient.DateClientParam
 
-val DateType.toLocalDate: LocalDate
-  get() =
-    LocalDate.of(
-      year,
-      month + 1,
-      day,
-    )
+internal const val LOCAL_LAST_UPDATED = "local_lastUpdated"
+internal const val LAST_UPDATED = "_lastUpdated"
+
+/** Resource Date Parameter to search using local last updated date. */
+val LOCAL_LAST_UPDATED_PARAM = DateClientParam(LOCAL_LAST_UPDATED)
+
+/** Resource Date Parameter to search using remote last updated date. */
+val LAST_UPDATED_PARAM = DateClientParam(LAST_UPDATED)

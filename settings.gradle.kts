@@ -47,5 +47,3 @@ include(":knowledge")
 include(":workflow")
 
 include(":workflow-testing")
-
-include(":testing")

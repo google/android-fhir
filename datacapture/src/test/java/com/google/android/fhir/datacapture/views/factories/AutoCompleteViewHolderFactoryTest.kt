@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,6 +108,15 @@ class AutoCompleteViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
           .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
       )
+
+    val fakeAnswerValueSetResolver = { uri: String ->
+      if (uri == "http://answwer-value-set-url") {
+        answers
+      } else {
+        emptyList()
+      }
+    }
+
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         repeats = true
@@ -131,13 +140,7 @@ class AutoCompleteViewHolderFactoryTest {
             }
           )
         },
-        resolveAnswerValueSet = {
-          if (it == "http://answwer-value-set-url") {
-            answers
-          } else {
-            emptyList()
-          }
-        },
+        enabledAnswerOptions = fakeAnswerValueSetResolver.invoke(questionnaireItem.answerValueSet),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
@@ -156,12 +159,23 @@ class AutoCompleteViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
           .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
       )
+
+    val fakeAnswerValueSetResolver = { uri: String ->
+      if (uri == "http://answwer-value-set-url") {
+        answers
+      } else {
+        emptyList()
+      }
+    }
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = false
+        answerValueSet = "#ContainedValueSet"
+      }
+
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = false
-          answerValueSet = "#ContainedValueSet"
-        },
+        questionnaireItem,
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -170,13 +184,7 @@ class AutoCompleteViewHolderFactoryTest {
             }
           )
         },
-        resolveAnswerValueSet = {
-          if (it == "#ContainedValueSet") {
-            answers
-          } else {
-            emptyList()
-          }
-        },
+        enabledAnswerOptions = fakeAnswerValueSetResolver.invoke(questionnaireItem.answerValueSet),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )

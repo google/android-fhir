@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,4 @@ object Sdk {
   // Engine and SDC must support API 24.
   // Remove desugaring when upgrading it to 26.
   const val minSdk = 24
-
-  // Workflow requires minSDK 26
-  const val minSdkWorkflow = 26
 }
