@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Bundle
 
 internal class HttpPutForCreateEntryComponentGenerator(useETagForUpload: Boolean) :
-  HttpVerbBasedBundleEntryComponentGenerator(Bundle.HTTPVerb.PUT, useETagForUpload) {
+  BundleEntryComponentGenerator(Bundle.HTTPVerb.PUT, useETagForUpload) {
   override fun getEntryResource(localChange: LocalChange): IBaseResource {
     return FhirContext.forCached(FhirVersionEnum.R4)
       .newJsonParser()
@@ -34,7 +34,7 @@ internal class HttpPutForCreateEntryComponentGenerator(useETagForUpload: Boolean
 }
 
 internal class HttpPatchForUpdateEntryComponentGenerator(useETagForUpload: Boolean) :
-  HttpVerbBasedBundleEntryComponentGenerator(Bundle.HTTPVerb.PATCH, useETagForUpload) {
+  BundleEntryComponentGenerator(Bundle.HTTPVerb.PATCH, useETagForUpload) {
   override fun getEntryResource(localChange: LocalChange): IBaseResource {
     return Binary().apply {
       contentType = ContentTypes.APPLICATION_JSON_PATCH
@@ -44,6 +44,6 @@ internal class HttpPatchForUpdateEntryComponentGenerator(useETagForUpload: Boole
 }
 
 internal class HttpDeleteEntryComponentGenerator(useETagForUpload: Boolean) :
-  HttpVerbBasedBundleEntryComponentGenerator(Bundle.HTTPVerb.DELETE, useETagForUpload) {
+  BundleEntryComponentGenerator(Bundle.HTTPVerb.DELETE, useETagForUpload) {
   override fun getEntryResource(localChange: LocalChange): IBaseResource? = null
 }

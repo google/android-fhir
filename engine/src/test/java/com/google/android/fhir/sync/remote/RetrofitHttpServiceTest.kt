@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ class RetrofitHttpServiceTest {
   }
 
   @Test // https://github.com/google/android-fhir/issues/1892
-  fun `should assemble upload request correctly`() = runTest {
+  fun `should assemble upload bundle request correctly`() = runTest {
     // checks that a upload request can be made successfully with parameters without exception
     val mockResponse =
       MockResponse().apply {

@@ -65,6 +65,9 @@
         <item name="questionnaireHelpButtonStyle">
             @style/Widget.MaterialComponents.Button.TextButton.Icon
         </item>
+        <item name="questionnaireMediaImageStyle">
+            @style/Questionnaire.MediaImageStyle
+        </item>
       <item
             name="questionnaireBottomNavContainerStyle"
         >@style/Questionnaire.BottomNavContainerStyle</item>
@@ -197,6 +200,25 @@
         parent="TextAppearance.Material3.BodyMedium"
     >
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="Questionnaire.MediaImageStyle" parent="">
+        <item name="android:maxWidth">@dimen/item_media_image_max_width</item>
+        <item name="android:maxHeight">@dimen/item_media_image_max_width</item>
+        <item name="android:layout_gravity">center</item>
+        <item
+            name="android:layout_marginTop"
+        >@dimen/item_media_image_margin_vertical</item>
+        <item
+            name="android:layout_marginBottom"
+        >@dimen/item_media_image_margin_vertical</item>
+        <item
+            name="android:layout_marginStart"
+        >@dimen/item_media_image_margin_horizontal</item>
+        <item
+            name="android:layout_marginEnd"
+        >@dimen/item_media_image_margin_horizontal</item>
+
     </style>
 
     <style name="Questionnaire.BottomNavContainerStyle" parent="">

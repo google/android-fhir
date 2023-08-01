@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +24,17 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.search.Search
-import com.google.android.fhir.sync.BundleRequest
+import com.google.android.fhir.sync.BundleDownloadRequest
+import com.google.android.fhir.sync.BundleUploadRequest
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.DownloadWorkManager
-import com.google.android.fhir.sync.Request
-import com.google.android.fhir.sync.UrlRequest
+import com.google.android.fhir.sync.UploadRequest
+import com.google.android.fhir.sync.UrlDownloadRequest
 import com.google.common.truth.Truth.assertThat
 import java.net.SocketTimeoutException
+import java.time.Instant
 import java.time.OffsetDateTime
 import java.util.Date
 import java.util.LinkedList
@@ -95,13 +98,13 @@ fun readJsonArrayFromFile(filename: String): JSONArray {
 
 object TestDataSourceImpl : DataSource {
 
-  override suspend fun download(request: Request) =
-    when (request) {
-      is UrlRequest -> Bundle().apply { type = Bundle.BundleType.SEARCHSET }
-      is BundleRequest -> Bundle().apply { type = Bundle.BundleType.BATCHRESPONSE }
+  override suspend fun download(downloadRequest: DownloadRequest) =
+    when (downloadRequest) {
+      is UrlDownloadRequest -> Bundle().apply { type = Bundle.BundleType.SEARCHSET }
+      is BundleDownloadRequest -> Bundle().apply { type = Bundle.BundleType.BATCHRESPONSE }
     }
 
-  override suspend fun upload(request: BundleRequest): Resource {
+  override suspend fun upload(request: UploadRequest): Resource {
     return Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
   }
 }
@@ -111,7 +114,9 @@ open class TestDownloadManagerImpl(
 ) : DownloadWorkManager {
   private val urls = LinkedList(queries)
 
-  override suspend fun getNextRequest(): Request? = urls.poll()?.let { Request.of(it) }
+  override suspend fun getNextRequest(): DownloadRequest? =
+    urls.poll()?.let { DownloadRequest.of(it) }
+
   override suspend fun getSummaryRequestUrls() =
     queries
       .stream()
@@ -143,7 +148,7 @@ object TestFhirEngineImpl : FhirEngine {
   override suspend fun syncUpload(
     upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
-    upload(listOf(getLocalChange(ResourceType.Patient, "123")))
+    upload(getLocalChanges(ResourceType.Patient, "123"))
   }
 
   override suspend fun syncDownload(
@@ -162,13 +167,16 @@ object TestFhirEngineImpl : FhirEngine {
 
   override suspend fun clearDatabase() {}
 
-  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange {
-    return LocalChange(
-      resourceType = type.name,
-      resourceId = id,
-      payload = "{}",
-      token = LocalChangeToken(listOf()),
-      type = LocalChange.Type.INSERT
+  override suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange> {
+    return listOf(
+      LocalChange(
+        resourceType = type.name,
+        resourceId = id,
+        payload = "{}",
+        token = LocalChangeToken(listOf()),
+        type = LocalChange.Type.INSERT,
+        timestamp = Instant.now()
+      )
     )
   }
 
@@ -177,28 +185,29 @@ object TestFhirEngineImpl : FhirEngine {
 
 object TestFailingDatasource : DataSource {
 
-  override suspend fun download(request: Request) =
-    when (request) {
-      is UrlRequest -> {
+  override suspend fun download(downloadRequest: DownloadRequest) =
+    when (downloadRequest) {
+      is UrlDownloadRequest -> {
         val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
         // data size exceeding the bytes acceptable by WorkManager serializer
         val dataSize = Data.MAX_DATA_BYTES + 1
         val hugeStackTraceMessage = (1..dataSize).map { allowedChars.random() }.joinToString("")
         throw Exception(hugeStackTraceMessage)
       }
-      is BundleRequest -> throw SocketTimeoutException("Posting Download Bundle failed...")
+      is BundleDownloadRequest -> throw SocketTimeoutException("Posting Download Bundle failed...")
     }
 
-  override suspend fun upload(request: BundleRequest): Resource {
+  override suspend fun upload(request: UploadRequest): Resource {
     throw SocketTimeoutException("Posting Upload Bundle failed...")
   }
 }
 
 class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSource {
 
-  override suspend fun download(request: Request): Resource {
+  override suspend fun download(downloadRequest: DownloadRequest): Resource {
     TODO("Not yet implemented")
   }
 
-  override suspend fun upload(request: BundleRequest) = onPostBundle(request.bundle)
+  override suspend fun upload(request: UploadRequest) =
+    onPostBundle((request as BundleUploadRequest).bundle)
 }
