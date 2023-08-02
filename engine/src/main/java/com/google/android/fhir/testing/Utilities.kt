@@ -25,6 +25,7 @@ import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.BundleDownloadRequest
+import com.google.android.fhir.sync.BundleUploadRequest
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadRequest
@@ -207,5 +208,6 @@ class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSou
     TODO("Not yet implemented")
   }
 
-  override suspend fun upload(request: UploadRequest) = onPostBundle(request.resource as Bundle)
+  override suspend fun upload(request: UploadRequest) =
+    onPostBundle((request as BundleUploadRequest).bundle)
 }

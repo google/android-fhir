@@ -89,9 +89,26 @@ internal constructor(val bundle: Bundle, override val headers: Map<String, Strin
  * Structure represents a request that can be made to upload resources/resource modifications to the
  * FHIR server.
  */
-data class UploadRequest(
+sealed class UploadRequest(
   val url: String,
-  val resource: Resource,
-  val localChangeToken: LocalChangeToken,
-  val headers: Map<String, String> = emptyMap()
+  open val headers: Map<String, String> = emptyMap(),
+  open val resource: Resource,
+  open val localChangeToken: LocalChangeToken,
 )
+
+/**
+ * A FHIR [Bundle] based request for uploads. Multiple resources/resource modifications can be
+ * uploaded as a single request using this.
+ */
+data class BundleUploadRequest(
+  val bundle: Bundle,
+  override val localChangeToken: LocalChangeToken,
+  override val headers: Map<String, String> = emptyMap()
+) : UploadRequest(".", headers, bundle, localChangeToken)
+
+/** A [url] based FHIR request to upload resources to the server. */
+data class UrlUploadRequest(
+  override val resource: Resource,
+  override val localChangeToken: LocalChangeToken,
+  override val headers: Map<String, String> = emptyMap()
+) : UploadRequest(resource.resourceType.name, headers, resource, localChangeToken)

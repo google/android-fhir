@@ -23,6 +23,7 @@ import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
+import com.google.android.fhir.sync.BundleUploadRequest
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
 import kotlinx.coroutines.runBlocking
@@ -130,11 +131,10 @@ class TransactionBundleGeneratorTest {
       val result = generator.generateUploadRequests(changes)
 
       assertThat(result).hasSize(1)
-      val bundleUploadRequest = result[0]
-      val bundle = bundleUploadRequest.resource as Bundle
-      assertThat(bundle.type).isEqualTo(Bundle.BundleType.TRANSACTION)
-      assertThat(bundle.entry).hasSize(3)
-      assertThat(bundle.entry.map { it.request.method })
+      val bundleUploadRequest = result.get(0) as BundleUploadRequest
+      assertThat(bundleUploadRequest.bundle.type).isEqualTo(Bundle.BundleType.TRANSACTION)
+      assertThat(bundleUploadRequest.bundle.entry).hasSize(3)
+      assertThat(bundleUploadRequest.bundle.entry.map { it.request.method })
         .containsExactly(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, Bundle.HTTPVerb.DELETE)
         .inOrder()
     }
@@ -234,14 +234,17 @@ class TransactionBundleGeneratorTest {
       // Exactly 3 Requests are generated
       assertThat(result).hasSize(3)
       // Each Request is of type Bundle
-      assertThat(result.all { (it.resource as Bundle).type == Bundle.BundleType.TRANSACTION })
+      assertThat(result.all { it is BundleUploadRequest }).isTrue()
+      assertThat(
+          result.all { (it as BundleUploadRequest).bundle.type == Bundle.BundleType.TRANSACTION }
+        )
         .isTrue()
       // Each Bundle has exactly 1 entry
-      assertThat(result.all { (it.resource as Bundle).entry.size == 1 }).isTrue()
-      assertThat(result.map { (it.resource as Bundle).entry.first().request.method })
+      assertThat(result.all { (it as BundleUploadRequest).bundle.entry.size == 1 }).isTrue()
+      assertThat(result.map { (it as BundleUploadRequest).bundle.entry.first().request.method })
         .containsExactly(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, Bundle.HTTPVerb.DELETE)
         .inOrder()
-      assertThat(result.map { (it.resource as Bundle).entry.first().request.ifMatch })
+      assertThat(result.map { it.bundle.entry.first().request.ifMatch })
         .containsExactly(null, "W/\"v-p002-01\"", "W/\"v-p003-01\"")
         .inOrder()
     }
@@ -265,7 +268,7 @@ class TransactionBundleGeneratorTest {
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = false)
       val result = generator.generateUploadRequests(changes)
 
-      assertThat((result.first().resource as Bundle).entry.first().request.ifMatch).isNull()
+      assertThat(result.first().bundle.entry.first().request.ifMatch).isNull()
     }
 
   @Test
@@ -287,7 +290,7 @@ class TransactionBundleGeneratorTest {
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(changes)
 
-      assertThat((result.first().resource as Bundle).entry.first().request.ifMatch)
+      assertThat(result.first().bundle.entry.first().request.ifMatch)
         .isEqualTo("W/\"patient-002-version-1\"")
     }
 
@@ -320,7 +323,7 @@ class TransactionBundleGeneratorTest {
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(changes)
 
-      assertThat((result.first().resource as Bundle).entry[0].request.ifMatch).isNull()
-      assertThat((result.first().resource as Bundle).entry[1].request.ifMatch).isNull()
+      assertThat(result.first().bundle.entry[0].request.ifMatch).isNull()
+      assertThat(result.first().bundle.entry[1].request.ifMatch).isNull()
     }
 }
