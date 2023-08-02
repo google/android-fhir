@@ -347,7 +347,11 @@ class DropDownViewHolderFactoryEspressoTest {
       responses.forEach { response ->
         addAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = Coding().apply { display = response }
+            value =
+              Coding().apply {
+                code = response.replace(" ", "_")
+                display = response
+              }
           }
         )
       }
