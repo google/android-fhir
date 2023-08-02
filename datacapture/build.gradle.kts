@@ -99,7 +99,6 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
-  testImplementation(project(":testing"))
 }
 
 tasks.dokkaHtml.configure {

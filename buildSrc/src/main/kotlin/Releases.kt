@@ -37,6 +37,8 @@ object Releases {
   const val groupId = "com.google.android.fhir"
 
   // Libraries
+  // After releasing a new version of a library, you will need to bump up the library version
+  // in Dependencies.kt (in a separate PR)
 
   object Common : LibraryArtifact {
     override val artifactId = "common"
@@ -58,7 +60,7 @@ object Releases {
 
   object Workflow : LibraryArtifact {
     override val artifactId = "workflow"
-    override val version = "0.1.0-alpha02"
+    override val version = "0.1.0-alpha03"
     override val name = "Android FHIR Workflow Library"
   }
 

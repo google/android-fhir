@@ -16,10 +16,13 @@
 
 package com.google.android.fhir.sync.remote
 
-import com.google.android.fhir.sync.BundleRequest
+import com.google.android.fhir.sync.BundleDownloadRequest
+import com.google.android.fhir.sync.BundleUploadRequest
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.Request
-import com.google.android.fhir.sync.UrlRequest
+import com.google.android.fhir.sync.DownloadRequest
+import com.google.android.fhir.sync.UploadRequest
+import com.google.android.fhir.sync.UrlDownloadRequest
+import org.hl7.fhir.r4.model.Resource
 
 /**
  * Implementation of [DataSource] to sync data with the FHIR server using HTTP method calls.
@@ -27,12 +30,13 @@ import com.google.android.fhir.sync.UrlRequest
  */
 internal class FhirHttpDataSource(private val fhirHttpService: FhirHttpService) : DataSource {
 
-  override suspend fun download(request: Request) =
-    when (request) {
-      is UrlRequest -> fhirHttpService.get(request.url, request.headers)
-      is BundleRequest -> fhirHttpService.post(request.bundle, request.headers)
+  override suspend fun download(downloadRequest: DownloadRequest) =
+    when (downloadRequest) {
+      is UrlDownloadRequest -> fhirHttpService.get(downloadRequest.url, downloadRequest.headers)
+      is BundleDownloadRequest ->
+        fhirHttpService.post(downloadRequest.bundle, downloadRequest.headers)
     }
 
-  override suspend fun upload(request: BundleRequest) =
-    fhirHttpService.post(request.bundle, request.headers)
+  override suspend fun upload(request: UploadRequest): Resource =
+    fhirHttpService.post((request as BundleUploadRequest).bundle, request.headers)
 }

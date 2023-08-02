@@ -63,7 +63,7 @@ internal object AutoCompleteViewHolderFactory :
             val answer =
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value =
-                  questionnaireViewItem.answerOption
+                  questionnaireViewItem.enabledAnswerOptions
                     .first {
                       it.value.identifierString(header.context) ==
                         (autoCompleteTextView.adapter.getItem(position)
@@ -82,7 +82,7 @@ internal object AutoCompleteViewHolderFactory :
         header.bind(questionnaireViewItem)
         header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
         val answerOptionValues =
-          questionnaireViewItem.answerOption.map {
+          questionnaireViewItem.enabledAnswerOptions.map {
             AutoCompleteViewAnswerOption(
               answerId = it.value.identifierString(header.context),
               answerDisplay = it.value.displayString(header.context)
