@@ -101,10 +101,10 @@ sealed class UploadRequest(
  * uploaded as a single request using this.
  */
 data class BundleUploadRequest(
-  val bundle: Bundle,
+  override val headers: Map<String, String> = emptyMap(),
+  override val resource: Bundle,
   override val localChangeToken: LocalChangeToken,
-  override val headers: Map<String, String> = emptyMap()
-) : UploadRequest(".", headers, bundle, localChangeToken)
+) : UploadRequest(".", headers, resource, localChangeToken)
 
 /** A [url] based FHIR request to upload resources to the server. */
 data class UrlUploadRequest(
