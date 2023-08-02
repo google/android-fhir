@@ -21,7 +21,7 @@ import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.HttpAuthenticator
 import com.google.android.fhir.sync.remote.HttpLogger
-import com.google.android.fhir.sync.upload.UploadStrategy
+import com.google.android.fhir.sync.upload.IdResolutionStrategy
 import org.hl7.fhir.r4.model.SearchParameter
 
 /** The provider for [FhirEngine] instance. */
@@ -61,8 +61,8 @@ object FhirEngineProvider {
 
   @Synchronized
   @JvmStatic // needed for mockito
-  internal fun getUploadStrategy(context: Context): UploadStrategy {
-    return getOrCreateFhirService(context).uploadStrategy
+  internal fun getUploadStrategy(context: Context): IdResolutionStrategy {
+    return getOrCreateFhirService(context).idResolutionStrategy
   }
   @Synchronized
   private fun getOrCreateFhirService(context: Context): FhirServices {

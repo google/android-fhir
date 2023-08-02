@@ -25,6 +25,7 @@ import com.google.android.fhir.sync.UploadState
 import com.google.android.fhir.sync.UploadWorkManager
 import com.google.android.fhir.sync.Uploader
 import com.google.android.fhir.sync.UrlUploadRequest
+import java.util.LinkedList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.exceptions.FHIRException
@@ -47,26 +48,31 @@ internal class UploaderImpl(
 
   override suspend fun upload(
     localChanges: List<LocalChange>,
-    idResolver: UploadStrategy
+    idResolver: IdResolutionStrategy
   ): Flow<UploadState> = flow {
     var resourceTypeToUpload: ResourceType = ResourceType.Bundle
-    uploadWorkManager.setChangesToUpload(localChanges)
-    val total = uploadWorkManager.getPendingUploadsIndicator()
+    val changesToUpload = LinkedList(uploadWorkManager.prepareChangesForUpload(localChanges))
+    val total = changesToUpload.size
     var completed = 0
     emit(UploadState.Started(total))
-    var request = uploadWorkManager.getNextRequest()
+    var request = uploadWorkManager.getNextRequest(changesToUpload.poll())
     while (request != null) {
       try {
         resourceTypeToUpload = request.toResourceType()
         val response = dataSource.upload(request)
-        idResolver.resolve(request.localChangeToken, response)
+        idResolver.resolve(response)
+        idResolver.updateVersionIdAndLastUpdated(request.localChangeToken, response)
         completed += 1
         emit(getUploadResult(resourceTypeToUpload, response, total, completed))
       } catch (e: Exception) {
         Timber.e(e)
         emit(UploadState.Failure(ResourceSyncException(resourceTypeToUpload, e)))
       }
-      request = uploadWorkManager.getNextRequest()
+      val localChangesToUpload = changesToUpload.poll()
+      request =
+        uploadWorkManager.getNextRequest(
+          localChangesToUpload?.let { idResolver.updateChangeToUpload(it) }
+        )
     }
   }
 

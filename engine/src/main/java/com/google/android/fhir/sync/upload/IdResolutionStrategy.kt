@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.sync.upload
 
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import org.hl7.fhir.r4.model.Bundle
@@ -23,25 +24,48 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
-interface UploadStrategy {
+interface IdResolutionStrategy {
 
-  suspend fun resolve(localChangeToken: LocalChangeToken, resource: Resource)
+  suspend fun updateVersionIdAndLastUpdated(localChangeToken: LocalChangeToken, resource: Resource)
+  suspend fun updateChangeToUpload(changesToUpload: List<LocalChange>): List<LocalChange>
+  suspend fun resolve(response: Resource)
 }
 
-internal class PostUploadStrategy(private val database: Database) : UploadStrategy {
-  override suspend fun resolve(localChangeToken: LocalChangeToken, resource: Resource) {
+internal class PostIdResolutionStrategy(private val database: Database) : IdResolutionStrategy {
+
+  override suspend fun updateVersionIdAndLastUpdated(
+    localChangeToken: LocalChangeToken,
+    resource: Resource
+  ) {
     TODO("Not yet implemented")
+  }
+
+  override suspend fun updateChangeToUpload(changesToUpload: List<LocalChange>): List<LocalChange> {
+    TODO("Not yet implemented")
+  }
+
+  override suspend fun resolve(response: Resource) {
+    database.insertRemote(response)
+    database.getAllLocalChanges().map { it.resourceId }
   }
 }
 
-internal class PutUploadStrategy(private val database: Database) : UploadStrategy {
-  override suspend fun resolve(localChangeToken: LocalChangeToken, resource: Resource) {
+internal class PutIdResolutionStrategy(private val database: Database) : IdResolutionStrategy {
+
+  override suspend fun updateVersionIdAndLastUpdated(
+    localChangeToken: LocalChangeToken,
+    resource: Resource
+  ) {
     database.deleteUpdates(localChangeToken)
     when (resource) {
       is Bundle -> updateVersionIdAndLastUpdated(resource)
       else -> updateVersionIdAndLastUpdated(resource)
     }
   }
+
+  override suspend fun updateChangeToUpload(changesToUpload: List<LocalChange>): List<LocalChange> =
+    changesToUpload
+  override suspend fun resolve(response: Resource) {}
 
   private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {
     when (bundle.type) {

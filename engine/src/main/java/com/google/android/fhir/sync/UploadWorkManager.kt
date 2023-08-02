@@ -28,14 +28,7 @@ interface UploadWorkManager {
    * [Resource] e.g. [SquashedChangesUploadWorkManager] or filtering out certain [LocalChange]s or
    * grouping the changes.
    */
-  fun setChangesToUpload(localChanges: List<LocalChange>)
+  fun prepareChangesForUpload(localChanges: List<LocalChange>): List<List<LocalChange>>
 
-  fun getNextRequest(): UploadRequest?
-
-  /**
-   * Gets the [Int] to indicate the progress in terms of the pending uploads. The indicator could be
-   * determined at the resource level (by extracting resource information from the upload requests)
-   * etc.
-   */
-  fun getPendingUploadsIndicator(): Int
+  fun getNextRequest(localChanges: List<LocalChange>?): UploadRequest?
 }

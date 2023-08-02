@@ -17,7 +17,7 @@
 package com.google.android.fhir.sync
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.sync.upload.UploadStrategy
+import com.google.android.fhir.sync.upload.IdResolutionStrategy
 import kotlinx.coroutines.flow.Flow
 
 /** Module for uploading local changes to a [DataSource]. */
@@ -28,7 +28,10 @@ internal interface Uploader {
    * transforming the [LocalChange]s to particular network operations. If [ProgressCallback] is
    * provided it also reports the intermediate progress
    */
-  suspend fun upload(localChanges: List<LocalChange>, idResolver: UploadStrategy): Flow<UploadState>
+  suspend fun upload(
+    localChanges: List<LocalChange>,
+    idResolver: IdResolutionStrategy
+  ): Flow<UploadState>
 }
 
 internal sealed class UploadState {

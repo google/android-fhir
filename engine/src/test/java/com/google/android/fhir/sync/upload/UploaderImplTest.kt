@@ -16,8 +16,12 @@
 
 package com.google.android.fhir.sync.upload
 
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.FhirServices
+import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -33,12 +37,22 @@ import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class UploaderImplTest {
+
+  private val context: Context = ApplicationProvider.getApplicationContext()
+  private lateinit var database: Database
+
+  @Before fun setUp(): Unit = runBlocking { buildFhirService() }
+
+  private fun buildFhirService() {
+    database = FhirServices.builder(context).inMemory().build().database
+  }
 
   @Test
   fun `upload Bundle transaction should emit Success`() = runBlocking {
@@ -47,7 +61,7 @@ class UploaderImplTest {
           BundleDataSource { Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE } },
           SquashedChangesUploadWorkManager()
         )
-        .upload(localChanges)
+        .upload(localChanges, PutIdResolutionStrategy(database))
         .toList()
 
     assertThat(result).hasSize(2)
@@ -63,7 +77,7 @@ class UploaderImplTest {
   fun `upload Bundle transaction should emit Started state`() = runBlocking {
     val result =
       UploaderImpl(BundleDataSource { Bundle() }, SquashedChangesUploadWorkManager())
-        .upload(localChanges)
+        .upload(localChanges, PutIdResolutionStrategy(database))
         .toList()
 
     assertThat(result.first()).isInstanceOf(UploadState.Started::class.java)
@@ -86,7 +100,7 @@ class UploaderImplTest {
           },
           SquashedChangesUploadWorkManager()
         )
-        .upload(localChanges)
+        .upload(localChanges, PutIdResolutionStrategy(database))
         .toList()
 
     assertThat(result).hasSize(2)
@@ -100,7 +114,7 @@ class UploaderImplTest {
           BundleDataSource { throw ConnectException("Failed to connect to server.") },
           SquashedChangesUploadWorkManager()
         )
-        .upload(localChanges)
+        .upload(localChanges, PutIdResolutionStrategy(database))
         .toList()
 
     assertThat(result).hasSize(2)

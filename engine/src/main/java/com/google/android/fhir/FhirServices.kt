@@ -30,9 +30,9 @@ import com.google.android.fhir.index.SearchParamDefinitionsProviderImpl
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.remote.FhirHttpDataSource
 import com.google.android.fhir.sync.remote.RetrofitHttpService
-import com.google.android.fhir.sync.upload.PostUploadStrategy
-import com.google.android.fhir.sync.upload.PutUploadStrategy
-import com.google.android.fhir.sync.upload.UploadStrategy
+import com.google.android.fhir.sync.upload.IdResolutionStrategy
+import com.google.android.fhir.sync.upload.PostIdResolutionStrategy
+import com.google.android.fhir.sync.upload.PutIdResolutionStrategy
 import org.hl7.fhir.r4.model.SearchParameter
 import timber.log.Timber
 
@@ -41,7 +41,7 @@ internal data class FhirServices(
   val parser: IParser,
   val database: Database,
   val remoteDataSource: DataSource? = null,
-  val uploadStrategy: UploadStrategy,
+  val idResolutionStrategy: IdResolutionStrategy,
 ) {
   class Builder(private val context: Context) {
     private var inMemory: Boolean = false
@@ -91,9 +91,9 @@ internal data class FhirServices(
       val engine = FhirEngineImpl(database = db, context = context)
       val uploadStrategy =
         if (idGenerationStrategy.equals(IdGenerationStrategy.USE_SERVER)) {
-          PostUploadStrategy(db)
+          PostIdResolutionStrategy(db)
         } else {
-          PutUploadStrategy(db)
+          PutIdResolutionStrategy(db)
         }
       val remoteDataSource =
         serverConfiguration?.let {
@@ -110,7 +110,7 @@ internal data class FhirServices(
         parser = parser,
         database = db,
         remoteDataSource = remoteDataSource,
-        uploadStrategy = uploadStrategy
+        idResolutionStrategy = uploadStrategy
       )
     }
   }
