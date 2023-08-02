@@ -30,8 +30,9 @@ class SquashedChangesUploadWorkManager : UploadWorkManager {
   private val bundleUploadRequestGenerator = TransactionBundleGenerator.getDefault()
 
   /**
-   * The implementation is to squash all the changes by resource type so that there is at most one
-   * local change to be uploaded per resource
+   * The implementation is to squash all the changes by {resourceId, resourceType}. If a resource is
+   * INSERTED and DELETED locally then the list of local changes are split to squash all INSERT AND
+   * UPDATE changes into 1 LocalChange and the last DELETE change into 1 LocalChange.
    */
   override fun prepareChangesForUpload(localChanges: List<LocalChange>): List<LocalChange> {
     val localChangeValuesInOrder = mutableListOf<List<LocalChange>>()
