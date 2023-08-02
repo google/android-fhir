@@ -162,6 +162,14 @@ class AutoCompleteViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
           .setValue(Coding().setCode("test2-code").setDisplay("Test Code") as Coding)
       )
+
+    val fakeAnswerValueSetResolver = { uri: String ->
+      if (uri == "http://answwer-value-set-url") {
+        answers
+      } else {
+        emptyList()
+      }
+    }
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         repeats = true
@@ -186,13 +194,7 @@ class AutoCompleteViewHolderFactoryTest {
             }
           )
         },
-        resolveAnswerValueSet = {
-          if (it == "http://answwer-value-set-url") {
-            answers
-          } else {
-            emptyList()
-          }
-        },
+        enabledAnswerOptions = fakeAnswerValueSetResolver.invoke(questionnaireItem.answerValueSet),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
