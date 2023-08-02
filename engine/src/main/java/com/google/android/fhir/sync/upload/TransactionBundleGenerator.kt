@@ -52,8 +52,8 @@ open class TransactionBundleGenerator(
         }
       }
     return BundleUploadRequest(
-      bundleRequest,
-      LocalChangeToken(localChanges.flatMap { it.token.ids })
+      resource = bundleRequest,
+      localChangeToken = LocalChangeToken(localChanges.flatMap { it.token.ids })
     )
   }
 
