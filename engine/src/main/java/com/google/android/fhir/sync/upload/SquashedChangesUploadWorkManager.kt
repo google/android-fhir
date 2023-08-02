@@ -34,9 +34,22 @@ class SquashedChangesUploadWorkManager : UploadWorkManager {
    * local change to be uploaded per resource
    */
   override fun prepareChangesForUpload(localChanges: List<LocalChange>): List<LocalChange> {
-    return localChanges
-      .groupBy { it.resourceId to it.resourceType }
-      .values.map { localResourceChanges -> LocalChangeUtils.squash(localResourceChanges) }
+    val localChangeValuesInOrder = mutableListOf<List<LocalChange>>()
+    with(localChangeValuesInOrder) {
+      localChanges
+        .groupBy { it.resourceId to it.resourceType }
+        .values.forEach { resourceLocalChanges ->
+          if (resourceLocalChanges.size > 1 &&
+              resourceLocalChanges.first().type == LocalChange.Type.INSERT &&
+              resourceLocalChanges.last().type == LocalChange.Type.DELETE
+          ) {
+            addAll(resourceLocalChanges.chunked(resourceLocalChanges.size - 1))
+          } else add(resourceLocalChanges)
+        }
+    }
+    return localChangeValuesInOrder.map { localResourceChanges ->
+      LocalChangeUtils.squash(localResourceChanges)
+    }
   }
 
   /**
