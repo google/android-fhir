@@ -25,7 +25,6 @@ import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.toTimeZoneString
 import com.google.android.fhir.versionId
 import java.time.Instant
 import java.util.Date
@@ -50,7 +49,6 @@ internal abstract class LocalChangeDao {
   open suspend fun addInsert(resource: Resource, timeOfLocalChange: Instant) {
     val resourceId = resource.logicalId
     val resourceType = resource.resourceType
-    val timestamp = Date.from(timeOfLocalChange).toTimeZoneString()
     val resourceString = iParser.encodeResourceToString(resource)
 
     addLocalChange(
@@ -58,7 +56,7 @@ internal abstract class LocalChangeDao {
         id = 0,
         resourceType = resourceType.name,
         resourceId = resourceId,
-        timestamp = timestamp,
+        timestamp = timeOfLocalChange,
         type = Type.INSERT,
         payload = resourceString,
         versionId = resource.versionId
@@ -69,7 +67,6 @@ internal abstract class LocalChangeDao {
   suspend fun addUpdate(oldEntity: ResourceEntity, resource: Resource, timeOfLocalChange: Instant) {
     val resourceId = resource.logicalId
     val resourceType = resource.resourceType
-    val timestamp = Date.from(timeOfLocalChange).toTimeZoneString()
 
     if (!localChangeIsEmpty(resourceId, resourceType) &&
         lastChangeType(resourceId, resourceType)!! == Type.DELETE
@@ -96,7 +93,7 @@ internal abstract class LocalChangeDao {
         id = 0,
         resourceType = resourceType.name,
         resourceId = resourceId,
-        timestamp = timestamp,
+        timestamp = timeOfLocalChange,
         type = Type.UPDATE,
         payload = jsonDiff.toString(),
         versionId = oldEntity.versionId
@@ -105,13 +102,12 @@ internal abstract class LocalChangeDao {
   }
 
   suspend fun addDelete(resourceId: String, resourceType: ResourceType, remoteVersionId: String?) {
-    val timestamp = Date().toTimeZoneString()
     addLocalChange(
       LocalChangeEntity(
         id = 0,
         resourceType = resourceType.name,
         resourceId = resourceId,
-        timestamp = timestamp,
+        timestamp = Date().toInstant(),
         type = Type.DELETE,
         payload = "",
         versionId = remoteVersionId
