@@ -863,7 +863,7 @@ class MoreQuestionnaireItemComponentsTest {
       )
     Locale.setDefault(Locale.US)
 
-    assertThat(questionItemList.localizedInstructionsSpanned.toString())
+    assertThat(questionItemList.getLocalizedInstructionsSpanned().toString())
       .isEqualTo("instruction-1\ninstruction-2")
   }
 

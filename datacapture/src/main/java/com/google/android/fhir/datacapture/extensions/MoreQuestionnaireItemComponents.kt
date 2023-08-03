@@ -342,23 +342,23 @@ val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
  * code is used as the instructions of the parent question.
  */
 val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spanned?
-  get() = item.localizedInstructionsSpanned
+  get() = item.getLocalizedInstructionsSpanned()
 
 /**
  * Returns a Spanned object that contains the localized instructions for all of the items in this
  * list that are of type `Questionnaire.QuestionnaireItemType.DISPLAY` and have the
  * `isInstructionsCode` flag set. The instructions are separated by newlines.
  */
-val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionsSpanned: Spanned
-  get() {
-    return SpannableStringBuilder().apply {
-      this@localizedInstructionsSpanned.filter { questionnaireItem ->
-          questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-            questionnaireItem.isInstructionsCode
-        }
-        .map { it.localizedTextSpanned }
-        .joinTo(this, "\n")
-    }
+fun List<Questionnaire.QuestionnaireItemComponent>.getLocalizedInstructionsSpanned(
+  separator: String = "\n"
+) =
+  SpannableStringBuilder().apply {
+    this@getLocalizedInstructionsSpanned.filter { questionnaireItem ->
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+          questionnaireItem.isInstructionsCode
+      }
+      .map { it.localizedTextSpanned }
+      .joinTo(this, separator)
   }
 
 /**
