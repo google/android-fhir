@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,11 +107,11 @@ object Dependencies {
   }
 
   object Jackson {
-    const val mainGroup = "com.fasterxml.jackson"
-    const val coreGroup = "$mainGroup.core"
-    const val dataformatGroup = "$mainGroup.dataformat"
-    const val datatypeGroup = "$mainGroup.datatype"
-    const val moduleGroup = "$mainGroup.module"
+    private const val mainGroup = "com.fasterxml.jackson"
+    private const val coreGroup = "$mainGroup.core"
+    private const val dataformatGroup = "$mainGroup.dataformat"
+    private const val datatypeGroup = "$mainGroup.datatype"
+    private const val moduleGroup = "$mainGroup.module"
 
     const val annotations = "$coreGroup:jackson-annotations:${Versions.jackson}"
     const val bom = "$mainGroup:jackson-bom:${Versions.jackson}"
@@ -168,10 +168,12 @@ object Dependencies {
   }
 
   const val androidFhirGroup = "com.google.android.fhir"
-  const val androidFhirCommon = "$androidFhirGroup:common:${Versions.androidFhirCommon}"
   const val androidFhirEngineModule = "engine"
+  const val androidFhirKnowledgeModule = "knowledge"
+  const val androidFhirCommon = "$androidFhirGroup:common:${Versions.androidFhirCommon}"
   const val androidFhirEngine =
     "$androidFhirGroup:$androidFhirEngineModule:${Versions.androidFhirEngine}"
+  const val androidFhirKnowledge = "$androidFhirGroup:knowledge:${Versions.androidFhirKnowledge}"
 
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
@@ -211,6 +213,7 @@ object Dependencies {
 
   const val androidBenchmarkRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
+
   // Makes Json assertions where the order of elements, tabs/whitespaces are not important.
   const val jsonAssert = "org.skyscreamer:jsonassert:${Versions.jsonAssert}"
   const val junit = "junit:junit:${Versions.junit}"
@@ -218,6 +221,7 @@ object Dependencies {
   const val mockitoInline = "org.mockito:mockito-inline:${Versions.mockitoInline}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
+
   // Makes XML assertions where the order of elements, tabs/whitespaces are not important.
   const val xmlUnit = "org.xmlunit:xmlunit-core:${Versions.xmlUnit}"
 
@@ -252,8 +256,9 @@ object Dependencies {
       const val stdlib = "1.8.20"
     }
 
-    const val androidFhirCommon = "0.1.0-alpha03"
-    const val androidFhirEngine = "0.1.0-beta02"
+    const val androidFhirCommon = "0.1.0-alpha04"
+    const val androidFhirEngine = "0.1.0-beta03"
+    const val androidFhirKnowledge = "0.1.0-alpha01"
     const val desugarJdkLibs = "2.0.3"
     const val caffeine = "2.9.1"
     const val fhirUcum = "1.0.3"
@@ -264,12 +269,15 @@ object Dependencies {
     // Newer versions of HapiFhir don't work on Android due to the use of Caffeine 3+
     // Wait for this to release (6.3): https://github.com/hapifhir/hapi-fhir/pull/4196
     const val hapiFhir = "6.0.1"
+
     // Newer versions don't work on Android due to Apache Commons Codec:
     // Wait for this fix: https://github.com/hapifhir/org.hl7.fhir.core/issues/1046
     const val hapiFhirCore = "5.6.36"
 
     const val http = "4.11.0"
-    const val jackson = "2.14.1"
+    // Maximum version that supports Android API Level 24:
+    // https://github.com/FasterXML/jackson-databind/issues/3658
+    const val jackson = "2.13.5"
     const val jsonToolsPatch = "1.13"
     const val jsonAssert = "1.5.1"
     const val material = "1.9.0"
@@ -343,6 +351,18 @@ object Dependencies {
       force(HapiFhir.validationDstu3)
       force(HapiFhir.validationR4)
       force(HapiFhir.validationR5)
+    }
+  }
+
+  fun Configuration.forceJacksonVersion() {
+    resolutionStrategy {
+      force(Jackson.annotations)
+      force(Jackson.bom)
+      force(Jackson.core)
+      force(Jackson.databind)
+      force(Jackson.jaxbAnnotations)
+      force(Jackson.jsr310)
+      force(Jackson.dataformatXml)
     }
   }
 }
