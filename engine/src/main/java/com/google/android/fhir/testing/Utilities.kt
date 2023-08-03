@@ -210,5 +210,5 @@ class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSou
   }
 
   override suspend fun upload(request: UploadRequest) =
-    onPostBundle((request as BundleUploadRequest).bundle)
+    onPostBundle((request as BundleUploadRequest).resource)
 }
