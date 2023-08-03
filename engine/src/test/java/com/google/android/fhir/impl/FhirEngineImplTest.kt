@@ -309,9 +309,7 @@ class FhirEngineImplTest {
   @Test
   fun syncUpload_uploadLocalChange() = runBlocking {
     val localChanges = mutableListOf<LocalChange>()
-    fhirEngine.syncUpload {
-        localChanges.addAll(it)
-    }
+    fhirEngine.syncUpload { localChanges.addAll(it) }
 
     assertThat(localChanges).hasSize(1)
     with(localChanges[0]) {

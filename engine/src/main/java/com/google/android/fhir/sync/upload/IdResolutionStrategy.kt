@@ -27,7 +27,7 @@ import timber.log.Timber
 interface IdResolutionStrategy {
 
   suspend fun updateVersionIdAndLastUpdated(localChangeToken: LocalChangeToken, resource: Resource)
-  suspend fun updateChangeToUpload(changesToUpload: List<LocalChange>): List<LocalChange>
+  suspend fun updateLocalChangeList(localChanges: List<LocalChange>): List<LocalChange>
   suspend fun resolve(response: Resource)
 }
 
@@ -40,7 +40,7 @@ internal class PostIdResolutionStrategy(private val database: Database) : IdReso
     TODO("Not yet implemented")
   }
 
-  override suspend fun updateChangeToUpload(changesToUpload: List<LocalChange>): List<LocalChange> {
+  override suspend fun updateLocalChangeList(localChanges: List<LocalChange>): List<LocalChange> {
     TODO("Not yet implemented")
   }
 
@@ -63,8 +63,8 @@ internal class PutIdResolutionStrategy(private val database: Database) : IdResol
     }
   }
 
-  override suspend fun updateChangeToUpload(changesToUpload: List<LocalChange>): List<LocalChange> =
-    changesToUpload
+  override suspend fun updateLocalChangeList(localChanges: List<LocalChange>): List<LocalChange> =
+    localChanges
   override suspend fun resolve(response: Resource) {}
 
   private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {

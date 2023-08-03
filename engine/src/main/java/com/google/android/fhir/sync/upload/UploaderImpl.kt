@@ -71,7 +71,7 @@ internal class UploaderImpl(
       val localChangesToUpload = changesToUpload.poll()
       request =
         uploadWorkManager.getNextRequest(
-          localChangesToUpload?.let { idResolver.updateChangeToUpload(it) }
+          localChangesToUpload?.let { idResolver.updateLocalChangeList(it) }
         )
     }
   }
