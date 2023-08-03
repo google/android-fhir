@@ -17,13 +17,12 @@
 package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.sync.UploadRequest
 import com.google.android.fhir.sync.UploadWorkManager
 
 /**
  * [UploadWorkManager] implementation to squash all the changes at a resource level into one change
- * and upload all resource level changes in a [BundleUploadRequest]
+ * and upload all resource level changes in a [UploadRequest]
  */
 class SquashedChangesUploadWorkManager : UploadWorkManager {
 
@@ -33,22 +32,10 @@ class SquashedChangesUploadWorkManager : UploadWorkManager {
    * The implementation is to squash all the changes by resource type so that there is at most one
    * local change to be uploaded per resource
    */
-  override fun prepareChangesForUpload(localChanges: List<LocalChange>): List<LocalChange> {
-    return localChanges
-      .groupBy { it.resourceId to it.resourceType }
-      .values.map { localResourceChanges -> LocalChangeUtils.squash(localResourceChanges) }
-  }
+  override fun chunkLocalChanges(localChanges: List<LocalChange>): List<List<LocalChange>> =
+    bundleUploadRequestGenerator.chunkLocalChanges(localChanges)
 
-  /**
-   * Use the [TransactionBundleGenerator] to bundle the [LocalChange]s into [BundleUploadRequest]s
-   */
-  override fun createUploadRequestsFromLocalChanges(
-    localChanges: List<LocalChange>
-  ): List<UploadRequest> {
-    return bundleUploadRequestGenerator.generateUploadRequests(localChanges)
+  override fun createNextRequest(localChanges: List<LocalChange>): UploadRequest {
+    return bundleUploadRequestGenerator.generateBundleRequest(localChanges)
   }
-
-  /** Simple progress indicator determined by the number of pending requests. */
-  override fun getPendingUploadsIndicator(uploadRequests: List<UploadRequest>): Int =
-    uploadRequests.size
 }

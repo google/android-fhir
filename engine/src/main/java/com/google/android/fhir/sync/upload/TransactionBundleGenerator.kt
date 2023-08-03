@@ -19,6 +19,7 @@ package com.google.android.fhir.sync.upload
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.sync.BundleUploadRequest
 import org.hl7.fhir.r4.model.Bundle
 
@@ -31,16 +32,17 @@ open class TransactionBundleGenerator(
   private val useETagForUpload: Boolean,
   val getBundleEntryComponentGeneratorForLocalChangeType:
     (type: Type, useETagForUpload: Boolean) -> BundleEntryComponentGenerator
-) : UploadRequestGenerator {
+) {
 
-  override fun generateUploadRequests(localChanges: List<LocalChange>): List<BundleUploadRequest> {
-    return localChanges
+  fun chunkLocalChanges(localChanges: List<LocalChange>): List<List<LocalChange>> =
+    localChanges
+      .groupBy { it.resourceId to it.resourceType }
+      .values
+      .map { localResourceChanges -> LocalChangeUtils.squash(localResourceChanges) }
       .chunked(generatedBundleSize)
       .filter { it.isNotEmpty() }
-      .map { generateBundleRequest(it) }
-  }
 
-  private fun generateBundleRequest(localChanges: List<LocalChange>): BundleUploadRequest {
+  fun generateBundleRequest(localChanges: List<LocalChange>): BundleUploadRequest {
     val bundleRequest =
       Bundle().apply {
         type = Bundle.BundleType.TRANSACTION

@@ -23,20 +23,13 @@ import com.google.android.fhir.LocalChange
  */
 interface UploadWorkManager {
   /**
-   * Transforms the [LocalChange]s to the final set of changes that needs to be uploaded to the
-   * server. The transformations can be of various types like squashing the [LocalChange]s by
-   * [Resource] e.g. [SquashedChangesUploadWorkManager] or filtering out certain [LocalChange]s or
-   * grouping the changes.
+   * Transforms the [LocalChange]s to a list of lists, containing the changes that need to be
+   * uploaded to the server. For example, given a list of changes [a, b, c ,d, e, f], this function
+   * could return a list of lists [ [a], [b,c], [d], [e]], or [ [a], [z]], where z is the result of
+   * a transformation like squashing
    */
-  fun prepareChangesForUpload(localChanges: List<LocalChange>): List<LocalChange>
+  fun chunkLocalChanges(localChanges: List<LocalChange>): List<List<LocalChange>>
 
-  /** Generates a list of [UploadRequest]s from the [LocalChange]s to be uploaded to the server */
-  fun createUploadRequestsFromLocalChanges(localChanges: List<LocalChange>): List<UploadRequest>
-
-  /**
-   * Gets the [Int] to indicate the progress in terms of the pending uploads. The indicator could be
-   * determined at the resource level (by extracting resource information from the upload requests)
-   * etc.
-   */
-  fun getPendingUploadsIndicator(uploadRequests: List<UploadRequest>): Int
+  /** Creates an [UploadRequest] from the list of local changes. */
+  fun createNextRequest(localChanges: List<LocalChange>): UploadRequest
 }

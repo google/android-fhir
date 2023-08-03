@@ -18,11 +18,15 @@ package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.sync.BundleUploadRequest
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
+import com.google.android.fhir.sync.UploadRequest
 import com.google.android.fhir.sync.UploadState
 import com.google.android.fhir.sync.UploadWorkManager
 import com.google.android.fhir.sync.Uploader
+import com.google.android.fhir.sync.UrlUploadRequest
+import java.util.LinkedList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.exceptions.FHIRException
@@ -44,33 +48,47 @@ internal class UploaderImpl(
 ) : Uploader {
 
   override suspend fun upload(localChanges: List<LocalChange>): Flow<UploadState> = flow {
-    val transformedChanges = uploadWorkManager.prepareChangesForUpload(localChanges)
-    val uploadRequests = uploadWorkManager.createUploadRequestsFromLocalChanges(transformedChanges)
-    val total = uploadWorkManager.getPendingUploadsIndicator(uploadRequests)
+    var resourceTypeToUpload = ResourceType.Bundle
+    val changesToUpload: LinkedList<List<LocalChange>> =
+      LinkedList(uploadWorkManager.chunkLocalChanges(localChanges))
     var completed = 0
+    val total = changesToUpload.size
     emit(UploadState.Started(total))
-    val pendingRequests = uploadRequests.toMutableList()
-    while (pendingRequests.isNotEmpty()) {
-      val uploadRequest = pendingRequests.first()
-      pendingRequests.remove(uploadRequest)
+
+    val requests = generateRequests(changesToUpload)
+    for (request in requests) {
       try {
-        val response = dataSource.upload(uploadRequest)
-        completed = total - uploadWorkManager.getPendingUploadsIndicator(pendingRequests)
+        resourceTypeToUpload = request.toResourceType()
+        val response = dataSource.upload(request)
         emit(
           getUploadResult(
-            uploadRequest.resource.resourceType,
+            resourceTypeToUpload,
             response,
-            uploadRequest.localChangeToken,
+            request.localChangeToken,
             total,
-            completed
+            ++completed
           )
         )
       } catch (e: Exception) {
         Timber.e(e)
-        emit(UploadState.Failure(ResourceSyncException(ResourceType.Bundle, e)))
+        emit(UploadState.Failure(ResourceSyncException(resourceTypeToUpload, e)))
       }
     }
   }
+
+  private fun generateRequests(
+    changesToUpload: LinkedList<List<LocalChange>>,
+  ): Sequence<UploadRequest> {
+    return generateSequence {
+      changesToUpload.poll()?.let { changes -> uploadWorkManager.createNextRequest(changes) }
+    }
+  }
+
+  private fun UploadRequest.toResourceType() =
+    when (this) {
+      is UrlUploadRequest -> ResourceType.fromCode(url)
+      is BundleUploadRequest -> ResourceType.Bundle
+    }
 
   private fun getUploadResult(
     requestResourceType: ResourceType,
