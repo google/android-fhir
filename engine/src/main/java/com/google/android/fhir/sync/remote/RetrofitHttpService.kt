@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.sync.remote
 
+import com.github.fge.jsonpatch.JsonPatch
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.HttpAuthenticator
 import java.util.concurrent.TimeUnit
@@ -25,8 +26,10 @@ import okhttp3.logging.HttpLoggingInterceptor
 import org.hl7.fhir.r4.model.Resource
 import retrofit2.Retrofit
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.HeaderMap
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Url
 
@@ -42,6 +45,16 @@ internal interface RetrofitHttpService : FhirHttpService {
     @Body resource: Resource,
     @HeaderMap headers: Map<String, String>
   ): Resource
+
+  @PATCH
+  override suspend fun patch(
+    @Url path: String,
+    @Body patchDocument: JsonPatch,
+    @HeaderMap headers: Map<String, String>,
+  ): Resource
+
+  @DELETE
+  override suspend fun delete(@Url path: String, @HeaderMap headers: Map<String, String>): Resource
 
   class Builder(
     private val baseUrl: String,
