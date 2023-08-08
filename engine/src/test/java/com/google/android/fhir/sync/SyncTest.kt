@@ -20,6 +20,8 @@ import android.content.Context
 import androidx.work.BackoffPolicy
 import androidx.work.WorkerParameters
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.sync.upload.DefaultResultProcessor
+import com.google.android.fhir.sync.upload.ResultProcessor
 import com.google.android.fhir.sync.upload.SquashedChangesUploadWorkManager
 import com.google.android.fhir.testing.TestDataSourceImpl
 import com.google.android.fhir.testing.TestDownloadManagerImpl
@@ -43,6 +45,8 @@ class SyncTest {
     override fun getUploadWorkManager(): UploadWorkManager = SquashedChangesUploadWorkManager()
 
     override fun getConflictResolver() = AcceptRemoteConflictResolver
+
+    override fun getResultProcessor(): ResultProcessor = DefaultResultProcessor
   }
 
   @Test

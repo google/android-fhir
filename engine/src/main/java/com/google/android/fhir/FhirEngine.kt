@@ -20,6 +20,7 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
+import com.google.android.fhir.sync.upload.ResultProcessor
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
@@ -51,10 +52,12 @@ interface FhirEngine {
   /**
    * Synchronizes the [upload] result in the database. [upload] operation may result in multiple
    * calls to the server to upload the data. Result of each call will be emitted by [upload] and the
-   * api caller should [Flow.collect] it.
+   * api caller should [Flow.collect] it. The [resultProcessor] is used to handle the processing of
+   * the upload results.
    */
   suspend fun syncUpload(
-    upload: (suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>)
+    upload: (suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>),
+    resultProcessor: ResultProcessor,
   )
 
   /**

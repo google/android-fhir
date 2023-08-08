@@ -35,6 +35,7 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
+import com.google.android.fhir.sync.upload.DefaultResultProcessor
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.readFromFile
@@ -504,19 +505,22 @@ class DatabaseImplTest {
         lastUpdated = Date()
       }
     database.insert(patient)
-    services.fhirEngine.syncUpload { it ->
-      it
-        .first { it.resourceId == "remote-patient-3" }
-        .let {
-          flowOf(
-            it.token to
-              Patient().apply {
-                id = it.resourceId
-                meta = remoteMeta
-              }
-          )
-        }
-    }
+    services.fhirEngine.syncUpload(
+      { it ->
+        it
+          .first { it.resourceId == "remote-patient-3" }
+          .let {
+            flowOf(
+              it.token to
+                Patient().apply {
+                  id = it.resourceId
+                  meta = remoteMeta
+                }
+            )
+          }
+      },
+      DefaultResultProcessor
+    )
     val selectedEntity = database.selectEntity(ResourceType.Patient, "remote-patient-3")
     assertThat(selectedEntity.versionId).isEqualTo(remoteMeta.versionId)
     assertThat(selectedEntity.lastUpdatedRemote).isEqualTo(remoteMeta.lastUpdated.toInstant())

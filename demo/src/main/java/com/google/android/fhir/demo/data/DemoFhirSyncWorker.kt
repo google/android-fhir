@@ -23,6 +23,8 @@ import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
 import com.google.android.fhir.sync.UploadWorkManager
+import com.google.android.fhir.sync.upload.DefaultResultProcessor
+import com.google.android.fhir.sync.upload.ResultProcessor
 import com.google.android.fhir.sync.upload.SquashedChangesUploadWorkManager
 
 class DemoFhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
@@ -35,6 +37,8 @@ class DemoFhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   override fun getUploadWorkManager(): UploadWorkManager = SquashedChangesUploadWorkManager()
 
   override fun getConflictResolver() = AcceptLocalConflictResolver
+
+  override fun getResultProcessor(): ResultProcessor = DefaultResultProcessor
 
   override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)
 }

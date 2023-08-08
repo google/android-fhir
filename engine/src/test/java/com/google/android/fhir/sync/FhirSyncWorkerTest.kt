@@ -23,6 +23,8 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.sync.upload.DefaultResultProcessor
+import com.google.android.fhir.sync.upload.ResultProcessor
 import com.google.android.fhir.sync.upload.SquashedChangesUploadWorkManager
 import com.google.android.fhir.testing.TestDataSourceImpl
 import com.google.android.fhir.testing.TestDownloadManagerImpl
@@ -47,6 +49,7 @@ class FhirSyncWorkerTest {
     override fun getDataSource(): DataSource = TestDataSourceImpl
     override fun getDownloadWorkManager(): DownloadWorkManager = TestDownloadManagerImpl()
     override fun getConflictResolver() = AcceptRemoteConflictResolver
+    override fun getResultProcessor(): ResultProcessor = DefaultResultProcessor
     override fun getUploadWorkManager(): UploadWorkManager = SquashedChangesUploadWorkManager()
   }
 
@@ -57,6 +60,7 @@ class FhirSyncWorkerTest {
     override fun getDataSource(): DataSource = TestFailingDatasource
     override fun getDownloadWorkManager(): DownloadWorkManager = TestDownloadManagerImpl()
     override fun getConflictResolver() = AcceptRemoteConflictResolver
+    override fun getResultProcessor(): ResultProcessor = DefaultResultProcessor
     override fun getUploadWorkManager(): UploadWorkManager = SquashedChangesUploadWorkManager()
   }
 
@@ -70,6 +74,7 @@ class FhirSyncWorkerTest {
     override fun getUploadWorkManager(): UploadWorkManager = SquashedChangesUploadWorkManager()
     override fun getDataSource(): DataSource? = null
     override fun getConflictResolver() = AcceptRemoteConflictResolver
+    override fun getResultProcessor(): ResultProcessor = DefaultResultProcessor
   }
 
   @Before

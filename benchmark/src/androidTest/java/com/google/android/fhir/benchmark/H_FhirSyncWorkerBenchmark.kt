@@ -36,6 +36,8 @@ import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
 import com.google.android.fhir.sync.UploadWorkManager
+import com.google.android.fhir.sync.upload.DefaultResultProcessor
+import com.google.android.fhir.sync.upload.ResultProcessor
 import com.google.android.fhir.sync.upload.SquashedChangesUploadWorkManager
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -87,6 +89,7 @@ class H_FhirSyncWorkerBenchmark {
     }
     override fun getDownloadWorkManager(): DownloadWorkManager = BenchmarkTestDownloadManagerImpl()
     override fun getConflictResolver() = AcceptRemoteConflictResolver
+    override fun getResultProcessor(): ResultProcessor = DefaultResultProcessor
     override fun getUploadWorkManager(): UploadWorkManager = SquashedChangesUploadWorkManager()
   }
 

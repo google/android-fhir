@@ -19,9 +19,9 @@ package com.google.android.fhir.sync
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.sync.upload.ResultProcessor
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -45,7 +45,8 @@ internal class FhirSynchronizer(
   private val fhirEngine: FhirEngine,
   private val uploader: Uploader,
   private val downloader: Downloader,
-  private val conflictResolver: ConflictResolver
+  private val conflictResolver: ConflictResolver,
+  private val resultProcessor: ResultProcessor,
 ) {
   private var syncState: MutableSharedFlow<SyncJobStatus>? = null
   private val datastoreUtil = DatastoreUtil(context)
@@ -83,7 +84,7 @@ internal class FhirSynchronizer(
   suspend fun synchronize(): SyncJobStatus {
     setSyncState(SyncJobStatus.Started())
 
-    return listOf(download(), upload())
+    return listOf(download(), upload(resultProcessor))
       .filterIsInstance<SyncResult.Error>()
       .flatMap { it.exceptions }
       .let {
@@ -123,25 +124,28 @@ internal class FhirSynchronizer(
     }
   }
 
-  private suspend fun upload(): SyncResult {
+  private suspend fun upload(resultProcessor: ResultProcessor): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
-    fhirEngine.syncUpload { list ->
-      flow {
-        uploader.upload(list).collect { result ->
-          when (result) {
-            is UploadState.Started ->
-              setSyncState(SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total))
-            is UploadState.Success ->
-              emit(result.localChangeToken to result.resource).also {
-                setSyncState(
-                  SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total, result.completed)
-                )
-              }
-            is UploadState.Failure -> exceptions.add(result.syncError)
+    fhirEngine.syncUpload(
+      { list ->
+        flow {
+          uploader.upload(list).collect { result ->
+            when (result) {
+              is UploadState.Started ->
+                setSyncState(SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total))
+              is UploadState.Success ->
+                emit(result.localChangeToken to result.resource).also {
+                  setSyncState(
+                    SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total, result.completed)
+                  )
+                }
+              is UploadState.Failure -> exceptions.add(result.syncError)
+            }
           }
         }
-      }
-    }
+      },
+      resultProcessor
+    )
     return if (exceptions.isEmpty()) {
       SyncResult.Success()
     } else {
