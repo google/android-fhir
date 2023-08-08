@@ -33,9 +33,9 @@ class SquashedChangesUploadWorkManager : UploadWorkManager {
    * local change to be uploaded per resource
    */
   override fun chunkLocalChanges(localChanges: List<LocalChange>): List<List<LocalChange>> =
-    bundleUploadRequestGenerator.chunkLocalChanges(localChanges)
+    bundleUploadRequestGenerator.squashAndChunkLocalChanges(localChanges)
 
   override fun createNextRequest(localChanges: List<LocalChange>): UploadRequest {
-    return bundleUploadRequestGenerator.generateBundleRequest(localChanges)
+    return bundleUploadRequestGenerator.generateUploadRequest(localChanges)
   }
 }

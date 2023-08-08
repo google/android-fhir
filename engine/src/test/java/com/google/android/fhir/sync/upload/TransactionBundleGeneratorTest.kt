@@ -41,8 +41,8 @@ class TransactionBundleGeneratorTest {
   fun `generateUploadRequests() should return empty list if there are no local changes`() =
     runBlocking {
       val generator = TransactionBundleGenerator.Factory.getDefault()
-      val changesToUpload = generator.chunkLocalChanges(listOf())
-      val result = changesToUpload.map { generator.generateBundleRequest(it) }
+      val result =
+        with(generator) { squashAndChunkLocalChanges(listOf()).map { generateUploadRequest(it) } }
       assertThat(result).isEmpty()
     }
 
@@ -128,9 +128,8 @@ class TransactionBundleGeneratorTest {
             .apply { LocalChangeToken(listOf(3)) }
         )
       val generator = TransactionBundleGenerator.Factory.getDefault()
-      val changesToUpload = generator.chunkLocalChanges(changes)
-      val result = changesToUpload.map { generator.generateBundleRequest(it) }
-
+      val result =
+        with(generator) { squashAndChunkLocalChanges(changes).map { generateUploadRequest(it) } }
       assertThat(result).hasSize(1)
       val bundleUploadRequest = result[0]
       assertThat(bundleUploadRequest.resource.type).isEqualTo(Bundle.BundleType.TRANSACTION)
@@ -230,8 +229,8 @@ class TransactionBundleGeneratorTest {
           1,
           true
         )
-      val changesToUpload = generator.chunkLocalChanges(changes)
-      val result = changesToUpload.map { generator.generateBundleRequest(it) }
+      val result =
+        with(generator) { squashAndChunkLocalChanges(changes).map { generateUploadRequest(it) } }
 
       // Exactly 3 Requests are generated
       assertThat(result).hasSize(3)
@@ -264,7 +263,7 @@ class TransactionBundleGeneratorTest {
             .toLocalChange()
         )
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = false)
-      val result = generator.generateBundleRequest(changes)
+      val result = generator.generateUploadRequest(changes)
 
       assertThat(result.resource.entry.first().request.ifMatch).isNull()
     }
@@ -286,7 +285,7 @@ class TransactionBundleGeneratorTest {
             .toLocalChange()
         )
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
-      val result = generator.generateBundleRequest(changes)
+      val result = generator.generateUploadRequest(changes)
 
       assertThat(result.resource.entry.first().request.ifMatch)
         .isEqualTo("W/\"patient-002-version-1\"")
@@ -319,7 +318,7 @@ class TransactionBundleGeneratorTest {
             .toLocalChange()
         )
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
-      val result = generator.generateBundleRequest(changes)
+      val result = generator.generateUploadRequest(changes)
 
       assertThat(result.resource.entry[0].request.ifMatch).isNull()
       assertThat(result.resource.entry[1].request.ifMatch).isNull()
