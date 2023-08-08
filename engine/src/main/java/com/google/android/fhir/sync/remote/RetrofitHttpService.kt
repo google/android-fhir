@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import retrofit2.Retrofit
 import retrofit2.http.Body
@@ -37,8 +36,12 @@ internal interface RetrofitHttpService : FhirHttpService {
   @GET
   override suspend fun get(@Url path: String, @HeaderMap headers: Map<String, String>): Resource
 
-  @POST(".")
-  override suspend fun post(@Body bundle: Bundle, @HeaderMap headers: Map<String, String>): Resource
+  @POST
+  override suspend fun post(
+    @Url path: String,
+    @Body resource: Resource,
+    @HeaderMap headers: Map<String, String>
+  ): Resource
 
   class Builder(
     private val baseUrl: String,
