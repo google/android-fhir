@@ -334,6 +334,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
       }
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
+      modificationCount.update { it + 1 }
 
       viewModelScope.launch(Dispatchers.IO) {
         updateDependentQuestionnaireResponseItems(questionnaireItem, questionnaireResponseItem)
