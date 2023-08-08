@@ -23,8 +23,8 @@ import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
-import com.google.android.fhir.sync.BundleUploadRequest
 import com.google.common.truth.Truth.assertThat
+import java.time.Instant
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.HumanName
@@ -67,97 +67,8 @@ class TransactionBundleGeneratorTest {
                       }
                     )
                   }
-                )
-            )
-            .toLocalChange()
-            .apply { token = LocalChangeToken(listOf(1)) },
-          LocalChangeEntity(
-              id = 2,
-              resourceType = ResourceType.Patient.name,
-              resourceId = "Patient-002",
-              type = Type.UPDATE,
-              payload =
-                LocalChangeUtils.diff(
-                    jsonParser,
-                    Patient().apply {
-                      id = "Patient-002"
-                      addName(
-                        HumanName().apply {
-                          addGiven("Jane")
-                          family = "Doe"
-                        }
-                      )
-                    },
-                    Patient().apply {
-                      id = "Patient-002"
-                      addName(
-                        HumanName().apply {
-                          addGiven("Janet")
-                          family = "Doe"
-                        }
-                      )
-                    }
-                  )
-                  .toString()
-            )
-            .toLocalChange()
-            .apply { LocalChangeToken(listOf(2)) },
-          LocalChangeEntity(
-              id = 3,
-              resourceType = ResourceType.Patient.name,
-              resourceId = "Patient-003",
-              type = Type.DELETE,
-              payload =
-                jsonParser.encodeResourceToString(
-                  Patient().apply {
-                    id = "Patient-003"
-                    addName(
-                      HumanName().apply {
-                        addGiven("John")
-                        family = "Roe"
-                      }
-                    )
-                  }
-                )
-            )
-            .toLocalChange()
-            .apply { LocalChangeToken(listOf(3)) }
-        )
-      val generator = TransactionBundleGenerator.Factory.getDefault()
-      val result = generator.generateUploadRequests(changes)
-
-      assertThat(result).hasSize(1)
-      val bundleUploadRequest = result.get(0) as BundleUploadRequest
-      assertThat(bundleUploadRequest.bundle.type).isEqualTo(Bundle.BundleType.TRANSACTION)
-      assertThat(bundleUploadRequest.bundle.entry).hasSize(3)
-      assertThat(bundleUploadRequest.bundle.entry.map { it.request.method })
-        .containsExactly(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, Bundle.HTTPVerb.DELETE)
-        .inOrder()
-    }
-
-  @Test
-  fun `generateUploadRequests() should return 3 Transaction Bundle with single entry each`() =
-    runBlocking {
-      val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-      val changes =
-        listOf(
-          LocalChangeEntity(
-              id = 1,
-              resourceType = ResourceType.Patient.name,
-              resourceId = "Patient-001",
-              type = Type.INSERT,
-              payload =
-                jsonParser.encodeResourceToString(
-                  Patient().apply {
-                    id = "Patient-001"
-                    addName(
-                      HumanName().apply {
-                        addGiven("John")
-                        family = "Doe"
-                      }
-                    )
-                  }
-                )
+                ),
+              timestamp = Instant.now()
             )
             .toLocalChange()
             .apply { token = LocalChangeToken(listOf(1)) },
@@ -189,7 +100,7 @@ class TransactionBundleGeneratorTest {
                     }
                   )
                   .toString(),
-              versionId = "v-p002-01"
+              timestamp = Instant.now()
             )
             .toLocalChange()
             .apply { LocalChangeToken(listOf(2)) },
@@ -210,7 +121,102 @@ class TransactionBundleGeneratorTest {
                     )
                   }
                 ),
-              versionId = "v-p003-01"
+              timestamp = Instant.now()
+            )
+            .toLocalChange()
+            .apply { LocalChangeToken(listOf(3)) }
+        )
+      val generator = TransactionBundleGenerator.Factory.getDefault()
+      val result = generator.generateUploadRequests(changes)
+
+      assertThat(result).hasSize(1)
+      val bundleUploadRequest = result[0]
+      assertThat(bundleUploadRequest.resource.type).isEqualTo(Bundle.BundleType.TRANSACTION)
+      assertThat(bundleUploadRequest.resource.entry).hasSize(3)
+      assertThat(bundleUploadRequest.resource.entry.map { it.request.method })
+        .containsExactly(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, Bundle.HTTPVerb.DELETE)
+        .inOrder()
+    }
+
+  @Test
+  fun `generateUploadRequests() should return 3 Transaction Bundle with single entry each`() =
+    runBlocking {
+      val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+      val changes =
+        listOf(
+          LocalChangeEntity(
+              id = 1,
+              resourceType = ResourceType.Patient.name,
+              resourceId = "Patient-001",
+              type = Type.INSERT,
+              payload =
+                jsonParser.encodeResourceToString(
+                  Patient().apply {
+                    id = "Patient-001"
+                    addName(
+                      HumanName().apply {
+                        addGiven("John")
+                        family = "Doe"
+                      }
+                    )
+                  }
+                ),
+              timestamp = Instant.now()
+            )
+            .toLocalChange()
+            .apply { token = LocalChangeToken(listOf(1)) },
+          LocalChangeEntity(
+              id = 2,
+              resourceType = ResourceType.Patient.name,
+              resourceId = "Patient-002",
+              type = Type.UPDATE,
+              payload =
+                LocalChangeUtils.diff(
+                    jsonParser,
+                    Patient().apply {
+                      id = "Patient-002"
+                      addName(
+                        HumanName().apply {
+                          addGiven("Jane")
+                          family = "Doe"
+                        }
+                      )
+                    },
+                    Patient().apply {
+                      id = "Patient-002"
+                      addName(
+                        HumanName().apply {
+                          addGiven("Janet")
+                          family = "Doe"
+                        }
+                      )
+                    }
+                  )
+                  .toString(),
+              versionId = "v-p002-01",
+              timestamp = Instant.now()
+            )
+            .toLocalChange()
+            .apply { LocalChangeToken(listOf(2)) },
+          LocalChangeEntity(
+              id = 3,
+              resourceType = ResourceType.Patient.name,
+              resourceId = "Patient-003",
+              type = Type.DELETE,
+              payload =
+                jsonParser.encodeResourceToString(
+                  Patient().apply {
+                    id = "Patient-003"
+                    addName(
+                      HumanName().apply {
+                        addGiven("John")
+                        family = "Roe"
+                      }
+                    )
+                  }
+                ),
+              versionId = "v-p003-01",
+              timestamp = Instant.now()
             )
             .toLocalChange()
             .apply { LocalChangeToken(listOf(3)) }
@@ -227,17 +233,13 @@ class TransactionBundleGeneratorTest {
       // Exactly 3 Requests are generated
       assertThat(result).hasSize(3)
       // Each Request is of type Bundle
-      assertThat(result.all { it is BundleUploadRequest }).isTrue()
-      assertThat(
-          result.all { (it as BundleUploadRequest).bundle.type == Bundle.BundleType.TRANSACTION }
-        )
-        .isTrue()
+      assertThat(result.all { it.resource.type == Bundle.BundleType.TRANSACTION }).isTrue()
       // Each Bundle has exactly 1 entry
-      assertThat(result.all { (it as BundleUploadRequest).bundle.entry.size == 1 }).isTrue()
-      assertThat(result.map { (it as BundleUploadRequest).bundle.entry.first().request.method })
+      assertThat(result.all { it.resource.entry.size == 1 }).isTrue()
+      assertThat(result.map { it.resource.entry.first().request.method })
         .containsExactly(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, Bundle.HTTPVerb.DELETE)
         .inOrder()
-      assertThat(result.map { it.bundle.entry.first().request.ifMatch })
+      assertThat(result.map { it.resource.entry.first().request.ifMatch })
         .containsExactly(null, "W/\"v-p002-01\"", "W/\"v-p003-01\"")
         .inOrder()
     }
@@ -253,14 +255,15 @@ class TransactionBundleGeneratorTest {
               resourceId = "Patient-002",
               type = Type.UPDATE,
               payload = "[]",
-              versionId = "patient-002-version-1"
+              versionId = "patient-002-version-1",
+              timestamp = Instant.now()
             )
             .toLocalChange()
         )
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = false)
       val result = generator.generateUploadRequests(changes)
 
-      assertThat(result.first().bundle.entry.first().request.ifMatch).isNull()
+      assertThat(result.first().resource.entry.first().request.ifMatch).isNull()
     }
 
   @Test
@@ -274,14 +277,15 @@ class TransactionBundleGeneratorTest {
               resourceId = "Patient-002",
               type = Type.UPDATE,
               payload = "[]",
-              versionId = "patient-002-version-1"
+              versionId = "patient-002-version-1",
+              timestamp = Instant.now()
             )
             .toLocalChange()
         )
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(changes)
 
-      assertThat(result.first().bundle.entry.first().request.ifMatch)
+      assertThat(result.first().resource.entry.first().request.ifMatch)
         .isEqualTo("W/\"patient-002-version-1\"")
     }
 
@@ -296,7 +300,8 @@ class TransactionBundleGeneratorTest {
               resourceId = "Patient-002",
               type = Type.UPDATE,
               payload = "[]",
-              versionId = ""
+              versionId = "",
+              timestamp = Instant.now()
             )
             .toLocalChange(),
           LocalChangeEntity(
@@ -305,14 +310,15 @@ class TransactionBundleGeneratorTest {
               resourceId = "Patient-003",
               type = Type.UPDATE,
               payload = "[]",
-              versionId = null
+              versionId = null,
+              timestamp = Instant.now()
             )
             .toLocalChange()
         )
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(changes)
 
-      assertThat(result.first().bundle.entry[0].request.ifMatch).isNull()
-      assertThat(result.first().bundle.entry[1].request.ifMatch).isNull()
+      assertThat(result.first().resource.entry[0].request.ifMatch).isNull()
+      assertThat(result.first().resource.entry[1].request.ifMatch).isNull()
     }
 }

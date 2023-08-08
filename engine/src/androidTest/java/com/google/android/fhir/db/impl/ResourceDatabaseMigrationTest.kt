@@ -21,6 +21,8 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import ca.uhn.fhir.context.FhirContext
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.toTimeZoneString
 import com.google.common.truth.Truth.assertThat
 import java.io.IOException
 import java.util.Date
@@ -172,13 +174,64 @@ class ResourceDatabaseMigrationTest {
     assertThat(retrievedTask).isEqualTo(bedNetTask)
   }
 
+  @Test
+  fun migrate5To6_should_execute_with_no_exception(): Unit = runBlocking {
+    val taskId = "bed-net-001"
+    val bedNetTask: String =
+      Task()
+        .apply {
+          id = taskId
+          description = "Issue bed net"
+          meta.lastUpdated = Date()
+        }
+        .let { iParser.encodeResourceToString(it) }
+
+    // Since the migration here is to change the column type of LocalChangeEntity.timestamp from
+    // string to Instant (integer). We are making sure that the data is migrated properly.
+    helper.createDatabase(DB_NAME, 5).apply {
+      val date = Date()
+      execSQL(
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource, lastUpdatedLocal) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask', '${DbTypeConverters.instantToLong(date.toInstant())}' );"
+      )
+
+      execSQL(
+        "INSERT INTO LocalChangeEntity (resourceType, resourceId, timestamp, type, payload) VALUES ('Task', 'bed-net-001', '${date.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.INSERT)}', '$bedNetTask'  );"
+      )
+      close()
+    }
+
+    helper.runMigrationsAndValidate(DB_NAME, 6, true, MIGRATION_5_6)
+
+    val retrievedTask: String?
+    val localChangeEntityTimeStamp: Long
+    val resourceEntityLastUpdatedLocal: Long
+    getMigratedRoomDatabase().apply {
+      retrievedTask = this.resourceDao().getResource(taskId, ResourceType.Task)
+      resourceEntityLastUpdatedLocal =
+        query("Select lastUpdatedLocal from ResourceEntity", null).let {
+          it.moveToFirst()
+          it.getLong(0)
+        }
+      localChangeEntityTimeStamp =
+        query("Select timestamp from LocalChangeEntity", null).let {
+          it.moveToFirst()
+          it.getLong(0)
+        }
+
+      openHelper.writableDatabase.close()
+    }
+
+    assertThat(retrievedTask).isEqualTo(bedNetTask)
+    assertThat(localChangeEntityTimeStamp).isEqualTo(resourceEntityLastUpdatedLocal)
+  }
+
   private fun getMigratedRoomDatabase(): ResourceDatabase =
     Room.databaseBuilder(
         InstrumentationRegistry.getInstrumentation().targetContext,
         ResourceDatabase::class.java,
         DB_NAME
       )
-      .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+      .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
       .build()
 
   companion object {
