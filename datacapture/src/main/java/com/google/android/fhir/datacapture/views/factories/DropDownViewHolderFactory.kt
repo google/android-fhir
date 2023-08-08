@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ internal object DropDownViewHolderFactory :
           helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
         }
         val answerOptionList =
-          this.questionnaireViewItem.answerOption
+          this.questionnaireViewItem.enabledAnswerOptions
             .map {
               DropDownAnswerOption(
                 it.value.displayString(context),
@@ -102,7 +102,7 @@ internal object DropDownViewHolderFactory :
               null
             )
             val selectedAnswer =
-              questionnaireViewItem.answerOption
+              questionnaireViewItem.enabledAnswerOptions
                 .firstOrNull { it.value.displayString(context) == selectedItem?.answerOptionString }
                 ?.value
 

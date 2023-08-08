@@ -799,7 +799,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `nested display item without instructions code returns null`() {
+  fun `nested display item without instructions code returns empty spanned`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -816,7 +816,7 @@ class MoreQuestionnaireItemComponentsTest {
         }
       )
 
-    assertThat(questionItemList.first().localizedInstructionsSpanned).isNull()
+    assertThat(questionItemList.first().localizedInstructionsSpanned.toString()).isEmpty()
   }
 
   @Test
@@ -842,6 +842,29 @@ class MoreQuestionnaireItemComponentsTest {
 
     assertThat(questionItemList.first().localizedInstructionsSpanned.toString())
       .isEqualTo("subtitle text")
+  }
+
+  @Test
+  fun `localizedInstructionsSpanned returns spanned for all of the items that have instruction code and type is display`() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "display-question"
+          text = "<strong>instruction-1<strong>"
+          extension = listOf(displayCategoryExtensionWithInstructionsCode)
+          type = Questionnaire.QuestionnaireItemType.DISPLAY
+        },
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "display-question"
+          text = "instruction-2"
+          extension = listOf(displayCategoryExtensionWithInstructionsCode)
+          type = Questionnaire.QuestionnaireItemType.DISPLAY
+        },
+      )
+    Locale.setDefault(Locale.US)
+
+    assertThat(questionItemList.getLocalizedInstructionsSpanned().toString())
+      .isEqualTo("instruction-1\ninstruction-2")
   }
 
   @Test

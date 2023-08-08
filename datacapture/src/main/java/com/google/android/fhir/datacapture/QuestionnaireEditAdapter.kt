@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,7 +169,7 @@ internal class QuestionnaireEditAdapter(
       }
     }
 
-    if (questionnaireViewItem.answerOption.isNotEmpty()) {
+    if (questionnaireViewItem.enabledAnswerOptions.isNotEmpty()) {
       return getChoiceViewHolderType(questionnaireViewItem).value
     }
 
@@ -200,7 +200,7 @@ internal class QuestionnaireEditAdapter(
     return questionnaireItem.itemControl?.viewHolderType
     // Otherwise, choose a sensible UI element automatically
     ?: run {
-        val numOptions = questionnaireViewItem.answerOption.size
+        val numOptions = questionnaireViewItem.enabledAnswerOptions.size
         when {
           // Always use a dialog for questions with a large number of options
           numOptions >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG ->

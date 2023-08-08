@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir
 
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
 
 /** Data class for squashed local changes for resource */
@@ -27,8 +28,8 @@ data class LocalChange(
   val resourceId: String,
   /** This is the id of the version of the resource that this local change is based of */
   val versionId: String? = null,
-  /** last updated timestamp on server when this local changes are sync with server */
-  val timestamp: String = "",
+  /** The time instant the app user performed a CUD operation on the resource. */
+  val timestamp: Instant,
   /** Type of local change like insert, delete, etc */
   val type: Type,
   /** json string with local changes */
