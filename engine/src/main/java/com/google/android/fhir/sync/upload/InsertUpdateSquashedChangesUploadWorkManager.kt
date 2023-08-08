@@ -22,35 +22,33 @@ import com.google.android.fhir.sync.UploadRequest
 import com.google.android.fhir.sync.UploadWorkManager
 
 /**
- * [UploadWorkManager] implementation to squash all the changes at a resource level into one change
- * and upload all resource level changes in a [BundleUploadRequest]
+ * [UploadWorkManager] implementation to squash changes at a resource level and upload all changes
+ * in a [BundleUploadRequest]. All the INSERT and UPDATE changes are squashed into one change and
+ * DELETE (if present) in another change.
  */
-class SquashedChangesUploadWorkManager : UploadWorkManager {
+class InsertUpdateSquashedChangesUploadWorkManager : UploadWorkManager {
 
   private val bundleUploadRequestGenerator = TransactionBundleGenerator.getDefault()
 
   /**
    * The implementation is to squash all the changes by {resourceId, resourceType}. If a resource is
-   * INSERTED and DELETED locally then the list of local changes are split to squash all INSERT AND
-   * UPDATE changes into 1 LocalChange and the last DELETE change into 1 LocalChange.
+   * DELETED locally then the list of local changes are chunked to squash all INSERT and UPDATE
+   * changes into 1 LocalChange and the last DELETE change into 1 LocalChange.
    */
   override fun prepareChangesForUpload(localChanges: List<LocalChange>): List<LocalChange> {
-    val localChangeValuesInOrder = mutableListOf<List<LocalChange>>()
-    with(localChangeValuesInOrder) {
+    val localChangesWithDisjointDeleteOperations = mutableListOf<List<LocalChange>>()
+    with(localChangesWithDisjointDeleteOperations) {
       localChanges
         .groupBy { it.resourceId to it.resourceType }
         .values.forEach { resourceLocalChanges ->
           if (resourceLocalChanges.size > 1 &&
-              resourceLocalChanges.first().type == LocalChange.Type.INSERT &&
               resourceLocalChanges.last().type == LocalChange.Type.DELETE
           ) {
             addAll(resourceLocalChanges.chunked(resourceLocalChanges.size - 1))
           } else add(resourceLocalChanges)
         }
     }
-    return localChangeValuesInOrder.map { localResourceChanges ->
-      LocalChangeUtils.squash(localResourceChanges)
-    }
+    return localChangesWithDisjointDeleteOperations.map { LocalChangeUtils.squash(it) }
   }
 
   /**

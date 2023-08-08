@@ -45,7 +45,7 @@ class UploaderImplTest {
     val result =
       UploaderImpl(
           BundleDataSource { Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE } },
-          SquashedChangesUploadWorkManager()
+          InsertUpdateSquashedChangesUploadWorkManager()
         )
         .upload(localChanges)
         .toList()
@@ -62,7 +62,7 @@ class UploaderImplTest {
   @Test
   fun `upload Bundle transaction should emit Started state`() = runBlocking {
     val result =
-      UploaderImpl(BundleDataSource { Bundle() }, SquashedChangesUploadWorkManager())
+      UploaderImpl(BundleDataSource { Bundle() }, InsertUpdateSquashedChangesUploadWorkManager())
         .upload(localChanges)
         .toList()
 
@@ -84,7 +84,7 @@ class UploaderImplTest {
               )
             }
           },
-          SquashedChangesUploadWorkManager()
+          InsertUpdateSquashedChangesUploadWorkManager()
         )
         .upload(localChanges)
         .toList()
@@ -98,7 +98,7 @@ class UploaderImplTest {
     val result =
       UploaderImpl(
           BundleDataSource { throw ConnectException("Failed to connect to server.") },
-          SquashedChangesUploadWorkManager()
+          InsertUpdateSquashedChangesUploadWorkManager()
         )
         .upload(localChanges)
         .toList()
