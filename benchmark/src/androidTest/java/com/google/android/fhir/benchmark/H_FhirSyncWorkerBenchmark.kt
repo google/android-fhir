@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,11 @@ import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
+import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
-import com.google.android.fhir.sync.Request
+import com.google.android.fhir.sync.UploadWorkManager
+import com.google.android.fhir.sync.upload.SquashedChangesUploadWorkManager
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.util.LinkedList
@@ -85,13 +87,14 @@ class H_FhirSyncWorkerBenchmark {
     }
     override fun getDownloadWorkManager(): DownloadWorkManager = BenchmarkTestDownloadManagerImpl()
     override fun getConflictResolver() = AcceptRemoteConflictResolver
+    override fun getUploadWorkManager(): UploadWorkManager = SquashedChangesUploadWorkManager()
   }
 
   open class BenchmarkTestDownloadManagerImpl(queries: List<String> = listOf("List/sync-list")) :
     DownloadWorkManager {
     private val urls = LinkedList(queries)
 
-    override suspend fun getNextRequest() = urls.poll()?.let { Request.of(it) }
+    override suspend fun getNextRequest() = urls.poll()?.let { DownloadRequest.of(it) }
     override suspend fun getSummaryRequestUrls(): Map<ResourceType, String> {
       return emptyMap()
     }

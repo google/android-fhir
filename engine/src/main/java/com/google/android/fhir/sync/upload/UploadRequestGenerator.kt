@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.workflow.testing
+package com.google.android.fhir.sync.upload
 
-import java.time.LocalDate
-import org.hl7.fhir.r4.model.DateType
+import com.google.android.fhir.LocalChange
+import com.google.android.fhir.sync.UploadRequest
 
-val DateType.toLocalDate: LocalDate
-  get() =
-    LocalDate.of(
-      year,
-      month + 1,
-      day,
-    )
+/** Generator that generates [UploadRequest]s from the [LocalChange]s */
+interface UploadRequestGenerator {
+  /** Generates a list of [UploadRequest] from the [localChanges] */
+  fun generateUploadRequests(localChanges: List<LocalChange>): List<UploadRequest>
+}

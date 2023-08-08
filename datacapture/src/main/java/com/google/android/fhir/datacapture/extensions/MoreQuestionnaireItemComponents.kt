@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.extensions
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.text.SpannableStringBuilder
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import ca.uhn.fhir.util.UrlUtil
@@ -111,6 +112,33 @@ internal const val EXTENSION_CQF_CALCULATED_VALUE_URL: String =
 
 internal const val EXTENSION_SLIDER_STEP_VALUE_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue"
+
+internal const val EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerOptionsToggleExpression"
+
+internal const val EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION = "option"
+
+internal const val EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION = "expression"
+
+internal val Questionnaire.QuestionnaireItemComponent.answerOptionsToggleExpressions
+  get() =
+    this.extension
+      .filter { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL }
+      .map { rootExtension ->
+        val options =
+          rootExtension.extension
+            .filter { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION }
+            .map { it.value }
+        if (options.isEmpty())
+          throw IllegalArgumentException(
+            "Questionnaire item $linkId with extension '$EXTENSION_ANSWER_EXPRESSION_URL' requires at least one option. See http://hl7.org/fhir/uv/sdc/STU3/StructureDefinition-sdc-questionnaire-answerOptionsToggleExpression.html."
+          )
+        val expression =
+          rootExtension.extension
+            .single { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION }
+            .let { it.castToExpression(it.value) }
+        expression to options
+      }
 
 internal val Questionnaire.QuestionnaireItemComponent.variableExpressions: List<Expression>
   get() =
@@ -314,16 +342,23 @@ val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
  * code is used as the instructions of the parent question.
  */
 val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spanned?
-  get() = item.localizedInstructionsSpanned
+  get() = item.getLocalizedInstructionsSpanned()
 
-/** [localizedInstructionsSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
-val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionsSpanned: Spanned?
-  get() {
-    return this.firstOrNull { questionnaireItem ->
+/**
+ * Returns a Spanned object that contains the localized instructions for all of the items in this
+ * list that are of type `Questionnaire.QuestionnaireItemType.DISPLAY` and have the
+ * `isInstructionsCode` flag set. The instructions are separated by newlines.
+ */
+fun List<Questionnaire.QuestionnaireItemComponent>.getLocalizedInstructionsSpanned(
+  separator: String = "\n"
+) =
+  SpannableStringBuilder().apply {
+    this@getLocalizedInstructionsSpanned.filter { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
           questionnaireItem.isInstructionsCode
       }
-      ?.localizedTextSpanned
+      .map { it.localizedTextSpanned }
+      .joinTo(this, separator)
   }
 
 /**

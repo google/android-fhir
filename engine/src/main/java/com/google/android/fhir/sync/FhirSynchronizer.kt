@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,15 +129,15 @@ internal class FhirSynchronizer(
       flow {
         uploader.upload(list).collect { result ->
           when (result) {
-            is UploadResult.Started ->
+            is UploadState.Started ->
               setSyncState(SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total))
-            is UploadResult.Success ->
+            is UploadState.Success ->
               emit(result.localChangeToken to result.resource).also {
                 setSyncState(
                   SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total, result.completed)
                 )
               }
-            is UploadResult.Failure -> exceptions.add(result.syncError)
+            is UploadState.Failure -> exceptions.add(result.syncError)
           }
         }
       }
