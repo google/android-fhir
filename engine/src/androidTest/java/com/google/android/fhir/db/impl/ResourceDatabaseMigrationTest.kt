@@ -220,7 +220,7 @@ class ResourceDatabaseMigrationTest {
           it.getLong(0)
         }
 
-      query("Select timestamp from LocalChangeEntity", null).let {
+      query("SELECT timestamp FROM LocalChangeEntity", null).let {
         it.moveToFirst()
         localChangeEntityTimeStamp = it.getLong(0)
         it.moveToNext()
