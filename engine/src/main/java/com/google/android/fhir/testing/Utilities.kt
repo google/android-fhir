@@ -148,7 +148,7 @@ object TestFhirEngineImpl : FhirEngine {
   override suspend fun syncUpload(
     upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
-    upload(getLocalChanges(ResourceType.Patient, "123"))
+    upload(getLocalChanges(ResourceType.Patient, "123")).collect()
   }
 
   override suspend fun syncDownload(
@@ -172,7 +172,7 @@ object TestFhirEngineImpl : FhirEngine {
       LocalChange(
         resourceType = type.name,
         resourceId = id,
-        payload = "{}",
+        payload = "{ 'resourceType' : 'Patient', 'id' : '123' }",
         token = LocalChangeToken(listOf()),
         type = LocalChange.Type.INSERT,
         timestamp = Instant.now()
@@ -209,5 +209,5 @@ class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSou
   }
 
   override suspend fun upload(request: UploadRequest) =
-    onPostBundle((request as BundleUploadRequest).bundle)
+    onPostBundle((request as BundleUploadRequest).resource)
 }

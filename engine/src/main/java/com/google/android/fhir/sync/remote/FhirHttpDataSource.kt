@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync.remote
 
 import com.google.android.fhir.sync.BundleDownloadRequest
-import com.google.android.fhir.sync.BundleUploadRequest
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.UploadRequest
@@ -34,9 +33,9 @@ internal class FhirHttpDataSource(private val fhirHttpService: FhirHttpService) 
     when (downloadRequest) {
       is UrlDownloadRequest -> fhirHttpService.get(downloadRequest.url, downloadRequest.headers)
       is BundleDownloadRequest ->
-        fhirHttpService.post(downloadRequest.bundle, downloadRequest.headers)
+        fhirHttpService.post(".", downloadRequest.bundle, downloadRequest.headers)
     }
 
   override suspend fun upload(request: UploadRequest): Resource =
-    fhirHttpService.post((request as BundleUploadRequest).bundle, request.headers)
+    fhirHttpService.post(request.url, request.resource, request.headers)
 }
