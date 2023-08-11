@@ -26,10 +26,10 @@ import org.hl7.fhir.r4.model.Bundle
  * Generates list of [BundleUploadRequest] with Transaction [Bundle] and [LocalChangeToken]s
  * associated with the resources present in the transaction bundle.
  */
-open class TransactionBundleGenerator(
+class TransactionBundleGenerator(
   private val generatedBundleSize: Int,
   private val useETagForUpload: Boolean,
-  val getBundleEntryComponentGeneratorForLocalChangeType:
+  private val getBundleEntryComponentGeneratorForLocalChangeType:
     (type: Type, useETagForUpload: Boolean) -> BundleEntryComponentGenerator
 ) : UploadRequestGenerator {
 

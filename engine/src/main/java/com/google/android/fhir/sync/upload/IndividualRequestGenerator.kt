@@ -27,8 +27,9 @@ import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
+/** Generates list of [UrlUploadRequest]s with for each [LocalChange] given. */
 class IndividualRequestGenerator(
-  val getIndividualRequestForLocalChangeType:
+  private val getIndividualRequestForLocalChangeType:
     (type: Type, localChange: LocalChange) -> UrlUploadRequest
 ) : UploadRequestGenerator {
 
