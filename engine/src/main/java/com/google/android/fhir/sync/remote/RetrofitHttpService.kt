@@ -31,6 +31,7 @@ import retrofit2.http.GET
 import retrofit2.http.HeaderMap
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Url
 
 /** Retrofit service to make http requests to the FHIR server. */
@@ -41,6 +42,13 @@ internal interface RetrofitHttpService : FhirHttpService {
 
   @POST
   override suspend fun post(
+    @Url path: String,
+    @Body resource: Resource,
+    @HeaderMap headers: Map<String, String>
+  ): Resource
+
+  @PUT
+  override suspend fun put(
     @Url path: String,
     @Body resource: Resource,
     @HeaderMap headers: Map<String, String>

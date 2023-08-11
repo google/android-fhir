@@ -38,13 +38,19 @@ internal interface FhirHttpService {
   suspend fun post(path: String, resource: Resource, headers: Map<String, String>): Resource
 
   /**
-   * Makes a HTTP-PATCH method request to the server with the [Bundle] as request-body.
+   * Makes a HTTP-PUT method request to the server with a [Resource] as request-body.
+   * @return The server may return [Bundle] or [OperationOutcome] based on the request processing.
+   */
+  suspend fun put(path: String, resource: Resource, headers: Map<String, String>): Resource
+
+  /**
+   * Makes a HTTP-PATCH method request to the server with a [JsonPatch] as request-body.
    * @return The server may return [Bundle] or [OperationOutcome] based on the request processing.
    */
   suspend fun patch(path: String, patchDocument: JsonPatch, headers: Map<String, String>): Resource
 
   /**
-   * Makes a HTTP-DELETE method request to the server with the [Bundle] as request-body.
+   * Makes a HTTP-DELETE method request to the server.
    * @return The server may return [Bundle] or [OperationOutcome] based on the request processing.
    */
   suspend fun delete(path: String, headers: Map<String, String>): Resource

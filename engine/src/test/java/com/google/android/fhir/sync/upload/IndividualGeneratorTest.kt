@@ -26,9 +26,11 @@ import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
 import kotlinx.coroutines.test.runTest
+import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.codesystems.HttpVerb
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -36,9 +38,18 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class IndividualGeneratorTest {
 
+  private val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+
+  @Test
+  fun `generateUploadRequests() should return empty list if there are no local changes`() =
+    runTest {
+      val generator = IndividualRequestGenerator.getDefault()
+      val result = generator.generateUploadRequests(listOf())
+      assertThat(result).isEmpty()
+    }
+
   @Test
   fun `generateUploadRequests() should return 3 requests`() = runTest {
-    val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
     val changes =
       listOf(
         LocalChangeEntity(
@@ -119,5 +130,124 @@ class IndividualGeneratorTest {
     val generator = IndividualRequestGenerator.Factory.getDefault()
     val result = generator.generateUploadRequests(changes)
     assertThat(result).hasSize(3)
+    assertThat(result.map { it.httpVerb })
+      .containsExactly(HttpVerb.PUT, HttpVerb.PATCH, HttpVerb.DELETE)
+      .inOrder()
+  }
+
+  @Test
+  fun `generateUploadRequests() should create a POST request for insert`() = runTest {
+    val generator = IndividualRequestGenerator.getGenerator(HttpVerb.POST, HttpVerb.PATCH)
+    val result =
+      generator.generateUploadRequests(
+        listOf(
+          LocalChangeEntity(
+              id = 1,
+              resourceType = ResourceType.Patient.name,
+              resourceId = "Patient-001",
+              type = Type.INSERT,
+              payload =
+                jsonParser.encodeResourceToString(
+                  Patient().apply {
+                    id = "Patient-001"
+                    addName(
+                      HumanName().apply {
+                        addGiven("John")
+                        family = "Doe"
+                      }
+                    )
+                  }
+                ),
+              timestamp = Instant.now()
+            )
+            .toLocalChange()
+            .apply { token = LocalChangeToken(listOf(1)) }
+        )
+      )
+
+    assertThat(result.size).isEqualTo(1)
+    assertThat(result.first().httpVerb).isEqualTo(HttpVerb.POST)
+    assertThat(result.first().url).isEqualTo("Patient")
+  }
+
+  @Test
+  fun `generateUploadRequests() should create a PUT request for insert`() = runTest {
+    val generator = IndividualRequestGenerator.getDefault()
+    val result =
+      generator.generateUploadRequests(
+        listOf(
+          LocalChangeEntity(
+              id = 1,
+              resourceType = ResourceType.Patient.name,
+              resourceId = "Patient-001",
+              type = Type.INSERT,
+              payload =
+                jsonParser.encodeResourceToString(
+                  Patient().apply {
+                    id = "Patient-001"
+                    addName(
+                      HumanName().apply {
+                        addGiven("John")
+                        family = "Doe"
+                      }
+                    )
+                  }
+                ),
+              timestamp = Instant.now()
+            )
+            .toLocalChange()
+            .apply { token = LocalChangeToken(listOf(1)) }
+        )
+      )
+
+    assertThat(result.size).isEqualTo(1)
+    assertThat(result.first().httpVerb).isEqualTo(HttpVerb.PUT)
+    assertThat(result.first().url).isEqualTo("Patient/Patient-001")
+  }
+
+  @Test
+  fun `generateUploadRequests() should create a PATCH request for update`() = runTest {
+    val changes =
+      listOf(
+        LocalChangeEntity(
+            id = 2,
+            resourceType = ResourceType.Patient.name,
+            resourceId = "Patient-002",
+            type = Type.UPDATE,
+            payload =
+              LocalChangeUtils.diff(
+                  jsonParser,
+                  Patient().apply {
+                    id = "Patient-002"
+                    addName(
+                      HumanName().apply {
+                        addGiven("Jane")
+                        family = "Doe"
+                      }
+                    )
+                  },
+                  Patient().apply {
+                    id = "Patient-002"
+                    addName(
+                      HumanName().apply {
+                        addGiven("Janet")
+                        family = "Doe"
+                      }
+                    )
+                  }
+                )
+                .toString(),
+            timestamp = Instant.now()
+          )
+          .toLocalChange()
+          .apply { LocalChangeToken(listOf(2)) },
+      )
+    val generator = IndividualRequestGenerator.Factory.getDefault()
+    val result = generator.generateUploadRequests(changes)
+    assertThat(result.size).isEqualTo(1)
+    assertThat(result.first().httpVerb).isEqualTo(HttpVerb.PATCH)
+    assertThat(result.first().url).isEqualTo("Patient/Patient-002")
+    assertThat((result.first().resource as Binary).data.toString(Charsets.UTF_8))
+      .isEqualTo("[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]")
   }
 }

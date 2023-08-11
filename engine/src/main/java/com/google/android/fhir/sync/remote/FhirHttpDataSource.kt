@@ -51,10 +51,11 @@ internal class FhirHttpDataSource(private val fhirHttpService: FhirHttpService) 
   private suspend fun uploadIndividualRequest(request: UrlUploadRequest): Resource =
     when (request.httpVerb) {
       HttpVerb.POST -> fhirHttpService.post(request.url, request.resource, request.headers)
+      HttpVerb.PUT -> fhirHttpService.put(request.url, request.resource, request.headers)
       HttpVerb.PATCH ->
         fhirHttpService.patch(request.url, request.resource.toJsonPatch(), request.headers)
       HttpVerb.DELETE -> fhirHttpService.delete(request.url, request.headers)
-      else -> error("Nah")
+      else -> error("The method, ${request.httpVerb}, is not supported for upload")
     }
 }
 

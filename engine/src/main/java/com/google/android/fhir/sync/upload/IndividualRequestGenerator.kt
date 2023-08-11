@@ -18,6 +18,7 @@ package com.google.android.fhir.sync.upload
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.ContentTypes
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
@@ -53,9 +54,14 @@ class IndividualRequestGenerator(
         HttpVerb.PATCH to this::patchForUpdateResource,
       )
 
-    fun getDefault() = getGenerator(HttpVerb.POST, HttpVerb.PATCH)
+    fun getDefault() = getGenerator(HttpVerb.PUT, HttpVerb.PATCH)
 
-    private fun getGenerator(
+    /**
+     * Returns a [IndividualRequestGenerator] based on the provided [HttpVerb]s for creating and
+     * updating resources. The function may throw an [IllegalArgumentException] if the provided
+     * [HttpVerb]s are not supported.
+     */
+    fun getGenerator(
       httpVerbToUseForCreate: HttpVerb,
       httpVerbToUseForUpdate: HttpVerb
     ): IndividualRequestGenerator {
@@ -111,6 +117,7 @@ class IndividualRequestGenerator(
         url = "${localChange.resourceType}/${localChange.resourceId}",
         resource = Binary().apply { data = localChange.payload.toByteArray() },
         localChangeToken = LocalChangeToken(localChange.token.ids),
+        headers = mapOf("Content-Type" to ContentTypes.APPLICATION_JSON_PATCH)
       )
   }
 }
