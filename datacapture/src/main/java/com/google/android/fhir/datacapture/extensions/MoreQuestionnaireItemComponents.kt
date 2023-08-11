@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.extensions
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.text.SpannableStringBuilder
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import ca.uhn.fhir.util.UrlUtil
@@ -341,16 +342,23 @@ val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
  * code is used as the instructions of the parent question.
  */
 val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spanned?
-  get() = item.localizedInstructionsSpanned
+  get() = item.getLocalizedInstructionsSpanned()
 
-/** [localizedInstructionsSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
-val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionsSpanned: Spanned?
-  get() {
-    return this.firstOrNull { questionnaireItem ->
+/**
+ * Returns a Spanned object that contains the localized instructions for all of the items in this
+ * list that are of type `Questionnaire.QuestionnaireItemType.DISPLAY` and have the
+ * `isInstructionsCode` flag set. The instructions are separated by newlines.
+ */
+fun List<Questionnaire.QuestionnaireItemComponent>.getLocalizedInstructionsSpanned(
+  separator: String = "\n"
+) =
+  SpannableStringBuilder().apply {
+    this@getLocalizedInstructionsSpanned.filter { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
           questionnaireItem.isInstructionsCode
       }
-      ?.localizedTextSpanned
+      .map { it.localizedTextSpanned }
+      .joinTo(this, separator)
   }
 
 /**
