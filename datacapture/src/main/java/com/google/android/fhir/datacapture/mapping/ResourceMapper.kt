@@ -255,18 +255,9 @@ object ResourceMapper {
       ?.let {
         // Set initial value for the questionnaire item. Questionnaire items should not have both
         // initial value and initial expression.
+        val value = it.asExpectedType(questionnaireItem.type)
         questionnaireItem.initial =
-          when (questionnaireItem.type) {
-            Questionnaire.QuestionnaireItemType.REFERENCE ->
-              mutableListOf(
-                Questionnaire.QuestionnaireItemInitialComponent()
-                  .setValue(it.asExpectedReferenceType())
-              )
-            else ->
-              mutableListOf(
-                Questionnaire.QuestionnaireItemInitialComponent().setValue(it.asExpectedType())
-              )
-          }
+          mutableListOf(Questionnaire.QuestionnaireItemInitialComponent().setValue(value))
       }
 
     populateInitialValues(questionnaireItem.item, *resources)
@@ -769,10 +760,14 @@ private fun Questionnaire.createResource(): Resource? =
  * objects and throws exception otherwise. This extension function takes care of the conversion
  * based on the input and expected [Type].
  */
-private fun Base.asExpectedType(): Type {
-  return when (this) {
-    is Enumeration<*> -> toCoding()
-    is IdType -> StringType(idPart)
+private fun Base.asExpectedType(
+  questionnaireItemType: Questionnaire.QuestionnaireItemType? = null
+): Type {
+  return when {
+    questionnaireItemType == Questionnaire.QuestionnaireItemType.REFERENCE ->
+      asExpectedReferenceType()
+    this is Enumeration<*> -> toCoding()
+    this is IdType -> StringType(idPart)
     else -> this as Type
   }
 }
