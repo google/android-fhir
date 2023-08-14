@@ -55,13 +55,34 @@ internal object LocalChangeUtils {
             )
           }
         }
-      Type.DELETE -> {
-        type = Type.DELETE
-        payload = ""
-      }
+      Type.DELETE ->
+        when (first.type) {
+          Type.INSERT -> {
+            // If an object is inserted and then deleted, return a special LocalChange that
+            // represents no-op
+            return LocalChange(
+              resourceId = second.resourceId,
+              resourceType = second.resourceType,
+              type = Type.NO_OP,
+              payload = "",
+              versionId = second.versionId,
+              token = LocalChangeToken(first.token.ids + second.token.ids),
+              timestamp = second.timestamp
+            )
+          }
+          else -> {
+            type = Type.DELETE
+            payload = ""
+          }
+        }
       Type.INSERT -> {
         type = Type.INSERT
         payload = second.payload
+      }
+      Type.NO_OP -> {
+        throw IllegalArgumentException(
+          "Cannot merge local changes with type ${first.type} and ${second.type}."
+        )
       }
     }
     return LocalChange(

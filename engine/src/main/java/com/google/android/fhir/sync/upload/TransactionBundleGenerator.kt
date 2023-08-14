@@ -30,7 +30,7 @@ open class TransactionBundleGenerator(
   private val generatedBundleSize: Int,
   private val useETagForUpload: Boolean,
   val getBundleEntryComponentGeneratorForLocalChangeType:
-    (type: Type, useETagForUpload: Boolean) -> BundleEntryComponentGenerator
+    (type: Type, useETagForUpload: Boolean) -> BundleEntryComponentGenerator?
 ) : UploadRequestGenerator {
 
   override fun generateUploadRequests(localChanges: List<LocalChange>): List<BundleUploadRequest> {
@@ -44,12 +44,14 @@ open class TransactionBundleGenerator(
     val bundleRequest =
       Bundle().apply {
         type = Bundle.BundleType.TRANSACTION
-        localChanges.forEach {
-          this.addEntry(
-            getBundleEntryComponentGeneratorForLocalChangeType(it.type, useETagForUpload)
-              .getEntry(it)
-          )
-        }
+        localChanges
+          .filterNot { it.type == Type.NO_OP }
+          .forEach {
+            this.addEntry(
+              getBundleEntryComponentGeneratorForLocalChangeType(it.type, useETagForUpload)!!
+                .getEntry(it)
+            )
+          }
       }
     return BundleUploadRequest(
       resource = bundleRequest,
@@ -91,11 +93,12 @@ open class TransactionBundleGenerator(
     private fun putForCreateAndPatchForUpdateBasedBundleComponentMapper(
       type: Type,
       useETagForUpload: Boolean
-    ): BundleEntryComponentGenerator {
+    ): BundleEntryComponentGenerator? {
       return when (type) {
         Type.INSERT -> HttpPutForCreateEntryComponentGenerator(useETagForUpload)
         Type.UPDATE -> HttpPatchForUpdateEntryComponentGenerator(useETagForUpload)
         Type.DELETE -> HttpDeleteEntryComponentGenerator(useETagForUpload)
+        Type.NO_OP -> null
       }
     }
   }
