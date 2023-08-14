@@ -62,7 +62,8 @@ internal class EnabledAnswerOptionsEvaluator(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     questionnaireResponse: QuestionnaireResponse,
-    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>
+    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>,
+    launchContextMap: Map<String, Resource>?
   ): Pair<
     List<Questionnaire.QuestionnaireItemAnswerOptionComponent>,
     List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
@@ -80,7 +81,8 @@ internal class EnabledAnswerOptionsEvaluator(
         questionnaireResponseItem,
         questionnaireResponse,
         resolvedAnswerOptions,
-        questionnaireItemParentMap
+        questionnaireItemParentMap,
+        launchContextMap
       )
     val disabledAnswers =
       questionnaireResponseItem.answer
@@ -214,7 +216,8 @@ internal class EnabledAnswerOptionsEvaluator(
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     questionnaireResponse: QuestionnaireResponse,
     answerOptions: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>,
-    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>
+    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>,
+    launchContextMap: Map<String, Resource>?
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     val results =
       item.answerOptionsToggleExpressions
@@ -229,7 +232,8 @@ internal class EnabledAnswerOptionsEvaluator(
                   item,
                   questionnaireResponseItem,
                   expression,
-                  questionnaireItemParentMap
+                  questionnaireItemParentMap,
+                  launchContextMap
                 )
               )
             else

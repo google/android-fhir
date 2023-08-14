@@ -404,7 +404,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     QuestionnaireResponseValidator.validateQuestionnaireResponse(
         questionnaire,
         questionnaireResponse,
-        getApplication()
+        getApplication(),
+        questionnaireItemParentMap,
+        questionnaireLaunchContextMap
       )
       .also { result ->
         if (result.values.flatten().filterIsInstance<Invalid>().isNotEmpty()) {
@@ -505,7 +507,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         updatedQuestionnaireResponseItem,
         questionnaire,
         questionnaireResponse,
-        questionnaireItemParentMap
+        questionnaireItemParentMap,
+        questionnaireLaunchContextMap
       )
       .forEach { (questionnaireItem, calculatedAnswers) ->
         // update all response item with updated values
@@ -544,7 +547,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       questionnaireItem,
       questionnaireResponseItem,
       cqfExpression,
-      questionnaireItemParentMap
+      questionnaireItemParentMap,
+      questionnaireLaunchContextMap
     )
   }
 
@@ -654,7 +658,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     if (questionnaireItem.isHidden) return emptyList()
     val enabled =
       EnablementEvaluator(questionnaireResponse)
-        .evaluate(questionnaireItem, questionnaireResponseItem)
+        .evaluate(
+          questionnaireItem,
+          questionnaireResponseItem,
+          questionnaire,
+          questionnaireItemParentMap,
+          questionnaireLaunchContextMap
+        )
     // Disabled questions should not get QuestionnaireItemViewItem instances
     if (!enabled) {
       cacheDisabledQuestionnaireItemAnswers(questionnaireResponseItem)
@@ -689,7 +699,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaireItem,
         questionnaireResponseItem,
         questionnaireResponse,
-        questionnaireItemParentMap
+        questionnaireItemParentMap,
+        questionnaireLaunchContextMap
       )
     if (disabledQuestionnaireResponseAnswers.isNotEmpty()) {
       removeDisabledAnswers(
@@ -713,7 +724,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             enabledDisplayItems =
               questionnaireItem.item.filter {
                 it.isDisplayItem &&
-                  EnablementEvaluator(questionnaireResponse).evaluate(it, questionnaireResponseItem)
+                  EnablementEvaluator(questionnaireResponse)
+                    .evaluate(
+                      it,
+                      questionnaireResponseItem,
+                      questionnaire,
+                      questionnaireItemParentMap,
+                      questionnaireLaunchContextMap
+                    )
               },
             questionViewTextConfiguration =
               QuestionTextConfiguration(
@@ -800,6 +818,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         enablementEvaluator.evaluate(
           questionnaireItem,
           questionnaireResponseItem,
+          questionnaire,
+          questionnaireItemParentMap,
+          questionnaireLaunchContextMap
         )
       }
       .map { (questionnaireItem, questionnaireResponseItem) ->
@@ -832,6 +853,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             .evaluate(
               questionnaireItem,
               questionnaireResponseItem,
+              questionnaire,
+              questionnaireItemParentMap,
+              questionnaireLaunchContextMap
             ),
           questionnaireItem.isHidden
         )
