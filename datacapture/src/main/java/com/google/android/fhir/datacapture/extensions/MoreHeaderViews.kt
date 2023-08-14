@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,7 @@ fun initHelpViews(
   helpTextView: TextView,
   questionnaireItem: Questionnaire.QuestionnaireItemComponent
 ) {
+  helpCardView.visibility = GONE
   helpButton.visibility =
     if (questionnaireItem.hasHelpButton) {
       VISIBLE

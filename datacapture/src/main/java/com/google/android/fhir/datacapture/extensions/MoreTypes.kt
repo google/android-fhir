@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,6 +90,21 @@ fun Type.displayString(context: Context): String =
         ?: this.valueAsString ?: context.getString(R.string.not_answered)
     is TimeType,
     is UriType -> (this as PrimitiveType<*>).valueAsString
+        ?: context.getString(R.string.not_answered)
+    else -> context.getString(R.string.not_answered)
+  }
+
+/** Returns value as string depending on the [Type] of element. */
+fun Type.getValueAsString(context: Context): String =
+  when (this) {
+    is DateType -> this.valueAsString ?: context.getString(R.string.not_answered)
+    is DateTimeType -> this.valueAsString ?: context.getString(R.string.not_answered)
+    is Quantity -> this.value.toString()
+    is StringType -> this.getLocalizedText()
+        ?: this.valueAsString ?: context.getString(R.string.not_answered)
+    is DecimalType,
+    is IntegerType,
+    is TimeType -> (this as PrimitiveType<*>).valueAsString
         ?: context.getString(R.string.not_answered)
     else -> context.getString(R.string.not_answered)
   }

@@ -1,4 +1,5 @@
 import Dependencies.forceHapiVersion
+import Dependencies.forceJacksonVersion
 import Dependencies.removeIncompatibleDependencies
 import java.net.URL
 
@@ -15,11 +16,10 @@ publishArtifact(Releases.Workflow)
 createJacocoTestReportTask()
 
 android {
+  namespace = "com.google.android.fhir.workflow"
   compileSdk = Sdk.compileSdk
-
   defaultConfig {
-    minSdk = Sdk.minSdkWorkflow
-    targetSdk = Sdk.targetSdk
+    minSdk = Sdk.minSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.workflow"
@@ -38,18 +38,13 @@ android {
   }
 
   buildTypes {
-    getByName("release") {
+    release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
   }
 
-  compileOptions {
-    sourceCompatibility = Java.sourceCompatibility
-    targetCompatibility = Java.targetCompatibility
-  }
-
-  packagingOptions {
+  packaging {
     resources.excludes.addAll(
       listOf(
         "license.html",
@@ -73,22 +68,28 @@ android {
       )
     )
   }
-
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
-
   configureJacocoTestOptions()
+  kotlin { jvmToolchain(11) }
+  compileOptions {
+    isCoreLibraryDesugaringEnabled = true
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+  }
 }
 
-afterEvaluate { configureFirebaseTestLab() }
+afterEvaluate { configureFirebaseTestLabForLibraries() }
 
 configurations {
   all {
     removeIncompatibleDependencies()
     forceHapiVersion()
+    forceJacksonVersion()
   }
 }
 
 dependencies {
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
@@ -98,7 +99,6 @@ dependencies {
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.xmlUnit)
-  androidTestImplementation(project(":testing"))
   androidTestImplementation(project(":workflow-testing"))
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
@@ -137,8 +137,8 @@ dependencies {
   implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.xerces)
-  implementation(project(":engine"))
-  implementation(project(":knowledge"))
+  implementation(Dependencies.androidFhirEngine) { exclude(module = "truth") }
+  implementation(Dependencies.androidFhirKnowledge)
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.jsonAssert)
@@ -146,7 +146,6 @@ dependencies {
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.xmlUnit)
-  testImplementation(project(":testing"))
   testImplementation(project(":workflow-testing"))
 }
 

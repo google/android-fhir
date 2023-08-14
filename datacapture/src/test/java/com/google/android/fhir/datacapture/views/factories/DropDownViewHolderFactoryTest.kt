@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,9 @@ import org.robolectric.RuntimeEnvironment
 class DropDownViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
+      RuntimeEnvironment.getApplication().apply {
+        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
+      }
     )
   private val viewHolder = DropDownViewHolderFactory.create(parent)
 
@@ -182,11 +184,20 @@ class DropDownViewHolderFactoryTest {
             display = "Test Code"
           }
       }
+    val fakeAnswerValueSetResolver = { uri: String ->
+      if (uri == "http://coding-value-set-url") {
+        listOf(answerOption)
+      } else {
+        emptyList()
+      }
+    }
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        answerValueSet = "http://coding-value-set-url"
+      }
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          answerValueSet = "http://coding-value-set-url"
-        },
+        questionnaireItem,
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -194,13 +205,7 @@ class DropDownViewHolderFactoryTest {
             }
           )
         },
-        resolveAnswerValueSet = {
-          if (it == "http://coding-value-set-url") {
-            listOf(answerOption)
-          } else {
-            emptyList()
-          }
-        },
+        enabledAnswerOptions = fakeAnswerValueSetResolver.invoke(questionnaireItem.answerValueSet),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
