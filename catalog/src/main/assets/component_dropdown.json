@@ -1,5 +1,15 @@
 {
   "resourceType": "Questionnaire",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "my-answer",
+        "language": "text/fhirpath",
+        "expression": "%resource.descendants().where(linkId='1').answer.value"
+      }
+    }
+  ],
   "item": [
     {
       "linkId": "1",
@@ -11,11 +21,11 @@
             "coding": [
               {
                 "system": "http://hl7.org/fhir/questionnaire-item-control",
-                "code": "drop-down",
-                "display": "Drop down"
+                "code": "radio-button",
+                "display": "Radio Button"
               }
             ],
-            "text": "Drop down"
+            "text": "Radio Button"
           }
         }
       ],
@@ -61,6 +71,93 @@
       "item": [
         {
           "linkId": "1-relationship",
+          "text": "State",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "2",
+      "type": "choice",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "drop-down",
+                "display": "Drop down"
+              }
+            ],
+            "text": "Drop down"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression",
+          "valueExpression": {
+            "language": "text/fhirpath",
+            "expression": "%my-answer"
+          }
+        }
+      ],
+      "text": "Choose one from the options below",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "option-1",
+            "display": "Option 1"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option-2",
+            "display": "Option 2"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option-3",
+            "display": "Option 3"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option-4",
+            "display": "Option 4"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option-5",
+            "display": "Option 5"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option-6",
+            "display": "Option 6"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "2-relationship",
           "text": "State",
           "type": "display",
           "extension": [

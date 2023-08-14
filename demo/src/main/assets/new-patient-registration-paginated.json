@@ -9,11 +9,44 @@
   ],
   "extension": [
     {
-      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext",
+      "extension": [
+        {
+          "url": "name",
+          "valueCoding": {
+            "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
+            "code": "patient",
+            "display": "Patient"
+          }
+        },
+        {
+          "url": "type",
+          "valueCode": "Patient"
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
       "valueExpression": {
+        "name": "searched-patients",
         "language": "application/x-fhir-query",
-        "expression": "Patient",
-        "name": "patient"
+        "expression": "Patient?name={{%patient.name.given}}&address-city={{%patient.address.city}}"
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "searched-patient",
+        "language": "text/fhirpath",
+        "expression": "%searched-patients.entry[0].resource"
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "patient-name",
+        "language": "text/fhirpath",
+        "expression": "%patient.name.given"
       }
     }
   ],
@@ -48,11 +81,10 @@
             {
               "extension": [
                 {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression",
                   "valueExpression": {
                     "language": "text/fhirpath",
-                    "expression": "Patient.name.given",
-                    "name": "patientName"
+                    "expression": "%searched-patient.name.given"
                   }
                 }
               ],
@@ -64,17 +96,11 @@
               "_text": {
                 "extension": [
                   {
-                    "extension": [
-                      {
-                        "url": "lang",
-                        "valueCode": "sw"
-                      },
-                      {
-                        "url": "content",
-                        "valueString": "Jina la kwanza"
-                      }
-                    ],
-                    "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                    "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                    "valueExpression": {
+                      "language": "text/fhirpath",
+                      "expression": "'Dynamic ' + %searched-patient.name.given"
+                    }
                   }
                 ]
               }
@@ -98,17 +124,11 @@
               "_text": {
                 "extension": [
                   {
-                    "extension": [
-                      {
-                        "url": "lang",
-                        "valueCode": "sw"
-                      },
-                      {
-                        "url": "content",
-                        "valueString": "Jina la ukoo"
-                      }
-                    ],
-                    "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                    "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                    "valueExpression": {
+                      "language": "text/fhirpath",
+                      "expression": "'Name from LaunchContext ' + %patient-name"
+                    }
                   }
                 ]
               }

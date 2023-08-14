@@ -1,0 +1,125 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "client-registration-sample",
+  "language": "en",
+  "status": "active",
+  "date": "2020-11-18T07:24:47.111Z",
+  "subjectType": [
+    "Patient"
+  ],
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "selected-answer",
+        "language": "text/fhirpath",
+        "expression": "%resource.descendants().where(linkId='1').answer.value"
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "city",
+        "language": "text/fhirpath",
+        "expression": "iif(%selected-answer.exists(), %selected-answer.code, 'NOTHING')"
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "name",
+        "language": "text/fhirpath",
+        "expression": "'ABCD'"
+      }
+    }
+  ],
+  "item": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "drop-down",
+                "display": "Drop down"
+              }
+            ],
+            "text": "Drop down"
+          }
+        }
+      ],
+      "linkId": "1",
+      "text": "Select City",
+      "type": "choice",
+      "required": true,
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "JAKARTA",
+            "display": "JAKARTA"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "NAIROBI",
+            "display": "NAIROBI"
+          }
+        }
+      ]
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "drop-down",
+                "display": "Drop down"
+              }
+            ],
+            "text": "Drop down"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+          "valueExpression": {
+            "expression": "Patient?address-city={{%city}}&name={{%name}}",
+            "language": "application/x-fhir-query"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn",
+          "extension": [
+            {
+              "url": "path",
+              "valueString": "id"
+            },
+            {
+              "url": "forDisplay",
+              "valueBoolean": true
+            }
+          ]
+        }
+      ],
+      "linkId": "2",
+      "text": "Find Patient From: X City",
+      "_text": {
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+            "valueExpression": {
+              "language": "text/fhirpath",
+              "expression": "'Find Patient From: ' + iif(%selected-answer.exists(), %selected-answer.code, 'NOTHING') + ' City'"
+            }
+          }
+        ]
+      },
+      "type": "reference",
+      "required": true
+    }
+  ]
+}

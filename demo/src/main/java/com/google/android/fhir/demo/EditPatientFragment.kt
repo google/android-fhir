@@ -24,8 +24,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.get
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.hl7.fhir.r4.model.Patient
 
 /** A fragment representing Edit Patient screen. This fragment is contained in a [MainActivity]. */
 class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
@@ -71,15 +78,21 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
   }
 
   private fun addQuestionnaireFragment(pair: Pair<String, String>) {
-    childFragmentManager.commit {
-      add(
-        R.id.add_patient_container,
-        QuestionnaireFragment.builder()
-          .setQuestionnaire(pair.first)
-          .setQuestionnaireResponse(pair.second)
-          .build(),
-        QUESTIONNAIRE_FRAGMENT_TAG
-      )
+    lifecycleScope.launch(Dispatchers.IO) {
+      val iParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+      val patient = viewModel.fhirEngine.get<Patient>(viewModel.patientId)
+      val patientStr = iParser.encodeResourceToString(patient)
+      childFragmentManager.commit {
+        add(
+          R.id.add_patient_container,
+          QuestionnaireFragment.builder()
+            .setQuestionnaire(pair.first)
+            .setQuestionnaireResponse(pair.second)
+            .setQuestionnaireLaunchContexts(listOf(patientStr))
+            .build(),
+          QUESTIONNAIRE_FRAGMENT_TAG
+        )
+      }
     }
   }
 
