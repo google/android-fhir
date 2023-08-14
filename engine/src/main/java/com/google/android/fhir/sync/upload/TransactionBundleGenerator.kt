@@ -30,7 +30,7 @@ open class TransactionBundleGenerator(
   private val generatedBundleSize: Int,
   private val useETagForUpload: Boolean,
   val getBundleEntryComponentGeneratorForLocalChangeType:
-    (type: Type, useETagForUpload: Boolean) -> BundleEntryComponentGenerator?
+    (type: Type, useETagForUpload: Boolean) -> BundleEntryComponentGenerator
 ) : UploadRequestGenerator {
 
   override fun generateUploadRequests(localChanges: List<LocalChange>): List<BundleUploadRequest> {
@@ -48,7 +48,7 @@ open class TransactionBundleGenerator(
           .filterNot { it.type == Type.NO_OP }
           .forEach {
             this.addEntry(
-              getBundleEntryComponentGeneratorForLocalChangeType(it.type, useETagForUpload)!!
+              getBundleEntryComponentGeneratorForLocalChangeType(it.type, useETagForUpload)
                 .getEntry(it)
             )
           }
@@ -93,12 +93,13 @@ open class TransactionBundleGenerator(
     private fun putForCreateAndPatchForUpdateBasedBundleComponentMapper(
       type: Type,
       useETagForUpload: Boolean
-    ): BundleEntryComponentGenerator? {
+    ): BundleEntryComponentGenerator {
       return when (type) {
         Type.INSERT -> HttpPutForCreateEntryComponentGenerator(useETagForUpload)
         Type.UPDATE -> HttpPatchForUpdateEntryComponentGenerator(useETagForUpload)
         Type.DELETE -> HttpDeleteEntryComponentGenerator(useETagForUpload)
-        Type.NO_OP -> null
+        Type.NO_OP ->
+          error("NO_OP type represents a no-operation and is not mapped to an HTTP operation.")
       }
     }
   }
