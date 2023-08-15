@@ -55,8 +55,20 @@ internal fun evaluateToBoolean(
   return fhirPathEngine.evaluateToBoolean(
     contextMap,
     questionnaireResponse,
-    questionnaireResponseItemComponent,
     null,
+    questionnaireResponseItemComponent,
     expressionNode
   )
 }
+
+internal fun evaluateToBoolean(
+  questionnaireResponse: QuestionnaireResponse,
+  questionnaireResponseItemComponent: QuestionnaireResponseItemComponent,
+  expression: String
+) =
+  fhirPathEngine.evaluateToBoolean(
+    questionnaireResponse,
+    null,
+    questionnaireResponseItemComponent,
+    expression
+  )

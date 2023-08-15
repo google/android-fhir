@@ -67,7 +67,9 @@ class ExpressionEvaluatorTest {
         ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.first(),
           questionnaire,
-          QuestionnaireResponse()
+          QuestionnaireResponse(),
+          mutableMapOf(),
+          mapOf()
         )
 
       assertThat((result as Type).asStringValue()).isEqualTo("1")
@@ -104,7 +106,9 @@ class ExpressionEvaluatorTest {
         ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.last(),
           questionnaire,
-          QuestionnaireResponse()
+          QuestionnaireResponse(),
+          mutableMapOf(),
+          mapOf()
         )
 
       assertThat((result as Type).asStringValue()).isEqualTo("2")
@@ -158,7 +162,9 @@ class ExpressionEvaluatorTest {
           questionnaire,
           QuestionnaireResponse(),
           mapOf(questionnaire.item[0].item[0] to questionnaire.item[0]),
-          questionnaire.item[0].item[0]
+          questionnaire.item[0].item[0],
+          mutableMapOf(),
+          mapOf()
         )
 
       assertThat((result as Type).asStringValue()).isEqualTo("2")
@@ -205,7 +211,9 @@ class ExpressionEvaluatorTest {
         ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.last(),
           questionnaire,
-          QuestionnaireResponse()
+          QuestionnaireResponse(),
+          mutableMapOf(),
+          mapOf()
         )
 
       assertThat((result as Type).asStringValue()).isEqualTo("3")
@@ -232,7 +240,9 @@ class ExpressionEvaluatorTest {
         ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.last(),
           questionnaire,
-          QuestionnaireResponse()
+          QuestionnaireResponse(),
+          mutableMapOf(),
+          mapOf()
         )
 
       assertThat(result).isEqualTo(null)
@@ -278,7 +288,9 @@ class ExpressionEvaluatorTest {
           questionnaire,
           QuestionnaireResponse(),
           mapOf(),
-          questionnaire.item[0]
+          questionnaire.item[0],
+          mutableMapOf(),
+          mapOf()
         )
 
       assertThat((result as Type).asStringValue()).isEqualTo("2")
@@ -314,7 +326,9 @@ class ExpressionEvaluatorTest {
           questionnaire,
           QuestionnaireResponse(),
           mapOf(),
-          questionnaire.item[0]
+          questionnaire.item[0],
+          mutableMapOf(),
+          mapOf()
         )
 
       assertThat(result).isEqualTo(null)
@@ -341,7 +355,9 @@ class ExpressionEvaluatorTest {
         ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.first(),
           questionnaire,
-          QuestionnaireResponse()
+          QuestionnaireResponse(),
+          mutableMapOf(),
+          mapOf()
         )
       }
     }
@@ -368,7 +384,9 @@ class ExpressionEvaluatorTest {
         ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.first(),
           questionnaire,
-          QuestionnaireResponse()
+          QuestionnaireResponse(),
+          mutableMapOf(),
+          mapOf()
         )
       }
     }
@@ -396,7 +414,9 @@ class ExpressionEvaluatorTest {
         ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.first(),
           questionnaire,
-          QuestionnaireResponse()
+          QuestionnaireResponse(),
+          mutableMapOf(),
+          mapOf()
         )
       }
     }
@@ -423,7 +443,9 @@ class ExpressionEvaluatorTest {
         ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.first(),
           questionnaire,
-          QuestionnaireResponse()
+          QuestionnaireResponse(),
+          mutableMapOf(),
+          mapOf()
         )
       }
     }
@@ -483,7 +505,9 @@ class ExpressionEvaluatorTest {
           questionnaire,
           questionnaireResponse,
           mapOf(),
-          questionnaire.item[0]
+          questionnaire.item[0],
+          mutableMapOf(),
+          mapOf()
         )
 
       assertThat((result as Type).asStringValue()).isEqualTo("2")
@@ -544,7 +568,8 @@ class ExpressionEvaluatorTest {
         questionnaireResponse.item.elementAt(1),
         questionnaire,
         questionnaireResponse,
-        emptyMap()
+        emptyMap(),
+        mapOf()
       )
 
     assertThat(result.first().second.first().asStringValue())
@@ -617,7 +642,8 @@ class ExpressionEvaluatorTest {
           questionnaireResponse.item.elementAt(1),
           questionnaire,
           questionnaireResponse,
-          emptyMap()
+          emptyMap(),
+          mapOf()
         )
 
       assertThat(result.first().second.first().asStringValue())
