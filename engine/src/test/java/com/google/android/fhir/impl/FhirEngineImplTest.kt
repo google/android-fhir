@@ -29,6 +29,7 @@ import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
+import com.google.android.fhir.sync.upload.FetchStrategyType
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.assertResourceNotEquals
 import com.google.android.fhir.testing.readFromFile
@@ -311,15 +312,14 @@ class FhirEngineImplTest {
   @Test
   fun syncUpload_uploadLocalChange() = runBlocking {
     val localChanges = mutableListOf<LocalChange>()
-    fhirEngine.syncUpload {
+    fhirEngine.syncUpload(FetchStrategyType.ALL_CHANGES) {
       flow {
-        localChanges.addAll(it)
-        emit(LocalChangeToken(it.flatMap { it.token.ids }) to TEST_PATIENT_1)
+        localChanges.addAll(it.next())
+        emit(LocalChangeToken(localChanges.flatMap { it.token.ids }) to TEST_PATIENT_1)
       }
     }
 
     assertThat(localChanges).hasSize(1)
-    // val localChange = localChanges[0].localChange
     with(localChanges[0]) {
       assertThat(this.resourceType).isEqualTo(ResourceType.Patient.toString())
       assertThat(this.resourceId).isEqualTo(TEST_PATIENT_1.id)
@@ -412,7 +412,7 @@ class FhirEngineImplTest {
       assertThat(get(0).payload).isEqualTo(patientString)
     }
     assertResourceEquals(patient, fhirEngine.get(ResourceType.Patient, patient.logicalId))
-    // clear databse
+    // clear database
     runBlocking(Dispatchers.IO) { fhirEngine.clearDatabase() }
     // assert that previously present resource not available after clearing database
     assertThat(fhirEngine.getLocalChanges(patient.resourceType, patient.logicalId)).isEmpty()

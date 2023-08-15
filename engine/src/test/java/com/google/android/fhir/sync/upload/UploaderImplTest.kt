@@ -47,7 +47,7 @@ class UploaderImplTest {
           BundleDataSource { Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE } },
           SquashedChangesUploadWorkManager()
         )
-        .upload(localChanges)
+        .upload(localChangeSelector)
         .toList()
 
     assertThat(result).hasSize(2)
@@ -63,7 +63,7 @@ class UploaderImplTest {
   fun `upload Bundle transaction should emit Started state`() = runBlocking {
     val result =
       UploaderImpl(BundleDataSource { Bundle() }, SquashedChangesUploadWorkManager())
-        .upload(localChanges)
+        .upload(localChangeSelector)
         .toList()
 
     assertThat(result.first()).isInstanceOf(UploadState.Started::class.java)
@@ -86,7 +86,7 @@ class UploaderImplTest {
           },
           SquashedChangesUploadWorkManager()
         )
-        .upload(localChanges)
+        .upload(localChangeSelector)
         .toList()
 
     assertThat(result).hasSize(2)
@@ -100,14 +100,14 @@ class UploaderImplTest {
           BundleDataSource { throw ConnectException("Failed to connect to server.") },
           SquashedChangesUploadWorkManager()
         )
-        .upload(localChanges)
+        .upload(localChangeSelector)
         .toList()
 
     assertThat(result).hasSize(2)
     assertThat(result.last()).isInstanceOf(UploadState.Failure::class.java)
   }
   companion object {
-    val localChanges =
+    val localChangeSelector = LocalChangeSelector {
       listOf(
         LocalChangeEntity(
             id = 1,
@@ -133,5 +133,6 @@ class UploaderImplTest {
           .toLocalChange()
           .apply { LocalChangeToken(listOf(1)) }
       )
+    }
   }
 }
