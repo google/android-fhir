@@ -18,6 +18,7 @@ package com.google.android.fhir.sync.upload
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -47,7 +48,7 @@ class UploaderImplTest {
           BundleDataSource { Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE } },
           SquashedChangesUploadWorkManager()
         )
-        .upload(localChangeSelector)
+        .upload(localChangeFetcher)
         .toList()
 
     assertThat(result).hasSize(2)
@@ -63,7 +64,7 @@ class UploaderImplTest {
   fun `upload Bundle transaction should emit Started state`() = runBlocking {
     val result =
       UploaderImpl(BundleDataSource { Bundle() }, SquashedChangesUploadWorkManager())
-        .upload(localChangeSelector)
+        .upload(localChangeFetcher)
         .toList()
 
     assertThat(result.first()).isInstanceOf(UploadState.Started::class.java)
@@ -86,7 +87,7 @@ class UploaderImplTest {
           },
           SquashedChangesUploadWorkManager()
         )
-        .upload(localChangeSelector)
+        .upload(localChangeFetcher)
         .toList()
 
     assertThat(result).hasSize(2)
@@ -100,14 +101,14 @@ class UploaderImplTest {
           BundleDataSource { throw ConnectException("Failed to connect to server.") },
           SquashedChangesUploadWorkManager()
         )
-        .upload(localChangeSelector)
+        .upload(localChangeFetcher)
         .toList()
 
     assertThat(result).hasSize(2)
     assertThat(result.last()).isInstanceOf(UploadState.Failure::class.java)
   }
   companion object {
-    val localChangeSelector = LocalChangeSelector {
+    val localChanges =
       listOf(
         LocalChangeEntity(
             id = 1,
@@ -133,6 +134,13 @@ class UploaderImplTest {
           .toLocalChange()
           .apply { LocalChangeToken(listOf(1)) }
       )
-    }
+    val localChangeFetcher =
+      object : LocalChangeFetcher {
+        override suspend fun hasNext(): Boolean = localChanges.isNotEmpty()
+
+        override suspend fun next(): List<LocalChange> = localChanges
+
+        override suspend fun getProgress(): Double = localChanges.size.toDouble()
+      }
   }
 }

@@ -35,7 +35,7 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
-import com.google.android.fhir.sync.upload.FetchStrategyType
+import com.google.android.fhir.sync.upload.FetchStrategy
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.readFromFile
@@ -505,7 +505,7 @@ class DatabaseImplTest {
         lastUpdated = Date()
       }
     database.insert(patient)
-    services.fhirEngine.syncUpload(FetchStrategyType.ALL_CHANGES) { it ->
+    services.fhirEngine.syncUpload(FetchStrategy.AllChanges(100)) { it ->
       val localChanges = it.next()
       localChanges
         .first { it.resourceId == "remote-patient-3" }

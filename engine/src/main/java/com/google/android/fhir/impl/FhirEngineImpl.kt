@@ -28,8 +28,9 @@ import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
-import com.google.android.fhir.sync.upload.FetchStrategyType
-import com.google.android.fhir.sync.upload.LocalChangeSelector
+import com.google.android.fhir.sync.upload.AllChangesLocalChangeFetcher
+import com.google.android.fhir.sync.upload.FetchStrategy
+import com.google.android.fhir.sync.upload.LocalChangeFetcher
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Bundle
@@ -124,16 +125,15 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       .intersect(database.getAllLocalChanges().map { it.resourceId }.toSet())
 
   override suspend fun syncUpload(
-    selectorStrategyType: FetchStrategyType,
-    upload: suspend (LocalChangeSelector) -> Flow<Pair<LocalChangeToken, Resource>>
+    strategyType: FetchStrategy,
+    upload: suspend (fetcher: LocalChangeFetcher) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
-    val localChangeSelector =
-      when (selectorStrategyType) {
-        FetchStrategyType.ALL_CHANGES -> LocalChangeSelector(::getAllLocalChanges)
-        else -> error("${selectorStrategyType.name} does not have a fetching strategy yet.")
+    val localChangeFetcher =
+      when (strategyType) {
+        is FetchStrategy.AllChanges -> AllChangesLocalChangeFetcher(database)
+        else -> error("$strategyType does not have a fetching strategy yet.")
       }
-
-    upload(localChangeSelector).collect {
+    upload(localChangeFetcher).collect {
       database.deleteUpdates(it.first)
       when (it.second) {
         is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
@@ -141,8 +141,6 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       }
     }
   }
-
-  private suspend fun getAllLocalChanges(): List<LocalChange> = database.getAllLocalChanges()
 
   private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {
     when (bundle.type) {
