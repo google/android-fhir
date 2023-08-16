@@ -88,13 +88,13 @@
     >
     <argument android:name="questionnaireTitleKey" app:argType="string" />
     <argument
-            android:name="questionnaireFilePathKey"
+            android:name="questionnaireJsonStringKey"
             app:argType="string"
             app:nullable="true"
             android:defaultValue="@null"
         />
     <argument
-            android:name="questionnaireFileWithValidationPathKey"
+            android:name="questionnaireWithValidationJsonStringKey"
             app:argType="string"
             app:nullable="true"
             android:defaultValue="@null"

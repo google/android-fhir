@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         Bundle().apply {
           putString("questionnaireTitleKey", "")
           putString(
-            "questionnaireFilePathKey",
+            "questionnaireJsonStringKey",
             readJsonFromFileUri(
               context = applicationContext,
               backgroundContext = coroutineContext,

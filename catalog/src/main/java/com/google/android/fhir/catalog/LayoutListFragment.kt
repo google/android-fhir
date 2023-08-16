@@ -75,7 +75,7 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
         .navigate(
           LayoutListFragmentDirections.actionLayoutsFragmentToGalleryQuestionnaireFragment(
             questionnaireTitleKey = context?.getString(layout.textId) ?: "",
-            questionnaireFilePathKey =
+            questionnaireJsonStringKey =
               getQuestionnaireJsonString(
                 context = requireContext(),
                 backgroundContext = coroutineContext,

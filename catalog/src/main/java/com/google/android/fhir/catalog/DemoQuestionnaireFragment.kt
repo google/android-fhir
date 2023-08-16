@@ -135,7 +135,7 @@ class DemoQuestionnaireFragment : Fragment() {
           setReorderingAllowed(true)
           val questionnaireFragment =
             QuestionnaireFragment.builder()
-              .apply { setQuestionnaire(args.questionnaireFilePathKey!!) }
+              .apply { setQuestionnaire(args.questionnaireJsonStringKey!!) }
               .build()
           add(R.id.container, questionnaireFragment, QUESTIONNAIRE_FRAGMENT_TAG)
         }
@@ -150,15 +150,15 @@ class DemoQuestionnaireFragment : Fragment() {
    */
   private fun replaceQuestionnaireFragmentWithQuestionnaireJson() {
     // TODO: remove check once all files are added
-    if (args.questionnaireFileWithValidationPathKey.isNullOrEmpty()) {
+    if (args.questionnaireWithValidationJsonStringKey.isNullOrEmpty()) {
       return
     }
     viewLifecycleOwner.lifecycleScope.launch {
       val questionnaireJsonString =
         if (isErrorState) {
-          args.questionnaireFileWithValidationPathKey!!
+          args.questionnaireWithValidationJsonStringKey!!
         } else {
-          args.questionnaireFilePathKey!!
+          args.questionnaireJsonStringKey!!
         }
       childFragmentManager.commit {
         setReorderingAllowed(true)

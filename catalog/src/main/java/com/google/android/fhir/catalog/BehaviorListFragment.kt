@@ -72,7 +72,7 @@ class BehaviorListFragment : Fragment(R.layout.behavior_list_fragment) {
         .navigate(
           BehaviorListFragmentDirections.actionBehaviorsFragmentToGalleryQuestionnaireFragment(
             questionnaireTitleKey = context?.getString(behavior.textId) ?: "",
-            questionnaireFilePathKey =
+            questionnaireJsonStringKey =
               getQuestionnaireJsonString(
                 context = requireContext(),
                 backgroundContext = coroutineContext,

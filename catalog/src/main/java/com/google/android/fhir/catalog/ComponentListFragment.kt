@@ -92,13 +92,13 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
         .navigate(
           ComponentListFragmentDirections.actionComponentsFragmentToGalleryQuestionnaireFragment(
             questionnaireTitleKey = context?.getString(component.textId) ?: "",
-            questionnaireFilePathKey =
+            questionnaireJsonStringKey =
               getQuestionnaireJsonString(
                 context = requireContext(),
                 backgroundContext = coroutineContext,
                 fileName = component.questionnaireFile,
               ),
-            questionnaireFileWithValidationPathKey =
+            questionnaireWithValidationJsonStringKey =
               getQuestionnaireJsonString(
                 context = requireContext(),
                 backgroundContext = coroutineContext,
