@@ -154,13 +154,17 @@ class DemoQuestionnaireFragment : Fragment() {
       return
     }
     viewLifecycleOwner.lifecycleScope.launch {
+      val questionnaireJsonString =
+        if (isErrorState) {
+          args.questionnaireFileWithValidationPathKey!!
+        } else {
+          args.questionnaireFilePathKey!!
+        }
       childFragmentManager.commit {
         setReorderingAllowed(true)
         replace(
           R.id.container,
-          QuestionnaireFragment.builder()
-            .setQuestionnaire(args.questionnaireFileWithValidationPathKey!!)
-            .build(),
+          QuestionnaireFragment.builder().setQuestionnaire(questionnaireJsonString).build(),
           QUESTIONNAIRE_FRAGMENT_TAG
         )
       }

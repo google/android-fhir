@@ -27,14 +27,13 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
   private var showOpenQuestionnaireMenu = true
-  val getContent =
+  val getContentLauncher =
     registerForActivityResult(ActivityResultContracts.GetContent()) {
       it?.let { launchQuestionnaireFragment(it) }
     }
@@ -57,7 +56,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       R.id.select_questionnaire_menu -> {
-        getContent.launch("application/json")
+        getContentLauncher.launch("application/json")
         true
       }
       else -> super.onOptionsItemSelected(item)
