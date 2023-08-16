@@ -21,7 +21,6 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.knowledge.Dependency
 import com.google.common.truth.Truth.assertThat
 import java.io.IOException
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -31,7 +30,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 class OkHttpPackageDownloaderTest {
 

@@ -26,7 +26,6 @@ import com.google.android.fhir.knowledge.npm.NpmFileManager
 import com.google.android.fhir.knowledge.npm.NpmPackage
 import com.google.common.truth.Truth.assertThat
 import java.io.File
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Library
 import org.junit.After
@@ -34,17 +33,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 internal class KnowledgeManagerTest {
   private val context: Context = ApplicationProvider.getApplicationContext()
-  private val knowledgeDb =
-    Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build()
-  private val knowledgeManager = KnowledgeManager(knowledgeDb, context.cacheDir.absolutePath)
-  private val implementationGuide = Dependency("anc-cds", "0.3.0", "http://url.com")
   private val dependency = Dependency("anc-cds", "0.3.0", "http://url.com")
   private val dataFolder = File(javaClass.getResource("/anc-cds")!!.file)
-
+  private val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
   private val knowledgeDb =
     Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build()
   private val npmFileManager = NpmFileManager(context.dataDir)
@@ -53,11 +47,11 @@ internal class KnowledgeManagerTest {
       knowledgeDb,
       context.dataDir,
       npmFileManager = npmFileManager,
-      packageDownloader = { implementationGuide, _ ->
+      packageDownloader = { dependency, _ ->
         NpmPackage(
-          implementationGuide.packageId,
-          implementationGuide.version,
-          implementationGuide.uri,
+          dependency.packageId,
+          dependency.version,
+          dependency.uri,
           emptyList(),
           dataFolder
         )
@@ -140,14 +134,6 @@ internal class KnowledgeManagerTest {
     val resources = knowledgeDb.knowledgeDao().getResources()
     assertThat(resources).hasSize(2)
   }
-
-  private val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-  private fun writeToFile(library: Library): File {
-    return File(context.filesDir, library.name).apply {
-      writeText(jsonParser.encodeResourceToString(library))
-    }
-  }
-
   fun `installing from npmPackageManager`() = runTest {
     knowledgeManager.install(dependency)
 
@@ -165,5 +151,11 @@ internal class KnowledgeManagerTest {
       .isNotEmpty()
     assertThat(knowledgeManager.loadResources(resourceType = "Measure", url = "Measure/ANCIND01"))
       .isNotNull()
+  }
+
+  private fun writeToFile(library: Library): File {
+    return File(context.filesDir, library.name).apply {
+      writeText(jsonParser.encodeResourceToString(library))
+    }
   }
 }

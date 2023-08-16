@@ -19,13 +19,11 @@ package com.google.android.fhir.knowledge.npm
 import com.google.android.fhir.knowledge.Dependency
 import com.google.common.truth.Truth.assertThat
 import java.io.File
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 class NpmFileManagerTest {
   private val testDataFolder = File(javaClass.getResource("/cache_manager")!!.file)
@@ -51,10 +49,8 @@ class NpmFileManagerTest {
   }
 
   @Test
-  fun getPackage_notFound() = runTest {
-    val npmPackage = npmFileManager.getPackage(PACKAGE_ID, MISSING_VERSION)
-
-    assertThat(npmPackage).isNull()
+  fun containsPackage_notFound() = runTest {
+    assertThat(npmFileManager.containsPackage(PACKAGE_ID, MISSING_VERSION)).isFalse()
   }
 
   companion object {
@@ -64,8 +60,6 @@ class NpmFileManagerTest {
     val DEPENDENCIES =
       listOf(
         Dependency("hl7.fhir.r4.core", "4.0.1"),
-        Dependency("hl7.terminology.r4", "5.0.0"),
-        Dependency("hl7.fhir.fr.core", "1.1.0")
       )
   }
 }

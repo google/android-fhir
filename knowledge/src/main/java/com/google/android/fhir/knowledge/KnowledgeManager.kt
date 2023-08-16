@@ -56,7 +56,7 @@ internal constructor(
     for (dependency in dependencies) {
       if (knowledgeDao.getImplementationGuide(dependency.packageId, dependency.version) != null)
         continue
-
+      println(dependency)
       val containsPackage = npmFileManager.containsPackage(dependency.packageId, dependency.version)
       val npmPackage =
         if (containsPackage) {
