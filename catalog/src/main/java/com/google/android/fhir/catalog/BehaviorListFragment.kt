@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,12 @@ import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlin.coroutines.coroutineContext
+import kotlinx.coroutines.launch
 
 class BehaviorListFragment : Fragment(R.layout.behavior_list_fragment) {
   private val viewModel: BehaviorListViewModel by viewModels()
@@ -64,13 +67,20 @@ class BehaviorListFragment : Fragment(R.layout.behavior_list_fragment) {
   }
 
   private fun launchQuestionnaireFragment(behavior: BehaviorListViewModel.Behavior) {
-    findNavController()
-      .navigate(
-        BehaviorListFragmentDirections.actionBehaviorsFragmentToGalleryQuestionnaireFragment(
-          questionnaireTitleKey = context?.getString(behavior.textId) ?: "",
-          questionnaireFilePathKey = behavior.questionnaireFileName,
-          workflow = behavior.workFlow
+    viewLifecycleOwner.lifecycleScope.launch {
+      findNavController()
+        .navigate(
+          BehaviorListFragmentDirections.actionBehaviorsFragmentToGalleryQuestionnaireFragment(
+            questionnaireTitleKey = context?.getString(behavior.textId) ?: "",
+            questionnaireFilePathKey =
+              getQuestionnaireJsonString(
+                context = requireContext(),
+                backgroundContext = coroutineContext,
+                fileName = behavior.questionnaireFileName,
+              ),
+            workflow = behavior.workFlow
+          )
         )
-      )
+    }
   }
 }

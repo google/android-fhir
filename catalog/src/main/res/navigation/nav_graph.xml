@@ -103,12 +103,6 @@
             android:name="workflow"
             app:argType="com.google.android.fhir.catalog.WorkflowType"
         />
-    <argument
-            android:name="questionnaireFileUri"
-            app:argType="android.net.Uri"
-            app:nullable="true"
-            android:defaultValue="@null"
-        />
     <action
             android:id="@+id/action_galleryQuestionnaireFragment_to_questionnaireResponseFragment"
             app:destination="@id/questionnaireResponseFragment"

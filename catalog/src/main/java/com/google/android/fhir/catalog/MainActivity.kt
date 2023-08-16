@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,19 @@ package com.google.android.fhir.catalog
 
 import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
   private var showOpenQuestionnaireMenu = true
@@ -90,12 +92,21 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
   }
 
   private fun launchQuestionnaireFragment(uri: Uri) {
-    val args =
-      Bundle().apply {
-        putString("questionnaireTitleKey", "")
-        putSerializable("workflow", WorkflowType.DEFAULT)
-        putParcelable("questionnaireFileUri", uri as Parcelable)
-      }
-    findNavController(R.id.nav_host_fragment).navigate(R.id.galleryQuestionnaireFragment, args)
+    lifecycleScope.launch {
+      val args =
+        Bundle().apply {
+          putString("questionnaireTitleKey", "")
+          putString(
+            "questionnaireFilePathKey",
+            readJsonFromFileUri(
+              context = applicationContext,
+              backgroundContext = coroutineContext,
+              uri = uri
+            )
+          )
+          putSerializable("workflow", WorkflowType.DEFAULT)
+        }
+      findNavController(R.id.nav_host_fragment).navigate(R.id.galleryQuestionnaireFragment, args)
+    }
   }
 }
