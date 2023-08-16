@@ -138,7 +138,7 @@ dependencies {
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.xerces)
   implementation(Dependencies.androidFhirEngine) { exclude(module = "truth") }
-  implementation(Dependencies.androidFhirKnowledge)
+  implementation(project(":knowledge"))
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.jsonAssert)
