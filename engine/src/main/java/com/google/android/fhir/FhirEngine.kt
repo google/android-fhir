@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,17 +85,16 @@ interface FhirEngine {
   suspend fun clearDatabase()
 
   /**
-   * Retrieve [LocalChange] for [Resource] with given type and id, which can be used to purge
-   * resource from database. Each resource will have at most one
-   * [LocalChange](multiple
-   * changes are squashed). If there is no local change for given
-   * [resourceType] and [Resource.id], return `null`.
+   * Retrieves a list of [LocalChange]s for [Resource] with given type and id, which can be used to
+   * purge resource from database. If there is no local change for given [resourceType] and
+   * [Resource.id], return an empty list.
    * @param type The [ResourceType]
    * @param id The resource id [Resource.id]
-   * @return [LocalChange] A squashed local changes for given [resourceType] and [Resource.id] . If
-   * there is no local change for given [resourceType] and [Resource.id], return `null`.
+   * @return [List]<[LocalChange]> A list of local changes for given [resourceType] and
+   * [Resource.id] . If there is no local change for given [resourceType] and [Resource.id], return
+   * an empty list.
    */
-  suspend fun getLocalChange(type: ResourceType, id: String): LocalChange?
+  suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange>
 
   /**
    * Purges a resource from the database based on resource type and id without any deletion of data
