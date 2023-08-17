@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
@@ -72,8 +71,8 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     database.clearDatabase()
   }
 
-  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange? {
-    return database.getLocalChange(type, id)?.toLocalChange()
+  override suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange> {
+    return database.getLocalChanges(type, id)
   }
 
   override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
@@ -121,14 +120,14 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     resources
       .map { it.logicalId }
       .toSet()
-      .intersect(database.getAllLocalChanges().map { it.localChange.resourceId }.toSet())
+      .intersect(database.getAllLocalChanges().map { it.resourceId }.toSet())
 
   override suspend fun syncUpload(
     upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
     val localChanges = database.getAllLocalChanges()
     if (localChanges.isNotEmpty()) {
-      upload(localChanges.map { it.toLocalChange() }).collect {
+      upload(localChanges).collect {
         database.deleteUpdates(it.first)
         when (it.second) {
           is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
@@ -161,7 +160,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
         database.updateVersionIdAndLastUpdated(
           id,
           type,
-          response.etag,
+          getVersionFromETag(response.etag),
           response.lastModified.toInstant()
         )
       }
@@ -178,6 +177,20 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       )
     }
   }
+
+  /**
+   * FHIR uses weak ETag that look something like W/"MTY4NDMyODE2OTg3NDUyNTAwMA", so we need to
+   * extract version from it. See https://hl7.org/fhir/http.html#Http-Headers.
+   */
+  private fun getVersionFromETag(eTag: String) =
+    // The server should always return a weak etag that starts with W, but if it server returns a
+    // strong tag, we store it as-is. The http-headers for conditional upload like if-match will
+    // always add value as a weak tag.
+    if (eTag.startsWith("W/")) {
+      eTag.split("\"")[1]
+    } else {
+      eTag
+    }
 
   /**
    * May return a Pair of versionId and resource type extracted from the

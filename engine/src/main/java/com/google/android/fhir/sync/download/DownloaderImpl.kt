@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,14 @@
 
 package com.google.android.fhir.sync.download
 
+import com.google.android.fhir.sync.BundleDownloadRequest
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.Downloader
 import com.google.android.fhir.sync.ResourceSyncException
+import com.google.android.fhir.sync.UrlDownloadRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.Bundle
@@ -41,45 +44,44 @@ internal class DownloaderImpl(
 
   override suspend fun download(): Flow<DownloadState> = flow {
     var resourceTypeToDownload: ResourceType = ResourceType.Bundle
-
     // download count summary of all resources for progress i.e. <type, total, completed>
-    val progressSummary =
-      downloadWorkManager
-        .getSummaryRequestUrls()
-        .map { summary ->
-          summary.key to
-            runCatching { dataSource.download(summary.value) }
-              .onFailure { Timber.e(it) }
-              .getOrNull()
-              .takeIf { it is Bundle }
-              ?.let { (it as Bundle).total }
-        }
-        .also { Timber.i("Download summary " + it.joinToString()) }
-        .toMap()
-
-    val total = progressSummary.values.sumOf { it ?: 0 }
-    var completed = 0
-
-    emit(DownloadState.Started(resourceTypeToDownload, total))
-
-    var url = downloadWorkManager.getNextRequestUrl()
-    while (url != null) {
+    val totalResourcesToDownloadCount = getProgressSummary().values.sumOf { it ?: 0 }
+    emit(DownloadState.Started(resourceTypeToDownload, totalResourcesToDownloadCount))
+    var downloadedResourcesCount = 0
+    var request = downloadWorkManager.getNextRequest()
+    while (request != null) {
       try {
-        resourceTypeToDownload =
-          ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
-
-        emit(
-          downloadWorkManager.processResponse(dataSource.download(url!!)).toList().let {
-            completed += it.size
-            DownloadState.Success(it, total, completed)
-          }
-        )
+        resourceTypeToDownload = request.toResourceType()
+        downloadWorkManager.processResponse(dataSource.download(request)).toList().let {
+          downloadedResourcesCount += it.size
+          emit(DownloadState.Success(it, totalResourcesToDownloadCount, downloadedResourcesCount))
+        }
       } catch (exception: Exception) {
         Timber.e(exception)
         emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
       }
-
-      url = downloadWorkManager.getNextRequestUrl()
+      request = downloadWorkManager.getNextRequest()
     }
   }
+
+  private fun DownloadRequest.toResourceType() =
+    when (this) {
+      is UrlDownloadRequest ->
+        ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
+      is BundleDownloadRequest -> ResourceType.Bundle
+    }
+
+  private suspend fun getProgressSummary() =
+    downloadWorkManager
+      .getSummaryRequestUrls()
+      .map { summary ->
+        summary.key to
+          runCatching { dataSource.download(DownloadRequest.of(summary.value)) }
+            .onFailure { Timber.e(it) }
+            .getOrNull()
+            .takeIf { it is Bundle }
+            ?.let { (it as Bundle).total }
+      }
+      .also { Timber.i("Download summary " + it.joinToString()) }
+      .toMap()
 }

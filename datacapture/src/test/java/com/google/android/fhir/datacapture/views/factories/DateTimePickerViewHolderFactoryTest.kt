@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
@@ -40,7 +41,9 @@ import org.robolectric.RuntimeEnvironment
 class DateTimePickerViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
+      RuntimeEnvironment.getApplication().apply {
+        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
+      }
     )
   private val viewHolder = DateTimePickerViewHolderFactory.create(parent)
 
@@ -78,6 +81,19 @@ class DateTimePickerViewHolderFactoryTest {
 
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("")
     assertThat(viewHolder.timeInputView.text.toString()).isEqualTo("")
+  }
+
+  @Test
+  fun `show dateFormat label in lowerCase`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+    assertThat(viewHolder.dateInputView.hint.toString()).isEqualTo("mm/dd/yyyy")
   }
 
   @Test
@@ -414,7 +430,24 @@ class DateTimePickerViewHolderFactoryTest {
     viewHolder.bind(itemViewItem)
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
-      .isEqualTo("Date format needs to be MM/dd/yyyy (e.g. 01/31/2023)")
+      .isEqualTo("Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)")
+  }
+
+  @Test
+  fun `show dateFormat in lowerCase in the error message`() {
+    val itemViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        draftAnswer = "11/19/202"
+      )
+
+    viewHolder.bind(itemViewItem)
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
+      .isEqualTo("Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)")
   }
 
   @Test
@@ -493,6 +526,116 @@ class DateTimePickerViewHolderFactoryTest {
 
     assertThat(viewHolder.dateInputView.text.toString()).isEmpty()
     assertThat(viewHolder.timeInputView.text.toString()).isEmpty()
+  }
+
+  @Test
+  fun `shows asterisk`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          text = "Question?"
+          required = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+      .isEqualTo("Question? *")
+  }
+
+  @Test
+  fun `hide asterisk`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          text = "Question?"
+          required = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+      .isEqualTo("Question?")
+  }
+
+  @Test
+  fun `shows required text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<TextInputLayout>(R.id.date_input_layout)
+          .helperText.toString()
+      )
+      .isEqualTo("Required")
+  }
+
+  @Test
+  fun `hide required text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).helperText)
+      .isNull()
+  }
+
+  @Test
+  fun `shows optional text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<TextInputLayout>(R.id.date_input_layout)
+          .helperText.toString()
+      )
+      .isEqualTo("Optional")
+  }
+
+  @Test
+  fun `hide optional text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).helperText)
+      .isNull()
   }
 
   private val QuestionnaireItemViewHolder.dateInputView: TextView

@@ -27,32 +27,36 @@ kotlin {
     main.kotlin.srcDirs(generateSourcesTask.map { it.srcOutputDir })
     test.kotlin.srcDirs(generateSourcesTask.map { it.testOutputDir })
   }
+  jvmToolchain(11)
 }
 
 android {
+  namespace = "com.google.android.fhir"
   compileSdk = Sdk.compileSdk
   defaultConfig {
     minSdk = Sdk.minSdk
-    targetSdk = Sdk.targetSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
+
+    javaCompileOptions {
+      annotationProcessorOptions {
+        compilerArgumentProviders(RoomSchemaArgProvider(File(projectDir, "schemas")))
+      }
+    }
   }
 
   sourceSets {
     getByName("androidTest").apply {
-      java.srcDirs("src/test-common/java")
-      resources.setSrcDirs(listOf("sampledata"))
+      resources.setSrcDirs(listOf("test-data"))
+      assets.srcDirs("$projectDir/schemas")
     }
 
-    getByName("test").apply {
-      java.srcDirs("src/test-common/java")
-      resources.setSrcDirs(listOf("sampledata"))
-    }
+    getByName("test").apply { resources.setSrcDirs(listOf("test-data")) }
   }
 
   buildTypes {
-    getByName("release") {
+    release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
     }
@@ -62,20 +66,16 @@ android {
     // Flag to enable support for the new language APIs
     // See https = //developer.android.com/studio/write/java8-support
     isCoreLibraryDesugaringEnabled = true
-    sourceCompatibility = Java.sourceCompatibility
-    targetCompatibility = Java.targetCompatibility
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
   }
 
-  packagingOptions {
-    resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
-  }
-
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
+  packaging { resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")) }
 
   configureJacocoTestOptions()
 }
 
-afterEvaluate { configureFirebaseTestLab() }
+afterEvaluate { configureFirebaseTestLabForLibraries() }
 
 configurations {
   all {
@@ -94,6 +94,7 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  androidTestImplementation(Dependencies.Room.testing)
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
 
@@ -119,6 +120,7 @@ dependencies {
   implementation(Dependencies.jsonToolsPatch)
   implementation(Dependencies.sqlcipher)
   implementation(Dependencies.timber)
+  implementation(Dependencies.truth)
 
   kapt(Dependencies.Room.compiler)
 

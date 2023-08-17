@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ interface DownloadWorkManager {
    * Returns the URL for the next download request, or `null` if there is no more download request
    * to be issued.
    */
-  suspend fun getNextRequestUrl(): String?
+  suspend fun getNextRequest(): DownloadRequest?
 
   /* TODO: Generalize the DownloadWorkManager API to not sequentially download resource by type (https://github.com/google/android-fhir/issues/1884) */
   /**

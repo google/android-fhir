@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +20,16 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.extensions.EXTENSION_ENTRY_FORMAT_URL
-import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
-import java.time.chrono.IsoChronology
-import java.time.format.DateTimeFormatterBuilder
-import java.time.format.FormatStyle
 import java.util.Locale
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -43,7 +38,9 @@ import org.robolectric.RuntimeEnvironment
 @RunWith(RobolectricTestRunner::class)
 class DatePickerViewHolderFactoryTest {
   private val context =
-    RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
+    RuntimeEnvironment.getApplication().apply {
+      setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
+    }
   private val parent = FrameLayout(context)
   private val viewHolder = DatePickerViewHolderFactory.create(parent)
 
@@ -112,6 +109,20 @@ class DatePickerViewHolderFactoryTest {
       )
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2020")
+  }
+
+  @Test
+  fun `show dateFormat label in lowerCase`() {
+    setLocale(Locale.US)
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+    assertThat(viewHolder.dateInputView.hint.toString()).isEqualTo("mm/dd/yyyy")
   }
 
   @Test
@@ -378,6 +389,23 @@ class DatePickerViewHolderFactoryTest {
   }
 
   @Test
+  fun `show dateFormat in lowerCase in the error message`() {
+    val itemViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        draftAnswer = "11/19/202"
+      )
+
+    viewHolder.bind(itemViewItem)
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isEqualTo("Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)")
+  }
+
+  @Test
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -479,105 +507,113 @@ class DatePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `should use date format in the entryFormat extension`() {
+  fun `show asterisk`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType("yyyy-MM-dd"))
+          text = "Question?"
+          required = true
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
       )
     )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo("yyyy-MM-dd")
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+      .isEqualTo("Question? *")
   }
 
   @Test
-  fun `should set local date input format when entryFormat extension has incorrect format string in Questionnaire`() {
+  fun `hide asterisk`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType("yMyd"))
+          text = "Question?"
+          required = true
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
       )
     )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo("MM/dd/yyyy")
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+      .isEqualTo("Question?")
   }
 
   @Test
-  fun `should use date format in the entryFormat extension though date separator is missing`() {
+  fun `show required text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType("yyyyMMdd"))
-        },
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
       )
     )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo("yyyyMMdd")
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<TextInputLayout>(R.id.text_input_layout)
+          .helperText.toString()
+      )
+      .isEqualTo("Required")
   }
 
   @Test
-  fun `should use date format in the entryFormat after converting it to SHORT FormatStyle`() {
+  fun `hide required text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType("yyyy MMMM dd"))
-        },
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
       )
     )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo("yyyy MM dd")
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).helperText)
+      .isNull()
   }
 
   @Test
-  fun `should set local date input format when entryFormat extension has empty string in Questionnaire`() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType(""))
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      )
-    )
-    val localeDatePattern =
-      DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-        FormatStyle.SHORT,
-        null,
-        IsoChronology.INSTANCE,
-        Locale.getDefault()
-      )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo(canonicalizeDatePattern(localeDatePattern))
-  }
-
-  @Test
-  fun `should set local date input format when no entryFormat extension in Questionnaire`() {
+  fun `shows optional text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
       )
     )
-    val localeDatePattern =
-      DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-        FormatStyle.SHORT,
-        null,
-        IsoChronology.INSTANCE,
-        Locale.getDefault()
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<TextInputLayout>(R.id.text_input_layout)
+          .helperText.toString()
       )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo(canonicalizeDatePattern(localeDatePattern))
+      .isEqualTo("Optional")
+  }
+
+  @Test
+  fun `hide optional text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).helperText)
+      .isNull()
   }
 
   private fun setLocale(locale: Locale) {

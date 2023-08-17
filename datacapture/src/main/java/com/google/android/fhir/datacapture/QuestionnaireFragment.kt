@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -216,6 +216,16 @@ class QuestionnaireFragment : Fragment() {
               )
             }
           }
+          is DisplayMode.InitMode -> {
+            questionnaireReviewRecyclerView.visibility = View.GONE
+            questionnaireEditRecyclerView.visibility = View.GONE
+            paginationPreviousButton.visibility = View.GONE
+            paginationNextButton.visibility = View.GONE
+            questionnaireProgressIndicator.visibility = View.GONE
+            submitButton.visibility = View.GONE
+            reviewModeButton.visibility = View.GONE
+            reviewModeEditButton.visibility = View.GONE
+          }
         }
       }
     }
@@ -304,6 +314,18 @@ class QuestionnaireFragment : Fragment() {
     }
 
     /**
+     * The launch context allows information to be passed into questionnaire based on the context in
+     * which the questionnaire is being evaluated. For example, what patient, what encounter, what
+     * user, etc. is "in context" at the time the questionnaire response is being completed:
+     * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
+     *
+     * @param launchContexts list of serialized resources
+     */
+    fun setQuestionnaireLaunchContexts(launchContexts: List<String>) = apply {
+      args.add(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS to launchContexts)
+    }
+
+    /**
      * An [Boolean] extra to control if the questionnaire is read-only. If review page and read-only
      * are both enabled, read-only will take precedence.
      */
@@ -324,6 +346,15 @@ class QuestionnaireFragment : Fragment() {
     fun showReviewPageFirst(value: Boolean) = apply {
       args.add(EXTRA_SHOW_REVIEW_PAGE_FIRST to value)
     }
+
+    /** A [Boolean] extra to control whether the asterisk text is shown. */
+    fun showAsterisk(value: Boolean) = apply { args.add(EXTRA_SHOW_ASTERISK_TEXT to value) }
+
+    /** A [Boolean] extra to control whether the required text is shown. */
+    fun showRequiredText(value: Boolean) = apply { args.add(EXTRA_SHOW_REQUIRED_TEXT to value) }
+
+    /** A [Boolean] extra to control whether the optional text is shown. */
+    fun showOptionalText(value: Boolean) = apply { args.add(EXTRA_SHOW_OPTIONAL_TEXT to value) }
 
     /**
      * A matcher to provide [QuestionnaireItemViewHolderFactoryMatcher]s for custom
@@ -385,6 +416,9 @@ class QuestionnaireFragment : Fragment() {
      */
     internal const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
 
+    /** A list of JSON encoded strings extra for each questionnaire context. */
+    internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS =
+      "questionnaire-launch-contexts"
     /**
      * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.
      *
@@ -419,6 +453,12 @@ class QuestionnaireFragment : Fragment() {
      * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
      */
     internal const val EXTRA_SHOW_SUBMIT_BUTTON = "show-submit-button"
+
+    internal const val EXTRA_SHOW_OPTIONAL_TEXT = "show-optional-text"
+
+    internal const val EXTRA_SHOW_ASTERISK_TEXT = "show-asterisk-text"
+
+    internal const val EXTRA_SHOW_REQUIRED_TEXT = "show-required-text"
 
     fun builder() = Builder()
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,9 @@ fun Project.configureLicensee() {
 
     // SQLCipher
     allowDependency("net.zetetic", "android-database-sqlcipher", "4.5.0") {
+      because("Custom license, essentially BSD-3. https://www.zetetic.net/sqlcipher/license/")
+    }
+    allowDependency("net.zetetic", "android-database-sqlcipher", "4.5.4") {
       because("Custom license, essentially BSD-3. https://www.zetetic.net/sqlcipher/license/")
     }
 
@@ -173,4 +176,5 @@ private val nonStandardLicenseUrls =
     // BSD-3
     "http://opensource.org/licenses/BSD-3-Clause",
     "http://www.opensource.org/licenses/bsd-license.php",
+    "https://asm.ow2.io/license.html",
   )

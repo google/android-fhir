@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
-import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
@@ -800,7 +799,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `nested display item without instructions code returns null`() {
+  fun `nested display item without instructions code returns empty spanned`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -817,7 +816,7 @@ class MoreQuestionnaireItemComponentsTest {
         }
       )
 
-    assertThat(questionItemList.first().localizedInstructionsSpanned).isNull()
+    assertThat(questionItemList.first().localizedInstructionsSpanned.toString()).isEmpty()
   }
 
   @Test
@@ -843,6 +842,29 @@ class MoreQuestionnaireItemComponentsTest {
 
     assertThat(questionItemList.first().localizedInstructionsSpanned.toString())
       .isEqualTo("subtitle text")
+  }
+
+  @Test
+  fun `localizedInstructionsSpanned returns spanned for all of the items that have instruction code and type is display`() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "display-question"
+          text = "<strong>instruction-1<strong>"
+          extension = listOf(displayCategoryExtensionWithInstructionsCode)
+          type = Questionnaire.QuestionnaireItemType.DISPLAY
+        },
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "display-question"
+          text = "instruction-2"
+          extension = listOf(displayCategoryExtensionWithInstructionsCode)
+          type = Questionnaire.QuestionnaireItemType.DISPLAY
+        },
+      )
+    Locale.setDefault(Locale.US)
+
+    assertThat(questionItemList.getLocalizedInstructionsSpanned().toString())
+      .isEqualTo("instruction-1\ninstruction-2")
   }
 
   @Test
@@ -1477,16 +1499,11 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun createQuestionResponseWithoutGroupAndNestedQuestions() {
     val question =
-      Questionnaire.QuestionnaireItemComponent(
-          StringType("gender"),
-          Enumeration(
-            Questionnaire.QuestionnaireItemTypeEnumFactory(),
-            Questionnaire.QuestionnaireItemType.STRING
-          )
-        )
-        .apply {
-          initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
-        }
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "gender"
+        type = Questionnaire.QuestionnaireItemType.STRING
+        initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
+      }
 
     val questionResponse = question.createQuestionnaireResponseItem()
 
@@ -1496,41 +1513,25 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun createQuestionResponseWithGroupQuestions() {
     val question =
-      Questionnaire.QuestionnaireItemComponent(
-          StringType("group-test"),
-          Enumeration(
-            Questionnaire.QuestionnaireItemTypeEnumFactory(),
-            Questionnaire.QuestionnaireItemType.GROUP
-          )
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "group-test"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "gender"
+            type = Questionnaire.QuestionnaireItemType.STRING
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
+          }
         )
-        .apply {
-          addItem(
-            Questionnaire.QuestionnaireItemComponent(
-                StringType("gender"),
-                Enumeration(
-                  Questionnaire.QuestionnaireItemTypeEnumFactory(),
-                  Questionnaire.QuestionnaireItemType.STRING
-                )
-              )
-              .apply {
-                initial =
-                  listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
-              }
-          )
 
-          addItem(
-            Questionnaire.QuestionnaireItemComponent(
-                StringType("isActive"),
-                Enumeration(
-                  Questionnaire.QuestionnaireItemTypeEnumFactory(),
-                  Questionnaire.QuestionnaireItemType.BOOLEAN
-                )
-              )
-              .apply {
-                initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true)))
-              }
-          )
-        }
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "isActive"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true)))
+          }
+        )
+      }
 
     val questionResponse = question.createQuestionnaireResponseItem()
 
@@ -1542,42 +1543,25 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun createQuestionResponseWithNestedQuestions() {
     val question =
-      Questionnaire.QuestionnaireItemComponent(
-          StringType("group-test"),
-          Enumeration(
-            Questionnaire.QuestionnaireItemTypeEnumFactory(),
-            Questionnaire.QuestionnaireItemType.GROUP
-          )
-        )
-        .apply {
-          addItem(
-            Questionnaire.QuestionnaireItemComponent(
-                StringType("gender"),
-                Enumeration(
-                  Questionnaire.QuestionnaireItemTypeEnumFactory(),
-                  Questionnaire.QuestionnaireItemType.STRING
-                )
-              )
-              .apply {
-                initial =
-                  listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "group-test"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "gender"
+            type = Questionnaire.QuestionnaireItemType.STRING
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
 
-                addItem(
-                  Questionnaire.QuestionnaireItemComponent(
-                      StringType("isActive"),
-                      Enumeration(
-                        Questionnaire.QuestionnaireItemTypeEnumFactory(),
-                        Questionnaire.QuestionnaireItemType.BOOLEAN
-                      )
-                    )
-                    .apply {
-                      initial =
-                        listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true)))
-                    }
-                )
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "isActive"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true)))
               }
-          )
-        }
+            )
+          }
+        )
+      }
 
     val questionResponse = question.createQuestionnaireResponseItem()
 
@@ -1591,24 +1575,19 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun `createQuestionResponse should not set answer for quantity type with missing value`() {
     val question =
-      Questionnaire.QuestionnaireItemComponent(
-          StringType("age"),
-          Enumeration(
-            Questionnaire.QuestionnaireItemTypeEnumFactory(),
-            Questionnaire.QuestionnaireItemType.QUANTITY
-          )
-        )
-        .apply {
-          initial =
-            listOf(
-              Questionnaire.QuestionnaireItemInitialComponent(
-                Quantity().apply {
-                  code = "months"
-                  system = "http://unitofmeausre.org"
-                }
-              )
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "age"
+        type = Questionnaire.QuestionnaireItemType.QUANTITY
+        initial =
+          listOf(
+            Questionnaire.QuestionnaireItemInitialComponent(
+              Quantity().apply {
+                code = "months"
+                system = "http://unitofmeausre.org"
+              }
             )
-        }
+          )
+      }
 
     val questionResponse = question.createQuestionnaireResponseItem()
 
@@ -1618,25 +1597,20 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun `createQuestionResponse should set answer with quantity type`() {
     val question =
-      Questionnaire.QuestionnaireItemComponent(
-          StringType("age"),
-          Enumeration(
-            Questionnaire.QuestionnaireItemTypeEnumFactory(),
-            Questionnaire.QuestionnaireItemType.QUANTITY
-          )
-        )
-        .apply {
-          initial =
-            listOf(
-              Questionnaire.QuestionnaireItemInitialComponent(
-                Quantity().apply {
-                  code = "months"
-                  system = "http://unitofmeausre.org"
-                  value = BigDecimal("1")
-                }
-              )
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "age"
+        type = Questionnaire.QuestionnaireItemType.QUANTITY
+        initial =
+          listOf(
+            Questionnaire.QuestionnaireItemInitialComponent(
+              Quantity().apply {
+                code = "months"
+                system = "http://unitofmeausre.org"
+                value = BigDecimal("1")
+              }
             )
-        }
+          )
+      }
 
     val questionResponse = question.createQuestionnaireResponseItem()
     val answer = questionResponse.answerFirstRep.value as Quantity
@@ -1651,6 +1625,63 @@ class MoreQuestionnaireItemComponentsTest {
         addExtension(EXTENSION_ENTRY_FORMAT_URL, null)
       }
     assertThat(questionnaireItem.entryFormat).isNull()
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should set answer for non repeating question initial value`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phone"
+        type = Questionnaire.QuestionnaireItemType.STRING
+        initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("000011111")))
+      }
+
+    val responseItem = question.createQuestionnaireResponseItem()
+
+    assertThat(responseItem.answer.map { it.value.primitiveValue() }).containsExactly("000011111")
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should set answer for repeating question initial values`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phones"
+        type = Questionnaire.QuestionnaireItemType.STRING
+        repeats = true
+        initial =
+          listOf(
+            Questionnaire.QuestionnaireItemInitialComponent(StringType("000011111")),
+            Questionnaire.QuestionnaireItemInitialComponent(StringType("000022222"))
+          )
+      }
+
+    val responseItem = question.createQuestionnaireResponseItem()
+
+    assertThat(responseItem.answer.map { it.value.primitiveValue() })
+      .containsExactly("000011111", "000022222")
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should throw exception for non repeating question with multiple initial values `() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phones"
+        type = Questionnaire.QuestionnaireItemType.STRING
+        initial =
+          listOf(
+            Questionnaire.QuestionnaireItemInitialComponent(StringType("000011111")),
+            Questionnaire.QuestionnaireItemInitialComponent(StringType("000022222"))
+          )
+      }
+    assertThrows(IllegalArgumentException::class.java) {
+        question.createQuestionnaireResponseItem()
+      }
+      .run {
+        assertThat(this.message)
+          .isEqualTo(
+            "Questionnaire item ${question.linkId} can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+          )
+      }
   }
 
   @Test
@@ -1863,6 +1894,55 @@ class MoreQuestionnaireItemComponentsTest {
         )
 
     assertThat(questionItem.itemFirstRep.answerExpression).isNull()
+  }
+
+  @Test
+  fun `candidateExpression should return expression`() {
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  EXTENSION_CANDIDATE_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "%resource.item.where(linkId='diseases').value"
+                  }
+                )
+              )
+          }
+        )
+
+    assertThat(questionnaire.itemFirstRep.candidateExpression!!.expression)
+      .isEqualTo("%resource.item.where(linkId='diseases').value")
+  }
+
+  @Test
+  fun `candidateExpression should return null for missing extension`() {
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "today()"
+                  }
+                )
+              )
+          }
+        )
+
+    assertThat(questionnaire.itemFirstRep.candidateExpression).isNull()
   }
 
   @Test

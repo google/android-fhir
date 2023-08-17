@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,16 +21,19 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
+import com.google.android.fhir.datacapture.extensions.getLocalizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.initHelpViews
-import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 
-internal class GroupHeaderView(context: Context, attrs: AttributeSet?) :
-  LinearLayout(context, attrs) {
+/**
+ * Generic view for the prefix, question, and hint as the header of a group using a view holder of
+ * type [QuestionnaireViewHolderType.GROUP].
+ */
+class GroupHeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
 
   init {
     LayoutInflater.from(context).inflate(R.layout.group_type_header_view, this, true)
@@ -48,9 +51,10 @@ internal class GroupHeaderView(context: Context, attrs: AttributeSet?) :
       questionnaireItem = questionnaireViewItem.questionnaireItem
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
-    question.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedTextSpanned)
+    // CQF expression takes precedence over static question text
+    question.updateTextAndVisibility(questionnaireViewItem.questionText)
     hint.updateTextAndVisibility(
-      questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
+      questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned()
     )
     visibility = getHeaderViewVisibility(prefix, question, hint)
   }

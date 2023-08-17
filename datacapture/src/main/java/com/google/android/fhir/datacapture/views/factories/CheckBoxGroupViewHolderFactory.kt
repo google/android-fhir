@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,7 @@ internal object CheckBoxGroupViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         header.bind(questionnaireViewItem)
+        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
         val choiceOrientation =
           questionnaireViewItem.questionnaireItem.choiceOrientation
             ?: ChoiceOrientationTypes.VERTICAL
@@ -70,7 +71,7 @@ internal object CheckBoxGroupViewHolderFactory :
             flow.setWrapMode(Flow.WRAP_NONE)
           }
         }
-        questionnaireViewItem.answerOption
+        questionnaireViewItem.enabledAnswerOptions
           .map { answerOption -> View.generateViewId() to answerOption }
           .onEach { populateViewWithAnswerOption(it.first, it.second, choiceOrientation) }
           .map { it.first }
@@ -126,24 +127,24 @@ internal object CheckBoxGroupViewHolderFactory :
                     // if this answer option has optionExclusive extension, then deselect other
                     // answer options.
                     val optionExclusiveIndex = checkboxGroup.indexOfChild(it) - 1
-                    for (i in 0 until questionnaireViewItem.answerOption.size) {
+                    for (i in 0 until questionnaireViewItem.enabledAnswerOptions.size) {
                       if (optionExclusiveIndex == i) {
                         continue
                       }
                       (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
                       newAnswers.removeIf {
-                        it.value.equalsDeep(questionnaireViewItem.answerOption[i].value)
+                        it.value.equalsDeep(questionnaireViewItem.enabledAnswerOptions[i].value)
                       }
                     }
                   } else {
                     // deselect optionExclusive answer option.
-                    for (i in 0 until questionnaireViewItem.answerOption.size) {
-                      if (!questionnaireViewItem.answerOption[i].optionExclusive) {
+                    for (i in 0 until questionnaireViewItem.enabledAnswerOptions.size) {
+                      if (!questionnaireViewItem.enabledAnswerOptions[i].optionExclusive) {
                         continue
                       }
                       (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
                       newAnswers.removeIf {
-                        it.value.equalsDeep(questionnaireViewItem.answerOption[i].value)
+                        it.value.equalsDeep(questionnaireViewItem.enabledAnswerOptions[i].value)
                       }
                     }
                   }

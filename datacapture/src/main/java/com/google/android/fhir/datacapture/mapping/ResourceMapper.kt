@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,21 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
+import com.google.android.fhir.datacapture.extensions.logicalId
 import com.google.android.fhir.datacapture.extensions.targetStructureMap
 import com.google.android.fhir.datacapture.extensions.toCodeType
 import com.google.android.fhir.datacapture.extensions.toCoding
 import com.google.android.fhir.datacapture.extensions.toIdType
 import com.google.android.fhir.datacapture.extensions.toUriType
+import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.util.Locale
+import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.context.IWorkerContext
-import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CanonicalType
@@ -47,12 +47,12 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.StructureDefinition
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
-import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 import timber.log.Timber
 
@@ -76,11 +76,6 @@ import timber.log.Timber
  * for more information.
  */
 object ResourceMapper {
-
-  private val fhirPathEngine: FHIRPathEngine =
-    with(FhirContext.forCached(FhirVersionEnum.R4)) {
-      FHIRPathEngine(HapiWorkerContext(this, this.validationSupport))
-    }
 
   /**
    * Extract FHIR resources from a [questionnaire] and [questionnaireResponse].
@@ -260,10 +255,9 @@ object ResourceMapper {
       ?.let {
         // Set initial value for the questionnaire item. Questionnaire items should not have both
         // initial value and initial expression.
+        val value = it.asExpectedType(questionnaireItem.type)
         questionnaireItem.initial =
-          mutableListOf(
-            Questionnaire.QuestionnaireItemInitialComponent().setValue(it.asExpectedType())
-          )
+          mutableListOf(Questionnaire.QuestionnaireItemInitialComponent().setValue(value))
       }
 
     populateInitialValues(questionnaireItem.item, *resources)
@@ -751,21 +745,6 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
 }
 
 /**
- * Returns the [Base] object as a [Type] as expected by
- * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue]. Also,
- * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue] only takes a certain [Type]
- * objects and throws exception otherwise. This extension function takes care of the conversion
- * based on the input and expected [Type].
- */
-private fun Base.asExpectedType(): Type {
-  return when (this) {
-    is Enumeration<*> -> toCoding()
-    is IdType -> StringType(idPart)
-    else -> this as Type
-  }
-}
-
-/**
  * Returns a newly created [Resource] from the item extraction context extension if one and only one
  * such extension exists in the questionnaire, or null otherwise.
  */
@@ -773,6 +752,43 @@ private fun Questionnaire.createResource(): Resource? =
   this.extension.itemExtractionContextExtensionValue?.let {
     Class.forName("org.hl7.fhir.r4.model.$it").newInstance() as Resource
   }
+
+/**
+ * Returns the [Base] object as a [Type] as expected by
+ * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue]. Also,
+ * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue] only takes a certain [Type]
+ * objects and throws exception otherwise. This extension function takes care of the conversion
+ * based on the input and expected [Type].
+ */
+private fun Base.asExpectedType(
+  questionnaireItemType: Questionnaire.QuestionnaireItemType? = null
+): Type {
+  return when {
+    questionnaireItemType == Questionnaire.QuestionnaireItemType.REFERENCE ->
+      asExpectedReferenceType()
+    this is Enumeration<*> -> toCoding()
+    this is IdType -> StringType(idPart)
+    else -> this as Type
+  }
+}
+
+private fun Base.asExpectedReferenceType(): Type {
+  return when {
+    this.isResource -> {
+      this@asExpectedReferenceType as Resource
+      Reference().apply {
+        reference =
+          "${this@asExpectedReferenceType.resourceType}/${this@asExpectedReferenceType.logicalId}"
+      }
+    }
+    this is IdType ->
+      Reference().apply {
+        reference =
+          "${this@asExpectedReferenceType.resourceType}/${this@asExpectedReferenceType.idPart}"
+      }
+    else -> throw FHIRException("Expression supplied does not evaluate to IdType.")
+  }
+}
 
 /**
  * Returns a newly created [Resource] from the item extraction context extension if one and only one

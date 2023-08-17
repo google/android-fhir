@@ -68,6 +68,11 @@
 
         <item name="colorOutline">@color/outline_neutral_variant_50</item>
 
+        <item
+            name="questionnaireMultiLineTextInputEditTextStyle"
+        >@style/Catalog.MultiLineTextInputEditTextStyle
+        </item>
+
     </style>
 
     <style name="Theme.MyQuestionnaire.DefaultLayout">
@@ -113,6 +118,13 @@
         parent="Widget.Material3.Button"
     >
         <item name="cornerRadius">100dp</item>
+    </style>
+
+    <style
+        name="Catalog.MultiLineTextInputEditTextStyle"
+        parent="Questionnaire.MultiLineTextInputEditTextStyle"
+    >
+        <item name="android:minLines">2</item>
     </style>
 
 </resources>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,19 @@ import androidx.lifecycle.viewModelScope
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_READ_ONLY
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_SUBMIT_BUTTON
 import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_CALCULATED_EXPRESSION_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_CQF_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ENABLE_WHEN_EXPRESSION_URL
@@ -40,6 +43,7 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_ENTRY_MODE_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_HIDDEN_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_VARIABLE_URL
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
 import com.google.android.fhir.datacapture.extensions.asStringValue
@@ -50,7 +54,6 @@ import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
 import java.util.Date
@@ -58,6 +61,7 @@ import java.util.UUID
 import kotlin.test.assertFailsWith
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -68,6 +72,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateType
@@ -75,9 +80,12 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.ValueSet
@@ -120,20 +128,16 @@ class MainDispatcherRule(
 }
 
 @RunWith(RobolectricTestRunner::class)
-@OptIn(ExperimentalCoroutinesApi::class)
 @Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
 class QuestionnaireViewModelTest {
-  @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
 
   @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
-  private lateinit var fhirEngine: FhirEngine
   private lateinit var state: SavedStateHandle
   private val context = ApplicationProvider.getApplicationContext<Application>()
 
   @Before
   fun setUp() {
-    fhirEngine = FhirEngineProvider.getInstance(context)
     state = SavedStateHandle()
     check(
       ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
@@ -375,7 +379,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should set the first of multiple initial values`() {
+  fun `should set all of multiple initial values`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -403,6 +407,11 @@ class QuestionnaireViewModelTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic question"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(true)
@@ -494,7 +503,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should throw exception for non-matching question linkIds`() {
+  fun `should remove response item of non-matching question linkIds`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -521,62 +530,21 @@ class QuestionnaireViewModelTest {
         )
       }
 
-    val errorMessage =
-      assertFailsWith<IllegalArgumentException> {
-          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-        }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo("Missing questionnaire item for questionnaire response item a-different-link-id")
-  }
-
-  @Test
-  fun `should throw an exception for extra questionnaire response items`() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
-        )
-      }
-    val questionnaireResponse =
+    val expectedQuestionnaireResponse =
       QuestionnaireResponse().apply {
         id = "a-questionnaire-response"
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
-          }
-        )
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-different-link-id"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
+            text = "Basic question"
           }
         )
       }
 
-    val errorMessage =
-      assertFailsWith<IllegalArgumentException> {
-          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-        }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo("Missing questionnaire item for questionnaire response item a-different-link-id")
+    assertResourceEquals(
+      createQuestionnaireViewModel(questionnaire, questionnaireResponse).getQuestionnaireResponse(),
+      expectedQuestionnaireResponse
+    )
   }
 
   @Test
@@ -770,7 +738,7 @@ class QuestionnaireViewModelTest {
       }
     val questionnaireResponse =
       QuestionnaireResponse().apply {
-        id = "a-questionnaire"
+        id = "a-questionnaire-response"
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
@@ -787,6 +755,65 @@ class QuestionnaireViewModelTest {
                         value = StringType("a-name")
                       }
                     )
+                  }
+                )
+              }
+            )
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+  }
+
+  @Test
+  fun `should not throw exception for repeated group`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "repeated-group"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            repeats = true
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "repeated-group"
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-question"
+                addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = BooleanType(true)
+                  }
+                )
+              }
+            )
+          }
+        )
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "repeated-group"
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-question"
+                addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = BooleanType(false)
                   }
                 )
               }
@@ -876,6 +903,202 @@ class QuestionnaireViewModelTest {
     createQuestionnaireViewModel(questionnaire, questionnaireResponse)
   }
 
+  @Test
+  fun `add empty nested QuestionnaireResponseItemComponent to the group if questions are not answered`() {
+    val questionnaireString =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "id": "client-registration-sample",
+          "item": [
+            {
+              "linkId": "1",
+              "type": "group",
+              "item": [
+                {
+                  "linkId": "1.1",
+                  "text": "First Nested Item",
+                  "type": "boolean"
+                },
+                {
+                  "linkId": "1.2",
+                  "text": "Second Nested Item",
+                  "type": "boolean"
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    val questionnaireResponseString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "1"
+            }
+          ]
+        }
+      """.trimIndent()
+
+    val expectedResponseString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "1",
+              "item": [
+                {
+                  "linkId": "1.1",
+                  "text": "First Nested Item"
+                },
+                {
+                  "linkId": "1.2",
+                  "text": "Second Nested Item"
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
+    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    val viewModel = QuestionnaireViewModel(context, state)
+    val value = viewModel.getQuestionnaireResponse()
+    val expectedResponse =
+      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+        as QuestionnaireResponse
+
+    assertResourceEquals(value, expectedResponse)
+  }
+
+  @Test
+  fun `maintain an order while adding empty QuestionnaireResponseItemComponent to the response items`() {
+    val questionnaireString =
+      """
+          {
+            "resourceType": "Questionnaire",
+            "item": [
+              {
+                "linkId": "1",
+                "type": "group",
+                "text": "Repeated Group",
+                "repeats": true,
+                "item": [
+                  {
+                    "linkId": "1-1",
+                    "type": "date",
+                    "extension": [
+                      {
+                        "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
+                        "valueString": "yyyy-mm-dd"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "linkId": "2",
+                "text": "Is this the first visit?",
+                "type": "boolean"
+              }
+            ]
+          }
+      """.trimIndent()
+
+    val questionnaireResponseString =
+      """
+              {
+                "resourceType": "QuestionnaireResponse",
+                "item": [
+                  {
+                    "linkId": "1",
+                    "text": "Repeated Group",
+                    "item": [
+                      {
+                        "linkId": "1-1",
+                        "answer": [
+                          {
+                            "valueDate": "2023-06-14"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "linkId": "1",
+                    "text": "Repeated Group",
+                    "item": [
+                      {
+                        "linkId": "1-1",
+                        "answer": [
+                          {
+                            "valueDate": "2023-06-13"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+      """.trimIndent()
+
+    val expectedResponseString =
+      """
+            {
+              "resourceType": "QuestionnaireResponse",
+              "item": [
+                {
+                  "linkId": "1",
+                  "text": "Repeated Group",
+                  "item": [
+                    {
+                      "linkId": "1-1",
+                      "answer": [
+                        {
+                          "valueDate": "2023-06-14"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "1",
+                  "text": "Repeated Group",
+                  "item": [
+                    {
+                      "linkId": "1-1",
+                      "answer": [
+                        {
+                          "valueDate": "2023-06-13"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "2",
+                  "text": "Is this the first visit?"
+                }
+              ]
+            }
+      """.trimIndent()
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
+    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    val viewModel = QuestionnaireViewModel(context, state)
+    val value = viewModel.getQuestionnaireResponse()
+    val expectedResponse =
+      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+        as QuestionnaireResponse
+
+    assertResourceEquals(value, expectedResponse)
+  }
+
   // ==================================================================== //
   //                                                                      //
   //                       Questionnaire State Flow                       //
@@ -904,19 +1127,20 @@ class QuestionnaireViewModelTest {
       }
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+      assertThat(questionnaireItemViewItemList).hasSize(2)
 
-    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    assertThat(questionnaireItemViewItemList).hasSize(2)
+      val firstQuestionnaireItem = questionnaireItemViewItemList[0].asQuestion().questionnaireItem
+      assertThat(firstQuestionnaireItem.linkId).isEqualTo("a-link-id")
+      assertThat(firstQuestionnaireItem.text).isEqualTo("Basic questions")
+      assertThat(firstQuestionnaireItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.GROUP)
 
-    val firstQuestionnaireItem = questionnaireItemViewItemList[0].asQuestion().questionnaireItem
-    assertThat(firstQuestionnaireItem.linkId).isEqualTo("a-link-id")
-    assertThat(firstQuestionnaireItem.text).isEqualTo("Basic questions")
-    assertThat(firstQuestionnaireItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.GROUP)
-
-    val secondQuestionnaireItem = questionnaireItemViewItemList[1].asQuestion().questionnaireItem
-    assertThat(secondQuestionnaireItem.linkId).isEqualTo("another-link-id")
-    assertThat(secondQuestionnaireItem.text).isEqualTo("Name?")
-    assertThat(secondQuestionnaireItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.STRING)
+      val secondQuestionnaireItem = questionnaireItemViewItemList[1].asQuestion().questionnaireItem
+      assertThat(secondQuestionnaireItem.linkId).isEqualTo("another-link-id")
+      assertThat(secondQuestionnaireItem.text).isEqualTo("Name?")
+      assertThat(secondQuestionnaireItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.STRING)
+    }
   }
 
   @Test
@@ -934,9 +1158,11 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    assertThat(questionnaireItemViewItemList.single().asQuestion().validationResult)
-      .isEqualTo(NotValidated)
+    viewModel.runViewModelBlocking {
+      val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+      assertThat(questionnaireItemViewItemList.single().asQuestion().validationResult)
+        .isEqualTo(NotValidated)
+    }
   }
 
   @Test
@@ -991,11 +1217,16 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-
-    assertThat(
-        viewModel.getQuestionnaireItemViewItemList().single().asQuestion().questionnaireItem.linkId
-      )
-      .isEqualTo("question-1")
+    viewModel.runViewModelBlocking {
+      assertThat(
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .single()
+            .asQuestion()
+            .questionnaireItem.linkId
+        )
+        .isEqualTo("question-1")
+    }
   }
 
   @Test
@@ -1023,14 +1254,15 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
 
-    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-
-    assertThat(questionnaireItemViewItemList).hasSize(2)
-    assertThat(questionnaireItemViewItemList[0].asQuestion().questionnaireItem.linkId)
-      .isEqualTo("question-1")
-    assertThat(questionnaireItemViewItemList[1].asQuestion().questionnaireItem.linkId)
-      .isEqualTo("question-2")
+      assertThat(questionnaireItemViewItemList).hasSize(2)
+      assertThat(questionnaireItemViewItemList[0].asQuestion().questionnaireItem.linkId)
+        .isEqualTo("question-1")
+      assertThat(questionnaireItemViewItemList[1].asQuestion().questionnaireItem.linkId)
+        .isEqualTo("question-2")
+    }
   }
 
   @Test
@@ -1077,11 +1309,16 @@ class QuestionnaireViewModelTest {
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
 
     val viewModel = QuestionnaireViewModel(context, state)
-
-    assertThat(
-        viewModel.getQuestionnaireItemViewItemList().single().asQuestion().questionnaireItem.linkId
-      )
-      .isEqualTo("a-boolean-item-1")
+    viewModel.runViewModelBlocking {
+      assertThat(
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .single()
+            .asQuestion()
+            .questionnaireItem.linkId
+        )
+        .isEqualTo("a-boolean-item-1")
+    }
   }
 
   // ==================================================================== //
@@ -1753,10 +1990,12 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.goToNextPage()
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
 
-    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.last()?.index)
+      assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
+      assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.last()?.index)
+    }
   }
 
   @Test
@@ -1800,11 +2039,13 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.goToNextPage()
-    viewModel.goToPreviousPage()
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
+      viewModel.goToPreviousPage()
 
-    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.first()?.index)
+      assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
+      assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.first()?.index)
+    }
   }
 
   @Test
@@ -1842,10 +2083,12 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.goToNextPage()
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
 
-    assertThat(viewModel.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.last()?.index)
+      assertThat(viewModel.entryMode).isEqualTo(EntryMode.RANDOM)
+      assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.last()?.index)
+    }
   }
 
   @Test
@@ -1883,11 +2126,13 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.goToNextPage()
-    viewModel.goToPreviousPage()
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
+      viewModel.goToPreviousPage()
 
-    assertThat(viewModel.entryMode).isEqualTo(EntryMode.RANDOM)
-    assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.first()?.index)
+      assertThat(viewModel.entryMode).isEqualTo(EntryMode.RANDOM)
+      assertThat(viewModel.currentPageIndexFlow.value).isEqualTo(viewModel.pages?.first()?.index)
+    }
   }
 
   @Test
@@ -2289,12 +2534,13 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
-
-      assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
-            .pagination.showReviewButton
-        )
-        .isFalse()
+      viewModel.runViewModelBlocking {
+        assertThat(
+            (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
+              .pagination.showReviewButton
+          )
+          .isFalse()
+      }
     }
 
   @Test
@@ -2380,12 +2626,13 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
-
-      assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
-            .pagination.showReviewButton
-        )
-        .isTrue()
+      viewModel.runViewModelBlocking {
+        assertThat(
+            (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode)
+              .pagination.showReviewButton
+          )
+          .isTrue()
+      }
     }
 
   @Test
@@ -3020,6 +3267,375 @@ class QuestionnaireViewModelTest {
       }
     }
 
+  @Test
+  fun `getQuestionnaireResponse() should return enabled repeated groups`() {
+    val questionnaireString =
+      """
+        {
+  "resourceType": "Questionnaire",
+  "id": "ANCDELIVERY",
+  "item": [
+    {
+      "linkId": "12.0",
+      "type": "group",
+      "text": "Pregnancy Outcome - Baby",
+      "repeats": true,
+      "item": [
+        {
+          "linkId": "12.6",
+          "type": "group",
+          "text": "Live Birth/Stillbirth",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "radio-button",
+                        "display": "Radio Button"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "linkId": "12.6.1",
+              "type": "choice",
+              "text": "Is it Live Birth/Stillbirth?",
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "live-birth",
+                    "display": "Live Birth"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "code": "still-birth",
+                    "display": "Stillbirth"
+                  }
+                }
+              ]
+            },
+            {
+              "enableWhen": [
+                {
+                  "question": "12.6.1",
+                  "operator": "=",
+                  "answerCoding": {
+                    "code": "live-birth",
+                    "display": "Live Birth"
+                  }
+                }
+              ],
+              "linkId": "12.6.3",
+              "type": "group",
+              "text": "Baby Gender",
+              "item": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "radio-button",
+                            "display": "Radio Button"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "linkId": "12.6.3.1",
+                  "type": "choice",
+                  "text": "Sex of Baby",
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "male",
+                        "display": "Male"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "female",
+                        "display": "Female"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "enableWhen": [
+                {
+                  "question": "12.6.1",
+                  "operator": "=",
+                  "answerCoding": {
+                    "code": "still-birth",
+                    "display": "Stillbirth"
+                  }
+                }
+              ],
+              "linkId": "12.6.4",
+              "type": "group",
+              "text": "Stillbirth Type",
+              "item": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "radio-button",
+                            "display": "Radio Button"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "linkId": "12.6.4.1",
+                  "type": "choice",
+                  "text": "Stillbirth Type",
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "FSB",
+                        "display": "FSB"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "MSB",
+                        "display": "MSB"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+      """.trimIndent()
+
+    val questionnaireResponseString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "12.0",
+              "answer": [
+                {
+                  "item": [
+                    {
+                      "linkId": "12.6",
+                      "item": [
+                        {
+                          "linkId": "12.6.1",
+                          "answer": [
+                            {
+                              "valueCoding": {
+                                "code": "live-birth",
+                                "display": "Live Birth"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "linkId": "12.6.3",
+                          "item": [
+                            {
+                              "linkId": "12.6.3.1",
+                              "answer": [
+                                {
+                                  "valueCoding": {
+                                    "code": "male",
+                                    "display": "Male"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "linkId": "12.6.4",
+                          "item": [
+                            {
+                              "linkId": "12.6.4.1"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "item": [
+                    {
+                      "linkId": "12.6",
+                      "item": [
+                        {
+                          "linkId": "12.6.1",
+                          "answer": [
+                            {
+                              "valueCoding": {
+                                "code": "still-birth",
+                                "display": "Stillbirth"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "linkId": "12.6.3",
+                          "item": [
+                            {
+                              "linkId": "12.6.3.1"
+                            }
+                          ]
+                        },
+                        {
+                          "linkId": "12.6.4",
+                          "item": [
+                            {
+                              "linkId": "12.6.4.1",
+                              "answer": [
+                                {
+                                  "valueCoding": {
+                                    "code": "FSB",
+                                    "display": "FSB"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+
+      """.trimIndent()
+
+    val expectedResponseString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "12.0",
+              "text": "Pregnancy Outcome - Baby",
+              "item": [
+                {
+                  "linkId": "12.6",
+                  "text": "Live Birth/Stillbirth",
+                  "item": [
+                    {
+                      "linkId": "12.6.1",
+                      "text": "Is it Live Birth/Stillbirth?",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "code": "live-birth",
+                            "display": "Live Birth"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "12.6.3",
+                      "text": "Baby Gender",
+                      "item": [
+                        {
+                          "linkId": "12.6.3.1",
+                          "text": "Sex of Baby",
+                          "answer": [
+                            {
+                              "valueCoding": {
+                                "code": "male",
+                                "display": "Male"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "linkId": "12.0",
+              "text": "Pregnancy Outcome - Baby",
+              "item": [
+                {
+                  "linkId": "12.6",
+                  "text": "Live Birth/Stillbirth",
+                  "item": [
+                    {
+                      "linkId": "12.6.1",
+                      "text": "Is it Live Birth/Stillbirth?",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "code": "still-birth",
+                            "display": "Stillbirth"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "12.6.4",
+                      "text": "Stillbirth Type",
+                      "item": [
+                        {
+                          "linkId": "12.6.4.1",
+                          "text": "Stillbirth Type",
+                          "answer": [
+                            {
+                              "valueCoding": {
+                                "code": "FSB",
+                                "display": "FSB"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+
+      """.trimIndent()
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
+    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    val viewModel = QuestionnaireViewModel(context, state)
+    val value = viewModel.getQuestionnaireResponse()
+    val expectedResponse =
+      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+        as QuestionnaireResponse
+
+    assertResourceEquals(value, expectedResponse)
+  }
+
   // ==================================================================== //
   //                                                                      //
   //               Questionnaire Response with Nested Items               //
@@ -3067,17 +3683,18 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      viewModel
+        .getQuestionnaireItemViewItemList()[1]
+        .asQuestion()
+        .setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            this.value = valueBooleanType.setValue(false)
+          }
+        )
 
-    viewModel
-      .getQuestionnaireItemViewItemList()[1]
-      .asQuestion()
-      .setAnswer(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          this.value = valueBooleanType.setValue(false)
-        }
-      )
-
-    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+      assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+    }
   }
 
   @Test
@@ -3379,7 +3996,7 @@ class QuestionnaireViewModelTest {
   // ==================================================================== //
 
   @Test
-  fun questionnaire_resolveContainedAnswerValueSet() = runTest {
+  fun questionnaire_resolveContainedAnswerValueSetInEnabledAnswerOptions() = runTest {
     val valueSetId = "yesnodontknow"
     val questionnaire =
       Questionnaire().apply {
@@ -3414,20 +4031,30 @@ class QuestionnaireViewModelTest {
               }
           }
         )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "q-yesnodontknow"
+            answerValueSet = "#$valueSetId"
+          }
+        )
       }
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val codeSet = viewModel.resolveAnswerValueSet("#$valueSetId")
-
-    assertThat(codeSet.map { it.valueCoding.display })
-      .containsExactly("Yes", "No", "Don't Know")
-      .inOrder()
+    viewModel.runViewModelBlocking {
+      val viewItem =
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "q-yesnodontknow" }
+      val answerOptions = viewItem.enabledAnswerOptions
+      assertThat(answerOptions.map { it.valueCoding.display })
+        .containsExactly("Yes", "No", "Don't Know")
+        .inOrder()
+    }
   }
 
   @Test
-  fun questionnaire_resolveAnswerValueSetExternalResolved() = runTest {
-    val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
-
+  fun questionnaire_resolveAnswerValueSetExternalResolvedInEnabledAnswerOptions() = runTest {
     ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
       .dataCaptureConfiguration =
       DataCaptureConfig(
@@ -3458,11 +4085,29 @@ class QuestionnaireViewModelTest {
           }
       )
 
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "q-codesystemyesno"
+            answerValueSet = CODE_SYSTEM_YES_NO
+          }
+        )
+      }
+
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val codeSet = viewModel.resolveAnswerValueSet(CODE_SYSTEM_YES_NO)
-    assertThat(codeSet.map { it.valueCoding.display })
-      .containsExactly("Yes", "No", "Don't Know")
-      .inOrder()
+    viewModel.runViewModelBlocking {
+      val viewItem =
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "q-codesystemyesno" }
+      val codeSet = viewItem.enabledAnswerOptions
+      assertThat(codeSet.map { it.valueCoding.display })
+        .containsExactly("Yes", "No", "Don't Know")
+        .inOrder()
+    }
   }
 
   // ==================================================================== //
@@ -3472,7 +4117,77 @@ class QuestionnaireViewModelTest {
   // ==================================================================== //
 
   @Test
-  fun `resolveAnswerExpression() should return questionnaire item answer options for answer expression and choice column`() =
+  fun `should return x-fhir-query referring to patient in context on start`() = runTest {
+    var searchString = ""
+    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+      .dataCaptureConfiguration =
+      DataCaptureConfig(
+        xFhirQueryResolver = { xFhirQuery ->
+          searchString = xFhirQuery
+          emptyList()
+        }
+      )
+
+    val patientId = "123"
+    val patient = Patient().apply { id = patientId }
+
+    val questionnaire =
+      Questionnaire().apply {
+        extension =
+          listOf(
+            Extension(
+                "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+              )
+              .apply {
+                addExtension(
+                  "name",
+                  Coding(
+                    "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
+                    "patient",
+                    "Patient"
+                  )
+                )
+                addExtension("type", CodeType("Patient"))
+              }
+          )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a"
+            text = "answer expression question text"
+            type = Questionnaire.QuestionnaireItemType.REFERENCE
+            extension =
+              listOf(
+                Extension(
+                  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                  Expression().apply {
+                    this.expression = "Observation?subject={{%patient.id}}"
+                    this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+                  }
+                )
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    state.set(
+      EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS,
+      listOf(printer.encodeResourceToString(patient))
+    )
+
+    val viewModel = QuestionnaireViewModel(context, state)
+    viewModel.runViewModelBlocking {
+      val viewItem =
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "a" }
+      assertThat(viewItem.enabledAnswerOptions).isEmpty()
+      assertThat(searchString).isEqualTo("Observation?subject=Patient/$patientId")
+    }
+  }
+
+  @Test
+  fun `should return questionnaire item answer options for answer expression and choice column`() =
     runTest {
       val practitioner =
         Practitioner().apply {
@@ -3514,14 +4229,19 @@ class QuestionnaireViewModelTest {
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
       val viewModel = QuestionnaireViewModel(context, state)
-      val answerOptions = viewModel.resolveAnswerExpression(questionnaire.itemFirstRep)
-
-      assertThat(answerOptions.first().valueReference.reference)
-        .isEqualTo("Practitioner/${practitioner.logicalId}")
+      viewModel.runViewModelBlocking {
+        val viewItem =
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .map { it.asQuestion() }
+            .single { it.questionnaireItem.linkId == "a" }
+        assertThat(viewItem.enabledAnswerOptions.first().valueReference.reference)
+          .isEqualTo("Practitioner/${practitioner.logicalId}")
+      }
     }
 
   @Test
-  fun `resolveAnswerExpression() should throw exception when XFhirQueryResolver is not provided`() {
+  fun `should throw exception when XFhirQueryResolver is not provided for x-fhir-query answer expressions`() {
     val questionnaire =
       Questionnaire().apply {
         addItem(
@@ -3553,14 +4273,820 @@ class QuestionnaireViewModelTest {
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
     val viewModel = QuestionnaireViewModel(context, state)
     val exception =
-      assertThrows(null, IllegalStateException::class.java) {
-        runTest { viewModel.resolveAnswerExpression(questionnaire.itemFirstRep) }
+      assertThrows(IllegalStateException::class.java) {
+        runTest { viewModel.runViewModelBlocking {} }
       }
     assertThat(exception.message)
       .isEqualTo(
         "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
       )
   }
+
+  // ==================================================================== //
+  //                                                                      //
+  //                 Answer Options Toggle Expression                     //
+  //                                                                      //
+  // ==================================================================== //
+  @Test
+  fun `only answer options evaluating to true in answerOptionsToggleExpression occurrences should be enabled on initial load`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "b"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              text = "Select an option"
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option3"
+                        display = "Option 3"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "false"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "true"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+              answerOption =
+                listOf(
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option3"
+                        display = "Option 3"
+                      }
+                  }
+                )
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        val viewItem =
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .map { it.asQuestion() }
+            .single { it.questionnaireItem.linkId == "b" }
+        assertThat(viewItem.enabledAnswerOptions.map { it.value as Coding }.map { it.code })
+          .containsExactly("option2")
+      }
+    }
+
+  @Test
+  fun `enabledAnswerOptions should toggle options in answerOptionsToggleExpression occurrence  when answers to depended question change`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              text = "Is Married?"
+              addInitial().apply { value = BooleanType(false) }
+            }
+          )
+
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "b"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              text = "Select an option"
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option3"
+                        display = "Option 3"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression =
+                          "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value)"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression =
+                          "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value.not())"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+              answerOption =
+                listOf(
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option3"
+                        display = "Option 3"
+                      }
+                  }
+                )
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run {
+            assertThat(this.enabledAnswerOptions.map { it.valueCoding.code })
+              .containsExactly("option2")
+          }
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "a" }
+          .setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = BooleanType(true)
+            }
+          )
+
+        assertThat(
+            viewModel
+              .getQuestionnaireResponse()
+              .item
+              .single { it.linkId == "a" }
+              .answerFirstRep.value.primitiveValue()
+          )
+          .isEqualTo(BooleanType(true).primitiveValue())
+
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run {
+            assertThat(this.enabledAnswerOptions.map { it.valueCoding.code })
+              .containsExactly("option3", "option1")
+          }
+      }
+    }
+
+  @Test
+  fun `enabledAnswerOptions should include answer options not listed in any answerOptionsToggleExpression occurrences`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "b"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              text = "Select an option"
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option3"
+                        display = "Option 3"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "false"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "true"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+              answerOption =
+                listOf(
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option3"
+                        display = "Option 3"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option4"
+                        display = "Option 4"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option5"
+                        display = "Option 5"
+                      }
+                  }
+                )
+            }
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run {
+            assertThat(enabledAnswerOptions.map { it.valueCoding.code })
+              .containsAtLeast("option4", "option5")
+          }
+      }
+    }
+
+  @Test
+  fun `enabledAnswerOptions should not include unknown options listed in answerOptionsToggleExpression occurrences`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "b"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              text = "Select an option"
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option75"
+                        display = "Option 75"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "true"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option3"
+                        display = "Option 3"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "false"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+              answerOption =
+                listOf(
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option3"
+                        display = "Option 3"
+                      }
+                  }
+                )
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run {
+            assertThat(enabledAnswerOptions.map { it.valueCoding.code }).doesNotContain("option75")
+            assertThat(enabledAnswerOptions.map { it.valueCoding.code }).containsExactly("option2")
+          }
+      }
+    }
+
+  @Test
+  fun `enabledAnswerOptions should include options listed in both allowed and disallowed answerOptionsToggleExtension options`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "b"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              text = "Select an option"
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "false"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "true"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+              answerOption =
+                listOf(
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                  },
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                    value =
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                  }
+                )
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run { assertThat(enabledAnswerOptions.map { it.valueCoding.code }).contains("option1") }
+      }
+    }
+
+  @Test
+  fun `enabledAnswerOptions should include options toggled from answerOptionsToggleExpression occurrences with variable expression`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addExtension(
+            Extension(EXTENSION_VARIABLE_URL).apply {
+              setValue(
+                Expression().apply {
+                  name = "textVal"
+                  language = "text/fhirpath"
+                  expression = "10"
+                }
+              )
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "b-link"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              text = "Select an option"
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "%textVal > 10"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression = "%textVal = 10"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+
+              addAnswerOption(
+                Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                  value =
+                    Coding().apply {
+                      code = "option1"
+                      display = "Option 1"
+                    }
+                }
+              )
+              addAnswerOption(
+                Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                  value =
+                    Coding().apply {
+                      code = "option2"
+                      display = "Option 2"
+                    }
+                }
+              )
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b-link" }
+          .run {
+            assertThat(enabledAnswerOptions.map { it.valueCoding.code }).containsExactly("option2")
+          }
+      }
+    }
+
+  @Test
+  fun `should remove previously selected answers that toggled off and disallowed in answerOptionsToggleExpression occurrences`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              text = "Is Married?"
+              addInitial().apply { value = BooleanType(false) }
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "b"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              text = "Select an option"
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option1"
+                        display = "Option 1"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression =
+                          "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value.not())"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+
+              addExtension(
+                Extension(EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL).apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION,
+                      Coding().apply {
+                        code = "option2"
+                        display = "Option 2"
+                      }
+                    )
+                  )
+                  addExtension(
+                    Extension(
+                      EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION,
+                      Expression().apply {
+                        this.expression =
+                          "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value)"
+                        this.language = "text/fhirpath"
+                      }
+                    )
+                  )
+                }
+              )
+
+              addAnswerOption(
+                Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                  value =
+                    Coding().apply {
+                      code = "option1"
+                      display = "Option 1"
+                    }
+                }
+              )
+              addAnswerOption(
+                Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                  value =
+                    Coding().apply {
+                      code = "option2"
+                      display = "Option 2"
+                    }
+                }
+              )
+            }
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run {
+            assertThat(enabledAnswerOptions.map { it.valueCoding.code }).containsExactly("option1")
+            setAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value =
+                  Coding().apply {
+                    code = "option1"
+                    display = "Option 1"
+                  }
+              }
+            )
+          }
+        assertThat(
+            viewModel
+              .getQuestionnaireResponse()
+              .item
+              .single { it.linkId == "b" }
+              .answerFirstRep.valueCoding.code
+          )
+          .isEqualTo("option1")
+        // change answer to depended question to trigger re-evaluation of
+        // answerOptionsToggleExpression expression
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "a" }
+          .run {
+            setAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run {
+            assertThat(enabledAnswerOptions.map { it.valueCoding.code }).containsExactly("option2")
+            assertThat(answers).isEmpty()
+          }
+        assertThat(viewModel.getQuestionnaireResponse().item.single { it.linkId == "b" }.answer)
+          .isEmpty()
+      }
+    }
 
   // ==================================================================== //
   //                                                                      //
@@ -3602,24 +5128,25 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        assertThat(
+            viewModel
+              .getQuestionnaireResponse()
+              .item
+              .single { it.linkId == "a-birthdate" }
+              .answerFirstRep.value.asStringValue()
+          )
+          .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -1) }.asStringValue())
 
-      assertThat(
-          viewModel
-            .getQuestionnaireResponse()
-            .item
-            .single { it.linkId == "a-birthdate" }
-            .answerFirstRep.value.asStringValue()
-        )
-        .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -1) }.asStringValue())
-
-      assertThat(
-          viewModel
-            .getQuestionnaireResponse()
-            .item
-            .single { it.linkId == "a-age-years" }
-            .answerFirstRep.valueQuantity.value.toString()
-        )
-        .isEqualTo("1")
+        assertThat(
+            viewModel
+              .getQuestionnaireResponse()
+              .item
+              .single { it.linkId == "a-age-years" }
+              .answerFirstRep.valueQuantity.value.toString()
+          )
+          .isEqualTo("1")
+      }
     }
 
   @Test
@@ -3653,36 +5180,37 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        val birthdateItem =
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-birthdate" }
+            .asQuestion()
 
-      val birthdateItem =
+        assertThat(birthdateItem.getQuestionnaireResponseItem().answer).isEmpty()
+
         viewModel
           .getQuestionnaireItemViewItemList()
-          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-birthdate" }
+          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-age-years" }
           .asQuestion()
+          .apply {
+            this.answersChangedCallback(
+              this.questionnaireItem,
+              this.getQuestionnaireResponseItem(),
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  this.value = Quantity.fromUcum("2", "years")
+                }
+              ),
+              null
+            )
+          }
 
-      assertThat(birthdateItem.getQuestionnaireResponseItem().answer).isEmpty()
-
-      viewModel
-        .getQuestionnaireItemViewItemList()
-        .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-age-years" }
-        .asQuestion()
-        .apply {
-          this.answersChangedCallback(
-            this.questionnaireItem,
-            this.getQuestionnaireResponseItem(),
-            listOf(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                this.value = Quantity.fromUcum("2", "years")
-              }
-            ),
-            null
+        assertThat(
+            birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
           )
-        }
-
-      assertThat(
-          birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
-        )
-        .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -2) }.valueAsString)
+          .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -2) }.valueAsString)
+      }
     }
 
   @Test
@@ -3716,60 +5244,117 @@ class QuestionnaireViewModelTest {
         }
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
-      val birthdateItem =
-        viewModel
-          .getQuestionnaireItemViewItemList()
-          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-birthdate" }
-          .asQuestion()
-      val birthdateValue = DateType(Date())
-      birthdateItem.apply {
-        this.answersChangedCallback(
-          this.questionnaireItem,
-          this.getQuestionnaireResponseItem(),
-          listOf(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              this.value = birthdateValue
-            }
-          ),
-          null
-        )
-      }
-
-      assertThat(
-          birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
-        )
-        .isEqualTo(birthdateValue.valueAsString)
-
-      viewModel
-        .getQuestionnaireItemViewItemList()
-        .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-age-years" }
-        .asQuestion()
-        .apply {
+      viewModel.runViewModelBlocking {
+        val birthdateItem =
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-birthdate" }
+            .asQuestion()
+        val birthdateValue = DateType(Date())
+        birthdateItem.apply {
           this.answersChangedCallback(
             this.questionnaireItem,
             this.getQuestionnaireResponseItem(),
             listOf(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                this.value = Quantity.fromUcum("2", "years")
+                this.value = birthdateValue
               }
             ),
             null
           )
         }
 
-      assertThat(
-          birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
-        )
-        .isEqualTo(birthdateValue.valueAsString)
+        assertThat(
+            birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
+          )
+          .isEqualTo(birthdateValue.valueAsString)
+
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-age-years" }
+          .asQuestion()
+          .apply {
+            this.answersChangedCallback(
+              this.questionnaireItem,
+              this.getQuestionnaireResponseItem(),
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  this.value = Quantity.fromUcum("2", "years")
+                }
+              ),
+              null
+            )
+          }
+
+        assertThat(
+            birthdateItem.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString
+          )
+          .isEqualTo(birthdateValue.valueAsString)
+      }
     }
 
   @Test
-  fun `should detect cyclic dependency for questionnaire item with calculated expression extension in flat list`() =
-    runTest {
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
+  fun `should detect cyclic dependency for questionnaire item with calculated expression extension in flat list`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-birthdate"
+            type = Questionnaire.QuestionnaireItemType.DATE
+            addInitial(
+              Questionnaire.QuestionnaireItemInitialComponent(
+                DateType(Date()).apply { add(Calendar.YEAR, -2) }
+              )
+            )
+            addExtension().apply {
+              url = EXTENSION_CALCULATED_EXPRESSION_URL
+              setValue(
+                Expression().apply {
+                  this.language = "text/fhirpath"
+                  this.expression =
+                    "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+                }
+              )
+            }
+          }
+        )
+
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-age-years"
+            type = Questionnaire.QuestionnaireItemType.INTEGER
+            addExtension().apply {
+              url = EXTENSION_CALCULATED_EXPRESSION_URL
+              setValue(
+                Expression().apply {
+                  this.language = "text/fhirpath"
+                  this.expression =
+                    "today().toString().substring(0, 4).toInteger() - %resource.repeat(item).where(linkId='a-birthdate').answer.value.toString().substring(0, 4).toInteger()"
+                }
+              )
+            }
+          }
+        )
+      }
+
+    val exception =
+      assertThrows(null, IllegalStateException::class.java) {
+        runTest {
+          val viewModel = createQuestionnaireViewModel(questionnaire)
+          viewModel.runViewModelBlocking {}
+        }
+      }
+    assertThat(exception.message)
+      .isEqualTo("a-birthdate and a-age-years have cyclic dependency in expression based extension")
+  }
+
+  @Test
+  fun `should detect cyclic dependency for questionnaire item with calculated expression extension in nested list`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "a-birthdate"
               type = Questionnaire.QuestionnaireItemType.DATE
@@ -3790,8 +5375,17 @@ class QuestionnaireViewModelTest {
               }
             }
           )
-
-          addItem(
+          .addItem()
+          .apply {
+            linkId = "a.1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+          }
+          .addItem()
+          .apply {
+            linkId = "a.1.1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+          }
+          .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "a-age-years"
               type = Questionnaire.QuestionnaireItemType.INTEGER
@@ -3807,82 +5401,18 @@ class QuestionnaireViewModelTest {
               }
             }
           )
-        }
+      }
 
-      val exception =
-        assertThrows(null, IllegalStateException::class.java) {
-          createQuestionnaireViewModel(questionnaire)
+    val exception =
+      assertThrows(null, IllegalStateException::class.java) {
+        runTest {
+          val viewModel = createQuestionnaireViewModel(questionnaire)
+          viewModel.runViewModelBlocking {}
         }
-      assertThat(exception.message)
-        .isEqualTo(
-          "a-birthdate and a-age-years have cyclic dependency in expression based extension"
-        )
-    }
-
-  @Test
-  fun `should detect cyclic dependency for questionnaire item with calculated expression extension in nested list`() =
-    runTest {
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "a-birthdate"
-                type = Questionnaire.QuestionnaireItemType.DATE
-                addInitial(
-                  Questionnaire.QuestionnaireItemInitialComponent(
-                    DateType(Date()).apply { add(Calendar.YEAR, -2) }
-                  )
-                )
-                addExtension().apply {
-                  url = EXTENSION_CALCULATED_EXPRESSION_URL
-                  setValue(
-                    Expression().apply {
-                      this.language = "text/fhirpath"
-                      this.expression =
-                        "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
-                    }
-                  )
-                }
-              }
-            )
-            .addItem()
-            .apply {
-              linkId = "a.1"
-              type = Questionnaire.QuestionnaireItemType.GROUP
-            }
-            .addItem()
-            .apply {
-              linkId = "a.1.1"
-              type = Questionnaire.QuestionnaireItemType.GROUP
-            }
-            .addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "a-age-years"
-                type = Questionnaire.QuestionnaireItemType.INTEGER
-                addExtension().apply {
-                  url = EXTENSION_CALCULATED_EXPRESSION_URL
-                  setValue(
-                    Expression().apply {
-                      this.language = "text/fhirpath"
-                      this.expression =
-                        "today().toString().substring(0, 4).toInteger() - %resource.repeat(item).where(linkId='a-birthdate').answer.value.toString().substring(0, 4).toInteger()"
-                    }
-                  )
-                }
-              }
-            )
-        }
-
-      val exception =
-        assertThrows(null, IllegalStateException::class.java) {
-          createQuestionnaireViewModel(questionnaire)
-        }
-      assertThat(exception.message)
-        .isEqualTo(
-          "a-birthdate and a-age-years have cyclic dependency in expression based extension"
-        )
-    }
+      }
+    assertThat(exception.message)
+      .isEqualTo("a-birthdate and a-age-years have cyclic dependency in expression based extension")
+  }
 
   // ==================================================================== //
   //                                                                      //
@@ -3914,11 +5444,12 @@ class QuestionnaireViewModelTest {
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
     val viewModel = QuestionnaireViewModel(context, state)
-
-    assertThat(
-        viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
-      )
-      .isEqualTo("nested-display-question")
+    viewModel.runViewModelBlocking {
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
+        )
+        .isEqualTo("nested-display-question")
+    }
   }
 
   @Test
@@ -3963,11 +5494,16 @@ class QuestionnaireViewModelTest {
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
       val viewModel = QuestionnaireViewModel(context, state)
-
-      assertThat(
-          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
-        )
-        .isEqualTo("parent-question")
+      viewModel.runViewModelBlocking {
+        assertThat(
+            viewModel
+              .getQuestionnaireItemViewItemList()
+              .last()
+              .asQuestion()
+              .questionnaireItem.linkId
+          )
+          .isEqualTo("parent-question")
+      }
     }
 
   @Test
@@ -4012,11 +5548,16 @@ class QuestionnaireViewModelTest {
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
       val viewModel = QuestionnaireViewModel(context, state)
-
-      assertThat(
-          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
-        )
-        .isEqualTo("parent-question")
+      viewModel.runViewModelBlocking {
+        assertThat(
+            viewModel
+              .getQuestionnaireItemViewItemList()
+              .last()
+              .asQuestion()
+              .questionnaireItem.linkId
+          )
+          .isEqualTo("parent-question")
+      }
     }
 
   @Test
@@ -4061,11 +5602,16 @@ class QuestionnaireViewModelTest {
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
       val viewModel = QuestionnaireViewModel(context, state)
-
-      assertThat(
-          viewModel.getQuestionnaireItemViewItemList().last().asQuestion().questionnaireItem.linkId
-        )
-        .isEqualTo("parent-question")
+      viewModel.runViewModelBlocking {
+        assertThat(
+            viewModel
+              .getQuestionnaireItemViewItemList()
+              .last()
+              .asQuestion()
+              .questionnaireItem.linkId
+          )
+          .isEqualTo("parent-question")
+      }
     }
 
   // ==================================================================== //
@@ -4186,12 +5732,14 @@ class QuestionnaireViewModelTest {
 
     // empty initial value
     var viewModel = QuestionnaireViewModel(context, state)
-    assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
-    // enabledDisplayItems is 0 when no choice is present
-    assertThat(
-        viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems.size
-      )
-      .isEqualTo(0)
+    viewModel.runViewModelBlocking {
+      assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
+      // enabledDisplayItems is 0 when no choice is present
+      assertThat(
+          viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems.size
+        )
+        .isEqualTo(0)
+    }
 
     // initial value is set to false
     state.set(
@@ -4206,13 +5754,16 @@ class QuestionnaireViewModelTest {
     )
 
     viewModel = QuestionnaireViewModel(context, state)
-    assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
-    var enabledDisplayItems =
-      viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems
-    assertThat(enabledDisplayItems.size).isEqualTo(1)
-    assertThat(enabledDisplayItems[0].type).isEqualTo(Questionnaire.QuestionnaireItemType.DISPLAY)
-    assertThat(enabledDisplayItems[0].linkId).isEqualTo("1.1")
-    assertThat(enabledDisplayItems[0].text).isEqualTo("Text when no is selected")
+    var enabledDisplayItems: List<QuestionnaireItemComponent>
+    viewModel.runViewModelBlocking {
+      assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
+      enabledDisplayItems =
+        viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems
+      assertThat(enabledDisplayItems.size).isEqualTo(1)
+      assertThat(enabledDisplayItems[0].type).isEqualTo(Questionnaire.QuestionnaireItemType.DISPLAY)
+      assertThat(enabledDisplayItems[0].linkId).isEqualTo("1.1")
+      assertThat(enabledDisplayItems[0].text).isEqualTo("Text when no is selected")
+    }
 
     // initial value is set to true
     state.set(
@@ -4227,14 +5778,152 @@ class QuestionnaireViewModelTest {
     )
 
     viewModel = QuestionnaireViewModel(context, state)
-    assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
-    enabledDisplayItems =
-      viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems
-    assertThat(enabledDisplayItems.size).isEqualTo(1)
-    assertThat(enabledDisplayItems[0].type).isEqualTo(Questionnaire.QuestionnaireItemType.DISPLAY)
-    assertThat(enabledDisplayItems[0].linkId).isEqualTo("1.2")
-    assertThat(enabledDisplayItems[0].text).isEqualTo("Text when yes is selected")
+    viewModel.runViewModelBlocking {
+      assertThat(viewModel.getQuestionnaireItemViewItemList().size).isEqualTo(1)
+      enabledDisplayItems =
+        viewModel.getQuestionnaireItemViewItemList()[0].asQuestion().enabledDisplayItems
+      assertThat(enabledDisplayItems.size).isEqualTo(1)
+      assertThat(enabledDisplayItems[0].type).isEqualTo(Questionnaire.QuestionnaireItemType.DISPLAY)
+      assertThat(enabledDisplayItems[0].linkId).isEqualTo("1.2")
+      assertThat(enabledDisplayItems[0].text).isEqualTo("Text when yes is selected")
+    }
   }
+
+  @Test
+  fun `should update question title for questionnaire item with cqf expression extension when corresponding item answer is updated`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-age"
+              type = Questionnaire.QuestionnaireItemType.INTEGER
+            }
+          )
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-description"
+              type = Questionnaire.QuestionnaireItemType.STRING
+              textElement.addExtension().apply {
+                url = EXTENSION_CQF_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression =
+                      "%resource.repeat(item).where(linkId='a-age' and answer.empty().not()).select('Notes for child of age ' + answer.value.toString() + ' years')"
+                  }
+                )
+              }
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+
+      val ageResponseItem = viewModel.getQuestionnaireResponse().item.first { it.linkId == "a-age" }
+
+      assertThat(ageResponseItem.answer).isEmpty()
+
+      var descriptionResponseItem: QuestionnaireViewItem? = null
+
+      val job =
+        this.launch {
+          viewModel.questionnaireStateFlow.collect {
+            descriptionResponseItem =
+              it.items
+                .find { it.asQuestion().questionnaireItem.linkId == "a-description" }!!.asQuestion()
+            this@launch.cancel()
+          }
+        }
+      job.join()
+
+      assertThat(descriptionResponseItem!!.questionText).isNull()
+      val ageItemUpdated =
+        viewModel.questionnaireStateFlow.value.items
+          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-age" }
+          .asQuestion()
+          .apply {
+            this.answersChangedCallback(
+              this.questionnaireItem,
+              this.getQuestionnaireResponseItem(),
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  this.value = IntegerType(2)
+                }
+              ),
+              null
+            )
+          }
+
+      assertThat(
+          ageItemUpdated.getQuestionnaireResponseItem().answer.first().valueIntegerType.value
+        )
+        .isEqualTo(2)
+
+      val descriptionItemUpdated =
+        viewModel.questionnaireStateFlow.value.items
+          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-description" }
+          .asQuestion()
+
+      assertThat(descriptionItemUpdated.questionText.toString())
+        .isEqualTo("Notes for child of age 2 years")
+    }
+
+  @Test
+  fun `should update question title for questionnaire item with cqf expression extension when expression has variable`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addExtension().apply {
+            url = EXTENSION_VARIABLE_URL
+            setValue(
+              Expression().apply {
+                name = "A"
+                language = "text/fhirpath"
+                expression = "1"
+              }
+            )
+          }
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-description"
+              type = Questionnaire.QuestionnaireItemType.STRING
+              addExtension().apply {
+                url = EXTENSION_VARIABLE_URL
+                setValue(
+                  Expression().apply {
+                    name = "B"
+                    language = "text/fhirpath"
+                    expression = "2"
+                  }
+                )
+              }
+              textElement.addExtension().apply {
+                url = EXTENSION_CQF_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression = "'Sum of variables is ' + ( %A + %B ).toString() "
+                  }
+                )
+              }
+            }
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        val descriptionItem =
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-description" }
+            .asQuestion()
+
+        assertThat(descriptionItem.questionText.toString()).isEqualTo("Sum of variables is 3")
+      }
+    }
 
   private fun createQuestionnaireViewModel(
     questionnaire: Questionnaire,

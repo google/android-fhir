@@ -4,6 +4,7 @@ import androidx.build.gradle.gcpbuildcache.GcpBuildCacheServiceFactory
 plugins {
   id("com.gradle.enterprise") version ("3.10")
   id("androidx.build.gradle.gcpbuildcache") version "1.0.0-beta01"
+  id("org.gradle.toolchains.foojay-resolver-convention") version ("0.5.0")
 }
 
 gradleEnterprise {
@@ -41,10 +42,8 @@ include(":demo")
 
 include(":engine")
 
-include(":implementationguide")
+include(":knowledge")
 
 include(":workflow")
 
 include(":workflow-testing")
-
-include(":testing")

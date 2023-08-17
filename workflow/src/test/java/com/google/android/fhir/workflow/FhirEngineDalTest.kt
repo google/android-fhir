@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 
 package com.google.android.fhir.workflow
 
+import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.search.search
-import com.google.android.fhir.testing.FhirEngineProviderTestRule
+import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.HumanName
@@ -44,8 +46,9 @@ class FhirEngineDalTest {
 
   @Before
   fun setupTest() {
-    fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
-    fhirEngineDal = FhirEngineDal(fhirEngine)
+    val context: Context = ApplicationProvider.getApplicationContext()
+    fhirEngine = FhirEngineProvider.getInstance(context)
+    fhirEngineDal = FhirEngineDal(fhirEngine, KnowledgeManager.createInMemory(context))
     runBlocking { fhirEngine.create(testPatient) }
   }
 

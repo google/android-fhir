@@ -28,12 +28,12 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.extensions.format
 import com.google.android.fhir.datacapture.extensions.getDateSeparator
+import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
+import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.parseDate
 import com.google.android.fhir.datacapture.extensions.toLocalizedString
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -125,7 +125,12 @@ internal object DateTimePickerViewHolderFactory :
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         clearPreviousState()
         header.bind(questionnaireViewItem)
-        dateInputLayout.hint = canonicalizedDatePattern
+        with(dateInputLayout) {
+          // Use 'mm' for month instead of 'MM' to avoid confusion.
+          // See https://developer.android.com/reference/kotlin/java/text/SimpleDateFormat.
+          hint = canonicalizedDatePattern.lowercase()
+          helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
+        }
         dateInputEditText.removeTextChangedListener(textWatcher)
 
         val questionnaireItemViewItemDateTimeAnswer =
@@ -154,11 +159,11 @@ internal object DateTimePickerViewHolderFactory :
 
       private fun displayDateValidationError(validationResult: ValidationResult) {
         dateInputLayout.error =
-          when (validationResult) {
-            is NotValidated,
-            Valid -> null
-            is Invalid -> validationResult.getSingleStringValidationMessage()
-          }
+          getValidationErrorMessage(
+            dateInputLayout.context,
+            questionnaireViewItem,
+            validationResult
+          )
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
