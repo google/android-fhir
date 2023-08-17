@@ -190,7 +190,7 @@ internal object QuantityViewHolderFactory :
             context,
             R.layout.drop_down_list_item,
             questionnaireViewItem.questionnaireItem.unitOption.map {
-              DropDownAnswerOption(it.display)
+              DropDownAnswerOption(it.code, it.display)
             }
           )
         unitAutoCompleteTextView.setAdapter(unitAdapter)
