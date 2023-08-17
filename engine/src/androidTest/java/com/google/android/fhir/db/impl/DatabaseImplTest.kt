@@ -35,6 +35,8 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
+import com.google.android.fhir.sync.UrlUploadRequest
+import com.google.android.fhir.sync.upload.UploadMode
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.readFromFile
@@ -44,7 +46,6 @@ import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.Date
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.CarePlan
@@ -504,16 +505,18 @@ class DatabaseImplTest {
         lastUpdated = Date()
       }
     database.insert(patient)
-    services.fhirEngine.syncUpload { it ->
+    val uploadMode = UploadMode.ALL_CHANGES_SQUASHED_BUNDLE_PUT(500)
+
+    services.fhirEngine.syncUpload(uploadMode) { it, resourceConsolidator ->
       it
         .first { it.resourceId == "remote-patient-3" }
         .let {
-          flowOf(
-            it.token to
-              Patient().apply {
-                id = it.resourceId
-                meta = remoteMeta
-              }
+          resourceConsolidator.consolidate(
+            Patient().apply {
+              id = it.resourceId
+              meta = remoteMeta
+            },
+            UrlUploadRequest(patient, it.token)
           )
         }
     }

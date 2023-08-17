@@ -22,20 +22,19 @@ import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.ResourceNotFoundException
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.get
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
+import com.google.android.fhir.sync.upload.UploadMode
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.assertResourceNotEquals
 import com.google.android.fhir.testing.readFromFile
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.exceptions.FHIRException
@@ -311,15 +310,10 @@ class FhirEngineImplTest {
   @Test
   fun syncUpload_uploadLocalChange() = runBlocking {
     val localChanges = mutableListOf<LocalChange>()
-    fhirEngine.syncUpload {
-      flow {
-        localChanges.addAll(it)
-        emit(LocalChangeToken(it.flatMap { it.token.ids }) to TEST_PATIENT_1)
-      }
-    }
+    val uploadMode = UploadMode.ALL_CHANGES_SQUASHED_BUNDLE_PUT(500)
+    fhirEngine.syncUpload(uploadMode) { it, _ -> localChanges.addAll(it) }
 
     assertThat(localChanges).hasSize(1)
-    // val localChange = localChanges[0].localChange
     with(localChanges[0]) {
       assertThat(this.resourceType).isEqualTo(ResourceType.Patient.toString())
       assertThat(this.resourceId).isEqualTo(TEST_PATIENT_1.id)
