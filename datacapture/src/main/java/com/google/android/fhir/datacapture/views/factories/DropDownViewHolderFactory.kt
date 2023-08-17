@@ -59,7 +59,6 @@ internal object DropDownViewHolderFactory :
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         cleanupOldState()
         header.bind(questionnaireViewItem)
-        textInputLayout.hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
         with(textInputLayout) {
           hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
           helperText = getRequiredOrOptionalText(questionnaireViewItem, context)

@@ -26,6 +26,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.extensions.unitOption
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -103,7 +104,10 @@ internal object QuantityViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         header.bind(questionnaireViewItem)
-        textInputLayout.hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
+        with(textInputLayout) {
+          hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
+          helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
+        }
         displayValidationResult(questionnaireViewItem.validationResult)
 
         textInputEditText.removeTextChangedListener(textWatcher)
