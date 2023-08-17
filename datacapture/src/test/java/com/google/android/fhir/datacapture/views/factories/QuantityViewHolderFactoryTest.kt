@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views.factories
 
 import android.view.View
+import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
@@ -32,7 +33,6 @@ import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -49,7 +49,7 @@ class QuantityViewHolderFactoryTest {
   private val viewHolder = QuantityViewHolderFactory.create(parent)
 
   @Test
-  fun shouldSetQuestionHeader() {
+  fun `should set question text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -64,7 +64,7 @@ class QuantityViewHolderFactoryTest {
   }
 
   @Test
-  fun shouldSetInputText() {
+  fun `should set input decimal value`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -89,7 +89,7 @@ class QuantityViewHolderFactoryTest {
   }
 
   @Test
-  fun shouldSetInputTextToEmpty() {
+  fun `should clear input decimal value`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -122,63 +122,65 @@ class QuantityViewHolderFactoryTest {
   }
 
   @Test
-  @Ignore(
-    "Needs to be moved to instrumentation tests https://github.com/google/android-fhir/issues/1494"
-  )
-  fun shouldSetQuestionnaireResponseItemAnswer() {
-    val questionnaireViewItem =
+  fun `should set unit value`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Quantity().apply { unit = "kg" }
+            }
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<AutoCompleteTextView>(R.id.unit_auto_complete)
+          .text.toString()
+      )
+      .isEqualTo("kg")
+  }
+
+  @Test
+  fun `should clear unit value`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Quantity().apply { unit = "kg" }
+            }
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+    viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("10")
-    viewHolder.itemView.clearFocus()
+    )
 
-    val answer = questionnaireViewItem.answers
-    assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueQuantity!!.value!!.toString()).isEqualTo("10")
-  }
-
-  @Test
-  @Ignore(
-    "Needs to be moved to instrumentation tests https://github.com/google/android-fhir/issues/1494"
-  )
-  fun shouldSetQuestionnaireResponseItemAnswerOneDecimalPlace() {
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
+    assertThat(
+        viewHolder.itemView
+          .findViewById<AutoCompleteTextView>(R.id.unit_auto_complete)
+          .text.toString()
       )
-    viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("10.1")
-
-    val answer = questionnaireViewItem.answers
-    assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueQuantity!!.value.toString()).isEqualTo("10.1")
+      .isEqualTo("")
   }
 
   @Test
-  fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      )
-    viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
-
-    assertThat(questionnaireViewItem.answers.size).isEqualTo(0)
-  }
-
-  @Test
-  fun displayValidationResult_error_shouldShowErrorMessage() {
+  fun `should display error message in validation result`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -193,7 +195,7 @@ class QuantityViewHolderFactoryTest {
   }
 
   @Test
-  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+  fun `should display no error message when validation result is valid`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -214,22 +216,7 @@ class QuantityViewHolderFactoryTest {
   }
 
   @Test
-  fun `hides error textview in the header`() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      )
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
-      .isEqualTo(View.GONE)
-  }
-
-  @Test
-  fun bind_readOnly_shouldDisableView() {
+  fun `should disable text input in read-only mode`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
@@ -246,7 +233,39 @@ class QuantityViewHolderFactoryTest {
   }
 
   @Test
-  fun `show asterisk`() {
+  fun `should disable unit input in read-only mode`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.unit_auto_complete).isEnabled
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun `should always hide error textview in the header`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
+      .isEqualTo(View.GONE)
+  }
+
+  @Test
+  fun `should show asterisk`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -265,7 +284,7 @@ class QuantityViewHolderFactoryTest {
   }
 
   @Test
-  fun `hide asterisk`() {
+  fun `should hide asterisk`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -284,7 +303,7 @@ class QuantityViewHolderFactoryTest {
   }
 
   @Test
-  fun `show required text`() {
+  fun `should show required text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -304,7 +323,7 @@ class QuantityViewHolderFactoryTest {
   }
 
   @Test
-  fun `hide required text`() {
+  fun `should hide required text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -320,7 +339,7 @@ class QuantityViewHolderFactoryTest {
   }
 
   @Test
-  fun `show optional text`() {
+  fun `should show optional text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -340,7 +359,7 @@ class QuantityViewHolderFactoryTest {
   }
 
   @Test
-  fun `hide optional text`() {
+  fun `should hide optional text`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),

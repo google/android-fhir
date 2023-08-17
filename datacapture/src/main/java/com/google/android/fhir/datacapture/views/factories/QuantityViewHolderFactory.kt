@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,6 +130,8 @@ internal object QuantityViewHolderFactory :
       override fun setReadOnly(isReadOnly: Boolean) {
         textInputLayout.isEnabled = !isReadOnly
         textInputEditText.isEnabled = !isReadOnly
+        unitTextInputLayout.isEnabled = !isReadOnly
+        unitAutoCompleteTextView.isEnabled = !isReadOnly
       }
 
       private fun handleInput(editable: Editable?, unitDropDown: Coding?) {
