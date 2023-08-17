@@ -35,10 +35,6 @@
             android:id="@+id/action_componentsFragment_to_behaviorsFragment"
             app:destination="@id/behaviorListFragment"
         />
-    <action
-            android:id="@+id/action_componentsFragment_to_GalleryQuestionnaireFragment"
-            app:destination="@id/galleryQuestionnaireFragment"
-        />
 
   </fragment>
   <fragment
@@ -55,10 +51,6 @@
             android:id="@+id/action_layoutsFragment_to_behaviorsFragment"
             app:destination="@id/behaviorListFragment"
         />
-    <action
-            android:id="@+id/action_layoutsFragment_to_galleryQuestionnaireFragment"
-            app:destination="@id/galleryQuestionnaireFragment"
-        />
   </fragment>
   <fragment
         android:id="@+id/behaviorListFragment"
@@ -74,13 +66,11 @@
             android:id="@+id/action_behaviorsFragment_to_layoutsFragment"
             app:destination="@id/layoutListFragment"
         />
-    <action
-            android:id="@+id/action_behaviorsFragment_to_galleryQuestionnaireFragment"
-            app:destination="@id/galleryQuestionnaireFragment"
-        />
-
-
   </fragment>
+  <action
+        android:id="@+id/action_global_galleryQuestionnaireFragment"
+        app:destination="@id/galleryQuestionnaireFragment"
+    />
   <fragment
         android:id="@+id/galleryQuestionnaireFragment"
         android:name="com.google.android.fhir.catalog.DemoQuestionnaireFragment"

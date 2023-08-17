@@ -25,7 +25,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.launch
 
 class BehaviorListFragment : Fragment(R.layout.behavior_list_fragment) {
@@ -70,7 +69,7 @@ class BehaviorListFragment : Fragment(R.layout.behavior_list_fragment) {
     viewLifecycleOwner.lifecycleScope.launch {
       findNavController()
         .navigate(
-          BehaviorListFragmentDirections.actionBehaviorsFragmentToGalleryQuestionnaireFragment(
+          MainNavGraphDirections.actionGlobalGalleryQuestionnaireFragment(
             questionnaireTitleKey = context?.getString(behavior.textId) ?: "",
             questionnaireJsonStringKey =
               getQuestionnaireJsonString(

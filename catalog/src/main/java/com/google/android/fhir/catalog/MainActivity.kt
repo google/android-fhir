@@ -92,20 +92,19 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
   private fun launchQuestionnaireFragment(uri: Uri) {
     lifecycleScope.launch {
-      val args =
-        Bundle().apply {
-          putString("questionnaireTitleKey", "")
-          putString(
-            "questionnaireJsonStringKey",
-            readJsonFromFileUri(
-              context = applicationContext,
-              backgroundContext = coroutineContext,
-              uri = uri
-            )
+      findNavController(R.id.nav_host_fragment)
+        .navigate(
+          MainNavGraphDirections.actionGlobalGalleryQuestionnaireFragment(
+            questionnaireTitleKey = "",
+            questionnaireJsonStringKey =
+              readJsonFromFileUri(
+                context = applicationContext,
+                backgroundContext = coroutineContext,
+                uri = uri
+              ),
+            workflow = WorkflowType.DEFAULT,
           )
-          putSerializable("workflow", WorkflowType.DEFAULT)
-        }
-      findNavController(R.id.nav_host_fragment).navigate(R.id.galleryQuestionnaireFragment, args)
+        )
     }
   }
 }

@@ -73,7 +73,7 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
     viewLifecycleOwner.lifecycleScope.launch {
       findNavController()
         .navigate(
-          LayoutListFragmentDirections.actionLayoutsFragmentToGalleryQuestionnaireFragment(
+          MainNavGraphDirections.actionGlobalGalleryQuestionnaireFragment(
             questionnaireTitleKey = context?.getString(layout.textId) ?: "",
             questionnaireJsonStringKey =
               getQuestionnaireJsonString(

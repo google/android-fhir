@@ -90,7 +90,7 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
     viewLifecycleOwner.lifecycleScope.launch {
       findNavController()
         .navigate(
-          ComponentListFragmentDirections.actionComponentsFragmentToGalleryQuestionnaireFragment(
+          MainNavGraphDirections.actionGlobalGalleryQuestionnaireFragment(
             questionnaireTitleKey = context?.getString(component.textId) ?: "",
             questionnaireJsonStringKey =
               getQuestionnaireJsonString(
