@@ -93,13 +93,13 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
           MainNavGraphDirections.actionGlobalGalleryQuestionnaireFragment(
             questionnaireTitleKey = context?.getString(component.textId) ?: "",
             questionnaireJsonStringKey =
-              getQuestionnaireJsonString(
+              getQuestionnaireJsonStringFromAssets(
                 context = requireContext(),
                 backgroundContext = coroutineContext,
                 fileName = component.questionnaireFile,
               ),
             questionnaireWithValidationJsonStringKey =
-              getQuestionnaireJsonString(
+              getQuestionnaireJsonStringFromAssets(
                 context = requireContext(),
                 backgroundContext = coroutineContext,
                 fileName = component.questionnaireFileWithValidation,

@@ -72,7 +72,7 @@ class BehaviorListFragment : Fragment(R.layout.behavior_list_fragment) {
           MainNavGraphDirections.actionGlobalGalleryQuestionnaireFragment(
             questionnaireTitleKey = context?.getString(behavior.textId) ?: "",
             questionnaireJsonStringKey =
-              getQuestionnaireJsonString(
+              getQuestionnaireJsonStringFromAssets(
                 context = requireContext(),
                 backgroundContext = coroutineContext,
                 fileName = behavior.questionnaireFileName,

@@ -76,7 +76,7 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
           MainNavGraphDirections.actionGlobalGalleryQuestionnaireFragment(
             questionnaireTitleKey = context?.getString(layout.textId) ?: "",
             questionnaireJsonStringKey =
-              getQuestionnaireJsonString(
+              getQuestionnaireJsonStringFromAssets(
                 context = requireContext(),
                 backgroundContext = coroutineContext,
                 fileName = layout.questionnaireFileName

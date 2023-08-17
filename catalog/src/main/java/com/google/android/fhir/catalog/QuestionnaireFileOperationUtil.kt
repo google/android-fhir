@@ -22,7 +22,7 @@ import java.io.BufferedReader
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.withContext
 
-suspend fun getQuestionnaireJsonString(
+suspend fun getQuestionnaireJsonStringFromAssets(
   context: Context,
   backgroundContext: CoroutineContext,
   fileName: String
@@ -32,7 +32,7 @@ suspend fun getQuestionnaireJsonString(
   }
 }
 
-suspend fun readJsonFromFileUri(
+suspend fun getQuestionnaireJsonStringFromFileUri(
   context: Context,
   backgroundContext: CoroutineContext,
   uri: Uri

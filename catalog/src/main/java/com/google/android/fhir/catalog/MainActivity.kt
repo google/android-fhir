@@ -97,7 +97,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
           MainNavGraphDirections.actionGlobalGalleryQuestionnaireFragment(
             questionnaireTitleKey = "",
             questionnaireJsonStringKey =
-              readJsonFromFileUri(
+              getQuestionnaireJsonStringFromFileUri(
                 context = applicationContext,
                 backgroundContext = coroutineContext,
                 uri = uri
