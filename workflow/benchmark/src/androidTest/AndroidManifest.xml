@@ -1,6 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+>
 
     <!--
       Important: disable debugging for accurate performance results
@@ -14,7 +16,7 @@
         tools:replace="android:debuggable"
         android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true"
-        >
+    >
     <profileable android:shell="true" />
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
