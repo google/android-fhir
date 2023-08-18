@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.benchmark
+package com.google.android.fhir.workflow.benchmark
 
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
@@ -23,32 +23,19 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.opencds.cqf.cql.engine.fhir.model.Dstu2FhirModelResolver
-import org.opencds.cqf.cql.engine.fhir.model.Dstu3FhirModelResolver
-import org.opencds.cqf.cql.engine.fhir.model.R4FhirModelResolver
+import org.opencds.cqf.cql.engine.serializing.jackson.JsonCqlMapper
 
 @RunWith(AndroidJUnit4::class)
-class C_CqlEngineFhirContextLoaderBenchmark {
-
+class A_JacksonMapperBenchmark {
   @get:Rule val benchmarkRule = BenchmarkRule()
 
   /**
-   * The CQL engine FhirModelResolvers need a complete FhirContext loaded with added classes. The
-   * loading of the FhirContext has already happen on B, thus this is just for the added classes
-   * from the Engine.
+   * The JSONMapper and the XMLMapper take 800ms to initialize the first time on Desktop. They seem
+   * to take less time on mobile or there is something pre-loading this object. Either way, it's
+   * important to keep an eye on it.
    */
   @Test
-  fun loadDstu2FhirModelResolver() {
-    benchmarkRule.measureRepeated { assertThat(Dstu2FhirModelResolver()).isNotNull() }
-  }
-
-  @Test
-  fun loadDstu3FhirModelResolver() {
-    benchmarkRule.measureRepeated { assertThat(Dstu3FhirModelResolver()).isNotNull() }
-  }
-
-  @Test
-  fun loadR4FhirModelResolver() {
-    benchmarkRule.measureRepeated { assertThat(R4FhirModelResolver()).isNotNull() }
+  fun loadJsonMapper() {
+    benchmarkRule.measureRepeated { assertThat(JsonCqlMapper.getMapper()).isNotNull() }
   }
 }

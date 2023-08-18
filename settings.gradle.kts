@@ -47,3 +47,7 @@ include(":knowledge")
 include(":workflow")
 
 include(":workflow-testing")
+
+include(":workflow:benchmark")
+
+include(":engine:benchmark")

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.benchmark
+package com.google.android.fhir.workflow.benchmark
 
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.benchmark
+package com.google.android.fhir.workflow.benchmark
 
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
@@ -23,15 +23,15 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
-import java.io.StringReader
+import java.time.ZonedDateTime
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Library
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.opencds.cqf.cql.engine.serializing.jackson.JsonCqlLibraryReader
 
 @RunWith(AndroidJUnit4::class)
-class E_ElmJsonLibraryLoaderBenchmark {
+class D_FhirJsonParserBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()
 
@@ -40,36 +40,39 @@ class E_ElmJsonLibraryLoaderBenchmark {
   }
 
   @Test
-  fun parseImmunityCheckCqlFromFhirLibrary() {
+  fun parseLightFhirBundle() {
     benchmarkRule.measureRepeated {
-      val immunityCheckLibrary = runWithTimingDisabled {
+      val jsonParser = runWithTimingDisabled {
         val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
-        val jsonParser = fhirContext.newJsonParser()
-        jsonParser.parseResource(open("/immunity-check/ImmunityCheck.json")) as Library
+        fhirContext.newJsonParser()
       }
 
-      val jsonLib = immunityCheckLibrary.content.first { it.contentType == "application/elm+json" }
+      val bundle = runWithTimingDisabled { open("/immunity-check/ImmunizationHistory.json") }
 
-      val immunityCheckCqlLibrary = JsonCqlLibraryReader().read(StringReader(String(jsonLib.data)))
-
-      assertThat(immunityCheckCqlLibrary.identifier.id).isEqualTo("ImmunityCheck")
+      System.out.println(ZonedDateTime.now())
+      assertThat((jsonParser.parseResource(bundle) as Bundle).entryFirstRep.resource.id)
+        .isEqualTo("Patient/d4d35004-24f8-40e4-8084-1ad75924514f")
+      System.out.println(ZonedDateTime.now())
     }
   }
 
   @Test
-  fun parseFhirHelpersCqlFromFhirLibrary() {
+  fun parseLightFhirLibrary() {
     benchmarkRule.measureRepeated {
-      val fhirHelpersLibrary = runWithTimingDisabled {
+      val jsonParser = runWithTimingDisabled {
         val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
-        val jsonParser = fhirContext.newJsonParser()
-        jsonParser.parseResource(open("/immunity-check/FhirHelpers.json")) as Library
+        fhirContext.newJsonParser()
       }
 
-      val jsonLib = fhirHelpersLibrary.content.first { it.contentType == "application/elm+json" }
+      val immunityCheckJson = runWithTimingDisabled { open("/immunity-check/ImmunityCheck.json") }
+      val immunityCheckLibrary = jsonParser.parseResource(immunityCheckJson) as Library
+      val fhirHelpersJson = runWithTimingDisabled { open("/immunity-check/FhirHelpers.json") }
+      val fhirHelpersLibrary = jsonParser.parseResource(fhirHelpersJson) as Library
 
-      val fhirHelpersCqlLibrary = JsonCqlLibraryReader().read(StringReader(String(jsonLib.data)))
-
-      assertThat(fhirHelpersCqlLibrary.identifier.id).isEqualTo("FHIRHelpers")
+      assertThat(immunityCheckLibrary.id).isEqualTo("Library/ImmunityCheck-1.0.0")
+      assertThat(immunityCheckLibrary.content[0].data.size).isEqualTo(575)
+      assertThat(fhirHelpersLibrary.id).isEqualTo("Library/FHIRHelpers-4.0.1")
+      assertThat(fhirHelpersLibrary.content[0].data.size).isEqualTo(17845)
     }
   }
 }
