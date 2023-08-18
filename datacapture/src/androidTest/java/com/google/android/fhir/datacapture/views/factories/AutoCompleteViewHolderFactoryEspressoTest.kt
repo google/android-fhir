@@ -29,7 +29,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.test.TestActivity
-import com.google.android.fhir.datacapture.test.utilities.waitUntilDisplayed
+import com.google.android.fhir.datacapture.test.utilities.delayMainThread
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.chip.ChipGroup
@@ -96,7 +96,7 @@ class AutoCompleteViewHolderFactoryEspressoTest {
         .findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView)
         .showDropDown()
     }
-    onView(ViewMatchers.withId(R.id.autoCompleteTextView)).perform(waitUntilDisplayed())
+    onView(ViewMatchers.withId(R.id.autoCompleteTextView)).perform(delayMainThread())
     onView(ViewMatchers.withText("Coding 3"))
       .inRoot(RootMatchers.isPlatformPopup())
       .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))

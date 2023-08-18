@@ -53,7 +53,8 @@ fun assertQuestionnaireResponseAtIndex(
   }
 }
 
-fun waitUntilDisplayed(): ViewAction {
+/* Avoid test flakiness with a delay. See https://github.com/google/android-fhir/issues/1323.*/
+fun delayMainThread(): ViewAction {
   return object : ViewAction {
     override fun getConstraints(): Matcher<View> {
       return any(View::class.java)
@@ -64,7 +65,6 @@ fun waitUntilDisplayed(): ViewAction {
     }
 
     override fun perform(uiController: UiController, view: View) {
-      // Avoid test flakiness with a delay. See https://github.com/google/android-fhir/issues/1323.
       uiController.loopMainThreadForAtLeast(1000)
     }
   }

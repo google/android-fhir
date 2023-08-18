@@ -34,7 +34,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_ANSWER_MEDIA
 import com.google.android.fhir.datacapture.test.TestActivity
-import com.google.android.fhir.datacapture.test.utilities.waitUntilDisplayed
+import com.google.android.fhir.datacapture.test.utilities.delayMainThread
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.DropDownAnswerOption
@@ -96,7 +96,7 @@ class DropDownViewHolderFactoryEspressoTest {
       viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
     }
 
-    onView(withId(R.id.auto_complete)).perform(waitUntilDisplayed())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onView(withText("-")).inRoot(isPlatformPopup()).check(matches(isDisplayed())).perform(click())
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
       .isEqualTo("-")
@@ -118,7 +118,7 @@ class DropDownViewHolderFactoryEspressoTest {
       viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
     }
 
-    onView(withId(R.id.auto_complete)).perform(waitUntilDisplayed())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onView(withText("Coding 3"))
       .inRoot(isPlatformPopup())
       .check(matches(isDisplayed()))
@@ -143,7 +143,7 @@ class DropDownViewHolderFactoryEspressoTest {
       viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
     }
 
-    onView(withId(R.id.auto_complete)).perform(waitUntilDisplayed())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onView(withText("Coding 3"))
       .inRoot(isPlatformPopup())
       .check(matches(isDisplayed()))
@@ -184,7 +184,7 @@ class DropDownViewHolderFactoryEspressoTest {
       viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
     }
 
-    onView(withId(R.id.auto_complete)).perform(waitUntilDisplayed())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onView(withText("Coding 3"))
       .inRoot(isPlatformPopup())
       .check(matches(isDisplayed()))
@@ -214,7 +214,7 @@ class DropDownViewHolderFactoryEspressoTest {
       viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
     }
 
-    onView(withId(R.id.auto_complete)).perform(waitUntilDisplayed())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onView(withText("Coding 1"))
       .inRoot(isPlatformPopup())
       .check(matches(isDisplayed()))
@@ -238,7 +238,7 @@ class DropDownViewHolderFactoryEspressoTest {
       viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
     }
 
-    onView(withId(R.id.auto_complete)).perform(waitUntilDisplayed())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     assertThat(
         viewHolder.itemView
           .findViewById<MaterialAutoCompleteTextView>(R.id.auto_complete)
@@ -260,7 +260,7 @@ class DropDownViewHolderFactoryEspressoTest {
       viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
     }
 
-    onView(withId(R.id.auto_complete)).perform(waitUntilDisplayed())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onView(withId(R.id.auto_complete)).perform(typeText("Coding"))
     assertThat(
         viewHolder.itemView
@@ -284,7 +284,7 @@ class DropDownViewHolderFactoryEspressoTest {
       viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
     }
 
-    onView(withId(R.id.auto_complete)).perform(waitUntilDisplayed())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onView(withId(R.id.auto_complete)).perform(typeText("Division"))
     assertThat(
         viewHolder.itemView
@@ -332,7 +332,7 @@ class DropDownViewHolderFactoryEspressoTest {
       viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
     }
 
-    onView(withId(R.id.auto_complete)).perform(waitUntilDisplayed())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onData(`is`(instanceOf(DropDownAnswerOption::class.java)))
       .atPosition(2)
       .inRoot(isPlatformPopup())
