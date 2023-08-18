@@ -44,12 +44,14 @@ open class TransactionBundleGenerator(
     val bundleRequest =
       Bundle().apply {
         type = Bundle.BundleType.TRANSACTION
-        localChanges.forEach {
-          this.addEntry(
-            getBundleEntryComponentGeneratorForLocalChangeType(it.type, useETagForUpload)
-              .getEntry(it)
-          )
-        }
+        localChanges
+          .filterNot { it.type == Type.NO_OP }
+          .forEach {
+            this.addEntry(
+              getBundleEntryComponentGeneratorForLocalChangeType(it.type, useETagForUpload)
+                .getEntry(it)
+            )
+          }
       }
     return BundleUploadRequest(
       resource = bundleRequest,
@@ -96,6 +98,8 @@ open class TransactionBundleGenerator(
         Type.INSERT -> HttpPutForCreateEntryComponentGenerator(useETagForUpload)
         Type.UPDATE -> HttpPatchForUpdateEntryComponentGenerator(useETagForUpload)
         Type.DELETE -> HttpDeleteEntryComponentGenerator(useETagForUpload)
+        Type.NO_OP ->
+          error("NO_OP type represents a no-operation and is not mapped to an HTTP operation.")
       }
     }
   }

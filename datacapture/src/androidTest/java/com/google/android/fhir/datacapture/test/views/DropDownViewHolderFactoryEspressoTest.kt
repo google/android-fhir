@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.test.views
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
@@ -35,15 +36,19 @@ import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.test.utilities.showDropDown
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.factories.DropDownAnswerOption
 import com.google.android.fhir.datacapture.views.factories.DropDownViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.common.truth.Truth.assertThat
+import org.hamcrest.Matchers.instanceOf
+import org.hamcrest.Matchers.`is`
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.junit.Before
 import org.junit.Rule
@@ -264,6 +269,53 @@ class DropDownViewHolderFactoryEspressoTest {
       .isEqualTo(0)
   }
 
+  @Test
+  fun shouldSetCorrectDropDownValueToAutoCompleteTextViewForDifferentAnswerOptionsWithSimilarDisplayString() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value =
+              Reference().apply {
+                id = "ref_1"
+                display = "Reference"
+              }
+          }
+        )
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value =
+              Reference().apply {
+                id = "ref_2"
+                display = "Reference"
+              }
+          }
+        )
+      }
+
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        questionnaireItem,
+        responseValueStringOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers }
+      )
+
+    runOnUI { viewHolder.bind(questionnaireViewItem) }
+
+    onView(withId(R.id.auto_complete)).perform(showDropDown())
+    onData(`is`(instanceOf(DropDownAnswerOption::class.java)))
+      .atPosition(2)
+      .inRoot(isPlatformPopup())
+      .perform(click())
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
+      .isEqualTo("Reference")
+    assertThat((answerHolder!!.single().value as Reference).display).isEqualTo("Reference")
+    assertThat((answerHolder!!.single().value as Reference).id).isEqualTo("ref_2")
+  }
+
   /** Method to run code snippet on UI/main thread */
   private fun runOnUI(action: () -> Unit) {
     activityScenarioRule.scenario.onActivity { action() }
@@ -295,7 +347,11 @@ class DropDownViewHolderFactoryEspressoTest {
       responses.forEach { response ->
         addAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = Coding().apply { display = response }
+            value =
+              Coding().apply {
+                code = response.replace(" ", "_")
+                display = response
+              }
           }
         )
       }
