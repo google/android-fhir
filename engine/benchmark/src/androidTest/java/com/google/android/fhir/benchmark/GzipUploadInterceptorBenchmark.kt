@@ -49,7 +49,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Url
 
-class I_GzipUploadInterceptorBenchmark {
+class GzipUploadInterceptorBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()
 

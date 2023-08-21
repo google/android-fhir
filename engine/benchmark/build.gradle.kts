@@ -75,12 +75,6 @@ dependencies {
   androidTestImplementation(Dependencies.Retrofit.coreRetrofit)
 
   androidTestImplementation(project(":engine"))
-  androidTestImplementation(project(":knowledge")) {
-    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
-  }
-  androidTestImplementation(project(":workflow")) {
-    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
-    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirKnowledgeModule)
-  }
+  // for test json files only
   androidTestImplementation(project(":workflow-testing"))
 }
