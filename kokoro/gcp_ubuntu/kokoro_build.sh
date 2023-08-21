@@ -92,7 +92,7 @@ function build_only() {
 function device_tests() {
   ./gradlew packageDebugAndroidTest --scan --stacktrace
   ./gradlew packageReleaseAndroidTest --scan --stacktrace
-    local lib_names=("benchmark" "datacapture" "engine" "knowledge" "workflow")
+    local lib_names=("workflow:benchmark" "engine:benchmark" "datacapture" "engine" "knowledge" "workflow")
     firebase_pids=()
     for lib_name in "${lib_names[@]}"; do
       ./gradlew :$lib_name:runFlank  --scan --stacktrace &
