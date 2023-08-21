@@ -36,8 +36,8 @@ class IndividualRequestGenerator(
   override fun generateUploadRequests(localChanges: List<LocalChange>): List<UrlUploadRequest> =
     localChanges.map { generateUploadRequest(it) }
 
-  private fun generateUploadRequest(localChanges: LocalChange): UrlUploadRequest {
-    return getIndividualRequestForLocalChangeType(localChanges.type, localChanges)
+  private fun generateUploadRequest(localChange: LocalChange): UrlUploadRequest {
+    return getIndividualRequestForLocalChangeType(localChange.type, localChange)
   }
 
   companion object Factory {
@@ -92,7 +92,7 @@ class IndividualRequestGenerator(
     private fun deleteFunction(localChange: LocalChange) =
       UrlUploadRequest(
         httpVerb = HttpVerb.DELETE,
-        url = localChange.resourceType,
+        url = "${localChange.resourceType}/${localChange.resourceId}",
         resource = parser.parseResource(localChange.payload) as Resource,
         localChangeToken = LocalChangeToken(localChange.token.ids),
       )

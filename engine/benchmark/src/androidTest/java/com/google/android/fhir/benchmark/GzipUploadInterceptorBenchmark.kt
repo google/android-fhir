@@ -170,7 +170,7 @@ class GzipUploadInterceptorBenchmark {
 
     @GET suspend fun get(@Url path: String): Resource
 
-    @POST(".") suspend fun post(@Body bundle: Bundle): Resource
+    @POST(".") suspend fun post(@Body bundle: Resource): Resource
 
     class Builder(
       private val baseUrl: String,
