@@ -16,7 +16,10 @@
 
 package com.google.android.fhir.datacapture.test.utilities
 
+import android.view.View
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isDialog
@@ -24,6 +27,8 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.google.common.truth.Truth.assertThat
+import org.hamcrest.CoreMatchers.any
+import org.hamcrest.Matcher
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -45,5 +50,22 @@ fun assertQuestionnaireResponseAtIndex(
 ) {
   for ((index, expectedString) in expectedStrings.withIndex()) {
     assertThat((answers[index].value as Coding).display).isEqualTo(expectedString)
+  }
+}
+
+/* Avoid test flakiness with a delay. See https://github.com/google/android-fhir/issues/1323.*/
+fun delayMainThread(): ViewAction {
+  return object : ViewAction {
+    override fun getConstraints(): Matcher<View> {
+      return any(View::class.java)
+    }
+
+    override fun getDescription(): String {
+      return "wait until displayed"
+    }
+
+    override fun perform(uiController: UiController, view: View) {
+      uiController.loopMainThreadForAtLeast(1000)
+    }
   }
 }
