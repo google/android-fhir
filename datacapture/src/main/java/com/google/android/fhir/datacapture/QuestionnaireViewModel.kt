@@ -747,7 +747,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                 showOptionalText = showOptionalText
               ),
             contextData = questionnaireItem.buildContextMap(questionnaire).toMutableMap().let {
-              runContextExpressions(questionnaireItem, questionnaireResponseItem, it))
+              runContextExpressions(questionnaireItem, questionnaireResponseItem, it)
             }
           )
         )
