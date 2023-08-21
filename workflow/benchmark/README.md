@@ -1,4 +1,4 @@
-# Android FHIR SDK Benchmark module
+# Android FHIR SDK Workflow Benchmark module
 
 Contains test cases that evaluate the performance of individual tasks executed for the first time directly on hardware. 
 
@@ -24,14 +24,13 @@ The results will be similar to this:
 1,238,212,883   ns    trace    D_FhirJsonParserBenchmark.parseLightFhirBundle
 2,785,964,288   ns    trace    E_ElmJsonLibraryLoaderBenchmark.parseImmunityCheckCqlFromFhirLibrary
   713,779,915   ns    trace    E_ElmJsonLibraryLoaderBenchmark.parseFhirHelpersCqlFromFhirLibrary
-  121,204,232   ns    trace    F_EngineDatabaseBenchmark.createAndGet
-9,833,892,387   ns    trace    G_CqlEvaluatorBenchmark.evaluatesLibrary
+9,833,892,387   ns    trace    F_CqlEvaluatorBenchmark.evaluatesLibrary
 ```
 
 Alternatively, from the command line, run the connectedCheck to run all of the tests from specified Gradle module:
 
 ```bash
-./gradlew benchmark:connectedReleaseAndroidTest
+./gradlew workflow:benchmark:connectedReleaseAndroidTest
 ```
 
 In this case, results will be saved to the `outputs/androidTest-results/connected/<device>/test-result.pb`. To visualize on Android Studio, click Run / Import Tests From File and find the `.pb` file
