@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.workflow.benchmark
+package com.google.android.fhir.benchmark
 
-import android.content.Context
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.test.core.app.ApplicationProvider
@@ -25,15 +24,11 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.knowledge.KnowledgeManager
-import com.google.android.fhir.workflow.FhirOperatorBuilder
 import com.google.common.truth.Truth.assertThat
-import java.io.File
 import java.io.InputStream
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Library
-import org.hl7.fhir.r4.model.Parameters
+import org.hl7.fhir.r4.model.ResourceType
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -41,7 +36,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class G_CqlEvaluatorBenchmark {
+class EngineDatabaseBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()
 
@@ -50,45 +45,25 @@ class G_CqlEvaluatorBenchmark {
   }
 
   @Test
-  fun evaluatesLibrary() = runBlocking {
+  fun createAndGet() = runBlocking {
     benchmarkRule.measureRepeated {
-      val fhirOperator = runWithTimingDisabled {
-        val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
-        val jsonParser = fhirContext.newJsonParser()
-        val context: Context = ApplicationProvider.getApplicationContext()
-
-        val patientImmunizationHistory =
-          jsonParser.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
-        val fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
-        val knowledgeManager = KnowledgeManager.createInMemory(context)
-        val lib = jsonParser.parseResource(open("/immunity-check/ImmunityCheck.json")) as Library
-
-        runBlocking {
-          for (entry in patientImmunizationHistory.entry) {
-            fhirEngine.create(entry.resource)
-          }
-          knowledgeManager.install(
-            File(context.filesDir, lib.name).apply {
-              writeText(jsonParser.encodeResourceToString(lib))
-            }
-          )
+      runBlocking {
+        val fhirEngine = runWithTimingDisabled {
+          FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
         }
 
-        FhirOperatorBuilder(context)
-          .withFhirContext(fhirContext)
-          .withFhirEngine(fhirEngine)
-          .withIgManager(knowledgeManager)
-          .build()
+        val patientImmunizationHistory = runWithTimingDisabled {
+          val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
+          val jsonParser = fhirContext.newJsonParser()
+          jsonParser.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
+        }
+
+        for (entry in patientImmunizationHistory.entry) {
+          fhirEngine.create(entry.resource)
+        }
+        assertThat(fhirEngine.get(ResourceType.Patient, "d4d35004-24f8-40e4-8084-1ad75924514f"))
+          .isNotNull()
       }
-
-      val results =
-        fhirOperator.evaluateLibrary(
-          "http://localhost/Library/ImmunityCheck|1.0.0",
-          "d4d35004-24f8-40e4-8084-1ad75924514f",
-          setOf("CompletedImmunization")
-        ) as Parameters
-
-      assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
     }
   }
 

@@ -12,20 +12,17 @@ In Android Studio, set your build variants to `release` and run your benchmark a
 
 The results will be similar to this:
 ```
-   48,093,078   ns    trace    A_JacksonMapperBenchmark.loadJsonMapper
-2,261,548,715   ns    trace    B_FhirContextLoaderBenchmark.loadR4
-2,928,293,365   ns    trace    B_FhirContextLoaderBenchmark.loadR5
-  337,669,721   ns    trace    B_FhirContextLoaderBenchmark.loadDstu2
-1,744,938,507   ns    trace    B_FhirContextLoaderBenchmark.loadDstu3
-6,817,953,752   ns    trace    C_CqlEngineFhirContextLoaderBenchmark.loadDstu2FhirModelResolver
-3,704,489,380   ns    trace    C_CqlEngineFhirContextLoaderBenchmark.loadR4FhirModelResolver
-2,814,451,999   ns    trace    C_CqlEngineFhirContextLoaderBenchmark.loadDstu3FhirModelResolver
-  675,991,839   ns    trace    D_FhirJsonParserBenchmark.parseLightFhirLibrary
-1,238,212,883   ns    trace    D_FhirJsonParserBenchmark.parseLightFhirBundle
-2,785,964,288   ns    trace    E_ElmJsonLibraryLoaderBenchmark.parseImmunityCheckCqlFromFhirLibrary
-  713,779,915   ns    trace    E_ElmJsonLibraryLoaderBenchmark.parseFhirHelpersCqlFromFhirLibrary
-  121,204,232   ns    trace    F_EngineDatabaseBenchmark.createAndGet
-9,833,892,387   ns    trace    G_CqlEvaluatorBenchmark.evaluatesLibrary
+1,297,374       ns        5345 allocs    trace    EngineDatabaseBenchmark.createAndGet
+1,114,474,793   ns     4922289 allocs    trace    FhirSyncWorkerBenchmark.oneTimeSync_50patients
+15,251,125      ns      100542 allocs    trace    FhirSyncWorkerBenchmark.oneTimeSync_1patient
+179,806,709     ns      986017 allocs    trace    FhirSyncWorkerBenchmark.oneTimeSync_10patients
+1,451,758       ns       11883 allocs    trace    GzipUploadInterceptorBenchmark.upload_10patientsWithGzip
+1,537,559       ns       11829 allocs    trace    GzipUploadInterceptorBenchmark.upload_10patientsWithoutGzip
+73,640,833      ns     1074360 allocs    trace    GzipUploadInterceptorBenchmark.upload_1000patientsWithGzip
+7,493,642       ns      108428 allocs    trace    GzipUploadInterceptorBenchmark.upload_100patientsWithoutGzip
+7,799,264       ns      108465 allocs    trace    GzipUploadInterceptorBenchmark.upload_100patientsWithGzip
+71,189,333      ns     1074466 allocs    trace    GzipUploadInterceptorBenchmark.upload_1000patientsWithoutGzip
+
 ```
 
 Alternatively, from the command line, run the connectedCheck to run all of the tests from specified Gradle module:
