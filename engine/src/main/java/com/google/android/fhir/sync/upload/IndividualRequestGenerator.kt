@@ -84,6 +84,7 @@ class IndividualRequestGenerator(
           Type.INSERT -> createFunction(localChange)
           Type.UPDATE -> updateFunction(localChange)
           Type.DELETE -> deleteFunction(localChange)
+          Type.NO_OP -> error("Cannot create a request from a NO_OP type")
         }
       }
     }
