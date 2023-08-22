@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,4 +16,6 @@
 
 package com.google.android.fhir.search
 
-@DslMarker internal annotation class SearchDslMarker
+@DslMarker
+@Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE)
+internal annotation class SearchDslMarker

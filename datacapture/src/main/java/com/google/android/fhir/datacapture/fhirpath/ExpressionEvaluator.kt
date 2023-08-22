@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -279,19 +279,36 @@ object ExpressionEvaluator {
   }
 
   /**
-   * Creates an x-fhir-query string for evaluation
-   *
-   * @param expression x-fhir-query expression
-   * @param launchContextMap if passed, the launch context to evaluate the expression against
+   * Creates an x-fhir-query string for evaluation. For this, it evaluates both variables and
+   * fhir-paths in the expression.
    */
   internal fun createXFhirQueryFromExpression(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse,
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>,
     expression: Expression,
     launchContextMap: Map<String, Resource>?
   ): String {
-    if (launchContextMap == null) {
-      return expression.expression
-    }
-    return evaluateXFhirEnhancement(expression, launchContextMap).fold(expression.expression) {
+    // get all dependent variables and their evaluated values
+    val variablesEvaluatedPairs =
+      mutableMapOf<String, Base?>()
+        .apply {
+          extractDependentVariables(
+            expression,
+            questionnaire,
+            questionnaireResponse,
+            questionnaireItemParentMap,
+            questionnaireItem,
+            this
+          )
+        }
+        .filterKeys { expression.expression.contains("{{%$it}}") }
+        .map { Pair("{{%${it.key}}}", it.value!!.primitiveValue()) }
+
+    val fhirPathsEvaluatedPairs =
+      launchContextMap?.let { evaluateXFhirEnhancement(expression, it) } ?: emptySequence()
+    return (fhirPathsEvaluatedPairs + variablesEvaluatedPairs).fold(expression.expression) {
       acc: String,
       pair: Pair<String, String> ->
       acc.replace(pair.first, pair.second)
