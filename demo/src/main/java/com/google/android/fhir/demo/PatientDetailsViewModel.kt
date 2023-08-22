@@ -26,8 +26,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.get
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.search.revInclude
 import com.google.android.fhir.search.search
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -40,6 +40,8 @@ import org.apache.commons.lang3.StringUtils
 import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.codesystems.RiskProbability
 
@@ -59,108 +61,131 @@ class PatientDetailsViewModel(
     viewModelScope.launch { livePatientData.value = getPatientDetailDataModel() }
   }
 
-  private suspend fun getPatient(): PatientListViewModel.PatientItem {
-    val patient = fhirEngine.get<Patient>(patientId)
-    return patient.toPatientItem(0)
-  }
-
-  private suspend fun getPatientObservations(): List<PatientListViewModel.ObservationItem> {
-    val observations: MutableList<PatientListViewModel.ObservationItem> = mutableListOf()
-    fhirEngine
-      .search<Observation> { filter(Observation.SUBJECT, { value = "Patient/$patientId" }) }
-      .take(MAX_RESOURCE_COUNT)
-      .map { createObservationItem(it, getApplication<Application>().resources) }
-      .let { observations.addAll(it) }
-    return observations
-  }
-
-  private suspend fun getPatientConditions(): List<PatientListViewModel.ConditionItem> {
-    val conditions: MutableList<PatientListViewModel.ConditionItem> = mutableListOf()
-    fhirEngine
-      .search<Condition> { filter(Condition.SUBJECT, { value = "Patient/$patientId" }) }
-      .take(MAX_RESOURCE_COUNT)
-      .map { createConditionItem(it, getApplication<Application>().resources) }
-      .let { conditions.addAll(it) }
-    return conditions
-  }
-
   private suspend fun getPatientDetailDataModel(): List<PatientDetailData> {
+    val searchResult =
+      fhirEngine.search<Patient> {
+        filter(Resource.RES_ID, { value = of(patientId) })
+
+        revInclude<RiskAssessment>(RiskAssessment.SUBJECT)
+        revInclude<Observation>(Observation.SUBJECT)
+        revInclude<Condition>(Condition.SUBJECT)
+      }
     val data = mutableListOf<PatientDetailData>()
-    val patient = getPatient()
-    patient.riskItem = getPatientRiskAssessment()
 
-    val observations = getPatientObservations()
-    val conditions = getPatientConditions()
+    searchResult.first().let {
+      data.addPatientDetailData(
+        it.resource,
+        getRiskItem(
+          it.revIncluded?.get(ResourceType.RiskAssessment to RiskAssessment.SUBJECT.paramName)
+            as List<RiskAssessment>?
+        )
+      )
 
-    patient.let { patientItem ->
-      data.add(PatientDetailOverview(patientItem, firstInGroup = true))
-      data.add(
-        PatientDetailProperty(
-          PatientProperty(getString(R.string.patient_property_mobile), patientItem.phone)
-        )
-      )
-      data.add(
-        PatientDetailProperty(
-          PatientProperty(getString(R.string.patient_property_id), patientItem.resourceId)
-        )
-      )
-      data.add(
-        PatientDetailProperty(
-          PatientProperty(
-            getString(R.string.patient_property_address),
-            "${patientItem.city}, ${patientItem.country} "
-          )
-        )
-      )
-      data.add(
-        PatientDetailProperty(
-          PatientProperty(
-            getString(R.string.patient_property_dob),
-            patientItem.dob?.localizedString ?: ""
-          )
-        )
-      )
-      data.add(
-        PatientDetailProperty(
-          PatientProperty(
-            getString(R.string.patient_property_gender),
-            patientItem.gender.replaceFirstChar {
-              if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-            }
-          ),
-          lastInGroup = true
-        )
-      )
+      it.revIncluded?.get(ResourceType.Observation to Observation.SUBJECT.paramName)?.let {
+        data.addObservationsData(it as List<Observation>)
+      }
+      it.revIncluded?.get(ResourceType.Condition to Condition.SUBJECT.paramName)?.let {
+        data.addConditionsData(it as List<Condition>)
+      }
     }
+    return data
+  }
 
+  private fun getRiskItem(riskAssessments: List<RiskAssessment>?) =
+    riskAssessments
+      ?.filter { it.hasOccurrence() }
+      ?.maxByOrNull { it.occurrenceDateTimeType.value }
+      .let {
+        RiskAssessmentItem(
+          getRiskAssessmentStatusColor(it),
+          getRiskAssessmentStatus(it),
+          getLastContactedDate(it),
+          getPatientDetailsCardColor(it)
+        )
+      }
+
+  private fun MutableList<PatientDetailData>.addPatientDetailData(
+    patient: Patient,
+    riskAssessment: RiskAssessmentItem
+  ) {
+    patient
+      .toPatientItem(0)
+      .apply { riskItem = riskAssessment }
+      .let { patientItem ->
+        add(PatientDetailOverview(patientItem, firstInGroup = true))
+        add(
+          PatientDetailProperty(
+            PatientProperty(getString(R.string.patient_property_mobile), patientItem.phone)
+          )
+        )
+        add(
+          PatientDetailProperty(
+            PatientProperty(getString(R.string.patient_property_id), patientItem.resourceId)
+          )
+        )
+        add(
+          PatientDetailProperty(
+            PatientProperty(
+              getString(R.string.patient_property_address),
+              "${patientItem.city}, ${patientItem.country} "
+            )
+          )
+        )
+        add(
+          PatientDetailProperty(
+            PatientProperty(
+              getString(R.string.patient_property_dob),
+              patientItem.dob?.localizedString ?: ""
+            )
+          )
+        )
+        add(
+          PatientDetailProperty(
+            PatientProperty(
+              getString(R.string.patient_property_gender),
+              patientItem.gender.replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
+              }
+            ),
+            lastInGroup = true
+          )
+        )
+      }
+  }
+
+  private fun MutableList<PatientDetailData>.addObservationsData(observations: List<Observation>) {
     if (observations.isNotEmpty()) {
-      data.add(PatientDetailHeader(getString(R.string.header_observation)))
+      add(PatientDetailHeader(getString(R.string.header_observation)))
 
-      val observationDataModel =
-        observations.mapIndexed { index, observationItem ->
+      observations
+        .take(MAX_RESOURCE_COUNT)
+        .map { createObservationItem(it, getApplication<Application>().resources) }
+        .mapIndexed { index, observationItem ->
           PatientDetailObservation(
             observationItem,
             firstInGroup = index == 0,
             lastInGroup = index == observations.size - 1
           )
         }
-      data.addAll(observationDataModel)
+        .let { addAll(it) }
     }
+  }
 
+  private fun MutableList<PatientDetailData>.addConditionsData(conditions: List<Condition>) {
     if (conditions.isNotEmpty()) {
-      data.add(PatientDetailHeader(getString(R.string.header_conditions)))
-      val conditionDataModel =
-        conditions.mapIndexed { index, conditionItem ->
+      add(PatientDetailHeader(getString(R.string.header_conditions)))
+      conditions
+        .take(MAX_RESOURCE_COUNT)
+        .map { createConditionItem(it, getApplication<Application>().resources) }
+        .mapIndexed { index, conditionItem ->
           PatientDetailCondition(
             conditionItem,
             firstInGroup = index == 0,
             lastInGroup = index == conditions.size - 1
           )
         }
-      data.addAll(conditionDataModel)
+        .let { addAll(it) }
     }
-
-    return data
   }
 
   private val LocalDate.localizedString: String
@@ -175,21 +200,6 @@ class PatientDetailsViewModel(
   private fun isAndroidIcuSupported() = true
 
   private fun getString(resId: Int) = getApplication<Application>().resources.getString(resId)
-
-  private suspend fun getPatientRiskAssessment(): RiskAssessmentItem {
-    val riskAssessment =
-      fhirEngine
-        .search<RiskAssessment> { filter(RiskAssessment.SUBJECT, { value = "Patient/$patientId" }) }
-        .filter { it.hasOccurrence() }
-        .sortedByDescending { it.occurrenceDateTimeType.value }
-        .firstOrNull()
-    return RiskAssessmentItem(
-      getRiskAssessmentStatusColor(riskAssessment),
-      getRiskAssessmentStatus(riskAssessment),
-      getLastContactedDate(riskAssessment),
-      getPatientDetailsCardColor(riskAssessment)
-    )
-  }
 
   private fun getRiskAssessmentStatusColor(riskAssessment: RiskAssessment?): Int {
     riskAssessment?.let {
