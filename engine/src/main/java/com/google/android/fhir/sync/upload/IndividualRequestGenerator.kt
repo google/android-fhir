@@ -34,11 +34,7 @@ class IndividualRequestGenerator(
 ) : UploadRequestGenerator {
 
   override fun generateUploadRequests(localChanges: List<LocalChange>): List<UrlUploadRequest> =
-    localChanges.map { generateUploadRequest(it) }
-
-  private fun generateUploadRequest(localChange: LocalChange): UrlUploadRequest {
-    return getIndividualRequestForLocalChangeType(localChange.type, localChange)
-  }
+    localChanges.map { getIndividualRequestForLocalChangeType(it.type, it) }
 
   companion object Factory {
 
