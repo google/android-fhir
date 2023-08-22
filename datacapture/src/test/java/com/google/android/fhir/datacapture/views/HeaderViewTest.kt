@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,9 @@ import org.robolectric.RuntimeEnvironment
 class HeaderViewTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
+      RuntimeEnvironment.getApplication().apply {
+        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
+      }
     )
   private val view = HeaderView(parent.context, null)
 

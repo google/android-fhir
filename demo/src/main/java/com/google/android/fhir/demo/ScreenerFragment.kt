@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
 package com.google.android.fhir.demo
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -48,19 +46,14 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
     }
-  }
-
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    super.onCreateOptionsMenu(menu, inflater)
-    inflater.inflate(R.menu.screen_encounter_fragment_menu, menu)
+    childFragmentManager.setFragmentResultListener(
+      QuestionnaireFragment.SUBMIT_REQUEST_KEY,
+      viewLifecycleOwner
+    ) { _, _ -> onSubmitAction() }
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
-      R.id.action_add_patient_submit -> {
-        onSubmitAction()
-        true
-      }
       android.R.id.home -> {
         showCancelScreenerQuestionnaireAlertDialog()
         true

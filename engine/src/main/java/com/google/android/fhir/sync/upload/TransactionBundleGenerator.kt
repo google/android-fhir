@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,40 +19,60 @@ package com.google.android.fhir.sync.upload
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.sync.BundleUploadRequest
 import org.hl7.fhir.r4.model.Bundle
 
-typealias ResourceBundleAndAssociatedLocalChangeTokens = Pair<Bundle, List<LocalChangeToken>>
-
 /**
- * Generates pairs of Transaction [Bundle] and [LocalChangeToken]s associated with the resources
- * present in the transaction bundle.
+ * Generates list of [BundleUploadRequest] with Transaction [Bundle] and [LocalChangeToken]s
+ * associated with the resources present in the transaction bundle.
  */
-internal open class TransactionBundleGenerator(
-  val getBundleEntryComponentGeneratorForLocalChangeType:
-    (type: Type) -> HttpVerbBasedBundleEntryComponentGenerator
-) {
+class TransactionBundleGenerator(
+  private val generatedBundleSize: Int,
+  private val useETagForUpload: Boolean,
+  private val getBundleEntryComponentGeneratorForLocalChangeType:
+    (type: Type, useETagForUpload: Boolean) -> BundleEntryComponentGenerator
+) : UploadRequestGenerator {
 
-  fun generate(
-    localChanges: List<List<LocalChange>>
-  ): List<ResourceBundleAndAssociatedLocalChangeTokens> {
-    return localChanges.filter { it.isNotEmpty() }.map { generateBundle(it) }
+  override fun generateUploadRequests(localChanges: List<LocalChange>): List<BundleUploadRequest> {
+    return localChanges
+      .chunked(generatedBundleSize)
+      .filter { it.isNotEmpty() }
+      .map { generateBundleRequest(it) }
   }
 
-  private fun generateBundle(
-    localChanges: List<LocalChange>
-  ): ResourceBundleAndAssociatedLocalChangeTokens {
-    return Bundle().apply {
-      type = Bundle.BundleType.TRANSACTION
-      localChanges.forEach {
-        this.addEntry(getBundleEntryComponentGeneratorForLocalChangeType(it.type).getEntry(it))
+  private fun generateBundleRequest(localChanges: List<LocalChange>): BundleUploadRequest {
+    val bundleRequest =
+      Bundle().apply {
+        type = Bundle.BundleType.TRANSACTION
+        localChanges
+          .filterNot { it.type == Type.NO_OP }
+          .forEach {
+            this.addEntry(
+              getBundleEntryComponentGeneratorForLocalChangeType(it.type, useETagForUpload)
+                .getEntry(it)
+            )
+          }
       }
-    } to localChanges.map { it.token }
+    return BundleUploadRequest(
+      resource = bundleRequest,
+      localChangeToken = LocalChangeToken(localChanges.flatMap { it.token.ids })
+    )
   }
 
   companion object Factory {
 
-    fun getDefault(useETagForUpload: Boolean = true) =
-      PutForCreateAndPatchForUpdateBasedTransactionGenerator(useETagForUpload)
+    private val createMapping =
+      mapOf(
+        Bundle.HTTPVerb.PUT to this::putForCreateBasedBundleComponentMapper,
+      )
+
+    private val updateMapping =
+      mapOf(
+        Bundle.HTTPVerb.PATCH to this::patchForUpdateBasedBundleComponentMapper,
+      )
+
+    fun getDefault(useETagForUpload: Boolean = true, bundleSize: Int = 500) =
+      getGenerator(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, bundleSize, useETagForUpload)
 
     /**
      * Returns a [TransactionBundleGenerator] based on the provided [Bundle.HTTPVerb]s for creating
@@ -62,27 +82,39 @@ internal open class TransactionBundleGenerator(
     fun getGenerator(
       httpVerbToUseForCreate: Bundle.HTTPVerb,
       httpVerbToUseForUpdate: Bundle.HTTPVerb,
-      useETagForUpload: Boolean,
+      generatedBundleSize: Int,
+      useETagForUpload: Boolean
     ): TransactionBundleGenerator {
 
-      return if (httpVerbToUseForCreate == Bundle.HTTPVerb.PUT &&
-          httpVerbToUseForUpdate == Bundle.HTTPVerb.PATCH
-      ) {
-        PutForCreateAndPatchForUpdateBasedTransactionGenerator(useETagForUpload)
-      } else {
-        throw IllegalArgumentException(
-          "Engine currently supports creation using [PUT] and updates using [PATCH]"
-        )
+      val createFunction =
+        createMapping[httpVerbToUseForCreate]
+          ?: throw IllegalArgumentException(
+            "Creation using $httpVerbToUseForCreate is not supported."
+          )
+
+      val updateFunction =
+        updateMapping[httpVerbToUseForUpdate]
+          ?: throw IllegalArgumentException(
+            "Update using $httpVerbToUseForUpdate is not supported."
+          )
+
+      return TransactionBundleGenerator(generatedBundleSize, useETagForUpload) { type, useETag ->
+        when (type) {
+          Type.INSERT -> createFunction(useETag)
+          Type.UPDATE -> updateFunction(useETag)
+          Type.DELETE -> HttpDeleteEntryComponentGenerator(useETag)
+          Type.NO_OP ->
+            error("NO_OP type represents a no-operation and is not mapped to an HTTP operation.")
+        }
       }
     }
+
+    private fun putForCreateBasedBundleComponentMapper(
+      useETagForUpload: Boolean
+    ): BundleEntryComponentGenerator = HttpPutForCreateEntryComponentGenerator(useETagForUpload)
+
+    private fun patchForUpdateBasedBundleComponentMapper(
+      useETagForUpload: Boolean
+    ): BundleEntryComponentGenerator = HttpPatchForUpdateEntryComponentGenerator(useETagForUpload)
   }
 }
-
-internal class PutForCreateAndPatchForUpdateBasedTransactionGenerator(useETagForUpload: Boolean) :
-  TransactionBundleGenerator({ type ->
-    when (type) {
-      Type.INSERT -> HttpPutForCreateEntryComponentGenerator(useETagForUpload)
-      Type.UPDATE -> HttpPatchForUpdateEntryComponentGenerator(useETagForUpload)
-      Type.DELETE -> HttpDeleteEntryComponentGenerator(useETagForUpload)
-    }
-  })
