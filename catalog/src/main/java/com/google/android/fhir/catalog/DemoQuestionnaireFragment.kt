@@ -85,10 +85,10 @@ class DemoQuestionnaireFragment : Fragment() {
     childFragmentManager.setFragmentResultListener(SUBMIT_REQUEST_KEY, viewLifecycleOwner) { _, _ ->
       onSubmitQuestionnaireClick()
     }
-    updateArguments()
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
     }
+    (activity as? MainActivity)?.showOpenQuestionnaireMenu(false)
   }
 
   override fun onResume() {
@@ -128,27 +128,16 @@ class DemoQuestionnaireFragment : Fragment() {
     setHasOptionsMenu(true)
   }
 
-  private fun updateArguments() {
-    requireArguments().putString(QUESTIONNAIRE_FILE_PATH_KEY, args.questionnaireFilePathKey)
-    requireArguments()
-      .putString(
-        QUESTIONNAIRE_FILE_WITH_VALIDATION_PATH_KEY,
-        args.questionnaireFileWithValidationPathKey
-      )
-  }
-
   private fun addQuestionnaireFragment() {
     viewLifecycleOwner.lifecycleScope.launch {
       if (childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) == null) {
         childFragmentManager.commit {
           setReorderingAllowed(true)
-          add(
-            R.id.container,
+          val questionnaireFragment =
             QuestionnaireFragment.builder()
-              .setQuestionnaire(viewModel.getQuestionnaireJson())
-              .build(),
-            QUESTIONNAIRE_FRAGMENT_TAG
-          )
+              .apply { setQuestionnaire(args.questionnaireJsonStringKey!!) }
+              .build()
+          add(R.id.container, questionnaireFragment, QUESTIONNAIRE_FRAGMENT_TAG)
         }
       }
     }
@@ -161,15 +150,15 @@ class DemoQuestionnaireFragment : Fragment() {
    */
   private fun replaceQuestionnaireFragmentWithQuestionnaireJson() {
     // TODO: remove check once all files are added
-    if (args.questionnaireFileWithValidationPathKey.isNullOrEmpty()) {
+    if (args.questionnaireWithValidationJsonStringKey.isNullOrEmpty()) {
       return
     }
     viewLifecycleOwner.lifecycleScope.launch {
       val questionnaireJsonString =
         if (isErrorState) {
-          viewModel.getQuestionnaireWithValidationJson()
+          args.questionnaireWithValidationJsonStringKey!!
         } else {
-          viewModel.getQuestionnaireJson()
+          args.questionnaireJsonStringKey!!
         }
       childFragmentManager.commit {
         setReorderingAllowed(true)
@@ -225,9 +214,6 @@ class DemoQuestionnaireFragment : Fragment() {
 
   companion object {
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
-    const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
-    const val QUESTIONNAIRE_FILE_WITH_VALIDATION_PATH_KEY =
-      "questionnaire-file-with-validation-path-key"
   }
 }
 
