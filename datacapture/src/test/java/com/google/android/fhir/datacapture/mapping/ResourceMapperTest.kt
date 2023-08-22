@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.RelatedPerson
 import org.hl7.fhir.r4.model.ResourceFactory
 import org.hl7.fhir.r4.model.StringType
@@ -1522,6 +1523,96 @@ class ResourceMapperTest {
       .isEqualTo(patientId)
   }
 
+  @Test
+  fun `populate() should correctly populate Reference value in QuestionnaireResponse`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire()
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "patient-id"
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              extension =
+                listOf(
+                  Extension(
+                    ITEM_INITIAL_EXPRESSION_URL,
+                    Expression().apply {
+                      language = "text/fhirpath"
+                      expression = "Patient.id"
+                    }
+                  )
+                )
+            }
+          )
+
+      val patientId = UUID.randomUUID().toString()
+      val patient = Patient().apply { id = "Patient/$patientId" }
+      val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+
+      assertThat((questionnaireResponse.item[0].answer[0].value as Reference).reference)
+        .isEqualTo(patient.id)
+    }
+
+  @Test
+  fun `populate() should throw error when Reference value in QuestionnaireResponse but FhirExpression `() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire()
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "patient-id"
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              extension =
+                listOf(
+                  Extension(
+                    ITEM_INITIAL_EXPRESSION_URL,
+                    Expression().apply {
+                      language = "text/fhirpath"
+                      expression = "Patient.gender"
+                    }
+                  )
+                )
+            }
+          )
+
+      val patientId = UUID.randomUUID().toString()
+      val patient =
+        Patient().apply {
+          id = "Patient/$patientId"
+          gender = Enumerations.AdministrativeGender.MALE
+        }
+
+      val errorMessage =
+        assertFailsWith<FHIRException> { ResourceMapper.populate(questionnaire, patient) }
+          .localizedMessage
+      assertThat(errorMessage).isEqualTo("Expression supplied does not evaluate to IdType.")
+    }
+
+  @Test
+  fun `populate() should correctly populate Reference value in QuestionnaireResponse when expression resolves to type Resource`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire()
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              addExtension(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "Patient"
+                  }
+                )
+              )
+            }
+          )
+      val patient = Patient().apply { id = UUID.randomUUID().toString() }
+      val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+
+      assertThat(questionnaireResponse.itemFirstRep.answerFirstRep.valueReference.reference)
+        .isEqualTo("Patient/${patient.id}")
+    }
   @Test
   fun `populate() should correctly populate IdType value with history in QuestionnaireResponse`() =
     runBlocking {

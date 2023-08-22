@@ -25,6 +25,7 @@ import androidx.core.view.get
 import androidx.core.view.isEmpty
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.identifierString
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -64,8 +65,10 @@ internal object AutoCompleteViewHolderFactory :
                 value =
                   questionnaireViewItem.enabledAnswerOptions
                     .first {
-                      it.value.displayString(header.context) ==
-                        autoCompleteTextView.adapter.getItem(position) as String
+                      it.value.identifierString(header.context) ==
+                        (autoCompleteTextView.adapter.getItem(position)
+                            as AutoCompleteViewAnswerOption)
+                          .answerId
                     }
                     .valueCoding
               }
@@ -78,9 +81,20 @@ internal object AutoCompleteViewHolderFactory :
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         header.bind(questionnaireViewItem)
         header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
-        val answerOptionString =
-          questionnaireViewItem.enabledAnswerOptions.map { it.value.displayString(header.context) }
-        val adapter = ArrayAdapter(header.context, R.layout.drop_down_list_item, answerOptionString)
+        val answerOptionValues =
+          questionnaireViewItem.enabledAnswerOptions.map {
+            AutoCompleteViewAnswerOption(
+              answerId = it.value.identifierString(header.context),
+              answerDisplay = it.value.displayString(header.context)
+            )
+          }
+        val adapter =
+          ArrayAdapter(
+            header.context,
+            R.layout.drop_down_list_item,
+            R.id.answer_option_textview,
+            answerOptionValues
+          )
         autoCompleteTextView.setAdapter(adapter)
         // Remove chips if any from the last bindView call on this VH.
         chipContainer.removeAllViews()
@@ -203,4 +217,14 @@ internal object AutoCompleteViewHolderFactory :
         }
       }
     }
+}
+
+/**
+ * An answer option that would show up as a dropdown item in an [AutoCompleteViewHolderFactory]
+ * textview
+ */
+internal data class AutoCompleteViewAnswerOption(val answerId: String, val answerDisplay: String) {
+  override fun toString(): String {
+    return this.answerDisplay
+  }
 }
