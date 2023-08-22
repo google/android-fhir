@@ -20,6 +20,7 @@ import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.logicalId
@@ -55,7 +56,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     database.delete(type, id)
   }
 
-  override suspend fun <R : Resource> search(search: Search): List<R> {
+  override suspend fun <R : Resource> search(search: Search): List<SearchResult<R>> {
     return search.execute(database)
   }
 
