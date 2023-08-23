@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.mapping
 
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
+import com.google.android.fhir.datacapture.extensions.logicalId
 import com.google.android.fhir.datacapture.extensions.getMatchingLaunchContexts
 import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
 import com.google.android.fhir.datacapture.extensions.targetStructureMap
@@ -30,6 +31,7 @@ import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.util.Locale
+import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.context.IWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Bundle
@@ -47,6 +49,7 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.StructureDefinition
@@ -254,10 +257,9 @@ object ResourceMapper {
       ?.let {
         // Set initial value for the questionnaire item. Questionnaire items should not have both
         // initial value and initial expression.
+        val value = it.asExpectedType(questionnaireItem.type)
         questionnaireItem.initial =
-          mutableListOf(
-            Questionnaire.QuestionnaireItemInitialComponent().setValue(it.asExpectedType())
-          )
+          mutableListOf(Questionnaire.QuestionnaireItemInitialComponent().setValue(value))
       }
 
     populateInitialValues(questionnaireItem.item, launchContexts)
@@ -743,11 +745,33 @@ private fun Questionnaire.createResource(): Resource? =
  * objects and throws exception otherwise. This extension function takes care of the conversion
  * based on the input and expected [Type].
  */
-private fun Base.asExpectedType(): Type {
-  return when (this) {
-    is Enumeration<*> -> toCoding()
-    is IdType -> StringType(idPart)
+private fun Base.asExpectedType(
+  questionnaireItemType: Questionnaire.QuestionnaireItemType? = null
+): Type {
+  return when {
+    questionnaireItemType == Questionnaire.QuestionnaireItemType.REFERENCE ->
+      asExpectedReferenceType()
+    this is Enumeration<*> -> toCoding()
+    this is IdType -> StringType(idPart)
     else -> this as Type
+  }
+}
+
+private fun Base.asExpectedReferenceType(): Type {
+  return when {
+    this.isResource -> {
+      this@asExpectedReferenceType as Resource
+      Reference().apply {
+        reference =
+          "${this@asExpectedReferenceType.resourceType}/${this@asExpectedReferenceType.logicalId}"
+      }
+    }
+    this is IdType ->
+      Reference().apply {
+        reference =
+          "${this@asExpectedReferenceType.resourceType}/${this@asExpectedReferenceType.idPart}"
+      }
+    else -> throw FHIRException("Expression supplied does not evaluate to IdType.")
   }
 }
 

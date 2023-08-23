@@ -26,6 +26,7 @@ import com.google.android.fhir.DatabaseErrorStrategy
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
+import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.ResourceEntity
@@ -92,7 +93,7 @@ internal class DatabaseImpl(
             }
           }
 
-          addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+          addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
         }
         .build()
   }
@@ -188,6 +189,20 @@ internal class DatabaseImpl(
         .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
         .map { iParser.parseResource(it) as R }
         .distinctBy { it.id }
+    }
+  }
+
+  override suspend fun searchReferencedResources(query: SearchQuery): List<IndexedIdAndResource> {
+    return db.withTransaction {
+      resourceDao
+        .getReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+        .map {
+          IndexedIdAndResource(
+            it.matchingIndex,
+            it.idOfBaseResourceOnWhichThisMatchedInc ?: it.idOfBaseResourceOnWhichThisMatchedRev!!,
+            iParser.parseResource(it.serializedResource) as Resource
+          )
+        }
     }
   }
 

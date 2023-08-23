@@ -58,7 +58,7 @@ internal class UploaderImpl(
         completed = total - uploadWorkManager.getPendingUploadsIndicator(pendingRequests)
         emit(
           getUploadResult(
-            uploadRequest.resourceType,
+            uploadRequest.resource.resourceType,
             response,
             uploadRequest.localChangeToken,
             total,

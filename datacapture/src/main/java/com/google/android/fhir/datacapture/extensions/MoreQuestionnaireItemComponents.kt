@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.extensions
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.text.SpannableStringBuilder
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import ca.uhn.fhir.util.UrlUtil
@@ -34,6 +35,7 @@ import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IntegerType
@@ -111,6 +113,30 @@ internal const val EXTENSION_CQF_CALCULATED_VALUE_URL: String =
 
 internal const val EXTENSION_SLIDER_STEP_VALUE_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue"
+
+/**
+ * Extension for questionnaire items of integer and decimal types including a single unit to be
+ * displayed.
+ *
+ * See https://hl7.org/fhir/extensions/StructureDefinition-questionnaire-unit.html.
+ */
+internal const val EXTENSION_QUESTIONNAIRE_UNIT_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
+
+/**
+ * Extension for questionnaire items of quantity type including unit options to choose from.
+ *
+ * See https://hl7.org/fhir/extensions/StructureDefinition-questionnaire-unitOption.html.
+ */
+internal const val EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption"
+
+/**
+ * Extension for questionnaire items of quantity type including a value set of unit options to
+ * choose from.
+ */
+internal const val EXTENSION_QUESTIONNAIRE_UNIT_VALUE_SET_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet"
 
 internal const val EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerOptionsToggleExpression"
@@ -298,7 +324,7 @@ internal fun Questionnaire.QuestionnaireItemComponent.isGivenSizeOverLimit(
 internal enum class DisplayItemControlType(val extensionCode: String) {
   FLYOVER("flyover"),
   PAGE("page"),
-  HELP("help")
+  HELP("help"),
 }
 
 /** Item control to show instruction text */
@@ -318,7 +344,7 @@ val Questionnaire.QuestionnaireItemComponent.hasHelpButton: Boolean
   }
 
 /** Converts Text with HTML Tag to formatted text. */
-private fun String.toSpanned(): Spanned {
+internal fun String.toSpanned(): Spanned {
   return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
 }
 
@@ -341,16 +367,23 @@ val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
  * code is used as the instructions of the parent question.
  */
 val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spanned?
-  get() = item.localizedInstructionsSpanned
+  get() = item.getLocalizedInstructionsSpanned()
 
-/** [localizedInstructionsSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
-val List<Questionnaire.QuestionnaireItemComponent>.localizedInstructionsSpanned: Spanned?
-  get() {
-    return this.firstOrNull { questionnaireItem ->
+/**
+ * Returns a Spanned object that contains the localized instructions for all of the items in this
+ * list that are of type `Questionnaire.QuestionnaireItemType.DISPLAY` and have the
+ * `isInstructionsCode` flag set. The instructions are separated by newlines.
+ */
+fun List<Questionnaire.QuestionnaireItemComponent>.getLocalizedInstructionsSpanned(
+  separator: String = "\n"
+) =
+  SpannableStringBuilder().apply {
+    this@getLocalizedInstructionsSpanned.filter { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
           questionnaireItem.isInstructionsCode
       }
-      ?.localizedTextSpanned
+      .map { it.localizedTextSpanned }
+      .joinTo(this, separator)
   }
 
 /**
@@ -478,6 +511,34 @@ val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
   }
 
 /**
+ * The unit for the numerical question.
+ *
+ * See http://hl7.org/fhir/R4/extension-questionnaire-unit.html.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.unit: Coding?
+  get() {
+    val extension =
+      this.extension.singleOrNull { it.url == EXTENSION_QUESTIONNAIRE_UNIT_URL } ?: return null
+    val value = extension.value
+    if (value is Coding) {
+      return value
+    }
+    return null
+  }
+
+/**
+ * The unit options for the quantity question.
+ *
+ * See http://hl7.org/fhir/R4/extension-questionnaire-unitoption.html.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.unitOption: List<Coding>
+  get() {
+    return this.extension
+      .filter { it.url == EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL }
+      .map { it.value as Coding }
+  }
+
+/**
  * Returns a list of values built from the elements of `this` and the
  * `questionnaireResponseItemList` with the same linkId using the provided `transform` function
  * applied to each pair of questionnaire item and questionnaire response item.
@@ -568,8 +629,9 @@ val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
  * value.
  */
 private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
-  MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? {
-  // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
+  MutableList<
+    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+  >? { // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
   // quantity given as initial without value is for unit reference purpose only. Answer conversion
   // not needed
   if (initial.isEmpty() ||
