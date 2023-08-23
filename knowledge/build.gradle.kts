@@ -9,6 +9,16 @@ plugins {
   id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
 }
 
+publishing {
+  repositories {
+    maven {
+      credentials(PasswordCredentials::class)
+      url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+      name = "sonatype"
+    }
+  }
+}
+
 publishArtifact(Releases.Knowledge)
 
 createJacocoTestReportTask()

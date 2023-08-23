@@ -5,10 +5,9 @@ plugins {
   jacoco
 }
 
-publishing{
+publishing {
   repositories {
     maven {
-
       credentials(PasswordCredentials::class)
       url = uri("https://oss.sonatype.org/content/repositories/snapshots")
       name = "sonatype"
