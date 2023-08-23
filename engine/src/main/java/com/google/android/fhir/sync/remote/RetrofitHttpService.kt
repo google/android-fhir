@@ -85,6 +85,7 @@ internal interface RetrofitHttpService : FhirHttpService {
                 }
               )
             }
+            networkConfiguration.okHttpCache?.let { this.cache(it) }
           }
           .build()
       return Retrofit.Builder()
