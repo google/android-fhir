@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,9 @@ package com.google.android.fhir
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import java.io.File
 import java.lang.IllegalStateException
+import okhttp3.Cache
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -93,6 +95,30 @@ class FhirEngineProviderTest {
       assertThat(this.connectionTimeOut).isEqualTo(5)
       assertThat(this.readTimeOut).isEqualTo(4)
       assertThat(this.writeTimeOut).isEqualTo(6)
+    }
+  }
+
+  @Test
+  fun createFhirEngineConfiguration_configureOkHttpCache_shouldHaveOkHttpCache() {
+    val config =
+      FhirEngineConfiguration(
+        serverConfiguration =
+          ServerConfiguration(
+            "",
+            NetworkConfiguration(
+              okHttpCache =
+                Cache(
+                  directory = File("sample-dir", "http_cache"),
+                  // $0.05 worth of phone storage in 2020
+                  maxSize = 50L * 1024L * 1024L // 50 MiB
+                )
+            )
+          )
+      )
+    with(config.serverConfiguration!!.networkConfiguration) {
+      assertThat(this.okHttpCache?.maxSize()).isEqualTo(50L * 1024L * 1024L)
+      assertThat(this.okHttpCache?.directory).isEqualTo(File("sample-dir", "http_cache"))
+      assertThat(this.okHttpCache).isEqualTo(6)
     }
   }
 }

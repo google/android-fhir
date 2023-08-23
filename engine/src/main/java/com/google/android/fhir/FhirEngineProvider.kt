@@ -21,6 +21,7 @@ import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.HttpAuthenticator
 import com.google.android.fhir.sync.remote.HttpLogger
+import okhttp3.Cache
 import org.hl7.fhir.r4.model.SearchParameter
 
 /** The provider for [FhirEngine] instance. */
@@ -161,4 +162,7 @@ data class NetworkConfiguration(
   val writeTimeOut: Long = 10,
   /** Compresses requests when uploading to a server that supports gzip. */
   val uploadWithGzip: Boolean = false,
+
+  /** Cache setting to enable Cache-Control Header */
+  val okHttpCache: Cache? = null
 )
