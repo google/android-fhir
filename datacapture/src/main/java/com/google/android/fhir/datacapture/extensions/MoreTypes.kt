@@ -67,7 +67,12 @@ fun Type.getValueAsString(context: Context): String =
  * may have similar display strings
  */
 fun Type.identifierString(context: Context): String =
-  id ?: (this as? Coding)?.code ?: (this as? Reference)?.reference ?: displayString(context)
+  id
+    ?: (this as? Coding)?.let {
+      arrayOf("${it.system.orEmpty()}${it.version.orEmpty()}", it.code.orEmpty())
+        .joinToString(if (it.hasSystem() && it.hasCode()) "|" else "")
+    }
+      ?: (this as? Reference)?.reference ?: displayString(context)
 
 private fun getDisplayString(type: Type, context: Context): String? =
   when (type) {
