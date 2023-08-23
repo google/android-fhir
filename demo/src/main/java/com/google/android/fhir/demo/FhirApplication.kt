@@ -28,6 +28,8 @@ import com.google.android.fhir.datacapture.DataCaptureConfig
 import com.google.android.fhir.datacapture.XFhirQueryResolver
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.remote.HttpLogger
+import java.io.File
+import okhttp3.Cache
 import timber.log.Timber
 
 class FhirApplication : Application(), DataCaptureConfig.Provider {
@@ -55,7 +57,16 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
                 if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC
               )
             ) { Timber.tag("App-HttpLog").d(it) },
-          networkConfiguration = NetworkConfiguration(uploadWithGzip = false)
+          networkConfiguration =
+            NetworkConfiguration(
+              uploadWithGzip = false,
+              okHttpCache =
+                Cache(
+                  directory = File(this.cacheDir, "http_cache"),
+                  // $0.05 worth of phone storage in 2020
+                  maxSize = 50L * 1024L * 1024L // 50 MiB
+                )
+            )
         )
       )
     )
