@@ -64,6 +64,7 @@ abstract class BundleEntryComponentGenerator(
             LocalChange.Type.UPDATE,
             LocalChange.Type.DELETE -> ifMatch = "W/\"${localChange.versionId}\""
             LocalChange.Type.INSERT -> {}
+            LocalChange.Type.NO_OP -> error("Cannot create a bundle from a NO_OP request")
           }
         }
       }

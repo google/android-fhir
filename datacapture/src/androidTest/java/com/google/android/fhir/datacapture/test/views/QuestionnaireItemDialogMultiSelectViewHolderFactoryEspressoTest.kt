@@ -22,7 +22,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
@@ -40,6 +39,7 @@ import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.test.utilities.assertQuestionnaireResponseAtIndex
 import com.google.android.fhir.datacapture.test.utilities.clickOnText
 import com.google.android.fhir.datacapture.test.utilities.clickOnTextInDialog
+import com.google.android.fhir.datacapture.test.utilities.delayMainThread
 import com.google.android.fhir.datacapture.test.utilities.endIconClickInTextInputLayout
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -288,7 +288,8 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     onView(withId(R.id.recycler_view))
       .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(8))
     clickOnTextInDialog("Other")
-    onView(withId(R.id.add_another)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+    onView(withId(R.id.add_another)).perform(delayMainThread())
+    onView(withId(R.id.add_another)).check(matches(isDisplayed()))
   }
 
   @Test
@@ -354,7 +355,8 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
       .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(8))
     clickOnTextInDialog("Other")
     onView(withId(R.id.add_another)).perform(click())
-    onView(withId(R.id.add_another)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+    onView(withId(R.id.add_another)).perform(delayMainThread())
+    onView(withId(R.id.add_another)).check(matches(isDisplayed()))
   }
 
   @Test

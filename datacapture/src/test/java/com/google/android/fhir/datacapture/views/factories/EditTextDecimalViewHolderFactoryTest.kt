@@ -28,7 +28,9 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
@@ -115,6 +117,74 @@ class EditTextDecimalViewHolderFactoryTest {
         viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
           .text.toString()
+      )
+      .isEqualTo("")
+  }
+
+  @Test
+  fun `should set unit text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          type = Questionnaire.QuestionnaireItemType.DECIMAL
+          addExtension(
+            Extension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
+              setValue(Coding().apply { code = "kg" })
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = DecimalType("1.1")
+            }
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.unit_text_view).text.toString())
+      .isEqualTo("kg")
+  }
+
+  @Test
+  fun `should clear unit text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          type = Questionnaire.QuestionnaireItemType.DECIMAL
+          addExtension(
+            Extension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
+              setValue(Coding().apply { code = "kg" })
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = DecimalType("1.1")
+            }
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
       )
       .isEqualTo("")
   }
