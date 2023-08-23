@@ -30,6 +30,7 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 
 private const val FHIR_PREFERENCES_NAME = "fhir_preferences"
 
@@ -54,13 +55,13 @@ class FhirDataStore(context: Context) {
           throw exception
         }
       }
-      .map { preferences -> preferences[stringPreferencesKey(key)] }
-      .map { statusData -> statusData?.let { gson.fromJson(it, Data::class.java) } }
-      .map { data ->
-        data?.getString("StateType")?.let { stateType ->
-          data.getString("State")?.let { stateData ->
-            gson.fromJson(stateData, Class.forName(stateType)) as? SyncJobStatus
-          }
+      .mapNotNull { preferences -> preferences[stringPreferencesKey(key)] }
+      .mapNotNull { statusData -> gson.fromJson(statusData, Data::class.java) }
+      .mapNotNull { data ->
+        val stateType = data.getString("StateType")
+        val stateData = data.getString("State")
+        stateType?.let { type ->
+          stateData?.let { gson.fromJson(stateData, Class.forName(type)) as? SyncJobStatus }
         }
       }
       .map { syncStatus -> SyncJobStatusPreferences(syncStatus) }
