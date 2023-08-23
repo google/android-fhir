@@ -18,7 +18,6 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.text.format.DateFormat
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -71,7 +70,6 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
   fun triggerOneTimeSync() {
     viewModelScope.launch {
-      Log.d("Demo1", "one time sync is triggered")
       Sync.oneTimeSync<DemoFhirSyncWorker>(getApplication())
         ?.shareIn(this, SharingStarted.Eagerly, 0)
         ?.collect {

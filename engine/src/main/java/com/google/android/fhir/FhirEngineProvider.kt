@@ -17,8 +17,6 @@
 package com.google.android.fhir
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.FhirDataStore
@@ -126,7 +124,6 @@ data class FhirEngineConfiguration(
    * in the reindexing of the resource.
    */
   val customSearchParameters: List<SearchParameter>? = null,
-  val dataStrore: DataStore<Preferences>? = null,
   val fhirDataStore: FhirDataStore? = null,
 )
 

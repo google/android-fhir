@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /** A WorkManager Worker that handles periodic sync. */
-abstract class FhirSyncWorker(appContext: Context, val workerParams: WorkerParameters) :
+abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDownloadWorkManager(): DownloadWorkManager
@@ -73,7 +73,6 @@ abstract class FhirSyncWorker(appContext: Context, val workerParams: WorkerParam
         val uniqueWorkerName = inputData.getString(PREFERENCES_DATASTORE_STRING_KEY)!!
         flow.collect {
           // now send Progress to work manager so caller app can listen
-          //          setProgress(buildWorkData(it))
           fhirDataStore?.updateSyncJobStatus(
             uniqueWorkerName,
             it,

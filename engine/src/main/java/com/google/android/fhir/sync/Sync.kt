@@ -58,7 +58,6 @@ object Sync {
   ): Flow<SyncJobStatusPreferences>? {
     //  ): Flow<SyncJobStatus> {
     val uniqueWorkName = "${W::class.java.name}-oneTimeSync"
-    //    val flow = getWorkerInfo(context, uniqueWorkName)
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
         uniqueWorkName,
@@ -66,7 +65,6 @@ object Sync {
         createOneTimeWorkRequest(retryConfiguration, W::class.java, uniqueWorkName)
       )
     return FhirEngineProvider.getFhirDataStore()?.getSyncJobStatusPreferencesFlow(uniqueWorkName)
-    //    return flow
   }
 
   /**
@@ -85,7 +83,6 @@ object Sync {
     periodicSyncConfiguration: PeriodicSyncConfiguration
   ): Flow<SyncJobStatusPreferences>? {
     val uniqueWorkName = "${W::class.java.name}-periodicSync"
-    //    val flow = getWorkerInfo(context, uniqueWorkName)
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
         uniqueWorkName,
