@@ -133,6 +133,9 @@ open class TestDownloadManagerImpl(
 
 object TestFhirEngineImpl : FhirEngine {
   override suspend fun create(vararg resource: Resource) = emptyList<String>()
+  override suspend fun createRemote(vararg resource: Resource) {
+    TODO("Not yet implemented")
+  }
 
   override suspend fun update(vararg resource: Resource) {}
 
