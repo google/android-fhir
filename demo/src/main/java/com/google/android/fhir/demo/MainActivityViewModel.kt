@@ -18,6 +18,7 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.text.format.DateFormat
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -34,6 +35,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
@@ -58,16 +60,25 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
               repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
             )
         )
-        .shareIn(this, SharingStarted.Eagerly, 10)
-        .collect { _pollState.emit(it) }
+        ?.shareIn(this, SharingStarted.Eagerly, 10)
+        ?.collect {
+          if (it.status != null) {
+            _pollState.emit(it.status!!)
+          }
+        }
     }
   }
 
   fun triggerOneTimeSync() {
     viewModelScope.launch {
+      Log.d("Demo1", "one time sync is triggered")
       Sync.oneTimeSync<DemoFhirSyncWorker>(getApplication())
-        .shareIn(this, SharingStarted.Eagerly, 10)
-        .collect { _pollState.emit(it) }
+        ?.shareIn(this, SharingStarted.Eagerly, 0)
+        ?.collect {
+          if (it.status != null) {
+            _pollState.emit(it.status!!)
+          }
+        }
     }
   }
 

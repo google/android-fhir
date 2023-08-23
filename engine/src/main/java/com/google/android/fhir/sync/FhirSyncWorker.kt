@@ -34,12 +34,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /** A WorkManager Worker that handles periodic sync. */
-abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
+abstract class FhirSyncWorker(appContext: Context, val workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDownloadWorkManager(): DownloadWorkManager
@@ -70,10 +69,15 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
 
     val job =
       CoroutineScope(Dispatchers.IO).launch {
+        val fhirDataStore = FhirEngineProvider.getFhirDataStore()
+        val uniqueWorkerName = inputData.getString(PREFERENCES_DATASTORE_STRING_KEY)!!
         flow.collect {
           // now send Progress to work manager so caller app can listen
-          setProgress(buildWorkData(it))
-
+          //          setProgress(buildWorkData(it))
+          fhirDataStore?.updateSyncJobStatus(
+            uniqueWorkerName,
+            it,
+          )
           if (it is SyncJobStatus.Finished || it is SyncJobStatus.Failed) {
             this@launch.cancel()
           }

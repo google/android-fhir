@@ -17,8 +17,11 @@
 package com.google.android.fhir
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.FhirDataStore
 import com.google.android.fhir.sync.HttpAuthenticator
 import com.google.android.fhir.sync.remote.HttpLogger
 import org.hl7.fhir.r4.model.SearchParameter
@@ -79,6 +82,8 @@ object FhirEngineProvider {
     return checkNotNull(fhirServices)
   }
 
+  fun getFhirDataStore() = fhirEngineConfiguration?.fhirDataStore
+
   @Synchronized
   fun cleanup() {
     check(fhirEngineConfiguration?.testMode == true) {
@@ -120,7 +125,9 @@ data class FhirEngineConfiguration(
    * them. Any new CRUD operations on a resource after a new [SearchParameter] is added will result
    * in the reindexing of the resource.
    */
-  val customSearchParameters: List<SearchParameter>? = null
+  val customSearchParameters: List<SearchParameter>? = null,
+  val dataStrore: DataStore<Preferences>? = null,
+  val fhirDataStore: FhirDataStore? = null,
 )
 
 enum class DatabaseErrorStrategy {

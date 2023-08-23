@@ -26,6 +26,7 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
 import com.google.android.fhir.DatastoreUtil
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -54,16 +55,18 @@ object Sync {
   inline fun <reified W : FhirSyncWorker> oneTimeSync(
     context: Context,
     retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
-  ): Flow<SyncJobStatus> {
+  ): Flow<SyncJobStatusPreferences>? {
+    //  ): Flow<SyncJobStatus> {
     val uniqueWorkName = "${W::class.java.name}-oneTimeSync"
-    val flow = getWorkerInfo(context, uniqueWorkName)
+    //    val flow = getWorkerInfo(context, uniqueWorkName)
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
         uniqueWorkName,
         ExistingWorkPolicy.KEEP,
-        createOneTimeWorkRequest(retryConfiguration, W::class.java)
+        createOneTimeWorkRequest(retryConfiguration, W::class.java, uniqueWorkName)
       )
-    return flow
+    return FhirEngineProvider.getFhirDataStore()?.getSyncJobStatusPreferencesFlow(uniqueWorkName)
+    //    return flow
   }
 
   /**
@@ -80,16 +83,16 @@ object Sync {
   inline fun <reified W : FhirSyncWorker> periodicSync(
     context: Context,
     periodicSyncConfiguration: PeriodicSyncConfiguration
-  ): Flow<SyncJobStatus> {
+  ): Flow<SyncJobStatusPreferences>? {
     val uniqueWorkName = "${W::class.java.name}-periodicSync"
-    val flow = getWorkerInfo(context, uniqueWorkName)
+    //    val flow = getWorkerInfo(context, uniqueWorkName)
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
         uniqueWorkName,
         ExistingPeriodicWorkPolicy.KEEP,
-        createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java)
+        createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java, uniqueWorkName)
       )
-    return flow
+    return FhirEngineProvider.getFhirDataStore()?.getSyncJobStatusPreferencesFlow(uniqueWorkName)
   }
 
   /** Gets the worker info for the [FhirSyncWorker] */
@@ -111,7 +114,8 @@ object Sync {
   @PublishedApi
   internal inline fun <W : FhirSyncWorker> createOneTimeWorkRequest(
     retryConfiguration: RetryConfiguration?,
-    clazz: Class<W>
+    clazz: Class<W>,
+    uniqueWorkName: String,
   ): OneTimeWorkRequest {
     val oneTimeWorkRequestBuilder = OneTimeWorkRequest.Builder(clazz)
     retryConfiguration?.let {
@@ -121,7 +125,10 @@ object Sync {
         it.backoffCriteria.timeUnit
       )
       oneTimeWorkRequestBuilder.setInputData(
-        Data.Builder().putInt(MAX_RETRIES_ALLOWED, it.maxRetries).build()
+        Data.Builder()
+          .putInt(MAX_RETRIES_ALLOWED, it.maxRetries)
+          .putString(PREFERENCES_DATASTORE_STRING_KEY, uniqueWorkName)
+          .build()
       )
     }
     return oneTimeWorkRequestBuilder.build()
@@ -130,7 +137,8 @@ object Sync {
   @PublishedApi
   internal inline fun <W : FhirSyncWorker> createPeriodicWorkRequest(
     periodicSyncConfiguration: PeriodicSyncConfiguration,
-    clazz: Class<W>
+    clazz: Class<W>,
+    uniqueWorkName: String,
   ): PeriodicWorkRequest {
     val periodicWorkRequestBuilder =
       PeriodicWorkRequest.Builder(
@@ -147,7 +155,10 @@ object Sync {
         it.backoffCriteria.timeUnit
       )
       periodicWorkRequestBuilder.setInputData(
-        Data.Builder().putInt(MAX_RETRIES_ALLOWED, it.maxRetries).build()
+        Data.Builder()
+          .putInt(MAX_RETRIES_ALLOWED, it.maxRetries)
+          .putString(PREFERENCES_DATASTORE_STRING_KEY, uniqueWorkName)
+          .build()
       )
     }
     return periodicWorkRequestBuilder.build()
