@@ -55,7 +55,6 @@ class EditTextMultiLineViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -77,7 +76,6 @@ class EditTextMultiLineViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -103,7 +101,6 @@ class EditTextMultiLineViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     viewHolder.bind(
@@ -112,7 +109,6 @@ class EditTextMultiLineViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -135,7 +131,6 @@ class EditTextMultiLineViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
 
     viewHolder.bind(questionnaireViewItem)
@@ -154,7 +149,6 @@ class EditTextMultiLineViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
 
     viewHolder.bind(questionnaireViewItem)
@@ -182,7 +176,6 @@ class EditTextMultiLineViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -212,7 +205,6 @@ class EditTextMultiLineViewHolderFactoryTest {
             listOf("The minimum number of characters that are permitted in the answer is: 10")
           ),
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -228,7 +220,6 @@ class EditTextMultiLineViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -244,7 +235,6 @@ class EditTextMultiLineViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -265,7 +255,6 @@ class EditTextMultiLineViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
       )
     )
@@ -285,7 +274,6 @@ class EditTextMultiLineViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
       )
     )
@@ -302,7 +290,6 @@ class EditTextMultiLineViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
       )
     )
@@ -323,7 +310,6 @@ class EditTextMultiLineViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
       )
     )
@@ -340,7 +326,6 @@ class EditTextMultiLineViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
       )
     )
@@ -361,7 +346,6 @@ class EditTextMultiLineViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
       )
     )

@@ -62,8 +62,7 @@ class GroupHeaderViewTest {
       questionnaireItem = questionnaireItem,
       questionnaireResponseItem = questionnaireResponseItem,
       validationResult = Valid,
-      answersChangedCallback = { _, _, _, _ -> },
-      resolveDynamicText = { _, _, _ -> "" }
+      answersChangedCallback = { _, _, _, _ -> }
     )
   }
 
@@ -76,7 +75,6 @@ class GroupHeaderViewTest {
       questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent(),
       validationResult = Valid,
       answersChangedCallback = { _, _, _, _ -> },
-      resolveDynamicText = { _, _, _ -> "" },
       enabledDisplayItems = enabledDisplayItems
     )
   }

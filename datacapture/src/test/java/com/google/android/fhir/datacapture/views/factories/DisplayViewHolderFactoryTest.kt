@@ -48,7 +48,6 @@ class DisplayViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -64,7 +63,6 @@ class DisplayViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 

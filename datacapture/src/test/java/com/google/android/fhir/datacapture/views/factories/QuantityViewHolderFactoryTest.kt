@@ -56,7 +56,6 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -78,7 +77,6 @@ class QuantityViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -104,7 +102,6 @@ class QuantityViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     viewHolder.bind(
@@ -113,7 +110,6 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -139,7 +135,6 @@ class QuantityViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -165,7 +160,6 @@ class QuantityViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     viewHolder.bind(
@@ -174,7 +168,6 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -194,7 +187,6 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -216,7 +208,6 @@ class QuantityViewHolderFactoryTest {
         },
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -232,7 +223,6 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -250,7 +240,6 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -268,7 +257,6 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -287,7 +275,6 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
       )
     )
@@ -307,7 +294,6 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
       )
     )
@@ -324,7 +310,6 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
       )
     )
@@ -345,7 +330,6 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
       )
     )
@@ -362,7 +346,6 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
       )
     )
@@ -383,7 +366,6 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
       )
     )

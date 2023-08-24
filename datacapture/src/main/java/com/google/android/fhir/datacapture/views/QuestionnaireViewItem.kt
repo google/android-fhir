@@ -26,12 +26,10 @@ import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
-import org.hl7.fhir.r4.model.StringType
 
 /**
  * Data item for [QuestionnaireItemViewHolder] in [RecyclerView].
@@ -67,23 +65,17 @@ import org.hl7.fhir.r4.model.StringType
  */
 data class QuestionnaireViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-  private val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  private val questionnaireResponseItem: QuestionnaireResponseItemComponent,
   val validationResult: ValidationResult,
   internal val answersChangedCallback:
-    (
+    suspend (
       Questionnaire.QuestionnaireItemComponent,
-      QuestionnaireResponse.QuestionnaireResponseItemComponent,
+      QuestionnaireResponseItemComponent,
       List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
       Any?
     ) -> Unit,
   val enabledAnswerOptions: List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
     questionnaireItem.answerOption.ifEmpty { emptyList() },
-  private val resolveDynamicText:
-    suspend (
-      Questionnaire.QuestionnaireItemComponent,
-      QuestionnaireResponseItemComponent,
-      StringType
-    ) -> String?,
   val draftAnswer: Any? = null,
   val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
   val questionViewTextConfiguration: QuestionTextConfiguration = QuestionTextConfiguration(),
@@ -112,17 +104,21 @@ data class QuestionnaireViewItem(
     check(questionnaireItem.repeats || questionnaireResponseItemAnswerComponent.size <= 1) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} has repeated answers."
     }
-    answersChangedCallback(
-      questionnaireItem,
-      questionnaireResponseItem,
-      questionnaireResponseItemAnswerComponent.toList(),
-      null
-    )
+    runBlocking {
+      answersChangedCallback(
+        questionnaireItem,
+        questionnaireResponseItem,
+        questionnaireResponseItemAnswerComponent.toList(),
+        null
+      )
+    }
   }
 
   /** Clears existing answers and any draft answer. */
   fun clearAnswer() {
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), null)
+    runBlocking {
+      answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), null)
+    }
   }
 
   /** Adds an answer to the existing answers and removes the draft answer. */
@@ -133,12 +129,14 @@ data class QuestionnaireViewItem(
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
-    answersChangedCallback(
-      questionnaireItem,
-      questionnaireResponseItem,
-      answers + questionnaireResponseItemAnswerComponent,
-      null
-    )
+    runBlocking {
+      answersChangedCallback(
+        questionnaireItem,
+        questionnaireResponseItem,
+        answers + questionnaireResponseItemAnswerComponent,
+        null
+      )
+    }
   }
 
   /** Removes an answer from the existing answers, as well as any draft answer. */
@@ -149,14 +147,16 @@ data class QuestionnaireViewItem(
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
-    answersChangedCallback(
-      questionnaireItem,
-      questionnaireResponseItem,
-      answers.filterNot { ans ->
-        questionnaireResponseItemAnswerComponent.any { ans.value.equalsDeep(it.value) }
-      },
-      null
-    )
+    runBlocking {
+      answersChangedCallback(
+        questionnaireItem,
+        questionnaireResponseItem,
+        answers.filterNot { ans ->
+          questionnaireResponseItemAnswerComponent.any { ans.value.equalsDeep(it.value) }
+        },
+        null
+      )
+    }
   }
 
   /**
@@ -164,7 +164,9 @@ data class QuestionnaireViewItem(
    * the question.
    */
   fun setDraftAnswer(draftAnswer: Any? = null) {
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), draftAnswer)
+    runBlocking {
+      answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), draftAnswer)
+    }
   }
 
   /**
@@ -188,15 +190,7 @@ data class QuestionnaireViewItem(
    * is derived from [localizedTextSpanned] of [QuestionnaireResponse.QuestionnaireItemComponent]
    */
   val questionText: Spanned? by lazy {
-    runBlocking(Dispatchers.IO) {
-      questionnaireResponseItem.text =
-        resolveDynamicText(
-          questionnaireItem,
-          questionnaireResponseItem,
-          questionnaireItem.textElement
-        )
-      questionnaireResponseItem.text?.toSpanned() ?: questionnaireItem.localizedTextSpanned
-    }
+    questionnaireResponseItem.text?.toSpanned() ?: questionnaireItem.localizedTextSpanned
   }
 
   /**

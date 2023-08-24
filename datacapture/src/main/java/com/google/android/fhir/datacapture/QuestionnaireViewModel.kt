@@ -58,7 +58,6 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -307,7 +306,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * - partial answer, the entered input is not a valid answer
    */
   private val answersChangedCallback:
-    (
+    suspend (
       QuestionnaireItemComponent,
       QuestionnaireResponseItemComponent,
       List<QuestionnaireResponseItemAnswerComponent>,
@@ -334,10 +333,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
       modificationCount.update { it + 1 }
 
-      viewModelScope.launch(Dispatchers.IO) {
-        updateDependentQuestionnaireResponseItems(questionnaireItem, questionnaireResponseItem)
-        modificationCount.update { it + 1 }
-      }
+      updateDependentQuestionnaireResponseItems(questionnaireItem, questionnaireResponseItem)
+      modificationCount.update { it + 1 }
     }
 
   private val answerOptionsEvaluator: EnabledAnswerOptionsEvaluator =
@@ -577,7 +574,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       questionnaireResponseItem.answer.filterNot { ans ->
         disabledAnswers.any { ans.value.equalsDeep(it.value) }
       }
-    answersChangedCallback(questionnaireItem, questionnaireResponseItem, validAnswers, null)
+    viewModelScope.launch {
+      answersChangedCallback(questionnaireItem, questionnaireResponseItem, validAnswers, null)
+    }
   }
 
   /**
@@ -729,9 +728,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             validationResult = validationResult,
             answersChangedCallback = answersChangedCallback,
             enabledAnswerOptions = enabledQuestionnaireAnswerOptions,
-            resolveDynamicText = { item, responseItem, textElement ->
-              resolveDynamicText(item, responseItem, textElement)
-            },
             draftAnswer = draftAnswerMap[questionnaireResponseItem],
             enabledDisplayItems =
               questionnaireItem.item.filter {
