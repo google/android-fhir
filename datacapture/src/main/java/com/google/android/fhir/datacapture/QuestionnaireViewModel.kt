@@ -188,8 +188,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
   }
 
-  private val questionnaireVariableMap: MutableMap<String, Base?> = mutableMapOf()
-
   /** The map from each item in the [Questionnaire] to its parent. */
   private var questionnaireItemParentMap:
     Map<QuestionnaireItemComponent, QuestionnaireItemComponent>
@@ -490,15 +488,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .onEach {
         if (it.index == 0) {
           detectExpressionCyclicDependency(questionnaire.item)
-          viewModelScope.launch(Dispatchers.IO) {
-            questionnaire.item.flattened().forEach { qItem ->
-              updateDependentQuestionnaireResponseItems(
-                qItem,
-                questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId }
-              )
-            }
-            modificationCount.update { it + 1 }
+          questionnaire.item.flattened().forEach { qItem ->
+            updateDependentQuestionnaireResponseItems(
+              qItem,
+              questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId }
+            )
           }
+          modificationCount.update { it + 1 }
         }
       }
       .map { it.value }
@@ -518,7 +514,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaire,
         questionnaireResponse,
         questionnaireItemParentMap,
-        questionnaireVariableMap,
         questionnaireLaunchContextMap,
         xFhirQueryResolver
       )
@@ -543,7 +538,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
   }
 
-  private fun resolveCqfExpression(
+  private suspend fun resolveCqfExpression(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent,
     element: Element,
@@ -560,7 +555,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       questionnaireResponseItem,
       cqfExpression,
       questionnaireItemParentMap,
-      questionnaireVariableMap,
       questionnaireLaunchContextMap,
       xFhirQueryResolver
     )

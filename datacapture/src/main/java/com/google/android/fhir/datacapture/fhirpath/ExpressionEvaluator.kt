@@ -320,26 +320,13 @@ object ExpressionEvaluator {
    * fhir-paths in the expression.
    */
   internal fun createXFhirQueryFromExpression(
-    questionnaire: Questionnaire,
-    questionnaireResponse: QuestionnaireResponse,
-    questionnaireItem: QuestionnaireItemComponent,
-    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>,
     expression: Expression,
     launchContextMap: Map<String, Resource>?,
+    variablesMap: Map<String, Base?>,
   ): String {
     // get all dependent variables and their evaluated values
     val variablesEvaluatedPairs =
-      mutableMapOf<String, Base?>()
-        .apply {
-          extractDependentVariables(
-            expression,
-            questionnaire,
-            questionnaireResponse,
-            questionnaireItemParentMap,
-            questionnaireItem,
-            this
-          )
-        }
+      variablesMap
         .filterKeys { expression.expression.contains("{{%$it}}") }
         .map { Pair("{{%${it.key}}}", it.value!!.primitiveValue()) }
 

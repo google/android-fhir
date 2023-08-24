@@ -25,6 +25,7 @@ import com.google.android.fhir.datacapture.extensions.isFhirPath
 import com.google.android.fhir.datacapture.extensions.isXFhirQuery
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
+import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
@@ -175,14 +176,25 @@ internal class EnabledAnswerOptionsEvaluator(
     return when {
       answerExpression.isXFhirQuery -> {
         xFhirQueryResolver?.let { xFhirQueryResolver ->
+          val variableMap =
+            mutableMapOf<String, Base?>().apply {
+              ExpressionEvaluator.extractDependentVariables(
+                answerExpression,
+                questionnaire,
+                questionnaireResponse,
+                questionnaireItemParentMap,
+                item,
+                this,
+                questionnaireLaunchContextMap,
+                xFhirQueryResolver
+              )
+            }
+
           val xFhirExpressionString =
             ExpressionEvaluator.createXFhirQueryFromExpression(
-              questionnaire,
-              questionnaireResponse,
-              item,
-              questionnaireItemParentMap,
               answerExpression,
-              questionnaireLaunchContextMap
+              questionnaireLaunchContextMap,
+              variableMap
             )
           if (answerExpressionMap.containsKey(xFhirExpressionString)) {
             answerExpressionMap[xFhirExpressionString]
@@ -209,7 +221,7 @@ internal class EnabledAnswerOptionsEvaluator(
     }
   }
 
-  private fun evaluateAnswerOptionsToggleExpressions(
+  private suspend fun evaluateAnswerOptionsToggleExpressions(
     item: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     questionnaireResponse: QuestionnaireResponse,
