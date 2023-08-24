@@ -1656,6 +1656,16 @@ class ResourceMapperTest {
     runBlocking {
       val questionnaire =
         Questionnaire()
+          .apply {
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
+                  Extension("type", StringType("Patient"))
+                )
+            }
+          }
           .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "patient-id"
@@ -1666,7 +1676,7 @@ class ResourceMapperTest {
                     ITEM_INITIAL_EXPRESSION_URL,
                     Expression().apply {
                       language = "text/fhirpath"
-                      expression = "Patient.id"
+                      expression = "%father.id"
                     }
                   )
                 )
@@ -1675,7 +1685,7 @@ class ResourceMapperTest {
 
       val patientId = UUID.randomUUID().toString()
       val patient = Patient().apply { id = "Patient/$patientId" }
-      val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+      val questionnaireResponse = ResourceMapper.populate(questionnaire, mapOf("father" to patient))
 
       assertThat((questionnaireResponse.item[0].answer[0].value as Reference).reference)
         .isEqualTo(patient.id)
@@ -1686,6 +1696,16 @@ class ResourceMapperTest {
     runBlocking {
       val questionnaire =
         Questionnaire()
+          .apply {
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
+                  Extension("type", StringType("Patient"))
+                )
+            }
+          }
           .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "patient-id"
@@ -1696,7 +1716,7 @@ class ResourceMapperTest {
                     ITEM_INITIAL_EXPRESSION_URL,
                     Expression().apply {
                       language = "text/fhirpath"
-                      expression = "Patient.gender"
+                      expression = "%father.gender"
                     }
                   )
                 )
@@ -1711,7 +1731,9 @@ class ResourceMapperTest {
         }
 
       val errorMessage =
-        assertFailsWith<FHIRException> { ResourceMapper.populate(questionnaire, patient) }
+        assertFailsWith<FHIRException> {
+            ResourceMapper.populate(questionnaire, mapOf(Pair("father", patient)))
+          }
           .localizedMessage
       assertThat(errorMessage).isEqualTo("Expression supplied does not evaluate to IdType.")
     }
@@ -1721,6 +1743,16 @@ class ResourceMapperTest {
     runBlocking {
       val questionnaire =
         Questionnaire()
+          .apply {
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "patient", "Patient")),
+                  Extension("type", StringType("Patient"))
+                )
+            }
+          }
           .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               type = Questionnaire.QuestionnaireItemType.REFERENCE
@@ -1729,17 +1761,18 @@ class ResourceMapperTest {
                   ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
-                    expression = "Patient"
+                    expression = "%patient.id"
                   }
                 )
               )
             }
           )
-      val patient = Patient().apply { id = UUID.randomUUID().toString() }
-      val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+      val patient = Patient().apply { id = "Patient/${UUID.randomUUID()}" }
+      val questionnaireResponse =
+        ResourceMapper.populate(questionnaire, mapOf("patient" to patient))
 
       assertThat(questionnaireResponse.itemFirstRep.answerFirstRep.valueReference.reference)
-        .isEqualTo("Patient/${patient.id}")
+        .isEqualTo(patient.id)
     }
   @Test
   fun `populate() should correctly populate IdType value with history in QuestionnaireResponse`() =
