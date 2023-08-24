@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,11 +184,20 @@ class DropDownViewHolderFactoryTest {
             display = "Test Code"
           }
       }
+    val fakeAnswerValueSetResolver = { uri: String ->
+      if (uri == "http://coding-value-set-url") {
+        listOf(answerOption)
+      } else {
+        emptyList()
+      }
+    }
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        answerValueSet = "http://coding-value-set-url"
+      }
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          answerValueSet = "http://coding-value-set-url"
-        },
+        questionnaireItem,
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -196,13 +205,7 @@ class DropDownViewHolderFactoryTest {
             }
           )
         },
-        resolveAnswerValueSet = {
-          if (it == "http://coding-value-set-url") {
-            listOf(answerOption)
-          } else {
-            emptyList()
-          }
-        },
+        enabledAnswerOptions = fakeAnswerValueSetResolver.invoke(questionnaireItem.answerValueSet),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
@@ -212,6 +215,50 @@ class DropDownViewHolderFactoryTest {
         viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).text.toString()
       )
       .isEqualTo(answerOption.value.displayString(parent.context))
+  }
+
+  @Test
+  fun shouldAutoCompleteTextViewToDisplayIfAnswerNotNullAndDisplayMatchesMoreThanOneOption() {
+    val answerOption1 =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value =
+          Reference().apply {
+            reference = "Patient/1234"
+            display = "John"
+          }
+      }
+
+    val answerOption2 =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value =
+          Reference().apply {
+            reference = "Patient/6789"
+            display = "John"
+          }
+      }
+
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addAnswerOption(answerOption1)
+          addAnswerOption(answerOption2)
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = answerOption2.value
+            }
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> }
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).text.toString()
+      )
+      .isEqualTo(answerOption2.value.displayString(parent.context))
   }
 
   @Test

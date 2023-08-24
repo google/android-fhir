@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,23 +103,24 @@ object ExpressionEvaluator {
     questionnaireResponseItem: QuestionnaireResponseItemComponent?,
     expression: Expression,
     questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>,
-    variablesMap: MutableMap<String, Base?> = mutableMapOf(),
     launchContextMap: Map<String, Resource>? = mapOf(),
     xFhirQueryResolver: XFhirQueryResolver? = null
   ): List<Base> {
-    val copyVariablesMap = mutableMapOf<String, Base?>().apply { putAll(variablesMap) }
-    extractDependentVariables(
-      expression,
-      questionnaire,
-      questionnaireResponse,
-      questionnaireItemParentMap,
-      questionnaireItem,
-      copyVariablesMap,
-      launchContextMap,
-      xFhirQueryResolver
-    )
+    val appContext =
+      mutableMapOf<String, Base?>().apply {
+        extractDependentVariables(
+          expression,
+          questionnaire,
+          questionnaireResponse,
+          questionnaireItemParentMap,
+          questionnaireItem,
+          this,
+          launchContextMap,
+          xFhirQueryResolver
+        )
+      }
     return fhirPathEngine.evaluate(
-      copyVariablesMap,
+      appContext,
       questionnaireResponse,
       null,
       questionnaireResponseItem,
@@ -137,7 +138,6 @@ object ExpressionEvaluator {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>,
-    variablesMap: MutableMap<String, Base?> = mutableMapOf(),
     launchContextMap: Map<String, Resource>? = mapOf(),
     xFhirQueryResolver: XFhirQueryResolver? = null
   ): List<ItemToAnswersPair> {
@@ -159,7 +159,6 @@ object ExpressionEvaluator {
               updatedQuestionnaireResponseItemComponent,
               questionnaireItem.calculatedExpression!!,
               questionnaireItemParentMap,
-              variablesMap,
               launchContextMap,
               xFhirQueryResolver
             )
@@ -317,26 +316,35 @@ object ExpressionEvaluator {
   }
 
   /**
-   * Creates an x-fhir-query string for evaluation
-   *
-   * @param expression x-fhir-query expression
-   * @param launchContextMap if passed, the launch context to evaluate the expression against
+   * Creates an x-fhir-query string for evaluation. For this, it evaluates both variables and
+   * fhir-paths in the expression.
    */
   internal fun createXFhirQueryFromExpression(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse,
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>,
     expression: Expression,
     launchContextMap: Map<String, Resource>?,
-    variablesMap: Map<String, Base?>
   ): String {
     // get all dependent variables and their evaluated values
     val variablesEvaluatedPairs =
-      variablesMap
+      mutableMapOf<String, Base?>()
+        .apply {
+          extractDependentVariables(
+            expression,
+            questionnaire,
+            questionnaireResponse,
+            questionnaireItemParentMap,
+            questionnaireItem,
+            this
+          )
+        }
         .filterKeys { expression.expression.contains("{{%$it}}") }
         .map { Pair("{{%${it.key}}}", it.value!!.primitiveValue()) }
 
-    var fhirPathsEvaluatedPairs = emptySequence<Pair<String, String>>()
-    if (launchContextMap != null) {
-      fhirPathsEvaluatedPairs = evaluateXFhirEnhancement(expression, launchContextMap)
-    }
+    val fhirPathsEvaluatedPairs =
+      launchContextMap?.let { evaluateXFhirEnhancement(expression, it) } ?: emptySequence()
     return (fhirPathsEvaluatedPairs + variablesEvaluatedPairs).fold(expression.expression) {
       acc: String,
       pair: Pair<String, String> ->
@@ -507,10 +515,8 @@ object ExpressionEvaluator {
     xFhirQueryResolver: XFhirQueryResolver? = null
   ): Base? =
     try {
-      require(expression.name?.isNotBlank() == true) { "Expression name should not be blank" }
-
-      require(expression.language?.isNotBlank() == true) {
-        "Expression language should not be blank"
+      require(expression.name?.isNotBlank() == true) {
+        "Expression name should be a valid expression name"
       }
 
       if (expression.isXFhirQuery) {

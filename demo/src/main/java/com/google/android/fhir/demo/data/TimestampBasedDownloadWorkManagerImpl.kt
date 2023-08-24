@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package com.google.android.fhir.demo.data
 
 import com.google.android.fhir.demo.DemoDataStore
+import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.DownloadWorkManager
-import com.google.android.fhir.sync.Request
 import com.google.android.fhir.sync.SyncDataParams
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -44,7 +44,7 @@ class TimestampBasedDownloadWorkManagerImpl(private val dataStore: DemoDataStore
       )
     )
 
-  override suspend fun getNextRequest(): Request? {
+  override suspend fun getNextRequest(): DownloadRequest? {
     var url = urls.poll() ?: return null
 
     val resourceTypeToDownload =
@@ -52,7 +52,7 @@ class TimestampBasedDownloadWorkManagerImpl(private val dataStore: DemoDataStore
     dataStore.getLasUpdateTimestamp(resourceTypeToDownload)?.let {
       url = affixLastUpdatedTimestamp(url, it)
     }
-    return Request.of(url)
+    return DownloadRequest.of(url)
   }
 
   override suspend fun getSummaryRequestUrls(): Map<ResourceType, String> {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ interface FhirEngine {
   /**
    * Searches the database and returns a list resources according to the [search] specifications.
    */
-  suspend fun <R : Resource> search(search: Search): List<R>
+  suspend fun <R : Resource> search(search: Search): List<SearchResult<R>>
 
   /**
    * Synchronizes the [upload] result in the database. [upload] operation may result in multiple
@@ -85,17 +85,16 @@ interface FhirEngine {
   suspend fun clearDatabase()
 
   /**
-   * Retrieve [LocalChange] for [Resource] with given type and id, which can be used to purge
-   * resource from database. Each resource will have at most one
-   * [LocalChange](multiple
-   * changes are squashed). If there is no local change for given
-   * [resourceType] and [Resource.id], return `null`.
+   * Retrieves a list of [LocalChange]s for [Resource] with given type and id, which can be used to
+   * purge resource from database. If there is no local change for given [resourceType] and
+   * [Resource.id], return an empty list.
    * @param type The [ResourceType]
    * @param id The resource id [Resource.id]
-   * @return [LocalChange] A squashed local changes for given [resourceType] and [Resource.id] . If
-   * there is no local change for given [resourceType] and [Resource.id], return `null`.
+   * @return [List]<[LocalChange]> A list of local changes for given [resourceType] and
+   * [Resource.id] . If there is no local change for given [resourceType] and [Resource.id], return
+   * an empty list.
    */
-  suspend fun getLocalChange(type: ResourceType, id: String): LocalChange?
+  suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange>
 
   /**
    * Purges a resource from the database based on resource type and id without any deletion of data
@@ -126,4 +125,57 @@ suspend inline fun <reified R : Resource> FhirEngine.get(id: String): R {
  */
 suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
   delete(getResourceType(R::class.java), id)
+}
+
+typealias SearchParamName = String
+
+/**
+ * Contains a FHIR resource that satisfies the search criteria in the query together with any
+ * referenced resources as specified in the query.
+ */
+data class SearchResult<R : Resource>(
+  /** Matching resource as per the query. */
+  val resource: R,
+  /** Matching referenced resources as per the [Search.include] criteria in the query. */
+  val included: Map<SearchParamName, List<Resource>>?,
+  /** Matching referenced resources as per the [Search.revInclude] criteria in the query. */
+  val revIncluded: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?
+) {
+  override fun equals(other: Any?) =
+    other is SearchResult<*> &&
+      equalsShallow(resource, other.resource) &&
+      equalsShallow(included, other.included) &&
+      equalsShallow(revIncluded, other.revIncluded)
+
+  private fun equalsShallow(first: Resource, second: Resource) =
+    first.resourceType == second.resourceType && first.logicalId == second.logicalId
+
+  private fun equalsShallow(first: List<Resource>, second: List<Resource>) =
+    first.size == second.size &&
+      first.asSequence().zip(second.asSequence()).all { (x, y) -> equalsShallow(x, y) }
+
+  private fun equalsShallow(
+    first: Map<SearchParamName, List<Resource>>?,
+    second: Map<SearchParamName, List<Resource>>?
+  ) =
+    if (first != null && second != null && first.size == second.size) {
+      first.entries.asSequence().zip(second.entries.asSequence()).all { (x, y) ->
+        x.key == y.key && equalsShallow(x.value, y.value)
+      }
+    } else {
+      first?.size == second?.size
+    }
+
+  @JvmName("equalsShallowRevInclude")
+  private fun equalsShallow(
+    first: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?,
+    second: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?
+  ) =
+    if (first != null && second != null && first.size == second.size) {
+      first.entries.asSequence().zip(second.entries.asSequence()).all { (x, y) ->
+        x.key == y.key && equalsShallow(x.value, y.value)
+      }
+    } else {
+      first?.size == second?.size
+    }
 }

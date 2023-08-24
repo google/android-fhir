@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import android.widget.TextView
 import androidx.core.view.get
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.identifierString
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -108,6 +109,15 @@ class AutoCompleteViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
           .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
       )
+
+    val fakeAnswerValueSetResolver = { uri: String ->
+      if (uri == "http://answwer-value-set-url") {
+        answers
+      } else {
+        emptyList()
+      }
+    }
+
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         repeats = true
@@ -131,13 +141,60 @@ class AutoCompleteViewHolderFactoryTest {
             }
           )
         },
-        resolveAnswerValueSet = {
-          if (it == "http://answwer-value-set-url") {
-            answers
-          } else {
-            emptyList()
-          }
+        enabledAnswerOptions = fakeAnswerValueSetResolver.invoke(questionnaireItem.answerValueSet),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    )
+
+    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
+      .isEqualTo(2)
+  }
+
+  @Test
+  fun shouldHaveTwoAnswerChipWithAnswerOptionsHavingSameDisplayStringDifferentId() {
+    val answers =
+      listOf(
+        Questionnaire.QuestionnaireItemAnswerOptionComponent()
+          .setValue(
+            Coding().setCode("test1-code").setDisplay("Test Code").setId("test1-code") as Coding
+          ),
+        Questionnaire.QuestionnaireItemAnswerOptionComponent()
+          .setValue(Coding().setCode("test2-code").setDisplay("Test Code") as Coding)
+      )
+
+    val fakeAnswerValueSetResolver = { uri: String ->
+      if (uri == "http://answwer-value-set-url") {
+        answers
+      } else {
+        emptyList()
+      }
+    }
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = true
+        answerValueSet = "http://answwer-value-set-url"
+      }
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        questionnaireItem,
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = answers.first { it.value.id == "test1-code" }.valueCoding
+            }
+          )
+
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value =
+                answers
+                  .first { it.value.identifierString(parent.context) == "test2-code" }
+                  .valueCoding
+            }
+          )
         },
+        enabledAnswerOptions = fakeAnswerValueSetResolver.invoke(questionnaireItem.answerValueSet),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
@@ -156,12 +213,23 @@ class AutoCompleteViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
           .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
       )
+
+    val fakeAnswerValueSetResolver = { uri: String ->
+      if (uri == "http://answwer-value-set-url") {
+        answers
+      } else {
+        emptyList()
+      }
+    }
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = false
+        answerValueSet = "#ContainedValueSet"
+      }
+
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = false
-          answerValueSet = "#ContainedValueSet"
-        },
+        questionnaireItem,
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -170,13 +238,7 @@ class AutoCompleteViewHolderFactoryTest {
             }
           )
         },
-        resolveAnswerValueSet = {
-          if (it == "#ContainedValueSet") {
-            answers
-          } else {
-            emptyList()
-          }
-        },
+        enabledAnswerOptions = fakeAnswerValueSetResolver.invoke(questionnaireItem.answerValueSet),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )

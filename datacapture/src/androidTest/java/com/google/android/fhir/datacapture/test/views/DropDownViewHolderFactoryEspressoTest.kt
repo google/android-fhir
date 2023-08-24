@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@
 package com.google.android.fhir.datacapture.test.views
 
 import android.view.View
+import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
@@ -32,18 +34,22 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_ANSWER_MEDIA
 import com.google.android.fhir.datacapture.test.TestActivity
-import com.google.android.fhir.datacapture.test.utilities.showDropDown
+import com.google.android.fhir.datacapture.test.utilities.delayMainThread
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.factories.DropDownAnswerOption
 import com.google.android.fhir.datacapture.views.factories.DropDownViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.common.truth.Truth.assertThat
+import org.hamcrest.Matchers.instanceOf
+import org.hamcrest.Matchers.`is`
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.junit.Before
 import org.junit.Rule
@@ -85,9 +91,12 @@ class DropDownViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    runOnUI {
+      viewHolder.bind(questionnaireViewItem)
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
+    }
 
-    onView(withId(R.id.auto_complete)).perform(showDropDown())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onView(withText("-")).inRoot(isPlatformPopup()).check(matches(isDisplayed())).perform(click())
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
       .isEqualTo("-")
@@ -104,9 +113,12 @@ class DropDownViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    runOnUI {
+      viewHolder.bind(questionnaireViewItem)
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
+    }
 
-    onView(withId(R.id.auto_complete)).perform(showDropDown())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onView(withText("Coding 3"))
       .inRoot(isPlatformPopup())
       .check(matches(isDisplayed()))
@@ -126,9 +138,12 @@ class DropDownViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    runOnUI {
+      viewHolder.bind(questionnaireViewItem)
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
+    }
 
-    onView(withId(R.id.auto_complete)).perform(showDropDown())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onView(withText("Coding 3"))
       .inRoot(isPlatformPopup())
       .check(matches(isDisplayed()))
@@ -164,9 +179,12 @@ class DropDownViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    runOnUI {
+      viewHolder.bind(questionnaireViewItem)
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
+    }
 
-    onView(withId(R.id.auto_complete)).perform(showDropDown())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onView(withText("Coding 3"))
       .inRoot(isPlatformPopup())
       .check(matches(isDisplayed()))
@@ -191,9 +209,12 @@ class DropDownViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    runOnUI {
+      viewHolder.bind(questionnaireViewItem)
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
+    }
 
-    onView(withId(R.id.auto_complete)).perform(showDropDown())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onView(withText("Coding 1"))
       .inRoot(isPlatformPopup())
       .check(matches(isDisplayed()))
@@ -212,9 +233,12 @@ class DropDownViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    runOnUI {
+      viewHolder.bind(questionnaireViewItem)
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
+    }
 
-    onView(withId(R.id.auto_complete)).perform(showDropDown())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     assertThat(
         viewHolder.itemView
           .findViewById<MaterialAutoCompleteTextView>(R.id.auto_complete)
@@ -231,9 +255,12 @@ class DropDownViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    runOnUI {
+      viewHolder.bind(questionnaireViewItem)
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
+    }
 
-    onView(withId(R.id.auto_complete)).perform(showDropDown())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onView(withId(R.id.auto_complete)).perform(typeText("Coding"))
     assertThat(
         viewHolder.itemView
@@ -252,9 +279,12 @@ class DropDownViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    runOnUI {
+      viewHolder.bind(questionnaireViewItem)
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
+    }
 
-    onView(withId(R.id.auto_complete)).perform(showDropDown())
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onView(withId(R.id.auto_complete)).perform(typeText("Division"))
     assertThat(
         viewHolder.itemView
@@ -262,6 +292,56 @@ class DropDownViewHolderFactoryEspressoTest {
           .adapter.count
       )
       .isEqualTo(0)
+  }
+
+  @Test
+  fun shouldSetCorrectDropDownValueToAutoCompleteTextViewForDifferentAnswerOptionsWithSimilarDisplayString() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value =
+              Reference().apply {
+                id = "ref_1"
+                display = "Reference"
+              }
+          }
+        )
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value =
+              Reference().apply {
+                id = "ref_2"
+                display = "Reference"
+              }
+          }
+        )
+      }
+
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        questionnaireItem,
+        responseValueStringOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers }
+      )
+
+    runOnUI {
+      viewHolder.bind(questionnaireViewItem)
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
+    }
+
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
+    onData(`is`(instanceOf(DropDownAnswerOption::class.java)))
+      .atPosition(2)
+      .inRoot(isPlatformPopup())
+      .perform(click())
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
+      .isEqualTo("Reference")
+    assertThat((answerHolder!!.single().value as Reference).display).isEqualTo("Reference")
+    assertThat((answerHolder!!.single().value as Reference).id).isEqualTo("ref_2")
   }
 
   /** Method to run code snippet on UI/main thread */
@@ -295,7 +375,11 @@ class DropDownViewHolderFactoryEspressoTest {
       responses.forEach { response ->
         addAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = Coding().apply { display = response }
+            value =
+              Coding().apply {
+                code = response.replace(" ", "_")
+                display = response
+              }
           }
         )
       }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,18 @@ internal data class ResourceIndices(
     private val dateTimeIndices = mutableListOf<DateTimeIndex>()
     private val numberIndices = mutableListOf<NumberIndex>()
     private val positionIndices = mutableListOf<PositionIndex>()
+
+    constructor(indices: ResourceIndices) : this(indices.resourceType, indices.resourceId) {
+      stringIndices += indices.stringIndices
+      referenceIndices += indices.referenceIndices
+      tokenIndices += indices.tokenIndices
+      quantityIndices += indices.quantityIndices
+      uriIndices += indices.uriIndices
+      dateIndices += indices.dateIndices
+      dateTimeIndices += indices.dateTimeIndices
+      numberIndices += indices.numberIndices
+      positionIndices += indices.positionIndices
+    }
 
     fun addNumberIndex(numberIndex: NumberIndex) {
       if (numberIndices.contains(numberIndex)) {

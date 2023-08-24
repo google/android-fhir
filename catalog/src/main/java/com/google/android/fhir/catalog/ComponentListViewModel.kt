@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,6 +113,12 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_slider.json",
       "component_slider_with_validation.json"
     ),
+    QUANTITY(
+      R.drawable.ic_unitoptions,
+      R.string.component_name_quantity,
+      "component_quantity.json",
+      "component_quantity_with_validation.json"
+    ),
     ATTACHMENT(
       R.drawable.ic_attachment,
       R.string.component_name_attachment,
@@ -151,6 +157,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       ViewItem.ComponentItem(Component.DATE_PICKER),
       ViewItem.ComponentItem(Component.DATE_TIME_PICKER),
       ViewItem.ComponentItem(Component.SLIDER),
+      ViewItem.ComponentItem(Component.QUANTITY),
       ViewItem.ComponentItem(Component.ATTACHMENT),
       ViewItem.ComponentItem(Component.REPEATED_GROUP),
       ViewItem.HeaderItem(Header.MISC_COMPONENTS),
