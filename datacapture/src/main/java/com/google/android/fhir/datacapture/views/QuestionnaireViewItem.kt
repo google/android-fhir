@@ -79,11 +79,11 @@ data class QuestionnaireViewItem(
   val enabledAnswerOptions: List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
     questionnaireItem.answerOption.ifEmpty { emptyList() },
   private val resolveDynamicText:
-  suspend (
-    Questionnaire.QuestionnaireItemComponent,
-    QuestionnaireResponseItemComponent,
-    StringType
-  ) -> String?,
+    suspend (
+      Questionnaire.QuestionnaireItemComponent,
+      QuestionnaireResponseItemComponent,
+      StringType
+    ) -> String?,
   val draftAnswer: Any? = null,
   val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
   val questionViewTextConfiguration: QuestionTextConfiguration = QuestionTextConfiguration(),
