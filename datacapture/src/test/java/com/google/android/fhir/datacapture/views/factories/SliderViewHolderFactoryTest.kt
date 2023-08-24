@@ -60,6 +60,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -81,6 +82,7 @@ class SliderViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -98,6 +100,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -112,6 +115,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -131,6 +135,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -145,6 +150,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -164,6 +170,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -178,6 +185,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -202,6 +210,7 @@ class SliderViewHolderFactoryTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
+          resolveDynamicText = { _, _, _ -> "" },
         )
       )
     }
@@ -216,6 +225,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
+        resolveDynamicText = { _, _, _ -> "" },
       )
 
     viewHolder.bind(questionnaireViewItem)
@@ -243,6 +253,7 @@ class SliderViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -272,6 +283,7 @@ class SliderViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -301,6 +313,7 @@ class SliderViewHolderFactoryTest {
         },
         validationResult = Invalid(listOf("Minimum value allowed is:50")),
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -316,6 +329,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -331,6 +345,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -351,6 +366,7 @@ class SliderViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -368,6 +384,7 @@ class SliderViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -384,6 +401,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -401,6 +419,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
       )
     )
@@ -417,6 +436,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
       )
     )
@@ -435,6 +455,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
       )
     )
@@ -455,6 +476,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
       )
     )
@@ -473,6 +495,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
       )
     )

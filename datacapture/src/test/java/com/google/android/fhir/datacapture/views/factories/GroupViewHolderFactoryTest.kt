@@ -51,6 +51,7 @@ class GroupViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -66,6 +67,7 @@ class GroupViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -93,6 +95,7 @@ class GroupViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -117,6 +120,7 @@ class GroupViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -144,6 +148,7 @@ class GroupViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     assertThat(viewHolder.itemView.findViewById<GroupHeaderView>(R.id.header).visibility)
@@ -158,6 +163,7 @@ class GroupViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -173,6 +179,7 @@ class GroupViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -188,6 +195,7 @@ class GroupViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 

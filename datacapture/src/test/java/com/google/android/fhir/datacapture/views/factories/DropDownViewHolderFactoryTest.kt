@@ -55,6 +55,7 @@ class DropDownViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -74,6 +75,7 @@ class DropDownViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     val selectedItem =
@@ -99,6 +101,7 @@ class DropDownViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     val selectedItem =
@@ -120,6 +123,7 @@ class DropDownViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     val selectedItem =
@@ -141,6 +145,7 @@ class DropDownViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     val selectedItem =
@@ -165,6 +170,7 @@ class DropDownViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -208,6 +214,7 @@ class DropDownViewHolderFactoryTest {
         enabledAnswerOptions = fakeAnswerValueSetResolver.invoke(questionnaireItem.answerValueSet),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -251,7 +258,8 @@ class DropDownViewHolderFactoryTest {
           )
         },
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> }
+        answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" }
       )
     )
 
@@ -269,6 +277,7 @@ class DropDownViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -296,6 +305,7 @@ class DropDownViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -311,6 +321,7 @@ class DropDownViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -326,6 +337,7 @@ class DropDownViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -344,6 +356,7 @@ class DropDownViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
       )
     )
@@ -363,6 +376,7 @@ class DropDownViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
       )
     )
@@ -379,6 +393,7 @@ class DropDownViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
       )
     )
@@ -399,6 +414,7 @@ class DropDownViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
       )
     )
@@ -415,6 +431,7 @@ class DropDownViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
       )
     )
@@ -435,6 +452,7 @@ class DropDownViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
       )
     )

@@ -64,6 +64,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -83,6 +84,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -119,6 +121,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         enabledDisplayItems = itemList
       )
     )
@@ -139,6 +142,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -158,6 +162,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -177,6 +182,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -203,6 +209,7 @@ class ReviewViewHolderFactoryTest {
           ),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -221,6 +228,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -236,6 +244,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -271,6 +280,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -294,6 +304,7 @@ class ReviewViewHolderFactoryTest {
           ),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -318,6 +329,7 @@ class ReviewViewHolderFactoryTest {
           ),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -337,6 +349,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field")),
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -356,6 +369,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field")),
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -379,6 +393,7 @@ class ReviewViewHolderFactoryTest {
           ),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -394,6 +409,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -410,6 +426,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -427,6 +444,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -451,6 +469,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         enabledDisplayItems = itemList
       )
     )
@@ -476,6 +495,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -501,6 +521,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -515,6 +536,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 

@@ -52,6 +52,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -67,6 +68,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -84,6 +86,7 @@ class DatePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -106,6 +109,7 @@ class DatePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2020")
@@ -120,6 +124,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     assertThat(viewHolder.dateInputView.hint.toString()).isEqualTo("mm/dd/yyyy")
@@ -139,6 +144,7 @@ class DatePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("2020/11/19")
@@ -157,6 +163,7 @@ class DatePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2020")
@@ -172,6 +179,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, result, _ -> answers = result },
+        resolveDynamicText = { _, _, _ -> "" },
       )
 
     viewHolder.bind(item)
@@ -195,6 +203,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, result, _ -> answers = result },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(item)
     viewHolder.dateInputView.text = "2020/11/19"
@@ -219,6 +228,7 @@ class DatePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, result, _ -> answers = result },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(questionnaireItem)
 
@@ -239,6 +249,7 @@ class DatePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(questionnaireItem)
 
@@ -261,6 +272,7 @@ class DatePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answersForCallback, _ -> answers = answersForCallback },
+        resolveDynamicText = { _, _, _ -> "" },
       )
 
     viewHolder.bind(questionnaireItem)
@@ -288,6 +300,7 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, partialAnswer ->
           partialValue = partialAnswer as? String
         },
+        resolveDynamicText = { _, _, _ -> "" },
       )
 
     viewHolder.bind(questionnaireItem)
@@ -309,6 +322,7 @@ class DatePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
 
     viewHolder.bind(questionnaireItem)
@@ -320,6 +334,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         draftAnswer = "02/07"
       )
 
@@ -336,6 +351,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         draftAnswer = "02/07"
       )
 
@@ -352,6 +368,7 @@ class DatePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
 
     viewHolder.bind(questionnaireItem)
@@ -381,6 +398,7 @@ class DatePickerViewHolderFactoryTest {
         },
         validationResult = Invalid(listOf("Maximum value allowed is:2025-01-01")),
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -396,6 +414,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         draftAnswer = "11/19/202"
       )
 
@@ -427,6 +446,7 @@ class DatePickerViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -442,6 +462,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -457,6 +478,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -477,6 +499,7 @@ class DatePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2020")
@@ -491,6 +514,7 @@ class DatePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2021")
@@ -501,6 +525,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEmpty()
@@ -517,6 +542,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
       )
     )
@@ -536,6 +562,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
       )
     )
@@ -552,6 +579,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
       )
     )
@@ -572,6 +600,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
       )
     )
@@ -588,6 +617,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
       )
     )
@@ -608,6 +638,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
       )
     )

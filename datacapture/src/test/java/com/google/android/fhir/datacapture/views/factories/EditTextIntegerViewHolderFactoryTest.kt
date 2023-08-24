@@ -53,6 +53,7 @@ class EditTextIntegerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -74,6 +75,7 @@ class EditTextIntegerViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -99,6 +101,7 @@ class EditTextIntegerViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     viewHolder.bind(
@@ -107,6 +110,7 @@ class EditTextIntegerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -127,6 +131,7 @@ class EditTextIntegerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, result, _ -> answers = result },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
@@ -142,6 +147,7 @@ class EditTextIntegerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, result, _ -> answers = result },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("13")
@@ -157,6 +163,7 @@ class EditTextIntegerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, result -> draftAnswer = result },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(questionnaireViewItem)
     // The character is the letter O, not the number 0
@@ -187,6 +194,7 @@ class EditTextIntegerViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -217,6 +225,7 @@ class EditTextIntegerViewHolderFactoryTest {
         },
         validationResult = Invalid(listOf("Minimum value allowed is:2")),
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -232,6 +241,7 @@ class EditTextIntegerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -247,6 +257,7 @@ class EditTextIntegerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -267,6 +278,7 @@ class EditTextIntegerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
       )
     )
@@ -286,6 +298,7 @@ class EditTextIntegerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
       )
     )
@@ -302,6 +315,7 @@ class EditTextIntegerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
       )
     )
@@ -322,6 +336,7 @@ class EditTextIntegerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
       )
     )
@@ -338,6 +353,7 @@ class EditTextIntegerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
       )
     )
@@ -358,6 +374,7 @@ class EditTextIntegerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
       )
     )

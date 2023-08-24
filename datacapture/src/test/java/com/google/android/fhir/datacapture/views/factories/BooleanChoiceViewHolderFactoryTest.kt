@@ -61,6 +61,7 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -76,6 +77,7 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(questionnaireViewItem)
 
@@ -90,6 +92,7 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -112,6 +115,7 @@ class BooleanChoiceViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(questionnaireViewItem)
 
@@ -131,6 +135,7 @@ class BooleanChoiceViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -153,6 +158,7 @@ class BooleanChoiceViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(questionnaireViewItem)
 
@@ -172,6 +178,7 @@ class BooleanChoiceViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -190,6 +197,7 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).performClick()
@@ -206,6 +214,7 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).performClick()
@@ -228,6 +237,7 @@ class BooleanChoiceViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).performClick()
@@ -249,6 +259,7 @@ class BooleanChoiceViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).performClick()
@@ -274,6 +285,7 @@ class BooleanChoiceViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).performClick()
@@ -295,6 +307,7 @@ class BooleanChoiceViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(questionnaireViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).performClick()
@@ -313,6 +326,7 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -334,6 +348,7 @@ class BooleanChoiceViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -358,6 +373,7 @@ class BooleanChoiceViewHolderFactoryTest {
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     assertThat((viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).isEnabled))
@@ -377,6 +393,7 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
       )
     )
@@ -396,6 +413,7 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
       )
     )
@@ -412,6 +430,7 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
       )
     )
@@ -430,6 +449,7 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
       )
     )
@@ -450,6 +470,7 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
       )
     )
@@ -468,6 +489,7 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
       )
     )

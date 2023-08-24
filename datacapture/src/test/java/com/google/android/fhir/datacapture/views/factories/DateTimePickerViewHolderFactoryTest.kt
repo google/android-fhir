@@ -61,6 +61,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -76,6 +77,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -91,6 +93,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
     assertThat(viewHolder.dateInputView.hint.toString()).isEqualTo("mm/dd/yyyy")
@@ -108,6 +111,7 @@ class DateTimePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -128,6 +132,7 @@ class DateTimePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, result -> draftAnswer = result },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(itemViewItem)
 
@@ -149,6 +154,7 @@ class DateTimePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, result -> draftAnswer = result },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(itemViewItem)
 
@@ -170,6 +176,7 @@ class DateTimePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, result, _ -> answers = result },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(itemViewItem)
     viewHolder.dateInputView.text = "2020/11/"
@@ -189,6 +196,7 @@ class DateTimePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     viewHolder.bind(itemViewItem)
     viewHolder.dateInputView.text = "2020/11/"
@@ -210,6 +218,7 @@ class DateTimePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answersForCallback, _ -> answers = answersForCallback },
+        resolveDynamicText = { _, _, _ -> "" },
       )
 
     viewHolder.bind(questionnaireItem)
@@ -234,6 +243,7 @@ class DateTimePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, draftAnswer -> draft = draftAnswer as? String },
+        resolveDynamicText = { _, _, _ -> "" },
       )
 
     viewHolder.bind(questionnaireItem)
@@ -254,6 +264,7 @@ class DateTimePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
 
     viewHolder.bind(questionnaireItem)
@@ -265,6 +276,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         draftAnswer = "02/07"
       )
 
@@ -280,6 +292,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         draftAnswer = "02/07"
       )
 
@@ -296,6 +309,7 @@ class DateTimePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
 
     viewHolder.bind(questionnaireItem)
@@ -310,6 +324,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         draftAnswer = "11/19/"
       )
 
@@ -327,6 +342,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         draftAnswer = ""
       )
 
@@ -344,6 +360,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         draftAnswer = null
       )
 
@@ -361,6 +378,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         draftAnswer = "11/19/2020"
       )
 
@@ -378,6 +396,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -407,6 +426,7 @@ class DateTimePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -424,6 +444,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         draftAnswer = "11/19/202"
       )
 
@@ -441,6 +462,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         draftAnswer = "11/19/202"
       )
 
@@ -458,6 +480,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -473,6 +496,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -493,6 +517,7 @@ class DateTimePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -509,6 +534,7 @@ class DateTimePickerViewHolderFactoryTest {
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -521,6 +547,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
     )
 
@@ -539,6 +566,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
       )
     )
@@ -558,6 +586,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
       )
     )
@@ -574,6 +603,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
       )
     )
@@ -594,6 +624,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
       )
     )
@@ -610,6 +641,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
       )
     )
@@ -630,6 +662,7 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
       )
     )

@@ -385,7 +385,7 @@ class ExpressionEvaluatorTest {
 
   @Test
   fun `should throw illegal argument exception with missing exception language for questionnaire variables`() {
-    assertThrows(IllegalArgumentException::class.java) {
+    assertThrows(UnsupportedOperationException::class.java) {
       runBlocking {
         val questionnaire =
           Questionnaire().apply {
@@ -395,6 +395,7 @@ class ExpressionEvaluatorTest {
               setValue(
                 Expression().apply {
                   name = "X"
+                  language = "text/cql"
                   expression = "1"
                 }
               )
@@ -752,10 +753,6 @@ class ExpressionEvaluatorTest {
 
     val expressionsToEvaluate =
       ExpressionEvaluator.createXFhirQueryFromExpression(
-        Questionnaire(),
-        QuestionnaireResponse(),
-        Questionnaire.QuestionnaireItemComponent(),
-        emptyMap(),
         expression,
         mapOf(Practitioner().resourceType.name.lowercase() to Practitioner()),
         emptyMap(),
@@ -781,10 +778,6 @@ class ExpressionEvaluatorTest {
 
     val expressionsToEvaluate =
       ExpressionEvaluator.createXFhirQueryFromExpression(
-        Questionnaire(),
-        QuestionnaireResponse(),
-        Questionnaire.QuestionnaireItemComponent(),
-        emptyMap(),
         expression,
         mapOf(practitioner.resourceType.name to practitioner),
         emptyMap(),
@@ -810,10 +803,6 @@ class ExpressionEvaluatorTest {
 
     val expressionsToEvaluate =
       ExpressionEvaluator.createXFhirQueryFromExpression(
-        Questionnaire(),
-        QuestionnaireResponse(),
-        Questionnaire.QuestionnaireItemComponent(),
-        emptyMap(),
         expression,
         mapOf(practitioner.resourceType.name.lowercase() to practitioner),
         emptyMap(),
@@ -839,10 +828,6 @@ class ExpressionEvaluatorTest {
 
     val expressionsToEvaluate =
       ExpressionEvaluator.createXFhirQueryFromExpression(
-        Questionnaire(),
-        QuestionnaireResponse(),
-        Questionnaire.QuestionnaireItemComponent(),
-        emptyMap(),
         expression,
         mapOf(practitioner.resourceType.name to practitioner),
         emptyMap(),
@@ -868,10 +853,6 @@ class ExpressionEvaluatorTest {
 
     val expressionsToEvaluate =
       ExpressionEvaluator.createXFhirQueryFromExpression(
-        Questionnaire(),
-        QuestionnaireResponse(),
-        Questionnaire.QuestionnaireItemComponent(),
-        emptyMap(),
         expression,
         mapOf(patient.resourceType.name.lowercase() to patient),
         emptyMap(),
@@ -911,10 +892,6 @@ class ExpressionEvaluatorTest {
 
     val expressionsToEvaluate =
       ExpressionEvaluator.createXFhirQueryFromExpression(
-        Questionnaire(),
-        QuestionnaireResponse(),
-        Questionnaire.QuestionnaireItemComponent(),
-        emptyMap(),
         expression,
         mapOf(
           patient.resourceType.name.lowercase() to patient,
@@ -990,10 +967,6 @@ class ExpressionEvaluatorTest {
 
       val result =
         ExpressionEvaluator.createXFhirQueryFromExpression(
-          questionnaire,
-          QuestionnaireResponse(),
-          questionnaire.item[0].item[0],
-          mapOf(questionnaire.item[0].item[0] to questionnaire.item[0]),
           questionnaire.item[0].item[0].answerExpression!!,
           null,
           variablesMap

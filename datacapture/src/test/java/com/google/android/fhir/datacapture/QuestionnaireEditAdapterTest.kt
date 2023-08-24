@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -80,6 +81,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -101,6 +103,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -127,6 +130,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -148,6 +152,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -169,6 +174,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -203,6 +209,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -229,6 +236,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -250,6 +258,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -271,6 +280,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -307,6 +317,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -333,6 +344,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -354,6 +366,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -375,6 +388,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -402,6 +416,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -444,6 +459,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -479,6 +495,7 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -504,6 +521,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -512,6 +530,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
         )
@@ -532,6 +551,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -540,6 +560,7 @@ class QuestionnaireEditAdapterTest {
               otherQuestionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
         )
@@ -559,6 +580,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -567,6 +589,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
         )
@@ -588,6 +611,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -596,6 +620,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
         )
@@ -616,6 +641,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -624,6 +650,7 @@ class QuestionnaireEditAdapterTest {
               otherQuestionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
         )
@@ -643,6 +670,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -651,6 +679,7 @@ class QuestionnaireEditAdapterTest {
                 questionnaireResponseItem,
                 validationResult = NotValidated,
                 answersChangedCallback = { _, _, _, _ -> },
+                resolveDynamicText = { _, _, _ -> "" }
               )
               .apply {
                 addAnswer(
@@ -677,6 +706,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -685,6 +715,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = Invalid(listOf()),
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
         )
@@ -704,6 +735,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -712,6 +744,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
         )
@@ -731,6 +764,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
           QuestionnaireAdapterItem.Question(
@@ -739,6 +773,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
+              resolveDynamicText = { _, _, _ -> "" }
             )
           ),
         )
@@ -783,6 +818,7 @@ class QuestionnaireEditAdapterTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        resolveDynamicText = { _, _, _ -> "" },
       )
 
     assertThat(expectedItemViewType)

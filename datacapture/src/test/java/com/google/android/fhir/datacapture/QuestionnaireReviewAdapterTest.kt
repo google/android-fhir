@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,7 @@ class QuestionnaireReviewAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = Valid,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         )
       )
@@ -70,6 +71,7 @@ class QuestionnaireReviewAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = Valid,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         ),
         QuestionnaireAdapterItem.Question(
@@ -79,6 +81,7 @@ class QuestionnaireReviewAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = Valid,
             answersChangedCallback = { _, _, _, _ -> },
+            resolveDynamicText = { _, _, _ -> "" }
           )
         ),
       )
