@@ -28,6 +28,12 @@ import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.android.fhir.datacapture.fhirpath.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
 import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.chrono.IsoChronology
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.FormatStyle
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.r4.model.Attachment
@@ -404,7 +410,9 @@ internal val Questionnaire.QuestionnaireItemComponent.isHidden: Boolean
     return false
   }
 
-/** Whether the QuestionnaireItem should have entry format string. */
+/**
+ * The entry format specified in the extension https://hl7.org/fhir/R4/extension-entryformat.html.
+ */
 val Questionnaire.QuestionnaireItemComponent.entryFormat: String?
   get() {
     val extension = extension.singleOrNull { it.url == EXTENSION_ENTRY_FORMAT_URL } ?: return null
@@ -414,6 +422,42 @@ val Questionnaire.QuestionnaireItemComponent.entryFormat: String?
     }
     return null
   }
+
+val Questionnaire.QuestionnaireItemComponent.dateEntryFormat: String
+  get() {
+    return if (isValidDateEntryFormat(entryFormat)) {
+      entryFormat!!
+    } else {
+      getLocalizedDateTimePattern()
+    }
+  }
+
+private fun isValidDateEntryFormat(entryFormat: String?): Boolean {
+  return entryFormat?.let {
+    try {
+      val text = LocalDate.now().format(DateTimeFormatter.ofPattern(entryFormat))
+      LocalDate.parse(text, DateTimeFormatter.ofPattern(entryFormat))
+      true
+    } catch (e: Exception) {
+      Timber.w(e.message)
+      false
+    }
+  }
+    ?: false
+}
+
+/**
+ * Medium and long format styles use alphabetical month names which are difficult for the user to
+ * input. Use short format style which is always numerical.
+ */
+internal fun getLocalizedDateTimePattern(): String {
+  return DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+    FormatStyle.SHORT,
+    null,
+    IsoChronology.INSTANCE,
+    Locale.getDefault()
+  )
+}
 
 internal const val INSTRUCTIONS = "instructions"
 

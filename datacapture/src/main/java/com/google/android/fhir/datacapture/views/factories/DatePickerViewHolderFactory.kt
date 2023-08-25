@@ -24,7 +24,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
-import com.google.android.fhir.datacapture.extensions.entryFormat
+import com.google.android.fhir.datacapture.extensions.dateEntryFormat
 import com.google.android.fhir.datacapture.extensions.format
 import com.google.android.fhir.datacapture.extensions.getDateSeparator
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
@@ -49,19 +49,12 @@ import java.text.ParseException
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.chrono.IsoChronology
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
 import java.time.format.DateTimeParseException
-import java.time.format.FormatStyle
 import java.util.Date
-import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.log10
 import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import timber.log.Timber
 
 internal object DatePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.date_picker_view) {
@@ -112,7 +105,7 @@ internal object DatePickerViewHolderFactory :
         clearPreviousState()
         header.bind(questionnaireViewItem)
 
-        val datePattern = datePattern(questionnaireViewItem.questionnaireItem)
+        val datePattern = questionnaireViewItem.questionnaireItem.dateEntryFormat
         // Special character used in date pattern
         val datePatternSeparator = getDateSeparator(datePattern)
         textWatcher = DatePatternTextWatcher(datePatternSeparator)
@@ -254,6 +247,9 @@ internal object DatePickerViewHolderFactory :
     }
 }
 
+internal const val TAG = "date-picker"
+internal val ZONE_ID_UTC = ZoneId.of("UTC")
+
 /**
  * Format entered date to acceptable date format where 2 digits for day and month, 4 digits for
  * year.
@@ -287,44 +283,6 @@ internal fun handleDateFormatAfterTextChange(
       editable.insert(editable.lastIndex, dateFormatSeparator.toString())
     }
   }
-}
-
-internal const val TAG = "date-picker"
-internal val ZONE_ID_UTC = ZoneId.of("UTC")
-
-internal fun datePattern(questionnaireItem: Questionnaire.QuestionnaireItemComponent): String {
-  if (isValidDateEntryFormat(questionnaireItem.entryFormat)) {
-    return questionnaireItem.entryFormat!!
-  } else {
-    return getLocalizedDateTimePattern()
-  }
-}
-
-internal fun isValidDateEntryFormat(entryFormat: String?): Boolean {
-  return entryFormat?.let {
-    try {
-      val text = LocalDate.now().format(DateTimeFormatter.ofPattern(entryFormat))
-      LocalDate.parse(text, DateTimeFormatter.ofPattern(entryFormat))
-      true
-    } catch (e: Exception) {
-      Timber.w(e.message)
-      false
-    }
-  }
-    ?: false
-}
-
-/**
- * Medium and long format styles use alphabetical month names which are difficult for the user to
- * input. Use short format style which is always numerical.
- */
-internal fun getLocalizedDateTimePattern(): String {
-  return DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-    FormatStyle.SHORT,
-    null,
-    IsoChronology.INSTANCE,
-    Locale.getDefault()
-  )
 }
 
 internal val DateType.localDate

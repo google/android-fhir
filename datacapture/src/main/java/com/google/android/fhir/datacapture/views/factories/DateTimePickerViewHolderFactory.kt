@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.extensions.format
 import com.google.android.fhir.datacapture.extensions.getDateSeparator
+import com.google.android.fhir.datacapture.extensions.getLocalizedDateTimePattern
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.parseDate
