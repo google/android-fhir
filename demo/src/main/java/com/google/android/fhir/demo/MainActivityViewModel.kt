@@ -31,10 +31,10 @@ import com.google.android.fhir.sync.SyncJobStatus
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
@@ -68,16 +68,18 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     }
   }
 
+  private var oneTimeSynjob: Job? = null
   fun triggerOneTimeSync() {
-    viewModelScope.launch {
-      Sync.oneTimeSync<DemoFhirSyncWorker>(getApplication())
-        ?.shareIn(this, SharingStarted.Eagerly, 0)
-        ?.collect {
-          if (it.status != null) {
-            _pollState.emit(it.status!!)
-          }
-        }
-    }
+    //    Cancels any ongoing sync job before starting a new one. Since this function may be called
+    // more than once, not canceling the ongoing job could result in the creation of multiple jobs
+    // that emit the same object.
+    oneTimeSynjob?.cancel()
+    oneTimeSynjob =
+      viewModelScope.launch {
+        Sync.oneTimeSync<DemoFhirSyncWorker>(getApplication())
+          ?.shareIn(this, SharingStarted.Eagerly, 0)
+          ?.collect { result -> result.status?.let { _pollState.emit(it) } }
+      }
   }
 
   /** Emits last sync time. */

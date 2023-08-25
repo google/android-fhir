@@ -56,7 +56,6 @@ object Sync {
     context: Context,
     retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
   ): Flow<SyncJobStatusPreferences>? {
-    //  ): Flow<SyncJobStatus> {
     val uniqueWorkName = "${W::class.java.name}-oneTimeSync"
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
