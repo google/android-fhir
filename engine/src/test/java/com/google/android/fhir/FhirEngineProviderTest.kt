@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,12 @@ class FhirEngineProviderTest {
 
   @Test
   fun build_twiceWithAppContext_afterCleanup_shouldReturnDifferentInstances() {
-    provider.init(FhirEngineConfiguration(testMode = true))
+    provider.init(
+      FhirEngineConfiguration(
+        testMode = true,
+        context = ApplicationProvider.getApplicationContext()
+      )
+    )
     val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
     provider.cleanup()
     val engineTwo = provider.getInstance(ApplicationProvider.getApplicationContext())
@@ -61,7 +66,12 @@ class FhirEngineProviderTest {
 
   @Test
   fun cleanup_not_in_test_mode_fails() {
-    provider.init(FhirEngineConfiguration(testMode = false))
+    provider.init(
+      FhirEngineConfiguration(
+        testMode = false,
+        context = ApplicationProvider.getApplicationContext()
+      )
+    )
 
     provider.getInstance(ApplicationProvider.getApplicationContext())
 
