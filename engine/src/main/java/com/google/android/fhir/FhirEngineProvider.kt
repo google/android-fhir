@@ -33,7 +33,8 @@ object FhirEngineProvider {
   /**
    * Initializes the [FhirEngine] singleton with a custom Configuration.
    *
-   * This method throws [IllegalStateException] if it is called multiple times
+   * This method throws [IllegalStateException] if it is called multiple times. It throws
+   * [NullPointerException] if [FhirEngineConfiguration.context] is null.
    */
   @Synchronized
   fun init(fhirEngineConfiguration: FhirEngineConfiguration) {
@@ -63,6 +64,9 @@ object FhirEngineProvider {
 
   @Synchronized
   private fun getOrCreateFhirService(context: Context): FhirServices {
+    if (fhirDataStore == null) {
+      fhirDataStore = FhirDataStore(context)
+    }
     if (fhirServices == null) {
       fhirEngineConfiguration = fhirEngineConfiguration ?: FhirEngineConfiguration()
       val configuration = checkNotNull(fhirEngineConfiguration)

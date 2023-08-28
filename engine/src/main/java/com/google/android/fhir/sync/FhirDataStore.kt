@@ -48,6 +48,14 @@ class FhirDataStore(context: Context) {
       .create()
   private val syncJobStatusFlowMap = mutableMapOf<String, Flow<SyncJobStatusPreferences>>()
 
+  /**
+   * Utilizes a flow from the DataStore to collect and transform data. It catches potential
+   * IOExceptions and emits an empty preference instance in such cases. The collected data is then
+   * mapped into a [SyncJobStatusPreferences].
+   *
+   * @param key The key associated with the data to collect.
+   * @return A flow that emits the [SyncJobStatusPreferences].
+   */
   fun getSyncJobStatusPreferencesFlow(key: String): Flow<SyncJobStatusPreferences> =
     syncJobStatusFlowMap.getOrPut(key) {
       dataStore.data
@@ -70,6 +78,14 @@ class FhirDataStore(context: Context) {
         .map { syncStatus -> SyncJobStatusPreferences(syncStatus) }
     }
 
+  /**
+   * Edits the DataStore to store synchronization job status. It creates a data object containing
+   * the state type and serialized state of the synchronization job status. The edited preferences
+   * are updated with the serialized data.
+   *
+   * @param syncJobStatus The synchronization job status to be stored.
+   * @param key The key associated with the data to edit.
+   */
   suspend fun updateSyncJobStatus(key: String, syncJobStatus: SyncJobStatus) {
     dataStore.edit { preferences ->
       val data =

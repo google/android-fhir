@@ -50,7 +50,7 @@ object Sync {
    * the same [FhirSyncWorker] to retrieve the status of the job.
    *
    * @param retryConfiguration configuration to guide the retry mechanism, or `null` to stop retry.
-   * @return a [Flow] of [SyncJobStatus]
+   * @return a [Flow] of [SyncJobStatusPreferences]
    */
   inline fun <reified W : FhirSyncWorker> oneTimeSync(
     context: Context,
@@ -74,7 +74,7 @@ object Sync {
    *
    * @param periodicSyncConfiguration configuration to determine the sync frequency and retry
    * mechanism
-   * @return a [Flow] of [SyncJobStatus]
+   * @return a [Flow] of [SyncJobStatusPreferences]
    */
   @ExperimentalCoroutinesApi
   inline fun <reified W : FhirSyncWorker> periodicSync(
