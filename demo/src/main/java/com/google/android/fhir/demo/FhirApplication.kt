@@ -27,7 +27,6 @@ import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.datacapture.DataCaptureConfig
 import com.google.android.fhir.datacapture.XFhirQueryResolver
 import com.google.android.fhir.search.search
-import com.google.android.fhir.sync.FhirDataStore
 import com.google.android.fhir.sync.remote.HttpLogger
 import timber.log.Timber
 
@@ -58,7 +57,7 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
             ) { Timber.tag("App-HttpLog").d(it) },
           networkConfiguration = NetworkConfiguration(uploadWithGzip = false)
         ),
-        fhirDataStore = FhirDataStore(applicationContext)
+        context = applicationContext
       )
     )
 

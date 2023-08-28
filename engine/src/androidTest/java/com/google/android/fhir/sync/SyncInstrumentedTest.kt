@@ -63,11 +63,11 @@ class SyncInstrumentedTest {
     val workManager = WorkManager.getInstance(context)
     runBlocking {
       Sync.oneTimeSync<TestSyncWorker>(context = context)
-        .transformWhile {
-          emit(it is SyncJobStatus.Finished)
-          it !is SyncJobStatus.Finished
+        ?.transformWhile {
+          emit(it.status is SyncJobStatus.Finished)
+          it.status !is SyncJobStatus.Finished
         }
-        .shareIn(this, SharingStarted.Eagerly, 5)
+        ?.shareIn(this, SharingStarted.Eagerly, 5)
     }
 
     assertThat(workManager.getWorkInfosByTag(TestSyncWorker::class.java.name).get().first().state)
@@ -88,11 +88,11 @@ class SyncInstrumentedTest {
               repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
             ),
         )
-        .transformWhile {
+        ?.transformWhile {
           emit(it)
-          it !is SyncJobStatus.Finished
+          it.status !is SyncJobStatus.Finished
         }
-        .shareIn(this, SharingStarted.Eagerly, 5)
+        ?.shareIn(this, SharingStarted.Eagerly, 5)
     }
 
     // Verify the periodic worker completed the run, and is queued to run again
@@ -104,11 +104,11 @@ class SyncInstrumentedTest {
     // Start and complete a oneTime job, and verify it does not remove the periodic worker
     runBlocking {
       Sync.oneTimeSync<TestSyncWorker>(context = context)
-        .transformWhile {
+        ?.transformWhile {
           emit(it)
-          it !is SyncJobStatus.Finished
+          it.status !is SyncJobStatus.Finished
         }
-        .shareIn(this, SharingStarted.Eagerly, 5)
+        ?.shareIn(this, SharingStarted.Eagerly, 5)
     }
     assertThat(workManager.getWorkInfosByTag(TestSyncWorker::class.java.name).get().size)
       .isEqualTo(2)
