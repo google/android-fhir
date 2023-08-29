@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync
+package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.sync.UploadRequest
 
 /**
  * Manager that pre-processes the local FHIR changes and handles how to upload them to the server.

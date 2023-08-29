@@ -25,7 +25,6 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.download.DownloaderImpl
-import com.google.android.fhir.sync.upload.SquashedChangesUploadWorkManager
 import com.google.android.fhir.sync.upload.UploaderImpl
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
@@ -35,7 +34,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
