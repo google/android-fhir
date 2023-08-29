@@ -115,6 +115,8 @@ internal object DateTimePickerViewHolderFactory :
         timeInputEditText.setOnClickListener {
           buildMaterialTimePicker(itemView.context, INPUT_MODE_KEYBOARD)
         }
+
+        // This widget does not currently support custom entry format.
         val localeDatePattern = getLocalizedDatePattern()
         // Special character used in date pattern
         val datePatternSeparator = getDateSeparator(localeDatePattern)

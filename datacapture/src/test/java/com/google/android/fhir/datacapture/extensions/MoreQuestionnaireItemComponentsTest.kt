@@ -2181,7 +2181,7 @@ class MoreQuestionnaireItemComponentsTest {
         )
       }
 
-    assertThat(questionnaireItem.dateEntryFormat).isEqualTo("y-MM-dd")
+    assertThat(questionnaireItem.dateEntryFormatOrSystemDefault).isEqualTo("y-MM-dd")
   }
 
   private val displayCategoryExtensionWithInstructionsCode =

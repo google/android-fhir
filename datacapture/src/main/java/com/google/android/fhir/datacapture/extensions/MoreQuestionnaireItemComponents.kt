@@ -217,9 +217,9 @@ val Questionnaire.QuestionnaireItemComponent.entryFormat: String?
 
 /**
  * The date entry format for the questionnaire item component if one is specified, otherwise, the
- * system date entry format.
+ * system default date entry format.
  */
-val Questionnaire.QuestionnaireItemComponent.dateEntryFormat: String
+val Questionnaire.QuestionnaireItemComponent.dateEntryFormatOrSystemDefault: String
   get() {
     return if (isValidDateEntryFormat(entryFormat)) {
       entryFormat!!

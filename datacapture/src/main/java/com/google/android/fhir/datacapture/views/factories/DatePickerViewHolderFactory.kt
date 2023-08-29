@@ -24,7 +24,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
-import com.google.android.fhir.datacapture.extensions.dateEntryFormat
+import com.google.android.fhir.datacapture.extensions.dateEntryFormatOrSystemDefault
 import com.google.android.fhir.datacapture.extensions.format
 import com.google.android.fhir.datacapture.extensions.getDateSeparator
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
@@ -105,7 +105,7 @@ internal object DatePickerViewHolderFactory :
         clearPreviousState()
         header.bind(questionnaireViewItem)
 
-        val datePattern = questionnaireViewItem.questionnaireItem.dateEntryFormat
+        val datePattern = questionnaireViewItem.questionnaireItem.dateEntryFormatOrSystemDefault
         // Special character used in date pattern
         val datePatternSeparator = getDateSeparator(datePattern)
         textWatcher = DatePatternTextWatcher(datePatternSeparator)
