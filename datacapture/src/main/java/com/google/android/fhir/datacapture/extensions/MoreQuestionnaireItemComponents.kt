@@ -29,11 +29,7 @@ import com.google.android.fhir.datacapture.fhirpath.evaluateToDisplay
 import com.google.android.fhir.getLocalizedText
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.chrono.IsoChronology
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
-import java.time.format.FormatStyle
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.r4.model.Attachment
@@ -219,12 +215,16 @@ val Questionnaire.QuestionnaireItemComponent.entryFormat: String?
     return null
   }
 
+/**
+ * The date entry format for the questionnaire item component if one is specified, otherwise, the
+ * system date entry format.
+ */
 val Questionnaire.QuestionnaireItemComponent.dateEntryFormat: String
   get() {
     return if (isValidDateEntryFormat(entryFormat)) {
       entryFormat!!
     } else {
-      getLocalizedDateTimePattern()
+      getLocalizedDatePattern()
     }
   }
 
@@ -240,19 +240,6 @@ private fun isValidDateEntryFormat(entryFormat: String?): Boolean {
     }
   }
     ?: false
-}
-
-/**
- * Medium and long format styles use alphabetical month names which are difficult for the user to
- * input. Use short format style which is always numerical.
- */
-internal fun getLocalizedDateTimePattern(): String {
-  return DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-    FormatStyle.SHORT,
-    null,
-    IsoChronology.INSTANCE,
-    Locale.getDefault()
-  )
 }
 
 /** Slider step extension value. */

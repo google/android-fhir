@@ -28,7 +28,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.extensions.format
 import com.google.android.fhir.datacapture.extensions.getDateSeparator
-import com.google.android.fhir.datacapture.extensions.getLocalizedDateTimePattern
+import com.google.android.fhir.datacapture.extensions.getLocalizedDatePattern
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.parseDate
@@ -115,7 +115,7 @@ internal object DateTimePickerViewHolderFactory :
         timeInputEditText.setOnClickListener {
           buildMaterialTimePicker(itemView.context, INPUT_MODE_KEYBOARD)
         }
-        val localeDatePattern = getLocalizedDateTimePattern()
+        val localeDatePattern = getLocalizedDatePattern()
         // Special character used in date pattern
         val datePatternSeparator = getDateSeparator(localeDatePattern)
         textWatcher = DatePatternTextWatcher(datePatternSeparator)
