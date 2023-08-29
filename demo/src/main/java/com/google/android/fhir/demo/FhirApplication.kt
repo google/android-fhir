@@ -63,7 +63,7 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
     dataCaptureConfig =
       DataCaptureConfig().apply {
         urlResolver = ReferenceUrlResolver(this@FhirApplication as Context)
-        xFhirQueryResolver = XFhirQueryResolver { fhirEngine.search(it) }
+        xFhirQueryResolver = XFhirQueryResolver { fhirEngine.search(it).map { it.resource } }
       }
   }
 

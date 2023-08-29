@@ -37,6 +37,7 @@ import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IntegerType
@@ -112,6 +113,30 @@ internal const val EXTENSION_ITEM_MEDIA =
 internal const val EXTENSION_MAX_SIZE = "http://hl7.org/fhir/StructureDefinition/maxSize"
 
 internal const val EXTENSION_MIME_TYPE = "http://hl7.org/fhir/StructureDefinition/mimeType"
+
+/**
+ * Extension for questionnaire items of integer and decimal types including a single unit to be
+ * displayed.
+ *
+ * See https://hl7.org/fhir/extensions/StructureDefinition-questionnaire-unit.html.
+ */
+internal const val EXTENSION_QUESTIONNAIRE_UNIT_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
+
+/**
+ * Extension for questionnaire items of quantity type including unit options to choose from.
+ *
+ * See https://hl7.org/fhir/extensions/StructureDefinition-questionnaire-unitOption.html.
+ */
+internal const val EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption"
+
+/**
+ * Extension for questionnaire items of quantity type including a value set of unit options to
+ * choose from.
+ */
+internal const val EXTENSION_QUESTIONNAIRE_UNIT_VALUE_SET_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet"
 
 internal const val EXTENSION_SLIDER_STEP_VALUE_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue"
@@ -516,6 +541,34 @@ private fun ByteArray.decodeToBitmap(): Bitmap? {
   return bitmap
 }
 
+/**
+ * The unit for the numerical question.
+ *
+ * See http://hl7.org/fhir/R4/extension-questionnaire-unit.html.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.unit: Coding?
+  get() {
+    val extension =
+      this.extension.singleOrNull { it.url == EXTENSION_QUESTIONNAIRE_UNIT_URL } ?: return null
+    val value = extension.value
+    if (value is Coding) {
+      return value
+    }
+    return null
+  }
+
+/**
+ * The unit options for the quantity question.
+ *
+ * See http://hl7.org/fhir/R4/extension-questionnaire-unitoption.html.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.unitOption: List<Coding>
+  get() {
+    return this.extension
+      .filter { it.url == EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL }
+      .map { it.value as Coding }
+  }
+
 // ********************************************************************************************** //
 //                                                                                                //
 // Expressions: answer options toggle expression, variable expression, calculated expression,     //
@@ -588,14 +641,6 @@ internal fun Questionnaire.QuestionnaireItemComponent.isReferencedBy(
       .expression
       .replace(" ", "")
       .contains(Regex(".*linkId='${this.linkId}'.*"))
-  }
-
-// Return expression if QuestionnaireItemComponent has ENABLE WHEN EXPRESSION URL
-val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
-  get() {
-    return this.extension
-      .firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }
-      ?.let { it.value as Expression }
   }
 
 internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expression?
