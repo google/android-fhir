@@ -59,8 +59,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
               repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
             )
         )
-        ?.shareIn(this, SharingStarted.Eagerly, 10)
-        ?.collect {
+        .shareIn(this, SharingStarted.Eagerly, 10)
+        .collect {
           if (it.status != null) {
             _pollState.emit(it.status!!)
           }
@@ -77,8 +77,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     oneTimeSynjob =
       viewModelScope.launch {
         Sync.oneTimeSync<DemoFhirSyncWorker>(getApplication())
-          ?.shareIn(this, SharingStarted.Eagerly, 0)
-          ?.collect { result -> result.status?.let { _pollState.emit(it) } }
+          .shareIn(this, SharingStarted.Eagerly, 0)
+          .collect { result -> result.status?.let { _pollState.emit(it) } }
       }
   }
 

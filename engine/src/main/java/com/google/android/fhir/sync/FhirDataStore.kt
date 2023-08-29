@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
-import android.util.Log
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -30,12 +29,12 @@ import java.io.IOException
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 
 private const val FHIR_PREFERENCES_NAME = "fhir_preferences"
 
-class FhirDataStore(context: Context) {
+@PublishedApi
+internal class FhirDataStore(context: Context) {
   private val Context.dataStore by
     preferencesDataStore(
       name = FHIR_PREFERENCES_NAME,
@@ -46,7 +45,7 @@ class FhirDataStore(context: Context) {
       .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeTypeAdapter().nullSafe())
       .setExclusionStrategies(FhirSyncWorker.StateExclusionStrategy())
       .create()
-  private val syncJobStatusFlowMap = mutableMapOf<String, Flow<SyncJobStatusPreferences>>()
+  private val syncJobStatusFlowMap = mutableMapOf<String, Flow<SyncJobStatus>>()
 
   /**
    * Utilizes a flow from the DataStore to collect and transform data. It catches potential
@@ -56,7 +55,8 @@ class FhirDataStore(context: Context) {
    * @param key The key associated with the data to collect.
    * @return A flow that emits the [SyncJobStatusPreferences].
    */
-  fun getSyncJobStatusPreferencesFlow(key: String): Flow<SyncJobStatusPreferences> =
+  @PublishedApi
+  internal fun getSyncJobStatusPreferencesFlow(key: String): Flow<SyncJobStatus> =
     syncJobStatusFlowMap.getOrPut(key) {
       dataStore.data
         .catch { exception ->
@@ -75,7 +75,6 @@ class FhirDataStore(context: Context) {
             stateData?.let { gson.fromJson(stateData, Class.forName(type)) as? SyncJobStatus }
           }
         }
-        .map { syncStatus -> SyncJobStatusPreferences(syncStatus) }
     }
 
   /**
@@ -86,17 +85,14 @@ class FhirDataStore(context: Context) {
    * @param syncJobStatus The synchronization job status to be stored.
    * @param key The key associated with the data to edit.
    */
-  suspend fun updateSyncJobStatus(key: String, syncJobStatus: SyncJobStatus) {
+  internal suspend fun updateSyncJobStatus(key: String, syncJobStatus: SyncJobStatus) {
     dataStore.edit { preferences ->
       val data =
         workDataOf(
           "StateType" to syncJobStatus::class.java.name,
           "State" to gson.toJson(syncJobStatus)
         )
-      Log.d("Demo1", "edit operation : " + gson.toJson(data))
       preferences[stringPreferencesKey(key)] = gson.toJson(data)
     }
   }
 }
-
-data class SyncJobStatusPreferences(val status: SyncJobStatus? = null)

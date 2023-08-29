@@ -32,7 +32,7 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)
 class FhirDataStoreTest {
-  val fhirDataStore = FhirDataStore(ApplicationProvider.getApplicationContext())
+  private val fhirDataStore = FhirDataStore(ApplicationProvider.getApplicationContext())
 
   @Test
   fun updateSyncJobStatus() = runBlocking {
@@ -48,8 +48,8 @@ class FhirDataStoreTest {
       syncJobStatusList.forEach { fhirDataStore.updateSyncJobStatus(key, it) }
     }
     val collectJob = launch {
-      fhirDataStore.getSyncJobStatusPreferencesFlow(key).take(3).collect {
-        it.status?.let { syncJobStatus -> collectedValues.add(syncJobStatus) }
+      fhirDataStore.getSyncJobStatusPreferencesFlow(key).take(3).collect { syncJobStatus ->
+        collectedValues.add(syncJobStatus)
       }
     }
     collectJob.join()

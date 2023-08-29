@@ -66,7 +66,6 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         )
 
     val flow = MutableSharedFlow<SyncJobStatus>()
-
     val job =
       CoroutineScope(Dispatchers.IO).launch {
         val fhirDataStore = FhirEngineProvider.getFhirDataStore()

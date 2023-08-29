@@ -23,6 +23,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
 import com.google.android.fhir.DatastoreUtil
@@ -34,7 +35,9 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 
 object Sync {
@@ -55,7 +58,7 @@ object Sync {
   inline fun <reified W : FhirSyncWorker> oneTimeSync(
     context: Context,
     retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
-  ): Flow<SyncJobStatusPreferences>? {
+  ): Flow<SyncJobStatusPreferences> {
     val uniqueWorkName = "${W::class.java.name}-oneTimeSync"
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
@@ -63,7 +66,7 @@ object Sync {
         ExistingWorkPolicy.KEEP,
         createOneTimeWorkRequest(retryConfiguration, W::class.java, uniqueWorkName)
       )
-    return FhirEngineProvider.getFhirDataStore()?.getSyncJobStatusPreferencesFlow(uniqueWorkName)
+    return combineSyncJobStatusAndWorkInfoState(context, uniqueWorkName)
   }
 
   /**
@@ -80,7 +83,7 @@ object Sync {
   inline fun <reified W : FhirSyncWorker> periodicSync(
     context: Context,
     periodicSyncConfiguration: PeriodicSyncConfiguration
-  ): Flow<SyncJobStatusPreferences>? {
+  ): Flow<SyncJobStatusPreferences> {
     val uniqueWorkName = "${W::class.java.name}-periodicSync"
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
@@ -88,7 +91,7 @@ object Sync {
         ExistingPeriodicWorkPolicy.KEEP,
         createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java, uniqueWorkName)
       )
-    return FhirEngineProvider.getFhirDataStore()?.getSyncJobStatusPreferencesFlow(uniqueWorkName)
+    return combineSyncJobStatusAndWorkInfoState(context, uniqueWorkName)
   }
 
   /** Gets the worker info for the [FhirSyncWorker] */
@@ -106,6 +109,31 @@ object Sync {
             gson.fromJson(stateData, Class.forName(state)) as SyncJobStatus
           }
       }
+
+  @PublishedApi
+  internal fun combineSyncJobStatusAndWorkInfoState(
+    context: Context,
+    workName: String
+  ): Flow<SyncJobStatusPreferences> {
+    val workStateFlow: Flow<WorkInfo.State> = observeWorkState(context, workName)
+    val syncJobStatusFlow: Flow<SyncJobStatus>? =
+      FhirEngineProvider.getFhirDataStore()?.getSyncJobStatusPreferencesFlow(workName)
+
+    return if (syncJobStatusFlow != null) {
+      workStateFlow.combine(syncJobStatusFlow) { workState, syncStatus ->
+        SyncJobStatusPreferences(syncStatus, workState)
+      }
+    } else {
+      workStateFlow.map { workState -> SyncJobStatusPreferences(state = workState) }
+    }
+  }
+
+  private fun observeWorkState(context: Context, workName: String): Flow<WorkInfo.State> =
+    WorkManager.getInstance(context)
+      .getWorkInfosForUniqueWorkLiveData(workName)
+      .asFlow()
+      .flatMapConcat { it.asFlow() }
+      .mapNotNull { workInfo -> workInfo.state }
 
   @PublishedApi
   internal inline fun <W : FhirSyncWorker> createOneTimeWorkRequest(
@@ -165,3 +193,8 @@ object Sync {
     return DatastoreUtil(context).readLastSyncTimestamp()
   }
 }
+
+data class SyncJobStatusPreferences(
+  val status: SyncJobStatus? = null,
+  var state: WorkInfo.State? = null
+)

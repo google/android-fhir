@@ -86,7 +86,7 @@ object FhirEngineProvider {
     return checkNotNull(fhirServices)
   }
 
-  fun getFhirDataStore() = fhirDataStore
+  @PublishedApi @Synchronized internal fun getFhirDataStore() = fhirDataStore
 
   @Synchronized
   fun cleanup() {
