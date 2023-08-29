@@ -598,6 +598,14 @@ internal val Questionnaire.QuestionnaireItemComponent.answerOptionsToggleExpress
         expression to options
       }
 
+// Return expression if QuestionnaireItemComponent has ENABLE WHEN EXPRESSION URL
+val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
+  get() {
+    return this.extension
+      .firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }
+      ?.let { it.value as Expression }
+  }
+
 internal val Questionnaire.QuestionnaireItemComponent.variableExpressions: List<Expression>
   get() =
     this.extension.filter { it.url == EXTENSION_VARIABLE_URL }.map { it.castToExpression(it.value) }
