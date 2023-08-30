@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync.upload
+package com.google.android.fhir.sync.upload.request
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.sync.UploadRequest
