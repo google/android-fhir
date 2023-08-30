@@ -25,6 +25,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.download.DownloaderImpl
+import com.google.android.fhir.sync.upload.SquashedChangesUploadWorkManager
 import com.google.android.fhir.sync.upload.UploaderImpl
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
@@ -43,7 +44,9 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDownloadWorkManager(): DownloadWorkManager
-  abstract fun getUploadWorkManager(): UploadWorkManager
+  private fun getUploadWorkManager(): UploadWorkManager {
+    return SquashedChangesUploadWorkManager()
+  }
   abstract fun getConflictResolver(): ConflictResolver
 
   private val gson =
