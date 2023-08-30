@@ -62,17 +62,19 @@ fun Type.displayString(context: Context): String =
 fun Type.getValueAsString(context: Context): String =
   getValueString(this) ?: context.getString(R.string.not_answered)
 
-/*
+/**
  * Returns the unique identifier of a [Type]. Used to differentiate between item answer options that
  * may have similar display strings
  */
 fun Type.identifierString(context: Context): String =
   id
-    ?: (this as? Coding)?.let {
-      arrayOf("${it.system.orEmpty()}${it.version.orEmpty()}", it.code.orEmpty())
-        .joinToString(if (it.hasSystem() && it.hasCode()) "|" else "")
+    ?: when (this) {
+      is Coding ->
+        arrayOf("${this.system.orEmpty()}${this.version.orEmpty()}", this.code.orEmpty())
+          .joinToString(if (this.hasSystem() && this.hasCode()) "|" else "")
+      is Reference -> this.reference ?: displayString(context)
+      else -> displayString(context)
     }
-      ?: (this as? Reference)?.reference ?: displayString(context)
 
 private fun getDisplayString(type: Type, context: Context): String? =
   when (type) {

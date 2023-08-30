@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import android.app.Application
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
@@ -41,6 +43,7 @@ import org.hl7.fhir.r4.model.MarkdownType
 import org.hl7.fhir.r4.model.OidType
 import org.hl7.fhir.r4.model.PositiveIntType
 import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.Type
@@ -56,6 +59,8 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class MoreTypesTest {
+
+  private val context = ApplicationProvider.getApplicationContext<Application>()
 
   @Test
   fun instant_shouldReturnExpectedStringValue() {
@@ -197,6 +202,24 @@ class MoreTypesTest {
   fun coding_toCodeType() {
     val code = Coding("fakeSystem", "fakeCode", "fakeDisplay").toCodeType()
     assertThat(code.equalsDeep(CodeType("fakeCode"))).isTrue()
+  }
+
+  @Test
+  fun `Coding should return identifierString containing system, version and code`() {
+    val coding = Coding("fakeSystem", "fakeCode", "fakeDisplay").apply { version = "2.0" }
+    assertThat(coding.identifierString(context)).isEqualTo("fakeSystem2.0|fakeCode")
+  }
+
+  @Test
+  fun `Coding without system should return identifierString containing code`() {
+    val coding = Coding().apply { code = "fakeCode" }
+    assertThat(coding.identifierString(context)).isEqualTo("fakeCode")
+  }
+
+  @Test
+  fun `Reference should return reference`() {
+    val reference = Reference().apply { reference = "fakeReference" }
+    assertThat(reference.identifierString(context)).isEqualTo("fakeReference")
   }
 
   @Test
