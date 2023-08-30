@@ -21,7 +21,6 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ENTRY_FORMAT_URL
-import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
@@ -513,6 +512,7 @@ class DatePickerViewHolderFactoryTest {
   }
   @Test
   fun `should use date format in the entryFormat extension`() {
+    setLocale(Locale.US)
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -523,11 +523,12 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
     )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo("yyyy-MM-dd")
+    assertThat(viewHolder.dateInputView.hint).isEqualTo("yyyy-mm-dd")
   }
 
   @Test
   fun `should set local date input format when entryFormat extension has incorrect format string in Questionnaire`() {
+    setLocale(Locale.US)
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -538,11 +539,12 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
     )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo("MM/dd/yyyy")
+    assertThat(viewHolder.dateInputView.hint).isEqualTo("mm/dd/yyyy")
   }
 
   @Test
   fun `should use date format in the entryFormat extension though date separator is missing`() {
+    setLocale(Locale.US)
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -553,11 +555,12 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
     )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo("yyyyMMdd")
+    assertThat(viewHolder.dateInputView.hint).isEqualTo("yyyymmdd")
   }
 
   @Test
   fun `should use date format in the entryFormat after converting it to SHORT FormatStyle`() {
+    setLocale(Locale.US)
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -568,11 +571,12 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
     )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo("yyyy MM dd")
+    assertThat(viewHolder.dateInputView.hint).isEqualTo("yyyy mm dd")
   }
 
   @Test
   fun `should set local date input format when entryFormat extension has empty string in Questionnaire`() {
+    setLocale(Locale.US)
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -590,11 +594,12 @@ class DatePickerViewHolderFactoryTest {
         IsoChronology.INSTANCE,
         Locale.getDefault()
       )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo(canonicalizeDatePattern(localeDatePattern))
+    assertThat(viewHolder.dateInputView.hint).isEqualTo("mm/dd/yyyy")
   }
 
   @Test
   fun `should set local date input format when no entryFormat extension in Questionnaire`() {
+    setLocale(Locale.US)
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -610,7 +615,7 @@ class DatePickerViewHolderFactoryTest {
         IsoChronology.INSTANCE,
         Locale.getDefault()
       )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo(canonicalizeDatePattern(localeDatePattern))
+    assertThat(viewHolder.dateInputView.hint).isEqualTo("mm/dd/yyyy")
   }
 
   @Test
