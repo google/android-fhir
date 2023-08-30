@@ -103,10 +103,9 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
                 getQuestionnaireJsonStringFromAssets(
                   context = requireContext(),
                   backgroundContext = coroutineContext,
-                  fileName = component.questionnaireFileWithValidation,
+                  fileName = it
                 )
-              }
-                ?: null,
+              },
             workflow = component.workflow
           )
         )
