@@ -21,7 +21,7 @@ import com.google.android.fhir.LocalChange
 /**
  * Manager that pre-processes the local FHIR changes and handles how to upload them to the server.
  */
-interface UploadWorkManager {
+internal interface UploadWorkManager {
   /**
    * Transforms the [LocalChange]s to the final set of changes that needs to be uploaded to the
    * server. The transformations can be of various types like squashing the [LocalChange]s by
