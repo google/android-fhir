@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync.upload
+package com.google.android.fhir.sync.upload.request
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
