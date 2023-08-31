@@ -22,8 +22,6 @@ import com.google.android.fhir.demo.FhirApplication
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
-import com.google.android.fhir.sync.UploadWorkManager
-import com.google.android.fhir.sync.upload.SquashedChangesUploadWorkManager
 
 class DemoFhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   FhirSyncWorker(appContext, workerParams) {
@@ -31,8 +29,6 @@ class DemoFhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   override fun getDownloadWorkManager(): DownloadWorkManager {
     return TimestampBasedDownloadWorkManagerImpl(FhirApplication.dataStore(applicationContext))
   }
-
-  override fun getUploadWorkManager(): UploadWorkManager = SquashedChangesUploadWorkManager()
 
   override fun getConflictResolver() = AcceptLocalConflictResolver
 

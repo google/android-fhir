@@ -117,7 +117,7 @@ val MIGRATION_5_6 =
         "CREATE TABLE IF NOT EXISTS `_new_LocalChangeEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceType` TEXT NOT NULL, `resourceId` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `type` INTEGER NOT NULL, `payload` TEXT NOT NULL, `versionId` TEXT)"
       )
       database.execSQL(
-        "INSERT INTO `_new_LocalChangeEntity` (`id`,`resourceType`,`resourceId`,`timestamp`,`type`,`payload`,`versionId`) SELECT `id`,`resourceType`,`resourceId`, strftime('%s', `timestamp`) ||  substr(strftime('%f', `timestamp`), 4),`type`,`payload`,`versionId` FROM `LocalChangeEntity`"
+        "INSERT INTO `_new_LocalChangeEntity` (`id`,`resourceType`,`resourceId`,`timestamp`,`type`,`payload`,`versionId`) SELECT `id`,`resourceType`,`resourceId`, COALESCE(strftime('%s', `timestamp`) ||  substr(strftime('%f', `timestamp`), 4) , /* default is EPOCH*/ 0 ),`type`,`payload`,`versionId` FROM `LocalChangeEntity`"
       )
       database.execSQL("DROP TABLE `LocalChangeEntity`")
       database.execSQL("ALTER TABLE `_new_LocalChangeEntity` RENAME TO `LocalChangeEntity`")
