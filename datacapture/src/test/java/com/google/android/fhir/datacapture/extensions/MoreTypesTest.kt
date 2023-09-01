@@ -205,19 +205,57 @@ class MoreTypesTest {
   }
 
   @Test
-  fun `Coding should return identifierString containing system, version and code`() {
+  fun `should return identifier string for coding containing system, version and code`() {
     val coding = Coding("fakeSystem", "fakeCode", "fakeDisplay").apply { version = "2.0" }
     assertThat(coding.identifierString(context)).isEqualTo("fakeSystem2.0|fakeCode")
   }
 
   @Test
-  fun `Coding without system should return identifierString containing code`() {
+  fun `should return identifier string for coding containing system and version`() {
+    val coding =
+      Coding().apply {
+        system = "fakeSystem"
+        version = "2.0"
+      }
+    assertThat(coding.identifierString(context)).isEqualTo("fakeSystem2.0")
+  }
+
+  @Test
+  fun `should return identifier string for coding containing system and code`() {
+    val coding = Coding("fakeSystem", "fakeCode", "fakeDisplay")
+    assertThat(coding.identifierString(context)).isEqualTo("fakeSystem|fakeCode")
+  }
+
+  @Test
+  fun `should return identifier string for coding containing only system`() {
+    val coding = Coding().apply { system = "fakeSystem" }
+    assertThat(coding.identifierString(context)).isEqualTo("fakeSystem")
+  }
+
+  @Test
+  fun `should return identifier string for coding containing version and code`() {
+    val coding =
+      Coding().apply {
+        version = "2.0"
+        code = "fakeCode"
+      }
+    assertThat(coding.identifierString(context)).isEqualTo("2.0|fakeCode")
+  }
+
+  @Test
+  fun `should return identifier string for coding containing only version`() {
+    val coding = Coding().apply { version = "2.0" }
+    assertThat(coding.identifierString(context)).isEqualTo("2.0")
+  }
+
+  @Test
+  fun `should return identifier string for coding containing only code`() {
     val coding = Coding().apply { code = "fakeCode" }
     assertThat(coding.identifierString(context)).isEqualTo("fakeCode")
   }
 
   @Test
-  fun `Reference should return reference`() {
+  fun `should return identifier string for reference`() {
     val reference = Reference().apply { reference = "fakeReference" }
     assertThat(reference.identifierString(context)).isEqualTo("fakeReference")
   }

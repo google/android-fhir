@@ -71,7 +71,7 @@ fun Type.identifierString(context: Context): String =
     ?: when (this) {
       is Coding ->
         arrayOf("${this.system.orEmpty()}${this.version.orEmpty()}", this.code.orEmpty())
-          .joinToString(if (this.hasSystem() && this.hasCode()) "|" else "")
+          .joinToString(if (this.hasSystem().or(this.hasVersion()) && this.hasCode()) "|" else "")
       is Reference -> this.reference ?: displayString(context)
       else -> displayString(context)
     }
