@@ -106,7 +106,7 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
     questionnaire: Questionnaire,
     questionnaireItemParentMap:
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
-    launchContextMap: Map<String, Resource>?
+    launchContextMap: Map<String, Resource>?,
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhen
     val enableWhenExpression = questionnaireItem.enableWhenExpression
@@ -126,7 +126,7 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
             questionnaireItemParentMap,
             questionnaireItem,
             this,
-            launchContextMap
+            launchContextMap,
           )
           if (launchContextMap != null) {
             putAll(launchContextMap)
@@ -136,7 +136,7 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
         questionnaireResponse,
         questionnaireResponseItem,
         enableWhenExpression.expression,
-        contextMap
+        contextMap,
       )
     }
 

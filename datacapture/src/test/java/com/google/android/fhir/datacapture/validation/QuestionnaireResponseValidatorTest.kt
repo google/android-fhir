@@ -84,7 +84,7 @@ class QuestionnaireResponseValidatorTest {
         questionnaireResponse,
         context,
         mapOf(),
-        mapOf()
+        mapOf(),
       )
     assertThat(result["a-question"]!!.single()).isEqualTo(Valid)
   }
@@ -118,7 +118,7 @@ class QuestionnaireResponseValidatorTest {
         questionnaireResponse,
         context,
         mapOf(),
-        mapOf()
+        mapOf(),
       )
     assertThat(result["a-question"]!!.single())
       .isEqualTo(
@@ -172,7 +172,7 @@ class QuestionnaireResponseValidatorTest {
         questionnaireResponse,
         context,
         mapOf(),
-        mapOf()
+        mapOf(),
       )
     assertThat(result["a-question"])
       .containsExactly(
@@ -243,7 +243,7 @@ class QuestionnaireResponseValidatorTest {
         questionnaireResponse,
         context,
         mapOf(),
-        mapOf()
+        mapOf(),
       )
     assertThat(result.keys).containsExactly("q1")
     assertThat(result["q1"]).containsExactly(Valid)
@@ -296,7 +296,7 @@ class QuestionnaireResponseValidatorTest {
         questionnaireResponse,
         context,
         mapOf(),
-        mapOf()
+        mapOf(),
       )
     assertThat(result["question-1"]!!.single()).isEqualTo(Valid)
   }
@@ -312,7 +312,7 @@ class QuestionnaireResponseValidatorTest {
       },
       context,
       mapOf(),
-      mapOf()
+      mapOf(),
     )
   }
 
@@ -333,7 +333,7 @@ class QuestionnaireResponseValidatorTest {
       QuestionnaireResponse(),
       context,
       mapOf(),
-      mapOf()
+      mapOf(),
     )
   }
 
@@ -403,7 +403,7 @@ class QuestionnaireResponseValidatorTest {
       },
       context,
       mapOf(),
-      mapOf()
+      mapOf(),
     )
   }
 
@@ -428,7 +428,7 @@ class QuestionnaireResponseValidatorTest {
       },
       context,
       mapOf(),
-      mapOf()
+      mapOf(),
     )
   }
 
@@ -468,7 +468,7 @@ class QuestionnaireResponseValidatorTest {
         questionnaireResponse,
         context,
         mapOf(),
-        mapOf()
+        mapOf(),
       )
 
     assertThat(result.entries.first().key).isEqualTo("valid-hidden-item")
@@ -511,7 +511,7 @@ class QuestionnaireResponseValidatorTest {
           questionnaireResponse,
           context,
           mapOf(),
-          mapOf()
+          mapOf(),
         )
         .entries.first()
 
@@ -1673,7 +1673,7 @@ class QuestionnaireResponseValidatorTest {
           questionnaireResponse,
           context,
           mapOf(),
-          mapOf()
+          mapOf(),
         )
       }
     assertThat(exception.message).isEqualTo(message)
@@ -1692,7 +1692,7 @@ class QuestionnaireResponseValidatorTest {
           questionnaireResponse,
           context,
           mapOf(),
-          mapOf()
+          mapOf(),
         )
       }
     assertThat(exception.message).isEqualTo(message)

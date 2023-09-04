@@ -84,7 +84,7 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
           questionnaireResponse,
           RuntimeEnvironment.getApplication(),
           mapOf(),
-          mapOf()
+          mapOf(),
         )
       )
     }

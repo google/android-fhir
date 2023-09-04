@@ -406,7 +406,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaireResponse,
         getApplication(),
         questionnaireItemParentMap,
-        questionnaireLaunchContextMap
+        questionnaireLaunchContextMap,
       )
       .also { result ->
         if (result.values.flatten().filterIsInstance<Invalid>().isNotEmpty()) {
@@ -508,7 +508,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaire,
         questionnaireResponse,
         questionnaireItemParentMap,
-        questionnaireLaunchContextMap
+        questionnaireLaunchContextMap,
       )
       .forEach { (questionnaireItem, calculatedAnswers) ->
         // update all response item with updated values
@@ -548,7 +548,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       questionnaireResponseItem,
       cqfExpression,
       questionnaireItemParentMap,
-      questionnaireLaunchContextMap
+      questionnaireLaunchContextMap,
     )
   }
 
@@ -663,7 +663,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireResponseItem,
           questionnaire,
           questionnaireItemParentMap,
-          questionnaireLaunchContextMap
+          questionnaireLaunchContextMap,
         )
     // Disabled questions should not get QuestionnaireItemViewItem instances
     if (!enabled) {
@@ -700,7 +700,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaireResponseItem,
         questionnaireResponse,
         questionnaireItemParentMap,
-        questionnaireLaunchContextMap
+        questionnaireLaunchContextMap,
       )
     if (disabledQuestionnaireResponseAnswers.isNotEmpty()) {
       removeDisabledAnswers(
@@ -730,7 +730,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                       questionnaireResponseItem,
                       questionnaire,
                       questionnaireItemParentMap,
-                      questionnaireLaunchContextMap
+                      questionnaireLaunchContextMap,
                     )
               },
             questionViewTextConfiguration =
@@ -820,7 +820,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireResponseItem,
           questionnaire,
           questionnaireItemParentMap,
-          questionnaireLaunchContextMap
+          questionnaireLaunchContextMap,
         )
       }
       .map { (questionnaireItem, questionnaireResponseItem) ->
@@ -855,7 +855,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               questionnaireResponseItem,
               questionnaire,
               questionnaireItemParentMap,
-              questionnaireLaunchContextMap
+              questionnaireLaunchContextMap,
             ),
           questionnaireItem.isHidden
         )

@@ -60,7 +60,7 @@ object QuestionnaireResponseValidator {
     context: Context,
     questionnaireItemParentMap:
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
-    launchContextMap: Map<String, Resource>?
+    launchContextMap: Map<String, Resource>?,
   ): Map<String, List<ValidationResult>> {
     require(
       questionnaireResponse.questionnaire == null ||
@@ -79,7 +79,7 @@ object QuestionnaireResponseValidator {
       linkIdToValidationResultMap,
       questionnaire,
       questionnaireItemParentMap,
-      launchContextMap
+      launchContextMap,
     )
 
     return linkIdToValidationResultMap
@@ -94,7 +94,7 @@ object QuestionnaireResponseValidator {
     questionnaire: Questionnaire,
     questionnaireItemParentMap:
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
-    launchContextMap: Map<String, Resource>?
+    launchContextMap: Map<String, Resource>?,
   ): Map<String, List<ValidationResult>> {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
@@ -115,7 +115,7 @@ object QuestionnaireResponseValidator {
           questionnaireResponseItem,
           questionnaire,
           questionnaireItemParentMap,
-          launchContextMap
+          launchContextMap,
         )
 
       if (enabled) {
@@ -127,7 +127,7 @@ object QuestionnaireResponseValidator {
           linkIdToValidationResultMap,
           questionnaire,
           questionnaireItemParentMap,
-          launchContextMap
+          launchContextMap,
         )
       }
     }
@@ -143,7 +143,7 @@ object QuestionnaireResponseValidator {
     questionnaire: Questionnaire,
     questionnaireItemParentMap:
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
-    launchContextMap: Map<String, Resource>?
+    launchContextMap: Map<String, Resource>?,
   ): Map<String, List<ValidationResult>> {
 
     when (checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }) {
@@ -160,7 +160,7 @@ object QuestionnaireResponseValidator {
           linkIdToValidationResultMap,
           questionnaire,
           questionnaireItemParentMap,
-          launchContextMap
+          launchContextMap,
         )
       else -> {
         require(questionnaireItem.repeats || questionnaireResponseItem.answer.size <= 1) {
@@ -176,7 +176,7 @@ object QuestionnaireResponseValidator {
             linkIdToValidationResultMap,
             questionnaire,
             questionnaireItemParentMap,
-            launchContextMap
+            launchContextMap,
           )
         }
 

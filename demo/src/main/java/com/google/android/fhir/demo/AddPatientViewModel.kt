@@ -60,7 +60,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
             questionnaireResponse,
             getApplication(),
             mapOf(),
-            mapOf()
+            mapOf(),
           )
           .values
           .flatten()
@@ -70,7 +70,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
         return@launch
       }
 
-      val entry = ResourceMapper.extract(questionnaire, questionnaireResponse).entryFirstRep
+      val entry = ResourceMapper.extract(questionnaire, questionnaireResponse,).entryFirstRep
       if (entry.resource !is Patient) {
         return@launch
       }

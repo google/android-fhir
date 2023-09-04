@@ -59,7 +59,7 @@ class EnablementEvaluatorTest {
     val questionnaireResponse = QuestionnaireResponse().apply { addItem(questionnaireResponseItem) }
     assertThat(
         EnablementEvaluator(questionnaireResponse)
-          .evaluate(questionnaireItem, questionnaireResponseItem, questionnaire, mapOf(), mapOf())
+          .evaluate(questionnaireItem, questionnaireResponseItem, questionnaire, mapOf(), mapOf(),)
       )
       .isFalse()
   }
@@ -180,7 +180,7 @@ class EnablementEvaluatorTest {
             questionnaireResponse.item[1],
             questionnaire,
             mapOf(),
-            mapOf()
+            mapOf(),
           )
       )
       .isTrue()
@@ -262,7 +262,7 @@ class EnablementEvaluatorTest {
             questionnaireResponse.item[1],
             questionnaire,
             mapOf(),
-            mapOf()
+            mapOf(),
           )
       )
       .isFalse()
@@ -344,7 +344,7 @@ class EnablementEvaluatorTest {
               questionnaireResponse.item[1],
               questionnaire,
               mapOf(),
-              mapOf()
+              mapOf(),
             )
         )
         .isTrue()
@@ -793,7 +793,7 @@ class EnablementEvaluatorTest {
           questionnaireResponse.item.last(),
           questionnaire,
           mapOf(),
-          mapOf()
+          mapOf(),
         )
     )
   }
