@@ -37,16 +37,16 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 class AddPatientViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
 
-  val questionnaire: String
+  private var _questionnaireJson: String? = null
+  val questionnaireJson: String
     get() = getQuestionnaireJson()
   val isPatientSaved = MutableLiveData<Boolean>()
 
-  private val questionnaireResource: Questionnaire
+  private val questionnaire: Questionnaire
     get() =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire)
+      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaireJson)
         as Questionnaire
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
-  private var questionnaireJson: String? = null
 
   /**
    * Saves patient registration questionnaire response into the application database.
@@ -56,7 +56,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
   fun savePatient(questionnaireResponse: QuestionnaireResponse) {
     viewModelScope.launch {
       if (QuestionnaireResponseValidator.validateQuestionnaireResponse(
-            questionnaireResource,
+            questionnaire,
             questionnaireResponse,
             getApplication(),
             mapOf(),
@@ -70,7 +70,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
         return@launch
       }
 
-      val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
+      val entry = ResourceMapper.extract(questionnaire, questionnaireResponse).entryFirstRep
       if (entry.resource !is Patient) {
         return@launch
       }
@@ -82,11 +82,11 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
   }
 
   private fun getQuestionnaireJson(): String {
-    questionnaireJson?.let {
+    _questionnaireJson?.let {
       return it
     }
-    questionnaireJson = readFileFromAssets(state[AddPatientFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
-    return questionnaireJson!!
+    _questionnaireJson = readFileFromAssets(state[AddPatientFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+    return _questionnaireJson!!
   }
 
   private fun readFileFromAssets(filename: String): String {
