@@ -53,13 +53,12 @@ class EnablementEvaluatorTest {
         type = Questionnaire.QuestionnaireItemType.BOOLEAN
         addEnableWhen(Questionnaire.QuestionnaireItemEnableWhenComponent().setQuestion("q2"))
       }
-    val questionnaire = Questionnaire().addItem(questionnaireItem)
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "q1" }
     val questionnaireResponse = QuestionnaireResponse().apply { addItem(questionnaireResponseItem) }
     assertThat(
         EnablementEvaluator(questionnaireResponse)
-          .evaluate(questionnaireItem, questionnaireResponseItem, questionnaire, mapOf(), mapOf(),)
+          .evaluate(questionnaireItem, questionnaireResponseItem)
       )
       .isFalse()
   }
@@ -178,9 +177,6 @@ class EnablementEvaluatorTest {
           .evaluate(
             questionnaireItem,
             questionnaireResponse.item[1],
-            questionnaire,
-            mapOf(),
-            mapOf(),
           )
       )
       .isTrue()
@@ -260,9 +256,6 @@ class EnablementEvaluatorTest {
           .evaluate(
             questionnaireItemComponent,
             questionnaireResponse.item[1],
-            questionnaire,
-            mapOf(),
-            mapOf(),
           )
       )
       .isFalse()
@@ -342,9 +335,6 @@ class EnablementEvaluatorTest {
             .evaluate(
               questionnaireItem,
               questionnaireResponse.item[1],
-              questionnaire,
-              mapOf(),
-              mapOf(),
             )
         )
         .isTrue()
@@ -769,7 +759,6 @@ class EnablementEvaluatorTest {
         behavior?.let { enableBehavior = it }
         type = Questionnaire.QuestionnaireItemType.BOOLEAN
       }
-    val questionnaire = Questionnaire().addItem(questionnaireItem)
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         enableWhen.forEachIndexed { index, enableWhen ->
@@ -788,13 +777,7 @@ class EnablementEvaluatorTest {
       }
     return assertThat(
       EnablementEvaluator(questionnaireResponse)
-        .evaluate(
-          questionnaireItem,
-          questionnaireResponse.item.last(),
-          questionnaire,
-          mapOf(),
-          mapOf(),
-        )
+        .evaluate(questionnaireItem, questionnaireResponse.item.last())
     )
   }
 

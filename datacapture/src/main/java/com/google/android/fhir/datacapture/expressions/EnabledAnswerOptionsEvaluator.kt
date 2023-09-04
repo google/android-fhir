@@ -63,7 +63,7 @@ internal class EnabledAnswerOptionsEvaluator(
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     questionnaireResponse: QuestionnaireResponse,
     questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>,
-    launchContextMap: Map<String, Resource>?,
+    launchContextMap: Map<String, Resource>? = mapOf(),
   ): Pair<
     List<Questionnaire.QuestionnaireItemAnswerOptionComponent>,
     List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>

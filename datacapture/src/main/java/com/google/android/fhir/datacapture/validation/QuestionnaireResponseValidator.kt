@@ -59,8 +59,8 @@ object QuestionnaireResponseValidator {
     questionnaireResponse: QuestionnaireResponse,
     context: Context,
     questionnaireItemParentMap:
-      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
-    launchContextMap: Map<String, Resource>?,
+      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> = mapOf(),
+    launchContextMap: Map<String, Resource>? = mapOf(),
   ): Map<String, List<ValidationResult>> {
     require(
       questionnaireResponse.questionnaire == null ||
@@ -91,10 +91,10 @@ object QuestionnaireResponseValidator {
     context: Context,
     enablementEvaluator: EnablementEvaluator,
     linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>,
-    questionnaire: Questionnaire,
+    questionnaire: Questionnaire = Questionnaire(),
     questionnaireItemParentMap:
-      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
-    launchContextMap: Map<String, Resource>?,
+      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> = mapOf(),
+    launchContextMap: Map<String, Resource>? = mapOf(),
   ): Map<String, List<ValidationResult>> {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
@@ -140,10 +140,10 @@ object QuestionnaireResponseValidator {
     context: Context,
     enablementEvaluator: EnablementEvaluator,
     linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>,
-    questionnaire: Questionnaire,
+    questionnaire: Questionnaire = Questionnaire(),
     questionnaireItemParentMap:
-      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
-    launchContextMap: Map<String, Resource>?,
+      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> = mapOf(),
+    launchContextMap: Map<String, Resource>? = mapOf(),
   ): Map<String, List<ValidationResult>> {
 
     when (checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }) {

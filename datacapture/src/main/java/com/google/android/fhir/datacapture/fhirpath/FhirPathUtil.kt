@@ -49,7 +49,7 @@ internal fun evaluateToBoolean(
   questionnaireResponse: QuestionnaireResponse,
   questionnaireResponseItemComponent: QuestionnaireResponseItemComponent,
   expression: String,
-  contextMap: Map<String, Base?>,
+  contextMap: Map<String, Base?> = mapOf(),
 ): Boolean {
   val expressionNode = fhirPathEngine.parse(expression)
   return fhirPathEngine.evaluateToBoolean(

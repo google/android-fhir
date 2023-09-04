@@ -98,7 +98,7 @@ object ExpressionEvaluator {
     questionnaireResponseItem: QuestionnaireResponseItemComponent?,
     expression: Expression,
     questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>,
-    launchContextMap: Map<String, Resource>?,
+    launchContextMap: Map<String, Resource>? = mapOf(),
   ): List<Base> {
     val appContext =
       mutableMapOf<String, Base?>().apply {
@@ -130,8 +130,8 @@ object ExpressionEvaluator {
     updatedQuestionnaireResponseItemComponent: QuestionnaireResponseItemComponent?,
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>,
-    launchContextMap: Map<String, Resource>?,
+    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent> = mapOf(),
+    launchContextMap: Map<String, Resource>? = mapOf(),
   ): List<ItemToAnswersPair> {
     return questionnaire.item
       .flattened()
@@ -189,7 +189,7 @@ object ExpressionEvaluator {
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     variablesMap: MutableMap<String, Base?> = mutableMapOf(),
-    launchContextMap: Map<String, Resource>?,
+    launchContextMap: Map<String, Resource>? = mapOf(),
   ): Base? {
     require(
       questionnaireItem.variableExpressions.any {
@@ -230,7 +230,7 @@ object ExpressionEvaluator {
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     variablesMap: MutableMap<String, Base?> = mutableMapOf(),
-    launchContextMap: Map<String, Resource>?,
+    launchContextMap: Map<String, Resource>? = mapOf(),
   ) =
     findDependentVariables(expression).forEach { variableName ->
       if (variablesMap[variableName] == null) {
@@ -268,7 +268,7 @@ object ExpressionEvaluator {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     variablesMap: MutableMap<String, Base?> = mutableMapOf(),
-    launchContextMap: Map<String, Resource>?,
+    launchContextMap: Map<String, Resource>? = mapOf(),
   ): Base? {
     findDependentVariables(expression).forEach { variableName ->
       questionnaire.findVariableExpression(variableName)?.let { expression ->
@@ -298,7 +298,7 @@ object ExpressionEvaluator {
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>,
     expression: Expression,
-    launchContextMap: Map<String, Resource>?
+    launchContextMap: Map<String, Resource>? = mapOf(),
   ): String {
     // get all dependent variables and their evaluated values
     val variablesEvaluatedPairs =
@@ -318,7 +318,7 @@ object ExpressionEvaluator {
         .map { Pair("{{%${it.key}}}", it.value!!.primitiveValue()) }
 
     val fhirPathsEvaluatedPairs =
-      launchContextMap?.let { evaluateXFhirEnhancement(expression, it) } ?: emptySequence()
+      launchContextMap.takeIf { !it.isNullOrEmpty() }?.let { evaluateXFhirEnhancement(expression, it) } ?: emptySequence()
     return (fhirPathsEvaluatedPairs + variablesEvaluatedPairs).fold(expression.expression) {
       acc: String,
       pair: Pair<String, String> ->
@@ -400,8 +400,8 @@ object ExpressionEvaluator {
     questionnaireResponse: QuestionnaireResponse,
     questionnaireItemParentMap:
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>,
-    variablesMap: MutableMap<String, Base?>,
-    launchContextMap: Map<String, Resource>?,
+    variablesMap: MutableMap<String, Base?> = mutableMapOf(),
+    launchContextMap: Map<String, Resource>? = mapOf(),
   ) {
     // First, check the questionnaire item itself
     val evaluatedValue =
@@ -481,7 +481,7 @@ object ExpressionEvaluator {
     expression: Expression,
     questionnaireResponse: QuestionnaireResponse,
     dependentVariables: Map<String, Base?> = mapOf(),
-    launchContextMap: Map<String, Resource>?,
+    launchContextMap: Map<String, Resource>? = mapOf(),
   ) =
     try {
       require(expression.name?.isNotBlank() == true) {

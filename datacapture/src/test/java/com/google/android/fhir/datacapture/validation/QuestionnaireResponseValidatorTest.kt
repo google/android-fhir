@@ -83,8 +83,6 @@ class QuestionnaireResponseValidatorTest {
         questionnaire,
         questionnaireResponse,
         context,
-        mapOf(),
-        mapOf(),
       )
     assertThat(result["a-question"]!!.single()).isEqualTo(Valid)
   }
@@ -117,8 +115,6 @@ class QuestionnaireResponseValidatorTest {
         questionnaire,
         questionnaireResponse,
         context,
-        mapOf(),
-        mapOf(),
       )
     assertThat(result["a-question"]!!.single())
       .isEqualTo(
@@ -171,8 +167,6 @@ class QuestionnaireResponseValidatorTest {
         questionnaire,
         questionnaireResponse,
         context,
-        mapOf(),
-        mapOf(),
       )
     assertThat(result["a-question"])
       .containsExactly(
@@ -242,8 +236,6 @@ class QuestionnaireResponseValidatorTest {
         questionnaire,
         questionnaireResponse,
         context,
-        mapOf(),
-        mapOf(),
       )
     assertThat(result.keys).containsExactly("q1")
     assertThat(result["q1"]).containsExactly(Valid)
@@ -295,8 +287,6 @@ class QuestionnaireResponseValidatorTest {
         questionnaire,
         questionnaireResponse,
         context,
-        mapOf(),
-        mapOf(),
       )
     assertThat(result["question-1"]!!.single()).isEqualTo(Valid)
   }
@@ -311,8 +301,6 @@ class QuestionnaireResponseValidatorTest {
         questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
       },
       context,
-      mapOf(),
-      mapOf(),
     )
   }
 
@@ -332,8 +320,6 @@ class QuestionnaireResponseValidatorTest {
       Questionnaire().apply { url = "questionnaire-1" },
       QuestionnaireResponse(),
       context,
-      mapOf(),
-      mapOf(),
     )
   }
 
@@ -402,8 +388,6 @@ class QuestionnaireResponseValidatorTest {
         addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("display-1")))
       },
       context,
-      mapOf(),
-      mapOf(),
     )
   }
 
@@ -427,8 +411,6 @@ class QuestionnaireResponseValidatorTest {
         addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("null-1")))
       },
       context,
-      mapOf(),
-      mapOf(),
     )
   }
 
@@ -467,8 +449,6 @@ class QuestionnaireResponseValidatorTest {
         questionnaire,
         questionnaireResponse,
         context,
-        mapOf(),
-        mapOf(),
       )
 
     assertThat(result.entries.first().key).isEqualTo("valid-hidden-item")
@@ -510,8 +490,6 @@ class QuestionnaireResponseValidatorTest {
           questionnaire,
           questionnaireResponse,
           context,
-          mapOf(),
-          mapOf(),
         )
         .entries.first()
 
@@ -1672,8 +1650,6 @@ class QuestionnaireResponseValidatorTest {
           questionnaire,
           questionnaireResponse,
           context,
-          mapOf(),
-          mapOf(),
         )
       }
     assertThat(exception.message).isEqualTo(message)
@@ -1691,8 +1667,6 @@ class QuestionnaireResponseValidatorTest {
           questionnaire,
           questionnaireResponse,
           context,
-          mapOf(),
-          mapOf(),
         )
       }
     assertThat(exception.message).isEqualTo(message)

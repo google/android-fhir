@@ -59,8 +59,6 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
             questionnaire,
             questionnaireResponse,
             getApplication(),
-            mapOf(),
-            mapOf(),
           )
           .values
           .flatten()
