@@ -39,7 +39,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
 
   private var _questionnaireJson: String? = null
   val questionnaireJson: String
-    get() = getQuestionnaireJson()
+    get() = fetchQuestionnaireJson()
   val isPatientSaved = MutableLiveData<Boolean>()
 
   private val questionnaire: Questionnaire
@@ -84,7 +84,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
     }
   }
 
-  private fun getQuestionnaireJson(): String {
+  private fun fetchQuestionnaireJson(): String {
     _questionnaireJson?.let {
       return it
     }
