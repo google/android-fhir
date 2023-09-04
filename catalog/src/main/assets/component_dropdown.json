@@ -1,23 +1,8 @@
 {
   "resourceType": "Questionnaire",
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/variable",
-      "valueExpression": {
-        "name": "fikri",
-        "language": "text/fhirpath",
-        "expression": "%resource.descendants().where(linkId='1').answer.value"
-      }
-    }
-  ],
   "item": [
     {
       "linkId": "1",
-      "type": "boolean",
-      "text": "Choose one from the options below"
-    },
-    {
-      "linkId": "2",
       "type": "choice",
       "extension": [
         {
@@ -31,13 +16,6 @@
               }
             ],
             "text": "Drop down"
-          }
-        },
-        {
-          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
-          "valueExpression": {
-            "language": "text/fhirpath",
-            "expression": "%fikri"
           }
         }
       ],
