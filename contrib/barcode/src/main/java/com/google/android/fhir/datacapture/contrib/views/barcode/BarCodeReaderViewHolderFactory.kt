@@ -111,6 +111,9 @@ object BarCodeReaderViewHolderFactory :
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {}
+      override fun addContentDescription() {
+        TODO("Not yet implemented")
+      }
     }
 
   const val WIDGET_EXTENSION = "https://fhir.labs.smartregister.org/barcode-type-widget-extension"

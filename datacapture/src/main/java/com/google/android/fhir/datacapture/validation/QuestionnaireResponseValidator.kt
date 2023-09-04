@@ -85,25 +85,23 @@ object QuestionnaireResponseValidator {
     enablementEvaluator: EnablementEvaluator,
     linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>,
   ): Map<String, List<ValidationResult>> {
-    val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
 
     while (questionnaireResponseItemListIterator.hasNext()) {
-      val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
-      var questionnaireItem: Questionnaire.QuestionnaireItemComponent?
-      do {
-        require(questionnaireItemListIterator.hasNext()) {
-          "Missing questionnaire item for questionnaire response item ${questionnaireResponseItem.linkId}"
-        }
-        questionnaireItem = questionnaireItemListIterator.next()
-      } while (questionnaireItem!!.linkId != questionnaireResponseItem.linkId)
+      val currentQuestionnaireResponseItem = questionnaireResponseItemListIterator.next()
+      val currentQuestionnaireItem =
+        questionnaireItemList.find { it.linkId == currentQuestionnaireResponseItem.linkId }
+      check(currentQuestionnaireItem != null) {
+        "Missing questionnaire item for questionnaire response item ${currentQuestionnaireResponseItem.linkId}"
+      }
 
-      val enabled = enablementEvaluator.evaluate(questionnaireItem, questionnaireResponseItem)
+      val enabled =
+        enablementEvaluator.evaluate(currentQuestionnaireItem, currentQuestionnaireResponseItem)
 
       if (enabled) {
         validateQuestionnaireResponseItem(
-          questionnaireItem,
-          questionnaireResponseItem,
+          currentQuestionnaireItem,
+          currentQuestionnaireResponseItem,
           context,
           enablementEvaluator,
           linkIdToValidationResultMap,
