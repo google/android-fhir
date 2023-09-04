@@ -59,7 +59,8 @@ object QuestionnaireResponseValidator {
     questionnaireResponse: QuestionnaireResponse,
     context: Context,
     questionnaireItemParentMap:
-      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> = mapOf(),
+      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> =
+      mapOf(),
     launchContextMap: Map<String, Resource>? = mapOf(),
   ): Map<String, List<ValidationResult>> {
     require(
@@ -93,7 +94,8 @@ object QuestionnaireResponseValidator {
     linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>,
     questionnaire: Questionnaire = Questionnaire(),
     questionnaireItemParentMap:
-      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> = mapOf(),
+      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> =
+      mapOf(),
     launchContextMap: Map<String, Resource>? = mapOf(),
   ): Map<String, List<ValidationResult>> {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
@@ -142,7 +144,8 @@ object QuestionnaireResponseValidator {
     linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>,
     questionnaire: Questionnaire = Questionnaire(),
     questionnaireItemParentMap:
-      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> = mapOf(),
+      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> =
+      mapOf(),
     launchContextMap: Map<String, Resource>? = mapOf(),
   ): Map<String, List<ValidationResult>> {
 

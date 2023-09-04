@@ -130,7 +130,8 @@ object ExpressionEvaluator {
     updatedQuestionnaireResponseItemComponent: QuestionnaireResponseItemComponent?,
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent> = mapOf(),
+    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent> =
+      mapOf(),
     launchContextMap: Map<String, Resource>? = mapOf(),
   ): List<ItemToAnswersPair> {
     return questionnaire.item
@@ -206,7 +207,12 @@ object ExpressionEvaluator {
       launchContextMap,
     )
 
-    return evaluateVariable(expression, questionnaireResponse, variablesMap, launchContextMap,)
+    return evaluateVariable(
+      expression,
+      questionnaireResponse,
+      variablesMap,
+      launchContextMap,
+    )
   }
 
   /**
@@ -285,7 +291,12 @@ object ExpressionEvaluator {
       }
     }
 
-    return evaluateVariable(expression, questionnaireResponse, variablesMap, launchContextMap,)
+    return evaluateVariable(
+      expression,
+      questionnaireResponse,
+      variablesMap,
+      launchContextMap,
+    )
   }
 
   /**
@@ -318,7 +329,10 @@ object ExpressionEvaluator {
         .map { Pair("{{%${it.key}}}", it.value!!.primitiveValue()) }
 
     val fhirPathsEvaluatedPairs =
-      launchContextMap.takeIf { !it.isNullOrEmpty() }?.let { evaluateXFhirEnhancement(expression, it) } ?: emptySequence()
+      launchContextMap
+        .takeIf { !it.isNullOrEmpty() }
+        ?.let { evaluateXFhirEnhancement(expression, it) }
+        ?: emptySequence()
     return (fhirPathsEvaluatedPairs + variablesEvaluatedPairs).fold(expression.expression) {
       acc: String,
       pair: Pair<String, String> ->
@@ -500,7 +514,13 @@ object ExpressionEvaluator {
           }
         }
       fhirPathEngine
-        .evaluate(contextMap, questionnaireResponse, null, null, expression.expression,)
+        .evaluate(
+          contextMap,
+          questionnaireResponse,
+          null,
+          null,
+          expression.expression,
+        )
         .firstOrNull()
     } catch (exception: FHIRException) {
       Timber.w("Could not evaluate expression with FHIRPathEngine", exception)

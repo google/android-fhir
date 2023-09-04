@@ -105,7 +105,8 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     questionnaire: Questionnaire = Questionnaire(),
     questionnaireItemParentMap:
-      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> = mapOf(),
+      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> =
+      mapOf(),
     launchContextMap: Map<String, Resource>? = mapOf(),
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhen
