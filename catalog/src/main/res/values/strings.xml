@@ -41,6 +41,7 @@
     <string name="layout_name_review">Review</string>
     <string name="layout_name_read_only">Read only</string>
     <string name="behavior_name_skip_logic">Skip logic</string>
+    <string name="behavior_name_skip_logic_with_expression">Skip logic with expression</string>
     <string
         name="behavior_name_skip_logic_info"
     >If Yes is selected, a follow-up question is displayed. If No is selected, no follow-up questions are displayed.</string>

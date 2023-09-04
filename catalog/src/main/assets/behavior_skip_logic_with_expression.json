@@ -1,0 +1,34 @@
+{
+  "resourceType": "Questionnaire",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "has-fever",
+        "language": "text/fhirpath",
+        "expression": "%resource.descendants().where(linkId='1').answer.value"
+      }
+    }
+  ],
+  "item": [
+    {
+      "linkId": "1",
+      "type": "boolean",
+      "text": "Does patient has fever?"
+    },
+    {
+      "linkId": "2",
+      "text": "Since when?",
+      "type": "date",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
+          "valueExpression": {
+            "language": "text/fhirpath",
+            "expression": "%has-fever"
+          }
+        }
+      ]
+    }
+  ]
+}
