@@ -26,7 +26,6 @@ import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.datacapture.DataCaptureConfig
 import com.google.android.fhir.datacapture.XFhirQueryResolver
-import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.remote.HttpLogger
 import timber.log.Timber
@@ -64,14 +63,7 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
     dataCaptureConfig =
       DataCaptureConfig().apply {
         urlResolver = ReferenceUrlResolver(this@FhirApplication as Context)
-        xFhirQueryResolver = XFhirQueryResolver {
-          try {
-            fhirEngine.search(it).map { it.resource }
-          } catch (e: ResourceNotFoundException) {
-            Timber.e(e)
-            emptyList()
-          }
-        }
+        xFhirQueryResolver = XFhirQueryResolver { fhirEngine.search(it).map { it.resource } }
       }
   }
 
