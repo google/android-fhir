@@ -160,7 +160,13 @@ class AutoCompleteViewHolderFactoryTest {
             Coding().setCode("test1-code").setDisplay("Test Code").setId("test1-code") as Coding
           ),
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
-          .setValue(Coding().setCode("test2-code").setDisplay("Test Code") as Coding)
+          .setValue(
+            Coding()
+              .setSystem("http://answers/test-codes")
+              .setVersion("1.0")
+              .setCode("test2-code")
+              .setDisplay("Test Code") as Coding
+          )
       )
 
     val fakeAnswerValueSetResolver = { uri: String ->
@@ -189,7 +195,10 @@ class AutoCompleteViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
                 answers
-                  .first { it.value.identifierString(parent.context) == "test2-code" }
+                  .first {
+                    it.value.identifierString(parent.context) ==
+                      "http://answers/test-codes1.0|test2-code"
+                  }
                   .valueCoding
             }
           )
