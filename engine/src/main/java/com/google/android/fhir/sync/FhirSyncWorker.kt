@@ -69,7 +69,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
     val job =
       CoroutineScope(Dispatchers.IO).launch {
         val fhirDataStore = FhirEngineProvider.getFhirDataStore()
-        val uniqueWorkerName = inputData.getString(PREFERENCES_DATASTORE_STRING_KEY)!!
+        val uniqueWorkerName = inputData.getString(STRING_PREFERENCES_DATASTORE_KEY)!!
         flow.collect {
           // now send Progress to work manager so caller app can listen
           fhirDataStore?.updateSyncJobStatus(

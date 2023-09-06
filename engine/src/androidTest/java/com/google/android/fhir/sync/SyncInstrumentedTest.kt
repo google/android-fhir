@@ -64,8 +64,8 @@ class SyncInstrumentedTest {
     runBlocking {
       Sync.oneTimeSync<TestSyncWorker>(context = context)
         .transformWhile {
-          emit(it.status is SyncJobStatus.Finished)
-          it.status !is SyncJobStatus.Finished
+          emit(it.lastSyncJobStatus is SyncJobStatus.Finished)
+          it.lastSyncJobStatus !is SyncJobStatus.Finished
         }
         .shareIn(this, SharingStarted.Eagerly, 5)
     }
@@ -90,7 +90,7 @@ class SyncInstrumentedTest {
         )
         .transformWhile {
           emit(it)
-          it.status !is SyncJobStatus.Finished
+          it.lastSyncJobStatus !is SyncJobStatus.Finished
         }
         .shareIn(this, SharingStarted.Eagerly, 5)
     }
@@ -106,7 +106,7 @@ class SyncInstrumentedTest {
       Sync.oneTimeSync<TestSyncWorker>(context = context)
         .transformWhile {
           emit(it)
-          it.status !is SyncJobStatus.Finished
+          it.lastSyncJobStatus !is SyncJobStatus.Finished
         }
         .shareIn(this, SharingStarted.Eagerly, 5)
     }

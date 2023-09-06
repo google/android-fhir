@@ -61,24 +61,24 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         )
         .shareIn(this, SharingStarted.Eagerly, 10)
         .collect {
-          if (it.status != null) {
-            _pollState.emit(it.status!!)
+          if (it.lastSyncJobStatus != null) {
+            _pollState.emit(it.lastSyncJobStatus!!)
           }
         }
     }
   }
 
-  private var oneTimeSynjob: Job? = null
+  private var oneTimeSyncJob: Job? = null
   fun triggerOneTimeSync() {
-    //    Cancels any ongoing sync job before starting a new one. Since this function may be called
+    // Cancels any ongoing sync job before starting a new one. Since this function may be called
     // more than once, not canceling the ongoing job could result in the creation of multiple jobs
     // that emit the same object.
-    oneTimeSynjob?.cancel()
-    oneTimeSynjob =
+    oneTimeSyncJob?.cancel()
+    oneTimeSyncJob =
       viewModelScope.launch {
         Sync.oneTimeSync<DemoFhirSyncWorker>(getApplication())
           .shareIn(this, SharingStarted.Eagerly, 0)
-          .collect { result -> result.status?.let { _pollState.emit(it) } }
+          .collect { result -> result.lastSyncJobStatus?.let { _pollState.emit(it) } }
       }
   }
 

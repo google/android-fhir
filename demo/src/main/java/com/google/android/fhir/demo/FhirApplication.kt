@@ -57,7 +57,7 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
             ) { Timber.tag("App-HttpLog").d(it) },
           networkConfiguration = NetworkConfiguration(uploadWithGzip = false)
         ),
-        context = applicationContext
+        context = applicationContext,
       )
     )
 

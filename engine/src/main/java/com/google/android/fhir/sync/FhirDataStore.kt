@@ -32,6 +32,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.mapNotNull
 
 private const val FHIR_PREFERENCES_NAME = "fhir_preferences"
+private const val STATE_TYPE = "StateType"
+private const val STATE = "State"
 
 @PublishedApi
 internal class FhirDataStore(context: Context) {
@@ -50,10 +52,10 @@ internal class FhirDataStore(context: Context) {
   /**
    * Utilizes a flow from the DataStore to collect and transform data. It catches potential
    * IOExceptions and emits an empty preference instance in such cases. The collected data is then
-   * mapped into a [SyncJobStatusPreferences].
+   * mapped into a [FhirSyncWorkStatus].
    *
    * @param key The key associated with the data to collect.
-   * @return A flow that emits the [SyncJobStatusPreferences].
+   * @return A flow that emits the [FhirSyncWorkStatus].
    */
   @PublishedApi
   internal fun getSyncJobStatusPreferencesFlow(key: String): Flow<SyncJobStatus> =
@@ -69,8 +71,8 @@ internal class FhirDataStore(context: Context) {
         .mapNotNull { preferences -> preferences[stringPreferencesKey(key)] }
         .mapNotNull { statusData -> gson.fromJson(statusData, Data::class.java) }
         .mapNotNull { data ->
-          val stateType = data.getString("StateType")
-          val stateData = data.getString("State")
+          val stateType = data.getString(STATE_TYPE)
+          val stateData = data.getString(STATE)
           stateType?.let { type ->
             stateData?.let { gson.fromJson(stateData, Class.forName(type)) as? SyncJobStatus }
           }
@@ -89,8 +91,8 @@ internal class FhirDataStore(context: Context) {
     dataStore.edit { preferences ->
       val data =
         workDataOf(
-          "StateType" to syncJobStatus::class.java.name,
-          "State" to gson.toJson(syncJobStatus)
+          STATE_TYPE to syncJobStatus::class.java.name,
+          STATE to gson.toJson(syncJobStatus)
         )
       preferences[stringPreferencesKey(key)] = gson.toJson(data)
     }

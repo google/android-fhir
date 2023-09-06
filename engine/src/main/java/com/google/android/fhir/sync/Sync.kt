@@ -53,12 +53,12 @@ object Sync {
    * the same [FhirSyncWorker] to retrieve the status of the job.
    *
    * @param retryConfiguration configuration to guide the retry mechanism, or `null` to stop retry.
-   * @return a [Flow] of [SyncJobStatusPreferences]
+   * @return a [Flow] of [FhirSyncWorkStatus]
    */
   inline fun <reified W : FhirSyncWorker> oneTimeSync(
     context: Context,
     retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
-  ): Flow<SyncJobStatusPreferences> {
+  ): Flow<FhirSyncWorkStatus> {
     val uniqueWorkName = "${W::class.java.name}-oneTimeSync"
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
@@ -77,13 +77,13 @@ object Sync {
    *
    * @param periodicSyncConfiguration configuration to determine the sync frequency and retry
    * mechanism
-   * @return a [Flow] of [SyncJobStatusPreferences]
+   * @return a [Flow] of [FhirSyncWorkStatus]
    */
   @ExperimentalCoroutinesApi
   inline fun <reified W : FhirSyncWorker> periodicSync(
     context: Context,
     periodicSyncConfiguration: PeriodicSyncConfiguration
-  ): Flow<SyncJobStatusPreferences> {
+  ): Flow<FhirSyncWorkStatus> {
     val uniqueWorkName = "${W::class.java.name}-periodicSync"
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
@@ -114,17 +114,17 @@ object Sync {
   internal fun combineSyncJobStatusAndWorkInfoState(
     context: Context,
     workName: String
-  ): Flow<SyncJobStatusPreferences> {
+  ): Flow<FhirSyncWorkStatus> {
     val workStateFlow: Flow<WorkInfo.State> = observeWorkState(context, workName)
     val syncJobStatusFlow: Flow<SyncJobStatus>? =
       FhirEngineProvider.getFhirDataStore()?.getSyncJobStatusPreferencesFlow(workName)
 
     return if (syncJobStatusFlow != null) {
       workStateFlow.combine(syncJobStatusFlow) { workState, syncStatus ->
-        SyncJobStatusPreferences(syncStatus, workState)
+        FhirSyncWorkStatus(syncStatus, workState)
       }
     } else {
-      workStateFlow.map { workState -> SyncJobStatusPreferences(state = workState) }
+      workStateFlow.map { workState -> FhirSyncWorkStatus(schedulingStatus = workState) }
     }
   }
 
@@ -151,7 +151,7 @@ object Sync {
       oneTimeWorkRequestBuilder.setInputData(
         Data.Builder()
           .putInt(MAX_RETRIES_ALLOWED, it.maxRetries)
-          .putString(PREFERENCES_DATASTORE_STRING_KEY, uniqueWorkName)
+          .putString(STRING_PREFERENCES_DATASTORE_KEY, uniqueWorkName)
           .build()
       )
     }
@@ -181,7 +181,7 @@ object Sync {
       periodicWorkRequestBuilder.setInputData(
         Data.Builder()
           .putInt(MAX_RETRIES_ALLOWED, it.maxRetries)
-          .putString(PREFERENCES_DATASTORE_STRING_KEY, uniqueWorkName)
+          .putString(STRING_PREFERENCES_DATASTORE_KEY, uniqueWorkName)
           .build()
       )
     }
@@ -194,7 +194,7 @@ object Sync {
   }
 }
 
-data class SyncJobStatusPreferences(
-  val status: SyncJobStatus? = null,
-  var state: WorkInfo.State? = null
+data class FhirSyncWorkStatus(
+  val lastSyncJobStatus: SyncJobStatus? = null,
+  var schedulingStatus: WorkInfo.State? = null,
 )

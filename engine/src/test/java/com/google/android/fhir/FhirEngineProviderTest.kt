@@ -55,7 +55,7 @@ class FhirEngineProviderTest {
     provider.init(
       FhirEngineConfiguration(
         testMode = true,
-        context = ApplicationProvider.getApplicationContext()
+        context = ApplicationProvider.getApplicationContext(),
       )
     )
     val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
@@ -69,7 +69,7 @@ class FhirEngineProviderTest {
     provider.init(
       FhirEngineConfiguration(
         testMode = false,
-        context = ApplicationProvider.getApplicationContext()
+        context = ApplicationProvider.getApplicationContext(),
       )
     )
 
