@@ -499,6 +499,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId }
             )
           }
+          modificationCount.update { it + 1 }
         }
       }
       .map { it.value }
