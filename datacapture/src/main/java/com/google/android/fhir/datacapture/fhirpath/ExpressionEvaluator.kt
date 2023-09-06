@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.fhirpath
 
-import android.util.Log
 import com.google.android.fhir.datacapture.extensions.calculatedExpression
 import com.google.android.fhir.datacapture.extensions.findVariableExpression
 import com.google.android.fhir.datacapture.extensions.flattened
@@ -213,7 +212,6 @@ internal class ExpressionEvaluator(
         )
       }
     }
-    Log.d("FIKRI", questionnaireLaunchContextMap?.size.toString())
     questionnaireLaunchContextMap?.let { variablesMap.putAll(it) }
     return variablesMap
   }
