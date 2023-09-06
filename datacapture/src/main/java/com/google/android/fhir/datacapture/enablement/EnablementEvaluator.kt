@@ -22,10 +22,8 @@ import com.google.android.fhir.datacapture.extensions.enableWhenExpression
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.evaluateToBoolean
 import com.google.android.fhir.equals
-import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.Resource
 
 /**
  * Evaluator for the enablement status of a [Questionnaire.QuestionnaireItemComponent].
@@ -62,7 +60,10 @@ import org.hl7.fhir.r4.model.Resource
  * [Questionnaire.item.enableBehavior](https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableBehavior)
  * .
  */
-internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireResponse) {
+internal class EnablementEvaluator(
+  private val questionnaireResponse: QuestionnaireResponse,
+  private val expressionEvaluator: ExpressionEvaluator,
+) {
   /**
    * The pre-order traversal trace of the items in the [QuestionnaireResponse]. This essentially
    * represents the order in which all items are displayed in the UI.
@@ -103,11 +104,6 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
   fun evaluate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-    questionnaire: Questionnaire = Questionnaire(),
-    questionnaireItemParentMap:
-      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> =
-      mapOf(),
-    launchContextMap: Map<String, Resource>? = mapOf(),
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhen
     val enableWhenExpression = questionnaireItem.enableWhenExpression
@@ -119,20 +115,10 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
     // Evaluate `enableWhenExpression`.
     if (enableWhenExpression != null && enableWhenExpression.hasExpression()) {
       val contextMap =
-        mutableMapOf<String, Base?>().apply {
-          ExpressionEvaluator.extractDependentVariables(
-            questionnaireItem.enableWhenExpression!!,
-            questionnaire,
-            questionnaireResponse,
-            questionnaireItemParentMap,
-            questionnaireItem,
-            this,
-            launchContextMap,
-          )
-          if (launchContextMap != null) {
-            putAll(launchContextMap)
-          }
-        }
+        expressionEvaluator.extractDependentVariables(
+          questionnaireItem.enableWhenExpression!!,
+          questionnaireItem,
+        )
       return evaluateToBoolean(
         questionnaireResponse,
         questionnaireResponseItem,

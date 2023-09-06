@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.enablement
 import android.os.Build
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.common.truth.BooleanSubject
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -53,11 +54,13 @@ class EnablementEvaluatorTest {
         type = Questionnaire.QuestionnaireItemType.BOOLEAN
         addEnableWhen(Questionnaire.QuestionnaireItemEnableWhenComponent().setQuestion("q2"))
       }
+    val questionnaire = Questionnaire().apply { addItem(questionnaireItem) }
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "q1" }
     val questionnaireResponse = QuestionnaireResponse().apply { addItem(questionnaireResponseItem) }
+    val expressionEvaluator = ExpressionEvaluator(questionnaire, questionnaireResponse)
     assertThat(
-        EnablementEvaluator(questionnaireResponse)
+        EnablementEvaluator(questionnaireResponse, expressionEvaluator)
           .evaluate(questionnaireItem, questionnaireResponseItem)
       )
       .isFalse()
@@ -158,7 +161,7 @@ class EnablementEvaluatorTest {
             "linkId": "2"
         }
     ]
-      } 
+      }
       """.trimIndent()
 
     val questionnaire =
@@ -172,8 +175,10 @@ class EnablementEvaluatorTest {
       iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
         as QuestionnaireResponse
 
+    val expressionEvaluator = ExpressionEvaluator(questionnaire, questionnaireResponse)
+
     assertThat(
-        EnablementEvaluator(questionnaireResponse)
+        EnablementEvaluator(questionnaireResponse, expressionEvaluator)
           .evaluate(
             questionnaireItem,
             questionnaireResponse.item[1],
@@ -238,7 +243,7 @@ class EnablementEvaluatorTest {
             "linkId": "2"
         }
     ]
-      } 
+      }
       """.trimIndent()
 
     val questionnaire =
@@ -251,8 +256,10 @@ class EnablementEvaluatorTest {
       iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
         as QuestionnaireResponse
 
+    val expressionEvaluator = ExpressionEvaluator(questionnaire, questionnaireResponse)
+
     assertThat(
-        EnablementEvaluator(questionnaireResponse)
+        EnablementEvaluator(questionnaireResponse, expressionEvaluator)
           .evaluate(
             questionnaireItemComponent,
             questionnaireResponse.item[1],
@@ -317,7 +324,7 @@ class EnablementEvaluatorTest {
           "linkId": "female"
         }
       ]
-    } 
+    }
         """.trimIndent()
 
       val questionnaire =
@@ -330,8 +337,10 @@ class EnablementEvaluatorTest {
         iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
           as QuestionnaireResponse
 
+      val expressionEvaluator = ExpressionEvaluator(questionnaire, questionnaireResponse)
+
       assertThat(
-          EnablementEvaluator(questionnaireResponse)
+          EnablementEvaluator(questionnaireResponse, expressionEvaluator)
             .evaluate(
               questionnaireItem,
               questionnaireResponse.item[1],
@@ -759,6 +768,7 @@ class EnablementEvaluatorTest {
         behavior?.let { enableBehavior = it }
         type = Questionnaire.QuestionnaireItemType.BOOLEAN
       }
+    val questionnaire = Questionnaire().apply { addItem(questionnaireItem) }
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         enableWhen.forEachIndexed { index, enableWhen ->
@@ -775,8 +785,11 @@ class EnablementEvaluatorTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "target" }
         )
       }
+
+    val expressionEvaluator = ExpressionEvaluator(questionnaire, questionnaireResponse)
+
     return assertThat(
-      EnablementEvaluator(questionnaireResponse)
+      EnablementEvaluator(questionnaireResponse, expressionEvaluator)
         .evaluate(questionnaireItem, questionnaireResponse.item.last())
     )
   }
