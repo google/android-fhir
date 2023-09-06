@@ -341,6 +341,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       questionnaireLaunchContextMap
     )
 
+  private val enablementEvaluator: EnablementEvaluator =
+    EnablementEvaluator(questionnaireResponse, expressionEvaluator)
+
   private val answerOptionsEvaluator: EnabledAnswerOptionsEvaluator =
     EnabledAnswerOptionsEvaluator(
       questionnaire,
@@ -657,11 +660,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     // Hidden questions should not get QuestionnaireItemViewItem instances
     if (questionnaireItem.isHidden) return emptyList()
     val enabled =
-      EnablementEvaluator(questionnaireResponse, expressionEvaluator)
-        .evaluate(
-          questionnaireItem,
-          questionnaireResponseItem,
-        )
+      enablementEvaluator.evaluate(
+        questionnaireItem,
+        questionnaireResponseItem,
+      )
     // Disabled questions should not get QuestionnaireItemViewItem instances
     if (!enabled) {
       cacheDisabledQuestionnaireItemAnswers(questionnaireResponseItem)
@@ -718,11 +720,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             enabledDisplayItems =
               questionnaireItem.item.filter {
                 it.isDisplayItem &&
-                  EnablementEvaluator(questionnaireResponse, expressionEvaluator)
-                    .evaluate(
-                      it,
-                      questionnaireResponseItem,
-                    )
+                  enablementEvaluator.evaluate(
+                    it,
+                    questionnaireResponseItem,
+                  )
               },
             questionViewTextConfiguration =
               QuestionTextConfiguration(
@@ -799,7 +800,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireItemList: List<QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>,
   ): List<QuestionnaireResponseItemComponent> {
-    val enablementEvaluator = EnablementEvaluator(questionnaireResponse, expressionEvaluator)
     val responseItemKeys = questionnaireResponseItemList.map { it.linkId }
     return questionnaireItemList
       .asSequence()
@@ -837,11 +837,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         ->
         QuestionnairePage(
           index,
-          EnablementEvaluator(questionnaireResponse, expressionEvaluator)
-            .evaluate(
-              questionnaireItem,
-              questionnaireResponseItem,
-            ),
+          enablementEvaluator.evaluate(
+            questionnaireItem,
+            questionnaireResponseItem,
+          ),
           questionnaireItem.isHidden
         )
       }
