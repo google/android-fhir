@@ -31,10 +31,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.mapNotNull
 
-private const val FHIR_PREFERENCES_NAME = "fhir_preferences"
-private const val STATE_TYPE = "StateType"
-private const val STATE = "State"
-
 @PublishedApi
 internal class FhirDataStore(context: Context) {
   private val Context.dataStore by
@@ -96,5 +92,11 @@ internal class FhirDataStore(context: Context) {
         )
       preferences[stringPreferencesKey(key)] = gson.toJson(data)
     }
+  }
+
+  companion object {
+    private const val FHIR_PREFERENCES_NAME = "fhir_preferences"
+    private const val STATE_TYPE = "StateType"
+    private const val STATE = "State"
   }
 }
