@@ -51,8 +51,12 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * is shown or hidden. However, it is also possible that only user interaction is enabled or
  * disabled (e.g. grayed out) with the [Questionnaire.QuestionnaireItemComponent] always shown.
  *
- * The evaluator does not track the changes in the `questionnaire` and `questionnaireResponse`.
- * Therefore, a new evaluator should be created if they were modified.
+ * The evaluator represents a session of [Questionnaire].
+ *
+ * To ensure the safe and accurate tracking of changes of the [Questionnaire] and
+ * [QuestionnaireResponse], it is crucial to associate the evaluator's lifecycle with a ViewModel or
+ * other lifecycle-aware class. If no lifecycle-aware class is available, create a new evaluator
+ * instance to manage its own lifecycle.
  *
  * For more information see
  * [Questionnaire.item.enableWhen](https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableWhen)
@@ -99,6 +103,7 @@ internal class EnablementEvaluator(
   /**
    * Returns whether [questionnaireItem] should be enabled.
    *
+   * @param questionnaireItem the corresponding questionnaire item.
    * @param questionnaireResponseItem the corresponding questionnaire response item.
    */
   fun evaluate(

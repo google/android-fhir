@@ -35,6 +35,13 @@ import timber.log.Timber
 /**
  * Evaluates an expression and returns its result.
  *
+ * The evaluator represents a session of [Questionnaire].
+ *
+ * To ensure the safe and accurate tracking of changes of the [Questionnaire] and
+ * [QuestionnaireResponse], it is crucial to associate the evaluator's lifecycle with a ViewModel or
+ * other lifecycle-aware class. If no lifecycle-aware class is available, create a new evaluator
+ * instance to manage its own lifecycle.
+ *
  * Expressions can be defined at questionnaire level and questionnaire item level. This
  * [ExpressionEvaluator] supports evaluation of
  * [variable expression](http://hl7.org/fhir/R4/extension-variable.html) defined at either
@@ -153,9 +160,6 @@ internal class ExpressionEvaluator(
    * expression being evaluated.
    *
    * @param expression the [Expression] Variable expression
-   * @param questionnaire the [Questionnaire] respective questionnaire
-   * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
-   * @param questionnaireItemParentMap the [Map<Questionnaire.QuestionnaireItemComponent,
    * Questionnaire.QuestionnaireItemComponent>] of child to parent
    * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] where this expression
    * is defined,
@@ -190,10 +194,6 @@ internal class ExpressionEvaluator(
    * values respecting the scope and hierarchy level
    *
    * @param expression the [Expression] expression to find variables applicable
-   * @param questionnaire the [Questionnaire] respective questionnaire
-   * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
-   * @param questionnaireItemParentMap the [Map<Questionnaire.QuestionnaireItemComponent,
-   * Questionnaire.QuestionnaireItemComponent>] of child to parent
    * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] where this expression
    * @param variablesMap the [Map<String, Base>] of variables, the default value is empty map is
    * defined
@@ -227,8 +227,6 @@ internal class ExpressionEvaluator(
    * the evaluated values to the expression being evaluated.
    *
    * @param expression the [Expression] Variable expression
-   * @param questionnaire the [Questionnaire] respective questionnaire
-   * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
    * @param variablesMap the [Map<String, Base>] of variables, the default value is empty map
    *
    * @return [Base] the result of expression
@@ -292,7 +290,7 @@ internal class ExpressionEvaluator(
    *
    * @param expression x-fhir-query expression containing a FHIRpath, e.g.
    * Practitioner?active=true&{{Practitioner.name.family}}
-   * @param questionnaireLaunchContextMap the launch context to evaluate the expression against
+   * @param launchContextMap the launch context to evaluate the expression against
    */
   private fun evaluateXFhirEnhancement(
     expression: Expression,
@@ -346,10 +344,6 @@ internal class ExpressionEvaluator(
    * @param variableName the [String] to match the variable in the ancestors
    * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] from where we have to
    * track hierarchy up in the ancestors
-   * @param questionnaire the [Questionnaire] respective questionnaire
-   * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
-   * @param questionnaireItemParentMap the [Map<Questionnaire.QuestionnaireItemComponent,
-   * Questionnaire.QuestionnaireItemComponent>] of child to parent
    * @param variablesMap the [Map<String, Base>] of variables
    */
   private fun findAndEvaluateVariable(
@@ -391,8 +385,6 @@ internal class ExpressionEvaluator(
    * @param variableName the [String] to match the variable in the ancestors
    * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] whose ancestors we
    * visit
-   * @param questionnaireItemParentMap the [Map<Questionnaire.QuestionnaireItemComponent,
-   * Questionnaire.QuestionnaireItemComponent>] of child to parent
    * @return [Pair] containing [Questionnaire.QuestionnaireItemComponent] and an [Expression]
    */
   private fun findVariableInAncestors(
@@ -413,7 +405,6 @@ internal class ExpressionEvaluator(
    * Evaluates the value of variable expression and returns its evaluated value
    *
    * @param expression the [Expression] the expression to evaluate
-   * @param questionnaireResponse the [QuestionnaireResponse] respective questionnaire response
    * @param dependentVariables the [Map] of variable names to their values
    *
    * @return [Base] the result of an expression

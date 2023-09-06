@@ -32,6 +32,18 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ValueSet
 
+/**
+ * Evaluates and manages answer options within a [Questionnaire] and its corresponding
+ * [QuestionnaireResponse]. It handles enablement, disablement, and presentation of options based on
+ * expressions and criteria.
+ *
+ * The evaluator represents a session of [Questionnaire].
+ *
+ * To ensure the safe and accurate tracking of changes of the [Questionnaire] and
+ * [QuestionnaireResponse], it is crucial to associate the evaluator's lifecycle with a ViewModel or
+ * other lifecycle-aware class. If no lifecycle-aware class is available, create a new evaluator
+ * instance to manage its own lifecycle.
+ */
 internal class EnabledAnswerOptionsEvaluator(
   private val questionnaire: Questionnaire,
   private val questionnaireResponse: QuestionnaireResponse,
