@@ -19,10 +19,26 @@ package com.google.android.fhir.sync.upload
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.Database
 
+/**
+ * Defines the contract for fetching local changes.
+ *
+ * This interface provides methods to check for the existence of further changes, retrieve the next
+ * batch of changes, and get the progress of fetched changes.
+ *
+ * It is marked as internal to keep [Database] unexposed to clients
+ */
 interface LocalChangeFetcher {
   suspend fun hasNext(): Boolean
   suspend fun next(): List<LocalChange>
   suspend fun getProgress(): Double
+
+  companion object {
+    internal fun byMode(mode: FetchMode, database: Database): LocalChangeFetcher =
+      when (mode) {
+        is FetchMode.AllChanges -> AllChangesLocalChangeFetcher(database)
+        else -> error("$mode does not have an implementation yet.")
+      }
+  }
 }
 
 internal class AllChangesLocalChangeFetcher(val database: Database) : LocalChangeFetcher {
@@ -33,9 +49,10 @@ internal class AllChangesLocalChangeFetcher(val database: Database) : LocalChang
   override suspend fun getProgress(): Double = database.getAllLocalChanges().size.toDouble()
 }
 
-sealed class FetchStrategy {
+/** Represents the mode in which local changes should be fetched. */
+sealed class FetchMode {
 
-  class AllChanges(val pageSize: Int) : FetchStrategy()
-  object PerResource : FetchStrategy()
-  object EarliestChange : FetchStrategy()
+  class AllChanges(val pageSize: Int) : FetchMode()
+  object PerResource : FetchMode()
+  object EarliestChange : FetchMode()
 }

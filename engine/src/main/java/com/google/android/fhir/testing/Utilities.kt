@@ -33,8 +33,7 @@ import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.UploadRequest
 import com.google.android.fhir.sync.UrlDownloadRequest
-import com.google.android.fhir.sync.upload.FetchStrategy
-import com.google.android.fhir.sync.upload.LocalChangeFetcher
+import com.google.android.fhir.sync.upload.FetchMode
 import com.google.common.truth.Truth.assertThat
 import java.net.SocketTimeoutException
 import java.time.Instant
@@ -149,19 +148,9 @@ object TestFhirEngineImpl : FhirEngine {
   }
 
   override suspend fun syncUpload(
-    strategyType: FetchStrategy,
-    upload: suspend (LocalChangeFetcher) -> Flow<Pair<LocalChangeToken, Resource>>
-  ) {
-    val localChanges = getLocalChanges(ResourceType.Patient, "123")
-    val localChangeFetcher =
-      object : LocalChangeFetcher {
-        override suspend fun hasNext(): Boolean = localChanges.isNotEmpty()
-        override suspend fun next(): List<LocalChange> = localChanges
-        override suspend fun getProgress(): Double = localChanges.size.toDouble()
-      }
-
-    upload(localChangeFetcher).collect()
-  }
+    fetchMode: FetchMode,
+    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+  ) = upload(getLocalChanges(ResourceType.Patient, "123")).collect()
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,

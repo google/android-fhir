@@ -29,8 +29,7 @@ import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
-import com.google.android.fhir.sync.upload.AllChangesLocalChangeFetcher
-import com.google.android.fhir.sync.upload.FetchStrategy
+import com.google.android.fhir.sync.upload.FetchMode
 import com.google.android.fhir.sync.upload.LocalChangeFetcher
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
@@ -126,15 +125,11 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       .intersect(database.getAllLocalChanges().map { it.resourceId }.toSet())
 
   override suspend fun syncUpload(
-    strategyType: FetchStrategy,
-    upload: suspend (fetcher: LocalChangeFetcher) -> Flow<Pair<LocalChangeToken, Resource>>
+    fetchMode: FetchMode,
+    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
-    val localChangeFetcher =
-      when (strategyType) {
-        is FetchStrategy.AllChanges -> AllChangesLocalChangeFetcher(database)
-        else -> error("$strategyType does not have a fetching strategy yet.")
-      }
-    upload(localChangeFetcher).collect {
+    val localChangeFetcher = LocalChangeFetcher.byMode(fetchMode, database)
+    upload(localChangeFetcher.next()).collect {
       database.deleteUpdates(it.first)
       when (it.second) {
         is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)

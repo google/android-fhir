@@ -40,8 +40,8 @@ internal class UploaderImpl(
   private val uploadWorkManager: UploadWorkManager,
 ) : Uploader {
 
-  override suspend fun upload(localChangeFetcher: LocalChangeFetcher): Flow<UploadState> = flow {
-    val transformedChanges = uploadWorkManager.prepareChangesForUpload(localChangeFetcher.next())
+  override suspend fun upload(localChanges: List<LocalChange>): Flow<UploadState> = flow {
+    val transformedChanges = uploadWorkManager.prepareChangesForUpload(localChanges)
     val uploadRequests = uploadWorkManager.createUploadRequestsFromLocalChanges(transformedChanges)
     val total = uploadWorkManager.getPendingUploadsIndicator(uploadRequests)
     var completed: Int

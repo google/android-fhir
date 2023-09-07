@@ -29,7 +29,7 @@ import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
-import com.google.android.fhir.sync.upload.FetchStrategy
+import com.google.android.fhir.sync.upload.FetchMode
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.assertResourceNotEquals
 import com.google.android.fhir.testing.readFromFile
@@ -314,10 +314,10 @@ class FhirEngineImplTest {
   @Test
   fun syncUpload_uploadLocalChange() = runBlocking {
     val localChanges = mutableListOf<LocalChange>()
-    fhirEngine.syncUpload(FetchStrategy.AllChanges(100)) {
+    fhirEngine.syncUpload(FetchMode.AllChanges(100)) {
       flow {
-        localChanges.addAll(it.next())
-        emit(LocalChangeToken(localChanges.flatMap { it.token.ids }) to TEST_PATIENT_1)
+        localChanges.addAll(it)
+        emit(LocalChangeToken(it.flatMap { it.token.ids }) to TEST_PATIENT_1)
       }
     }
 

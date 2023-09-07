@@ -19,9 +19,9 @@ package com.google.android.fhir.sync
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.sync.upload.FetchMode
 import com.google.android.fhir.sync.upload.UploadState
 import com.google.android.fhir.sync.upload.Uploader
-import com.google.android.fhir.sync.upload.FetchStrategy
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
@@ -127,10 +127,10 @@ internal class FhirSynchronizer(
 
   private suspend fun upload(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
-    val strategyType = FetchStrategy.AllChanges(100)
-    fhirEngine.syncUpload(strategyType) { localChangeFetcher ->
+    val fetchMode = FetchMode.AllChanges(100)
+    fhirEngine.syncUpload(fetchMode) { list ->
       flow {
-        uploader.upload(localChangeFetcher).collect { result ->
+        uploader.upload(list).collect { result ->
           when (result) {
             is UploadState.Started ->
               setSyncState(SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total))
