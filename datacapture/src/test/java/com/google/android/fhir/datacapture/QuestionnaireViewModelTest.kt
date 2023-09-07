@@ -36,6 +36,7 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_ANSWER_OPTION_TO
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_CALCULATED_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_CQF_EXPRESSION_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ENABLE_WHEN_EXPRESSION_URL
@@ -45,7 +46,6 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYS
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_VARIABLE_URL
 import com.google.android.fhir.datacapture.extensions.EntryMode
-import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
 import com.google.android.fhir.datacapture.extensions.asStringValue
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.getNestedQuestionnaireResponseItems
@@ -5463,7 +5463,7 @@ class QuestionnaireViewModelTest {
               coding =
                 listOf(
                   Coding().apply {
-                    code = INSTRUCTIONS
+                    code = EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
                     system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
                   }
                 )
@@ -5685,7 +5685,7 @@ class QuestionnaireViewModelTest {
             coding =
               listOf(
                 Coding().apply {
-                  code = INSTRUCTIONS
+                  code = EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
                   system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
                 }
               )

@@ -20,9 +20,6 @@ import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
-import com.google.android.fhir.sync.UploadState
-import com.google.android.fhir.sync.UploadWorkManager
-import com.google.android.fhir.sync.Uploader
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.exceptions.FHIRException
