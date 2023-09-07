@@ -39,6 +39,7 @@ import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
 import com.google.android.fhir.search.include
 import com.google.android.fhir.search.revInclude
+import com.google.android.fhir.sync.upload.ConsolidatorMode
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.readFromFile
@@ -512,7 +513,7 @@ class DatabaseImplTest {
         lastUpdated = Date()
       }
     database.insert(patient)
-    services.fhirEngine.syncUpload { it ->
+    services.fhirEngine.syncUpload(ConsolidatorMode.Default) { it ->
       it
         .first { it.resourceId == "remote-patient-3" }
         .let {
@@ -2370,7 +2371,7 @@ class DatabaseImplTest {
 
   @Test
   fun search_nameGivenDuplicate_deduplicatePatient() = runBlocking {
-    var patient: Patient = readFromFile(Patient::class.java, "/patient_name_given_duplicate.json")
+    val patient: Patient = readFromFile(Patient::class.java, "/patient_name_given_duplicate.json")
     database.insertRemote(patient)
     val result =
       database.search<Patient>(

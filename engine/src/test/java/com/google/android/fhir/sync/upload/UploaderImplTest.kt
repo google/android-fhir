@@ -47,9 +47,7 @@ class UploaderImplTest {
           BundleDataSource { Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE } },
           SquashedChangesUploadWorkManager()
         )
-        .upload(
-          localChanges,
-        ) { _, _ -> }
+        .upload(localChanges)
         .toList()
 
     assertThat(result).hasSize(2)
@@ -65,9 +63,7 @@ class UploaderImplTest {
   fun `upload Bundle transaction should emit Started state`() = runBlocking {
     val result =
       UploaderImpl(BundleDataSource { Bundle() }, SquashedChangesUploadWorkManager())
-        .upload(
-          localChanges,
-        ) { _, _ -> }
+        .upload(localChanges)
         .toList()
 
     assertThat(result.first()).isInstanceOf(UploadState.Started::class.java)
@@ -90,7 +86,7 @@ class UploaderImplTest {
           },
           SquashedChangesUploadWorkManager()
         )
-        .upload(localChanges) { _, _ -> }
+        .upload(localChanges)
         .toList()
 
     assertThat(result).hasSize(2)
@@ -104,9 +100,7 @@ class UploaderImplTest {
           BundleDataSource { throw ConnectException("Failed to connect to server.") },
           SquashedChangesUploadWorkManager()
         )
-        .upload(
-          localChanges,
-        ) { _, _ -> }
+        .upload(localChanges)
         .toList()
 
     assertThat(result).hasSize(2)

@@ -19,7 +19,7 @@ package com.google.android.fhir.sync
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.sync.upload.UploadMode
+import com.google.android.fhir.sync.upload.ConsolidatorMode
 import com.google.android.fhir.sync.upload.UploadState
 import com.google.android.fhir.sync.upload.Uploader
 import java.time.OffsetDateTime
@@ -127,17 +127,20 @@ internal class FhirSynchronizer(
 
   private suspend fun upload(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
-    val uploadMode = UploadMode.ALL_CHANGES_SQUASHED_BUNDLE_PUT(500)
-    fhirEngine.syncUpload(uploadMode) { list, resourceConsolidator ->
-      uploader.upload(list, resourceConsolidator).collect { result ->
-        when (result) {
-          is UploadState.Started ->
-            setSyncState(SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total))
-          is UploadState.Success ->
-            setSyncState(
-              SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total, result.completed)
-            )
-          is UploadState.Failure -> exceptions.add(result.syncError)
+    fhirEngine.syncUpload(ConsolidatorMode.Default) { list ->
+      flow {
+        uploader.upload(list).collect { result ->
+          when (result) {
+            is UploadState.Started ->
+              setSyncState(SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total))
+            is UploadState.Success ->
+              emit(result.localChangeToken to result.resource).also {
+                setSyncState(
+                  SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total, result.completed)
+                )
+              }
+            is UploadState.Failure -> exceptions.add(result.syncError)
+          }
         }
       }
     }

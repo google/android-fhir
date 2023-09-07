@@ -22,19 +22,21 @@ import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.ResourceNotFoundException
+import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.get
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
-import com.google.android.fhir.sync.upload.UploadMode
+import com.google.android.fhir.sync.upload.ConsolidatorMode
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.assertResourceNotEquals
 import com.google.android.fhir.testing.readFromFile
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.exceptions.FHIRException
@@ -312,9 +314,12 @@ class FhirEngineImplTest {
   @Test
   fun syncUpload_uploadLocalChange() = runBlocking {
     val localChanges = mutableListOf<LocalChange>()
-    val uploadMode = UploadMode.ALL_CHANGES_SQUASHED_BUNDLE_PUT(500)
-    fhirEngine.syncUpload(uploadMode) { it, _ -> localChanges.addAll(it) }
-
+    fhirEngine.syncUpload(ConsolidatorMode.Default) {
+      flow {
+        localChanges.addAll(it)
+        emit(LocalChangeToken(it.flatMap { it.token.ids }) to TEST_PATIENT_1)
+      }
+    }
     assertThat(localChanges).hasSize(1)
     with(localChanges[0]) {
       assertThat(this.resourceType).isEqualTo(ResourceType.Patient.toString())
@@ -408,7 +413,7 @@ class FhirEngineImplTest {
       assertThat(get(0).payload).isEqualTo(patientString)
     }
     assertResourceEquals(patient, fhirEngine.get(ResourceType.Patient, patient.logicalId))
-    // clear databse
+    // clear database
     runBlocking(Dispatchers.IO) { fhirEngine.clearDatabase() }
     // assert that previously present resource not available after clearing database
     assertThat(fhirEngine.getLocalChanges(patient.resourceType, patient.logicalId)).isEmpty()

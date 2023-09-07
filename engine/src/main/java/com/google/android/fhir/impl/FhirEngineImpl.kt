@@ -22,16 +22,15 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
+import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
-import com.google.android.fhir.sync.upload.DefaultResourceConsolidator
+import com.google.android.fhir.sync.upload.ConsolidatorMode
 import com.google.android.fhir.sync.upload.ResourceConsolidator
-import com.google.android.fhir.sync.upload.ResourceConsolidatorStrategy
-import com.google.android.fhir.sync.upload.UploadMode
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
@@ -124,17 +123,13 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       .intersect(database.getAllLocalChanges().map { it.resourceId }.toSet())
 
   override suspend fun syncUpload(
-    uploadMode: UploadMode,
-    upload: suspend (List<LocalChange>, ResourceConsolidator) -> Unit,
+    consolidatorMode: ConsolidatorMode,
+    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>,
   ) {
-    val resourceConsolidator =
-      when (uploadMode.resourceConsolidatorStrategy) {
-        ResourceConsolidatorStrategy.Default -> DefaultResourceConsolidator(database)
-        ResourceConsolidatorStrategy.IDUpdater -> error("Not yet implemented")
-      }
+    val resourceConsolidator = ResourceConsolidator.byMode(consolidatorMode, database)
     val localChanges = database.getAllLocalChanges()
     if (localChanges.isNotEmpty()) {
-      upload(localChanges, resourceConsolidator)
+      upload(localChanges).collect { resourceConsolidator.consolidate(it.first, it.second) }
     }
   }
 }

@@ -40,10 +40,7 @@ internal class UploaderImpl(
   private val uploadWorkManager: UploadWorkManager,
 ) : Uploader {
 
-  override suspend fun upload(
-    localChanges: List<LocalChange>,
-    resourceConsolidator: ResourceConsolidator
-  ): Flow<UploadState> = flow {
+  override suspend fun upload(localChanges: List<LocalChange>): Flow<UploadState> = flow {
     val transformedChanges = uploadWorkManager.prepareChangesForUpload(localChanges)
     val uploadRequests = uploadWorkManager.createUploadRequestsFromLocalChanges(transformedChanges)
     val total = uploadWorkManager.getPendingUploadsIndicator(uploadRequests)
@@ -56,7 +53,6 @@ internal class UploaderImpl(
       try {
         val response = dataSource.upload(uploadRequest)
         completed = total - uploadWorkManager.getPendingUploadsIndicator(pendingRequests)
-        resourceConsolidator.consolidate(response, uploadRequest)
         emit(
           getUploadResult(
             uploadRequest.resource.resourceType,

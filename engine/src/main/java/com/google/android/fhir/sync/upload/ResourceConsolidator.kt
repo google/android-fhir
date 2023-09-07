@@ -17,20 +17,27 @@
 package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.db.Database
-import com.google.android.fhir.sync.UploadRequest
+import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
 fun interface ResourceConsolidator {
-  suspend fun consolidate(response: Resource, uploadRequest: UploadRequest)
+  suspend fun consolidate(localChangeToken: LocalChangeToken, response: Resource)
+  companion object {
+    internal fun byMode(mode: ConsolidatorMode, database: Database): ResourceConsolidator =
+      when (mode) {
+        is ConsolidatorMode.Default -> DefaultResourceConsolidator(database)
+        else -> error("$mode does not have an implementation yet.")
+      }
+  }
 }
 
 internal class DefaultResourceConsolidator(private val database: Database) : ResourceConsolidator {
 
-  override suspend fun consolidate(response: Resource, uploadRequest: UploadRequest) {
-    database.deleteUpdates(uploadRequest.localChangeToken)
+  override suspend fun consolidate(localChangeToken: LocalChangeToken, response: Resource) {
+    database.deleteUpdates(localChangeToken)
     when (response) {
       is Bundle -> updateVersionIdAndLastUpdated(response)
       else -> updateVersionIdAndLastUpdated(response)
@@ -108,4 +115,9 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
         ?.split("/")
         ?.takeIf { it.size > 3 }
         ?.let { it[it.size - 3] to ResourceType.fromCode(it[it.size - 4]) }
+}
+
+sealed class ConsolidatorMode {
+  object IDUpdater : ConsolidatorMode()
+  object Default : ConsolidatorMode()
 }
