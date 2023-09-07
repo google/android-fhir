@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync.upload.request
+package com.google.android.fhir.sync.upload.patch
 
-import com.google.android.fhir.sync.UploadRequest
-import com.google.android.fhir.sync.upload.patch.Patch
+import com.google.android.fhir.LocalChange
 
-/** Generator that generates [UploadRequest]s from the [Patch]es */
-internal interface UploadRequestGenerator {
-  /** Generates a list of [UploadRequest] from the [Patch]es */
-  fun generateUploadRequests(patches: List<Patch>): List<UploadRequest>
+internal interface PatchGenerator {
+  fun generate(localChanges: List<LocalChange>): List<Patch>
 }

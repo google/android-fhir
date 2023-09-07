@@ -18,11 +18,13 @@ package com.google.android.fhir.sync.upload.request
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.LocalChangeUtils
-import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
+import com.google.android.fhir.sync.upload.patch.LocalChangeUtils
+import com.google.android.fhir.sync.upload.patch.toLocalChange
+import com.google.android.fhir.toLocalChange
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
 import kotlinx.coroutines.test.runTest

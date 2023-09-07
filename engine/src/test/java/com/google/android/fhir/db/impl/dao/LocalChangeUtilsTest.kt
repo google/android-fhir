@@ -21,6 +21,8 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.sync.upload.patch.LocalChangeUtils
+import com.google.android.fhir.sync.upload.patch.toLocalChange
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.readFromFile
 import com.google.android.fhir.testing.readJsonArrayFromFile

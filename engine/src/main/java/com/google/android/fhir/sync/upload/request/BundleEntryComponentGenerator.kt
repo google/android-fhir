@@ -16,8 +16,7 @@
 
 package com.google.android.fhir.sync.upload.request
 
-import com.google.android.fhir.LocalChange
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.sync.upload.patch.Patch
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Enumeration
@@ -25,9 +24,9 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.UriType
 
 /**
- * Abstract class for generating [Bundle.BundleEntryComponent] for a [LocalChange] to be added to
- * the [Bundle] based on [Bundle.HTTPVerb] supported by the Fhir server. Concrete implementations of
- * the class should provide implementation of [getEntryResource] to provide [Resource] for the
+ * Abstract class for generating [Bundle.BundleEntryComponent] for a [Patch] to be added to the
+ * [Bundle] based on [Bundle.HTTPVerb] supported by the Fhir server. Concrete implementations of the
+ * class should provide implementation of [getEntryResource] to provide [Resource] for the
  * [LocalChangeEntity]. See [https://www.hl7.org/fhir/http.html#transaction] for more info regarding
  * the supported [Bundle.HTTPVerb].
  */
@@ -41,30 +40,29 @@ abstract class BundleEntryComponentGenerator(
    * [Resource] may not be required in the request like in the case of a [Bundle.HTTPVerb.DELETE]
    * request.
    */
-  protected abstract fun getEntryResource(localChange: LocalChange): IBaseResource?
+  protected abstract fun getEntryResource(patch: Patch): IBaseResource?
 
-  /** Returns a [Bundle.BundleEntryComponent] for a [LocalChange] to be added to the [Bundle] . */
-  fun getEntry(localChange: LocalChange): Bundle.BundleEntryComponent {
+  /** Returns a [Bundle.BundleEntryComponent] for a [Patch] to be added to the [Bundle] . */
+  fun getEntry(patch: Patch): Bundle.BundleEntryComponent {
     return Bundle.BundleEntryComponent().apply {
-      resource = getEntryResource(localChange) as Resource?
-      request = getEntryRequest(localChange)
+      resource = getEntryResource(patch) as Resource?
+      request = getEntryRequest(patch)
       fullUrl = request?.url
     }
   }
 
-  private fun getEntryRequest(localChange: LocalChange) =
+  private fun getEntryRequest(patch: Patch) =
     Bundle.BundleEntryRequestComponent(
         Enumeration(Bundle.HTTPVerbEnumFactory()).apply { value = httpVerb },
-        UriType("${localChange.resourceType}/${localChange.resourceId}")
+        UriType("${patch.resourceType}/${patch.resourceId}")
       )
       .apply {
-        if (useETagForUpload && !localChange.versionId.isNullOrEmpty()) {
+        if (useETagForUpload && !patch.versionId.isNullOrEmpty()) {
           // FHIR supports weak Etag, See ETag section https://hl7.org/fhir/http.html#Http-Headers
-          when (localChange.type) {
-            LocalChange.Type.UPDATE,
-            LocalChange.Type.DELETE -> ifMatch = "W/\"${localChange.versionId}\""
-            LocalChange.Type.INSERT -> {}
-            LocalChange.Type.NO_OP -> error("Cannot create a bundle from a NO_OP request")
+          when (patch.type) {
+            Patch.Type.UPDATE,
+            Patch.Type.DELETE -> ifMatch = "W/\"${patch.versionId}\""
+            Patch.Type.INSERT -> {}
           }
         }
       }

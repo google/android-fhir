@@ -19,10 +19,8 @@ package com.google.android.fhir.sync.upload.patch
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.LocalChangeUtils
-import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.sync.upload.SquashedChangesUploadWorkManager
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
 import org.hl7.fhir.r4.model.HumanName
@@ -76,7 +74,7 @@ class SquashedChangesUploadWorkManagerTest {
           .toLocalChange()
           .apply { LocalChangeToken(listOf(2)) }
       )
-    val patchToUpload = SquashedChangesUploadWorkManager().prepareChangesForUpload(changes)
+    val patchToUpload = SquashedChangesUploadWorkManager().generatePatches(changes)
 
     assertThat(patchToUpload).hasSize(1)
     assertThat(patchToUpload.first().type).isEqualTo(LocalChange.Type.NO_OP)
@@ -152,7 +150,7 @@ class SquashedChangesUploadWorkManagerTest {
           .toLocalChange()
           .apply { LocalChangeToken(listOf(3)) },
       )
-    val patchToUpload = SquashedChangesUploadWorkManager().prepareChangesForUpload(changes)
+    val patchToUpload = SquashedChangesUploadWorkManager().generatePatches(changes)
 
     assertThat(patchToUpload).hasSize(1)
     assertThat(patchToUpload.first().type).isEqualTo(LocalChange.Type.NO_OP)
@@ -209,7 +207,7 @@ class SquashedChangesUploadWorkManagerTest {
 
     val errorMessage =
       assertThrows(IllegalArgumentException::class.java) {
-          SquashedChangesUploadWorkManager().prepareChangesForUpload(changes)
+          SquashedChangesUploadWorkManager().generatePatches(changes)
         }
         .localizedMessage
 

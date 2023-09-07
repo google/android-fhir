@@ -19,31 +19,29 @@ package com.google.android.fhir.sync.upload.request
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.ContentTypes
-import com.google.android.fhir.LocalChange
+import com.google.android.fhir.sync.upload.patch.Patch
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Bundle
 
 internal class HttpPutForCreateEntryComponentGenerator(useETagForUpload: Boolean) :
   BundleEntryComponentGenerator(Bundle.HTTPVerb.PUT, useETagForUpload) {
-  override fun getEntryResource(localChange: LocalChange): IBaseResource {
-    return FhirContext.forCached(FhirVersionEnum.R4)
-      .newJsonParser()
-      .parseResource(localChange.payload)
+  override fun getEntryResource(patch: Patch): IBaseResource {
+    return FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(patch.payload)
   }
 }
 
 internal class HttpPatchForUpdateEntryComponentGenerator(useETagForUpload: Boolean) :
   BundleEntryComponentGenerator(Bundle.HTTPVerb.PATCH, useETagForUpload) {
-  override fun getEntryResource(localChange: LocalChange): IBaseResource {
+  override fun getEntryResource(patch: Patch): IBaseResource {
     return Binary().apply {
       contentType = ContentTypes.APPLICATION_JSON_PATCH
-      data = localChange.payload.toByteArray()
+      data = patch.payload.toByteArray()
     }
   }
 }
 
 internal class HttpDeleteEntryComponentGenerator(useETagForUpload: Boolean) :
   BundleEntryComponentGenerator(Bundle.HTTPVerb.DELETE, useETagForUpload) {
-  override fun getEntryResource(localChange: LocalChange): IBaseResource? = null
+  override fun getEntryResource(patch: Patch): IBaseResource? = null
 }
