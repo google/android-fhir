@@ -24,6 +24,7 @@ import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.FhirServices
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
@@ -33,8 +34,11 @@ import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
+import com.google.android.fhir.search.execute
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
+import com.google.android.fhir.search.include
+import com.google.android.fhir.search.revInclude
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.readFromFile
@@ -54,6 +58,7 @@ import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
@@ -61,10 +66,13 @@ import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Observation
+import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.SearchParameter
@@ -2483,96 +2491,6 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun search_practitioner_has_patient_has_conditions_diabetes_and_hypertension() = runBlocking {
-    // Running this test with more resources than required to try and hit all the cases
-    // patient 1 has 2 practitioners & both conditions
-    // patient 2 has both conditions but no associated practitioner
-    // patient 3 has 1 practitioner & 1 condition
-    val diabetesCodeableConcept =
-      CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes"))
-    val hyperTensionCodeableConcept =
-      CodeableConcept(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1"))
-    val resources =
-      listOf(
-        Practitioner().apply { id = "practitioner-001" },
-        Practitioner().apply { id = "practitioner-002" },
-        Patient().apply {
-          gender = Enumerations.AdministrativeGender.MALE
-          id = "patient-001"
-          this.addGeneralPractitioner(Reference("Practitioner/practitioner-001"))
-          this.addGeneralPractitioner(Reference("Practitioner/practitioner-002"))
-        },
-        Condition().apply {
-          subject = Reference("Patient/patient-001")
-          id = "condition-001"
-          code = diabetesCodeableConcept
-        },
-        Condition().apply {
-          subject = Reference("Patient/patient-001")
-          id = "condition-002"
-          code = hyperTensionCodeableConcept
-        },
-        Patient().apply {
-          gender = Enumerations.AdministrativeGender.MALE
-          id = "patient-002"
-        },
-        Condition().apply {
-          subject = Reference("Patient/patient-002")
-          id = "condition-003"
-          code = hyperTensionCodeableConcept
-        },
-        Condition().apply {
-          subject = Reference("Patient/patient-002")
-          id = "condition-004"
-          code = diabetesCodeableConcept
-        },
-        Practitioner().apply { id = "practitioner-003" },
-        Patient().apply {
-          gender = Enumerations.AdministrativeGender.MALE
-          id = "patient-003"
-          this.addGeneralPractitioner(Reference("Practitioner/practitioner-00"))
-        },
-        Condition().apply {
-          subject = Reference("Patient/patient-003")
-          id = "condition-005"
-          code = diabetesCodeableConcept
-        }
-      )
-    database.insert(*resources.toTypedArray())
-
-    val result =
-      database.search<Practitioner>(
-        Search(ResourceType.Practitioner)
-          .apply {
-            has<Patient>(Patient.GENERAL_PRACTITIONER) {
-              has<Condition>(Condition.SUBJECT) {
-                filter(
-                  Condition.CODE,
-                  { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) }
-                )
-              }
-            }
-            has<Patient>(Patient.GENERAL_PRACTITIONER) {
-              has<Condition>(Condition.SUBJECT) {
-                filter(
-                  Condition.CODE,
-                  {
-                    value =
-                      of(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1"))
-                  }
-                )
-              }
-            }
-          }
-          .getQuery()
-      )
-
-    assertThat(result.map { it.logicalId })
-      .containsExactly("practitioner-001", "practitioner-002")
-      .inOrder()
-  }
-
-  @Test
   fun search_sortDescending_Date(): Unit = runBlocking {
     database.insert(
       Patient().apply {
@@ -3024,6 +2942,544 @@ class DatabaseImplTest {
     assertThat(result.map { it.logicalId })
       .containsAtLeast("patient-test-002", "patient-test-003", "patient-test-001")
       .inOrder()
+  }
+
+  @Test
+  fun search_patient_and_include_practitioners(): Unit = runBlocking {
+    val patient01 =
+      Patient().apply {
+        id = "pa-01"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Gorden"
+          }
+        )
+        addGeneralPractitioner(Reference("Practitioner/gp-01"))
+        addGeneralPractitioner(Reference("Practitioner/gp-02"))
+      }
+
+    val patient02 =
+      Patient().apply {
+        id = "pa-02"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Bond"
+          }
+        )
+        addGeneralPractitioner(Reference("Practitioner/gp-02"))
+        addGeneralPractitioner(Reference("Practitioner/gp-03"))
+      }
+    val patients = listOf(patient01, patient02)
+
+    val gp01 =
+      Practitioner().apply {
+        id = "gp-01"
+        addName(
+          HumanName().apply {
+            family = "Practitioner-01"
+            addGiven("General-01")
+          }
+        )
+        active = true
+      }
+    val gp02 =
+      Practitioner().apply {
+        id = "gp-02"
+        addName(
+          HumanName().apply {
+            family = "Practitioner-02"
+            addGiven("General-02")
+          }
+        )
+        active = false
+      }
+    val gp03 =
+      Practitioner().apply {
+        id = "gp-03"
+        addName(
+          HumanName().apply {
+            family = "Practitioner-03"
+            addGiven("General-03")
+          }
+        )
+        active = true
+      }
+
+    val practitioners = listOf(gp01, gp02, gp03)
+
+    database.insertRemote(*(patients + practitioners).toTypedArray())
+
+    val result =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.GIVEN,
+            {
+              value = "James"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            }
+          )
+
+          include<Practitioner>(Patient.GENERAL_PRACTITIONER) {
+            filter(Practitioner.ACTIVE, { value = of(true) })
+          }
+        }
+        .execute<Patient>(database)
+
+    assertThat(result)
+      .isEqualTo(
+        listOf(
+          SearchResult(
+            patient01,
+            included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp01)),
+            revIncluded = null
+          ),
+          SearchResult(
+            patient02,
+            included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp03)),
+            revIncluded = null
+          )
+        )
+      )
+  }
+
+  @Test
+  fun search_patient_and_revInclude_conditions(): Unit = runBlocking {
+    val patient01 =
+      Patient().apply {
+        id = "pa-01"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Gorden"
+          }
+        )
+        addGeneralPractitioner(Reference("Practitioner/gp-01"))
+      }
+
+    val patient02 =
+      Patient().apply {
+        id = "pa-02"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Bond"
+          }
+        )
+        addGeneralPractitioner(Reference("Practitioner/gp-02"))
+      }
+    val patients = listOf(patient01, patient02)
+    val diabetesCodeableConcept =
+      CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+    val hyperTensionCodeableConcept =
+      CodeableConcept(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1"))
+    val migraineCodeableConcept =
+      CodeableConcept(Coding("http://snomed.info/sct", "37796009", "Migraine"))
+
+    val con1 =
+      Condition().apply {
+        id = "con-01"
+        code = diabetesCodeableConcept
+        subject = Reference("Patient/pa-01")
+      }
+    val con2 =
+      Condition().apply {
+        id = "con-02"
+        code = hyperTensionCodeableConcept
+        subject = Reference("Patient/pa-01")
+      }
+    val con3 =
+      Condition().apply {
+        id = "con-03"
+        code = migraineCodeableConcept
+        subject = Reference("Patient/pa-02")
+      }
+    val conditions = listOf(con1, con2, con3)
+
+    database.insertRemote(*(patients + conditions).toTypedArray())
+
+    val result =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.GIVEN,
+            {
+              value = "James"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            }
+          )
+          revInclude<Condition>(Condition.SUBJECT) {
+            filter(Condition.CODE, { value = of(diabetesCodeableConcept) })
+            filter(Condition.CODE, { value = of(migraineCodeableConcept) })
+            operation = Operation.OR
+          }
+        }
+        .execute<Patient>(database)
+
+    assertThat(result)
+      .isEqualTo(
+        listOf(
+          SearchResult(
+            patient01,
+            included = null,
+            revIncluded =
+              mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con1))
+          ),
+          SearchResult(
+            patient02,
+            included = null,
+            revIncluded =
+              mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con3))
+          )
+        )
+      )
+  }
+
+  @Test
+  fun search_patient_with_reference_resources(): Unit = runBlocking {
+    val diabetesCodeableConcept =
+      CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+    val hyperTensionCodeableConcept =
+      CodeableConcept(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1"))
+    val migraineCodeableConcept =
+      CodeableConcept(Coding("http://snomed.info/sct", "37796009", "Migraine"))
+
+    val patients =
+      listOf(
+        Patient().apply {
+          id = "pa-01"
+          addName(
+            HumanName().apply {
+              addGiven("James")
+              family = "Gorden"
+            }
+          )
+          addGeneralPractitioner(Reference("Practitioner/gp-01"))
+          addGeneralPractitioner(Reference("Practitioner/gp-02"))
+          addGeneralPractitioner(Reference("Practitioner/gp-03"))
+          managingOrganization = Reference("Organization/org-01")
+        },
+        Patient().apply {
+          id = "pa-02"
+          addName(
+            HumanName().apply {
+              addGiven("James")
+              family = "Bond"
+            }
+          )
+          addGeneralPractitioner(Reference("Practitioner/gp-01"))
+          addGeneralPractitioner(Reference("Practitioner/gp-02"))
+          addGeneralPractitioner(Reference("Practitioner/gp-03"))
+          managingOrganization = Reference("Organization/org-02")
+        },
+        Patient().apply {
+          id = "pa-03"
+          addName(
+            HumanName().apply {
+              addGiven("James")
+              family = "Doe"
+            }
+          )
+          addGeneralPractitioner(Reference("Practitioner/gp-01"))
+          addGeneralPractitioner(Reference("Practitioner/gp-02"))
+          addGeneralPractitioner(Reference("Practitioner/gp-03"))
+          managingOrganization = Reference("Organization/org-03")
+        }
+      )
+
+    val practitioners =
+      listOf(
+        Practitioner().apply {
+          id = "gp-01"
+          addName(
+            HumanName().apply {
+              family = "Practitioner-01"
+              addGiven("General-01")
+            }
+          )
+          active = true
+        },
+        Practitioner().apply {
+          id = "gp-02"
+          addName(
+            HumanName().apply {
+              family = "Practitioner-02"
+              addGiven("General-02")
+            }
+          )
+          active = true
+        },
+        Practitioner().apply {
+          id = "gp-03"
+          addName(
+            HumanName().apply {
+              family = "Practitioner-03"
+              addGiven("General-03")
+            }
+          )
+          active = false
+        }
+      )
+
+    val organizations =
+      listOf(
+        Organization().apply {
+          id = "org-01"
+          name = "Organization-01"
+          active = true
+        },
+        Organization().apply {
+          id = "org-02"
+          name = "Organization-02"
+          active = true
+        },
+        Organization().apply {
+          id = "org-03"
+          name = "Organization-03"
+          active = false
+        }
+      )
+
+    val conditions =
+      listOf(
+        Condition().apply {
+          id = "con-01-pa-01"
+          code = diabetesCodeableConcept
+          subject = Reference("Patient/pa-01")
+        },
+        Condition().apply {
+          id = "con-02-pa-01"
+          code = hyperTensionCodeableConcept
+          subject = Reference("Patient/pa-01")
+        },
+        Condition().apply {
+          id = "con-03-pa-01"
+          code = migraineCodeableConcept
+          subject = Reference("Patient/pa-01")
+        },
+        Condition().apply {
+          id = "con-01-pa-02"
+          code = diabetesCodeableConcept
+          subject = Reference("Patient/pa-02")
+        },
+        Condition().apply {
+          id = "con-02-pa-02"
+          code = hyperTensionCodeableConcept
+          subject = Reference("Patient/pa-02")
+        },
+        Condition().apply {
+          id = "con-03-pa-02"
+          code = migraineCodeableConcept
+          subject = Reference("Patient/pa-02")
+        },
+        Condition().apply {
+          id = "con-01-pa-03"
+          code = diabetesCodeableConcept
+          subject = Reference("Patient/pa-03")
+        },
+        Condition().apply {
+          id = "con-02-pa-03"
+          code = hyperTensionCodeableConcept
+          subject = Reference("Patient/pa-03")
+        },
+        Condition().apply {
+          id = "con-03-pa-03"
+          code = migraineCodeableConcept
+          subject = Reference("Patient/pa-03")
+        },
+      )
+
+    val encounters =
+      listOf(
+        Encounter().apply {
+          id = "en-01-pa-01"
+          subject = Reference("Patient/pa-01")
+          period =
+            Period().apply {
+              start = DateType(2023, 2, 1).value
+              end = DateType(2023, 11, 1).value
+            }
+        },
+        Encounter().apply {
+          id = "en-02-pa-01"
+          subject = Reference("Patient/pa-01")
+          period =
+            Period().apply {
+              start = DateType(2023, 2, 1).value
+              end = DateType(2023, 11, 1).value
+            }
+        },
+        Encounter().apply {
+          id = "en-03-pa-01"
+          subject = Reference("Patient/pa-01")
+          period =
+            Period().apply {
+              start = DateType(2022, 2, 1).value
+              end = DateType(2022, 11, 1).value
+            }
+        },
+        Encounter().apply {
+          id = "en-01-pa-02"
+          subject = Reference("Patient/pa-02")
+          period =
+            Period().apply {
+              start = DateType(2023, 2, 1).value
+              end = DateType(2023, 11, 1).value
+            }
+        },
+        Encounter().apply {
+          id = "en-02-pa-02"
+          subject = Reference("Patient/pa-02")
+          period =
+            Period().apply {
+              start = DateType(2023, 2, 1).value
+              end = DateType(2023, 11, 1).value
+            }
+        },
+        Encounter().apply {
+          id = "en-03-pa-02"
+          subject = Reference("Patient/pa-02")
+          period =
+            Period().apply {
+              start = DateType(2022, 2, 1).value
+              end = DateType(2022, 11, 1).value
+            }
+        },
+        Encounter().apply {
+          id = "en-01-pa-03"
+          subject = Reference("Patient/pa-03")
+          period =
+            Period().apply {
+              start = DateType(2023, 2, 1).value
+              end = DateType(2023, 11, 1).value
+            }
+        },
+        Encounter().apply {
+          id = "en-02-pa-03"
+          subject = Reference("Patient/pa-03")
+          period =
+            Period().apply {
+              start = DateType(2023, 2, 1).value
+              end = DateType(2023, 11, 1).value
+            }
+        },
+        Encounter().apply {
+          id = "en-03-pa-03"
+          subject = Reference("Patient/pa-03")
+          period =
+            Period().apply {
+              start = DateType(2022, 2, 1).value
+              end = DateType(2022, 11, 1).value
+            }
+        }
+      )
+    // 3 Patients.
+    // Each has 3 conditions, only 2 should match
+    // Each has 3 encounters, only 2 should match
+
+    val resources: Map<String, Resource> =
+      (patients + practitioners + organizations + conditions + encounters).associateBy {
+        it.logicalId
+      }
+    // Each has 3 GP, only 2 should match
+    database.insertRemote(*resources.values.toTypedArray())
+
+    val result =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.GIVEN,
+            {
+              value = "James"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            }
+          )
+
+          include<Practitioner>(Patient.GENERAL_PRACTITIONER) {
+            filter(Practitioner.ACTIVE, { value = of(true) })
+            filter(
+              Practitioner.FAMILY,
+              {
+                value = "Practitioner"
+                modifier = StringFilterModifier.STARTS_WITH
+              }
+            )
+            operation = Operation.AND
+          }
+          include<Organization>(Patient.ORGANIZATION) {
+            filter(
+              Organization.NAME,
+              {
+                value = "Organization"
+                modifier = StringFilterModifier.STARTS_WITH
+              }
+            )
+            filter(Practitioner.ACTIVE, { value = of(true) })
+            operation = Operation.AND
+          }
+
+          revInclude<Condition>(Condition.SUBJECT) {
+            filter(Condition.CODE, { value = of(diabetesCodeableConcept) })
+            filter(Condition.CODE, { value = of(migraineCodeableConcept) })
+            operation = Operation.OR
+          }
+          revInclude<Encounter>(Encounter.SUBJECT) {
+            filter(
+              Encounter.DATE,
+              {
+                value = of(DateTimeType("2023-01-01"))
+                prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              }
+            )
+          }
+        }
+        .execute<Patient>(database)
+
+    assertThat(result)
+      .isEqualTo(
+        listOf(
+          SearchResult(
+            resources["pa-01"]!!,
+            mapOf(
+              "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
+              "organization" to listOf(resources["org-01"]!!),
+            ),
+            mapOf(
+              Pair(ResourceType.Condition, "subject") to
+                listOf(resources["con-01-pa-01"]!!, resources["con-03-pa-01"]!!),
+              Pair(ResourceType.Encounter, "subject") to
+                listOf(resources["en-01-pa-01"]!!, resources["en-02-pa-01"]!!)
+            )
+          ),
+          SearchResult(
+            resources["pa-02"]!!,
+            mapOf(
+              "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
+              "organization" to listOf(resources["org-02"]!!)
+            ),
+            mapOf(
+              Pair(ResourceType.Condition, "subject") to
+                listOf(resources["con-01-pa-02"]!!, resources["con-03-pa-02"]!!),
+              Pair(ResourceType.Encounter, "subject") to
+                listOf(resources["en-01-pa-02"]!!, resources["en-02-pa-02"]!!)
+            )
+          ),
+          SearchResult(
+            resources["pa-03"]!!,
+            mapOf(
+              "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
+            ),
+            mapOf(
+              Pair(ResourceType.Condition, "subject") to
+                listOf(resources["con-01-pa-03"]!!, resources["con-03-pa-03"]!!),
+              Pair(ResourceType.Encounter, "subject") to
+                listOf(resources["en-01-pa-03"]!!, resources["en-02-pa-03"]!!)
+            )
+          )
+        )
+      )
   }
 
   private companion object {

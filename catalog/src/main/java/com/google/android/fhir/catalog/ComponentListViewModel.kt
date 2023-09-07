@@ -44,7 +44,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
      * Path to the questionnaire json file with some or all required fields. If the user doesn't
      * answer the required questions, an error may be displayed on the particular question.
      */
-    val questionnaireFileWithValidation: String = "",
+    val questionnaireFileWithValidation: String? = null,
     val workflow: WorkflowType = WorkflowType.COMPONENT
   ) {
     BOOLEAN_CHOICE(
@@ -113,6 +113,12 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_slider.json",
       "component_slider_with_validation.json"
     ),
+    QUANTITY(
+      R.drawable.ic_unitoptions,
+      R.string.component_name_quantity,
+      "component_quantity.json",
+      "component_quantity_with_validation.json"
+    ),
     ATTACHMENT(
       R.drawable.ic_attachment,
       R.string.component_name_attachment,
@@ -151,6 +157,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       ViewItem.ComponentItem(Component.DATE_PICKER),
       ViewItem.ComponentItem(Component.DATE_TIME_PICKER),
       ViewItem.ComponentItem(Component.SLIDER),
+      ViewItem.ComponentItem(Component.QUANTITY),
       ViewItem.ComponentItem(Component.ATTACHMENT),
       ViewItem.ComponentItem(Component.REPEATED_GROUP),
       ViewItem.HeaderItem(Header.MISC_COMPONENTS),

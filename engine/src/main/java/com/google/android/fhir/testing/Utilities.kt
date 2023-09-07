@@ -22,6 +22,7 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.BundleDownloadRequest
@@ -141,14 +142,14 @@ object TestFhirEngineImpl : FhirEngine {
 
   override suspend fun delete(type: ResourceType, id: String) {}
 
-  override suspend fun <R : Resource> search(search: Search): List<R> {
+  override suspend fun <R : Resource> search(search: Search): List<SearchResult<R>> {
     return emptyList()
   }
 
   override suspend fun syncUpload(
     upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
-    upload(getLocalChanges(ResourceType.Patient, "123"))
+    upload(getLocalChanges(ResourceType.Patient, "123")).collect()
   }
 
   override suspend fun syncDownload(
@@ -172,7 +173,7 @@ object TestFhirEngineImpl : FhirEngine {
       LocalChange(
         resourceType = type.name,
         resourceId = id,
-        payload = "{}",
+        payload = "{ 'resourceType' : 'Patient', 'id' : '123' }",
         token = LocalChangeToken(listOf()),
         type = LocalChange.Type.INSERT,
         timestamp = Instant.now()
@@ -209,5 +210,5 @@ class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSou
   }
 
   override suspend fun upload(request: UploadRequest) =
-    onPostBundle((request as BundleUploadRequest).bundle)
+    onPostBundle((request as BundleUploadRequest).resource)
 }
