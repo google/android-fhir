@@ -14,7 +14,27 @@
     {
       "linkId": "1",
       "type": "boolean",
-      "text": "Does patient has fever?"
+      "text": "Does patient has fever?",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1.1",
+          "text": "Define the questionnaire variable 'has-fever' based on the answer to the question 'Does the patient have a fever?",
+          "type": "display"
+        }
+      ]
     },
     {
       "linkId": "2",
@@ -27,6 +47,26 @@
             "language": "text/fhirpath",
             "expression": "%has-fever"
           }
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "2.1",
+          "text": "Enabled if variable 'has-fever' evaluates to true",
+          "type": "display"
         }
       ]
     }

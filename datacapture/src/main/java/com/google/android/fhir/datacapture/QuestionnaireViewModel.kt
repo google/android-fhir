@@ -342,15 +342,21 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     )
 
   private val enablementEvaluator: EnablementEvaluator =
-    EnablementEvaluator(questionnaireResponse, expressionEvaluator)
+    EnablementEvaluator(
+      questionnaire,
+      questionnaireResponse,
+      questionnaireItemParentMap,
+      questionnaireLaunchContextMap
+    )
 
   private val answerOptionsEvaluator: EnabledAnswerOptionsEvaluator =
     EnabledAnswerOptionsEvaluator(
       questionnaire,
       questionnaireResponse,
-      expressionEvaluator,
       xFhirQueryResolver,
-      externalValueSetResolver
+      externalValueSetResolver,
+      questionnaireItemParentMap,
+      questionnaireLaunchContextMap
     )
 
   /**
@@ -499,7 +505,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId }
             )
           }
-          modificationCount.update { it + 1 }
+          modificationCount.update { count -> count + 1 }
         }
       }
       .map { it.value }
@@ -510,12 +516,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       )
 
   private fun updateDependentQuestionnaireResponseItems(
-    updatedQuestionnaireItem: QuestionnaireItemComponent,
+    questionnaireItem: QuestionnaireItemComponent,
     updatedQuestionnaireResponseItem: QuestionnaireResponseItemComponent?,
   ) {
     expressionEvaluator
       .evaluateCalculatedExpressions(
-        updatedQuestionnaireItem,
+        questionnaireItem,
         updatedQuestionnaireResponseItem,
       )
       .forEach { (questionnaireItem, calculatedAnswers) ->

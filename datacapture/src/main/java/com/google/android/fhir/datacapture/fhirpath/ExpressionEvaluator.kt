@@ -35,25 +35,28 @@ import timber.log.Timber
 /**
  * Evaluates an expression and returns its result.
  *
- * The evaluator represents a session of [Questionnaire].
- *
- * To ensure the safe and accurate tracking of changes of the [Questionnaire] and
- * [QuestionnaireResponse], it is crucial to associate the evaluator's lifecycle with a ViewModel or
- * other lifecycle-aware class. If no lifecycle-aware class is available, create a new evaluator
- * instance to manage its own lifecycle.
+ * The evaluator works in the context of a [Questionnaire] and the corresponding
+ * [QuestionnaireResponse]. It is the caller's responsibility to make sure to call the evaluator
+ * with [QuestionnaireItemComponent] and [QuestionnaireResponseItemComponent] that belong to the
+ * [Questionnaire] and the [QuestionnaireResponse].
  *
  * Expressions can be defined at questionnaire level and questionnaire item level. This
  * [ExpressionEvaluator] supports evaluation of
  * [variable expression](http://hl7.org/fhir/R4/extension-variable.html) defined at either
  * questionnaire level or questionnaire item level.
+ *
+ * @param questionnaire the [Questionnaire] where the expression belong to
+ * @param questionnaireResponse the [QuestionnaireResponse] related to the [Questionnaire]
+ * @param questionnaireItemParentMap the [Map] of items parent
+ * @param questionnaireLaunchContextMap the [Map] of launchContext names to their resource values
  */
 internal class ExpressionEvaluator(
   private val questionnaire: Questionnaire,
   private val questionnaireResponse: QuestionnaireResponse,
   private val questionnaireItemParentMap:
     Map<QuestionnaireItemComponent, QuestionnaireItemComponent> =
-    mapOf(),
-  private val questionnaireLaunchContextMap: Map<String, Resource>? = mapOf(),
+    emptyMap(),
+  private val questionnaireLaunchContextMap: Map<String, Resource>? = emptyMap(),
 ) {
 
   private val reservedVariables =
@@ -123,7 +126,7 @@ internal class ExpressionEvaluator(
    * calculated expression extension, which is dependent on value of updated response
    */
   fun evaluateCalculatedExpressions(
-    updatedQuestionnaireItem: QuestionnaireItemComponent,
+    questionnaireItem: QuestionnaireItemComponent,
     updatedQuestionnaireResponseItemComponent: QuestionnaireResponseItemComponent?,
   ): List<ItemToAnswersPair> {
     return questionnaire.item
@@ -132,18 +135,18 @@ internal class ExpressionEvaluator(
         // Condition 1. item is calculable
         // Condition 2. item answer depends on the updated item answer OR has a variable dependency
         item.calculatedExpression != null &&
-          (updatedQuestionnaireItem.isReferencedBy(item) ||
+          (questionnaireItem.isReferencedBy(item) ||
             findDependentVariables(item.calculatedExpression!!).isNotEmpty())
       }
-      .map { questionnaireItem ->
+      .map { item ->
         val updatedAnswer =
           evaluateExpression(
-              questionnaireItem,
+              item,
               updatedQuestionnaireResponseItemComponent,
-              questionnaireItem.calculatedExpression!!,
+              item.calculatedExpression!!,
             )
             .map { it.castToType(it) }
-        questionnaireItem to updatedAnswer
+        item to updatedAnswer
       }
   }
 
@@ -203,6 +206,7 @@ internal class ExpressionEvaluator(
     questionnaireItem: QuestionnaireItemComponent,
     variablesMap: MutableMap<String, Base?> = mutableMapOf(),
   ): MutableMap<String, Base?> {
+    questionnaireLaunchContextMap?.let { variablesMap.putAll(it) }
     findDependentVariables(expression).forEach { variableName ->
       if (variablesMap[variableName] == null) {
         findAndEvaluateVariable(
@@ -212,7 +216,6 @@ internal class ExpressionEvaluator(
         )
       }
     }
-    questionnaireLaunchContextMap?.let { variablesMap.putAll(it) }
     return variablesMap
   }
 
@@ -411,7 +414,7 @@ internal class ExpressionEvaluator(
    */
   private fun evaluateVariable(
     expression: Expression,
-    dependentVariables: Map<String, Base?> = mapOf(),
+    dependentVariables: Map<String, Base?> = emptyMap(),
   ) =
     try {
       require(expression.name?.isNotBlank() == true) {
@@ -422,16 +425,9 @@ internal class ExpressionEvaluator(
         "Unsupported expression language, language should be text/fhirpath"
       }
 
-      val contextMap =
-        mutableMapOf<String, Base?>().apply {
-          putAll(dependentVariables)
-          if (questionnaireLaunchContextMap != null) {
-            putAll(questionnaireLaunchContextMap)
-          }
-        }
       fhirPathEngine
         .evaluate(
-          contextMap,
+          dependentVariables,
           questionnaireResponse,
           null,
           null,

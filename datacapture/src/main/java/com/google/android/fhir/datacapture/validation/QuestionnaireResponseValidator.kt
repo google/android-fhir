@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
-import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Resource
@@ -73,19 +72,16 @@ object QuestionnaireResponseValidator {
 
     val linkIdToValidationResultMap = mutableMapOf<String, MutableList<ValidationResult>>()
 
-    val expressionEvaluator =
-      ExpressionEvaluator(
-        questionnaire,
-        questionnaireResponse,
-        questionnaireItemParentMap,
-        launchContextMap
-      )
-
     validateQuestionnaireResponseItems(
       questionnaire.item,
       questionnaireResponse.item,
       context,
-      EnablementEvaluator(questionnaireResponse, expressionEvaluator),
+      EnablementEvaluator(
+        questionnaire,
+        questionnaireResponse,
+        questionnaireItemParentMap,
+        launchContextMap
+      ),
       linkIdToValidationResultMap,
     )
 

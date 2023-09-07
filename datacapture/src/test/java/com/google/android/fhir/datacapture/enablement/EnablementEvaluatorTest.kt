@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.enablement
 import android.os.Build
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.common.truth.BooleanSubject
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -58,9 +57,8 @@ class EnablementEvaluatorTest {
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "q1" }
     val questionnaireResponse = QuestionnaireResponse().apply { addItem(questionnaireResponseItem) }
-    val expressionEvaluator = ExpressionEvaluator(questionnaire, questionnaireResponse)
     assertThat(
-        EnablementEvaluator(questionnaireResponse, expressionEvaluator)
+        EnablementEvaluator(questionnaire, questionnaireResponse)
           .evaluate(questionnaireItem, questionnaireResponseItem)
       )
       .isFalse()
@@ -175,10 +173,8 @@ class EnablementEvaluatorTest {
       iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
         as QuestionnaireResponse
 
-    val expressionEvaluator = ExpressionEvaluator(questionnaire, questionnaireResponse)
-
     assertThat(
-        EnablementEvaluator(questionnaireResponse, expressionEvaluator)
+        EnablementEvaluator(questionnaire, questionnaireResponse)
           .evaluate(
             questionnaireItem,
             questionnaireResponse.item[1],
@@ -256,10 +252,8 @@ class EnablementEvaluatorTest {
       iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
         as QuestionnaireResponse
 
-    val expressionEvaluator = ExpressionEvaluator(questionnaire, questionnaireResponse)
-
     assertThat(
-        EnablementEvaluator(questionnaireResponse, expressionEvaluator)
+        EnablementEvaluator(questionnaire, questionnaireResponse)
           .evaluate(
             questionnaireItemComponent,
             questionnaireResponse.item[1],
@@ -337,10 +331,8 @@ class EnablementEvaluatorTest {
         iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
           as QuestionnaireResponse
 
-      val expressionEvaluator = ExpressionEvaluator(questionnaire, questionnaireResponse)
-
       assertThat(
-          EnablementEvaluator(questionnaireResponse, expressionEvaluator)
+          EnablementEvaluator(questionnaire, questionnaireResponse)
             .evaluate(
               questionnaireItem,
               questionnaireResponse.item[1],
@@ -786,10 +778,8 @@ class EnablementEvaluatorTest {
         )
       }
 
-    val expressionEvaluator = ExpressionEvaluator(questionnaire, questionnaireResponse)
-
     return assertThat(
-      EnablementEvaluator(questionnaireResponse, expressionEvaluator)
+      EnablementEvaluator(questionnaire, questionnaireResponse)
         .evaluate(questionnaireItem, questionnaireResponse.item.last())
     )
   }

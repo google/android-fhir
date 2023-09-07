@@ -29,6 +29,8 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ValueSet
 
@@ -37,20 +39,37 @@ import org.hl7.fhir.r4.model.ValueSet
  * [QuestionnaireResponse]. It handles enablement, disablement, and presentation of options based on
  * expressions and criteria.
  *
- * The evaluator represents a session of [Questionnaire].
+ * The evaluator works in the context of a [Questionnaire] and the corresponding
+ * [QuestionnaireResponse]. It is the caller's responsibility to make sure to call the evaluator
+ * with [QuestionnaireItemComponent] and [QuestionnaireResponseItemComponent] that belong to the
+ * [Questionnaire] and the [QuestionnaireResponse].
  *
- * To ensure the safe and accurate tracking of changes of the [Questionnaire] and
- * [QuestionnaireResponse], it is crucial to associate the evaluator's lifecycle with a ViewModel or
- * other lifecycle-aware class. If no lifecycle-aware class is available, create a new evaluator
- * instance to manage its own lifecycle.
+ * @param questionnaire the [Questionnaire] where the expression belong to
+ * @param questionnaireResponse the [QuestionnaireResponse] related to the [Questionnaire]
+ * @param xFhirQueryResolver the [XFhirQueryResolver] to resolve resources based on the X-FHIR-Query
+ * @param externalValueSetResolver the [ExternalAnswerValueSetResolver] to resolve value sets
+ * externally/outside of the [Questionnaire]
+ * @param questionnaireItemParentMap the [Map] of items parent
+ * @param questionnaireLaunchContextMap the [Map] of launchContext names to their resource values
  */
 internal class EnabledAnswerOptionsEvaluator(
   private val questionnaire: Questionnaire,
   private val questionnaireResponse: QuestionnaireResponse,
-  private val expressionEvaluator: ExpressionEvaluator,
   private val xFhirQueryResolver: XFhirQueryResolver?,
   private val externalValueSetResolver: ExternalAnswerValueSetResolver?,
+  private val questionnaireItemParentMap:
+    Map<QuestionnaireItemComponent, QuestionnaireItemComponent> =
+    emptyMap(),
+  private val questionnaireLaunchContextMap: Map<String, Resource>? = emptyMap(),
 ) {
+
+  private val expressionEvaluator =
+    ExpressionEvaluator(
+      questionnaire,
+      questionnaireResponse,
+      questionnaireItemParentMap,
+      questionnaireLaunchContextMap
+    )
 
   private val answerValueSetMap =
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
@@ -72,7 +91,7 @@ internal class EnabledAnswerOptionsEvaluator(
    */
   internal suspend fun evaluate(
     questionnaireItem: QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
   ): Pair<
     List<Questionnaire.QuestionnaireItemAnswerOptionComponent>,
     List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
