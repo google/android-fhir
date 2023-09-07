@@ -21,9 +21,9 @@ import android.widget.FrameLayout
 import android.widget.RadioButton
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
-import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
@@ -488,7 +488,7 @@ class BooleanChoiceViewHolderFactoryTest {
           coding =
             listOf(
               Coding().apply {
-                code = INSTRUCTIONS
+                code = EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
                 system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
               }
             )
