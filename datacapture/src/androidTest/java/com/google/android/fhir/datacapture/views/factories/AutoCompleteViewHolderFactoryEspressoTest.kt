@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views.factories
 
 import android.view.View
+import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.test.espresso.Espresso.onView
@@ -28,7 +29,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.test.TestActivity
-import com.google.android.fhir.datacapture.test.utilities.showDropDown
+import com.google.android.fhir.datacapture.test.utilities.delayMainThread
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.chip.ChipGroup
@@ -90,7 +91,12 @@ class AutoCompleteViewHolderFactoryEspressoTest {
     runOnUI { viewHolder.bind(questionnaireViewItem) }
 
     onView(ViewMatchers.withId(R.id.autoCompleteTextView)).perform(ViewActions.typeText("Coding 3"))
-    onView(ViewMatchers.withId(R.id.autoCompleteTextView)).perform(showDropDown())
+    runOnUI {
+      viewHolder.itemView
+        .findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView)
+        .showDropDown()
+    }
+    onView(ViewMatchers.withId(R.id.autoCompleteTextView)).perform(delayMainThread())
     onView(ViewMatchers.withText("Coding 3"))
       .inRoot(RootMatchers.isPlatformPopup())
       .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))

@@ -19,17 +19,18 @@
     <string name="component_nav_heading">Components</string>
     <string name="layout_nav_heading">Layouts</string>
     <string name="behavior_nav_heading">Behaviors</string>
-    <string name="component_name_multiple_choice">Multiple choice</string>
-    <string name="component_name_single_choice">Single choice</string>
     <string name="component_name_boolean_choice">Boolean choice</string>
+    <string name="component_name_single_choice">Single choice</string>
+    <string name="component_name_multiple_choice">Multiple choice</string>
+    <string name="component_name_dropdown">Dropdown</string>
+    <string name="component_name_modal">Modal</string>
     <string name="component_name_open_choice">Open choice</string>
     <string name="component_name_text_field">Text field </string>
+    <string name="component_name_auto_complete">Auto Complete</string>
     <string name="component_name_date_picker">Date picker</string>
     <string name="component_name_date_time_picker">DateTime picker</string>
-    <string name="component_name_modal">Modal</string>
     <string name="component_name_slider">Slider</string>
-    <string name="component_name_dropdown">Dropdown</string>
-    <string name="component_name_auto_complete">Auto Complete</string>
+    <string name="component_name_quantity">Quantity</string>
     <string name="component_name_help">Help</string>
     <string name="component_name_item_media">Item Media</string>
     <string name="component_name_item_answer_media">Item Answer Media</string>
@@ -69,4 +70,5 @@
     <string name="error">Error</string>
     <string name="widgets">Widgets</string>
     <string name="misc_components">Miscellaneous components</string>
+    <string name="open_questionnaire">Open questionnaire</string>
 </resources>

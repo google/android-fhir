@@ -22,7 +22,7 @@ import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
-import com.google.android.fhir.sync.UploadState
+import com.google.android.fhir.sync.upload.patch.SquashedChangesUploadWorkManager
 import com.google.android.fhir.testing.BundleDataSource
 import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
