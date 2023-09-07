@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,12 +38,14 @@ import com.google.android.fhir.search.filter.TokenParamFilterCriteria
 import com.google.android.fhir.search.filter.TokenParamFilterCriterion
 import com.google.android.fhir.search.filter.UriFilterCriteria
 import com.google.android.fhir.search.filter.UriParamFilterCriterion
-import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 
 @SearchDslMarker
-data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
-  internal val p = Patient()
+class Search(
+  val type: ResourceType,
+  override var count: Int? = null,
+  override var from: Int? = null
+) : BaseSearch {
   internal val stringFilterCriteria = mutableListOf<StringParamFilterCriteria>()
   internal val dateTimeFilterCriteria = mutableListOf<DateClientParamFilterCriteria>()
   internal val numberFilterCriteria = mutableListOf<NumberParamFilterCriteria>()
@@ -54,22 +56,25 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   internal var sort: IParam? = null
   internal var order: Order? = null
   @PublishedApi internal var nestedSearches = mutableListOf<NestedSearch>()
-  var operation = Operation.AND
+  @PublishedApi internal var revIncludes = mutableListOf<NestedSearch>()
+  @PublishedApi internal var forwardIncludes = mutableListOf<NestedSearch>()
 
-  fun filter(
+  override var operation = Operation.AND
+
+  override fun filter(
     stringParameter: StringClientParam,
     vararg init: StringParamFilterCriterion.() -> Unit,
-    operation: Operation = Operation.OR
+    operation: Operation
   ) {
     val filters = mutableListOf<StringParamFilterCriterion>()
     init.forEach { StringParamFilterCriterion(stringParameter).apply(it).also(filters::add) }
     stringFilterCriteria.add(StringParamFilterCriteria(stringParameter, filters, operation))
   }
 
-  fun filter(
+  override fun filter(
     referenceParameter: ReferenceClientParam,
     vararg init: ReferenceParamFilterCriterion.() -> Unit,
-    operation: Operation = Operation.OR
+    operation: Operation
   ) {
     val filters = mutableListOf<ReferenceParamFilterCriterion>()
     init.forEach { ReferenceParamFilterCriterion(referenceParameter).apply(it).also(filters::add) }
@@ -78,67 +83,67 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     )
   }
 
-  fun filter(
+  override fun filter(
     dateParameter: DateClientParam,
     vararg init: DateParamFilterCriterion.() -> Unit,
-    operation: Operation = Operation.OR
+    operation: Operation
   ) {
     val filters = mutableListOf<DateParamFilterCriterion>()
     init.forEach { DateParamFilterCriterion(dateParameter).apply(it).also(filters::add) }
     dateTimeFilterCriteria.add(DateClientParamFilterCriteria(dateParameter, filters, operation))
   }
 
-  fun filter(
+  override fun filter(
     quantityParameter: QuantityClientParam,
     vararg init: QuantityParamFilterCriterion.() -> Unit,
-    operation: Operation = Operation.OR
+    operation: Operation
   ) {
     val filters = mutableListOf<QuantityParamFilterCriterion>()
     init.forEach { QuantityParamFilterCriterion(quantityParameter).apply(it).also(filters::add) }
     quantityFilterCriteria.add(QuantityParamFilterCriteria(quantityParameter, filters, operation))
   }
 
-  fun filter(
+  override fun filter(
     tokenParameter: TokenClientParam,
     vararg init: TokenParamFilterCriterion.() -> Unit,
-    operation: Operation = Operation.OR
+    operation: Operation
   ) {
     val filters = mutableListOf<TokenParamFilterCriterion>()
     init.forEach { TokenParamFilterCriterion(tokenParameter).apply(it).also(filters::add) }
     tokenFilterCriteria.add(TokenParamFilterCriteria(tokenParameter, filters, operation))
   }
 
-  fun filter(
+  override fun filter(
     numberParameter: NumberClientParam,
     vararg init: NumberParamFilterCriterion.() -> Unit,
-    operation: Operation = Operation.OR
+    operation: Operation
   ) {
     val filters = mutableListOf<NumberParamFilterCriterion>()
     init.forEach { NumberParamFilterCriterion(numberParameter).apply(it).also(filters::add) }
     numberFilterCriteria.add(NumberParamFilterCriteria(numberParameter, filters, operation))
   }
 
-  fun filter(
+  override fun filter(
     uriParam: UriClientParam,
     vararg init: UriParamFilterCriterion.() -> Unit,
-    operation: Operation = Operation.OR
+    operation: Operation
   ) {
     val filters = mutableListOf<UriParamFilterCriterion>()
     init.forEach { UriParamFilterCriterion(uriParam).apply(it).also(filters::add) }
     uriFilterCriteria.add(UriFilterCriteria(uriParam, filters, operation))
   }
 
-  fun sort(parameter: StringClientParam, order: Order) {
+  override fun sort(parameter: StringClientParam, order: Order) {
     sort = parameter
     this.order = order
   }
 
-  fun sort(parameter: NumberClientParam, order: Order) {
+  override fun sort(parameter: NumberClientParam, order: Order) {
     sort = parameter
     this.order = order
   }
 
-  fun sort(parameter: DateClientParam, order: Order) {
+  override fun sort(parameter: DateClientParam, order: Order) {
     sort = parameter
     this.order = order
   }
