@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.JsonPatch
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
-import com.google.android.fhir.LocalChangeToken
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -35,7 +34,16 @@ internal object PerResourcePatchGenerator : PatchGenerator {
 
   private fun mergeLocalChangesForSingleResource(localChanges: List<LocalChange>): Patch? {
     // TODO (maybe this should throw exception when two entities don't have the same versionID)
-    val tokens = LocalChangeToken(localChanges.flatMap { it.token.ids })
+    val firstDeleteLocalChange = localChanges.indexOfFirst { it.type == Type.DELETE }
+    require(firstDeleteLocalChange == -1 || firstDeleteLocalChange == localChanges.size - 1) {
+      "Changes after deletion of resource are not permitted"
+    }
+
+    val lastInsertLocalChange = localChanges.indexOfLast { it.type == Type.INSERT }
+    require(lastInsertLocalChange == -1 || lastInsertLocalChange == 0) {
+      "Changes before creation of resource are not permitted"
+    }
+
     return when {
       localChanges.first().type == Type.INSERT && localChanges.last().type == Type.DELETE -> null
       localChanges.first().type == Type.INSERT -> {
