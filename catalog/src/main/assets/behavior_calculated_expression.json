@@ -19,26 +19,13 @@
       "linkId": "a-age-years",
       "text": "Age years",
       "type": "quantity",
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
-          "valueCoding": {
-            "system": "http://unitsofmeasure.org",
-            "code": "years",
-            "display": "years"
-          }
+      "initial": [{
+        "valueQuantity": {
+          "unit": "years",
+          "system": "http://unitsofmeasure.org",
+          "code": "years"
         }
-      ],
-      "initial": [
-        {
-          "valueQuantity": {
-            "value": 0,
-            "unit": "years",
-            "system": "http://unitsofmeasure.org",
-            "code": "years"
-          }
-        }
-      ]
+      }]
     }
   ]
 }
