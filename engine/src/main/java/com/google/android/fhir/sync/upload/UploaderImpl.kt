@@ -44,7 +44,7 @@ internal class UploaderImpl(
     val transformedChanges = uploadWorkManager.prepareChangesForUpload(localChanges)
     val uploadRequests = uploadWorkManager.createUploadRequestsFromLocalChanges(transformedChanges)
     val total = uploadWorkManager.getPendingUploadsIndicator(uploadRequests)
-    var completed: Int
+    var completed = 0
     emit(UploadState.Started(total))
     val pendingRequests = uploadRequests.toMutableList()
     while (pendingRequests.isNotEmpty()) {

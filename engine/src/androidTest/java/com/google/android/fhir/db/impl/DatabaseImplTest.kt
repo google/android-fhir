@@ -39,7 +39,7 @@ import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
 import com.google.android.fhir.search.include
 import com.google.android.fhir.search.revInclude
-import com.google.android.fhir.sync.upload.FetchMode
+import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.readFromFile
@@ -513,7 +513,7 @@ class DatabaseImplTest {
         lastUpdated = Date()
       }
     database.insert(patient)
-    services.fhirEngine.syncUpload(FetchMode.AllChanges(100)) {
+    services.fhirEngine.syncUpload(LocalChangesFetchMode.AllChanges) {
       println(it.first())
       it
         .first { it.resourceId == "remote-patient-3" }

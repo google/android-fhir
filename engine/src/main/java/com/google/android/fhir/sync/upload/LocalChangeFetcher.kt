@@ -27,15 +27,15 @@ import com.google.android.fhir.db.Database
  *
  * It is marked as internal to keep [Database] unexposed to clients
  */
-interface LocalChangeFetcher {
+internal interface LocalChangeFetcher {
   suspend fun hasNext(): Boolean
   suspend fun next(): List<LocalChange>
   suspend fun getProgress(): Double
 
   companion object {
-    internal fun byMode(mode: FetchMode, database: Database): LocalChangeFetcher =
+    internal fun byMode(mode: LocalChangesFetchMode, database: Database): LocalChangeFetcher =
       when (mode) {
-        is FetchMode.AllChanges -> AllChangesLocalChangeFetcher(database)
+        is LocalChangesFetchMode.AllChanges -> AllChangesLocalChangeFetcher(database)
         else -> error("$mode does not have an implementation yet.")
       }
   }
@@ -50,9 +50,9 @@ internal class AllChangesLocalChangeFetcher(val database: Database) : LocalChang
 }
 
 /** Represents the mode in which local changes should be fetched. */
-sealed class FetchMode {
+sealed class LocalChangesFetchMode {
 
-  class AllChanges(val pageSize: Int) : FetchMode()
-  object PerResource : FetchMode()
-  object EarliestChange : FetchMode()
+  object AllChanges : LocalChangesFetchMode()
+  object PerResource : LocalChangesFetchMode()
+  object EarliestChange : LocalChangesFetchMode()
 }
