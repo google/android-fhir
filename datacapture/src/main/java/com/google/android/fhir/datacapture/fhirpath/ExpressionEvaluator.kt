@@ -311,11 +311,11 @@ internal class ExpressionEvaluator(
             ?: expressionNode.name?.lowercase()
         val evaluatedResult =
           fhirPathEngine.evaluateToString(
-            /* <appInfo> */ launchContextMap,
-            /* <focusResource> */ null,
-            /* <rootResource> */ null,
-            /* <base> */ launchContextMap[resourceType],
-            /* <node> */ expressionNode
+            /* appInfo= */ launchContextMap,
+            /* focusResource= */ null,
+            /* rootResource= */ null,
+            /* base= */ launchContextMap[resourceType],
+            /* node= */ expressionNode
           )
 
         // If the result of evaluating the FHIRPath expressions is an invalid query, it returns
