@@ -4283,12 +4283,12 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should return questionnaire item answer options for answer expression with fhirpath and variable`() =
+  fun `should return questionnaire item answer options for answer expression with fhirpath variable and context`() =
     runTest {
       val questionnaire =
         Questionnaire().apply {
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a"
               text = "Question 1"
               type = Questionnaire.QuestionnaireItemType.CHOICE
@@ -4301,7 +4301,7 @@ class QuestionnaireViewModelTest {
             }
           )
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "b"
               text = "Question 2"
               type = Questionnaire.QuestionnaireItemType.STRING
@@ -4310,7 +4310,8 @@ class QuestionnaireViewModelTest {
                   Extension(
                     "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
                     Expression().apply {
-                      this.expression = "%resource.item[0].answer.value.select(%VAR1 + code)"
+                      this.expression =
+                        "%resource.item[0].answer.value.select(%VAR1 + code + '-' + %context.linkId)"
                       this.language = Expression.ExpressionLanguage.TEXT_FHIRPATH.toCode()
                     }
                   ),
@@ -4337,7 +4338,7 @@ class QuestionnaireViewModelTest {
             .map { it.asQuestion() }
             .single { it.questionnaireItem.linkId == "b" }
         assertThat(viewItem.enabledAnswerOptions.map { it.valueStringType.value })
-          .containsExactly("Class 1", "Class 2")
+          .containsExactly("Class 1-b", "Class 2-b")
       }
     }
 

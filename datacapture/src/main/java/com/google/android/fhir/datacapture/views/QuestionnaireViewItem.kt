@@ -28,7 +28,6 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 
 /**
  * Data item for [QuestionnaireItemViewHolder] in [RecyclerView].
@@ -69,7 +68,7 @@ data class QuestionnaireViewItem(
   internal val answersChangedCallback:
     (
       Questionnaire.QuestionnaireItemComponent,
-      QuestionnaireResponseItemComponent,
+      QuestionnaireResponse.QuestionnaireResponseItemComponent,
       List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
       Any?
     ) -> Unit,
