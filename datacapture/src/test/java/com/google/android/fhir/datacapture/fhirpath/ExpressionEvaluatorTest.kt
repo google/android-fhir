@@ -999,7 +999,7 @@ class ExpressionEvaluatorTest {
       ExpressionEvaluator(
         questionnaire,
         QuestionnaireResponse(),
-        mapOf(questionnaire.item[0].item[0] to questionnaire.item[0]),
+        /* questionnaireItemParentMap= */ mapOf(questionnaire.item[0].item[0] to questionnaire.item[0]),
         mapOf()
       )
 
