@@ -45,7 +45,7 @@ internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.optionExclusiv
   }
 
 /** Get the answer options values with `initialSelected` set to true */
-internal val List<QuestionnaireItemAnswerOptionComponent>.initial: List<Type>
+internal val List<QuestionnaireItemAnswerOptionComponent>.initialSelected: List<Type>
   get() = this.filter { it.initialSelected }.map { it.value }
 
 fun Questionnaire.QuestionnaireItemAnswerOptionComponent.itemAnswerOptionImage(
