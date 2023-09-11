@@ -427,11 +427,11 @@ internal class ExpressionEvaluator(
 
       fhirPathEngine
         .evaluate(
-          /* <appContext> */ dependentVariables,
-          /* <focusResource> */ questionnaireResponse,
-          /* <rootResource> */ null,
-          /* <base> */ null,
-          /* <path> */ expression.expression,
+          /* appContext= */ dependentVariables,
+          /* focusResource= */ questionnaireResponse,
+          /* rootResource= */ null,
+          /* base= */ null,
+          /* path= */ expression.expression,
         )
         .firstOrNull()
     } catch (exception: FHIRException) {
