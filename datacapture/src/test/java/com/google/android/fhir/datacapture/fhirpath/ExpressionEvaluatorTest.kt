@@ -817,7 +817,7 @@ class ExpressionEvaluatorTest {
       ExpressionEvaluator(
         Questionnaire(),
         QuestionnaireResponse(),
-        mapOf(),
+        /* questionnaireItemParentMap= */ mapOf(),
         mapOf(patient.resourceType.name.lowercase() to patient)
       )
 
