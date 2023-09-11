@@ -26,6 +26,7 @@ import com.google.android.fhir.testing.readFromFile
 import com.google.android.fhir.testing.readJsonArrayFromFile
 import com.google.android.fhir.versionId
 import com.google.common.truth.Truth.assertThat
+import java.time.Instant
 import java.util.Date
 import junit.framework.TestCase
 import kotlinx.coroutines.runBlocking
@@ -62,7 +63,8 @@ class LocalChangeUtilsTest : TestCase() {
                 }
               )
             }
-          )
+          ),
+        timestamp = Instant.now()
       )
 
     val localChange = localChangeEntity.toLocalChange()
@@ -158,7 +160,8 @@ class LocalChangeUtilsTest : TestCase() {
       type = LocalChange.Type.UPDATE,
       payload = jsonDiff.toString(),
       versionId = oldEntity.versionId,
-      token = LocalChangeToken(listOf(currentChangeId + 1))
+      token = LocalChangeToken(listOf(currentChangeId + 1)),
+      timestamp = Instant.now()
     )
   }
 
@@ -169,7 +172,8 @@ class LocalChangeUtilsTest : TestCase() {
       type = LocalChange.Type.INSERT,
       payload = jsonParser.encodeResourceToString(entity),
       versionId = entity.versionId,
-      token = LocalChangeToken(listOf(1L))
+      token = LocalChangeToken(listOf(1L)),
+      timestamp = Instant.now()
     )
   }
 
@@ -183,7 +187,8 @@ class LocalChangeUtilsTest : TestCase() {
       type = LocalChange.Type.DELETE,
       payload = "",
       versionId = entity.versionId,
-      token = LocalChangeToken(listOf(currentChangeId + 1))
+      token = LocalChangeToken(listOf(currentChangeId + 1)),
+      timestamp = Instant.now()
     )
   }
 }

@@ -63,7 +63,7 @@
             name="questionnaireHelpTextStyle"
         >@style/TextAppearance.Material3.BodyMedium</item>
         <item name="questionnaireHelpButtonStyle">
-            @style/Widget.MaterialComponents.Button.TextButton.Icon
+            @style/Questionnaire.HelpIconStyle
         </item>
         <item name="questionnaireMediaImageStyle">
             @style/Questionnaire.MediaImageStyle
@@ -371,6 +371,13 @@
             name="android:paddingEnd"
         >@dimen/option_item_after_text_padding</item>
     </style>
+
+  <style
+        name="Questionnaire.HelpIconStyle"
+        parent="Widget.MaterialComponents.Button.TextButton.Icon"
+    >
+    <item name="android:padding">@dimen/help_icon_padding</item>
+  </style>
 
     <style
         name="Questionnaire.EditButtonStyle"

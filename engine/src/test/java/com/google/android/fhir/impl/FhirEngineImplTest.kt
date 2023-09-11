@@ -183,7 +183,9 @@ class FhirEngineImplTest {
     val result = fhirEngine.search("Patient?gender=female")
 
     assertThat(result.size).isEqualTo(2)
-    assertThat(result.all { (it as Patient).gender == Enumerations.AdministrativeGender.FEMALE })
+    assertThat(
+        result.all { (it.resource as Patient).gender == Enumerations.AdministrativeGender.FEMALE }
+      )
       .isTrue()
   }
 
@@ -198,7 +200,7 @@ class FhirEngineImplTest {
 
     fhirEngine.create(*patients.toTypedArray())
 
-    val result = fhirEngine.search("Patient?_sort=-name").map { it as Patient }
+    val result = fhirEngine.search("Patient?_sort=-name").map { it.resource as Patient }
 
     assertThat(result.mapNotNull { it.nameFirstRep.given.firstOrNull()?.value })
       .isEqualTo(listOf("C", "B", "A"))
@@ -215,7 +217,7 @@ class FhirEngineImplTest {
 
     fhirEngine.create(*patients.toTypedArray())
 
-    val result = fhirEngine.search("Patient?_count=1").map { it as Patient }
+    val result = fhirEngine.search("Patient?_count=1").map { it.resource as Patient }
 
     assertThat(result.size).isEqualTo(1)
   }
@@ -261,7 +263,7 @@ class FhirEngineImplTest {
 
     fhirEngine.create(*patients.toTypedArray())
 
-    val result = fhirEngine.search("Patient?_tag=Tag1").map { it as Patient }
+    val result = fhirEngine.search("Patient?_tag=Tag1").map { it.resource as Patient }
 
     assertThat(result.size).isEqualTo(1)
     assertThat(result.all { patient -> patient.meta.tag.all { it.code == "Tag1" } }).isTrue()
@@ -295,7 +297,7 @@ class FhirEngineImplTest {
         .search(
           "Patient?_profile=http://fhir.org/STU3/StructureDefinition/Example-Patient-Profile-1"
         )
-        .map { it as Patient }
+        .map { it.resource as Patient }
 
     assertThat(result.size).isEqualTo(1)
     assertThat(
@@ -571,14 +573,14 @@ class FhirEngineImplTest {
         filter(
           LOCAL_LAST_UPDATED_PARAM,
           {
-            value = of(DateTimeType(localChangeTimestamp))
+            value = of(DateTimeType(Date.from(localChangeTimestamp)))
             prefix = ParamPrefixEnum.EQUAL
           }
         )
       }
 
     assertThat(result).isNotEmpty()
-    assertThat(result.map { it.logicalId }).containsExactly("patient-id-create").inOrder()
+    assertThat(result.map { it.resource.logicalId }).containsExactly("patient-id-create").inOrder()
   }
 
   @Test
@@ -607,16 +609,18 @@ class FhirEngineImplTest {
           filter(
             LOCAL_LAST_UPDATED_PARAM,
             {
-              value = of(DateTimeType(localChangeTimestampWhenUpdated))
+              value = of(DateTimeType(Date.from(localChangeTimestampWhenUpdated)))
               prefix = ParamPrefixEnum.EQUAL
             }
           )
         }
 
-      assertThat(DateTimeType(localChangeTimestampWhenUpdated).value)
-        .isAtLeast(DateTimeType(localChangeTimestampWhenCreated).value)
+      assertThat(DateTimeType(Date.from(localChangeTimestampWhenUpdated)).value)
+        .isAtLeast(DateTimeType(Date.from(localChangeTimestampWhenCreated)).value)
       assertThat(result).isNotEmpty()
-      assertThat(result.map { it.logicalId }).containsExactly("patient-id-update").inOrder()
+      assertThat(result.map { it.resource.logicalId })
+        .containsExactly("patient-id-update")
+        .inOrder()
     }
 
   companion object {

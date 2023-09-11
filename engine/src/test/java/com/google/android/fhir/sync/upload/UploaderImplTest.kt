@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,11 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
-import com.google.android.fhir.sync.UploadState
+import com.google.android.fhir.sync.upload.patch.SquashedChangesUploadWorkManager
 import com.google.android.fhir.testing.BundleDataSource
 import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
+import java.time.Instant
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
@@ -126,7 +127,8 @@ class UploaderImplTest {
                       }
                     )
                   }
-                )
+                ),
+            timestamp = Instant.now()
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(1)) }

@@ -799,7 +799,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `nested display item without instructions code returns null`() {
+  fun `nested display item without instructions code returns empty spanned`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -816,7 +816,7 @@ class MoreQuestionnaireItemComponentsTest {
         }
       )
 
-    assertThat(questionItemList.first().localizedInstructionsSpanned).isNull()
+    assertThat(questionItemList.first().localizedInstructionsSpanned.toString()).isEmpty()
   }
 
   @Test
@@ -842,6 +842,29 @@ class MoreQuestionnaireItemComponentsTest {
 
     assertThat(questionItemList.first().localizedInstructionsSpanned.toString())
       .isEqualTo("subtitle text")
+  }
+
+  @Test
+  fun `localizedInstructionsSpanned returns spanned for all of the items that have instruction code and type is display`() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "display-question"
+          text = "<strong>instruction-1<strong>"
+          extension = listOf(displayCategoryExtensionWithInstructionsCode)
+          type = Questionnaire.QuestionnaireItemType.DISPLAY
+        },
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "display-question"
+          text = "instruction-2"
+          extension = listOf(displayCategoryExtensionWithInstructionsCode)
+          type = Questionnaire.QuestionnaireItemType.DISPLAY
+        },
+      )
+    Locale.setDefault(Locale.US)
+
+    assertThat(questionItemList.getLocalizedInstructionsSpanned().toString())
+      .isEqualTo("instruction-1\ninstruction-2")
   }
 
   @Test
@@ -2108,6 +2131,59 @@ class MoreQuestionnaireItemComponentsTest {
     assertThat(questionnaireItem.sliderStepValue).isNull()
   }
 
+  @Test
+  fun `should return entry format`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DATE
+        addExtension(
+          Extension().setUrl(EXTENSION_ENTRY_FORMAT_URL).setValue(StringType("yyyymmdd"))
+        )
+      }
+
+    assertThat(questionnaireItem.entryFormat).isEqualTo("yyyymmdd")
+  }
+
+  @Test
+  fun `should return empty entry format`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DATE
+      }
+
+    assertThat(questionnaireItem.entryFormat).isNull()
+  }
+
+  @Test
+  fun `should return valid date entry format`() {
+    Locale.setDefault(Locale.forLanguageTag("en_US"))
+
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DATE
+        addExtension(Extension().setUrl(EXTENSION_ENTRY_FORMAT_URL).setValue(StringType("y-MM-dd")))
+      }
+
+    assertThat(questionnaireItem.entryFormat).isEqualTo("y-MM-dd")
+  }
+
+  @Test
+  fun `should return default string for invalid date entry format`() {
+    Locale.setDefault(Locale.forLanguageTag("en_US"))
+
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DATE
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ENTRY_FORMAT_URL)
+            .setValue(StringType("This is not a valid date format string!"))
+        )
+      }
+
+    assertThat(questionnaireItem.dateEntryFormatOrSystemDefault).isEqualTo("y-MM-dd")
+  }
+
   private val displayCategoryExtensionWithInstructionsCode =
     Extension().apply {
       url = EXTENSION_DISPLAY_CATEGORY_URL
@@ -2116,7 +2192,7 @@ class MoreQuestionnaireItemComponentsTest {
           coding =
             listOf(
               Coding().apply {
-                code = INSTRUCTIONS
+                code = EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
                 system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
               }
             )
