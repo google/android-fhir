@@ -53,10 +53,10 @@ internal fun evaluateToBoolean(
 ): Boolean {
   val expressionNode = fhirPathEngine.parse(expression)
   return fhirPathEngine.evaluateToBoolean(
-    contextMap,
-    questionnaireResponse,
-    null,
-    questionnaireResponseItemComponent,
-    expressionNode,
+    /* <appInfo> */ contextMap,
+    /* <focusResource> */ questionnaireResponse,
+    /* <rootResource> */ null,
+    /* <base> */ questionnaireResponseItemComponent,
+    /* <node> */ expressionNode,
   )
 }
