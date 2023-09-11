@@ -818,7 +818,7 @@ class ExpressionEvaluatorTest {
         Questionnaire(),
         QuestionnaireResponse(),
         /* questionnaireItemParentMap= */ mapOf(),
-        mapOf(patient.resourceType.name.lowercase() to patient)
+        /* questionnaireLaunchContextMap= */ mapOf(patient.resourceType.name.lowercase() to patient),
       )
 
     val expressionsToEvaluate =
