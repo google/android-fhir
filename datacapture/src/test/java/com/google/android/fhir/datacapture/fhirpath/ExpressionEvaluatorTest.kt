@@ -689,8 +689,9 @@ class ExpressionEvaluatorTest {
       ExpressionEvaluator(
         Questionnaire(),
         QuestionnaireResponse(),
-        /* questionnaireItemParentMap= */ mapOf(),
-        /* questionnaireLaunchContextMap= */ mapOf(Practitioner().resourceType.name.lowercase() to Practitioner()),
+        questionnaireItemParentMap = emptyMap(),
+        questionnaireLaunchContextMap =
+          mapOf(Practitioner().resourceType.name.lowercase() to Practitioner()),
       )
 
     val expressionsToEvaluate =
@@ -721,8 +722,8 @@ class ExpressionEvaluatorTest {
       ExpressionEvaluator(
         Questionnaire(),
         QuestionnaireResponse(),
-        /* questionnaireItemParentMap= */ mapOf(),
-        /* questionnaireLaunchContextMap= */ mapOf(practitioner.resourceType.name to practitioner),
+        questionnaireItemParentMap = emptyMap(),
+        questionnaireLaunchContextMap = mapOf(practitioner.resourceType.name to practitioner),
       )
 
     val expressionsToEvaluate =
@@ -753,8 +754,9 @@ class ExpressionEvaluatorTest {
       ExpressionEvaluator(
         Questionnaire(),
         QuestionnaireResponse(),
-        /* questionnaireItemParentMap= */ mapOf(),
-        /* questionnaireLaunchContextMap= */ mapOf(practitioner.resourceType.name.lowercase() to practitioner),
+        questionnaireItemParentMap = emptyMap(),
+        questionnaireLaunchContextMap =
+          mapOf(practitioner.resourceType.name.lowercase() to practitioner),
       )
 
     val expressionsToEvaluate =
@@ -785,8 +787,8 @@ class ExpressionEvaluatorTest {
       ExpressionEvaluator(
         Questionnaire(),
         QuestionnaireResponse(),
-        /* questionnaireItemParentMap= */ mapOf(),
-        /* questionnaireLaunchContextMap= */ mapOf(practitioner.resourceType.name to practitioner),
+        questionnaireItemParentMap = emptyMap(),
+        questionnaireLaunchContextMap = mapOf(practitioner.resourceType.name to practitioner),
       )
 
     val expressionsToEvaluate =
@@ -817,8 +819,8 @@ class ExpressionEvaluatorTest {
       ExpressionEvaluator(
         Questionnaire(),
         QuestionnaireResponse(),
-        /* questionnaireItemParentMap= */ mapOf(),
-        /* questionnaireLaunchContextMap= */ mapOf(patient.resourceType.name.lowercase() to patient),
+        questionnaireItemParentMap = emptyMap(),
+        questionnaireLaunchContextMap = mapOf(patient.resourceType.name.lowercase() to patient),
       )
 
     val expressionsToEvaluate =
@@ -863,11 +865,12 @@ class ExpressionEvaluatorTest {
       ExpressionEvaluator(
         Questionnaire(),
         QuestionnaireResponse(),
-        /* questionnaireItemParentMap= */ mapOf(),
-        /* questionnaireLaunchContextMap= */ mapOf(
-          patient.resourceType.name.lowercase() to patient,
-          location.resourceType.name.lowercase() to location
-        )
+        questionnaireItemParentMap = emptyMap(),
+        questionnaireLaunchContextMap =
+          mapOf(
+            patient.resourceType.name.lowercase() to patient,
+            location.resourceType.name.lowercase() to location
+          )
       )
 
     val expressionsToEvaluate =
@@ -932,8 +935,8 @@ class ExpressionEvaluatorTest {
       ExpressionEvaluator(
         questionnaire,
         QuestionnaireResponse(),
-        /* questionnaireItemParentMap= */ mapOf(questionnaire.item[0].item[0] to questionnaire.item[0]),
-        /* questionnaireLaunchContextMap= */ null,
+        questionnaireItemParentMap = mapOf(questionnaire.item[0].item[0] to questionnaire.item[0]),
+        questionnaireLaunchContextMap = null,
       )
 
     val result =
@@ -999,8 +1002,8 @@ class ExpressionEvaluatorTest {
       ExpressionEvaluator(
         questionnaire,
         QuestionnaireResponse(),
-        /* questionnaireItemParentMap= */ mapOf(questionnaire.item[0].item[0] to questionnaire.item[0]),
-        mapOf()
+        questionnaireItemParentMap = mapOf(questionnaire.item[0].item[0] to questionnaire.item[0]),
+        questionnaireLaunchContextMap = emptyMap(),
       )
 
     val result =

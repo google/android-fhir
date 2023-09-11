@@ -117,7 +117,7 @@ internal class ExpressionEvaluator(
       /* focusResource= */ questionnaireResponse,
       /* rootResource= */ null,
       /* base= */ questionnaireResponseItem,
-      /* path= */ expression.expression
+      /* path= */ expression.expression,
     )
   }
 
@@ -315,7 +315,7 @@ internal class ExpressionEvaluator(
             /* focusResource= */ null,
             /* rootResource= */ null,
             /* base= */ launchContextMap[resourceType],
-            /* node= */ expressionNode
+            /* node= */ expressionNode,
           )
 
         // If the result of evaluating the FHIRPath expressions is an invalid query, it returns
