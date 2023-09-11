@@ -21,7 +21,6 @@ import android.os.Build
 import android.util.Base64
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.DataCapture
-import com.google.android.fhir.datacapture.mapping.ITEM_INITIAL_EXPRESSION_URL
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.testing.TestUrlResolver
 import com.google.common.truth.Truth.assertThat

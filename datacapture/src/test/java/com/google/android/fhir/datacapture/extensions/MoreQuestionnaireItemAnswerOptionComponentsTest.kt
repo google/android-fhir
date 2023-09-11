@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,4 +204,44 @@ class MoreQuestionnaireItemAnswerOptionComponentsTest {
 
     assertThat(questionnaire.item.single().answerOption.single().optionExclusive).isTrue()
   }
+
+  @Test
+  fun `initialSelected should return selected items only`() {
+    val answerOptions =
+      listOf(
+        answerOptionOf("test-code 1", "http://code.com", "Test Code 1", true),
+        answerOptionOf("test-code 2", "http://code.com", "Test Code 2", null),
+        answerOptionOf("test-code 3", "http://code.com", "Test Code 3", false),
+        answerOptionOf("test-code 4", "http://code.com", "Test Code 4", true)
+      )
+    val selectedOptions = answerOptions.initialSelected
+
+    assertThat(selectedOptions.map { it as Coding }.map { it.code })
+      .containsExactly("test-code 1", "test-code 4")
+  }
+
+  @Test
+  fun `initialSelected should return empty list if none selected`() {
+    val answerOptions =
+      listOf(
+        answerOptionOf("test-code 1", "http://code.com", "Test Code 1", null),
+        answerOptionOf("test-code 2", "http://code.com", "Test Code 2", null),
+        answerOptionOf("test-code 3", "http://code.com", "Test Code 3", false),
+        answerOptionOf("test-code 4", "http://code.com", "Test Code 4", false)
+      )
+    val selectedOptions = answerOptions.initialSelected
+
+    assertThat(selectedOptions).isEmpty()
+  }
+
+  private fun answerOptionOf(
+    code: String,
+    url: String,
+    display: String,
+    initialSelected: Boolean?
+  ) =
+    Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+      this.value = Coding().setCode(code).setDisplay(display).setSystem(url)
+      initialSelected?.let { this.initialSelected = it }
+    }
 }
