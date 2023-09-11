@@ -514,7 +514,6 @@ class DatabaseImplTest {
       }
     database.insert(patient)
     services.fhirEngine.syncUpload(LocalChangesFetchMode.AllChanges) {
-      println(it.first())
       it
         .first { it.resourceId == "remote-patient-3" }
         .let {

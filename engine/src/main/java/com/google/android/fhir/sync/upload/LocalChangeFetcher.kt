@@ -20,7 +20,7 @@ import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.Database
 
 /**
- * Defines the contract for fetching local changes.
+ * Fetches local changes.
  *
  * This interface provides methods to check for the existence of further changes, retrieve the next
  * batch of changes, and get the progress of fetched changes.
@@ -28,25 +28,41 @@ import com.google.android.fhir.db.Database
  * It is marked as internal to keep [Database] unexposed to clients
  */
 internal interface LocalChangeFetcher {
+  /** Checks if there are more local changes to be fetched. */
   suspend fun hasNext(): Boolean
+
+  /** Retrieves the next batch of local changes. */
   suspend fun next(): List<LocalChange>
+
+  /** Returns the completion percentage of the local changes fetched. */
   suspend fun getProgress(): Double
 
   companion object {
-    internal fun byMode(mode: LocalChangesFetchMode, database: Database): LocalChangeFetcher =
-      when (mode) {
-        is LocalChangesFetchMode.AllChanges -> AllChangesLocalChangeFetcher(database)
+    internal suspend fun byMode(
+      mode: LocalChangesFetchMode,
+      database: Database
+    ): LocalChangeFetcher {
+      val totalLocalChangeCount = database.getAllLocalChanges().size
+      return when (mode) {
+        is LocalChangesFetchMode.AllChanges ->
+          AllChangesLocalChangeFetcher(database, totalLocalChangeCount)
         else -> error("$mode does not have an implementation yet.")
       }
+    }
   }
 }
 
-internal class AllChangesLocalChangeFetcher(val database: Database) : LocalChangeFetcher {
+internal class AllChangesLocalChangeFetcher(
+  private val database: Database,
+  private val total: Int
+) : LocalChangeFetcher {
+
   override suspend fun hasNext(): Boolean = database.getAllLocalChanges().isNotEmpty()
 
   override suspend fun next(): List<LocalChange> = database.getAllLocalChanges()
 
-  override suspend fun getProgress(): Double = database.getAllLocalChanges().size.toDouble()
+  override suspend fun getProgress(): Double =
+    1.0 - database.getAllLocalChanges().size.div(total.toDouble())
 }
 
 /** Represents the mode in which local changes should be fetched. */
