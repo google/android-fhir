@@ -785,7 +785,7 @@ class ExpressionEvaluatorTest {
       ExpressionEvaluator(
         Questionnaire(),
         QuestionnaireResponse(),
-        mapOf(),
+        /* questionnaireItemParentMap= */ mapOf(),
         mapOf(practitioner.resourceType.name to practitioner)
       )
 
