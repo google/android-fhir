@@ -113,11 +113,11 @@ internal class ExpressionEvaluator(
   ): List<Base> {
     val appContext = extractDependentVariables(expression, questionnaireItem)
     return fhirPathEngine.evaluate(
-      /* <appContext> */ appContext,
-      /* <focusResource> */ questionnaireResponse,
-      /* <rootResource> */ null,
-      /* <base> */ questionnaireResponseItem,
-      /* <path> */ expression.expression
+      /* appContext= */ appContext,
+      /* focusResource= */ questionnaireResponse,
+      /* rootResource= */ null,
+      /* base= */ questionnaireResponseItem,
+      /* path= */ expression.expression
     )
   }
 
