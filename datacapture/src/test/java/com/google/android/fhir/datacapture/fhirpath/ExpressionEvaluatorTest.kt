@@ -689,7 +689,7 @@ class ExpressionEvaluatorTest {
       ExpressionEvaluator(
         Questionnaire(),
         QuestionnaireResponse(),
-        mapOf(),
+        /* questionnaireItemParentMap= */ mapOf(),
         mapOf(Practitioner().resourceType.name.lowercase() to Practitioner())
       )
 
