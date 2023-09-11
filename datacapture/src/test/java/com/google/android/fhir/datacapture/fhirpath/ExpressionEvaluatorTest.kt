@@ -690,7 +690,7 @@ class ExpressionEvaluatorTest {
         Questionnaire(),
         QuestionnaireResponse(),
         /* questionnaireItemParentMap= */ mapOf(),
-        mapOf(Practitioner().resourceType.name.lowercase() to Practitioner())
+        /* questionnaireLaunchContextMap= */ mapOf(Practitioner().resourceType.name.lowercase() to Practitioner()),
       )
 
     val expressionsToEvaluate =
