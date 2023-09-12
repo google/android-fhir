@@ -74,8 +74,8 @@ internal fun validateLaunchContextExtensions(launchContextExtensions: List<Exten
   }
 
 /**
- * Verifies the existence of extension:name and extension:type with valid system and type values
- * from the [QuestionnaireLaunchContextSet].
+ * Verifies the existence of extension:name and extension:type with valid name system and type
+ * values.
  */
 private fun validateLaunchContextExtension(launchExtension: Extension) {
   check(launchExtension.extension.size == 2) {
@@ -83,38 +83,13 @@ private fun validateLaunchContextExtension(launchExtension: Extension) {
   }
 
   val nameCoding = launchExtension.getExtensionByUrl("name").value as Coding
+  val typeCodeType = launchExtension.getExtensionByUrl("type").value as CodeType
 
-  val commonExtension =
-    Extension().apply {
-      addExtension(
-        Extension().apply {
-          url = "name"
-          setValue(
-            Coding().apply {
-              code = nameCoding.code
-              display = nameCoding.display
-              system = ""
-            }
-          )
-        }
-      )
-      addExtension(
-        Extension().apply {
-          url = "type"
-          setValue(CodeType().setValue(""))
-        }
-      )
-    }
+  val hasNameCodingSystem = nameCoding.system == EXTENSION_LAUNCH_CONTEXT
+  val isValidResourceType = MoreResourceTypes.isValidCode(typeCodeType.value)
 
-  val isValidExtension =
-    QuestionnaireLaunchContextSet.values().any {
-      launchExtension.equalsDeep(
-        commonExtension.apply {
-          (getExtensionByUrl("name").value as Coding).system = it.system
-          (getExtensionByUrl("type").value as CodeType).value = it.resourceType
-        }
-      )
-    }
+  val isValidExtension = hasNameCodingSystem && isValidResourceType
+
   if (!isValidExtension) {
     error(
       "The extension:name extension and/or extension:type extension do not follow the format " +
