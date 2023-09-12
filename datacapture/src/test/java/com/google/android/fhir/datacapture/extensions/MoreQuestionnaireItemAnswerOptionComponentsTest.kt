@@ -217,18 +217,17 @@ class MoreQuestionnaireItemAnswerOptionComponentsTest {
   fun `initialSelected should not select option with initialSelected as false`() {
     val answerOptions =
       listOf(answerOptionOf("test-code 1", "http://code.com", "Test Code 1", false))
-    val selectedOptions = answerOptions.initialSelected
 
-    assertThat(selectedOptions).isEmpty()
+    assertThat(answerOptions.initialSelected).isEmpty()
   }
 
   @Test
   fun `initialSelected should select option with initialSelected as true`() {
     val answerOptions =
       listOf(answerOptionOf("test-code 1", "http://code.com", "Test Code 1", true))
-    val selectedOptions = answerOptions.initialSelected.map { it as Coding }
 
-    assertThat(selectedOptions.map { it.code }).containsExactly("test-code 1")
+    assertThat(answerOptions.initialSelected.map { (it as Coding).code })
+      .containsExactly("test-code 1")
   }
 
   @Test
@@ -240,9 +239,9 @@ class MoreQuestionnaireItemAnswerOptionComponentsTest {
         answerOptionOf("test-code 3", "http://code.com", "Test Code 3", false),
         answerOptionOf("test-code 4", "http://code.com", "Test Code 4", true)
       )
-    val selectedOptions = answerOptions.initialSelected.map { it as Coding }
 
-    assertThat(selectedOptions.map { it.code }).containsExactly("test-code 2", "test-code 4")
+    assertThat(answerOptions.initialSelected.map { (it as Coding).code })
+      .containsExactly("test-code 2", "test-code 4")
   }
 
   private fun answerOptionOf(
