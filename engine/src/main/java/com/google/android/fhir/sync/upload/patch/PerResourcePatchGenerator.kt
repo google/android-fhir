@@ -24,6 +24,13 @@ import com.google.android.fhir.LocalChange.Type
 import org.json.JSONArray
 import org.json.JSONObject
 
+/**
+ * Generates a [Patch] for all [LocalChange]es made to a single FHIR resource.
+ *
+ * Used when individual client-side changes do not need to be uploaded to the server in order to
+ * maintain an audit trail, but instead, multiple changes made to the same FHIR resource on the
+ * client can be recorded as a single change on the server.
+ */
 internal object PerResourcePatchGenerator : PatchGenerator {
 
   override fun generate(localChanges: List<LocalChange>): List<Patch> {
