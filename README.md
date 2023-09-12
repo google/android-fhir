@@ -38,7 +38,7 @@ To contribute to the project, please see [Contributing](https://github.com/googl
 
 You can create a [GitHub issue](https://github.com/google/android-fhir/issues) for bugs and feature requests.
 
-In case you find any security bug, please do NOT create a Github issue. Instead, email us at <android-fhir-sdk-feedback@google.com>.
+In case you find any security bug, please do NOT create a GitHub issue. Instead, email us at <android-fhir-sdk-feedback@google.com>.
 
 If you want to provide any feedback or discuss use cases you can: 
 * email us at <android-fhir-sdk-feedback@google.com>
