@@ -241,7 +241,7 @@ class MoreQuestionnaireItemAnswerOptionComponentsTest {
     initialSelected: Boolean?
   ) =
     Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-      this.value = Coding().setCode(code).setDisplay(display).setSystem(url)
+      value = Coding().setCode(code).setDisplay(display).setSystem(url)
       initialSelected?.let { this.initialSelected = it }
     }
 }
