@@ -209,9 +209,8 @@ class MoreQuestionnaireItemAnswerOptionComponentsTest {
   fun `initialSelected should not select option with initialSelected as null`() {
     val answerOptions =
       listOf(answerOptionOf("test-code 1", "http://code.com", "Test Code 1", null))
-    val selectedOptions = answerOptions.initialSelected
 
-    assertThat(selectedOptions).isEmpty()
+    assertThat(answerOptions.initialSelected).isEmpty()
   }
 
   @Test
