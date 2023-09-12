@@ -19,21 +19,19 @@ package com.google.android.fhir.sync.upload.request
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.ContentTypes
-import com.google.android.fhir.LocalChange
 import com.google.android.fhir.sync.UrlUploadRequest
 import com.google.android.fhir.sync.upload.patch.Patch
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
-/** Generates list of [UrlUploadRequest]s with for each [LocalChange] given. */
+/** Generates list of [UrlUploadRequest]s with for each [Patch] given. */
 class IndividualRequestGenerator(
-  private val getIndividualRequestForLocalChangeType:
-    (type: Patch.Type, patch: Patch) -> UrlUploadRequest
+  private val getIndividualRequestForPatchType: (type: Patch.Type, patch: Patch) -> UrlUploadRequest
 ) : UploadRequestGenerator {
 
   override fun generateUploadRequests(patches: List<Patch>): List<UrlUploadRequest> =
-    patches.map { getIndividualRequestForLocalChangeType(it.type, it) }
+    patches.map { getIndividualRequestForPatchType(it.type, it) }
 
   companion object Factory {
 

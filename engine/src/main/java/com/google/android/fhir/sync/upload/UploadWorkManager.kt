@@ -32,6 +32,6 @@ internal interface UploadWorkManager {
    */
   fun generatePatches(localChanges: List<LocalChange>): List<Patch>
 
-  /** Generates a list of [UploadRequest]s from the [LocalChange]s to be uploaded to the server */
+  /** Generates a list of [UploadRequest]s from the [Patch]es to be uploaded to the server */
   fun generateRequests(patches: List<Patch>): List<UploadRequest>
 }

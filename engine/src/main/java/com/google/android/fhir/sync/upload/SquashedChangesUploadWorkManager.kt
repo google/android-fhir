@@ -32,15 +32,13 @@ class SquashedChangesUploadWorkManager : UploadWorkManager {
 
   /**
    * The implementation is to squash all the changes by resource type so that there is at most one
-   * local change to be uploaded per resource
+   * patch to be uploaded per resource.
    */
   override fun generatePatches(localChanges: List<LocalChange>): List<Patch> {
     return PerResourcePatchGenerator.generate(localChanges)
   }
 
-  /**
-   * Use the [TransactionBundleGenerator] to bundle the [LocalChange]s into [BundleUploadRequest]s
-   */
+  /** Use the [TransactionBundleGenerator] to bundle the [Patch]es into [BundleUploadRequest]s. */
   override fun generateRequests(patches: List<Patch>): List<UploadRequest> {
     return bundleUploadRequestGenerator.generateUploadRequests(patches)
   }
