@@ -140,6 +140,11 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       R.drawable.ic_item_answer_media,
       R.string.component_name_item_answer_media,
       ""
+    ),
+    INITIAL_VALUE(
+      R.drawable.ic_initial_value_component,
+      R.string.component_name_initial_value,
+      "component_initial_value.json"
     )
   }
 
@@ -164,5 +169,6 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       ViewItem.ComponentItem(Component.HELP),
       ViewItem.ComponentItem(Component.ITEM_MEDIA),
       ViewItem.ComponentItem(Component.ITEM_ANSWER_MEDIA),
+      ViewItem.ComponentItem(Component.INITIAL_VALUE),
     )
 }

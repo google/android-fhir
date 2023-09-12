@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemAnswerOptionComponent
+import org.hl7.fhir.r4.model.Type
 
 internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive"
@@ -41,6 +43,10 @@ internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.optionExclusiv
     }
     return false
   }
+
+/** Get the answer options values with `initialSelected` set to true */
+internal val List<QuestionnaireItemAnswerOptionComponent>.initialSelected: List<Type>
+  get() = this.filter { it.initialSelected }.map { it.value }
 
 fun Questionnaire.QuestionnaireItemAnswerOptionComponent.itemAnswerOptionImage(
   context: Context
