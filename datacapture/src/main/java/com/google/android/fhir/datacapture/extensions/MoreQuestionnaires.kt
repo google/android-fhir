@@ -115,23 +115,6 @@ internal fun getMatchingLaunchContexts(
 }
 
 /**
- * The set of supported launch contexts, as per: http://hl7.org/fhir/uv/sdc/ValueSet/launchContext
- */
-private enum class QuestionnaireLaunchContextSet(
-  val system: String,
-  val resourceType: String,
-) {
-  PATIENT(EXTENSION_LAUNCH_CONTEXT, "Patient"),
-  ENCOUNTER(EXTENSION_LAUNCH_CONTEXT, "Encounter"),
-  LOCATION(EXTENSION_LAUNCH_CONTEXT, "Location"),
-  USER_AS_PATIENT(EXTENSION_LAUNCH_CONTEXT, "Patient"),
-  USER_AS_PRACTITIONER(EXTENSION_LAUNCH_CONTEXT, "Practitioner"),
-  USER_AS_PRACTITIONER_ROLE(EXTENSION_LAUNCH_CONTEXT, "PractitionerRole"),
-  USER_AS_RELATED_PERSON(EXTENSION_LAUNCH_CONTEXT, "RelatedPerson"),
-  STUDY(EXTENSION_LAUNCH_CONTEXT, "ResearchStudy"),
-}
-
-/**
  * See
  * [Extension: target structure map](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-targetStructureMap.html)
  * .
