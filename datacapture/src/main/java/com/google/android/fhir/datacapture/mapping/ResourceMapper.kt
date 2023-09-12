@@ -18,7 +18,7 @@ package com.google.android.fhir.datacapture.mapping
 
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
-import com.google.android.fhir.datacapture.extensions.getMatchingLaunchContexts
+import com.google.android.fhir.datacapture.extensions.filterLaunchContextsByCodeInNameExtension
 import com.google.android.fhir.datacapture.extensions.logicalId
 import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
 import com.google.android.fhir.datacapture.extensions.targetStructureMap
@@ -225,7 +225,7 @@ object ResourceMapper {
     launchContexts: Map<String, Resource>
   ): QuestionnaireResponse {
     val filteredLaunchContexts =
-      getMatchingLaunchContexts(
+      filterLaunchContextsByCodeInNameExtension(
         launchContexts,
         questionnaire.questionnaireLaunchContexts ?: listOf()
       )

@@ -99,10 +99,10 @@ private fun validateLaunchContextExtension(launchExtension: Extension) {
 }
 
 /**
- * Gets the launch contexts resource map, filtered based on the matching nameCode values found in
- * the launchContextExtensions list.
+ * Filters the provided launch contexts by matching the keys with the `code` values found in the
+ * "name" extensions.
  */
-internal fun getMatchingLaunchContexts(
+internal fun filterLaunchContextsByCodeInNameExtension(
   launchContexts: Map<String, Resource>,
   launchContextExtensions: List<Extension>
 ): Map<String, Resource> {
