@@ -91,9 +91,7 @@ internal class EnabledAnswerOptionsEvaluator(
    */
   internal suspend fun evaluate(
     questionnaireItem: QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponseItemComponent,
-    questionnaireResponse: QuestionnaireResponse,
-    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>
+    questionnaireResponseItem: QuestionnaireResponseItemComponent
   ): Pair<
     List<Questionnaire.QuestionnaireItemAnswerOptionComponent>,
     List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
@@ -232,15 +230,7 @@ internal class EnabledAnswerOptionsEvaluator(
           )
       }
       answerExpression.isFhirPath -> {
-        val data =
-          ExpressionEvaluator.evaluateExpression(
-            questionnaire,
-            questionnaireResponse,
-            item,
-            responseItem,
-            answerExpression,
-            questionnaireItemParentMap
-          )
+        val data = expressionEvaluator.evaluateExpression(item, responseItem, answerExpression)
         item.extractAnswerOptions(data)
       }
       else ->
