@@ -52,8 +52,8 @@ data class LocalChange(
 }
 
 /** Method to convert LocalChangeEntity to LocalChange instance. */
-internal fun LocalChangeEntity.toLocalChange(): LocalChange {
-  return LocalChange(
+internal fun LocalChangeEntity.toLocalChange(): LocalChange =
+  LocalChange(
     resourceType,
     resourceId,
     versionId,
@@ -62,6 +62,5 @@ internal fun LocalChangeEntity.toLocalChange(): LocalChange {
     payload,
     LocalChangeToken(listOf(id))
   )
-}
 
 data class LocalChangeToken(val ids: List<Long>)
