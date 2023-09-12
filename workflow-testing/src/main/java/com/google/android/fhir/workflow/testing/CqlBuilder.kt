@@ -87,7 +87,7 @@ object CqlBuilder : Loadable() {
   }
 
   /**
-   * Assembles an ELM Library exported as a JSON in to a FHIRLibrary
+   * Assembles an ELM Library exported as a JSON into a FHIRLibrary
    *
    * @param jsonElmStr the JSON representation of the ELM Library
    * @param libName the Library name
