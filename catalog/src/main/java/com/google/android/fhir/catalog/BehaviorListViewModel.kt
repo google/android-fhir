@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,11 @@ class BehaviorListViewModel(application: Application) : AndroidViewModel(applica
       R.drawable.ic_skiplogic_behavior,
       R.string.behavior_name_skip_logic,
       "behavior_skip_logic.json"
+    ),
+    SKIP_LOGIC_WITH_EXPRESSION(
+      R.drawable.ic_skiplogic_behavior,
+      R.string.behavior_name_skip_logic_with_expression,
+      "behavior_skip_logic_with_expression.json"
     ),
     DYNAMIC_QUESTION_TEXT(
       R.drawable.ic_dynamic_text_behavior,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.Type
 
 object QuestionnaireResponseValidator {
@@ -56,7 +57,11 @@ object QuestionnaireResponseValidator {
   fun validateQuestionnaireResponse(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    context: Context
+    context: Context,
+    questionnaireItemParentMap:
+      Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> =
+      mapOf(),
+    launchContextMap: Map<String, Resource>? = mapOf(),
   ): Map<String, List<ValidationResult>> {
     require(
       questionnaireResponse.questionnaire == null ||
@@ -71,7 +76,12 @@ object QuestionnaireResponseValidator {
       questionnaire.item,
       questionnaireResponse.item,
       context,
-      EnablementEvaluator(questionnaireResponse),
+      EnablementEvaluator(
+        questionnaire,
+        questionnaireResponse,
+        questionnaireItemParentMap,
+        launchContextMap
+      ),
       linkIdToValidationResultMap,
     )
 
@@ -98,7 +108,11 @@ object QuestionnaireResponseValidator {
         questionnaireItem = questionnaireItemListIterator.next()
       } while (questionnaireItem!!.linkId != questionnaireResponseItem.linkId)
 
-      val enabled = enablementEvaluator.evaluate(questionnaireItem, questionnaireResponseItem)
+      val enabled =
+        enablementEvaluator.evaluate(
+          questionnaireItem,
+          questionnaireResponseItem,
+        )
 
       if (enabled) {
         validateQuestionnaireResponseItem(
@@ -118,7 +132,7 @@ object QuestionnaireResponseValidator {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     context: Context,
     enablementEvaluator: EnablementEvaluator,
-    linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>
+    linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>,
   ): Map<String, List<ValidationResult>> {
 
     when (checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }) {

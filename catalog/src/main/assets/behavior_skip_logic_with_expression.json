@@ -1,0 +1,74 @@
+{
+  "resourceType": "Questionnaire",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "has-fever",
+        "language": "text/fhirpath",
+        "expression": "%resource.descendants().where(linkId='1').answer.value"
+      }
+    }
+  ],
+  "item": [
+    {
+      "linkId": "1",
+      "type": "boolean",
+      "text": "Does patient has fever?",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1.1",
+          "text": "Define the questionnaire variable 'has-fever' based on the answer to the question 'Does the patient have a fever?",
+          "type": "display"
+        }
+      ]
+    },
+    {
+      "linkId": "2",
+      "text": "Since when?",
+      "type": "date",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
+          "valueExpression": {
+            "language": "text/fhirpath",
+            "expression": "%has-fever"
+          }
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "2.1",
+          "text": "Enabled if variable 'has-fever' evaluates to true",
+          "type": "display"
+        }
+      ]
+    }
+  ]
+}

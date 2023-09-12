@@ -22,8 +22,6 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_VARIABLE_URL
 import com.google.android.fhir.datacapture.extensions.answerExpression
 import com.google.android.fhir.datacapture.extensions.asStringValue
 import com.google.android.fhir.datacapture.extensions.variableExpressions
-import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
-import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
 import java.util.Date
@@ -63,11 +61,11 @@ class ExpressionEvaluatorTest {
           }
         }
 
+      val expressionEvaluator = ExpressionEvaluator(questionnaire, QuestionnaireResponse())
+
       val result =
-        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+        expressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.first(),
-          questionnaire,
-          QuestionnaireResponse()
         )
 
       assertThat((result as Type).asStringValue()).isEqualTo("1")
@@ -100,11 +98,11 @@ class ExpressionEvaluatorTest {
           }
         }
 
+      val expressionEvaluator = ExpressionEvaluator(questionnaire, QuestionnaireResponse())
+
       val result =
-        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+        expressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.last(),
-          questionnaire,
-          QuestionnaireResponse()
         )
 
       assertThat((result as Type).asStringValue()).isEqualTo("2")
@@ -152,13 +150,17 @@ class ExpressionEvaluatorTest {
           )
         }
 
-      val result =
-        ExpressionEvaluator.evaluateQuestionnaireItemVariableExpression(
-          questionnaire.item[0].item[0].variableExpressions.last(),
+      val expressionEvaluator =
+        ExpressionEvaluator(
           questionnaire,
           QuestionnaireResponse(),
-          mapOf(questionnaire.item[0].item[0] to questionnaire.item[0]),
-          questionnaire.item[0].item[0]
+          mapOf(questionnaire.item[0].item[0] to questionnaire.item[0])
+        )
+
+      val result =
+        expressionEvaluator.evaluateQuestionnaireItemVariableExpression(
+          questionnaire.item[0].item[0].variableExpressions.last(),
+          questionnaire.item[0].item[0],
         )
 
       assertThat((result as Type).asStringValue()).isEqualTo("2")
@@ -201,11 +203,11 @@ class ExpressionEvaluatorTest {
           }
         }
 
+      val expressionEvaluator = ExpressionEvaluator(questionnaire, QuestionnaireResponse())
+
       val result =
-        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+        expressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.last(),
-          questionnaire,
-          QuestionnaireResponse()
         )
 
       assertThat((result as Type).asStringValue()).isEqualTo("3")
@@ -228,11 +230,11 @@ class ExpressionEvaluatorTest {
           }
         }
 
+      val expressionEvaluator = ExpressionEvaluator(questionnaire, QuestionnaireResponse())
+
       val result =
-        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+        expressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.last(),
-          questionnaire,
-          QuestionnaireResponse()
         )
 
       assertThat(result).isEqualTo(null)
@@ -272,13 +274,12 @@ class ExpressionEvaluatorTest {
           )
         }
 
+      val expressionEvaluator = ExpressionEvaluator(questionnaire, QuestionnaireResponse())
+
       val result =
-        ExpressionEvaluator.evaluateQuestionnaireItemVariableExpression(
+        expressionEvaluator.evaluateQuestionnaireItemVariableExpression(
           questionnaire.item[0].variableExpressions.last(),
-          questionnaire,
-          QuestionnaireResponse(),
-          mapOf(),
-          questionnaire.item[0]
+          questionnaire.item[0],
         )
 
       assertThat((result as Type).asStringValue()).isEqualTo("2")
@@ -308,13 +309,12 @@ class ExpressionEvaluatorTest {
           )
         }
 
+      val expressionEvaluator = ExpressionEvaluator(questionnaire, QuestionnaireResponse())
+
       val result =
-        ExpressionEvaluator.evaluateQuestionnaireItemVariableExpression(
+        expressionEvaluator.evaluateQuestionnaireItemVariableExpression(
           questionnaire.item[0].variableExpressions.last(),
-          questionnaire,
-          QuestionnaireResponse(),
-          mapOf(),
-          questionnaire.item[0]
+          questionnaire.item[0],
         )
 
       assertThat(result).isEqualTo(null)
@@ -338,10 +338,10 @@ class ExpressionEvaluatorTest {
             }
           }
 
-        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+        val expressionEvaluator = ExpressionEvaluator(questionnaire, QuestionnaireResponse())
+
+        expressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.first(),
-          questionnaire,
-          QuestionnaireResponse()
         )
       }
     }
@@ -365,10 +365,10 @@ class ExpressionEvaluatorTest {
             }
           }
 
-        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+        val expressionEvaluator = ExpressionEvaluator(questionnaire, QuestionnaireResponse())
+
+        expressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.first(),
-          questionnaire,
-          QuestionnaireResponse()
         )
       }
     }
@@ -393,10 +393,10 @@ class ExpressionEvaluatorTest {
             }
           }
 
-        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+        val expressionEvaluator = ExpressionEvaluator(questionnaire, QuestionnaireResponse())
+
+        expressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.first(),
-          questionnaire,
-          QuestionnaireResponse()
         )
       }
     }
@@ -420,10 +420,10 @@ class ExpressionEvaluatorTest {
             }
           }
 
-        ExpressionEvaluator.evaluateQuestionnaireVariableExpression(
+        val expressionEvaluator = ExpressionEvaluator(questionnaire, QuestionnaireResponse())
+
+        expressionEvaluator.evaluateQuestionnaireVariableExpression(
           questionnaire.variableExpressions.first(),
-          questionnaire,
-          QuestionnaireResponse()
         )
       }
     }
@@ -477,13 +477,12 @@ class ExpressionEvaluatorTest {
           )
         }
 
+      val expressionEvaluator = ExpressionEvaluator(questionnaire, questionnaireResponse)
+
       val result =
-        ExpressionEvaluator.evaluateQuestionnaireItemVariableExpression(
+        expressionEvaluator.evaluateQuestionnaireItemVariableExpression(
           questionnaire.item[0].variableExpressions.last(),
-          questionnaire,
-          questionnaireResponse,
-          mapOf(),
-          questionnaire.item[0]
+          questionnaire.item[0],
         )
 
       assertThat((result as Type).asStringValue()).isEqualTo("2")
@@ -538,13 +537,12 @@ class ExpressionEvaluatorTest {
         )
       }
 
+    val expressionEvaluator = ExpressionEvaluator(questionnaire, questionnaireResponse)
+
     val result =
-      evaluateCalculatedExpressions(
+      expressionEvaluator.evaluateCalculatedExpressions(
         questionnaire.item.elementAt(1),
         questionnaireResponse.item.elementAt(1),
-        questionnaire,
-        questionnaireResponse,
-        emptyMap()
       )
 
     assertThat(result.first().second.first().asStringValue())
@@ -611,13 +609,12 @@ class ExpressionEvaluatorTest {
           )
         }
 
+      val expressionEvaluator = ExpressionEvaluator(questionnaire, questionnaireResponse)
+
       val result =
-        evaluateCalculatedExpressions(
+        expressionEvaluator.evaluateCalculatedExpressions(
           questionnaire.item.elementAt(1),
           questionnaireResponse.item.elementAt(1),
-          questionnaire,
-          questionnaireResponse,
-          emptyMap()
         )
 
       assertThat(result.first().second.first().asStringValue())
@@ -669,9 +666,11 @@ class ExpressionEvaluatorTest {
         )
       }
 
+    val expressionEvaluator = ExpressionEvaluator(questionnaire, QuestionnaireResponse())
+
     val exception =
       assertThrows(null, IllegalStateException::class.java) {
-        detectExpressionCyclicDependency(questionnaire.item)
+        expressionEvaluator.detectExpressionCyclicDependency(questionnaire.item)
       }
     assertThat(exception.message)
       .isEqualTo("a-birthdate and a-age-years have cyclic dependency in expression based extension")
@@ -686,14 +685,19 @@ class ExpressionEvaluatorTest {
           "Practitioner?var1={{random}}&var2={{  random   }}&var3={{ random}}&var4={{random }}"
       }
 
-    val expressionsToEvaluate =
-      ExpressionEvaluator.createXFhirQueryFromExpression(
+    val expressionEvaluator =
+      ExpressionEvaluator(
         Questionnaire(),
         QuestionnaireResponse(),
+        questionnaireItemParentMap = emptyMap(),
+        questionnaireLaunchContextMap =
+          mapOf(Practitioner().resourceType.name.lowercase() to Practitioner()),
+      )
+
+    val expressionsToEvaluate =
+      expressionEvaluator.createXFhirQueryFromExpression(
         Questionnaire.QuestionnaireItemComponent(),
-        emptyMap(),
         expression,
-        mapOf(Practitioner().resourceType.name.lowercase() to Practitioner())
       )
 
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?var1=&var2=&var3=&var4=")
@@ -714,14 +718,18 @@ class ExpressionEvaluatorTest {
         this.expression = "Practitioner?gender={{Practitioner.gender}}"
       }
 
-    val expressionsToEvaluate =
-      ExpressionEvaluator.createXFhirQueryFromExpression(
+    val expressionEvaluator =
+      ExpressionEvaluator(
         Questionnaire(),
         QuestionnaireResponse(),
+        questionnaireItemParentMap = emptyMap(),
+        questionnaireLaunchContextMap = mapOf(practitioner.resourceType.name to practitioner),
+      )
+
+    val expressionsToEvaluate =
+      expressionEvaluator.createXFhirQueryFromExpression(
         Questionnaire.QuestionnaireItemComponent(),
-        emptyMap(),
         expression,
-        mapOf(practitioner.resourceType.name to practitioner)
       )
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
   }
@@ -742,14 +750,19 @@ class ExpressionEvaluatorTest {
         this.expression = "Practitioner?gender={{Practitioner.gender}}"
       }
 
-    val expressionsToEvaluate =
-      ExpressionEvaluator.createXFhirQueryFromExpression(
+    val expressionEvaluator =
+      ExpressionEvaluator(
         Questionnaire(),
         QuestionnaireResponse(),
+        questionnaireItemParentMap = emptyMap(),
+        questionnaireLaunchContextMap =
+          mapOf(practitioner.resourceType.name.lowercase() to practitioner),
+      )
+
+    val expressionsToEvaluate =
+      expressionEvaluator.createXFhirQueryFromExpression(
         Questionnaire.QuestionnaireItemComponent(),
-        emptyMap(),
         expression,
-        mapOf(practitioner.resourceType.name.lowercase() to practitioner)
       )
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=male")
   }
@@ -770,14 +783,18 @@ class ExpressionEvaluatorTest {
         this.expression = "Practitioner?gender={{%patient.gender}}"
       }
 
-    val expressionsToEvaluate =
-      ExpressionEvaluator.createXFhirQueryFromExpression(
+    val expressionEvaluator =
+      ExpressionEvaluator(
         Questionnaire(),
         QuestionnaireResponse(),
+        questionnaireItemParentMap = emptyMap(),
+        questionnaireLaunchContextMap = mapOf(practitioner.resourceType.name to practitioner),
+      )
+
+    val expressionsToEvaluate =
+      expressionEvaluator.createXFhirQueryFromExpression(
         Questionnaire.QuestionnaireItemComponent(),
-        emptyMap(),
         expression,
-        mapOf(practitioner.resourceType.name to practitioner)
       )
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
   }
@@ -798,14 +815,18 @@ class ExpressionEvaluatorTest {
         this.expression = "Patient?family={{%patient.name.family}}"
       }
 
-    val expressionsToEvaluate =
-      ExpressionEvaluator.createXFhirQueryFromExpression(
+    val expressionEvaluator =
+      ExpressionEvaluator(
         Questionnaire(),
         QuestionnaireResponse(),
+        questionnaireItemParentMap = emptyMap(),
+        questionnaireLaunchContextMap = mapOf(patient.resourceType.name.lowercase() to patient),
+      )
+
+    val expressionsToEvaluate =
+      expressionEvaluator.createXFhirQueryFromExpression(
         Questionnaire.QuestionnaireItemComponent(),
-        emptyMap(),
         expression,
-        mapOf(patient.resourceType.name.lowercase() to patient)
       )
     assertThat(expressionsToEvaluate).isEqualTo("Patient?family=John")
   }
@@ -840,23 +861,28 @@ class ExpressionEvaluatorTest {
           "Patient?family={{%patient.name.family}}&address-city={{%location.address.city}}"
       }
 
-    val expressionsToEvaluate =
-      ExpressionEvaluator.createXFhirQueryFromExpression(
+    val expressionEvaluator =
+      ExpressionEvaluator(
         Questionnaire(),
         QuestionnaireResponse(),
+        questionnaireItemParentMap = emptyMap(),
+        questionnaireLaunchContextMap =
+          mapOf(
+            patient.resourceType.name.lowercase() to patient,
+            location.resourceType.name.lowercase() to location
+          )
+      )
+
+    val expressionsToEvaluate =
+      expressionEvaluator.createXFhirQueryFromExpression(
         Questionnaire.QuestionnaireItemComponent(),
-        emptyMap(),
         expression,
-        mapOf(
-          patient.resourceType.name.lowercase() to patient,
-          location.resourceType.name.lowercase() to location
-        )
       )
     assertThat(expressionsToEvaluate).isEqualTo("Patient?family=John&address-city=NAIROBI")
   }
 
   @Test
-  fun `createXFhirQueryFromExpression() should evaluate variables in answer expression`() {
+  fun `createXFhirQueryFromExpression() should evaluate variables in answer expression when launch context is null`() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -905,14 +931,85 @@ class ExpressionEvaluatorTest {
         )
       }
 
-    val result =
-      ExpressionEvaluator.createXFhirQueryFromExpression(
+    val expressionEvaluator =
+      ExpressionEvaluator(
         questionnaire,
         QuestionnaireResponse(),
+        questionnaireItemParentMap = mapOf(questionnaire.item[0].item[0] to questionnaire.item[0]),
+        questionnaireLaunchContextMap = null,
+      )
+
+    val result =
+      expressionEvaluator.createXFhirQueryFromExpression(
         questionnaire.item[0].item[0],
-        mapOf(questionnaire.item[0].item[0] to questionnaire.item[0]),
         questionnaire.item[0].item[0].answerExpression!!,
-        null
+      )
+
+    assertThat(result).isEqualTo("Patient?address-city=1&gender=2")
+  }
+
+  @Test
+  fun `createXFhirQueryFromExpression() should evaluate variables in answer expression when launch context in empty`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-group-item"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension().apply {
+              url = EXTENSION_VARIABLE_URL
+              setValue(
+                Expression().apply {
+                  name = "A"
+                  language = "text/fhirpath"
+                  expression = "1"
+                }
+              )
+            }
+            addExtension().apply {
+              url = EXTENSION_VARIABLE_URL
+              setValue(
+                Expression().apply {
+                  name = "B"
+                  language = "text/fhirpath"
+                  expression = "2"
+                }
+              )
+            }
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "an-item"
+                text = "a question"
+                type = Questionnaire.QuestionnaireItemType.TEXT
+                addExtension().apply {
+                  url = EXTENSION_ANSWER_EXPRESSION_URL
+                  setValue(
+                    Expression().apply {
+                      language = "application/x-fhir-query"
+                      expression = "Patient?address-city={{%A}}&gender={{%B}}"
+                    }
+                  )
+                }
+              }
+            )
+          }
+        )
+      }
+
+    val expressionEvaluator =
+      ExpressionEvaluator(
+        questionnaire,
+        QuestionnaireResponse(),
+        questionnaireItemParentMap = mapOf(questionnaire.item[0].item[0] to questionnaire.item[0]),
+        questionnaireLaunchContextMap = emptyMap(),
+      )
+
+    val result =
+      expressionEvaluator.createXFhirQueryFromExpression(
+        questionnaire.item[0].item[0],
+        questionnaire.item[0].item[0].answerExpression!!,
       )
 
     assertThat(result).isEqualTo("Patient?address-city=1&gender=2")
