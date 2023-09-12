@@ -20,7 +20,6 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
-import com.google.android.fhir.sync.upload.ConsolidatorMode
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
@@ -55,8 +54,7 @@ interface FhirEngine {
    * api caller should [Flow.collect] it.
    */
   suspend fun syncUpload(
-    consolidatorMode: ConsolidatorMode,
-    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+    upload: (suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>)
   )
 
   /**

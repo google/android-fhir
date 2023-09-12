@@ -25,13 +25,6 @@ import timber.log.Timber
 
 fun interface ResourceConsolidator {
   suspend fun consolidate(localChangeToken: LocalChangeToken, response: Resource)
-  companion object {
-    internal fun byMode(mode: ConsolidatorMode, database: Database): ResourceConsolidator =
-      when (mode) {
-        is ConsolidatorMode.Default -> DefaultResourceConsolidator(database)
-        else -> error("$mode does not have an implementation yet.")
-      }
-  }
 }
 
 internal class DefaultResourceConsolidator(private val database: Database) : ResourceConsolidator {
@@ -115,9 +108,4 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
         ?.split("/")
         ?.takeIf { it.size > 3 }
         ?.let { it[it.size - 3] to ResourceType.fromCode(it[it.size - 4]) }
-}
-
-sealed class ConsolidatorMode {
-  object IDUpdater : ConsolidatorMode()
-  object Default : ConsolidatorMode()
 }

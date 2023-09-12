@@ -19,7 +19,6 @@ package com.google.android.fhir.sync
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.sync.upload.ConsolidatorMode
 import com.google.android.fhir.sync.upload.UploadState
 import com.google.android.fhir.sync.upload.Uploader
 import java.time.OffsetDateTime
@@ -127,7 +126,7 @@ internal class FhirSynchronizer(
 
   private suspend fun upload(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
-    fhirEngine.syncUpload(ConsolidatorMode.Default) { list ->
+    fhirEngine.syncUpload { list ->
       flow {
         uploader.upload(list).collect { result ->
           when (result) {
