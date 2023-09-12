@@ -18,11 +18,7 @@ package com.google.android.fhir.sync.upload.request
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.LocalChangeUtils
-import com.google.android.fhir.db.impl.dao.toLocalChange
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
+import com.google.android.fhir.sync.upload.patch.Patch
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
 import kotlinx.coroutines.test.runTest
@@ -43,41 +39,38 @@ class IndividualGeneratorTest {
   @Test
   fun `should return empty list if there are no local changes`() = runTest {
     val generator = IndividualRequestGenerator.getDefault()
-    val result = generator.generateUploadRequests(listOf())
-    assertThat(result).isEmpty()
+    val requests = generator.generateUploadRequests(listOf())
+    assertThat(requests).isEmpty()
   }
 
   @Test
   fun `should create a POST request for insert`() = runTest {
     val generator = IndividualRequestGenerator.getGenerator(HttpVerb.POST, HttpVerb.PATCH)
-    val result =
+    val requests =
       generator.generateUploadRequests(
         listOf(
-          LocalChangeEntity(
-              id = 1,
-              resourceType = ResourceType.Patient.name,
-              resourceId = "Patient-001",
-              type = Type.INSERT,
-              payload =
-                jsonParser.encodeResourceToString(
-                  Patient().apply {
-                    id = "Patient-001"
-                    addName(
-                      HumanName().apply {
-                        addGiven("John")
-                        family = "Doe"
-                      }
-                    )
-                  }
-                ),
-              timestamp = Instant.now()
-            )
-            .toLocalChange()
-            .apply { token = LocalChangeToken(listOf(1)) }
+          Patch(
+            resourceType = ResourceType.Patient.name,
+            resourceId = "Patient-001",
+            type = Patch.Type.INSERT,
+            payload =
+              jsonParser.encodeResourceToString(
+                Patient().apply {
+                  id = "Patient-001"
+                  addName(
+                    HumanName().apply {
+                      addGiven("John")
+                      family = "Doe"
+                    }
+                  )
+                }
+              ),
+            timestamp = Instant.now()
+          ),
         )
       )
 
-    with(result.single()) {
+    with(requests.single()) {
       assertThat(httpVerb).isEqualTo(HttpVerb.POST)
       assertThat(url).isEqualTo("Patient")
     }
@@ -86,34 +79,31 @@ class IndividualGeneratorTest {
   @Test
   fun `should create a PUT request for insert`() = runTest {
     val generator = IndividualRequestGenerator.getDefault()
-    val result =
+    val requests =
       generator.generateUploadRequests(
         listOf(
-          LocalChangeEntity(
-              id = 1,
-              resourceType = ResourceType.Patient.name,
-              resourceId = "Patient-001",
-              type = Type.INSERT,
-              payload =
-                jsonParser.encodeResourceToString(
-                  Patient().apply {
-                    id = "Patient-001"
-                    addName(
-                      HumanName().apply {
-                        addGiven("John")
-                        family = "Doe"
-                      }
-                    )
-                  }
-                ),
-              timestamp = Instant.now()
-            )
-            .toLocalChange()
-            .apply { token = LocalChangeToken(listOf(1)) }
+          Patch(
+            resourceType = ResourceType.Patient.name,
+            resourceId = "Patient-001",
+            type = Patch.Type.INSERT,
+            payload =
+              jsonParser.encodeResourceToString(
+                Patient().apply {
+                  id = "Patient-001"
+                  addName(
+                    HumanName().apply {
+                      addGiven("John")
+                      family = "Doe"
+                    }
+                  )
+                }
+              ),
+            timestamp = Instant.now()
+          ),
         )
       )
 
-    with(result.single()) {
+    with(requests.single()) {
       assertThat(httpVerb).isEqualTo(HttpVerb.PUT)
       assertThat(url).isEqualTo("Patient/Patient-001")
     }
@@ -121,45 +111,21 @@ class IndividualGeneratorTest {
 
   @Test
   fun `should create a PATCH request for update`() = runTest {
-    val changes =
+    val patches =
       listOf(
-        LocalChangeEntity(
-            id = 2,
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-002",
-            type = Type.UPDATE,
-            payload =
-              LocalChangeUtils.diff(
-                  jsonParser,
-                  Patient().apply {
-                    id = "Patient-002"
-                    addName(
-                      HumanName().apply {
-                        addGiven("Jane")
-                        family = "Doe"
-                      }
-                    )
-                  },
-                  Patient().apply {
-                    id = "Patient-002"
-                    addName(
-                      HumanName().apply {
-                        addGiven("Janet")
-                        family = "Doe"
-                      }
-                    )
-                  }
-                )
-                .toString(),
-            timestamp = Instant.now()
-          )
-          .toLocalChange()
-          .apply { LocalChangeToken(listOf(2)) },
+        Patch(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-002",
+          type = Patch.Type.UPDATE,
+          payload =
+            "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]",
+          timestamp = Instant.now()
+        ),
       )
     val generator = IndividualRequestGenerator.Factory.getDefault()
-    val result = generator.generateUploadRequests(changes)
-    with(result.single()) {
-      assertThat(result.size).isEqualTo(1)
+    val requests = generator.generateUploadRequests(patches)
+    with(requests.single()) {
+      assertThat(requests.size).isEqualTo(1)
       assertThat(httpVerb).isEqualTo(HttpVerb.PATCH)
       assertThat(url).isEqualTo("Patient/Patient-002")
       assertThat((resource as Binary).data.toString(Charsets.UTF_8))
@@ -171,33 +137,30 @@ class IndividualGeneratorTest {
 
   @Test
   fun `should create a DELETE request for delete`() = runTest {
-    val changes =
+    val patches =
       listOf(
-        LocalChangeEntity(
-            id = 1,
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-001",
-            type = Type.DELETE,
-            payload =
-              jsonParser.encodeResourceToString(
-                Patient().apply {
-                  id = "Patient-001"
-                  addName(
-                    HumanName().apply {
-                      addGiven("John")
-                      family = "Doe"
-                    }
-                  )
-                }
-              ),
-            timestamp = Instant.now()
-          )
-          .toLocalChange()
-          .apply { LocalChangeToken(listOf(1)) },
+        Patch(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-001",
+          type = Patch.Type.DELETE,
+          payload =
+            jsonParser.encodeResourceToString(
+              Patient().apply {
+                id = "Patient-001"
+                addName(
+                  HumanName().apply {
+                    addGiven("John")
+                    family = "Doe"
+                  }
+                )
+              }
+            ),
+          timestamp = Instant.now()
+        ),
       )
     val generator = IndividualRequestGenerator.Factory.getDefault()
-    val result = generator.generateUploadRequests(changes)
-    with(result.single()) {
+    val requests = generator.generateUploadRequests(patches)
+    with(requests.single()) {
       assertThat(httpVerb).isEqualTo(HttpVerb.DELETE)
       assertThat(url).isEqualTo("Patient/Patient-001")
     }
@@ -205,85 +168,55 @@ class IndividualGeneratorTest {
 
   @Test
   fun `should return multiple requests in order`() = runTest {
-    val changes =
+    val patches =
       listOf(
-        LocalChangeEntity(
-            id = 1,
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-001",
-            type = Type.INSERT,
-            payload =
-              jsonParser.encodeResourceToString(
-                Patient().apply {
-                  id = "Patient-001"
-                  addName(
-                    HumanName().apply {
-                      addGiven("John")
-                      family = "Doe"
-                    }
-                  )
-                }
-              ),
-            timestamp = Instant.now()
-          )
-          .toLocalChange()
-          .apply { token = LocalChangeToken(listOf(1)) },
-        LocalChangeEntity(
-            id = 2,
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-002",
-            type = Type.UPDATE,
-            payload =
-              LocalChangeUtils.diff(
-                  jsonParser,
-                  Patient().apply {
-                    id = "Patient-002"
-                    addName(
-                      HumanName().apply {
-                        addGiven("Jane")
-                        family = "Doe"
-                      }
-                    )
-                  },
-                  Patient().apply {
-                    id = "Patient-002"
-                    addName(
-                      HumanName().apply {
-                        addGiven("Janet")
-                        family = "Doe"
-                      }
-                    )
+        Patch(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-001",
+          type = Patch.Type.INSERT,
+          payload =
+            jsonParser.encodeResourceToString(
+              Patient().apply {
+                id = "Patient-001"
+                addName(
+                  HumanName().apply {
+                    addGiven("John")
+                    family = "Doe"
                   }
                 )
-                .toString(),
-            timestamp = Instant.now()
-          )
-          .toLocalChange()
-          .apply { LocalChangeToken(listOf(2)) },
-        LocalChangeEntity(
-            id = 3,
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-003",
-            type = Type.DELETE,
-            payload =
-              jsonParser.encodeResourceToString(
-                Patient().apply {
-                  id = "Patient-003"
-                  addName(
-                    HumanName().apply {
-                      addGiven("John")
-                      family = "Roe"
-                    }
-                  )
-                }
-              ),
-            timestamp = Instant.now()
-          )
-          .toLocalChange()
-          .apply { LocalChangeToken(listOf(3)) }
+              }
+            ),
+          timestamp = Instant.now()
+        ),
+        Patch(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-002",
+          type = Patch.Type.UPDATE,
+          payload =
+            "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]",
+          timestamp = Instant.now()
+        ),
+        Patch(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-003",
+          type = Patch.Type.DELETE,
+          payload =
+            jsonParser.encodeResourceToString(
+              Patient().apply {
+                id = "Patient-003"
+                addName(
+                  HumanName().apply {
+                    addGiven("John")
+                    family = "Roe"
+                  }
+                )
+              }
+            ),
+          timestamp = Instant.now()
+        ),
       )
     val generator = IndividualRequestGenerator.Factory.getDefault()
-    val result = generator.generateUploadRequests(changes)
+    val result = generator.generateUploadRequests(patches)
     assertThat(result).hasSize(3)
     assertThat(result.map { it.httpVerb })
       .containsExactly(HttpVerb.PUT, HttpVerb.PATCH, HttpVerb.DELETE)

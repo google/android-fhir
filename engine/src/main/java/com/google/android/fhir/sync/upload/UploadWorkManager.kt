@@ -18,26 +18,19 @@ package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.sync.UploadRequest
+import com.google.android.fhir.sync.upload.patch.Patch
 
 /**
  * Manager that pre-processes the local FHIR changes and handles how to upload them to the server.
  */
 internal interface UploadWorkManager {
   /**
-   * Transforms the [LocalChange]s to the final set of changes that needs to be uploaded to the
-   * server. The transformations can be of various types like squashing the [LocalChange]s by
-   * [Resource] e.g. [SquashedChangesUploadWorkManager] or filtering out certain [LocalChange]s or
-   * grouping the changes.
+   * Transforms the [LocalChange]s to the final set of [Patch]es that need to be uploaded to the
+   * server. The transformation can be of various types like grouping the [LocalChange]s by resource
+   * or filtering out certain [LocalChange]s.
    */
-  fun prepareChangesForUpload(localChanges: List<LocalChange>): List<LocalChange>
+  fun generatePatches(localChanges: List<LocalChange>): List<Patch>
 
-  /** Generates a list of [UploadRequest]s from the [LocalChange]s to be uploaded to the server */
-  fun createUploadRequestsFromLocalChanges(localChanges: List<LocalChange>): List<UploadRequest>
-
-  /**
-   * Gets the [Int] to indicate the progress in terms of the pending uploads. The indicator could be
-   * determined at the resource level (by extracting resource information from the upload requests)
-   * etc.
-   */
-  fun getPendingUploadsIndicator(uploadRequests: List<UploadRequest>): Int
+  /** Generates a list of [UploadRequest]s from the [Patch]es to be uploaded to the server */
+  fun generateRequests(patches: List<Patch>): List<UploadRequest>
 }
