@@ -111,19 +111,15 @@ class MoreQuestionnairesTest {
   }
 
   @Test
-  fun `should throw exception if resource type in context is not part of launchContext value set`() {
+  fun `should throw exception if type in type extension is not a valid resource type`() {
     val launchContextExtension =
       Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
         .apply {
           addExtension(
             "name",
-            Coding(
-              "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
-              "observation",
-              "Observation"
-            )
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "me", "Me")
           )
-          addExtension("type", CodeType("Observation"))
+          addExtension("type", CodeType("Avocado"))
         }
 
     val errorMessage =
@@ -140,37 +136,12 @@ class MoreQuestionnairesTest {
   }
 
   @Test
-  fun `should throw exception if system in name extension is different to the fhir standard`() {
+  fun `should throw exception if system in name extension is not valid`() {
     val launchContextExtension =
       Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
         .apply {
-          addExtension("name", Coding("http://idk-bro", "grandma", "Grandma"))
+          addExtension("name", Coding("http://wrong-system", "grandma", "Grandma"))
           addExtension("type", CodeType("Patient"))
-        }
-
-    val errorMessage =
-      assertFailsWith<IllegalStateException> {
-          validateLaunchContextExtensions(listOf(launchContextExtension))
-        }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo(
-        "The extension:name extension and/or extension:type extension do not follow " +
-          "the format specified in http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
-      )
-  }
-
-  @Test
-  fun `should throw exception if type extension is not a subset of User value set in name extension`() {
-    val launchContextExtension =
-      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
-        .apply {
-          addExtension(
-            "name",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User")
-          )
-          addExtension("type", CodeType("Observation"))
         }
 
     val errorMessage =
