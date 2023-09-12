@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,20 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.SearchResult
 import com.google.android.fhir.search.Search
+import com.google.android.fhir.sync.BundleDownloadRequest
+import com.google.android.fhir.sync.BundleUploadRequest
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.DownloadWorkManager
-import com.google.android.fhir.sync.Request
+import com.google.android.fhir.sync.UploadRequest
+import com.google.android.fhir.sync.UrlDownloadRequest
 import com.google.common.truth.Truth.assertThat
 import java.net.SocketTimeoutException
+import java.time.Instant
 import java.time.OffsetDateTime
 import java.util.Date
 import java.util.LinkedList
@@ -93,15 +99,13 @@ fun readJsonArrayFromFile(filename: String): JSONArray {
 
 object TestDataSourceImpl : DataSource {
 
-  override suspend fun download(path: String): Resource {
-    return Bundle().apply { type = Bundle.BundleType.SEARCHSET }
-  }
+  override suspend fun download(downloadRequest: DownloadRequest) =
+    when (downloadRequest) {
+      is UrlDownloadRequest -> Bundle().apply { type = Bundle.BundleType.SEARCHSET }
+      is BundleDownloadRequest -> Bundle().apply { type = Bundle.BundleType.BATCHRESPONSE }
+    }
 
-  override suspend fun download(bundle: Bundle): Resource {
-    return Bundle().apply { type = Bundle.BundleType.BATCHRESPONSE }
-  }
-
-  override suspend fun upload(bundle: Bundle): Resource {
+  override suspend fun upload(request: UploadRequest): Resource {
     return Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
   }
 }
@@ -111,7 +115,9 @@ open class TestDownloadManagerImpl(
 ) : DownloadWorkManager {
   private val urls = LinkedList(queries)
 
-  override suspend fun getNextRequest(): Request? = urls.poll()?.let { Request.of(it) }
+  override suspend fun getNextRequest(): DownloadRequest? =
+    urls.poll()?.let { DownloadRequest.of(it) }
+
   override suspend fun getSummaryRequestUrls() =
     queries
       .stream()
@@ -136,14 +142,14 @@ object TestFhirEngineImpl : FhirEngine {
 
   override suspend fun delete(type: ResourceType, id: String) {}
 
-  override suspend fun <R : Resource> search(search: Search): List<R> {
+  override suspend fun <R : Resource> search(search: Search): List<SearchResult<R>> {
     return emptyList()
   }
 
   override suspend fun syncUpload(
     upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
-    upload(listOf(getLocalChange(ResourceType.Patient, "123")))
+    upload(getLocalChanges(ResourceType.Patient, "123")).collect()
   }
 
   override suspend fun syncDownload(
@@ -162,13 +168,16 @@ object TestFhirEngineImpl : FhirEngine {
 
   override suspend fun clearDatabase() {}
 
-  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange {
-    return LocalChange(
-      resourceType = type.name,
-      resourceId = id,
-      payload = "{}",
-      token = LocalChangeToken(listOf()),
-      type = LocalChange.Type.INSERT
+  override suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange> {
+    return listOf(
+      LocalChange(
+        resourceType = type.name,
+        resourceId = id,
+        payload = "{ 'resourceType' : 'Patient', 'id' : '123' }",
+        token = LocalChangeToken(listOf()),
+        type = LocalChange.Type.INSERT,
+        timestamp = Instant.now()
+      )
     )
   }
 
@@ -177,32 +186,29 @@ object TestFhirEngineImpl : FhirEngine {
 
 object TestFailingDatasource : DataSource {
 
-  override suspend fun download(path: String): Resource {
-    val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
-    // data size exceeding the bytes acceptable by WorkManager serializer
-    val dataSize = Data.MAX_DATA_BYTES + 1
-    val hugeStackTraceMessage = (1..dataSize).map { allowedChars.random() }.joinToString("")
-    throw Exception(hugeStackTraceMessage)
-  }
+  override suspend fun download(downloadRequest: DownloadRequest) =
+    when (downloadRequest) {
+      is UrlDownloadRequest -> {
+        val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+        // data size exceeding the bytes acceptable by WorkManager serializer
+        val dataSize = Data.MAX_DATA_BYTES + 1
+        val hugeStackTraceMessage = (1..dataSize).map { allowedChars.random() }.joinToString("")
+        throw Exception(hugeStackTraceMessage)
+      }
+      is BundleDownloadRequest -> throw SocketTimeoutException("Posting Download Bundle failed...")
+    }
 
-  override suspend fun download(bundle: Bundle): Resource {
-    throw SocketTimeoutException("Posting Download Bundle failed...")
-  }
-
-  override suspend fun upload(bundle: Bundle): Resource {
+  override suspend fun upload(request: UploadRequest): Resource {
     throw SocketTimeoutException("Posting Upload Bundle failed...")
   }
 }
 
 class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSource {
 
-  override suspend fun download(path: String): Resource {
+  override suspend fun download(downloadRequest: DownloadRequest): Resource {
     TODO("Not yet implemented")
   }
 
-  override suspend fun download(bundle: Bundle): Resource {
-    TODO("Not yet implemented")
-  }
-
-  override suspend fun upload(bundle: Bundle) = onPostBundle(bundle)
+  override suspend fun upload(request: UploadRequest) =
+    onPostBundle((request as BundleUploadRequest).resource)
 }

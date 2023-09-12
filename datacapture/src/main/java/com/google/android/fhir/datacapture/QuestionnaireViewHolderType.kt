@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ package com.google.android.fhir.datacapture
  * https://www.hl7.org/fhir/valueset-item-type.html and
  * http://hl7.org/fhir/R4/valueset-questionnaire-item-control.html.
  */
-internal enum class QuestionnaireViewHolderType(val value: Int) {
+enum class QuestionnaireViewHolderType(val value: Int) {
   GROUP(0),
   BOOLEAN_TYPE_PICKER(1),
   DATE_PICKER(2),

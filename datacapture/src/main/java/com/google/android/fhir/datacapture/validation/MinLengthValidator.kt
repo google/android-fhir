@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
+import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.PrimitiveType
@@ -41,9 +42,8 @@ internal object MinLengthValidator :
         (answer.value as PrimitiveType<*>).asStringValue().length <
           (extension.value as IntegerType).value
     },
-    messageGenerator = { extension: Extension, _: Context ->
-      ("The minimum number of characters that are permitted in the answer is: " +
-        extension.value.primitiveValue())
+    messageGenerator = { extension: Extension, context: Context ->
+      context.getString(R.string.min_length_validation_error_msg, extension.value.primitiveValue())
     }
   )
 

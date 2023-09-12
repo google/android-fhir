@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,6 +88,8 @@ internal constructor(
     val resType = ResourceType.fromCode(resourceType)
     val resourceEntities =
       when {
+        url != null && version != null ->
+          listOfNotNull(knowledgeDao.getResourceWithUrlAndVersion(url, version))
         url != null -> listOfNotNull(knowledgeDao.getResourceWithUrl(url))
         id != null -> listOfNotNull(knowledgeDao.getResourceWithUrlLike("%$id"))
         name != null && version != null ->

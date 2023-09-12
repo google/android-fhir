@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package com.google.android.fhir.sync.download
 
+import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.GREATER_THAN_PREFIX
 import com.google.android.fhir.sync.ParamMap
-import com.google.android.fhir.sync.Request
 import com.google.android.fhir.sync.SyncDataParams
 import com.google.android.fhir.sync.concatParams
 import com.google.android.fhir.toTimeZoneString
@@ -44,15 +44,15 @@ class ResourceParamsBasedDownloadWorkManager(
   private val resourcesToDownloadWithSearchParams = LinkedList(syncParams.entries)
   private val urlOfTheNextPagesToDownloadForAResource = LinkedList<String>()
 
-  override suspend fun getNextRequest(): Request? {
+  override suspend fun getNextRequest(): DownloadRequest? {
     if (urlOfTheNextPagesToDownloadForAResource.isNotEmpty())
-      return urlOfTheNextPagesToDownloadForAResource.poll()?.let { Request.of(it) }
+      return urlOfTheNextPagesToDownloadForAResource.poll()?.let { DownloadRequest.of(it) }
 
     return resourcesToDownloadWithSearchParams.poll()?.let { (resourceType, params) ->
       val newParams =
         params.toMutableMap().apply { putAll(getLastUpdatedParam(resourceType, params, context)) }
 
-      Request.of("${resourceType.name}?${newParams.concatParams()}")
+      DownloadRequest.of("${resourceType.name}?${newParams.concatParams()}")
     }
   }
 

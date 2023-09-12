@@ -27,13 +27,14 @@ kotlin {
     main.kotlin.srcDirs(generateSourcesTask.map { it.srcOutputDir })
     test.kotlin.srcDirs(generateSourcesTask.map { it.testOutputDir })
   }
+  jvmToolchain(11)
 }
 
 android {
+  namespace = "com.google.android.fhir"
   compileSdk = Sdk.compileSdk
   defaultConfig {
     minSdk = Sdk.minSdk
-    targetSdk = Sdk.targetSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
@@ -55,7 +56,7 @@ android {
   }
 
   buildTypes {
-    getByName("release") {
+    release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
     }
@@ -65,20 +66,14 @@ android {
     // Flag to enable support for the new language APIs
     // See https = //developer.android.com/studio/write/java8-support
     isCoreLibraryDesugaringEnabled = true
-    sourceCompatibility = Java.sourceCompatibility
-    targetCompatibility = Java.targetCompatibility
   }
 
-  packagingOptions {
-    resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
-  }
-
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
+  packaging { resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")) }
 
   configureJacocoTestOptions()
 }
 
-afterEvaluate { configureFirebaseTestLab() }
+afterEvaluate { configureFirebaseTestLabForLibraries() }
 
 configurations {
   all {

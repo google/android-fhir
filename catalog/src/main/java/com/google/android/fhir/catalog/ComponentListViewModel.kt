@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
      * Path to the questionnaire json file with some or all required fields. If the user doesn't
      * answer the required questions, an error may be displayed on the particular question.
      */
-    val questionnaireFileWithValidation: String = "",
+    val questionnaireFileWithValidation: String? = null,
     val workflow: WorkflowType = WorkflowType.COMPONENT
   ) {
     BOOLEAN_CHOICE(
@@ -113,6 +113,12 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_slider.json",
       "component_slider_with_validation.json"
     ),
+    QUANTITY(
+      R.drawable.ic_unitoptions,
+      R.string.component_name_quantity,
+      "component_quantity.json",
+      "component_quantity_with_validation.json"
+    ),
     ATTACHMENT(
       R.drawable.ic_attachment,
       R.string.component_name_attachment,
@@ -120,7 +126,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_attachment_with_validation.json"
     ),
     REPEATED_GROUP(
-      R.drawable.ic_textfield,
+      R.drawable.ic_repeatgroups,
       R.string.component_name_repeated_group,
       "component_repeated_group.json",
     ),
@@ -134,6 +140,11 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       R.drawable.ic_item_answer_media,
       R.string.component_name_item_answer_media,
       ""
+    ),
+    INITIAL_VALUE(
+      R.drawable.ic_initial_value_component,
+      R.string.component_name_initial_value,
+      "component_initial_value.json"
     )
   }
 
@@ -151,11 +162,13 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       ViewItem.ComponentItem(Component.DATE_PICKER),
       ViewItem.ComponentItem(Component.DATE_TIME_PICKER),
       ViewItem.ComponentItem(Component.SLIDER),
+      ViewItem.ComponentItem(Component.QUANTITY),
       ViewItem.ComponentItem(Component.ATTACHMENT),
       ViewItem.ComponentItem(Component.REPEATED_GROUP),
       ViewItem.HeaderItem(Header.MISC_COMPONENTS),
       ViewItem.ComponentItem(Component.HELP),
       ViewItem.ComponentItem(Component.ITEM_MEDIA),
       ViewItem.ComponentItem(Component.ITEM_ANSWER_MEDIA),
+      ViewItem.ComponentItem(Component.INITIAL_VALUE),
     )
 }

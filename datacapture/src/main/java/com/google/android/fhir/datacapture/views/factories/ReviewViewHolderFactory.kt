@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
+import com.google.android.fhir.datacapture.extensions.getLocalizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
-import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
@@ -69,7 +69,7 @@ internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
           questionnaireViewItem.questionnaireItem.localizedTextSpanned
         )
         hint.updateTextAndVisibility(
-          questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
+          questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned()
         )
         header.visibility = getHeaderViewVisibility(prefix, question, hint)
 

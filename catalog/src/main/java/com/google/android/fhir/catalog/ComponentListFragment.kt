@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,11 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.launch
 
 /** Fragment for the component list. */
 class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
@@ -33,6 +35,7 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     setUpComponentsRecyclerView()
+    (activity as? MainActivity)?.showOpenQuestionnaireMenu(true)
   }
 
   override fun onResume() {
@@ -84,14 +87,28 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
   }
 
   private fun launchQuestionnaireFragment(component: ComponentListViewModel.Component) {
-    findNavController()
-      .navigate(
-        ComponentListFragmentDirections.actionComponentsFragmentToGalleryQuestionnaireFragment(
-          context?.getString(component.textId) ?: "",
-          component.questionnaireFile,
-          component.questionnaireFileWithValidation,
-          component.workflow
+    viewLifecycleOwner.lifecycleScope.launch {
+      findNavController()
+        .navigate(
+          MainNavGraphDirections.actionGlobalGalleryQuestionnaireFragment(
+            questionnaireTitleKey = context?.getString(component.textId) ?: "",
+            questionnaireJsonStringKey =
+              getQuestionnaireJsonStringFromAssets(
+                context = requireContext(),
+                backgroundContext = coroutineContext,
+                fileName = component.questionnaireFile,
+              ),
+            questionnaireWithValidationJsonStringKey =
+              component.questionnaireFileWithValidation?.let {
+                getQuestionnaireJsonStringFromAssets(
+                  context = requireContext(),
+                  backgroundContext = coroutineContext,
+                  fileName = it
+                )
+              },
+            workflow = component.workflow
+          )
         )
-      )
+    }
   }
 }

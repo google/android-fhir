@@ -10,18 +10,11 @@ publishArtifact(Releases.Common)
 createJacocoTestReportTask()
 
 android {
+  namespace = "com.google.android.fhir.common"
   compileSdk = Sdk.compileSdk
-
-  defaultConfig {
-    minSdk = Sdk.minSdk
-    targetSdk = Sdk.targetSdk
-  }
-  compileOptions {
-    sourceCompatibility = Java.sourceCompatibility
-    targetCompatibility = Java.targetCompatibility
-  }
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
+  defaultConfig { minSdk = Sdk.minSdk }
   configureJacocoTestOptions()
+  kotlin { jvmToolchain(11) }
 }
 
 configurations { all { exclude(module = "xpp3") } }

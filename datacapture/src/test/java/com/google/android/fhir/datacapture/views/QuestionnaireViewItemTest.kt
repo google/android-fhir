@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -796,5 +796,41 @@ class QuestionnaireViewItemTest {
     )
 
     assertThat(partialAnswer).isNull()
+  }
+
+  @Test
+  fun `enabledAnswerOption should return default questionnaire answerOption when item has no arg passed`() {
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = true
+          linkId = "a-question"
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent()
+              .setValue(
+                Coding().apply {
+                  code = "option1"
+                  display = "Option 1"
+                }
+              )
+          )
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent()
+              .setValue(
+                Coding().apply {
+                  code = "option2"
+                  display = "Option 2"
+                }
+              )
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = Valid,
+        answersChangedCallback = { _, _, _, _ -> }
+      )
+
+    val enabledOptions = questionnaireViewItem.enabledAnswerOptions
+
+    assertThat(enabledOptions.map { it.valueCoding.code }).containsExactly("option1", "option2")
   }
 }

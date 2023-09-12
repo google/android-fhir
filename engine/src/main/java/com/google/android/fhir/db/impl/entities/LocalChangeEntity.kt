@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.db.impl.entities
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.time.Instant
 
 /**
  * When a local change to a resource happens, the lastUpdated timestamp in [ResourceEntity] is
@@ -55,7 +56,7 @@ internal data class LocalChangeEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceType: String,
   val resourceId: String,
-  val timestamp: String = "",
+  val timestamp: Instant,
   val type: Type,
   val payload: String,
   val versionId: String? = null

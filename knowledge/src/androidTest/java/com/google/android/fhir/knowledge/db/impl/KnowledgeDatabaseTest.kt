@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ internal class KnowledgeDatabaseTest {
 
   @Test
   fun igInserted(): Unit = runTest {
-    assertThat(knowledgeDao.insert(IG_ENTITY)).isGreaterThan(0)
+    assertThat(knowledgeDao.insert(IG_ENTITY)).isGreaterThan(0L)
     assertThat(knowledgeDao.getImplementationGuides().map { it.packageId })
       .containsExactly(IG_PACKAGE_ID)
   }

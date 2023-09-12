@@ -10,11 +10,10 @@ publishArtifact(Releases.Contrib.Barcode)
 createJacocoTestReportTask()
 
 android {
+  namespace = "com.google.android.fhir.datacapture.contrib.views.barcode"
   compileSdk = Sdk.compileSdk
-
   defaultConfig {
     minSdk = Sdk.minSdk
-    targetSdk = Sdk.targetSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
@@ -23,19 +22,12 @@ android {
   buildFeatures { viewBinding = true }
 
   buildTypes {
-    getByName("release") {
+    release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
   }
-  compileOptions {
-    sourceCompatibility = Java.sourceCompatibility
-    targetCompatibility = Java.targetCompatibility
-  }
-
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
-
-  packagingOptions {
+  packaging {
     resources.excludes.addAll(
       listOf(
         "META-INF/INDEX.LIST",
@@ -49,6 +41,7 @@ android {
   configureJacocoTestOptions()
 
   testOptions { animationsDisabled = true }
+  kotlin { jvmToolchain(11) }
 }
 
 configurations { all { exclude(module = "xpp3") } }

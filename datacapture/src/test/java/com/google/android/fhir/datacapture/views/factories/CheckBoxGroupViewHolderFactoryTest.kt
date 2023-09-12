@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,11 @@ import androidx.core.view.children
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.extensions.EXTENSION_CHOICE_ORIENTATION_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_ANSWER_MEDIA
 import com.google.android.fhir.datacapture.extensions.EXTENSION_OPTION_EXCLUSIVE_URL
-import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
@@ -54,7 +54,9 @@ import org.robolectric.RuntimeEnvironment
 class CheckBoxGroupViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
+      RuntimeEnvironment.getApplication().apply {
+        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
+      }
     )
   private val viewHolder = CheckBoxGroupViewHolderFactory.create(parent)
 
@@ -360,12 +362,30 @@ class CheckBoxGroupViewHolderFactoryTest {
   @Test
   fun click_shouldRemoveQuestionnaireResponseItemAnswer() {
     var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    val fakeAnswerValueSetResolver = { uri: String ->
+      if (uri == "http://coding-value-set-url") {
+        listOf(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value =
+              Coding().apply {
+                code = "code 1"
+                display = "Coding 1"
+              }
+          }
+        )
+      } else {
+        emptyList()
+      }
+    }
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = true
+        answerValueSet = "http://coding-value-set-url"
+      }
+
     val questionnaireViewItem =
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          answerValueSet = "http://coding-value-set-url"
-        },
+        questionnaireItem,
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -377,21 +397,7 @@ class CheckBoxGroupViewHolderFactoryTest {
             }
           )
         },
-        resolveAnswerValueSet = {
-          if (it == "http://coding-value-set-url") {
-            listOf(
-              Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-                value =
-                  Coding().apply {
-                    code = "code 1"
-                    display = "Coding 1"
-                  }
-              }
-            )
-          } else {
-            emptyList()
-          }
-        },
+        enabledAnswerOptions = fakeAnswerValueSetResolver.invoke(questionnaireItem.answerValueSet),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
@@ -599,7 +605,7 @@ class CheckBoxGroupViewHolderFactoryTest {
           coding =
             listOf(
               Coding().apply {
-                code = INSTRUCTIONS
+                code = EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
                 system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
               }
             )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package com.google.android.fhir.sync.download
 
-import com.google.android.fhir.sync.BundleRequest
+import com.google.android.fhir.sync.BundleDownloadRequest
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.Downloader
-import com.google.android.fhir.sync.Request
 import com.google.android.fhir.sync.ResourceSyncException
-import com.google.android.fhir.sync.UrlRequest
+import com.google.android.fhir.sync.UrlDownloadRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.Bundle
@@ -52,7 +52,7 @@ internal class DownloaderImpl(
     while (request != null) {
       try {
         resourceTypeToDownload = request.toResourceType()
-        downloadWorkManager.processResponse(download(request)).toList().let {
+        downloadWorkManager.processResponse(dataSource.download(request)).toList().let {
           downloadedResourcesCount += it.size
           emit(DownloadState.Success(it, totalResourcesToDownloadCount, downloadedResourcesCount))
         }
@@ -64,17 +64,11 @@ internal class DownloaderImpl(
     }
   }
 
-  private suspend fun download(request: Request) =
-    when (request) {
-      is UrlRequest -> dataSource.download(request.url)
-      is BundleRequest -> dataSource.download(request.bundle)
-    }
-
-  private fun Request.toResourceType() =
+  private fun DownloadRequest.toResourceType() =
     when (this) {
-      is UrlRequest ->
+      is UrlDownloadRequest ->
         ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
-      is BundleRequest -> ResourceType.Bundle
+      is BundleDownloadRequest -> ResourceType.Bundle
     }
 
   private suspend fun getProgressSummary() =
@@ -82,7 +76,7 @@ internal class DownloaderImpl(
       .getSummaryRequestUrls()
       .map { summary ->
         summary.key to
-          runCatching { dataSource.download(summary.value) }
+          runCatching { dataSource.download(DownloadRequest.of(summary.value)) }
             .onFailure { Timber.e(it) }
             .getOrNull()
             .takeIf { it is Bundle }

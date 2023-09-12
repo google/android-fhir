@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ class QuestionnaireResponseFragment : Fragment() {
     setCloseOnClickListener()
     view.findViewById<TextView>(R.id.questionnaire_response_tv).text =
       JSONObject(args.questionnaireResponse).toString(2)
+    (activity as? MainActivity)?.showOpenQuestionnaireMenu(false)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {

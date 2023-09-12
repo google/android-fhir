@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,11 @@ import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.launch
 
 /** Fragment for the layout list. */
 class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
@@ -38,6 +40,7 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     setUpLayoutsRecyclerView()
+    (activity as? MainActivity)?.showOpenQuestionnaireMenu(true)
   }
 
   private fun setUpLayoutsRecyclerView() {
@@ -67,14 +70,20 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
   }
 
   private fun launchQuestionnaireFragment(layout: LayoutListViewModel.Layout) {
-    findNavController()
-      .navigate(
-        LayoutListFragmentDirections.actionLayoutsFragmentToGalleryQuestionnaireFragment(
-          context?.getString(layout.textId) ?: "",
-          layout.questionnaireFileName,
-          null,
-          layout.workflow
+    viewLifecycleOwner.lifecycleScope.launch {
+      findNavController()
+        .navigate(
+          MainNavGraphDirections.actionGlobalGalleryQuestionnaireFragment(
+            questionnaireTitleKey = context?.getString(layout.textId) ?: "",
+            questionnaireJsonStringKey =
+              getQuestionnaireJsonStringFromAssets(
+                context = requireContext(),
+                backgroundContext = coroutineContext,
+                fileName = layout.questionnaireFileName
+              ),
+            workflow = layout.workflow
+          )
         )
-      )
+    }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir.db.impl.dao
 
 import androidx.annotation.VisibleForTesting
+import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -36,12 +37,16 @@ import com.google.android.fhir.db.impl.entities.StringIndexEntity
 import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
 import com.google.android.fhir.index.ResourceIndexer
+import com.google.android.fhir.index.ResourceIndexer.Companion.createLastUpdatedIndex
+import com.google.android.fhir.index.ResourceIndexer.Companion.createLocalLastUpdatedIndex
 import com.google.android.fhir.index.ResourceIndices
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.versionId
 import java.time.Instant
+import java.util.Date
 import java.util.UUID
+import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -53,26 +58,42 @@ internal abstract class ResourceDao {
   lateinit var iParser: IParser
   lateinit var resourceIndexer: ResourceIndexer
 
-  open suspend fun update(resource: Resource) {
+  open suspend fun update(resource: Resource, timeOfLocalChange: Instant) {
     getResourceEntity(resource.logicalId, resource.resourceType)?.let {
-      val entity = it.copy(serializedResource = iParser.encodeResourceToString(resource))
+      // In case the resource has lastUpdated meta data, use it, otherwise use the old value.
+      val lastUpdatedRemote: Date? = resource.meta.lastUpdated
+      val entity =
+        it.copy(
+          serializedResource = iParser.encodeResourceToString(resource),
+          lastUpdatedLocal = timeOfLocalChange,
+          lastUpdatedRemote = lastUpdatedRemote?.toInstant() ?: it.lastUpdatedRemote
+        )
       // The foreign key in Index entity tables is set with cascade delete constraint and
       // insertResource has REPLACE conflict resolution. So, when we do an insert to update the
       // resource, it deletes old resource and corresponding index entities (based on foreign key
       // constrain) before inserting the new resource.
       insertResource(entity)
-      val index = resourceIndexer.index(resource)
-      updateIndicesForResource(index, entity, it.resourceUuid)
+      val index =
+        ResourceIndices.Builder(resourceIndexer.index(resource))
+          .apply {
+            addDateTimeIndex(
+              createLocalLastUpdatedIndex(
+                resource.resourceType,
+                InstantType(Date.from(timeOfLocalChange))
+              )
+            )
+            lastUpdatedRemote?.let { date ->
+              addDateTimeIndex(createLastUpdatedIndex(resource.resourceType, InstantType(date)))
+            }
+          }
+          .build()
+      updateIndicesForResource(index, resource.resourceType, it.resourceUuid)
     }
       ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
   }
 
-  open suspend fun insert(resource: Resource): String {
-    return insertResource(resource)
-  }
-
-  open suspend fun insertAll(resources: List<Resource>): List<String> {
-    return resources.map { resource -> insertResource(resource) }
+  open suspend fun insertAllRemote(resources: List<Resource>): List<String> {
+    return resources.map { resource -> insertRemoteResource(resource) }
   }
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -117,8 +138,8 @@ internal abstract class ResourceDao {
   abstract suspend fun updateRemoteVersionIdAndLastUpdate(
     resourceId: String,
     resourceType: ResourceType,
-    versionId: String?,
-    lastUpdatedRemote: Instant?
+    versionId: String,
+    lastUpdatedRemote: Instant
   )
 
   @Query(
@@ -150,9 +171,25 @@ internal abstract class ResourceDao {
 
   @RawQuery abstract suspend fun getResources(query: SupportSQLiteQuery): List<String>
 
+  @RawQuery
+  abstract suspend fun getReferencedResources(
+    query: SupportSQLiteQuery
+  ): List<IndexedIdAndSerializedResource>
+
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
-  private suspend fun insertResource(resource: Resource): String {
+  suspend fun insertLocalResource(resource: Resource, timeOfChange: Instant) =
+    insertResource(resource, timeOfChange)
+
+  // Since the insert removes any old indexes and lastUpdatedLocal (data not contained in resource
+  // itself), we extract the lastUpdatedLocal if any and then set it back again.
+  private suspend fun insertRemoteResource(resource: Resource) =
+    insertResource(
+      resource,
+      getResourceEntity(resource.logicalId, resource.resourceType)?.lastUpdatedLocal
+    )
+
+  private suspend fun insertResource(resource: Resource, lastUpdatedLocal: Instant?): String {
     val resourceUuid = UUID.randomUUID()
 
     // Use the local UUID as the logical ID of the resource
@@ -168,18 +205,51 @@ internal abstract class ResourceDao {
         resourceId = resource.logicalId,
         serializedResource = iParser.encodeResourceToString(resource),
         versionId = resource.versionId,
-        lastUpdatedRemote = resource.lastUpdated
+        lastUpdatedRemote = resource.lastUpdated,
+        lastUpdatedLocal = lastUpdatedLocal
       )
     insertResource(entity)
-    val index = resourceIndexer.index(resource)
-    updateIndicesForResource(index, entity, resourceUuid)
+
+    val index =
+      ResourceIndices.Builder(resourceIndexer.index(resource))
+        .apply {
+          lastUpdatedLocal?.let {
+            addDateTimeIndex(
+              createLocalLastUpdatedIndex(entity.resourceType, InstantType(Date.from(it)))
+            )
+          }
+        }
+        .build()
+
+    updateIndicesForResource(index, resource.resourceType, resourceUuid)
 
     return resource.id
   }
 
+  suspend fun updateAndIndexRemoteVersionIdAndLastUpdate(
+    resourceId: String,
+    resourceType: ResourceType,
+    versionId: String,
+    lastUpdated: Instant
+  ) {
+    updateRemoteVersionIdAndLastUpdate(resourceId, resourceType, versionId, lastUpdated)
+    // update the remote lastUpdated index
+    getResourceEntity(resourceId, resourceType)?.let {
+      val indicesToUpdate =
+        ResourceIndices.Builder(resourceType, resourceId)
+          .apply {
+            addDateTimeIndex(
+              createLastUpdatedIndex(resourceType, InstantType(Date.from(lastUpdated)))
+            )
+          }
+          .build()
+      updateIndicesForResource(indicesToUpdate, resourceType, it.resourceUuid)
+    }
+  }
+
   private suspend fun updateIndicesForResource(
     index: ResourceIndices,
-    resource: ResourceEntity,
+    resourceType: ResourceType,
     resourceUuid: UUID
   ) {
     // TODO Move StringIndices to persistable types
@@ -191,7 +261,7 @@ internal abstract class ResourceDao {
       insertStringIndex(
         StringIndexEntity(
           id = 0,
-          resourceType = resource.resourceType,
+          resourceType = resourceType,
           index = it,
           resourceUuid = resourceUuid,
         )
@@ -201,7 +271,7 @@ internal abstract class ResourceDao {
       insertReferenceIndex(
         ReferenceIndexEntity(
           id = 0,
-          resourceType = resource.resourceType,
+          resourceType = resourceType,
           index = it,
           resourceUuid = resourceUuid,
         )
@@ -211,7 +281,7 @@ internal abstract class ResourceDao {
       insertCodeIndex(
         TokenIndexEntity(
           id = 0,
-          resourceType = resource.resourceType,
+          resourceType = resourceType,
           index = it,
           resourceUuid = resourceUuid,
         )
@@ -221,7 +291,7 @@ internal abstract class ResourceDao {
       insertQuantityIndex(
         QuantityIndexEntity(
           id = 0,
-          resourceType = resource.resourceType,
+          resourceType = resourceType,
           index = it,
           resourceUuid = resourceUuid,
         )
@@ -231,7 +301,7 @@ internal abstract class ResourceDao {
       insertUriIndex(
         UriIndexEntity(
           id = 0,
-          resourceType = resource.resourceType,
+          resourceType = resourceType,
           index = it,
           resourceUuid = resourceUuid,
         )
@@ -241,7 +311,7 @@ internal abstract class ResourceDao {
       insertDateIndex(
         DateIndexEntity(
           id = 0,
-          resourceType = resource.resourceType,
+          resourceType = resourceType,
           index = it,
           resourceUuid = resourceUuid,
         )
@@ -251,7 +321,7 @@ internal abstract class ResourceDao {
       insertDateTimeIndex(
         DateTimeIndexEntity(
           id = 0,
-          resourceType = resource.resourceType,
+          resourceType = resourceType,
           index = it,
           resourceUuid = resourceUuid,
         )
@@ -261,7 +331,7 @@ internal abstract class ResourceDao {
       insertNumberIndex(
         NumberIndexEntity(
           id = 0,
-          resourceType = resource.resourceType,
+          resourceType = resourceType,
           index = it,
           resourceUuid = resourceUuid,
         )
@@ -271,7 +341,7 @@ internal abstract class ResourceDao {
       insertPositionIndex(
         PositionIndexEntity(
           id = 0,
-          resourceType = resource.resourceType,
+          resourceType = resourceType,
           index = it,
           resourceUuid = resourceUuid,
         )
@@ -279,3 +349,24 @@ internal abstract class ResourceDao {
     }
   }
 }
+
+/**
+ * Data class representing the value returned by [getReferencedResources]. The optional fields may
+ * or may-not contain values based on the search query.
+ */
+internal data class IndexedIdAndSerializedResource(
+  @ColumnInfo(name = "index_name") val matchingIndex: String,
+  @ColumnInfo(name = "index_value") val idOfBaseResourceOnWhichThisMatchedRev: String?,
+  @ColumnInfo(name = "resourceId") val idOfBaseResourceOnWhichThisMatchedInc: String?,
+  val serializedResource: String
+)
+
+/**
+ * Data class representing an included or revIncluded [Resource], index on which the match was done
+ * and the id of the base [Resource] for which this [Resource] has been included.
+ */
+internal data class IndexedIdAndResource(
+  val matchingIndex: String,
+  val idOfBaseResourceOnWhichThisMatched: String,
+  val resource: Resource
+)

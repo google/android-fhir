@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.knowledge.ImplementationGuide
 import com.google.android.fhir.knowledge.KnowledgeManager
-import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.android.fhir.workflow.testing.CqlBuilder
+import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import java.io.InputStream
@@ -148,7 +148,7 @@ class FhirOperatorTest {
 
     assertEquals(
       readResourceAsString("/plan-definition/cql-applicability-condition/care_plan.json"),
-      jsonParser.encodeResourceToString(carePlan),
+      jsonParser.setPrettyPrint(true).encodeResourceToString(carePlan),
       true
     )
   }
