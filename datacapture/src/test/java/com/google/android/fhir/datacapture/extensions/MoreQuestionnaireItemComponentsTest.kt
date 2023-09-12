@@ -1775,11 +1775,9 @@ class MoreQuestionnaireItemComponentsTest {
         answerOption =
           listOf(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              initialSelected = true
               value = Coding("http://abc.com", "a", "A")
             },
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              initialSelected = true
               value = Coding("http://abc.com", "b", "B")
             },
           )

@@ -206,32 +206,44 @@ class MoreQuestionnaireItemAnswerOptionComponentsTest {
   }
 
   @Test
-  fun `initialSelected should return selected items only`() {
+  fun `initialSelected should not select option with initialSelected as null`() {
     val answerOptions =
-      listOf(
-        answerOptionOf("test-code 1", "http://code.com", "Test Code 1", true),
-        answerOptionOf("test-code 2", "http://code.com", "Test Code 2", null),
-        answerOptionOf("test-code 3", "http://code.com", "Test Code 3", false),
-        answerOptionOf("test-code 4", "http://code.com", "Test Code 4", true)
-      )
-    val selectedOptions = answerOptions.initialSelected
-
-    assertThat(selectedOptions.map { it as Coding }.map { it.code })
-      .containsExactly("test-code 1", "test-code 4")
-  }
-
-  @Test
-  fun `initialSelected should return empty list if none selected`() {
-    val answerOptions =
-      listOf(
-        answerOptionOf("test-code 1", "http://code.com", "Test Code 1", null),
-        answerOptionOf("test-code 2", "http://code.com", "Test Code 2", null),
-        answerOptionOf("test-code 3", "http://code.com", "Test Code 3", false),
-        answerOptionOf("test-code 4", "http://code.com", "Test Code 4", false)
-      )
+      listOf(answerOptionOf("test-code 1", "http://code.com", "Test Code 1", null))
     val selectedOptions = answerOptions.initialSelected
 
     assertThat(selectedOptions).isEmpty()
+  }
+
+  @Test
+  fun `initialSelected should not select option with initialSelected as false`() {
+    val answerOptions =
+      listOf(answerOptionOf("test-code 1", "http://code.com", "Test Code 1", false))
+    val selectedOptions = answerOptions.initialSelected
+
+    assertThat(selectedOptions).isEmpty()
+  }
+
+  @Test
+  fun `initialSelected should select option with initialSelected as true`() {
+    val answerOptions =
+      listOf(answerOptionOf("test-code 1", "http://code.com", "Test Code 1", true))
+    val selectedOptions = answerOptions.initialSelected.map { it as Coding }
+
+    assertThat(selectedOptions.map { it.code }).containsExactly("test-code 1")
+  }
+
+  @Test
+  fun `initialSelected should select multiple options with initialSelected as true`() {
+    val answerOptions =
+      listOf(
+        answerOptionOf("test-code 1", "http://code.com", "Test Code 1", null),
+        answerOptionOf("test-code 2", "http://code.com", "Test Code 2", true),
+        answerOptionOf("test-code 3", "http://code.com", "Test Code 3", false),
+        answerOptionOf("test-code 4", "http://code.com", "Test Code 4", true)
+      )
+    val selectedOptions = answerOptions.initialSelected.map { it as Coding }
+
+    assertThat(selectedOptions.map { it.code }).containsExactly("test-code 2", "test-code 4")
   }
 
   private fun answerOptionOf(
