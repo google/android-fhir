@@ -52,7 +52,7 @@ revealParents = (part) => {
 };
 
 /*
-    This is a work-around for safari being IE of our times.
+    This is a workaround for safari being IE of our times.
     It doesn't fire a DOMContentLoaded, presumably because eventListener is added after it wants to do it
 */
 if (document.readyState == 'loading') {
