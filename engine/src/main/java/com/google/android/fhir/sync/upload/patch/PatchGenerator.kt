@@ -18,6 +18,20 @@ package com.google.android.fhir.sync.upload.patch
 
 import com.google.android.fhir.LocalChange
 
+/**
+ * Generates [Patch]es from [LocalChange]s.
+ *
+ * INTERNAL ONLY. This interface should NEVER been exposed as an external API because it works
+ * together with other components in the upload package to fulfill a specific upload strategy.
+ * Application-specific implementations of this interface are unlikely to catch all the edge cases
+ * and work with other components in the upload package seamlessly. Should there be a genuine need
+ * to control the [Patch]es to be uploaded to the server, more granulated control mechanisms should
+ * be opened up to applications to guarantee correctness.
+ */
 internal interface PatchGenerator {
+  /**
+   * NOTE: different implementations may have requirements on the size of [localChanges] and output
+   * certain numbers of [Patch]es.
+   */
   fun generate(localChanges: List<LocalChange>): List<Patch>
 }
