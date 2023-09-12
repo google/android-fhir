@@ -19,13 +19,28 @@ package com.google.android.fhir.datacapture.extensions
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.ResourceType
 
+/** A utility object for working with FHIR Resource Types. */
 internal object MoreResourceTypes {
-  internal fun isValidCode(code: String): Boolean {
+
+  /**
+   * Checks if a given code is a valid FHIR Resource Type code.
+   *
+   * @param code The code to check for validity.
+   * @return `true` if the code is valid, `false` otherwise.
+   */
+  internal fun isValidCode(code: String): Boolean = fromCodeOrNull(code) != null
+
+  /**
+   * Converts a code into a ResourceType, returning null if the conversion fails.
+   *
+   * @param code The code to convert.
+   * @return The ResourceType if conversion is successful, or null if it fails.
+   */
+  internal fun fromCodeOrNull(code: String): ResourceType? {
     return try {
       ResourceType.fromCode(code)
-      true
     } catch (exception: FHIRException) {
-      false
+      null
     }
   }
 }
