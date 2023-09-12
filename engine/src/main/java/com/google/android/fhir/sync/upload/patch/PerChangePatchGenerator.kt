@@ -18,6 +18,12 @@ package com.google.android.fhir.sync.upload.patch
 
 import com.google.android.fhir.LocalChange
 
+/**
+ * Generates a [Patch] for each [LocalChange].
+ *
+ * Used when all client-side changes to FHIR resources need to be uploaded to the server in order to
+ * maintain an audit trail.
+ */
 internal object PerChangePatchGenerator : PatchGenerator {
   override fun generate(localChanges: List<LocalChange>): List<Patch> {
     return localChanges.map {
