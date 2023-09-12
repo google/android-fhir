@@ -25,8 +25,8 @@ import com.google.android.fhir.LocalChange
  * maintain an audit trail.
  */
 internal object PerChangePatchGenerator : PatchGenerator {
-  override fun generate(localChanges: List<LocalChange>): List<Patch> {
-    return localChanges.map {
+  override fun generate(localChanges: List<LocalChange>): List<Patch> =
+    localChanges.map {
       Patch(
         resourceType = it.resourceType,
         resourceId = it.resourceId,
@@ -36,5 +36,4 @@ internal object PerChangePatchGenerator : PatchGenerator {
         payload = it.payload,
       )
     }
-  }
 }
