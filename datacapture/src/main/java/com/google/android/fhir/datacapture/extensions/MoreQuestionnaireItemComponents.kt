@@ -829,7 +829,7 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
 }
 
 /**
- * Returns a list of answers from the initial values of the questionnaire item. `null` if no intial
+ * Returns a list of answers from the initial values of the questionnaire item. `null` if no initial
  * value.
  */
 private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
