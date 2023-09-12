@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync.upload
+package com.google.android.fhir.sync.upload.patch
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.sync.UploadRequest
-import com.google.android.fhir.sync.UploadWorkManager
+import com.google.android.fhir.sync.upload.UploadWorkManager
+import com.google.android.fhir.sync.upload.request.TransactionBundleGenerator
 
 /**
  * [UploadWorkManager] implementation to squash all the changes at a resource level into one change
