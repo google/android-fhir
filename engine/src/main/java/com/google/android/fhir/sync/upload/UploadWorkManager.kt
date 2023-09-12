@@ -25,10 +25,9 @@ import com.google.android.fhir.sync.upload.patch.Patch
  */
 internal interface UploadWorkManager {
   /**
-   * Transforms the [LocalChange]s to the final set of changes that needs to be uploaded to the
-   * server. The transformations can be of various types like squashing the [LocalChange]s by
-   * [Resource] e.g. [SquashedChangesUploadWorkManager] or filtering out certain [LocalChange]s or
-   * grouping the changes.
+   * Transforms the [LocalChange]s to the final set of [Patch]es that need to be uploaded to the
+   * server. The transformation can be of various types like grouping the [LocalChange]s by resource
+   * or filtering out certain [LocalChange]s.
    */
   fun generatePatches(localChanges: List<LocalChange>): List<Patch>
 
