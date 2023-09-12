@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,4 +204,54 @@ class MoreQuestionnaireItemAnswerOptionComponentsTest {
 
     assertThat(questionnaire.item.single().answerOption.single().optionExclusive).isTrue()
   }
+
+  @Test
+  fun `initialSelected should not select option with initialSelected as null`() {
+    val answerOptions =
+      listOf(answerOptionOf("test-code 1", "http://code.com", "Test Code 1", null))
+
+    assertThat(answerOptions.initialSelected).isEmpty()
+  }
+
+  @Test
+  fun `initialSelected should not select option with initialSelected as false`() {
+    val answerOptions =
+      listOf(answerOptionOf("test-code 1", "http://code.com", "Test Code 1", false))
+
+    assertThat(answerOptions.initialSelected).isEmpty()
+  }
+
+  @Test
+  fun `initialSelected should select option with initialSelected as true`() {
+    val answerOptions =
+      listOf(answerOptionOf("test-code 1", "http://code.com", "Test Code 1", true))
+
+    assertThat(answerOptions.initialSelected.map { (it as Coding).code })
+      .containsExactly("test-code 1")
+  }
+
+  @Test
+  fun `initialSelected should select multiple options with initialSelected as true`() {
+    val answerOptions =
+      listOf(
+        answerOptionOf("test-code 1", "http://code.com", "Test Code 1", null),
+        answerOptionOf("test-code 2", "http://code.com", "Test Code 2", true),
+        answerOptionOf("test-code 3", "http://code.com", "Test Code 3", false),
+        answerOptionOf("test-code 4", "http://code.com", "Test Code 4", true)
+      )
+
+    assertThat(answerOptions.initialSelected.map { (it as Coding).code })
+      .containsExactly("test-code 2", "test-code 4")
+  }
+
+  private fun answerOptionOf(
+    code: String,
+    url: String,
+    display: String,
+    initialSelected: Boolean?
+  ) =
+    Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+      value = Coding().setCode(code).setDisplay(display).setSystem(url)
+      initialSelected?.let { this.initialSelected = it }
+    }
 }
