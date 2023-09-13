@@ -240,7 +240,7 @@ class PerResourcePatchGeneratorTest {
           .toLocalChange()
           .apply { LocalChangeToken(listOf(3)) },
       )
-    val patchToUpload = SquashedChangesUploadWorkManager().generatePatches(changes)
+    val patchToUpload = PerResourcePatchGenerator.generate(changes)
 
     assertThat(patchToUpload).isEmpty()
   }
