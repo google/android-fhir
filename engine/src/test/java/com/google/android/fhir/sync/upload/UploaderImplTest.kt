@@ -40,7 +40,17 @@ import org.robolectric.RobolectricTestRunner
 class UploaderImplTest {
 
   @Test
-  fun `upload Bundle transaction should emit Success`() = runBlocking {
+  fun `upload should start`() = runBlocking {
+    val result =
+      UploaderImpl(BundleDataSource { Bundle() }, SquashedChangesUploadWorkManager())
+        .upload(localChanges)
+        .toList()
+
+    assertThat(result.first()).isInstanceOf(UploadState.Started::class.java)
+  }
+
+  @Test
+  fun `upload should succeed if response is transaction response`() = runBlocking {
     val result =
       UploaderImpl(
           BundleDataSource { Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE } },
@@ -59,17 +69,7 @@ class UploaderImplTest {
   }
 
   @Test
-  fun `upload Bundle transaction should emit Started state`() = runBlocking {
-    val result =
-      UploaderImpl(BundleDataSource { Bundle() }, SquashedChangesUploadWorkManager())
-        .upload(localChanges)
-        .toList()
-
-    assertThat(result.first()).isInstanceOf(UploadState.Started::class.java)
-  }
-
-  @Test
-  fun `upload Bundle Transaction server error should emit Failure`() = runBlocking {
+  fun `upload should fail if response is operation outcome with issue`() = runBlocking {
     val result =
       UploaderImpl(
           BundleDataSource {
@@ -93,7 +93,36 @@ class UploaderImplTest {
   }
 
   @Test
-  fun `upload Bundle transaction error during upload should emit Failure`() = runBlocking {
+  fun `upload should fail if response is empty operation outcome`() = runBlocking {
+    val result =
+      UploaderImpl(
+          BundleDataSource { OperationOutcome() },
+          SquashedChangesUploadWorkManager(),
+        )
+        .upload(localChanges)
+        .toList()
+
+    assertThat(result).hasSize(2)
+    assertThat(result.last()).isInstanceOf(UploadState.Failure::class.java)
+  }
+
+  @Test
+  fun `upload should fail if response is neither transaction response nor operation outcome`() =
+    runBlocking {
+      val result =
+        UploaderImpl(
+            BundleDataSource { Bundle().apply { type = Bundle.BundleType.SEARCHSET } },
+            SquashedChangesUploadWorkManager(),
+          )
+          .upload(localChanges)
+          .toList()
+
+      assertThat(result).hasSize(2)
+      assertThat(result.last()).isInstanceOf(UploadState.Failure::class.java)
+    }
+
+  @Test
+  fun `upload should fail if there is connection exception`() = runBlocking {
     val result =
       UploaderImpl(
           BundleDataSource { throw ConnectException("Failed to connect to server.") },
@@ -105,6 +134,7 @@ class UploaderImplTest {
     assertThat(result).hasSize(2)
     assertThat(result.last()).isInstanceOf(UploadState.Failure::class.java)
   }
+
   companion object {
     val localChanges =
       listOf(
@@ -132,35 +162,5 @@ class UploaderImplTest {
           .toLocalChange()
           .apply { LocalChangeToken(listOf(1)) }
       )
-  }
-
-  @Test
-  fun `upload Bundle Transaction with non transaction response Bundle response should emit Failure`() =
-      runBlocking {
-    val result =
-      BundleUploader(
-          TestingUtils.BundleDataSource { Bundle().apply { type = Bundle.BundleType.SEARCHSET } },
-          TransactionBundleGenerator.getDefault()
-        )
-        .upload(localChanges)
-        .toList()
-
-    assertThat(result).hasSize(1)
-    assertThat(result.first()).isInstanceOf(UploadResult.Failure::class.java)
-  }
-
-  @Test
-  fun `upload Bundle Transaction with empty issue OperationOutcome response should emit Failure`() =
-      runBlocking {
-    val result =
-      BundleUploader(
-          TestingUtils.BundleDataSource { Bundle().apply { type = Bundle.BundleType.SEARCHSET } },
-          TransactionBundleGenerator.getDefault()
-        )
-        .upload(localChanges)
-        .toList()
-
-    assertThat(result).hasSize(1)
-    assertThat(result.first()).isInstanceOf(UploadResult.Failure::class.java)
   }
 }
