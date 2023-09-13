@@ -36,7 +36,7 @@ import timber.log.Timber
  */
 internal class DownloaderImpl(
   private val dataSource: DataSource,
-  private val downloadWorkManager: DownloadWorkManager
+  private val downloadWorkManager: DownloadWorkManager,
 ) : Downloader {
   private val resourceTypeList = ResourceType.values().map { it.name }
 

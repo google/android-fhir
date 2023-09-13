@@ -29,7 +29,7 @@ class TransactionBundleGenerator(
   private val generatedBundleSize: Int,
   private val useETagForUpload: Boolean,
   private val getBundleEntryComponentGeneratorForLocalChangeType:
-    (type: Patch.Type, useETagForUpload: Boolean) -> BundleEntryComponentGenerator
+    (type: Patch.Type, useETagForUpload: Boolean) -> BundleEntryComponentGenerator,
 ) : UploadRequestGenerator {
 
   override fun generateUploadRequests(patches: List<Patch>): List<BundleUploadRequest> {
@@ -43,7 +43,7 @@ class TransactionBundleGenerator(
         patches.forEach {
           this.addEntry(
             getBundleEntryComponentGeneratorForLocalChangeType(it.type, useETagForUpload)
-              .getEntry(it)
+              .getEntry(it),
           )
         }
       }
@@ -78,17 +78,16 @@ class TransactionBundleGenerator(
       generatedBundleSize: Int,
       useETagForUpload: Boolean,
     ): TransactionBundleGenerator {
-
       val createFunction =
         createMapping[httpVerbToUseForCreate]
           ?: throw IllegalArgumentException(
-            "Creation using $httpVerbToUseForCreate is not supported."
+            "Creation using $httpVerbToUseForCreate is not supported.",
           )
 
       val updateFunction =
         updateMapping[httpVerbToUseForUpdate]
           ?: throw IllegalArgumentException(
-            "Update using $httpVerbToUseForUpdate is not supported."
+            "Update using $httpVerbToUseForUpdate is not supported.",
           )
 
       return TransactionBundleGenerator(generatedBundleSize, useETagForUpload) { type, useETag ->
@@ -101,11 +100,11 @@ class TransactionBundleGenerator(
     }
 
     private fun putForCreateBasedBundleComponentMapper(
-      useETagForUpload: Boolean
+      useETagForUpload: Boolean,
     ): BundleEntryComponentGenerator = HttpPutForCreateEntryComponentGenerator(useETagForUpload)
 
     private fun patchForUpdateBasedBundleComponentMapper(
-      useETagForUpload: Boolean
+      useETagForUpload: Boolean,
     ): BundleEntryComponentGenerator = HttpPatchForUpdateEntryComponentGenerator(useETagForUpload)
   }
 }

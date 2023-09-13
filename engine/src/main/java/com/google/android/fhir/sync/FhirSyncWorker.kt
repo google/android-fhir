@@ -41,6 +41,7 @@ import timber.log.Timber
 abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
+
   abstract fun getDownloadWorkManager(): DownloadWorkManager
 
   abstract fun getConflictResolver(): ConflictResolver
@@ -60,9 +61,9 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         ?: return Result.failure(
           buildWorkData(
             IllegalStateException(
-              "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration."
-            )
-          )
+              "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration.",
+            ),
+          ),
         )
 
     val flow = MutableSharedFlow<SyncJobStatus>()
@@ -86,7 +87,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
           getFhirEngine(),
           Uploader(dataSource),
           DownloaderImpl(dataSource, getDownloadWorkManager()),
-          getConflictResolver()
+          getConflictResolver(),
         )
         .apply { subscribe(flow) }
         .synchronize()
@@ -121,7 +122,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
     return workDataOf(
       // send serialized state and type so that consumer can convert it back
       "StateType" to state::class.java.name,
-      "State" to gson.toJson(state)
+      "State" to gson.toJson(state),
     )
   }
 
@@ -133,8 +134,9 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
    * Exclusion strategy for [Gson] that handles field exclusions for [SyncJobStatus] returned by
    * FhirSynchronizer. It should skip serializing the exceptions to avoid exceeding WorkManager
    * WorkData limit
+   *
    * @see <a
-   * href="https://github.com/google/android-fhir/issues/707">https://github.com/google/android-fhir/issues/707</a>
+   *   href="https://github.com/google/android-fhir/issues/707">https://github.com/google/android-fhir/issues/707</a>
    */
   internal class StateExclusionStrategy : ExclusionStrategy {
     override fun shouldSkipField(field: FieldAttributes) = field.name.equals("exceptions")

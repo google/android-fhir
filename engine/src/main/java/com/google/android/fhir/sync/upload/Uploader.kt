@@ -33,12 +33,11 @@ import timber.log.Timber
 
 /**
  * Uploads changes made locally to FHIR resources to server in the following steps:
- *
  * 1. fetching local changes from the on-device SQLite database,
  * 2. creating patches to be sent to the server using the local changes,
  * 3. generating HTTP requests to be sent to the server,
  * 4. processing the responses from the server and consolidate any changes (i.e. updates resource
- * IDs).
+ *    IDs).
  */
 internal class Uploader(
   private val dataSource: DataSource,
@@ -56,7 +55,7 @@ internal class Uploader(
       try {
         val response = dataSource.upload(uploadRequest)
         emit(
-          getUploadResult(uploadRequest.resource.resourceType, response, token, total, index + 1)
+          getUploadResult(uploadRequest.resource.resourceType, response, token, total, index + 1),
         )
       } catch (e: Exception) {
         Timber.e(e)
@@ -70,7 +69,7 @@ internal class Uploader(
     response: Resource,
     localChangeToken: LocalChangeToken,
     total: Int,
-    completed: Int
+    completed: Int,
   ) =
     when {
       response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
@@ -80,16 +79,16 @@ internal class Uploader(
         UploadState.Failure(
           ResourceSyncException(
             requestResourceType,
-            FHIRException(response.issueFirstRep.diagnostics)
-          )
+            FHIRException(response.issueFirstRep.diagnostics),
+          ),
         )
       }
       else -> {
         UploadState.Failure(
           ResourceSyncException(
             requestResourceType,
-            FHIRException("Unknown response for ${response.resourceType}")
-          )
+            FHIRException("Unknown response for ${response.resourceType}"),
+          ),
         )
       }
     }
@@ -97,11 +96,13 @@ internal class Uploader(
 
 internal sealed class UploadState {
   data class Started(val total: Int) : UploadState()
+
   data class Success(
     val localChangeToken: LocalChangeToken,
     val resource: Resource,
     val total: Int,
-    val completed: Int
+    val completed: Int,
   ) : UploadState()
+
   data class Failure(val syncError: ResourceSyncException) : UploadState()
 }

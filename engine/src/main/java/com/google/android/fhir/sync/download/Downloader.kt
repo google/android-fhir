@@ -25,7 +25,7 @@ import org.hl7.fhir.r4.model.ResourceType
 internal interface Downloader {
   /**
    * @return Flow of the [DownloadState] which keeps emitting [Resource]s or Error based on the
-   * response of each page download request. It also updates progress if [ProgressCallback] exists
+   *   response of each page download request. It also updates progress if [ProgressCallback] exists
    */
   suspend fun download(): Flow<DownloadState>
 }

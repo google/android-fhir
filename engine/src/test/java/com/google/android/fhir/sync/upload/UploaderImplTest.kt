@@ -75,7 +75,7 @@ class UploaderImplTest {
                   severity = OperationOutcome.IssueSeverity.WARNING
                   code = OperationOutcome.IssueType.CONFLICT
                   diagnostics = "The resource has already been updated."
-                }
+                },
               )
             }
           },
@@ -145,14 +145,14 @@ class UploaderImplTest {
                       HumanName().apply {
                         addGiven("John")
                         family = "Doe"
-                      }
+                      },
                     )
-                  }
+                  },
                 ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
-          .apply { LocalChangeToken(listOf(1)) }
+          .apply { LocalChangeToken(listOf(1)) },
       )
   }
 }
