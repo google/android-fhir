@@ -19,7 +19,7 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 
 fun Project.configureSpotless() {
-  val ktlintVersion = "0.41.0"
+  val ktlintVersion = "0.50.0"
   val ktlintOptions = mapOf("indent_size" to "2", "continuation_indent_size" to "2")
   apply(plugin = Plugins.BuildPlugins.spotless)
   configure<com.diffplug.gradle.spotless.SpotlessExtension> {
@@ -32,10 +32,10 @@ fun Project.configureSpotless() {
       ktfmt().googleStyle()
       licenseHeaderFile(
         "${project.rootProject.projectDir}/license-header.txt",
-        "package|import|class|object|sealed|open|interface|abstract "
+        "package|import|class|object|sealed|open|interface|abstract ",
         // It is necessary to tell spotless the top level of a file in order to apply config to it
         // See: https://github.com/diffplug/spotless/issues/135
-        )
+      )
       toggleOffOn()
     }
     kotlinGradle {
@@ -48,17 +48,6 @@ fun Project.configureSpotless() {
       targetExclude("**/build/", ".idea/")
       prettier(mapOf("prettier" to "2.0.5", "@prettier/plugin-xml" to "0.13.0"))
         .config(mapOf("parser" to "xml", "tabWidth" to 4))
-    }
-    // Creates one off SpotlessApply task for generated files
-    com.diffplug.gradle.spotless.KotlinExtension(this).apply {
-      target("**/*_Generated.kt")
-      ktlint(ktlintVersion).userData(ktlintOptions)
-      ktfmt().googleStyle()
-      licenseHeaderFile(
-        "${project.rootProject.projectDir}/license-header.txt",
-        "package|import|class|object|sealed|open|interface|abstract "
-      )
-      createIndependentApplyTask("spotlessGenerated")
     }
   }
 }
