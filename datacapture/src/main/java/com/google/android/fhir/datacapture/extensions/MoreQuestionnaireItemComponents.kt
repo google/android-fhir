@@ -143,6 +143,9 @@ internal const val EXTENSION_SLIDER_STEP_VALUE_URL =
 
 internal const val EXTENSION_VARIABLE_URL = "http://hl7.org/fhir/StructureDefinition/variable"
 
+internal const val ITEM_INITIAL_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+
 // ********************************************************************************************** //
 //                                                                                                //
 // Rendering extensions: item control, choice orientation, etc.                                   //
@@ -168,6 +171,17 @@ enum class ItemControlTypes(
   SLIDER("slider", QuestionnaireViewHolderType.SLIDER),
   PHONE_NUMBER("phone-number", QuestionnaireViewHolderType.PHONE_NUMBER),
 }
+
+/**
+ * The initial-expression extension on [QuestionnaireItemComponent] to allow dynamic selection of
+ * default or initially selected answers
+ */
+val Questionnaire.QuestionnaireItemComponent.initialExpression: Expression?
+  get() {
+    return this.extension
+      .firstOrNull { it.url == ITEM_INITIAL_EXPRESSION_URL }
+      ?.let { it.value as Expression }
+  }
 
 /**
  * The [ItemControlTypes] of the questionnaire item if it is specified by the item control
@@ -834,11 +848,20 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
  */
 private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
   MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? {
+  // TODO https://github.com/google/android-fhir/issues/2161
+  // The rule can be by-passed if initial value was set by an initial-expression.
+  // The [ResourceMapper] at L260 wrongfully sets the initial property of questionnaire after
+  // evaluation of initial-expression.
+  require(answerOption.isEmpty() || initial.isEmpty() || initialExpression != null) {
+    "Questionnaire item $linkId has both initial value(s) and has answerOption. See rule que-11 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+  }
+
   // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
   // quantity given as initial without value is for unit reference purpose only. Answer conversion
   // not needed
-  if (initial.isEmpty() ||
-      (initialFirstRep.hasValueQuantity() && initialFirstRep.valueQuantity.value == null)
+  if (answerOption.initialSelected.isEmpty() &&
+      (initial.isEmpty() ||
+        (initialFirstRep.hasValueQuantity() && initialFirstRep.valueQuantity.value == null))
   ) {
     return null
   }
@@ -851,16 +874,16 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
     )
   }
 
-  if (initial.size > 1 && !repeats) {
+  if ((answerOption.initialSelected.size > 1 || initial.size > 1) && !repeats) {
     throw IllegalArgumentException(
       "Questionnaire item $linkId can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
     )
   }
 
   return initial
-    .map {
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply { value = it.value }
-    }
+    .map { it.value }
+    .plus(answerOption.initialSelected)
+    .map { QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply { value = it } }
     .toMutableList()
 }
 

@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.mapping
 
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
+import com.google.android.fhir.datacapture.extensions.initialExpression
 import com.google.android.fhir.datacapture.extensions.filterLaunchContextsByCodeInNameExtension
 import com.google.android.fhir.datacapture.extensions.logicalId
 import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
@@ -264,13 +265,6 @@ object ResourceMapper {
 
     populateInitialValues(questionnaireItem.item, launchContexts)
   }
-
-  private val Questionnaire.QuestionnaireItemComponent.initialExpression: Expression?
-    get() {
-      return this.extension
-        .firstOrNull { it.url == ITEM_INITIAL_EXPRESSION_URL }
-        ?.let { it.value as Expression }
-    }
 
   /**
    * Updates corresponding fields in [extractionContext] with answers in
@@ -705,9 +699,6 @@ private fun wrapAnswerInFieldType(answer: Base, fieldType: Field): Base {
   }
   return answer
 }
-
-internal const val ITEM_INITIAL_EXPRESSION_URL: String =
-  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
 
 private val Field.isList: Boolean
   get() = isParameterized && type == List::class.java
