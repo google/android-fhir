@@ -32,10 +32,13 @@ import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
 /**
- * Implementation of the [Uploader]. It orchestrates the pre processing of [LocalChange] and
- * constructing appropriate upload requests via [UploadWorkManager] and uploading of requests via
- * [DataSource]. [Uploader] clients should call upload and listen to the various states emitted by
- * [UploadWorkManager] as [UploadState].
+ * Uploads changes made locally to FHIR resources to server in the following steps:
+ *
+ * 1. fetching local changes from the on-device SQLite database,
+ * 2. creating patches to be sent to the server using the local changes,
+ * 3. generating HTTP requests to be sent to the server,
+ * 4. processing the responses from the server and consolidate any changes (i.e. updates resource
+ * IDs).
  */
 internal class Uploader(
   private val dataSource: DataSource,
@@ -43,11 +46,6 @@ internal class Uploader(
   private val patchGenerator = PerResourcePatchGenerator
   private val requestGenerator = TransactionBundleGenerator.getDefault()
 
-  /**
-   * Uploads the local changes to the [DataSource]. Particular implementations should take care of
-   * transforming the [LocalChange]s to particular network operations. If [ProgressCallback] is
-   * provided it also reports the intermediate progress
-   */
   suspend fun upload(localChanges: List<LocalChange>): Flow<UploadState> = flow {
     val patches = patchGenerator.generate(localChanges)
     val requests = requestGenerator.generateUploadRequests(patches)
