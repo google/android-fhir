@@ -102,30 +102,30 @@ class ResourceParamsBasedDownloadWorkManager(
       throw FHIRException(response.issueFirstRep.diagnostics)
     }
 
-    return if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
-      response.link
-        .firstOrNull { component -> component.relation == "next" }
-        ?.url?.let { next -> urlOfTheNextPagesToDownloadForAResource.add(next) }
-
-      response.entry
-        .map { it.resource }
-        .also { resources ->
-          resources
-            .groupBy { it.resourceType }
-            .entries.map { map ->
-              map.value
-                .filter { it.meta.lastUpdated != null }
-                .let {
-                  context.saveLastUpdatedTimestamp(
-                    map.key,
-                    it.maxOfOrNull { it.meta.lastUpdated }?.toTimeZoneString()
-                  )
-                }
-            }
-        }
-    } else {
-      emptyList()
+    if ((response !is Bundle || response.type != Bundle.BundleType.SEARCHSET)) {
+      return emptyList()
     }
+
+    response.link
+      .firstOrNull { component -> component.relation == "next" }
+      ?.url?.let { next -> urlOfTheNextPagesToDownloadForAResource.add(next) }
+
+    return response.entry
+      .map { it.resource }
+      .also { resources ->
+        resources
+          .groupBy { it.resourceType }
+          .entries.map { map ->
+            map.value
+              .filter { it.meta.lastUpdated != null }
+              .let {
+                context.saveLastUpdatedTimestamp(
+                  map.key,
+                  it.maxOfOrNull { it.meta.lastUpdated }?.toTimeZoneString()
+                )
+              }
+          }
+      }
   }
 
   interface TimestampContext {
