@@ -76,7 +76,7 @@ class TransactionBundleGenerator(
       httpVerbToUseForCreate: Bundle.HTTPVerb,
       httpVerbToUseForUpdate: Bundle.HTTPVerb,
       generatedBundleSize: Int,
-      useETagForUpload: Boolean
+      useETagForUpload: Boolean,
     ): TransactionBundleGenerator {
 
       val createFunction =
