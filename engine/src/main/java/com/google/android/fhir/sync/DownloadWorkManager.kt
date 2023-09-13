@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.sync
 
+import com.google.android.fhir.sync.download.DownloadRequest
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 

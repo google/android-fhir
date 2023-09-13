@@ -18,7 +18,6 @@ package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.sync.SyncDataParams
-import com.google.android.fhir.sync.UrlDownloadRequest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.exceptions.FHIRException

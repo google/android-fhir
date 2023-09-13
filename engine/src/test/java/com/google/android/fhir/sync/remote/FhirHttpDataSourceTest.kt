@@ -17,9 +17,9 @@
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.ContentTypes
 import com.google.android.fhir.NetworkConfiguration
-import com.google.android.fhir.sync.UrlUploadRequest
 import com.google.android.fhir.sync.remote.FhirHttpDataSource
 import com.google.android.fhir.sync.remote.RetrofitHttpService
+import com.google.android.fhir.sync.upload.request.UrlUploadRequest
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.common.truth.Truth.assertThat
 import java.net.HttpURLConnection

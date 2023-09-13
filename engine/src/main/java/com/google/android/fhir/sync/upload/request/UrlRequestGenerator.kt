@@ -19,19 +19,18 @@ package com.google.android.fhir.sync.upload.request
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.ContentTypes
-import com.google.android.fhir.sync.UrlUploadRequest
 import com.google.android.fhir.sync.upload.patch.Patch
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
-/** Generates list of [UrlUploadRequest]s with for each [Patch] given. */
-class IndividualRequestGenerator(
-  private val getIndividualRequestForPatchType: (type: Patch.Type, patch: Patch) -> UrlUploadRequest
+/** Generates list of [UrlUploadRequest]s for a list of [Patch]es. */
+internal class UrlRequestGenerator(
+  private val getUrlRequestForPatch: (patch: Patch) -> UrlUploadRequest
 ) : UploadRequestGenerator {
 
   override fun generateUploadRequests(patches: List<Patch>): List<UrlUploadRequest> =
-    patches.map { getIndividualRequestForPatchType(it.type, it) }
+    patches.map { getUrlRequestForPatch(it) }
 
   companion object Factory {
 
@@ -51,14 +50,14 @@ class IndividualRequestGenerator(
     fun getDefault() = getGenerator(HttpVerb.PUT, HttpVerb.PATCH)
 
     /**
-     * Returns a [IndividualRequestGenerator] based on the provided [HttpVerb]s for creating and
-     * updating resources. The function may throw an [IllegalArgumentException] if the provided
-     * [HttpVerb]s are not supported.
+     * Returns a [UrlRequestGenerator] based on the provided [HttpVerb]s for creating and updating
+     * resources. The function may throw an [IllegalArgumentException] if the provided [HttpVerb]s
+     * are not supported.
      */
     fun getGenerator(
       httpVerbToUseForCreate: HttpVerb,
       httpVerbToUseForUpdate: HttpVerb
-    ): IndividualRequestGenerator {
+    ): UrlRequestGenerator {
 
       val createFunction =
         createMapping[httpVerbToUseForCreate]
@@ -72,8 +71,8 @@ class IndividualRequestGenerator(
             "Update using $httpVerbToUseForUpdate is not supported."
           )
 
-      return IndividualRequestGenerator { type, patch ->
-        when (type) {
+      return UrlRequestGenerator { patch ->
+        when (patch.type) {
           Patch.Type.INSERT -> createFunction(patch)
           Patch.Type.UPDATE -> updateFunction(patch)
           Patch.Type.DELETE -> deleteFunction(patch)

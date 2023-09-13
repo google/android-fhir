@@ -16,6 +16,8 @@
 
 package com.google.android.fhir.sync
 
+import com.google.android.fhir.sync.download.DownloadRequest
+import com.google.android.fhir.sync.upload.request.UploadRequest
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Bundle.BundleType
 import org.hl7.fhir.r4.model.OperationOutcome

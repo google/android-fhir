@@ -38,14 +38,14 @@ class IndividualGeneratorTest {
 
   @Test
   fun `should return empty list if there are no local changes`() = runTest {
-    val generator = IndividualRequestGenerator.getDefault()
+    val generator = UrlRequestGenerator.getDefault()
     val requests = generator.generateUploadRequests(listOf())
     assertThat(requests).isEmpty()
   }
 
   @Test
   fun `should create a POST request for insert`() = runTest {
-    val generator = IndividualRequestGenerator.getGenerator(HttpVerb.POST, HttpVerb.PATCH)
+    val generator = UrlRequestGenerator.getGenerator(HttpVerb.POST, HttpVerb.PATCH)
     val requests =
       generator.generateUploadRequests(
         listOf(
@@ -78,7 +78,7 @@ class IndividualGeneratorTest {
 
   @Test
   fun `should create a PUT request for insert`() = runTest {
-    val generator = IndividualRequestGenerator.getDefault()
+    val generator = UrlRequestGenerator.getDefault()
     val requests =
       generator.generateUploadRequests(
         listOf(
@@ -122,7 +122,7 @@ class IndividualGeneratorTest {
           timestamp = Instant.now()
         ),
       )
-    val generator = IndividualRequestGenerator.Factory.getDefault()
+    val generator = UrlRequestGenerator.Factory.getDefault()
     val requests = generator.generateUploadRequests(patches)
     with(requests.single()) {
       assertThat(requests.size).isEqualTo(1)
@@ -158,7 +158,7 @@ class IndividualGeneratorTest {
           timestamp = Instant.now()
         ),
       )
-    val generator = IndividualRequestGenerator.Factory.getDefault()
+    val generator = UrlRequestGenerator.Factory.getDefault()
     val requests = generator.generateUploadRequests(patches)
     with(requests.single()) {
       assertThat(httpVerb).isEqualTo(HttpVerb.DELETE)
@@ -215,7 +215,7 @@ class IndividualGeneratorTest {
           timestamp = Instant.now()
         ),
       )
-    val generator = IndividualRequestGenerator.Factory.getDefault()
+    val generator = UrlRequestGenerator.Factory.getDefault()
     val result = generator.generateUploadRequests(patches)
     assertThat(result).hasSize(3)
     assertThat(result.map { it.httpVerb })

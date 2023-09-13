@@ -17,10 +17,10 @@
 package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.sync.UploadRequest
 import com.google.android.fhir.sync.upload.patch.Patch
 import com.google.android.fhir.sync.upload.patch.PerResourcePatchGenerator
 import com.google.android.fhir.sync.upload.request.TransactionBundleGenerator
+import com.google.android.fhir.sync.upload.request.UploadRequest
 
 /**
  * [UploadWorkManager] implementation to squash all the changes at a resource level into one change

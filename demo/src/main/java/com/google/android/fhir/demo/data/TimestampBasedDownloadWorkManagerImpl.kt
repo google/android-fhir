@@ -17,7 +17,7 @@
 package com.google.android.fhir.demo.data
 
 import com.google.android.fhir.demo.DemoDataStore
-import com.google.android.fhir.sync.DownloadRequest
+import com.google.android.fhir.sync.download.DownloadRequest
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.SyncDataParams
 import java.time.ZoneId
