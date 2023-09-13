@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync
 
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
@@ -94,7 +93,6 @@ sealed class UploadRequest(
   open val url: String,
   open val headers: Map<String, String> = emptyMap(),
   open val resource: Resource,
-  open val localChangeToken: LocalChangeToken,
 )
 
 /**
@@ -104,14 +102,12 @@ sealed class UploadRequest(
 data class BundleUploadRequest(
   override val headers: Map<String, String> = emptyMap(),
   override val resource: Bundle,
-  override val localChangeToken: LocalChangeToken,
-) : UploadRequest(".", headers, resource, localChangeToken)
+) : UploadRequest(".", headers, resource)
 
 /** A [url] based FHIR request to upload resources to the server. */
 data class UrlUploadRequest(
   val httpVerb: HttpVerb,
   override val url: String,
   override val resource: Resource,
-  override val localChangeToken: LocalChangeToken,
   override val headers: Map<String, String> = emptyMap()
-) : UploadRequest(url, headers, resource, localChangeToken)
+) : UploadRequest(url, headers, resource)

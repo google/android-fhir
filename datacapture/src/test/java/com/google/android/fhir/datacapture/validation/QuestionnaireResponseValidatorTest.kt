@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ class QuestionnaireResponseValidatorTest {
       QuestionnaireResponseValidator.validateQuestionnaireResponse(
         questionnaire,
         questionnaireResponse,
-        context
+        context,
       )
     assertThat(result["a-question"]!!.single()).isEqualTo(Valid)
   }
@@ -114,7 +114,7 @@ class QuestionnaireResponseValidatorTest {
       QuestionnaireResponseValidator.validateQuestionnaireResponse(
         questionnaire,
         questionnaireResponse,
-        context
+        context,
       )
     assertThat(result["a-question"]!!.single())
       .isEqualTo(
@@ -166,7 +166,7 @@ class QuestionnaireResponseValidatorTest {
       QuestionnaireResponseValidator.validateQuestionnaireResponse(
         questionnaire,
         questionnaireResponse,
-        context
+        context,
       )
     assertThat(result["a-question"])
       .containsExactly(
@@ -235,7 +235,7 @@ class QuestionnaireResponseValidatorTest {
       QuestionnaireResponseValidator.validateQuestionnaireResponse(
         questionnaire,
         questionnaireResponse,
-        context
+        context,
       )
     assertThat(result.keys).containsExactly("q1")
     assertThat(result["q1"]).containsExactly(Valid)
@@ -286,7 +286,7 @@ class QuestionnaireResponseValidatorTest {
       QuestionnaireResponseValidator.validateQuestionnaireResponse(
         questionnaire,
         questionnaireResponse,
-        context
+        context,
       )
     assertThat(result["question-1"]!!.single()).isEqualTo(Valid)
   }
@@ -300,7 +300,7 @@ class QuestionnaireResponseValidatorTest {
       QuestionnaireResponse().apply {
         questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
       },
-      context
+      context,
     )
   }
 
@@ -319,7 +319,7 @@ class QuestionnaireResponseValidatorTest {
     QuestionnaireResponseValidator.validateQuestionnaireResponse(
       Questionnaire().apply { url = "questionnaire-1" },
       QuestionnaireResponse(),
-      context
+      context,
     )
   }
 
@@ -387,7 +387,7 @@ class QuestionnaireResponseValidatorTest {
         questionnaire = "questionnaire-1"
         addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("display-1")))
       },
-      context
+      context,
     )
   }
 
@@ -410,7 +410,7 @@ class QuestionnaireResponseValidatorTest {
         questionnaire = "questionnaire-1"
         addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("null-1")))
       },
-      context
+      context,
     )
   }
 
@@ -448,7 +448,7 @@ class QuestionnaireResponseValidatorTest {
       QuestionnaireResponseValidator.validateQuestionnaireResponse(
         questionnaire,
         questionnaireResponse,
-        context
+        context,
       )
 
     assertThat(result.entries.first().key).isEqualTo("valid-hidden-item")
@@ -489,7 +489,7 @@ class QuestionnaireResponseValidatorTest {
       QuestionnaireResponseValidator.validateQuestionnaireResponse(
           questionnaire,
           questionnaireResponse,
-          context
+          context,
         )
         .entries.first()
 
@@ -1649,7 +1649,7 @@ class QuestionnaireResponseValidatorTest {
         QuestionnaireResponseValidator.validateQuestionnaireResponse(
           questionnaire,
           questionnaireResponse,
-          context
+          context,
         )
       }
     assertThat(exception.message).isEqualTo(message)
@@ -1666,7 +1666,7 @@ class QuestionnaireResponseValidatorTest {
         QuestionnaireResponseValidator.validateQuestionnaireResponse(
           questionnaire,
           questionnaireResponse,
-          context
+          context,
         )
       }
     assertThat(exception.message).isEqualTo(message)
