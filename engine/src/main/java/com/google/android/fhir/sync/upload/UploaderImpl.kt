@@ -17,7 +17,7 @@
 package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
 import kotlinx.coroutines.flow.Flow
@@ -41,26 +41,16 @@ internal class UploaderImpl(
 ) : Uploader {
 
   override suspend fun upload(localChanges: List<LocalChange>): Flow<UploadState> = flow {
-    val transformedChanges = uploadWorkManager.prepareChangesForUpload(localChanges)
-    val uploadRequests = uploadWorkManager.createUploadRequestsFromLocalChanges(transformedChanges)
-    val total = uploadWorkManager.getPendingUploadsIndicator(uploadRequests)
-    var completed = 0
+    val patches = uploadWorkManager.generatePatches(localChanges)
+    val requests = uploadWorkManager.generateRequests(patches)
+    val token = LocalChangeToken(localChanges.flatMap { it.token.ids })
+    val total = requests.size
     emit(UploadState.Started(total))
-    val pendingRequests = uploadRequests.toMutableList()
-    while (pendingRequests.isNotEmpty()) {
-      val uploadRequest = pendingRequests.first()
-      pendingRequests.remove(uploadRequest)
+    requests.forEachIndexed { index, uploadRequest ->
       try {
         val response = dataSource.upload(uploadRequest)
-        completed = total - uploadWorkManager.getPendingUploadsIndicator(pendingRequests)
         emit(
-          getUploadResult(
-            uploadRequest.resource.resourceType,
-            response,
-            uploadRequest.localChangeToken,
-            total,
-            completed
-          )
+          getUploadResult(uploadRequest.resource.resourceType, response, token, total, index + 1)
         )
       } catch (e: Exception) {
         Timber.e(e)
