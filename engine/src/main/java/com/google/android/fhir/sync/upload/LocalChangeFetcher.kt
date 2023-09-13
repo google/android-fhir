@@ -34,8 +34,11 @@ internal interface LocalChangeFetcher {
   /** Retrieves the next batch of local changes. */
   suspend fun next(): List<LocalChange>
 
-  /** Returns the completion percentage of the local changes fetched. */
-  suspend fun getProgress(): Double
+  /**
+   * Returns [ProgressState], which contains the remaining changes left to upload and the initial
+   * total to upload
+   */
+  suspend fun getProgress(): ProgressState
 
   companion object {
     internal suspend fun byMode(
@@ -52,6 +55,11 @@ internal interface LocalChangeFetcher {
   }
 }
 
+data class ProgressState(
+  val remaining: Int,
+  val initialTotal: Int,
+)
+
 internal class AllChangesLocalChangeFetcher(
   private val database: Database,
   private val total: Int
@@ -61,8 +69,8 @@ internal class AllChangesLocalChangeFetcher(
 
   override suspend fun next(): List<LocalChange> = database.getAllLocalChanges()
 
-  override suspend fun getProgress(): Double =
-    1.0 - database.getAllLocalChanges().size.div(total.toDouble())
+  override suspend fun getProgress(): ProgressState =
+    ProgressState(database.getAllLocalChanges().size, total)
 }
 
 /** Represents the mode in which local changes should be fetched. */

@@ -62,20 +62,20 @@ class AllChangesLocalChangeFetcherTest {
   }
 
   @Test
-  fun `getProgress returns 1,0 when all local changes are removed`() = runTest {
+  fun `getProgress when all local changes are removed`() = runTest {
     database.deleteUpdates(listOf(TEST_PATIENT_1, TEST_PATIENT_2))
-    assertThat(fetcher.getProgress()).isEqualTo(1.0)
+    assertThat(fetcher.getProgress()).isEqualTo(ProgressState(0, 2))
   }
 
   @Test
-  fun `getProgress returns 0,5 when half the local changes are removed`() = runTest {
+  fun `getProgress when half the local changes are removed`() = runTest {
     database.deleteUpdates(listOf(TEST_PATIENT_1))
-    assertThat(fetcher.getProgress()).isEqualTo(0.5)
+    assertThat(fetcher.getProgress()).isEqualTo(ProgressState(1, 2))
   }
 
   @Test
-  fun `getProgress returns 0,0 when none of the local changes are removed`() = runTest {
-    assertThat(fetcher.getProgress()).isEqualTo(0.0)
+  fun `getProgress when none of the local changes are removed`() = runTest {
+    assertThat(fetcher.getProgress()).isEqualTo(ProgressState(2, 2))
   }
   companion object {
     private const val TEST_PATIENT_1_ID = "test_patient_1"
