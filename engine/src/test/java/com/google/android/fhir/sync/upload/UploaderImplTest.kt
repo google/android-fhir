@@ -65,18 +65,6 @@ class UploaderImplTest {
   }
 
   @Test
-  fun `upload Bundle transaction should emit Started state`() = runBlocking {
-    val result =
-      Uploader(
-          BundleDataSource { Bundle() },
-        )
-        .upload(localChanges)
-        .toList()
-
-    assertThat(result.first()).isInstanceOf(UploadState.Started::class.java)
-  }
-
-  @Test
   fun `upload should fail if response is operation outcome with issue`() = runBlocking {
     val result =
       Uploader(
